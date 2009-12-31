@@ -1,5 +1,6 @@
 package org.yeastrc.www.proteinfer;
 
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -79,6 +80,16 @@ public class ProteinPeptidesAjaxAction extends Action {
         
         
         List<WIdPickerIon> ionList = IdPickerResultsLoader.getPeptideIonsForProteinGroup(pinferId, proteinGroupId);
+        // Iterate over the ionList and see if any of them have Bullseye calculated area for the precursor
+        // If even one has calculated area we will display the "Area" column, otherwise not.
+        boolean hasPrecursorArea = false;
+        for(WIdPickerIon ion: ionList) {
+            if(ion.hasPrecursorArea()) {
+                hasPrecursorArea = true;
+                break;
+            }
+        }
+        request.setAttribute("hasPrecursorArea", hasPrecursorArea);
         request.setAttribute("proteinPeptideIons", ionList);
         
         return mapping.findForward("Success");

@@ -1,6 +1,5 @@
 package org.yeastrc.www.proteinfer.idpicker;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,11 +14,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
+import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.nr_seq.NRProtein;
@@ -60,6 +62,8 @@ public class IdPickerResultsLoader {
     private static final ProteinferDAOFactory pinferDaoFactory = ProteinferDAOFactory.instance();
     private static final org.yeastrc.ms.dao.DAOFactory msDataDaoFactory = org.yeastrc.ms.dao.DAOFactory.instance();
     private static final MsScanDAO scanDao = msDataDaoFactory.getMsScanDAO();
+    private static final MsRunDAO runDao = msDataDaoFactory.getMsRunDAO();
+    private static final MS2ScanDAO ms2ScanDao = msDataDaoFactory.getMS2FileScanDAO();
     private static final MsRunSearchDAO rsDao = msDataDaoFactory.getMsRunSearchDAO();
     private static final MsRunSearchAnalysisDAO rsaDao = msDataDaoFactory.getMsRunSearchAnalysisDAO();
     
@@ -650,8 +654,15 @@ public class IdPickerResultsLoader {
             WIdPickerIon makeWIdPickerIon(I ion, Program inputGenerator) {
         ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
         MsSearchResult origResult = getOriginalResult(psm.getMsRunSearchResultId(), inputGenerator);
-        MsScan scan = scanDao.loadScanLite(origResult.getScanId());
-        return new WIdPickerIon(ion, origResult, scan);
+        // If this scan was processed with Bullseye it will have extra information in the scan headers.
+        if(ms2ScanDao.isGeneratedByBullseye(origResult.getScanId())) {
+            MS2Scan scan = ms2ScanDao.loadScanLite(origResult.getScanId());
+            return new WIdPickerIon(ion, origResult, scan);
+        }
+        else {
+            MsScan scan = scanDao.loadScanLite(origResult.getScanId());
+            return new WIdPickerIon(ion, origResult, scan);
+        }
     }
 
     private static void sortIonList(List<? extends GenericProteinferIon<?>> ions) {
@@ -808,22 +819,23 @@ public class IdPickerResultsLoader {
         List<WIdPickerSpectrumMatch> wPsmList = new ArrayList<WIdPickerSpectrumMatch>(psmList.size());
         for(ProteinferSpectrumMatch psm: psmList) {
             MsSearchResult origResult = getOriginalResult(psm.getMsRunSearchResultId(), inputGenerator);
-            WIdPickerSpectrumMatch wPsm = new WIdPickerSpectrumMatch(psm, origResult);
-            MsScan scan = scanDao.load(origResult.getScanId());
-            wPsm.setScanNumber(scan.getStartScanNum());
-            wPsm.setRetentionTime(round(scan.getRetentionTime()));
+            WIdPickerSpectrumMatch wPsm = null;
+            int scanId = origResult.getScanId();
+            if(ms2ScanDao.isGeneratedByBullseye(scanId)) {
+                MS2Scan scan = ms2ScanDao.load(scanId);
+                wPsm = new WIdPickerSpectrumMatch(psm, origResult, scan);
+            }
+            else {
+                MsScan scan = scanDao.load(origResult.getScanId());
+                wPsm = new WIdPickerSpectrumMatch(psm, origResult, scan);
+            }
             wPsmList.add(wPsm);
         }
         
         return wPsmList;
     }
     
-    private static double round(BigDecimal number) {
-        return round(number.doubleValue());
-    }
-    private static double round(double num) {
-        return Math.round(num*100.0)/100.0;
-    }
+    
     
 
     

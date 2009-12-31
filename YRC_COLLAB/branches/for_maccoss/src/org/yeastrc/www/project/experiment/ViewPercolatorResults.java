@@ -28,11 +28,18 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
+import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.RunFileFormat;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
+import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
@@ -161,18 +168,41 @@ public class ViewPercolatorResults extends Action {
         // TODO if the pageNum is out of range .....
         List<Integer> forPage = pager.page(resultIds, pageNum, numResultsPerPage, desc);
 
-
+        
+        // Do we have Bullseye results for the searched files
+        boolean hasBullsEyeArea = false;
+        MsRunSearchDAO rsDao = DAOFactory.instance().getMsRunSearchDAO();
+        MS2RunDAO runDao = DAOFactory.instance().getMS2FileRunDAO();
+        List<Integer> runSearchIds = rsDao.loadRunSearchIdsForSearch(searchIds.get(0));
+        for(int runSearchId: runSearchIds) {
+            int runId = rsDao.loadRunSearch(runSearchId).getRunId();
+            if(runDao.isGeneratedByBullseye(runId)) {
+                hasBullsEyeArea = true;
+                break;
+            }
+        }
+        
 
         // Get details for the result we will display
         Map<Integer, String> filenameMap = getFileNames(searchAnalysisId);
         List<PercolatorResultPlus> results = new ArrayList<PercolatorResultPlus>(numResultsPerPage);
 
         MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
+        MS2ScanDAO ms2ScanDao = DAOFactory.instance().getMS2FileScanDAO();
         SequestSearchResultDAO seqResDao = DAOFactory.instance().getSequestResultDAO();
         for(Integer resultId: forPage) {
             PercolatorResult result = presDao.load(resultId);
-            MsScan scan = scanDao.loadScanLite(result.getScanId());
-            PercolatorResultPlus resPlus = new PercolatorResultPlus(result, scan);
+            PercolatorResultPlus resPlus = null;
+            
+            if(hasBullsEyeArea) {
+                MS2Scan scan = ms2ScanDao.loadScanLite(result.getScanId());
+                resPlus = new PercolatorResultPlus(result, scan);
+            }
+            else {
+                MsScan scan = scanDao.loadScanLite(result.getScanId());
+                resPlus = new PercolatorResultPlus(result, scan);
+            }
+            
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
             resPlus.setSequestData(seqResDao.load(resultId).getSequestResultData());
             results.add(resPlus);
@@ -194,7 +224,7 @@ public class ViewPercolatorResults extends Action {
         
         
         // Set up for tabular display
-        TabularPercolatorResults tabResults = new TabularPercolatorResults(results, hasPEP);
+        TabularPercolatorResults tabResults = new TabularPercolatorResults(results, hasPEP, hasBullsEyeArea);
         tabResults.setCurrentPage(pageNum);
         int pageCount = pager.getPageCount(resultIds.size(), numResultsPerPage);
         tabResults.setLastPage(pageCount);

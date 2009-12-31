@@ -39,6 +39,7 @@ public class TabularSequestResults implements Tabular, Pageable {
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
     
     private List<SequestResultPlus> results;
+    private boolean hasBullsEyeArea = false;
     
     private int currentPage;
     private int lastPage = currentPage;
@@ -46,9 +47,30 @@ public class TabularSequestResults implements Tabular, Pageable {
     
     
     public TabularSequestResults(List<SequestResultPlus> results) {
+        this(results,false);
+    }
+    
+    public TabularSequestResults(List<SequestResultPlus> results, boolean hasBullsEyeArea) {
         this.results = results;
         displayPageNumbers = new ArrayList<Integer>();
         displayPageNumbers.add(currentPage);
+        if(hasBullsEyeArea) {
+            columns = new SORT_BY[] {
+                    SORT_BY.FILE_SEARCH,
+                    SORT_BY.SCAN, 
+                    SORT_BY.CHARGE, 
+                    SORT_BY.MASS, 
+                    SORT_BY.RT, 
+                    SORT_BY.AREA, // extra column
+                    SORT_BY.XCORR_RANK,
+                    SORT_BY.XCORR, 
+                    SORT_BY.DELTACN, 
+                    SORT_BY.SP, 
+                    SORT_BY.PEPTIDE,
+                    SORT_BY.PROTEIN
+                };
+            hasBullsEyeArea = true;
+        }
     }
     
     
@@ -82,7 +104,7 @@ public class TabularSequestResults implements Tabular, Pageable {
                 header.setSorted(true);
                 header.setSortOrder(sortOrder);
             }
-            if(col == SORT_BY.PROTEIN)
+            if(col == SORT_BY.PROTEIN || col == SORT_BY.AREA)
                 header.setSortable(false);
             headers.add(header);
         }
@@ -111,6 +133,11 @@ public class TabularSequestResults implements Tabular, Pageable {
         }
         else
             row.addCell(new TableCell(String.valueOf(round(temp))));
+        
+        // Area of the precursor ion
+        if(hasBullsEyeArea) {
+            row.addCell(new TableCell(String.valueOf(round(result.getArea()))));
+        }
         
         
         row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getxCorrRank())));

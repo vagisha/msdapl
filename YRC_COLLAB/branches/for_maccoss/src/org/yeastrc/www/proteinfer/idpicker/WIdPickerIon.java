@@ -1,8 +1,11 @@
 package org.yeastrc.www.proteinfer.idpicker;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
+import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 
 import edu.uwpr.protinfer.database.dto.GenericProteinferIon;
@@ -14,6 +17,8 @@ public class WIdPickerIon {
     private MsSearchResult bestSpectrumMatch;
     private MsScan bestScan;
     private boolean uniqueToProteinGrp = false;
+    private double precursorArea = -2.0; // -2.0 == we have not hit the database yet to get this info
+                                         // -1.0 == we have hit the database and area was not found
     
     public WIdPickerIon(GenericProteinferIon<? extends ProteinferSpectrumMatch> ion, MsSearchResult psm, MsScan bestScan) {
         this.ion = ion;
@@ -39,6 +44,20 @@ public class WIdPickerIon {
     
     public double getRetentionTime() {
         return round(bestScan.getRetentionTime());
+    }
+    
+    public double getPrecursorArea() {
+        if(precursorArea == -2.0 && bestScan instanceof MS2Scan) {
+            MS2Scan scan2 = (MS2Scan) bestScan;
+            precursorArea = scan2.getBullsEyeArea();
+        }
+        else
+            precursorArea  = -1.0; // area was not found
+        return precursorArea;
+    }
+    
+    public boolean hasPrecursorArea() {
+        return (getPrecursorArea() != -1.0);
     }
     
     public boolean getIsUniqueToProteinGroup() {

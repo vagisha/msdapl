@@ -89,6 +89,9 @@
     <th width="10%" align="left" class="main" style="font-size:10pt;"><b># Spectra</b></th>
     <th width="10%" align="left" class="main" style="font-size:10pt;"><b>Charge</b></th>
 	<th width="10%" align="left" class="main" style="font-size:10pt;"><b>RT</b></th>
+	<logic:equal name="hasPrecursorArea" value="true">
+     	<th width="10%" align="left" class="main" style="font-size:10pt;"><b>Area</b></th>
+    </logic:equal>
 	
     <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
      	<th class="main" style="font-size:10pt;">Best FDR</th>
@@ -130,6 +133,9 @@
      		</td>
      		<td><bean:write name="ion" property="charge" /></td>
      		<td class="left_align"><bean:write name="ion" property="retentionTime" /></td>
+     		<logic:equal name="hasPrecursorArea" value="true">
+     			<td class="left_align"><bean:write name="ion" property="precursorArea" /></td>
+     		</logic:equal>
      		
      		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
      			<bean:define name="ion" property="ion.bestSpectrumMatch" id="psm_idp" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch"/>

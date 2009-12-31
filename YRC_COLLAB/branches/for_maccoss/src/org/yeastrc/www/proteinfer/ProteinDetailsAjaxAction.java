@@ -12,6 +12,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerIon;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerIonForProtein;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
 import org.yeastrc.www.user.User;
@@ -103,6 +104,16 @@ public class ProteinDetailsAjaxAction extends Action {
         List<WIdPickerIonForProtein> ionsWAllSpectra = IdPickerResultsLoader.getPeptideIonsForProtein(pinferId, pinferProtId);
         request.setAttribute("ionList", ionsWAllSpectra);
         
+        // Iterate over the ionList and see if any of them have Bullseye calculated area for the precursor
+        // If even one has calculated area we will display the "Area" column, otherwise not.
+        boolean hasPrecursorArea = false;
+        for(WIdPickerIonForProtein ion: ionsWAllSpectra) {
+            if(ion.hasPrecursorArea()) {
+                hasPrecursorArea = true;
+                break;
+            }
+        }
+        request.setAttribute("hasPrecursorArea", hasPrecursorArea);
         
         request.setAttribute("pinferProtId", pinferProtId);
         request.setAttribute("pinferId", pinferId);

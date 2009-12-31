@@ -43,34 +43,47 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     private boolean hasPEP = true;
     
     private List<PercolatorResultPlus> results;
+    private boolean hasBullsEyeArea = false;
     
     private int currentPage;
     private int lastPage = currentPage;
     private List<Integer> displayPageNumbers;
     
     public TabularPercolatorResults(List<PercolatorResultPlus> results, boolean hasPEP) {
+        this(results, hasPEP, false);
+    }
+    
+    public TabularPercolatorResults(List<PercolatorResultPlus> results, boolean hasPEP, boolean hasBullsEyeArea) {
         this.results = results;
         displayPageNumbers = new ArrayList<Integer>();
         displayPageNumbers.add(currentPage);
         
-        this.hasPEP = hasPEP;
-        // Report Percolator Discriminant Score instead of PEP
-        if(!hasPEP) {
+        if(hasBullsEyeArea) {
             columns = new SORT_BY[] {
                     SORT_BY.FILE_PERC,
                     SORT_BY.SCAN, 
                     SORT_BY.CHARGE, 
                     SORT_BY.MASS, 
                     SORT_BY.RT, 
+                    SORT_BY.AREA, // extra column
                     //SORT_BY.P_RT, 
                     SORT_BY.QVAL, 
-                    SORT_BY.DS,
+                    SORT_BY.PEP,
                     SORT_BY.XCORR_RANK,
                     SORT_BY.XCORR,
 //                    SORT_BY.DELTACN,
                     SORT_BY.PEPTIDE,
                     SORT_BY.PROTEIN
                 };
+            this.hasBullsEyeArea = true;
+        }
+        this.hasPEP = hasPEP;
+        // Report Percolator Discriminant Score instead of PEP
+        if(!hasPEP) {
+            if(hasBullsEyeArea)
+                columns[7] = SORT_BY.DS;
+            else
+                columns[6] = SORT_BY.DS;
         }
     }
     
@@ -103,7 +116,7 @@ public class TabularPercolatorResults implements Tabular, Pageable {
             
             if(col == SORT_BY.XCORR_RANK || col == SORT_BY.XCORR || col == SORT_BY.DELTACN)
                 header.setSortable(false);
-            if(col == SORT_BY.PROTEIN)
+            if(col == SORT_BY.PROTEIN || col == SORT_BY.AREA)
                 header.setSortable(false);
             
             if(col == sortColumn) {
@@ -137,6 +150,11 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         }
         else
             row.addCell(new TableCell(String.valueOf(round(temp))));
+        
+        // Area of the precursor ion
+        if(hasBullsEyeArea) {
+            row.addCell(new TableCell(String.valueOf(round(result.getArea()))));
+        }
         
         // Predicted retention time
 //        temp = result.getPredictedRetentionTime();

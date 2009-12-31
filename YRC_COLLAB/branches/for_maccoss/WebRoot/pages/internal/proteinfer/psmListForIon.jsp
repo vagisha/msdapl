@@ -12,7 +12,10 @@
      <thead><tr>
 	     <th class="sort-alpha" align="left">Scan Number</th>
 	     <th class="sort-int" align="left">Charge</th>
-	     <th class="sort-int" align="left">RT</th>
+	     <th class="sort-alpha" align="left">RT</th>
+	     <logic:equal name="hasPrecursorArea" value="true">
+     		<th class="sort-alpha" align="left">Area</th>
+     	 </logic:equal>
 	     <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
 	     	<th class="sort-float" align="left">FDR</th>
 	     </logic:equal>
@@ -41,6 +44,9 @@
      		<td><bean:write name="psm" property="scanNumber" /></td>
      		<td><bean:write name="psm" property="spectrumMatch.charge" /></td>
      		<td class="left_align"><bean:write name="psm" property="retentionTime" /></td>
+     		<logic:equal name="hasPrecursorArea" value="true">
+     			<td class="left_align"><bean:write name="psm" property="precursorArea" /></td>
+     		</logic:equal>
      		
      		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
      			<bean:define name="psm" property="proteinferSpectrumMatch" id="psm_idp" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch"/>

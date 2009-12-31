@@ -26,9 +26,15 @@ import org.yeastrc.experiment.SequestResultPlus;
 import org.yeastrc.experiment.TabularSequestResults;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.RunFileFormat;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
+import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
@@ -131,7 +137,7 @@ public class ViewSequestResults extends Action {
         numResultsFiltered = resultIds.size();
 
 
-
+        
 
         // Extract the ones we will display
         int numResultsPerPage = 50;
@@ -148,23 +154,43 @@ public class ViewSequestResults extends Action {
         List<Integer> forPage = pager.page(resultIds, pageNum, numResultsPerPage, desc);
 
 
+        // Do we have Bullseye results for the searched files
+        boolean hasBullsEyeArea = false;
+        MsRunSearchDAO rsDao = DAOFactory.instance().getMsRunSearchDAO();
+        MS2RunDAO runDao = DAOFactory.instance().getMS2FileRunDAO();
+        List<Integer> runSearchIds = rsDao.loadRunSearchIdsForSearch(searchId);
+        for(int runSearchId: runSearchIds) {
+            int runId = rsDao.loadRunSearch(runSearchId).getRunId();
+            if(runDao.isGeneratedByBullseye(runId)) {
+                hasBullsEyeArea = true;
+                break;
+            }
+        }
 
         // Get details for the result we will display
         Map<Integer, String> filenameMap = getFileNames(searchId);
         List<SequestResultPlus> results = new ArrayList<SequestResultPlus>(numResultsPerPage);
 
         MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
+        MS2ScanDAO ms2ScanDao = DAOFactory.instance().getMS2FileScanDAO();
         for(Integer resultId: forPage) {
             SequestSearchResult result = sresDao.load(resultId);
-            MsScan scan = scanDao.loadScanLite(result.getScanId());
-            SequestResultPlus resPlus = new SequestResultPlus(result, scan);
+            SequestResultPlus resPlus = null;
+            if(hasBullsEyeArea) {
+                MS2Scan scan = ms2ScanDao.loadScanLite(result.getScanId());
+                resPlus = new SequestResultPlus(result, scan);
+            }
+            else {
+                MsScan scan = scanDao.loadScanLite(result.getScanId());
+                resPlus = new SequestResultPlus(result, scan);
+            }
             resPlus.setFilename(filenameMap.get(result.getRunSearchId()));
             results.add(resPlus);
         }
 
-
+        
         // Set up for tabular display
-        TabularSequestResults tabResults = new TabularSequestResults(results);
+        TabularSequestResults tabResults = new TabularSequestResults(results, hasBullsEyeArea);
         tabResults.setCurrentPage(pageNum);
         int pageCount = pager.getPageCount(resultIds.size(), numResultsPerPage);
         tabResults.setLastPage(pageCount);
