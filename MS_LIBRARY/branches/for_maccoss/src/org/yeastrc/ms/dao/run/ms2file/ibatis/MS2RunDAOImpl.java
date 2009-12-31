@@ -96,6 +96,22 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MS2RunDAO {
         return msRunDao.loadRunIdForSearchAndFileName(searchId, runFileName);
     }
     
+    @Override
+    public boolean isGeneratedByBullseye(int runId) {
+        MS2Run run = loadRun(runId);
+        List<MS2NameValuePair> headers = run.getHeaderList();
+        // get the value of the file header with name "FileGenerator"
+        for(MS2NameValuePair header: headers) {
+            if(header.getName().equalsIgnoreCase("FileGenerator")) {
+                String headerValue = header.getValue();
+                if(headerValue != null && headerValue.toLowerCase().startsWith("bullseye")) 
+                    return true;
+            }
+            
+        }
+        return false;
+    }
+    
     public void delete(int runId) {
         msRunDao.delete(runId);
     }
@@ -109,5 +125,25 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MS2RunDAO {
     public Integer loadRunIdForExperimentAndFileName(int experimentId,
             String runFileName) {
         return msRunDao.loadRunIdForExperimentAndFileName(experimentId, runFileName);
+    }
+
+    @Override
+    public double getMaxRetentionTimeForRun(int runId) {
+        return msRunDao.getMaxRetentionTimeForRun(runId);
+    }
+
+    @Override
+    public double getMaxRetentionTimeForRuns(List<Integer> runIds) {
+        return msRunDao.getMaxRetentionTimeForRuns(runIds);
+    }
+
+    @Override
+    public double getMinRetentionTimeForRun(int runId) {
+        return msRunDao.getMinRetentionTimeForRun(runId);
+    }
+
+    @Override
+    public double getMinRetentionTimeForRuns(List<Integer> runIds) {
+        return msRunDao.getMinRetentionTimeForRuns(runIds);
     }
 }

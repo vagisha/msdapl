@@ -55,6 +55,16 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MS2ScanDAO {
         return msScanDao.loadScanNumber(scanId);
     }
     
+    @Override
+    public boolean isGeneratedByBullseye(int scanId) {
+        // get the value of the MS2 / CMS2 file header with name "FileGenerator"
+        String headerValue = (String) queryForObject("MS2Scan.selectFileGeneratorHeader", scanId);
+        if(headerValue != null && headerValue.toLowerCase().startsWith("bullseye")) 
+            return true;
+        else
+            return false;
+    }
+    
     /**
      * Returns a list of scan ids for the given run.
      */
@@ -104,4 +114,5 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MS2ScanDAO {
     public void delete(int scanId) {
         msScanDao.delete(scanId);
     }
+    
 }

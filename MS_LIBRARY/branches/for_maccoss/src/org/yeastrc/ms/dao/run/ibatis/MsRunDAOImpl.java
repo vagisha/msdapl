@@ -21,6 +21,7 @@ import org.yeastrc.ms.domain.run.MsRunIn;
 import org.yeastrc.ms.domain.run.MsRunLocation;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.impl.MsRunLocationWrap;
+import org.yeastrc.ms.util.StringUtils;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -136,6 +137,44 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO {
         return queryForList("MsRun.selectRuns", buf.toString());
     }
     
+    @Override
+    public double getMaxRetentionTimeForRun(int runId) {
+        Double rt = (Double) queryForObject("MsScan.getMaxRTForRun", runId);
+        if(rt == null)
+            return 0;
+        else
+            return rt;
+    }
+    
+    @Override
+    public double getMinRetentionTimeForRun(int runId) {
+        Double rt = (Double) queryForObject("MsScan.getMinRTForRun", runId);
+        if(rt == null)
+            return 0;
+        else
+            return rt;
+    }
+
+    @Override
+    public double getMaxRetentionTimeForRuns(List<Integer> runIds) {
+        String runList = StringUtils.makeCommaSeparated(runIds);
+        Double rt = (Double) queryForObject("MsScan.getMaxRTForRunList", runList);
+        if(rt == null)
+            return 0;
+        else
+            return rt;
+    }
+
+    @Override
+    public double getMinRetentionTimeForRuns(List<Integer> runIds) {
+        String runList = StringUtils.makeCommaSeparated(runIds);
+        Double rt = (Double) queryForObject("MsScan.getMinRTForRunList", runList);
+        if(rt == null)
+            return 0;
+        else
+            return rt;
+    }
+    
     /**
      * Delete only the top level run; everything else is deleted via SQL triggers.
      */
@@ -152,6 +191,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO {
         }
         return run.getRunFileFormat();
     }
+    
     
     //---------------------------------------------------------------------------------------
     /** 
@@ -178,4 +218,5 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO {
             return RunFileFormat.instance(s);
         }
     }
+   
 }

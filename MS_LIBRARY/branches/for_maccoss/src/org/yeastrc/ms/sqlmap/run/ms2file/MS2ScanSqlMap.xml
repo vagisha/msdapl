@@ -61,4 +61,12 @@
     			WHERE id= #id#
     </select>
     
+    <select id="selectFileGeneratorHeader" resultClass="String" parameterClass="Integer">
+    	SELECT header.value
+    	FROM msData.msScan AS scan, msData.MS2FileHeader AS header
+    	WHERE scan.id=#scanId#
+    	AND scan.runID = header.runID
+    	AND header.header="FileGenerator"
+    </select>
+    
 </sqlMap>

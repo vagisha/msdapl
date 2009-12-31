@@ -119,6 +119,22 @@
     	SELECT id from msScan where runId=#runId# AND startScanNumber=#scanNum#
     </select>
     
+    <select id="getMaxRTForRun" resultClass="Double" parameterClass="Integer">
+    	SELECT max(retentionTime) from msScan where runID=#runId#
+    </select>
+    
+    <select id="getMinRTForRun" resultClass="Double" parameterClass="Integer">
+    	SELECT min(retentionTime) from msScan where runID=#runId#
+    </select>
+    
+    <select id="getMaxRTForRunList" resultClass="Double" parameterClass="String">
+    	SELECT max(retentionTime) from msScan where runID IN ($runList$)
+    </select>
+    
+    <select id="getMinRTForRunList" resultClass="Double" parameterClass="String">
+    	SELECT min(retentionTime) from msScan where runID IN ($runList$)
+    </select>
+    
     <insert id="insert" parameterMap="msScanParam">
     	INSERT INTO msScan (runID, 
     						startScanNumber, 
