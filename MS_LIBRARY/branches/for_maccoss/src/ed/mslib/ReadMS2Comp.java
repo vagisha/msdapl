@@ -164,7 +164,7 @@ public class ReadMS2Comp implements ReadMS2Interface{
 				
 				zs.avail_in = mzcomp.length;
 				zs.avail_out = mzbbig.length;
-				err = zs.inflate(JZlib.Z_NO_FLUSH);
+				err = zs.inflate(JZlib.Z_FINISH);
 				
 				zs.next_in = intcomp;
 				zs.next_in_index = 0;
@@ -174,7 +174,7 @@ public class ReadMS2Comp implements ReadMS2Interface{
 				
 				zs.avail_in = intcomp.length;
 				zs.avail_out = intbbig.length;
-				err = zs.inflate(JZlib.Z_NO_FLUSH);
+				err = zs.inflate(JZlib.Z_FINISH);
 				//jzlib end
 				
 				//*****test debug
@@ -292,6 +292,7 @@ public class ReadMS2Comp implements ReadMS2Interface{
 	}
 	
 	public int getversion(){return version;}
+	public long getfiletype(){return filetype;}
 	
 	private String header;
 	private File file;
