@@ -123,7 +123,7 @@
      			<logic:equal name="ion" property="isUniqueToProteinGroup" value="true">*</logic:equal>
      			<logic:equal name="ion" property="isUniqueToProteinGroup" value="false"></logic:equal>
      		</td>
-     		<td class="left_align"><bean:write name="ion" property="ionSequence" /></td>
+     		<td><bean:write name="ion" property="ionSequence" /></td>
      		<td>
      			<bean:write name="ion" property="spectrumCount" />
      			<span class="showAllIonHits" style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #000000;" 
@@ -132,9 +132,9 @@
 				  >[Show]</span>
      		</td>
      		<td><bean:write name="ion" property="charge" /></td>
-     		<td class="left_align"><bean:write name="ion" property="retentionTime" /></td>
+     		<td><bean:write name="ion" property="retentionTime" /></td>
      		<logic:equal name="hasPrecursorArea" value="true">
-     			<td class="left_align"><bean:write name="ion" property="precursorArea" /></td>
+     			<td><bean:write name="ion" property="precursorArea" /></td>
      		</logic:equal>
      		
      		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
@@ -161,8 +161,8 @@
      		 
      		<logic:equal name="inputGenerator" value="<%=Program.PERCOLATOR.name() %>">
      		 	<bean:define name="ion" property="bestSpectrumMatch" id="psm_perc" type="org.yeastrc.ms.domain.analysis.percolator.PercolatorResult"/>
-     		 	<td class="left_align"><bean:write name="psm_perc" property="qvalueRounded" /></td>
-     			<td class="left_align"><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
+     		 	<td><bean:write name="psm_perc" property="qvalueRounded" /></td>
+     			<td><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
      		</logic:equal>
      		 
      		<td><span style="text-decoration: underline; cursor: pointer;" 

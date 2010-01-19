@@ -40,13 +40,13 @@
 <tbody>
 <logic:iterate id="project" name="userProjects" scope="request">
  <TR>
-  <TD valign="top">
+  <TD valign="top" class="center_align">
    <NOBR>
     <html:link action="viewProject.do" paramId="ID" paramName="project" paramProperty="ID">View</html:link>
    </NOBR>
   </TD>
   <TD valign="top"><bean:write name="project" property="ID"/></TD>
-  <TD valign="top" class="left_align"><bean:write name="project" property="title"/></TD>
+  <TD valign="top"><bean:write name="project" property="title"/></TD>
   <TD valign="top"><bean:write name="project" property="submitDate"/></TD>
  </TR>
 </logic:iterate>
@@ -78,14 +78,14 @@
 	 	<tbody>
 		<logic:iterate id="project" name="newProjects" scope="request">
 		 <TR>
-		  <TD valign="top">
+		  <TD valign="top" class="center_align">
 		   <NOBR>
 		    <html:link action="viewProject.do" paramId="ID" paramName="project" paramProperty="ID">View</html:link>
 		   </NOBR>
 		  </TD>
-		  <TD valign="top"><bean:write name="project" property="ID"/></TD>
+		  <TD valign="top" class="center_align"><bean:write name="project" property="ID"/></TD>
 		  <TD valign="top"><bean:write name="project" property="PI.lastName"/></TD>
-		  <TD valign="top" class="left_align"><bean:write name="project" property="title"/></TD>
+		  <TD valign="top"><bean:write name="project" property="title"/></TD>
 		  <TD valign="top"><bean:write name="project" property="submitDate"/></TD>
 		 </TR>
 		</logic:iterate>

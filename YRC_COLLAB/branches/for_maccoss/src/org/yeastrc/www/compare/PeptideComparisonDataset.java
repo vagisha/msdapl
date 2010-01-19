@@ -63,7 +63,6 @@ public class PeptideComparisonDataset implements Tabular {
         TableRow row = new TableRow();
         
         TableCell sequenceCell = new TableCell(peptide.getSequence());
-        sequenceCell.setClassName("left_align");
         row.addCell(sequenceCell);
         
         int dsIndex = 0;

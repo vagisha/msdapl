@@ -70,7 +70,7 @@
 		<tbody>
 		<logic:iterate name="jobs" scope="request" id="job">
 			<tr>
-				<td align="left" valign="top" style="width:8%;font-size:8pt;"><a href="<yrcwww:link path='viewUploadJob.do?'/>id=<bean:write name="job" property="id" />">View Job</td>
+				<td valign="top" class="center_align" style="width:8%;font-size:8pt;"><a href="<yrcwww:link path='viewUploadJob.do?'/>id=<bean:write name="job" property="id" />">View Job</td>
 
 				<td align="left" valign="top" style="width:8%;font-size:8pt;">
 
@@ -92,7 +92,7 @@
 					
 				<td align="left" valign="top" style="width:10%;font-size:8pt;"><bean:write name="job" property="submitDate" /></td>
 
-				<td align="left" valign="top" style="width:32%;font-size:8pt;" class="left_align">
+				<td align="left" valign="top" style="width:32%;font-size:8pt;">
 					<div style="width:100%;height:auto;overflow:auto;">
 						<bean:write name="job" property="serverDirectory" />
 					</div>
@@ -104,7 +104,7 @@
 					</div>
 				</td>
 
-				<td align="left" valign="top" style="width:15%;font-size:8pt;" class="left_align">
+				<td align="left" valign="top" style="width:15%;font-size:8pt;">
 					<div style="width:100%;height:auto;overflow:auto;">
 						<bean:write name="job" property="comments" />
 					</div>

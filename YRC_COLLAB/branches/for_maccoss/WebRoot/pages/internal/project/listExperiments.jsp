@@ -356,11 +356,9 @@ function confirmDeleteExperiment(experimentId) {
 						<td width="33%">
 							<b>
 								<html:link action="viewPercolatorResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link>
-								<yrcwww:member group="administrators">
 								&nbsp;
 								<b><a href="<yrcwww:link path='viewQCPlots.do?'/>analysisId=<bean:write name='analysis' property='id' />&experimentId=<bean:write name='experiment' property='id'/>"> 
 								[QC Plots]</a></b>
-								</yrcwww:member>
 								<!-- <html:link action="percolatorPepXmlDownloadForm.do" 
 											paramId="ID" 
 											paramName="search" paramProperty="id">[PepXML]</html:link> -->

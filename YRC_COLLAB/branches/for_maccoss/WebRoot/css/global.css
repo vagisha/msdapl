@@ -238,11 +238,11 @@ DIV.pinfer_header_small {
 	border-width: medium 1px 1px medium;
 	border-color: #FFFFFF #CBCBCB #F2F2F2 #FFFFFF;
 	padding: 3 3 3 3;
-	text-align: center;
+	text-align: left;
 }
 
-.table_basic td.left_align, .table_compare_grp td.left_align {
-	text-align: left;
+.table_basic td.center_align, .table_compare_grp td.center_align{
+	text-align: center;
 }
 
 .table_compare_grp td {

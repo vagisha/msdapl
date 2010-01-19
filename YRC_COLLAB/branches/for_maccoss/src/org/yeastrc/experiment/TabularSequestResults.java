@@ -120,7 +120,6 @@ public class TabularSequestResults implements Tabular, Pageable {
         
         // row.addCell(new TableCell(String.valueOf(result.getId())));
         TableCell cell = new TableCell(result.getFilename());
-        cell.setClassName("left_align");
         row.addCell(cell);
         row.addCell(new TableCell(String.valueOf(result.getScanNumber())));
         row.addCell(new TableCell(String.valueOf(result.getCharge())));
@@ -147,11 +146,9 @@ public class TabularSequestResults implements Tabular, Pageable {
         
         String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
         cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);
-        cell.setClassName("left_align");
         row.addCell(cell);
         
         cell = new TableCell(String.valueOf(result.getProteins()));
-        cell.setClassName("left_align");
         row.addCell(cell);
         return row;
     }

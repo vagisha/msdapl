@@ -43,9 +43,9 @@
         <tr>
      		<td><bean:write name="psm" property="scanNumber" /></td>
      		<td><bean:write name="psm" property="spectrumMatch.charge" /></td>
-     		<td class="left_align"><bean:write name="psm" property="retentionTime" /></td>
+     		<td><bean:write name="psm" property="retentionTime" /></td>
      		<logic:equal name="hasPrecursorArea" value="true">
-     			<td class="left_align"><bean:write name="psm" property="precursorArea" /></td>
+     			<td><bean:write name="psm" property="precursorArea" /></td>
      		</logic:equal>
      		
      		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
@@ -72,8 +72,8 @@
      		 
      		<logic:equal name="inputGenerator" value="<%=Program.PERCOLATOR.name() %>">
      		 	<bean:define name="psm" property="spectrumMatch" id="psm_perc" type="org.yeastrc.ms.domain.analysis.percolator.PercolatorResult"/>
-     		 	<td class="left_align"><bean:write name="psm_perc" property="qvalueRounded" /></td>
-     			<td class="left_align"><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
+     		 	<td><bean:write name="psm_perc" property="qvalueRounded" /></td>
+     			<td><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
      		</logic:equal>
      		 
      		<td><span style="text-decoration: underline; cursor: pointer;"

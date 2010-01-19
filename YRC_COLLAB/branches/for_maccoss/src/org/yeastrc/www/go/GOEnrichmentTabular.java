@@ -110,7 +110,6 @@ public class GOEnrichmentTabular implements Tabular {
         
         String pdrUrl = "http://www.yeastrc.org/pdr/viewGONode.do?acc="+term.getGoNode().getAccession();
         TableCell cell = new TableCell(term.getGoNode().getName(), pdrUrl, true, true); // absoulte url; opens in a new window
-        cell.setClassName("left_align");
         row.addCell(cell);
         
         cell = new TableCell(term.getPValueString());

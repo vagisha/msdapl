@@ -185,7 +185,7 @@
 			</td>
 			
 			<!-- Protein accesion -->
-			<td class="left_align"> 
+			<td> 
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
@@ -198,7 +198,7 @@
 			</td>
 			
 			<!-- Protein common name -->
-			<td class="left_align"> 
+			<td> 
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
@@ -210,7 +210,7 @@
 			</td>
 			
 			<!-- Protein description -->
-			<td style="font-size: 8pt;" class="left_align"><bean:write name="protein" property="shortDescription"/></td>
+			<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
 			<td><bean:write name="protein" property="molecularWeight"/></td>
 			<td><bean:write name="protein" property="pi"/></td>
 			<td><bean:write name="protein" property="protein.coverage"/></td>
@@ -302,7 +302,7 @@
 		</td>
 		
 		<!-- Protein accession -->
-		<td class="left_align">
+		<td>
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
@@ -315,7 +315,7 @@
 		</td>
 		
 		<!-- Protein common name -->
-			<td class="left_align"> 
+			<td> 
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
@@ -327,7 +327,7 @@
 			</td>
 			
 		<!-- Protein Description -->
-		<td style="font-size: 8pt;" class="left_align"><bean:write name="protein" property="shortDescription"/></td>
+		<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
 		
 		
 		<td><bean:write name="protein" property="molecularWeight"/></td>

@@ -41,7 +41,7 @@
   <TD valign="top" width="13%">
    <logic:present name="project" property="PI"><bean:write name="project" property="PI.lastName"/></logic:present>
   </TD>
-  <TD valign="top" width="43%" class="left_align"><bean:write name="project" property="title"/></TD>
+  <TD valign="top" width="43%"><bean:write name="project" property="title"/></TD>
   <TD valign="top" width="12%"><bean:write name="project" property="submitDate"/></TD>
   <TD valign="top" width="12%"><bean:write name="project" property="lastChange"/></TD>
   </tr>

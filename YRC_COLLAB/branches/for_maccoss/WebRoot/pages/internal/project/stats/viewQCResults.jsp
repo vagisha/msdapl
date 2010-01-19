@@ -13,7 +13,7 @@
 <%@ include file="/includes/errors.jsp" %>
 
 
-<yrcwww:contentbox title="QC Results" centered="true" width="95" widthRel="true">
+<yrcwww:contentbox title="QC Results" centered="true" width="85" widthRel="true">
 <center>
 
 	<div style="padding:10 7 10 7; margin-bottom:5; border: 1px dashed gray;background-color: #F0F0F0;">

@@ -139,7 +139,6 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
         for(MsFile file: ms2Files) {
             TableRow row = new TableRow();
             TableCell cell = new TableCell(file.getFileName(), null);
-            cell.setClassName("left_align");
             row.addCell(cell);
             row.addCell(new TableCell(String.valueOf(file.getScanCount()), null));
             rows.add(row);

@@ -44,7 +44,7 @@
 	<tbody>
 	 	<logic:iterate name="inputSummary"  id="input">
  			<tr>
- 				<td class="left_align">
+ 				<td>
  					<!--  <span style="text-decoration: underline; cursor: pointer;"
  								onclick="showSpectrumMatches(<bean:write name="input" property="input.inputId" />, '<bean:write name="input" property="fileName" />')">
  					-->
@@ -52,9 +52,9 @@
  					<!-- </span> -->
  				</td>
  				<!--  <td><bean:write name="input" property="input.numDecoyHits" /></td> -->
- 				<td class="left_align"><bean:write name="input" property="numHits" /></td>
- 				<td class="left_align"><bean:write name="input" property="numFilteredHits" /></td>
- 				<td class="left_align"><bean:write name="input" property="percentFilteredHits"/>%</td>
+ 				<td><bean:write name="input" property="numHits" /></td>
+ 				<td><bean:write name="input" property="numFilteredHits" /></td>
+ 				<td><bean:write name="input" property="percentFilteredHits"/>%</td>
  			</tr>
 	 	</logic:iterate>
 	 	</tbody>
