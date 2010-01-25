@@ -49,6 +49,16 @@ public class ProteinSetComparisonForm extends ActionForm {
     private int speciesId;
     private String goEnrichmentPVal = "0.01";
     
+    private boolean showFullDescriptions = false;
+    
+    public boolean isShowFullDescriptions() {
+        return showFullDescriptions;
+    }
+
+    public void setShowFullDescriptions(boolean showFullDescriptions) {
+        this.showFullDescriptions = showFullDescriptions;
+    }
+
     public boolean isGroupProteins() {
         return groupProteins;
     }

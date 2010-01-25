@@ -106,6 +106,7 @@
 	<forward name="viewProteinInferenceResult" path="/viewProteinInferenceResult.do" />
 	<forward name="newProteinSetComparison" path="/newProteinSetComparison.do" />
 	<forward name="doProteinSetComparison" path="/doProteinSetComparison.do" />
+	<forward name="availableFasta" path="/availableFasta.do"/>
 	<forward name="sequestPepxmlDownload" path="/newSequestPepXmlDownload.do" />
     </global-forwards>
 
@@ -262,6 +263,17 @@
 	  <forward name="Success" path="/pages/internal/project/newResearcher.jsp" redirect="false"/>
 	</action>
 	
+	
+	<!-- ================================================================================== -->
+	<!-- Available FASTA files -->
+	<!-- ================================================================================== -->
+	<action
+	  path="/availableFasta"
+	  type="org.yeastrc.www.project.ViewAvailableFastaFilesAction"
+	  validate="false">
+	  <forward name="Success" path="/pages/internal/project/viewAvailableFasta.jsp" redirect="false"/>
+	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+	</action>
 	
 	
 	<!-- ================================================================================== -->

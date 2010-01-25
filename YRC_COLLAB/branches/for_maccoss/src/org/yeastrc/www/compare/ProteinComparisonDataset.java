@@ -46,6 +46,8 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     private int pageCount = 1;
     private List<Integer> displayPageNumbers;
     
+    private boolean showFullDescriptions = false;
+    
     private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
     
 
@@ -54,6 +56,10 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         this.datasets = new ArrayList<Dataset>();
         this.proteins = new ArrayList<ComparisonProtein>();
         this.displayPageNumbers = new ArrayList<Integer>();
+    }
+    
+    public void setShowFullDescriptions(boolean show) {
+        this.showFullDescriptions = show;
     }
     
     private int  getOffset() {
@@ -272,7 +278,10 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         // Protein description
         TableCell protDescr = new TableCell();
         protDescr.setClassName("prot_descr");
-        protDescr.setData(protein.getShortDescription());
+        if(!showFullDescriptions)
+            protDescr.setData(protein.getShortDescription());
+        else
+            protDescr.setData(protein.getDescription());
         row.addCell(protDescr);
         
         // Spectrum counts in each dataset

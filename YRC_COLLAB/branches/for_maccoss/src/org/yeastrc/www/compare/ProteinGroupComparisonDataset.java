@@ -58,6 +58,8 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     
     private String rowCssClass = "tr_even";
     
+    private boolean showFullDescriptions = false;
+    
     private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
     
     private int  getStartIndex() {
@@ -100,6 +102,10 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         this.rowCount = count;
     }
 
+    public void setShowFullDescriptions(boolean show) {
+        this.showFullDescriptions = show;
+    }
+    
     public ProteinGroupComparisonDataset() {
         this.datasets = new ArrayList<Dataset>();
         this.proteinGroups = new ArrayList<ComparisonProteinGroup>();
@@ -399,7 +405,10 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         // Protein description
         TableCell protDescr = new TableCell();
         protDescr.setClassName("prot_descr");
-        protDescr.setData(protein.getShortDescription());
+        if(!showFullDescriptions)
+            protDescr.setData(protein.getShortDescription());
+        else
+            protDescr.setData(protein.getDescription());
         row.addCell(protDescr);
         
         // Spectrum counts in each dataset

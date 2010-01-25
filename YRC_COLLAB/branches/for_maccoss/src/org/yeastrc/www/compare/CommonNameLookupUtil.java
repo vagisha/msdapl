@@ -81,7 +81,7 @@ public class CommonNameLookupUtil {
           for(String name: names) {
               ProteinNameDescription cnd = new ProteinNameDescription();
               cnd.setName(name.trim());
-              cnd.setDescription(nrseqProt.getDescription());
+              cnd.setDescription(nrseqProt.getFullDescription());
               list.add(cnd);
           }
           listing.setNameAndDescription(list);

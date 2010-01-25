@@ -169,7 +169,9 @@
 	<logic:notPresent name="goEnrichmentView">
 	<tr>
 		<td valign="top" align="center" colspan="4" style="padding-top:5px;">
- 			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button"></html:submit> &nbsp;
+			<html:checkbox name="proteinSetComparisonForm" property="showFullDescriptions">Display full descriptions</html:checkbox>&nbsp;
+ 			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button"></html:submit>
+ 			
 		</td>
 	</tr>
 	<tr>

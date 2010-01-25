@@ -235,6 +235,8 @@ public class CompareProteinSetsAction extends Action {
                 request.setAttribute("chart", googleChartUrl);
             }
             
+            comparison.setShowFullDescriptions(myForm.isShowFullDescriptions());
+            
             request.setAttribute("comparison", comparison);
             request.setAttribute("showGOForm", isSpeciesYeast(datasets));
             return mapping.findForward("ProteinList");
@@ -297,6 +299,8 @@ public class CompareProteinSetsAction extends Action {
                 String googleChartUrl = VennDiagramCreator.instance().getChartUrl(grpComparison);
                 request.setAttribute("chart", googleChartUrl);
             }
+            
+            grpComparison.setShowFullDescriptions(myForm.isShowFullDescriptions());
             
             request.setAttribute("comparison", grpComparison);
             request.setAttribute("showGOForm", isSpeciesYeast(datasets));
