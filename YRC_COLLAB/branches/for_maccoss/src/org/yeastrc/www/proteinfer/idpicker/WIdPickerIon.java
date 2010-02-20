@@ -42,8 +42,12 @@ public class WIdPickerIon {
         return bestScan;
     }
     
-    public double getRetentionTime() {
-        return round(bestScan.getRetentionTime());
+    public BigDecimal getRetentionTime() {
+        BigDecimal rt = bestScan.getRetentionTime();
+        if(rt != null) {
+            rt = new BigDecimal(round(bestScan.getRetentionTime()));
+        }
+        return rt;
     }
     
     public double getPrecursorArea() {

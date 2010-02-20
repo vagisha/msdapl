@@ -26,7 +26,7 @@
      <th class="sort-alpha" align="left">Peptide</th>
      <th class="sort-int" align="left"># Spectra</th>
      <th class="sort-int" align="left">Charge</th>
-     <th class="sort-alpha" align="left">RT</th>
+     <th class="sort-float" align="left">RT</th>
      <logic:equal name="hasPrecursorArea" value="true">
      	<th class="sort-alpha" align="left">Area</th>
      </logic:equal>
