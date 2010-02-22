@@ -1,10 +1,8 @@
 package org.yeastrc.www.proteinfer.idpicker;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.yeastrc.ms.domain.run.MsScan;
-import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 
@@ -45,7 +43,7 @@ public class WIdPickerIon {
     public BigDecimal getRetentionTime() {
         BigDecimal rt = bestScan.getRetentionTime();
         if(rt != null) {
-            rt = new BigDecimal(round(bestScan.getRetentionTime()));
+            rt = new BigDecimal(String.valueOf(round(bestScan.getRetentionTime())));
         }
         return rt;
     }
