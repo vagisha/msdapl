@@ -1,7 +1,9 @@
 package org.yeastrc.www.proteinfer;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,10 +14,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerPeptideBase;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptide;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerIonForProtein;
@@ -88,7 +93,10 @@ public class ProteinDetailsAjaxAction extends Action {
         
         request.setAttribute("pinferProtId", pinferProtId);
         request.setAttribute("pinferId", pinferId);
-         
+        
+        Set<String> peptideSequences = null;
+        int nrseqProteinId = 0;
+        
         if(ProteinInferenceProgram.isIdPicker(run.getProgram())) {
             // get the protein 
             WIdPickerProtein iProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, pinferProtId, peptideDef);
@@ -115,6 +123,14 @@ public class ProteinDetailsAjaxAction extends Action {
             // We will return the best filtered search hit for each peptide ion (along with terminal residues in the protein).
             List<WIdPickerIonForProtein> ionsWAllSpectra = IdPickerResultsLoader.getPeptideIonsForProtein(pinferId, pinferProtId);
             request.setAttribute("ionList", ionsWAllSpectra);
+            
+            // Get the unique peptide sequences for this protein (for building the protein sequence HTML)
+            peptideSequences = new HashSet<String>(iProt.getProtein().getPeptideCount());
+            for(IdPickerPeptideBase peptide: iProt.getProtein().getPeptides()) {
+                peptideSequences.add(peptide.getSequence());
+            }
+            nrseqProteinId = iProt.getProtein().getNrseqProteinId();
+            
         }
         else if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {
             
@@ -143,7 +159,20 @@ public class ProteinDetailsAjaxAction extends Action {
             // We will return the best filtered search hit for each peptide ion (along with terminal residues in the protein).
             List<WProteinProphetIon> ionsWAllSpectra = ProteinProphetResultsLoader.getPeptideIonsForProtein(pinferId, pinferProtId);
             request.setAttribute("ionList", ionsWAllSpectra);
+            
+            // Get the unique peptide sequences for this protein (for building the protein sequence HTML)
+            peptideSequences = new HashSet<String>(pProt.getProtein().getPeptideCount());
+            for(ProteinProphetProteinPeptide peptide: pProt.getProtein().getPeptides()) {
+                peptideSequences.add(peptide.getSequence());
+            }
+            nrseqProteinId = pProt.getProtein().getNrseqProteinId();
         }
+        
+        // Get the sequence for this protein
+        String sequence = NrSeqLookupUtil.getProteinSequence(nrseqProteinId);
+        String proteinSequenceHtml = ProteinSequenceHtmlBuilder.getInstance().build(sequence, peptideSequences);
+        request.setAttribute("proteinSequenceHtml", proteinSequenceHtml);
+        request.setAttribute("proteinSequence", sequence);
         
         
         long e = System.currentTimeMillis();

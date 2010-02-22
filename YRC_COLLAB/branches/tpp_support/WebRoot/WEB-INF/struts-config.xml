@@ -565,6 +565,28 @@
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	</action>
 
+	<!-- ================================================================================== -->
+	<!-- Actions related to PHILIUS WebService -->
+	<!-- ================================================================================== -->
+	<action
+	  path="/submitPhiliusJob"
+	  type="org.yeastrc.www.philiusws.PhiliusSubmitJobAjaxAction"
+	  validate="false">
+	</action>
+	
+	<action
+	  path="/getPhiliusResults"
+	  type="org.yeastrc.www.philiusws.PhiliusResultsAjaxAction"
+	  validate="false">
+	  <forward name="Success" path="/pages/internal/philius/philiusResults.jsp" redirect="false" />
+	</action>
+	
+	<action
+	  path="/viewPhiliusGraphic"
+	  type="org.yeastrc.www.philiusws.ViewPhiliusGraphicAction"
+	  validate="false">
+	  <forward name="Success" path="/pages/internal/philius/philiusGraphic.jsp" redirect="false"/>
+	</action>
 
 	<!-- ================================================================================== -->
 	<!-- Actions related to data upload -->

@@ -1,7 +1,9 @@
 package org.yeastrc.www.proteinfer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -130,6 +132,10 @@ public class ViewProteinInferenceResultAction extends Action {
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
         filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
         filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
+        filterCriteria.setMinMolecularWt(filterForm.getMinMolecularWtDouble());
+        filterCriteria.setMaxMolecularWt(filterForm.getMaxMolecularWtDouble());
+        filterCriteria.setMinPi(filterForm.getMinPiDouble());
+        filterCriteria.setMaxPi(filterForm.getMaxPiDouble());
         filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
         filterCriteria.setNumMaxPeptides(filterForm.getMaxPeptidesInteger());
         filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptidesInteger());
@@ -198,6 +204,7 @@ public class ViewProteinInferenceResultAction extends Action {
         request.setAttribute("totalDecoyHits", totalDecoyHits);
         request.setAttribute("totalTargetHits", totalTargetHits);
         request.setAttribute("filteredTargetHits", filteredTargetHits);
+        request.setAttribute("filteredPercent", round(filteredTargetHits*100.0/(double)totalTargetHits));
         request.setAttribute("filteredUniquePeptideCount", IdPickerResultsLoader.getUniquePeptideCount(pinferId));
         
         // Results summary
@@ -224,6 +231,8 @@ public class ViewProteinInferenceResultAction extends Action {
     private boolean isSpeciesYeast(int pinferId) throws Exception {
         
         
+        Set<Integer> notYeastExpts = new HashSet<Integer>();
+        
         ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
         MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
         
@@ -233,14 +242,23 @@ public class ViewProteinInferenceResultAction extends Action {
 
                 MsSearch search = searchDao.loadSearch(searchId);
 
+                if(notYeastExpts.contains(search.getExperimentId())) // if we have already seen this and it is not yeast go on looking
+                    continue;
+
                 MSJob job = MSJobFactory.getInstance().getJobForExperiment(search.getExperimentId());
 
-                if(!(job.getTargetSpecies() == 4932)) {
-                    return false;
+                if(job.getTargetSpecies() == 4932) {
+                    return true;
                 }
+                else 
+                    notYeastExpts.add(search.getExperimentId());
             }
         }
-        return true;
+        return false;
+    }
+    
+    private static double round(double num) {
+        return Math.round(num*100.0)/100.0;
     }
 
 }

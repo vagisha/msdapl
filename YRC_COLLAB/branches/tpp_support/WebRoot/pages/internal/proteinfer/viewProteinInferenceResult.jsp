@@ -239,32 +239,57 @@ function saveComments(url, idName, id, comments) {
 }
 
 // ---------------------------------------------------------------------------------------
-// SHOW/HIDE PROTEIN SEQUENCE
+// SUBMIT/SHOW/HIDE PHILIUS RESULTS
 // --------------------------------------------------------------------------------------- 
-// View the protein sequence
-function toggleProteinSequence (pinferProteinId) {
+// Submit Philius job OR show / hide results
+function philiusAnnotations(pinferProteinId, nrseqProteinId) {
 
-	//alert("protein id: "+pinferProteinId+" pinferId: "+pinferId);
-	var button = $("#protseqbutton_"+pinferProteinId);
+	var button = $("#philiusbutton_"+pinferProteinId);
 	
-	if(button.text() == "[View Sequence]") {
-		//alert("View");
-		if($("#protsequence_"+pinferProteinId).html().length == 0) {
-			//alert("Getting...");
-			// load data in the appropriate div
-			$.blockUI(); 
-			$("#protsequence_"+pinferProteinId).load("<yrcwww:link path='proteinSequence.do'/>",   				// url
-							                        {'pinferProteinId': pinferProteinId}, 	// data
-							                        function(responseText, status, xhr) {	// callback
-								  						$.unblockUI();
-								  					});
-		}
-		button.text("[Hide Sequence]");
-		$("#protseqtbl_"+pinferProteinId).show();
+	if(button.text() == "[Get Annotations]") {
+		// submit a Philius job, get a job token and display a status message.
+		//alert("Submitting Philius job...");
+		button.text("[Processing...]");
+		
+		
+		var token = 0;
+		//$.post("<yrcwww:link path='submitPhiliusJob.do'/>",
+    	//				{'nrseqId': nrseqProteinId},
+    	//				function(data) {
+    	//					token = data;
+    	//		});
+		
+		alert("token is: "+token);
+		
+		// show the status text with a link for fetching the results with the returned token.
+		var statusText = "Your request has been submitted to the Philius Server.  ";
+		statusText += "Processing typically takes about <b>10 minutes</b>.  ";
+		statusText += "To get your results click on <b>REFRESH</b>."
+		$("#philius_status_"+pinferProteinId).text(statusText);
+		$("#philius_status_"+pinferProteinId).show();
+		
 	}
-	else {
-		button.text("[View Sequence]");
-		$("#protseqtbl_"+pinferProteinId).hide();
+	else if (button.text() == "[Processing...]") {
+		// hide the philius status text
+		$("#philius_status_"+pinferProteinId).hide();
+		// request the results 
+		// if results are still not available
+		// show philius status again
+		
+		// otherwise show the Philius annotations and hide the protein sequence.
+		$("#protsequence_"+pinferProteinId).hide();
+		$("#philiusannot_"+pinferProteinId).text("Placeholder for Philius results");
+		$("#philiusannot_"+pinferProteinId).show();
+	}
+	else if (button.text() == "[Hide Annotations]") {
+		$("#philiusannot_"+pinferProteinId).hide();
+		$("#protsequence_"+pinferProteinId).show();
+		button.text("[Show Sequence]");
+	}
+	else if (button.text() == "[Show Annotations}") {
+		$("#philiusannot_"+pinferProteinId).show();
+		$("#protsequence_"+pinferProteinId).hide();
+		button.text("[Hide Annotations]");
 	}
 }
 
@@ -822,6 +847,12 @@ function validateForm() {
     if(!valid)	return false;
     $('form#filterForm input[@name=minSpectrumMatches]').val(parseInt(value));
     
+    value = $('form#filterForm input[@name=minMolecularWt]').fieldValue();
+    valid = validateFloat(value, "Min. Molecular Wt.", 0);
+    if(!valid)	return false;
+    $('form#filterForm input[@name=minMolecularWt]').val(parseInt(value));
+    
+    
     return true;
 }
 function validateInt(value, fieldName, min, max) {
@@ -882,6 +913,12 @@ function downloadResults() {
 	$("#downloadForm  input[name='minCoverage']").val($("#filterForm  input[name='minCoverage']").val());
 	$("#downloadForm  input[name='maxCoverage']").val($("#filterForm  input[name='maxCoverage']").val());
 	
+	$("#downloadForm  input[name='minMolecularWt']").val($("#filterForm  input[name='minMolecularWt']").val());
+	$("#downloadForm  input[name='maxMolecularWt']").val($("#filterForm  input[name='maxMolecularWt']").val());
+	
+	$("#downloadForm  input[name='minPi']").val($("#filterForm  input[name='minPi']").val());
+	$("#downloadForm  input[name='maxPi']").val($("#filterForm  input[name='maxPi']").val());
+	
 	$("#downloadForm  input[name='minSpectrumMatches']").val($("#filterForm  input[name='minSpectrumMatches']").val());
 	$("#downloadForm  input[name='maxSpectrumMatches']").val($("#filterForm  input[name='maxSpectrumMatches']").val());
 	
@@ -924,6 +961,12 @@ function doGoEnrichmentAnalysis() {
 	
 	$("#goEnrichmentForm  input[name='minCoverage']").val($("#filterForm  input[name='minCoverage']").val());
 	$("#goEnrichmentForm  input[name='maxCoverage']").val($("#filterForm  input[name='maxCoverage']").val());
+	
+	$("#goEnrichmentForm  input[name='minMolecularWt']").val($("#filterForm  input[name='minMolecularWt']").val());
+	$("#goEnrichmentForm  input[name='maxMolecularWt']").val($("#filterForm  input[name='maxMolecularWt']").val());
+	
+	$("#goEnrichmentForm  input[name='minPi']").val($("#filterForm  input[name='minPi']").val());
+	$("#goEnrichmentForm  input[name='maxPi']").val($("#filterForm  input[name='maxPi']").val());
 	
 	$("#goEnrichmentForm  input[name='minSpectrumMatches']").val($("#filterForm  input[name='minSpectrumMatches']").val());
 	$("#goEnrichmentForm  input[name='maxSpectrumMatches']").val($("#filterForm  input[name='maxSpectrumMatches']").val());

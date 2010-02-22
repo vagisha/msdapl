@@ -6,6 +6,7 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 
+
 <center>
 <div align="center" style="padding:5px;font-size: 10pt;width: 90%; color: black;">
 
@@ -15,10 +16,6 @@
 <span style="color: #888888; font-size: 9pt;"><bean:write name="protein" property="description" /></span>
 
 <br>
-<span style="text-decoration: underline; cursor: pointer; font-size: 8pt; color: red;"
-      onclick="toggleProteinSequence(<bean:write name="protein" property="protein.id" />)"
-      id="protseqbutton_<bean:write name="protein" property="protein.id" />">[View Sequence]</span>
-&nbsp; &nbsp;
 <span style="font-size: 8pt; color: red;">
 <a  style="color:red;"   href="<yrcwww:link path='viewProtein.do?id'/>=<bean:write name='protein' property='protein.nrseqProteinId'/>">[Protein Details]</a>
 </span>
@@ -77,10 +74,38 @@
 
 <br><br>
 
-<!--  placeholder for protein sequence -->
 <div align="center">
-<table  align="center" width="60%" id="protseqtbl_<bean:write name='protein' property='protein.id'/>" style="display: none;border:1px solid gray;">
-	<tr><td align="left" id="protsequence_<bean:write name="protein" property="protein.id"/>" ></td></tr>
+<table  align="center" width="60%" id="protseqtbl_<bean:write name='protein' property='protein.id'/>" style="border:1px solid gray;">
+	<tr>
+	<td valign="top">
+	<font style="font-size:9pt;">
+     [<a target="blast_window"
+         href="http://www.ncbi.nlm.nih.gov/blast/Blast.cgi?CMD=Web&LAYOUT=TwoWindows&AUTO_FORMAT=Semiauto&ALIGNMENTS=50&ALIGNMENT_VIEW=Pairwise&CDD_SEARCH=on&CLIENT=web&COMPOSITION_BASED_STATISTICS=on&DATABASE=nr&DESCRIPTIONS=100&ENTREZ_QUERY=(none)&EXPECT=1000&FILTER=L&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML&I_THRESH=0.005&MATRIX_NAME=BLOSUM62&NCBI_GI=on&PAGE=Proteins&PROGRAM=blastp&SERVICE=plain&SET_DEFAULTS.x=41&SET_DEFAULTS.y=5&SHOW_OVERVIEW=on&END_OF_HTTPGET=Yes&SHOW_LINKOUT=yes&QUERY=<bean:write name="proteinSequence"/>">NCBI BLAST</a>]
+
+	<BR><br>
+	<b>YRC Philius</b><br>
+	<span><a href="http://www.ncbi.nlm.nih.gov/sites/entrez?cmd=Search&db=pubmed&term=18989393">Reynolds <I>et al.</I></a></span>
+	<br/>
+	<span style="text-decoration: underline; cursor: pointer;"
+      onclick="philiusAnnotations(<bean:write name="protein" property="protein.id" />,<bean:write name="protein" property="protein.nrseqProteinId" />)"
+      id="philiusbutton_<bean:write name="protein" property="protein.id"/>">[Get Predictions]</span>
+    </font>
+	</td>
+	<td align="left" valign="top">
+	<div id="protsequence_<bean:write name="protein" property="protein.id"/>">
+	<!-- Protein sequwnce -->
+	<pre><bean:write name="proteinSequenceHtml" filter="false"/></pre>
+	</div>
+	<!-- Place holder for Philius Annotations -->
+	<div id="philiusannot_<bean:write name="protein" property="protein.id"/>"></div>
+	</td>
+	</tr>
+	<tr>
+		<td colspan="2" align="center">
+		<div id="philius_status_<bean:write name="protein" property="protein.id"/>" 
+			 style="display:none;font-size:10pt;color:red;"></div>
+		</td>
+	</tr>
 </table>
 </div>
 <br><br>

@@ -224,34 +224,103 @@ function saveComments(url, idName, id, comments) {
 }
 
 // ---------------------------------------------------------------------------------------
-// SHOW/HIDE PROTEIN SEQUENCE
+// SUBMIT/SHOW/HIDE PHILIUS RESULTS
 // --------------------------------------------------------------------------------------- 
-// View the protein sequence
-function toggleProteinSequence (pinferProteinId) {
+// Submit Philius job OR show / hide results
+function philiusAnnotations(pinferProteinId, nrseqProteinId) {
 
-	//alert("protein id: "+pinferProteinId+" pinferId: "+pinferId);
-	var button = $("#protseqbutton_"+pinferProteinId);
+	var button = $("#philiusbutton_"+pinferProteinId);
 	
-	if(button.text() == "[View Sequence]") {
-		//alert("View");
-		if($("#protsequence_"+pinferProteinId).html().length == 0) {
-			//alert("Getting...");
-			// load data in the appropriate div
-			$.blockUI(); 
-			$("#protsequence_"+pinferProteinId).load("<yrcwww:link path='proteinSequence.do'/>",   				// url
-							                        {'pinferProteinId': pinferProteinId}, 	// data
-							                        function(responseText, status, xhr) {	// callback
-								  						$.unblockUI();
-								  					});
-		}
-		button.text("[Hide Sequence]");
-		$("#protseqtbl_"+pinferProteinId).show();
+	if(button.text() == "[Get Predictions]") {
+		// submit a Philius job, get a job token and display a status message.
+		//alert("Submitting Philius job...");
+		button.text("[Processing...]");
+		
+		
+		var token = 0;
+		var statusText = "Your request has been submitted to the Philius Server.  ";
+		statusText += "Processing typically takes about <b>10 seconds</b>.  ";
+		statusText += "To get your results click ";
+		statusText += "<span id=\"philius_refresher\" style=\"text-decoration: underline; cursor: pointer;\" ";
+		
+		$.post("<yrcwww:link path='submitPhiliusJob.do'/>",
+   					{'nrseqId': nrseqProteinId},
+   					function(data) {
+   						token = data;
+   						if(token.substr(0,6) == "FAILED") {
+   							statusText = "Philius Job Submission failed!<br>"+token;
+   							button.text("[Failed...]");
+   						}
+   						else {
+   							//alert("Returned token is: "+token);
+   							statusText += " onclick=philiusAnnotations("+pinferProteinId+","+nrseqProteinId+") >";
+   							statusText += "<b>REFRESH</b></span>.";
+   							button.attr('name', token);
+						}
+						// show the status text with a link for fetching the results with the returned token.
+						// OR the failure message.
+						$("#philius_status_"+pinferProteinId).html(statusText);
+						$("#philius_status_"+pinferProteinId).show();
+   					}
+    		);
 	}
-	else {
-		button.text("[View Sequence]");
-		$("#protseqtbl_"+pinferProteinId).hide();
+	else if (button.text() == "[Processing...]") {
+		// hide the philius status text
+		$("#philius_status_"+pinferProteinId).hide();
+		// request the results 
+		var token = button.attr('name');
+		$.post("<yrcwww:link path='getPhiliusResults.do'/>",
+   					{'pinferProteinId': pinferProteinId,
+   					 'philiusToken': token},
+   					function(data) {
+   						// if results are still not available
+   						if(data == "WAIT") {
+   							// show philius status again
+   							$("#philius_status_"+pinferProteinId).show();
+   						}
+   						// if the request failed
+   						else if (data.substr(0,6) == "FAILED") {
+   							var statusText = "Philius Job Submission failed!<br>"+data;
+   							$("#philius_status_"+pinferProteinId).html(statusText);
+   							$("#philius_status_"+pinferProteinId).show();
+   							button.text("[Failed...]");
+   						}
+   						// Philius did not find any segments
+   						else if (data == "NONE") {
+   							var statusText = "Philius did not predict any segments";
+   							$("#philius_status_"+pinferProteinId).html(statusText);
+   							$("#philius_status_"+pinferProteinId).show();
+   							button.text("[Hide Annotations]");
+   						}
+   						// request succeeded; display the results
+   						else {
+   							// show the Philius annotations and hide the protein sequence.
+							$("#protsequence_"+pinferProteinId).hide();
+							$("#philiusannot_"+pinferProteinId).html(data);
+							$("#philiusannot_"+pinferProteinId).show();
+							button.text("[Hide Annotations]");
+   						}
+   					}
+   				);
+	}
+	else if (button.text() == "[Hide Annotations]") {
+		// If the Philius status is visible hide it too
+		$("#philius_status_"+pinferProteinId).hide();
+		$("#philiusannot_"+pinferProteinId).hide();
+		$("#protsequence_"+pinferProteinId).show();
+		button.text("[Show Annotations]");
+	}
+	else if (button.text() == "[Show Annotations]") {
+		$("#philiusannot_"+pinferProteinId).show();
+		$("#protsequence_"+pinferProteinId).hide();
+		button.text("[Hide Annotations]");
+	}
+	else if (button.text() == "[Failed...]") {
+		button.text("[Get Predictions]");
+		$("#philius_status_"+pinferProteinId).hide();
 	}
 }
+
 
 // ---------------------------------------------------------------------------------------
 // SHOW/HIDE HITS FOR AN ION
