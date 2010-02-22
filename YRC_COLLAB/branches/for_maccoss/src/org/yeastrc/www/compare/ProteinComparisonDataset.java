@@ -11,15 +11,18 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.www.misc.Pageable;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
+import org.yeastrc.www.project.SORT_CLASS;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinBaseDAO;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinBase;
 import edu.uwpr.protinfer.util.ProteinUtils;
 
@@ -45,6 +48,9 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     private int currentPage = 1;
     private int pageCount = 1;
     private List<Integer> displayPageNumbers;
+    
+    private SORT_BY sortBy = SORT_BY.NUM_PEPT;
+    private SORT_ORDER sortOrder = SORT_ORDER.DESC;
     
     private boolean showFullDescriptions = false;
     
@@ -107,6 +113,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     }
     
     public void initSummary() {
+        
         initProteinCounts();
         this.totalProteinCount = proteins.size();
         calculateSpectrumCountNormalization();
@@ -249,6 +256,12 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         }
         
         // Peptide count
+        // If the sorting was by peptide count this attribute was already calculated for all proteins. 
+        // If sorting order was something else we will have to calculate the num peptides.
+        if(!(sortBy == SORT_BY.NUM_PEPT)) {
+            // get the (max)number of peptides identified for this protein
+            protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
+        }
         TableCell peptCount = new TableCell(String.valueOf(protein.getMaxPeptideCount()));
         peptCount.setClassName("pept_count clickable underline");
         peptCount.setId(String.valueOf(protein.getNrseqId()));
@@ -367,7 +380,13 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         
         header = new TableHeader("#Pept");
         header.setWidth(5);
-        header.setSortable(false);
+        header.setSortable(true);
+        header.setSortClass(SORT_CLASS.SORT_INT);
+        header.setHeaderId(SORT_BY.NUM_PEPT.name());
+        if(this.sortBy == SORT_BY.NUM_PEPT) {
+            header.setSorted(true);
+            header.setSortOrder(this.sortOrder);
+        }
         headers.add(header);
         
         header = new TableHeader("Name");
@@ -382,12 +401,23 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         
         header = new TableHeader("Mol. Wt.");
         header.setWidth(8);
-        header.setSortable(false);
+        header.setSortable(true);
+        header.setSortClass(SORT_CLASS.SORT_FLOAT);
+        header.setHeaderId(SORT_BY.MOL_WT.name());
+        if(this.sortBy == SORT_BY.MOL_WT) {
+            header.setSorted(true);
+            header.setSortOrder(this.sortOrder);
+        }
         headers.add(header);
         
         header = new TableHeader("pI");
         header.setWidth(5);
-        header.setSortable(false);
+        header.setSortClass(SORT_CLASS.SORT_FLOAT);
+        header.setHeaderId(SORT_BY.PI.name());
+        if(this.sortBy == SORT_BY.PI) {
+            header.setSorted(true);
+            header.setSortOrder(this.sortOrder);
+        }
         headers.add(header);
         
         header = new TableHeader("Description");
@@ -469,9 +499,11 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 //            protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
         
         // get the protein properties
-        String sequence = NrSeqLookupUtil.getProteinSequence(protein.getNrseqId());
-        protein.setMolecularWeight( (float) (Math.round(ProteinUtils.calculateMolWt(sequence)*100) / 100.0));
-        protein.setPi((float) (Math.round(ProteinUtils.calculatePi(sequence)*100) / 100.0));
+        if(!protein.molWtAndPiSet()) {
+            String sequence = NrSeqLookupUtil.getProteinSequence(protein.getNrseqId());
+            protein.setMolecularWeight( (float) (Math.round(ProteinUtils.calculateMolWt(sequence)*100) / 100.0));
+            protein.setPi((float) (Math.round(ProteinUtils.calculatePi(sequence)*100) / 100.0));
+        }
     }
     
     private String[] getProteinNames(int nrseqProteinId) {
@@ -543,6 +575,22 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     @Override
     public int getPageCount() {
         return this.pageCount;
+    }
+    
+    public SORT_BY getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(SORT_BY sortBy) {
+        this.sortBy = sortBy;
+    }
+
+    public SORT_ORDER getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(SORT_ORDER sortOrder) {
+        this.sortOrder = sortOrder;
     }
    
 }

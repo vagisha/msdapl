@@ -1,7 +1,8 @@
 
 <%@page import="org.yeastrc.www.compare.ProteinGroupComparisonDataset"%>
 <%@page import="org.yeastrc.www.compare.DatasetColor"%>
-<%@page import="org.yeastrc.www.compare.Dataset"%><%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
+<%@page import="org.yeastrc.www.compare.Dataset"%>
+<%@page import="edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_ORDER"%><%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -58,9 +59,12 @@
 // SETUP THE TABLE
 // ---------------------------------------------------------------------------------------
 $(document).ready(function() {
-	
+
+	// make the table sortable
+   	makeSortable();
     
-   $("#compare_results_pager").attr('width', "80%").attr('align', 'center');
+   $("#compare_results_pager1").attr('width', "80%").attr('align', 'center');
+   $("#compare_results_pager2").attr('width', "80%").attr('align', 'center');
    
    var colCount = <%=comparison.tableHeaders().size()%>
    $("#compare_results").each(function() {
@@ -208,6 +212,39 @@ function  setupPeptidesTable(table){
 }
 
 // ---------------------------------------------------------------------------------------
+// MAKE TABLE SORTABLE
+// ---------------------------------------------------------------------------------------
+function makeSortable() {
+
+   $(".sortable_table").each(function() {
+   		var $table = $(this);
+   		$table.attr('width', "100%");
+   		$table.attr('align', 'center');
+   		//$('tbody > tr:odd', $table).addClass("tr_odd");
+   		//$('tbody > tr:even', $table).addClass("tr_even");
+   		
+   		$('th', $table).each(function() {
+   		
+   				if($(this).is('.sortable')) {
+      					
+      				$(this).click(function() {
+						var sortBy = $(this).attr('id');
+						// sorting direction
+						var sortOrder = "<%=SORT_ORDER.ASC.name()%>";
+						if ($(this).is('.sorted-asc')) {
+		          			sortOrder = "<%=SORT_ORDER.DESC.name()%>";
+		        		}
+		        		else if ($(this).is('.sorted-desc')) {
+		          			sortOrder = "<%=SORT_ORDER.ASC.name()%>";
+		        		}
+	        			sortResults(sortBy, sortOrder);
+      			});
+      		}
+      	});
+   });
+}
+
+// ---------------------------------------------------------------------------------------
 // PAGE RESULTS
 // ---------------------------------------------------------------------------------------
 function pageResults(pageNum) {
@@ -215,6 +252,19 @@ function pageResults(pageNum) {
   	$("input#download").val("false");
   	$("input#goEnrichment").val("false");
   	//alert("setting to "+pageNum+" value set to: "+$("input#pageNum").val());
+  	$("form[name='proteinSetComparisonForm']").submit();
+}
+
+// ---------------------------------------------------------------------------------------
+// SORT RESULTS
+// ---------------------------------------------------------------------------------------
+function sortResults(sortBy, sortOrder) {
+  	$("input#pageNum").val(1);
+  	$("input#download").val("false");
+  	$("input#goEnrichment").val("false");
+  	$("input#sortBy").val(sortBy);
+  	$("input#sortOrder").val(sortOrder);
+  	$("form[name='proteinSetComparisonForm']").attr('target', '');
   	$("form[name='proteinSetComparisonForm']").submit();
 }
 
@@ -452,7 +502,7 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 
 <!-- PAGE RESULTS -->
 <bean:define name="comparison" id="pageable" />
-<table id="compare_results_pager">
+<table id="compare_results_pager1">
 <tr>
 <td>
 <%@include file="/pages/internal/pager.jsp" %>
@@ -462,11 +512,18 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 		
 <!-- RESULTS TABLE -->
 <div > 
-<yrcwww:table name="comparison" tableId='compare_results' tableClass="table_compare_grp" center="true" />
+<yrcwww:table name="comparison" tableId='compare_results' tableClass="table_compare_grp sortable_table" center="true" />
 </div>
 <!--  
 
 -->
+<table id="compare_results_pager2">
+<tr>
+<td>
+<%@include file="/pages/internal/pager.jsp" %>
+</td>
+</tr>
+</table>
 </yrcwww:contentbox>
 
 </CENTER>

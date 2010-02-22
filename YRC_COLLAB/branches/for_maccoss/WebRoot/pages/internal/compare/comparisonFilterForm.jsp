@@ -16,7 +16,10 @@
 	
 	<!-- Does the user want to do GO Enrichment analysis-->
 	<html:hidden name="proteinSetComparisonForm" property="goEnrichmentGraph" value="false" styleId="goEnrichmentGraph" />
-	
+
+	<!-- Sorting criteria for the results -->
+	<html:hidden name="proteinSetComparisonForm" property="sortByString"  styleId="sortBy" />
+	<html:hidden name="proteinSetComparisonForm" property="sortOrderString"  styleId="sortOrder" />
 	
 	<logic:iterate name="proteinSetComparisonForm" property="proteinferRunList" id="proteinferRun">
 		<logic:equal name="proteinferRun" property="selected" value="true">
@@ -151,42 +154,67 @@
 		</logic:notPresent>
 	</tr>
 	
+	<!-- ################## MOLECULAR WT. AND pI FILTERS	  ########################################### -->
+	<tr>
+		<td colspan="2" style="padding: 0 5 5 0;">
+			<b>Mol. Wt.</b> 
+			Min. <html:text name="proteinSetComparisonForm" property="minMolecularWt" size="8"></html:text> 
+		    Max. <html:text name="proteinSetComparisonForm" property="maxMolecularWt" size="8"></html:text>
+		</td>
+		<td colspan="2" style="padding:0 0 5 5;">
+			<b>pI</b>
+			Min. <html:text name="proteinSetComparisonForm" property="minPi" size="8"></html:text> 
+			Max. <html:text name="proteinSetComparisonForm" property="maxPi" size="8"></html:text>
+		</td>
+	</tr>
+	
+	
 	<tr>
 		<!-- ################## SEARCH BOX	  ########################################### -->
-		<td valign="top">
-			Search:
-		</td>
-		<td style="padding-left:5px;"> 
-			Fasta ID(s): <html:text name="proteinSetComparisonForm" property="nameSearchString" size="40"></html:text><br>
+		<td style="padding-right:5px;" colspan="2"> 
+			<b>Fasta ID(s):</b> <html:text name="proteinSetComparisonForm" property="nameSearchString" size="40"></html:text><br>
  			<span style="font-size:8pt;">Enter a comma-separated list of complete or partial FASTA identifiers.</span>
  		</td>
  		<td style="padding-left:5px;" colspan="2"> 
-			Description: <html:text name="proteinSetComparisonForm" property="descriptionSearchString" size="40"></html:text><br>
+			<b>Description:</b> <html:text name="proteinSetComparisonForm" property="descriptionSearchString" size="40"></html:text><br>
  			<span style="font-size:8pt;">Enter a comma-separated list of terms.</span>
  		</td>
 	</tr>
 	
 	<logic:notPresent name="goEnrichmentView">
 	<tr>
-		<td valign="top" align="center" colspan="4" style="padding-top:5px;">
-			<html:checkbox name="proteinSetComparisonForm" property="showFullDescriptions">Display full descriptions</html:checkbox>&nbsp;
+		<td valign="top" align="left" colspan="2" style="padding-top:5px;">
+			<html:checkbox name="proteinSetComparisonForm" property="keepProteinGroups">Keep Protein Groups</html:checkbox><br>
+			<span style="font-size:8pt;">Display ALL protein group members even if some of them do not pass the filtering criteria.</span>
+ 		</td>
+ 		<td valign="top" align="left" colspan="2" style="padding-top:5px;">
+			<html:checkbox name="proteinSetComparisonForm" property="showFullDescriptions">Display Full Descriptions</html:checkbox>
+ 		</td>
+ 	</tr>
+ 	<tr>
+ 		<td valign="top" align="center" colspan="4" style="padding-top:5px;">	
  			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button"></html:submit>
  			
-		</td>
-	</tr>
-	<tr>
-		<td valign="bottom" align="center" colspan="4">
-			<span style="color:red; font-size:9pt; text-decoration:underline;" class="clickable" onclick="javascript:downloadResults(); return false;">[Download Results]</span>
-			&nbsp;
-			<html:checkbox name="proteinSetComparisonForm" property="collapseProteinGroups">Collapse Protein Groups</html:checkbox>
-			&nbsp;
-			<html:checkbox name="proteinSetComparisonForm" property="includeDescriptions">Include Description</html:checkbox>
 		</td>
 	</tr>
 	</logic:notPresent>
 	
 </table>
 </div>
+
+<!-- DOWNLOAD RESULTS -->
+<logic:notPresent name="goEnrichmentView">
+<div align="center" style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%; margin-top:10px;">
+		<b>Download:</b>
+		<html:checkbox name="proteinSetComparisonForm" property="collapseProteinGroups">Collapse Protein Groups</html:checkbox>
+		&nbsp;
+		<html:checkbox name="proteinSetComparisonForm" property="includeDescriptions">Include Description</html:checkbox>
+		<html:submit value="Download" onclick="javascript:downloadResults(); return false;" styleClass="plain_button" style="margin-top:0px;"></html:submit>
+		&nbsp;
+</div>
+</logic:notPresent>
+
+
 
 <logic:equal name="showGOForm" value="true">
 
@@ -209,7 +237,7 @@
 	&nbsp; &nbsp; P-Value:
 	<html:text name="proteinSetComparisonForm" property="goEnrichmentPVal"></html:text>
 	&nbsp; &nbsp;
-	<html:submit value="Calculate" onclick="javascript:doGoEnrichmentAnalysis();"></html:submit>
+	<html:submit value="Calculate" onclick="javascript:doGoEnrichmentAnalysis();" styleClass="plain_button" style="margin-top:0px;"></html:submit>
 	<logic:present name="goEnrichmentView">
 		<html:submit value="Create Graph" onclick="javascript:doGoEnrichmentAnalysisGraph();"></html:submit>
 	</logic:present>

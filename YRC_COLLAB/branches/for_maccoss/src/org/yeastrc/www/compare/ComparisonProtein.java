@@ -150,4 +150,8 @@ public class ComparisonProtein {
     public void setPi(float pi) {
         this.pi = pi;
     }
+    
+    public boolean molWtAndPiSet() {
+        return molecularWeight != -1.0f && pi != -1.0;
+    }
 }

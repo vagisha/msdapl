@@ -162,20 +162,33 @@ public class CompareGOEnrichmentAction extends Action {
         log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
         // If the user is searching for some proteins by name, filter the list
-        String searchString = myForm.getNameSearchString();
-        if(searchString != null && searchString.trim().length() > 0) {
-            ProteinDatasetComparer.instance().applySearchNameFilter(comparison, searchString);
+        String nameSearchString = myForm.getNameSearchString();
+        if(nameSearchString != null && nameSearchString.trim().length() > 0) {
+            ProteinDatasetPropertiesFilterer.instance().applyFastaNameFilter(comparison.getProteins(), nameSearchString);
         }
         
         // If the user is searching for some proteins by description, filter the list
         String descSearchString = myForm.getDescriptionSearchString();
         if(descSearchString != null && descSearchString.trim().length() > 0) {
-            ProteinDatasetComparer.instance().applyDescriptionFilter(comparison, descSearchString);
+            ProteinDatasetPropertiesFilterer.instance().applyDescriptionFilter(comparison.getProteins(), comparison.getFastaDatabaseIds(), descSearchString);
+        }
+        
+        // If there are molecular wt. or pI filters apply them now
+        if(myForm.getMinMolecularWtDouble() != null || myForm.getMaxMolecularWtDouble() != null) {
+            double min = myForm.getMinMolecularWtDouble() == null ? 0.0 : myForm.getMinMolecularWtDouble();
+            double max = myForm.getMaxMolecularWtDouble() == null ? Double.MAX_VALUE : myForm.getMaxMolecularWtDouble();
+            ProteinDatasetPropertiesFilterer.instance().applyMolecularWtFilter(comparison.getProteins(), min, max);
+        }
+        
+        if(myForm.getMinPiDouble() != null || myForm.getMaxPiDouble() != null) {
+            double min = myForm.getMinPiDouble() == null ? 0.0 : myForm.getMinPiDouble();
+            double max = myForm.getMaxPiDouble() == null ? Double.MAX_VALUE : myForm.getMaxPiDouble();
+            ProteinDatasetPropertiesFilterer.instance().applyPiFilter(comparison.getProteins(), min, max);
         }
         
         // Apply AND, OR, NOT filters
         s = System.currentTimeMillis();
-        ProteinDatasetComparer.instance().applyFilters(comparison, filters); // now apply all the filters
+        ProteinDatasetBooleanFilterer.instance().applyFilters(comparison, filters); // now apply all the filters
         e = System.currentTimeMillis();
         log.info("Time to filter results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         

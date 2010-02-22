@@ -16,6 +16,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.bio.go.GOUtils;
+import org.yeastrc.ms.domain.search.SORT_ORDER;
+
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
 
 /**
  * 
@@ -45,11 +48,20 @@ public class ProteinSetComparisonForm extends ActionForm {
     
     private boolean groupProteins = false;
     
+    private SORT_BY sortBy = SORT_BY.NUM_PEPT;
+    private SORT_ORDER sortOrder = SORT_ORDER.DESC;
+    
+    private String minMolWt;
+    private String maxMolWt;
+    private String minPi;
+    private String maxPi;
+    
     private int goAspect = GOUtils.BIOLOGICAL_PROCESS;
     private int speciesId;
     private String goEnrichmentPVal = "0.01";
     
     private boolean showFullDescriptions = false;
+    private boolean keepProteinGroups = false;
     
     public boolean isShowFullDescriptions() {
         return showFullDescriptions;
@@ -57,6 +69,14 @@ public class ProteinSetComparisonForm extends ActionForm {
 
     public void setShowFullDescriptions(boolean showFullDescriptions) {
         this.showFullDescriptions = showFullDescriptions;
+    }
+    
+    public boolean isKeepProteinGroups() {
+        return keepProteinGroups;
+    }
+
+    public void setKeepProteinGroups(boolean keepProteinGroups) {
+        this.keepProteinGroups = keepProteinGroups;
     }
 
     public boolean isGroupProteins() {
@@ -123,6 +143,13 @@ public class ProteinSetComparisonForm extends ActionForm {
         return errors;
     }
 
+//    public void reset(ActionMapping mapping, HttpServletRequest request) {
+//        // This needs to be set to false because if a checkbox is not checked the browser does not
+//        // send its value in the request.
+//        // http://struts.apache.org/1.1/faqs/ne...tml#checkboxes
+//        this.keepProteinGroups = false;
+//  }
+    
     private int selectedRunCount() {
         int i = 0;
         for (ProteinferRunFormBean piRun: piRuns) {
@@ -259,6 +286,95 @@ public class ProteinSetComparisonForm extends ActionForm {
         return xorList;
     }
 
+    //-----------------------------------------------------------------------------
+    // Molecular Weight
+    //-----------------------------------------------------------------------------
+    public String getMinMolecularWt() {
+        return minMolWt;
+    }
+    public Double getMinMolecularWtDouble() {
+        if(minMolWt != null && minMolWt.trim().length() > 0)
+            return Double.parseDouble(minMolWt);
+        return null;
+    }
+    public void setMinMolecularWt(String molWt) {
+        this.minMolWt = molWt;
+    }
+    
+    public String getMaxMolecularWt() {
+        return maxMolWt;
+    }
+    public Double getMaxMolecularWtDouble() {
+        if(maxMolWt != null && maxMolWt.trim().length() > 0)
+            return Double.parseDouble(maxMolWt);
+        return null;
+    }
+    public void setMaxMolecularWt(String molWt) {
+        this.maxMolWt = molWt;
+    }
+    
+    //-----------------------------------------------------------------------------
+    // pI
+    //-----------------------------------------------------------------------------
+    public String getMinPi() {
+        return minPi;
+    }
+    public Double getMinPiDouble() {
+        if(minPi != null && minPi.trim().length() > 0)
+            return Double.parseDouble(minPi);
+        return null;
+    }
+    public void setMinPi(String pi) {
+        this.minPi = pi;
+    }
+    
+    public String getMaxPi() {
+        return maxPi;
+    }
+    public Double getMaxPiDouble() {
+        if(maxPi != null && maxPi.trim().length() > 0)
+            return Double.parseDouble(maxPi);
+        return null;
+    }
+    public void setMaxPi(String pi) {
+        this.maxPi = pi;
+    }
+
+
+    //-----------------------------------------------------------------------------
+    // Sorting
+    //-----------------------------------------------------------------------------
+    public SORT_BY getSortBy() {
+        return this.sortBy;
+    }
+    public String getSortByString() {
+        if(sortBy == null)  return null;
+        return this.sortBy.name();
+    }
+    
+    public void setSortBy(SORT_BY sortBy) {
+        this.sortBy = sortBy;
+    }
+    public void setSortByString(String sortBy) {
+        this.sortBy = SORT_BY.getSortByForString(sortBy);
+    }
+    
+    
+    public SORT_ORDER getSortOrder() {
+        return this.sortOrder;
+    }
+    public String getSortOrderString() {
+        if(sortOrder == null)   return null;
+        return this.sortOrder.name();
+    }
+    
+    public void setSortOrder(SORT_ORDER sortOrder) {
+        this.sortOrder = sortOrder;
+    }
+    public void setSortOrderString(String sortOrder) {
+        this.sortOrder = SORT_ORDER.getSortByForName(sortOrder);
+    }
+    
     //-----------------------------------------------------------------------------
     // Download
     //-----------------------------------------------------------------------------

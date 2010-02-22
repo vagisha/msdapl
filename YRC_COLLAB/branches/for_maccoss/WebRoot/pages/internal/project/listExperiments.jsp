@@ -195,11 +195,11 @@ function compareSelectedProtInfer() {
 	var groupIndistinguishable = $("input#grpProts:checked").val() != null;
 	forDisplay +="Group Indistinguishable Proteins: "+groupIndistinguishable;
 	
-	var doCompare = confirm("Compare protein inference results: "+forDisplay);
-	if(doCompare) {
+	// var doCompare = confirm("Compare protein inference results: "+forDisplay);
+	// if(doCompare) {
 		var url = "<yrcwww:link path='compareProteinInferenceResults.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;
 		window.location.href = url;
-	}
+	// }
 }
 
 function compareSelectedProtInferAndMore() {

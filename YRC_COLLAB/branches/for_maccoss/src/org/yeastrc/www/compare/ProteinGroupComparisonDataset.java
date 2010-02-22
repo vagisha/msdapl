@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.misc.Pageable;
 import org.yeastrc.www.misc.ResultsPager;
@@ -20,9 +21,11 @@ import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
+import org.yeastrc.www.project.SORT_CLASS;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinBaseDAO;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinBase;
 import edu.uwpr.protinfer.util.ProteinUtils;
 
@@ -59,6 +62,9 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     private String rowCssClass = "tr_even";
     
     private boolean showFullDescriptions = false;
+    
+    private SORT_BY sortBy = SORT_BY.NUM_PEPT;
+    private SORT_ORDER sortOrder = SORT_ORDER.DESC;
     
     private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
     
@@ -392,13 +398,11 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         
         // Protein molecular wt.
         TableCell molWt = new TableCell();
-        molWt.setClassName("prot_descr");
         molWt.setData(protein.getMolecularWeight()+"");
         row.addCell(molWt);
         
         // Protein pI
         TableCell pi = new TableCell();
-        pi.setClassName("prot_descr");
         pi.setData(protein.getPi()+"");
         row.addCell(pi);
         
@@ -496,7 +500,14 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         
         header = new TableHeader("#Pept");
         header.setWidth(5);
-        header.setSortable(false);
+        header.setSortable(true);
+        header.setSortClass(SORT_CLASS.SORT_INT);
+        header.setHeaderId(SORT_BY.NUM_PEPT.name());
+        header.setSortOrder(SORT_ORDER.ASC);
+        if(this.sortBy == SORT_BY.NUM_PEPT) {
+            header.setSorted(true);
+            header.setSortOrder(this.sortOrder);
+        }
         headers.add(header);
         
         header = new TableHeader("Name");
@@ -511,12 +522,24 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         
         header = new TableHeader("Mol. Wt.");
         header.setWidth(8);
-        header.setSortable(false);
+        header.setSortable(true);
+        header.setSortClass(SORT_CLASS.SORT_FLOAT);
+        header.setHeaderId(SORT_BY.MOL_WT.name());
+        if(this.sortBy == SORT_BY.MOL_WT) {
+            header.setSorted(true);
+            header.setSortOrder(this.sortOrder);
+        }
         headers.add(header);
         
         header = new TableHeader("pI");
         header.setWidth(5);
-        header.setSortable(false);
+        header.setSortable(true);
+        header.setSortClass(SORT_CLASS.SORT_FLOAT);
+        header.setHeaderId(SORT_BY.PI.name());
+        if(this.sortBy == SORT_BY.PI) {
+            header.setSorted(true);
+            header.setSortOrder(this.sortOrder);
+        }
         headers.add(header);
         
         header = new TableHeader("Description");
@@ -679,5 +702,21 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     @Override
     public int getPageCount() {
         return this.pageCount;
+    }
+
+    public SORT_BY getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(SORT_BY sortBy) {
+        this.sortBy = sortBy;
+    }
+
+    public SORT_ORDER getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(SORT_ORDER sortOrder) {
+        this.sortOrder = sortOrder;
     }
 }

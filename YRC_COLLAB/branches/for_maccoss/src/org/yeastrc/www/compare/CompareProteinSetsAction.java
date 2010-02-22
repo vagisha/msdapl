@@ -7,8 +7,6 @@
 package org.yeastrc.www.compare;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -29,6 +27,7 @@ import org.yeastrc.jobqueue.MSJobFactory;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.compare.graph.GraphBuilder;
 import org.yeastrc.www.user.User;
@@ -37,7 +36,7 @@ import org.yeastrc.yates.YatesRun;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferSpectrumMatchDAO;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
 import edu.uwpr.protinfer.infer.graph.BipartiteGraph;
 import edu.uwpr.protinfer.infer.graph.GraphCollapser;
 import edu.uwpr.protinfer.infer.graph.PeptideVertex;
@@ -190,21 +189,10 @@ public class CompareProteinSetsAction extends Action {
         long e = System.currentTimeMillis();
         log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
-        // If the user is searching for some proteins by name, filter the list
-        String nameSearchString = myForm.getNameSearchString();
-        if(nameSearchString != null && nameSearchString.trim().length() > 0) {
-            ProteinDatasetComparer.instance().applySearchNameFilter(comparison, nameSearchString);
-        }
-        
-        // If the user is searching for some proteins by description, filter the list
-        String descSearchString = myForm.getDescriptionSearchString();
-        if(descSearchString != null && descSearchString.trim().length() > 0) {
-            ProteinDatasetComparer.instance().applyDescriptionFilter(comparison, descSearchString);
-        }
         
         // Apply AND, OR, NOT, XOR filters
         s = System.currentTimeMillis();
-        ProteinDatasetComparer.instance().applyFilters(comparison, filters); // now apply all the filters
+        ProteinDatasetBooleanFilterer.instance().applyFilters(comparison, filters); // now apply all the filters
         e = System.currentTimeMillis();
         log.info("Time to filter results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
@@ -215,14 +203,59 @@ public class CompareProteinSetsAction extends Action {
         request.setAttribute("piDatasetIds", makeCommaSeparated(piRunIds));
         request.setAttribute("dtaDatasetIds", makeCommaSeparated(dtaRunIds));
         
+        SORT_BY sortBy = myForm.getSortBy();
+        SORT_ORDER sortOrder = myForm.getSortOrder();
+        
+        // If the user is NOT interested in keeping protein groups intact after filtering 
+        // OR proteins are not being grouped
+        // apply filters now
+        if(!myForm.isKeepProteinGroups() || !myForm.isGroupProteins()) {
+            
+            // If the user is searching for some proteins by name, filter the list
+            String nameSearchString = myForm.getNameSearchString();
+            if(nameSearchString != null && nameSearchString.trim().length() > 0) {
+                ProteinDatasetPropertiesFilterer.instance().applyFastaNameFilter(comparison.getProteins(), nameSearchString);
+            }
+            
+            // If the user is searching for some proteins by description, filter the list
+            String descSearchString = myForm.getDescriptionSearchString();
+            if(descSearchString != null && descSearchString.trim().length() > 0) {
+                ProteinDatasetPropertiesFilterer.instance().applyDescriptionFilter(comparison.getProteins(), comparison.getFastaDatabaseIds(), descSearchString);
+            }
+            
+            // If there are molecular wt. or pI filters apply them now
+            if(myForm.getMinMolecularWtDouble() != null || myForm.getMaxMolecularWtDouble() != null) {
+                double min = myForm.getMinMolecularWtDouble() == null ? 0.0 : myForm.getMinMolecularWtDouble();
+                double max = myForm.getMaxMolecularWtDouble() == null ? Double.MAX_VALUE : myForm.getMaxMolecularWtDouble();
+                ProteinDatasetPropertiesFilterer.instance().applyMolecularWtFilter(comparison.getProteins(), min, max);
+            }
+            
+            if(myForm.getMinPiDouble() != null || myForm.getMaxPiDouble() != null) {
+                double min = myForm.getMinPiDouble() == null ? 0.0 : myForm.getMinPiDouble();
+                double max = myForm.getMaxPiDouble() == null ? Double.MAX_VALUE : myForm.getMaxPiDouble();
+                ProteinDatasetPropertiesFilterer.instance().applyPiFilter(comparison.getProteins(), min, max);
+            }
+        }
         
         if(!myForm.isGroupProteins()) {
-            // Sort by peptide count
+            
+            // Sort the results
             s = System.currentTimeMillis();
+            
             ProteinDatasetSorter sorter = ProteinDatasetSorter.instance();
-            sorter.sortByPeptideCount(comparison);
+            if(sortBy == SORT_BY.MOL_WT)
+                sorter.sortByMolecularWeight(comparison, sortOrder);
+            else if (sortBy == SORT_BY.PI)
+                sorter.sortByPi(comparison, sortOrder);
+            else
+                sorter.sortByPeptideCount(comparison, sortOrder);
+            
             e = System.currentTimeMillis();
             log.info("Time to sort results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+            
+            // sorting order
+            comparison.setSortBy(myForm.getSortBy());
+            comparison.setSortOrder(myForm.getSortOrder());
             
             // Set the page number
             comparison.setCurrentPage(myForm.getPageNum());
@@ -245,8 +278,7 @@ public class CompareProteinSetsAction extends Action {
         else {
             s = System.currentTimeMillis();
             GraphBuilder graphBuilder = new GraphBuilder();
-            BipartiteGraph<ComparisonProteinGroup, PeptideVertex> graph = 
-                graphBuilder.buildGraph(comparison.getProteins(), piRunIds);
+            BipartiteGraph<ComparisonProteinGroup, PeptideVertex> graph = graphBuilder.buildGraph(comparison.getProteins(), piRunIds);
             log.info("BEFORE collapsing graph: "+graph.getLeftVertices().size());
             GraphCollapser<ComparisonProteinGroup, PeptideVertex> collapser = new GraphCollapser<ComparisonProteinGroup, PeptideVertex>();
             collapser.collapseGraph(graph);
@@ -259,13 +291,6 @@ public class CompareProteinSetsAction extends Action {
             int groupId = 1;
             for(ComparisonProteinGroup group: proteinGroups)
                 group.setGroupId(groupId++);
-            // sort
-            Collections.sort(proteinGroups, new Comparator<ComparisonProteinGroup>() {
-                @Override
-                public int compare(ComparisonProteinGroup o1,
-                        ComparisonProteinGroup o2) {
-                    return Integer.valueOf(o2.getMaxPeptideCount()).compareTo(o1.getMaxPeptideCount());
-                }});
             
             // remove protein groups that do not have any parsimonious proteins
             Iterator<ComparisonProteinGroup> iter = proteinGroups.iterator();
@@ -279,14 +304,63 @@ public class CompareProteinSetsAction extends Action {
             e = System.currentTimeMillis();
             log.info("Time to do graph analysis: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
             
+            // If the user IS interested in keeping protein groups intact after filtering 
+            // apply filters now
+            if(myForm.isKeepProteinGroups()) {
+                // If the user is searching for some proteins by name, filter the list
+                String nameSearchString = myForm.getNameSearchString();
+                if(nameSearchString != null && nameSearchString.trim().length() > 0) {
+                    ProteinDatasetPropertiesFilterer.instance().applyFastaNameFilterToGroup(proteinGroups, nameSearchString);
+                }
+
+                // If the user is searching for some proteins by description, filter the list
+                String descSearchString = myForm.getDescriptionSearchString();
+                if(descSearchString != null && descSearchString.trim().length() > 0) {
+                    ProteinDatasetPropertiesFilterer.instance().applyDescriptionFilterToGroup(proteinGroups, comparison.getFastaDatabaseIds(), descSearchString);
+                }
+
+                // If there are molecular wt. or pI filters apply them now
+                if(myForm.getMinMolecularWtDouble() != null || myForm.getMaxMolecularWtDouble() != null) {
+                    double min = myForm.getMinMolecularWtDouble() == null ? 0.0 : myForm.getMinMolecularWtDouble();
+                    double max = myForm.getMaxMolecularWtDouble() == null ? Double.MAX_VALUE : myForm.getMaxMolecularWtDouble();
+                    ProteinDatasetPropertiesFilterer.instance().applyMolecularWtFilterToGroup(proteinGroups, min, max);
+                }
+
+                if(myForm.getMinPiDouble() != null || myForm.getMaxPiDouble() != null) {
+                    double min = myForm.getMinPiDouble() == null ? 0.0 : myForm.getMinPiDouble();
+                    double max = myForm.getMaxPiDouble() == null ? Double.MAX_VALUE : myForm.getMaxPiDouble();
+                    ProteinDatasetPropertiesFilterer.instance().applyPiFilterToGroup(proteinGroups, min, max);
+                }
+            }
+            
+            // Sort the results
+            s = System.currentTimeMillis();
+            
+            ProteinDatasetSorter sorter = ProteinDatasetSorter.instance();
+            if(sortBy == SORT_BY.MOL_WT)
+                sorter.sortByMolecularWeight(proteinGroups, sortOrder);
+            else if (sortBy == SORT_BY.PI)
+                sorter.sortByPi(proteinGroups, sortOrder);
+            else
+                sorter.sortByPeptideCount(proteinGroups, sortOrder);
+            
+            e = System.currentTimeMillis();
+            log.info("Time to sort results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+            
+            
             ProteinGroupComparisonDataset grpComparison = new ProteinGroupComparisonDataset();
             for(ComparisonProteinGroup grp: proteinGroups)
                 grpComparison.addProteinGroup(grp);
             
             grpComparison.setDatasets(datasets);
             
+            
             // Set the page number
             grpComparison.setCurrentPage(myForm.getPageNum());
+            
+            // sorting order
+            grpComparison.setSortBy(myForm.getSortBy());
+            grpComparison.setSortOrder(myForm.getSortOrder());
             
             grpComparison.initSummary(); // initialize the summary -- 
                                         // (totalProteinCount, # common proteins)

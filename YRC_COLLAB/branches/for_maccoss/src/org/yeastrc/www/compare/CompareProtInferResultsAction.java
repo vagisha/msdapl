@@ -68,6 +68,8 @@ public class CompareProtInferResultsAction extends Action {
         boolean groupProteins = Boolean.parseBoolean(request.getParameter("groupProteins"));
         ((ProteinSetComparisonForm)form).setPiRuns(inputPiRuns);
         ((ProteinSetComparisonForm)form).setGroupProteins(groupProteins);
+        ((ProteinSetComparisonForm)form).setKeepProteinGroups(true);
+        
         
         return mapping.findForward("Success");
     }
