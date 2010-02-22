@@ -60,7 +60,7 @@ public class GraphCollapser <L extends IVertex<L>, R extends IVertex<R>> {
                 return o1.getLabel().compareTo(o2.getLabel());
             }});
         for (IVertex<?> adj: adjV) {
-            buf.append(adj.getLabel());
+            buf.append(adj.getLabel()+",");
         }
         return buf.toString();
     }
