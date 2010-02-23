@@ -31,6 +31,7 @@
 						column="originalFileType" 
 						typeHandler="RunTypeHandler">
 			<subMap value="MS2" resultMap="ms2RunResult"/>
+			<subMap value="CMS2" resultMap="ms2RunResult"/>
 		</discriminator>
 	</resultMap>
 	

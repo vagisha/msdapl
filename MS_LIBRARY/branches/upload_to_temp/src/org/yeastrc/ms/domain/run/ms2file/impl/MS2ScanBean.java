@@ -44,4 +44,18 @@ public class MS2ScanBean extends ScanBean implements MS2Scan {
         this.chargeIndependentAnalysisList = chargeIndependentAnalysisList;
     }
 
+    @Override
+    public double getBullsEyeArea() {
+        List <MS2NameValuePair> analyses = getChargeIndependentAnalysisList();
+        for(MS2NameValuePair pair: analyses) {
+            // Extract the area of the precursor ion as calculated by Bullseye.
+            // Example EZ line: I    EZ    3    4353.2741    0.2220    15650459.0
+            // EZ  <charge> <m+h> <retention time> <area>
+            if(pair.getName().equalsIgnoreCase("EZ")) {
+                return Double.parseDouble(pair.getValue().split("\\s+")[3]);
+            }
+        }
+        return -1.0;
+    }
+
 }

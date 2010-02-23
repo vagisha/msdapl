@@ -126,4 +126,32 @@ public interface GenericRunDAO <I extends MsRunIn, O extends MsRun> {
      */
     public abstract String loadFilenameForRun(int runId);
     
+    /**
+     * Returns the minimum retention time for a scan in the given run
+     * @param runId
+     * @return
+     */
+    public double getMinRetentionTimeForRun(int runId);
+    
+    /**
+     * Returns the maximum retention time for a scan in the given run
+     * @param runId
+     * @return
+     */
+    public double getMaxRetentionTimeForRun(int runId);
+    
+    /**
+     * Returns the minimum retentionTime for a scan in the given runs
+     * @param runIds
+     * @return
+     */
+    public double getMinRetentionTimeForRuns(List<Integer> runIds);
+    
+    /**
+     * Returns the maximum retentionTime for a scan in the given runs.
+     * @param runIds
+     * @return
+     */
+    public double getMaxRetentionTimeForRuns(List<Integer> runIds);
+    
 }

@@ -31,4 +31,15 @@ public class MS2RunBean extends RunBean implements MS2Run {
     public List<MS2NameValuePair> getHeaderList() {
         return headers;
     }
+
+    @Override
+    public boolean isGeneratedByBullseye() {
+        List<MS2NameValuePair> headers = getHeaderList();
+        for(MS2NameValuePair header: headers) {
+            if(header.getName().toLowerCase().startsWith("bullseye")) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

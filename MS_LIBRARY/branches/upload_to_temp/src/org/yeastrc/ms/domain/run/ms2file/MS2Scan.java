@@ -24,4 +24,11 @@ public interface MS2Scan extends MsScan {
      * @return list of charge independent analysis for the scan.
      */
     public abstract List<MS2NameValuePair> getChargeIndependentAnalysisList();
+    
+    /**
+     * Returns the precursor ion area calculated by Bullseye. 
+     * Returns -1.0 if no calculated area was found
+     * @return
+     */
+    public abstract double getBullsEyeArea();
 }

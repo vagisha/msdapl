@@ -1,14 +1,12 @@
 /**
- * MS2FileScanDAOImpl.java
+ * MS2ScanDAOImpl.java
  * @author Vagisha Sharma
  * Jul 5, 2008
  * @version 1.0
  */
 package org.yeastrc.ms.dao.run.ms2file.ibatis;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
@@ -16,9 +14,9 @@ import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
-import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
-import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -55,6 +53,16 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MS2ScanDAO {
     @Override
     public int loadScanNumber(int scanId) {
         return msScanDao.loadScanNumber(scanId);
+    }
+    
+    @Override
+    public boolean isGeneratedByBullseye(int scanId) {
+        // get the value of the MS2 / CMS2 file header with name "FileGenerator"
+        String headerValue = (String) queryForObject("MS2Scan.selectFileGeneratorHeader", scanId);
+        if(headerValue != null && headerValue.toLowerCase().startsWith("bullseye")) 
+            return true;
+        else
+            return false;
     }
     
     /**

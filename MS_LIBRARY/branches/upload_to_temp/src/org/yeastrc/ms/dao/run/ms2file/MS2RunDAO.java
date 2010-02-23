@@ -15,4 +15,5 @@ import org.yeastrc.ms.domain.run.ms2file.MS2Run;
  */
 public interface MS2RunDAO extends GenericRunDAO<MS2RunIn, MS2Run> {
 
+    public abstract boolean isGeneratedByBullseye(int runId);
 }

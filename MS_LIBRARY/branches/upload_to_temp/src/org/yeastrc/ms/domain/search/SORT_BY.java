@@ -14,6 +14,7 @@ public enum SORT_BY {
     CHARGE("Charge", "charge"), 
     MASS("Obs. Mass", "observedMass"), 
     RT("RT", "retentionTime"), 
+    AREA("Area", "area"),
     PEPTIDE("Peptide", "peptide"),
     PROTEIN("Protein", "accession"),
     FILE_SEARCH("File", "runSearchID"),

@@ -15,4 +15,5 @@ import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
  */
 public interface MS2ScanDAO extends GenericScanDAO <MS2ScanIn, MS2Scan> {
 
+    public abstract boolean isGeneratedByBullseye(int scanId);
 }

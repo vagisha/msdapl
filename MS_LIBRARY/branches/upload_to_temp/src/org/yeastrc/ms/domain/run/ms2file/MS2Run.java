@@ -19,4 +19,6 @@ public interface MS2Run extends MsRun {
      * @return the list of headers for the MS2 run.
      */
     public abstract List<MS2NameValuePair> getHeaderList();
+    
+    public abstract boolean isGeneratedByBullseye();
 }
