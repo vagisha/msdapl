@@ -50,6 +50,25 @@ public class BufferedRaf extends RandomAccessFile {
 		return bytebuffer[buffpos - 1];
 	}
 	
+	public int read(byte[] b) throws IOException{
+		return this.read(b, 0, b.length);
+	}
+	
+	public int read(byte[] b, int off, int len) throws IOException {
+		int count=0;
+		byte temp;
+		for (int i=0; i<len; i++, off++){
+			temp = (byte) this.read();
+			if (temp == -1){
+				return -1;
+			}
+			b[off] = temp;
+			count++;
+		}
+		return count;
+	}
+	
+	
 	public String readLine2() throws IOException {
 		sb.delete(0, sb.length());
 		int c = -1;

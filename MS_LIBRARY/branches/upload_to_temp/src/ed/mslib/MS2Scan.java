@@ -10,6 +10,7 @@ public class MS2Scan implements java.lang.Cloneable {
 		dfield = new ArrayList<String>();
 		ifield = new ArrayList<String>();
 		mzint = new ArrayList<MzInt>();
+		ezlines = new ArrayList<EZline>();
 	}
 	
 	private int scan;
@@ -47,6 +48,11 @@ public class MS2Scan implements java.lang.Cloneable {
 	 */
 	private List<MzInt> mzint;
 	
+	/**
+	 * list of EZline objects
+	 */
+	private List<EZline> ezlines;
+	
 	public int getscan(){return scan;}
 	public void setscan(int sc){scan = sc;}
 	
@@ -66,6 +72,7 @@ public class MS2Scan implements java.lang.Cloneable {
 		charges.add(chrg);
 		masses.add(mass);
 	}
+
 	/**
 	 * Z FIELD
 	 * Get charge from List at position
@@ -84,6 +91,18 @@ public class MS2Scan implements java.lang.Cloneable {
 	public double getmass(int position){
 		return masses.get(position);
 	}
+	
+	public void addezline(int charge, double mph, float rtime, float area){
+		ezlines.add(new EZline(charge, mph, rtime, area));
+		addIfield("EZ\t" + charge+ "\t"+ mph+"\t"+ rtime+"\t"+ area);
+	}
+	public EZline getezline(int index){
+		return ezlines.get(index);
+	}
+	public int numez(){
+		return ezlines.size();
+	}
+	
 	
 	/**
 	 * D FIELD
@@ -276,11 +295,36 @@ public class MS2Scan implements java.lang.Cloneable {
 			while (st.hasMoreTokens()){
 				String token = st.nextToken();
 				if (token.equals(value)){
+					if (value.equals("EZ")){
+						String x = "";
+						while (st.hasMoreTokens()){
+							x += st.nextToken() + "\t";
+						}
+						return x;
+					}
 					return st.nextToken();
 				}
 			}
 		}
 		return "";
+	}
+	
+	/**
+	 * class that holds data from EZ lines.
+	 * @author Ed
+	 *
+	 */
+	public class EZline{
+		public EZline(int charge, double mph, float rtime, float area){
+			this.charge = charge;
+			this.mph = mph;
+			this.rtime = rtime;
+			this.area = area;
+		}
+		int charge;
+		double mph;
+		float rtime;
+		float area;
 	}
 	
 	public void outputall(){	
@@ -289,6 +333,12 @@ public class MS2Scan implements java.lang.Cloneable {
 			for (int i=0; i<ifield.size();i++){
 				System.out.println("I\t"+ifield.get(i));
 			}
+			/*
+			for (int i=0; i<numez(); i++){
+				System.out.println("I\tEZ\t"+ezlines.get(i).charge + "\t" + ezlines.get(i).mph+"\t"+
+						ezlines.get(i).rtime+"\t"+ezlines.get(i).area);
+			}
+			*/
 			for (int i=0; i<charges.size(); i++){
 				System.out.println("Z\t" + charges.get(i) + "\t" + masses.get(i));
 				if (dfield.size() != 0 && dfield.get(i) != ""){
@@ -322,6 +372,15 @@ public class MS2Scan implements java.lang.Cloneable {
 		result.setscan(this.scan);
 		result.setendscan(this.endscan);
 		result.setprecursor(this.precursor);
+		/* not needed as ifields include this
+		result.bpi = this.bpi;
+		result.bpm = this.bpm;
+		result.convA = this.convA;
+		result.convB = this.convB;
+		result.iit = this.iit;
+		result.rtime = this.rtime;
+		result.tic = this.tic;
+		*/
 		for (int c=0; c<charges.size(); c++){
 			result.addchargemass(charges.get(c), masses.get(c));
 		}
