@@ -78,7 +78,7 @@ public class PiCalculator {
         int nterm_res; // nterm residue
         int cterm_res; // cterm residue
         
-        sequence = sequence.trim().toUpperCase();
+        sequence = sequence.trim().toUpperCase().replaceAll("[^A-Z]", "");
         
         for(int i = 0; i < sequence.length(); i++) {
             aaCount[sequence.charAt(i) - 'A']++;

@@ -32,6 +32,9 @@ public class ProteinFilterCriteria {
     
     private List<ProteinUserValidation> validationStatus = new ArrayList<ProteinUserValidation>();
     
+    private List<Integer> chargeStates = new ArrayList<Integer>();
+    private int chargeGreaterThan = -1;
+    
     private int numSpectra = 1;
     private int numMaxSpectra = Integer.MAX_VALUE;
     private double coverage = 0.0;
@@ -39,6 +42,7 @@ public class ProteinFilterCriteria {
     
     private String accessionLike;
     private String descriptionLike;
+    private String descriptionNotLike;
     
     private double minMolWt = 0.0;
     private double maxMolWt = Double.MAX_VALUE;
@@ -188,6 +192,14 @@ public class ProteinFilterCriteria {
         this.descriptionLike = descriptionLike;
     }
     
+    public String getDescriptionNotLike() {
+        return descriptionNotLike;
+    }
+    
+    public void setDescriptionNotLike(String descriptionNotLike) {
+        this.descriptionNotLike = descriptionNotLike;
+    }
+    
     public List<ProteinUserValidation> getValidationStatus() {
         return validationStatus;
     }
@@ -203,6 +215,22 @@ public class ProteinFilterCriteria {
                 if(s != null)   this.validationStatus.add(s);
             }
         }
+    }
+    
+    public List<Integer> getChargeStates() {
+        return this.chargeStates;
+    }
+    
+    public void setChargeStates(List<Integer> chargeStates) {
+        this.chargeStates = chargeStates;
+    }
+    
+    public int getChargeGreaterThan() {
+        return this.chargeGreaterThan;
+    }
+    
+    public void setChargeGreaterThan(int chargeGreaterThan) {
+        this.chargeGreaterThan = chargeGreaterThan;
     }
 
     public int getNumMaxPeptides() {
@@ -319,6 +347,17 @@ public class ProteinFilterCriteria {
         if(this.parsimonious != that.parsimonious)              return false;
         if(this.nonParsimonious != that.nonParsimonious)        return false;
         
+        if(this.chargeStates.size() != that.chargeStates.size())
+            return false;
+        else {
+            for(int chg: this.chargeStates) {
+                if(!that.chargeStates.contains(chg))
+                    return false;
+            }
+        }
+        if(this.chargeGreaterThan != that.chargeGreaterThan) 
+            return false;
+        
         if(this.validationStatus.size() != that.validationStatus.size()) return false;
         else {
             for(ProteinUserValidation vs: this.validationStatus)
@@ -340,6 +379,14 @@ public class ProteinFilterCriteria {
         }
         else {
             if(!this.descriptionLike.equalsIgnoreCase(that.descriptionLike))
+                return false;
+        }
+        
+        if(descriptionNotLike == null) {
+            if(that.descriptionNotLike != null)  return false;
+        }
+        else {
+            if(!this.descriptionNotLike.equalsIgnoreCase(that.descriptionNotLike))
                 return false;
         }
         

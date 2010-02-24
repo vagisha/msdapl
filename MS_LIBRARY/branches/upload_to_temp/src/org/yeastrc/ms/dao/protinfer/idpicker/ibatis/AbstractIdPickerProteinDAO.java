@@ -419,6 +419,27 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     }
     
     // -----------------------------------------------------------------------------------
+    // PEPTIDE CHARGE STATE
+    // -----------------------------------------------------------------------------------
+    private List<Integer> proteinIdsByPeptideChargeState(int pinferId,
+            List<Integer> chargeStates, int chargeGreaterThan) {
+        Map<String, Object> map = new HashMap<String, Object>(6);
+        map.put("pinferId", pinferId);
+        if(chargeStates != null && chargeStates.size() > 0) {
+            String cs = "";
+            for(Integer c: chargeStates)
+                cs += ","+c;
+            if(cs.length() > 0) cs = cs.substring(1); // remove first comma
+            cs = "("+cs+")";
+            map.put("chargeStates", cs);
+        }
+        if(chargeGreaterThan != -1) {
+            map.put("chargeGreaterThan", chargeGreaterThan);
+        }
+        return queryForList(sqlMapNameSpace+".filterByChargeStates", map);
+    }
+    
+    // -----------------------------------------------------------------------------------
     // PEPTIDE COUNT
     // -----------------------------------------------------------------------------------
     public List<Integer> sortProteinIdsByPeptideCount(int pinferId, PeptideDefinition peptideDef, boolean groupProteins) {
@@ -820,6 +841,13 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
                                                                  sort);
         }
         
+        // If the user if filtering on peptide charge states
+        List<Integer> ids_chargeStates = null;
+        if(filterCriteria.getChargeStates().size() > 0 || filterCriteria.getChargeGreaterThan() != -1) {
+            ids_chargeStates = proteinIdsByPeptideChargeState(pinferId, filterCriteria.getChargeStates(),
+                    filterCriteria.getChargeGreaterThan());
+        }
+        
         // If the user wants to exclude indistinguishable protein groups get the protein IDs that are not
         // in a indistinguishable protein group.
         List<Integer> notInGroup = null;
@@ -837,37 +865,45 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         // get the set of common ids; keep the order of ids returned from the query
         // that returned sorted results
         if(filterCriteria.getSortBy() == SORT_BY.COVERAGE) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup, peptideMatches);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             return getCommonIds(ids_cov, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_SPECTRA) {
-            Set<Integer> others = combineLists(ids_cov, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup, peptideMatches);
+            Set<Integer> others = combineLists(ids_cov, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             return getCommonIds(ids_spec_count, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_PEPT) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup, peptideMatches);
+            Set<Integer> others = combineLists(ids_spec_count, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             return getCommonIds(ids_pept, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_UNIQ_PEPT) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_validation_status, notInGroup, peptideMatches);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_validation_status, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             return getCommonIds(ids_uniq_pept, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.GROUP_ID) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup, peptideMatches);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             List<Integer> idsbyGroup = sortProteinIdsByGroup(pinferId);
             return getCommonIds(idsbyGroup, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.CLUSTER_ID) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup, peptideMatches);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             List<Integer> idsbyCluster = sortProteinIdsByCluster(pinferId);
             return getCommonIds(idsbyCluster, others);
         }
         else if(filterCriteria.getSortBy() == SORT_BY.VALIDATION_STATUS) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, notInGroup, peptideMatches);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             return getCommonIds(ids_validation_status, others);
         }
         else {
-            Set<Integer> combineLists = combineLists(ids_cov, ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup, peptideMatches);
+            Set<Integer> combineLists = combineLists(ids_cov, ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             return new ArrayList<Integer>(combineLists);
         }
     }
