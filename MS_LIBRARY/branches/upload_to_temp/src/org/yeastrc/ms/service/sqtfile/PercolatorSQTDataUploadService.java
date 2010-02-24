@@ -395,13 +395,14 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             
             int numMatches = resultDao.numResultsForRunSearchScanChargeMass(runSearchId, scanId, scan.getCharge(), scan.getObservedMass());
             if(numMatches == 0) {
-                log.error("No matching results found with runSearchId: "+runSearchId+
-                        "; scanId: "+scanId+"; charge: "+scan.getCharge()+
-                        "; mass: "+scan.getObservedMass());
-//              String msg = "No matching SQTSearchScan found with runSearchId: "+runSearchId+"; scanId: "+scanId+"; charge: "+scan.getCharge();
-//              UploadException ex = new UploadException(ERROR_CODE.NOT_MATCHING_SEARCH_SCAN);
-//              ex.setErrorMessage(msg);
-//              throw ex;
+                String msg = "No matching results found with runSearchId: "+runSearchId+
+                "; scanId: "+scanId+"; charge: "+scan.getCharge()+
+                "; mass: "+scan.getObservedMass();
+                
+//                log.error(msg);
+                UploadException ex = new UploadException(ERROR_CODE.NO_MATCHING_SEARCH_SCAN);
+                ex.setErrorMessage(msg);
+                throw ex;
             }
             else {
                 // save all the search results for this scan
@@ -479,20 +480,39 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             if(matchingResults.size() == 1) 
                 searchResult = matchingResults.get(0);
             
-            else if(matchingResults.size() > 1) { // this can happen if we have the same sequence with different mods
-                String myPeptide = result.getResultPeptide().getModifiedPeptidePS();
+            else if(matchingResults.size() > 1) { // this can happen if 
+                                                  // 1. scan searched with same charge but different M+H (due to Bullseye) results in same peptide match
+                                                  // 2. we have the same sequence with different mods (TODO will this ever happen??)
+                // check for 1. first
+                int numMatching = 0;
                 for(MsSearchResult res: matchingResults) {
-                    if(myPeptide.equals(res.getResultPeptide().getModifiedPeptidePS())) {
-                        if(searchResult != null) {
-                            UploadException ex = new UploadException(ERROR_CODE.MULTI_MATCHING_SEARCH_RESULT);
-                            ex.setErrorMessage("Multiple matching search results were found for runSearchId: "+runSearchId+
-                                    " scanId: "+scanId+"; charge: "+result.getCharge()+
-                                    "; peptide: "+result.getResultPeptide().getPeptideSequence()+
-                                    "; modified peptide: "+result.getResultPeptide().getModifiedPeptidePS());
-                            throw ex;
-                        }
+//                    log.info("My mass: "+result.getObservedMass()+". Looking at: "+res.getObservedMass());
+                    if(result.getObservedMass().doubleValue() == res.getObservedMass().doubleValue()) {
                         searchResult = res;
+                        numMatching++;
                     }
+                }
+                
+                // If we still have multiple matches check for 2.
+                if(numMatching > 1) {
+                    numMatching = 0;
+                    String myPeptide = result.getResultPeptide().getModifiedPeptidePS();
+                    for(MsSearchResult res: matchingResults) {
+                        if(myPeptide.equals(res.getResultPeptide().getModifiedPeptidePS())) {
+                            searchResult = res;
+                            numMatching++;
+                        }
+                    }
+                }
+                
+                // If we still don't have a definite match
+                if(numMatching > 1) {
+                    UploadException ex = new UploadException(ERROR_CODE.MULTI_MATCHING_SEARCH_RESULT);
+                    ex.setErrorMessage("Multiple matching search results were found for runSearchId: "+runSearchId+
+                            " scanId: "+scanId+"; charge: "+result.getCharge()+"; mass: "+result.getObservedMass()+
+                            "; peptide: "+result.getResultPeptide().getPeptideSequence()+
+                            "; modified peptide: "+result.getResultPeptide().getModifiedPeptidePS());
+                    throw ex;
                 }
             }
         }
@@ -505,7 +525,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             numResultsNotFound++;
             UploadException ex = new UploadException(ERROR_CODE.NO_MATCHING_SEARCH_RESULT);
             ex.setErrorMessage("No matching search result was found for runSearchId: "+runSearchId+
-                    " scanId: "+scanId+"; charge: "+result.getCharge()+
+                    " scanId: "+scanId+"; charge: "+result.getCharge()+"; mass: "+result.getObservedMass()+
                     "; peptide: "+result.getResultPeptide().getPeptideSequence()+
                     "; modified peptide: "+result.getResultPeptide().getModifiedPeptidePS());
             throw ex;
@@ -697,7 +717,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     public void setSearchDataFileNames(List<String> searchDataFileNames) {
         this.searchDataFileNames = searchDataFileNames;
     }
-    
+
     public int getMaxPsmRank() {
 
         for (String file: filenames) {
