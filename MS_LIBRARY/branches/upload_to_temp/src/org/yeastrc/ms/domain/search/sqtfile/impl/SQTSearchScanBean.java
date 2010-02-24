@@ -21,7 +21,7 @@ public class SQTSearchScanBean implements SQTSearchScan {
     private int processTime;
     private String serverName;
     private BigDecimal totalIntensity;
-//    private BigDecimal observedMass;
+    private BigDecimal observedMass;
     private BigDecimal lowestSp;
     private int sequenceMatches = -1;
     
@@ -99,14 +99,14 @@ public class SQTSearchScanBean implements SQTSearchScan {
         this.totalIntensity = totalIntensity;
     }
     
-//    @Override
-//    public BigDecimal getObservedMass() {
-//        return observedMass;
-//    }
-//    
-//    public void setObservedMass(BigDecimal mass) {
-//        this.observedMass = mass;
-//    }
+    @Override
+    public BigDecimal getObservedMass() {
+        return observedMass;
+    }
+    
+    public void setObservedMass(BigDecimal mass) {
+        this.observedMass = mass;
+    }
     
     /**
      * @return the lowestSp
