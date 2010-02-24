@@ -6,19 +6,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.upload.dao.UploadDAOFactory;
-import org.yeastrc.ms.upload.dao.search.MsSearchModificationUploadDAO;
 import org.yeastrc.ms.util.AminoAcidUtils;
 
 public class DynamicModLookupUtil {
 
 
-    private MsSearchModificationUploadDAO modDao;
+    private MsSearchModificationDAO modDao;
 
     private List<MsResidueModification> dynaResMods;
     private List<MsTerminalModification> dynaTermMods;
@@ -31,7 +30,7 @@ public class DynamicModLookupUtil {
     private int searchId;
 
     public DynamicModLookupUtil(int searchId){
-        modDao = UploadDAOFactory.getInstance().getMsSearchModDAO();
+        modDao = DAOFactory.instance().getMsSearchModDAO();
         residueModMap = new HashMap<String, Integer>();
         terminalModMap = new HashMap<String, Integer>();
         buildModLookups(searchId);

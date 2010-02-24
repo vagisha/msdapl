@@ -484,6 +484,11 @@ public class XtandemSearchResultDAOImpl extends BaseSqlMapDAO implements Xtandem
     }
     
     @Override
+    public <T extends MsSearchResult> List<Integer> saveResultsOnly(List<T> results) {
+        return resultDao.saveResultsOnly(results);
+    }
+    
+    @Override
     public void saveAllXtandemResultData(List<XtandemResultDataWId> resultDataList) {
         if (resultDataList.size() == 0)
             return;

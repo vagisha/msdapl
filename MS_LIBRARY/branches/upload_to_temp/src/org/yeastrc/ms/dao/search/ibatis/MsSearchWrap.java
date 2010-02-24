@@ -4,7 +4,7 @@
  * Sep 18, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.upload.dao.search.ibatis;
+package org.yeastrc.ms.dao.search.ibatis;
 
 import java.sql.Date;
 

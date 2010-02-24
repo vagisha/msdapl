@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchDAO;
+import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
@@ -30,16 +33,13 @@ import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser;
 import org.yeastrc.ms.parser.sqtFile.prolucid.ProlucidSQTFileReader;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.upload.dao.UploadDAOFactory;
-import org.yeastrc.ms.upload.dao.search.prolucid.ProlucidSearchResultUploadDAO;
-import org.yeastrc.ms.upload.dao.search.prolucid.ProlucidSearchUploadDAO;
 
 /**
  * 
  */
 public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadService {
 
-    private final ProlucidSearchResultUploadDAO sqtResultDao;
+    private final ProlucidSearchResultDAO sqtResultDao;
     
     List<ProlucidResultDataWId> prolucidResultDataList; // cached prolucid search result data
     
@@ -54,7 +54,7 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
         this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
         
-        UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
+        DAOFactory daoFactory = DAOFactory.instance();
         sqtResultDao = daoFactory.getProlucidResultDAO();
     }
     
@@ -96,7 +96,7 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
         
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
-            ProlucidSearchUploadDAO searchDAO = UploadDAOFactory.getInstance().getProlucidSearchDAO();
+            ProlucidSearchDAO searchDAO = DAOFactory.instance().getProlucidSearchDAO();
             return searchDAO.saveSearch(makeSearchObject(parser, remoteDirectory, searchDate), experimentId, sequenceDatabaseId);
         }
         catch(RuntimeException e) {
@@ -211,6 +211,9 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
                     numResults++;
                     numProteins += result.getProteinMatchList().size();
                 }
+            }
+            else {
+                log.info("Ignoring search scan: "+scan.getScanNumber()+"; scanId: "+scanId+"; charge: "+scan.getCharge()+"; mass: "+scan.getObservedMass());
             }
         }
         

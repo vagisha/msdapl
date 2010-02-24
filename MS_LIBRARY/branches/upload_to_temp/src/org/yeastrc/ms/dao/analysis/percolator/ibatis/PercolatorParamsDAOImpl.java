@@ -5,7 +5,6 @@ import java.util.List;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorParamsDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorParam;
-import org.yeastrc.ms.upload.dao.analysis.percolator.ibatis.PercolatorParamWrap;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

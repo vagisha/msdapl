@@ -15,5 +15,5 @@ public interface PeptideProphetRocDAO {
 
     public abstract PeptideProphetROC loadRoc(int analysisId);
 
-    public abstract void saveRocPoint(PeptideProphetROC roc);
+    public abstract void saveRoc(PeptideProphetROC roc);
 }

@@ -32,6 +32,8 @@ public interface GenericScanDAO <I extends MsScanIn, O extends MsScan> {
      */
     public abstract int save(I scan, int runId);
 
+    public abstract <T extends MsScanIn> List<Integer> save(List<T> scans, int runId);
+    
     /**
      * Returns a scan with the given scan ID from the database.
      * @param scanId

@@ -9,13 +9,12 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.dao.general.MsExperimentDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.upload.dao.UploadDAOFactory;
-import org.yeastrc.ms.upload.dao.general.MsExperimentUploadDAO;
-import org.yeastrc.ms.upload.dao.search.MsSearchUploadDAO;
 
 public class MsDataUploader {
 
@@ -305,7 +304,7 @@ public class MsDataUploader {
         
         // enable keys on msRunSearchResult table
         log.info("Enabling keys on msRunSearchResult table");
-        UploadDAOFactory.getInstance().getMsSearchResultDAO().enableKeys();
+        DAOFactory.instance().getMsSearchResultDAO().enableKeys();
         
 //        // enable keys on SQTSearchResult
 //        log.info("Enabling keys on SQTSearchResult table");
@@ -452,7 +451,7 @@ public class MsDataUploader {
     public void uploadData(int experimentId) {
         
         resetUploader();
-        MsExperimentUploadDAO exptDao = UploadDAOFactory.getInstance().getMsExperimentDAO();
+        MsExperimentDAO exptDao = DAOFactory.instance().getMsExperimentDAO();
         MsExperiment expt = exptDao.loadExperiment(experimentId);
         if (expt == null) {
             UploadException ex = new UploadException(ERROR_CODE.EXPT_NOT_FOUND);
@@ -694,7 +693,7 @@ public class MsDataUploader {
 
     private int getExperimentSearchId(int uploadedExptId2) throws Exception {
        
-        MsSearchUploadDAO searchDao = UploadDAOFactory.getInstance().getMsSearchDAO();
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
         List<Integer> searchIds = searchDao.getSearchIdsForExperiment(uploadedExptId2);
         
         if(searchIds.size() == 0)
@@ -708,7 +707,7 @@ public class MsDataUploader {
     }
 
     private void updateLastUpdateDate(int experimentId) {
-        MsExperimentUploadDAO experimentDao = UploadDAOFactory.getInstance().getMsExperimentDAO();
+        MsExperimentDAO experimentDao = DAOFactory.instance().getMsExperimentDAO();
         experimentDao.updateLastUpdateDate(experimentId);
         
     }

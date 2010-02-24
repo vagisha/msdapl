@@ -12,6 +12,14 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
+import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.impl.RunSearchAnalysisBean;
 import org.yeastrc.ms.domain.analysis.peptideProphet.BasePeptideProphetResultIn;
@@ -37,16 +45,6 @@ import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.upload.dao.UploadDAOFactory;
-import org.yeastrc.ms.upload.dao.analysis.MsRunSearchAnalysisUploadDAO;
-import org.yeastrc.ms.upload.dao.analysis.MsSearchAnalysisUploadDAO;
-import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetAnalysisUploadDAO;
-import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetResultUploadDAO;
-import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetRocUploadDAO;
-import org.yeastrc.ms.upload.dao.run.MsScanUploadDAO;
-import org.yeastrc.ms.upload.dao.search.MsRunSearchUploadDAO;
-import org.yeastrc.ms.upload.dao.search.MsSearchResultUploadDAO;
-import org.yeastrc.ms.upload.dao.search.MsSearchUploadDAO;
 import org.yeastrc.ms.util.TimeUtils;
 
 // This will upload the corresponding PeptideProphet results. 
@@ -67,16 +65,15 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
 
     private boolean preUploadCheckDone;
     
-    private final MsScanUploadDAO scanDao;
-    private final MsRunSearchUploadDAO runSearchDao;
-    private final MsSearchResultUploadDAO uploadResultDao;
+    private final MsScanDAO scanDao;
+    private final MsRunSearchDAO runSearchDao;
     private final MsSearchResultDAO resDao;
-    private final MsSearchUploadDAO searchDao;
-    private final MsSearchAnalysisUploadDAO analysisDao;
-    private final MsRunSearchAnalysisUploadDAO runSearchAnalysisDao;
-    private final PeptideProphetRocUploadDAO rocDao;
-    private final PeptideProphetResultUploadDAO ppResDao;
-    private final PeptideProphetAnalysisUploadDAO ppAnalysisDao;
+    private final MsSearchDAO searchDao;
+    private final MsSearchAnalysisDAO analysisDao;
+    private final MsRunSearchAnalysisDAO runSearchAnalysisDao;
+    private final PeptideProphetRocDAO rocDao;
+    private final PeptideProphetResultDAO ppResDao;
+    private final PeptideProphetAnalysisDAO ppAnalysisDao;
     
     
     // these are the things we will cache and do bulk-inserts
@@ -107,12 +104,12 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         this.dynaResidueMods = new ArrayList<MsResidueModification>();
         this.dynaTermMods = new ArrayList<MsTerminalModification>();
         
-        UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
+        DAOFactory daoFactory = DAOFactory.instance();
         
         this.scanDao = daoFactory.getMsScanDAO();
         this.searchDao = daoFactory.getMsSearchDAO();
         this.runSearchDao = daoFactory.getMsRunSearchDAO();
-        this.uploadResultDao = daoFactory.getMsSearchResultDAO();
+        resDao = DAOFactory.instance().getMsSearchResultDAO();
         
         this.analysisDao = daoFactory.getMsSearchAnalysisDAO();
         this.runSearchAnalysisDao  = daoFactory.getMsRunSearchAnalysisDAO();
@@ -120,8 +117,6 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         this.rocDao = daoFactory.getPeptideProphetRocDAO();
         this.ppResDao = daoFactory.getPeptideProphetResultDAO();
         this.ppAnalysisDao = daoFactory.getPeptideProphetAnalysisDAO();
-        
-        resDao = DAOFactory.instance().getMsSearchResultDAO();
         
         uploadMsg = new StringBuilder();
         this.analysisIds = new ArrayList<Integer>();
@@ -494,7 +489,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         
         MsSearchResult searchResult = null;
         try {
-            List<MsSearchResult> matchingResults = uploadResultDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, 
+            List<MsSearchResult> matchingResults = resDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, 
                         result.getSearchResult().getCharge(), 
                         result.getSearchResult().getResultPeptide().getPeptideSequence());
             

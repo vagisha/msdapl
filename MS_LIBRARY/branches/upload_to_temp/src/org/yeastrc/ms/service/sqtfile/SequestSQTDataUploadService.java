@@ -13,6 +13,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
@@ -32,9 +35,6 @@ import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
 import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.upload.dao.UploadDAOFactory;
-import org.yeastrc.ms.upload.dao.search.sequest.SequestSearchResultUploadDAO;
-import org.yeastrc.ms.upload.dao.search.sequest.SequestSearchUploadDAO;
 import org.yeastrc.ms.util.FileUtils;
 
 /**
@@ -43,7 +43,7 @@ import org.yeastrc.ms.util.FileUtils;
 public final class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
 
     
-    private final SequestSearchResultUploadDAO sqtResultDao;
+    private final SequestSearchResultDAO sqtResultDao;
     
     // these are the things we will cache and do bulk-inserts
     List<SequestResultDataWId> sequestResultDataList; // sequest scores
@@ -64,7 +64,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
         this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
         
-        UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
+        DAOFactory daoFactory = DAOFactory.instance();
         
         this.sqtResultDao = daoFactory.getSequestResultDAO();
     }
@@ -108,7 +108,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
-            SequestSearchUploadDAO searchDAO = UploadDAOFactory.getInstance().getSequestSearchDAO();
+            SequestSearchDAO searchDAO = DAOFactory.instance().getSequestSearchDAO();
             return searchDAO.saveSearch(makeSearchObject(parser, getSearchProgram(),
                     remoteDirectory, searchDate), experimentId, sequenceDatabaseId);
         }

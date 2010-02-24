@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.xtandem.XtandemSearchDAO;
+import org.yeastrc.ms.dao.search.xtandem.XtandemSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.peptideProphet.XtandemPeptideProphetResultIn;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
@@ -21,16 +22,13 @@ import org.yeastrc.ms.parser.pepxml.PepXmlGenericFileReader;
 import org.yeastrc.ms.parser.pepxml.PepXmlXtandemFileReader;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.upload.dao.UploadDAOFactory;
-import org.yeastrc.ms.upload.dao.search.xtandem.XtandemSearchResultUploadDAO;
-import org.yeastrc.ms.upload.dao.search.xtandem.XtandemSearchUploadDAO;
 
 public class PepXmlXtandemDataUploadService extends PepXmlDataUploadService<PepXmlXtandemSearchScanIn, 
                                                                             XtandemPeptideProphetResultIn,
                                                                             XtandemSearchResultIn,
                                                                             XtandemSearchIn>{
 
-    private final XtandemSearchResultUploadDAO xtandemResultDao;
+    private final XtandemSearchResultDAO xtandemResultDao;
     
     private List<XtandemResultDataWId> xtandemResultDataList; // Xtandem scores
     
@@ -39,7 +37,7 @@ public class PepXmlXtandemDataUploadService extends PepXmlDataUploadService<PepX
         super();
         this.xtandemResultDataList = new ArrayList<XtandemResultDataWId>(BUF_SIZE);
         
-        UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
+        DAOFactory daoFactory = DAOFactory.instance();
         this.xtandemResultDao = daoFactory.getXtandemResultDAO();
     }
     
@@ -80,7 +78,7 @@ public class PepXmlXtandemDataUploadService extends PepXmlDataUploadService<PepX
     
     @Override
     protected int saveSearch(XtandemSearchIn search, int experimentId, int sequenceDatabaseId) {
-        XtandemSearchUploadDAO searchDAO = UploadDAOFactory.getInstance().getXtandemSearchDAO();
+        XtandemSearchDAO searchDAO = DAOFactory.instance().getXtandemSearchDAO();
         return searchDAO.saveSearch(search, experimentId, sequenceDatabaseId);
     }
 

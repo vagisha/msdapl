@@ -14,6 +14,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.general.MsExperimentDAO;
+import org.yeastrc.ms.dao.run.MsRunDAO;
+import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
 import org.yeastrc.ms.domain.run.MsRunIn;
 import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.RunFileFormat;
@@ -23,11 +28,6 @@ import org.yeastrc.ms.parser.mzxml.MzXmlFileReader;
 import org.yeastrc.ms.service.SpectrumDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.upload.dao.UploadDAOFactory;
-import org.yeastrc.ms.upload.dao.general.MsExperimentUploadDAO;
-import org.yeastrc.ms.upload.dao.run.MsRunUploadDAO;
-import org.yeastrc.ms.upload.dao.run.MsScanUploadDAO;
-import org.yeastrc.ms.upload.dao.run.ms2file.MS2RunUploadDAO;
 import org.yeastrc.ms.util.Sha1SumCalculator;
 
 /**
@@ -39,8 +39,8 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
     
     private static final Logger log = Logger.getLogger(MzXmlDataUploadService.class.getName());
 
-    private final UploadDAOFactory daoFactory;
-    private MsScanUploadDAO scanDao;
+    private final DAOFactory daoFactory;
+    private MsScanDAO scanDao;
 
     public static final int SCAN_BUF_SIZE = 100;
     
@@ -56,7 +56,7 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
     private int numRunsUploaded = 0;
     
     public MzXmlDataUploadService() {
-        daoFactory = UploadDAOFactory.getInstance();
+        daoFactory = DAOFactory.instance();
         scanDao = daoFactory.getMsScanDAO();
     }
 
@@ -197,7 +197,7 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
     }
     
     private static void deleteRun(Integer runId) {
-        MS2RunUploadDAO runDao = UploadDAOFactory.getInstance().getMS2FileRunDAO();
+        MS2RunDAO runDao = DAOFactory.instance().getMS2FileRunDAO();
         runDao.delete(runId);
     }
     
@@ -270,7 +270,7 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
     int getMatchingRunId(String fileName, String sha1Sum) {
 
         fileName = removeExtension(fileName);
-        MS2RunUploadDAO runDao = daoFactory.getMS2FileRunDAO();
+        MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
         return runDao.loadRunIdForFileNameAndSha1Sum(fileName, sha1Sum);
     }
     
@@ -284,7 +284,7 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
     }
     
     private void saveRunLocation(String serverDirectory, int runId) {
-        MsRunUploadDAO runDao = daoFactory.getMsRunDAO();
+        MsRunDAO runDao = daoFactory.getMsRunDAO();
         // Save the original location (on remote server) of the MS2 file, if the location is not in the database already.
         int runLocs = runDao.loadMatchingRunLocations(runId, serverDirectory);
         if (runLocs == 0) {
@@ -293,7 +293,7 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
     }
     
     private void linkExperimentAndRun(int experimentId, int runId) {
-        MsExperimentUploadDAO exptDao = daoFactory.getMsExperimentDAO();
+        MsExperimentDAO exptDao = daoFactory.getMsExperimentDAO();
         // an entry will be made in the msExperimentRun table only if 
         // it does not already exists. 
         exptDao.saveExperimentRun(experimentId, runId);
@@ -312,7 +312,7 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
         log.info("BEGIN mzXML FILE UPLOAD: "+provider.getFileName());
         long startTime = System.currentTimeMillis();
         
-        MsRunUploadDAO runDao = daoFactory.getMsRunDAO();
+        MsRunDAO runDao = daoFactory.getMsRunDAO();
 
 
         // Get the top-level run information and upload it

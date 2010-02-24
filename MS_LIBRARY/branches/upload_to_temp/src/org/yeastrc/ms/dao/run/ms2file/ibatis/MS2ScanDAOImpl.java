@@ -13,6 +13,7 @@ import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
+import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
@@ -107,6 +108,11 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MS2ScanDAO {
         }
         
         return scanId;
+    }
+    
+    @Override
+    public <T extends MsScanIn> List<Integer> save(List<T> scans, int runId) {
+        return msScanDao.save(scans, runId);
     }
     
     public int save(MS2ScanIn scan, int runId) {

@@ -22,6 +22,8 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferInputDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferIonDAO;
@@ -69,9 +71,6 @@ import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.ms.service.ProtinferUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.upload.dao.UploadDAOFactory;
-import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetAnalysisUploadDAO;
-import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetResultUploadDAO;
 import org.yeastrc.ms.util.TimeUtils;
 
 /**
@@ -81,7 +80,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
 
     private final DAOFactory daoFactory;
     private final MsSearchResultDAO resDao;
-    private final PeptideProphetResultUploadDAO ppResDao;
+    private final PeptideProphetResultDAO ppResDao;
     
     
     private final ProteinferDAOFactory piDaoFactory;
@@ -141,7 +140,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         daoFactory = DAOFactory.instance();
         
         resDao = daoFactory.getMsSearchResultDAO();
-        ppResDao = UploadDAOFactory.getInstance().getPeptideProphetResultDAO();
+        ppResDao = daoFactory.getPeptideProphetResultDAO();
         
         peptDao = piDaoFactory.getProteinferPeptideDao();
         protDao = piDaoFactory.getProteinferProteinDao();
@@ -735,7 +734,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         
         boolean first = true;
         for(String inputPepXml: inputFiles) {
-            PeptideProphetAnalysisUploadDAO pprophAnalysisDao = UploadDAOFactory.getInstance().getPeptideProphetAnalysisDAO();
+            PeptideProphetAnalysisDAO pprophAnalysisDao = daoFactory.getPeptideProphetAnalysisDAO();
             String fileName = new File(inputPepXml).getName();
             PeptideProphetAnalysis analysis = pprophAnalysisDao.loadAnalysisForFileName(fileName, this.searchId);
             if(analysis == null) {

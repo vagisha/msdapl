@@ -362,6 +362,11 @@ ProlucidSearchResultDAO {
         // save the base result (saves data to msRunSearchResult table only).
         return resultDao.saveResultOnly(searchResult, runSearchId, scanId);
     }
+    
+    @Override
+    public <T extends MsSearchResult> List<Integer> saveResultsOnly(List<T> results) {
+        return resultDao.saveResultsOnly(results);
+    }
 
     /**
      * resultID, 

@@ -54,4 +54,11 @@ public class PeptideProphetAnalysisDAOImpl extends BaseSqlMapDAO implements
         return (PeptideProphetAnalysis) queryForObject(namespace+".selectAnalysisForFileName", map);
     }
    
+    @Override
+    public int save(PeptideProphetAnalysis analysis) {
+        int analysisId = analysisDao.save(analysis);
+        analysis.setId(analysisId);
+        this.save(namespace+".insert", analysis);
+        return analysisId;
+    }
 }

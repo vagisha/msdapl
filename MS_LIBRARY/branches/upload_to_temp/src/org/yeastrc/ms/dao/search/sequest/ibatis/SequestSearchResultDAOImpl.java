@@ -680,6 +680,11 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
     }
     
     @Override
+    public <T extends MsSearchResult> List<Integer> saveResultsOnly(List<T> results) {
+        return resultDao.saveResultsOnly(results);
+    }
+    
+    @Override
     public void saveAllSequestResultData(List<SequestResultDataWId> resultDataList) {
         if (resultDataList.size() == 0)
             return;

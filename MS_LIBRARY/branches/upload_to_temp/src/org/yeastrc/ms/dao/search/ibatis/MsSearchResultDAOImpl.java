@@ -2,12 +2,17 @@ package org.yeastrc.ms.dao.search.ibatis;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.ms.ConnectionFactory;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
@@ -21,7 +26,6 @@ import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.impl.MsResidueModificationWrap;
 import org.yeastrc.ms.domain.search.impl.MsTerminalModificationWrap;
-import org.yeastrc.ms.upload.dao.search.ibatis.MsSearchResultWrap;
 import org.yeastrc.ms.util.StringUtils;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -203,6 +207,84 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
                 continue;
             int modId = modDao.loadMatchingDynamicTerminalModId(new MsTerminalModificationWrap(mod, searchId));
             modDao.saveDynamicTerminalModForResult(resultId, modId);
+        }
+    }
+    
+    @Override
+    public <T extends MsSearchResult> List<Integer> saveResultsOnly(List<T> results) {
+        
+        String sql = "INSERT INTO msRunSearchResult ";
+        sql +=       "( runSearchID, scanID, charge, observedMass, peptide, preResidue, postResidue, validationStatus )";
+        sql +=       " VALUES (?,?,?,?,?,?,?,?)";
+        
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            conn = ConnectionFactory.getMsDataConnection();
+            stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            conn.setAutoCommit(false);
+            
+            for(MsSearchResult result: results) {
+                if(result.getRunSearchId() == 0)    stmt.setNull(1, Types.INTEGER);
+                else                                stmt.setInt(1, result.getRunSearchId());
+                
+                if(result.getScanId() == 0)         stmt.setNull(2, Types.INTEGER);
+                else                                stmt.setInt(2, result.getScanId());
+                
+                if(result.getCharge() == 0)      stmt.setNull(3, Types.INTEGER);
+                else                                stmt.setInt(3, result.getCharge());
+                
+                stmt.setBigDecimal(4, result.getObservedMass());
+                
+                stmt.setString(5, result.getResultPeptide().getPeptideSequence());
+                
+                String preResidue = Character.toString(result.getResultPeptide().getPreResidue());
+                stmt.setString(6, preResidue);
+                
+                String postResidue = Character.toString(result.getResultPeptide().getPostResidue());
+                stmt.setString(7, postResidue);
+                
+                ValidationStatus validationStatus = result.getValidationStatus();
+                if(validationStatus == null || validationStatus == ValidationStatus.UNKNOWN)
+                    stmt.setNull(8, Types.CHAR);
+                else
+                    stmt.setString(8, Character.toString(validationStatus.getStatusChar()));
+               
+                stmt.addBatch();
+            }
+            
+            int[] counts = stmt.executeBatch();
+            conn.commit();
+            
+            int numInserted = 0;
+            for(int cnt: counts)    numInserted += cnt;
+            
+            if(numInserted != results.size())
+                throw new RuntimeException("Number of results inserted ("+numInserted+
+                        ") does not equal number input ("+results.size()+")");
+                
+            
+            // check that we inserted everything and get the generated ids
+            rs = stmt.getGeneratedKeys();
+            List<Integer> generatedKeys = new ArrayList<Integer>(results.size());
+            while(rs.next())
+                generatedKeys.add(rs.getInt(1));
+            
+            if(generatedKeys.size() != numInserted)
+                throw new RuntimeException("Failed to get auto_increment key for all results inserted. Number of keys returned: "
+                        +generatedKeys.size());
+            
+            return generatedKeys;
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute sql: "+sql, e);
+            throw new RuntimeException("Failed to execute sql: "+sql, e);
+        }
+        finally {
+            if(rs != null) try { rs.close(); } catch (SQLException e){}
+            if(stmt != null) try { stmt.close(); } catch (SQLException e){}
+            if(conn != null) try { conn.close(); } catch (SQLException e){}
         }
     }
     

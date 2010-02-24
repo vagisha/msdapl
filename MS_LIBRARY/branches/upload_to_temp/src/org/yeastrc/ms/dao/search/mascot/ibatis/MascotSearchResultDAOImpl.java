@@ -484,6 +484,11 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
     }
     
     @Override
+    public <T extends MsSearchResult> List<Integer> saveResultsOnly(List<T> results) {
+        return resultDao.saveResultsOnly(results);
+    }
+    
+    @Override
     public void saveAllMascotResultData(List<MascotResultDataWId> resultDataList) {
         if (resultDataList.size() == 0)
             return;

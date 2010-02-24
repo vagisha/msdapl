@@ -6,5 +6,7 @@ public interface PeptideProphetAnalysisDAO {
 
     public PeptideProphetAnalysis load(int analysisId);
     
+    public int save(PeptideProphetAnalysis analysis);
+    
     public PeptideProphetAnalysis loadAnalysisForFileName(String fileName, int searchId);
 }

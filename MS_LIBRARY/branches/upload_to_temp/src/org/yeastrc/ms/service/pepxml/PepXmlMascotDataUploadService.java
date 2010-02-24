@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.mascot.MascotSearchDAO;
+import org.yeastrc.ms.dao.search.mascot.MascotSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.peptideProphet.MascotPeptideProphetResultIn;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
@@ -27,9 +28,6 @@ import org.yeastrc.ms.parser.pepxml.PepXmlGenericFileReader;
 import org.yeastrc.ms.parser.pepxml.PepXmlMascotFileReader;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.upload.dao.UploadDAOFactory;
-import org.yeastrc.ms.upload.dao.search.mascot.MascotSearchResultUploadDAO;
-import org.yeastrc.ms.upload.dao.search.mascot.MascotSearchUploadDAO;
 
 /**
  * 
@@ -39,7 +37,7 @@ public class PepXmlMascotDataUploadService extends PepXmlDataUploadService<PepXm
                                                                            MascotSearchResultIn,
                                                                            MascotSearchIn> {
 
-    private final MascotSearchResultUploadDAO mascotResultDao;
+    private final MascotSearchResultDAO mascotResultDao;
     
     private List<MascotResultDataWId> mascotResultDataList; // mascot scores
     
@@ -48,7 +46,7 @@ public class PepXmlMascotDataUploadService extends PepXmlDataUploadService<PepXm
         super();
         this.mascotResultDataList = new ArrayList<MascotResultDataWId>(BUF_SIZE);
         
-        UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
+        DAOFactory daoFactory = DAOFactory.instance();
         this.mascotResultDao = daoFactory.getMascotResultDAO();
     }
     
@@ -89,7 +87,7 @@ public class PepXmlMascotDataUploadService extends PepXmlDataUploadService<PepXm
     
     @Override
     protected int saveSearch(MascotSearchIn search, int experimentId, int sequenceDatabaseId) {
-        MascotSearchUploadDAO searchDAO = UploadDAOFactory.getInstance().getMascotSearchDAO();
+        MascotSearchDAO searchDAO = DAOFactory.instance().getMascotSearchDAO();
         return searchDAO.saveSearch(search, experimentId, sequenceDatabaseId);
     }
 

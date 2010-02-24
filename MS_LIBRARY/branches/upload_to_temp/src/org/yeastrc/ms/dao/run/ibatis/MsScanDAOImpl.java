@@ -6,13 +6,22 @@
  */
 package org.yeastrc.ms.dao.run.ibatis;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.ms.ConnectionFactory;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.domain.run.DataConversionType;
@@ -20,7 +29,7 @@ import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.Peak;
 import org.yeastrc.ms.domain.run.PeakStorageType;
-import org.yeastrc.ms.upload.dao.run.ibatis.MsScanUploadDAOIbatisImpl.MsScanDataSqlMapParam;
+import org.yeastrc.ms.util.PeakStringBuilder;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -109,6 +118,155 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
     public void delete(int scanId) {
         delete("MsScan.delete", scanId);
         delete("MsScan.deletePeakData", scanId);
+    }
+    
+    @Override
+    public <T extends MsScanIn> List<Integer> save(List<T> scans, int runId) {
+        
+        List<Integer> keys = insertAllScans(scans, runId);
+        insertAllScanData(scans, keys);
+        return keys;
+        
+    }
+    
+    private <T extends MsScanIn> void insertAllScanData(List<T> scans, List<Integer> keys) {
+        
+        String sql = "INSERT INTO msScanData (scanID,type,data) VALUES (?,?,COMPRESS(?))";
+        
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        try {
+            conn = ConnectionFactory.getMsDataConnection();
+            conn.setAutoCommit(false);
+            stmt = conn.prepareStatement(sql);
+            
+            for(int i = 0; i < scans.size(); i++) {
+                MsScanIn scan = scans.get(i);
+                int scanId = keys.get(i);
+                MsScanDataSqlMapParam param = new MsScanDataSqlMapParam(scanId, scan, peakStorageType);
+                prepareScanDataInsertStatement(stmt, param, scanId);
+                stmt.addBatch();
+            }
+            int[] counts = stmt.executeBatch();
+            int numInserted = 0;
+            conn.commit();
+            for(int cnt: counts)    numInserted += cnt;
+            if(numInserted != scans.size())
+                throw new RuntimeException("Number of scan data rows inserted ("+numInserted+") does not equal number input ("+scans.size()+")");
+            
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute sql: "+sql, e);
+            throw new RuntimeException("Failed to execute sql: "+sql, e);
+        }
+        catch (IOException e) {
+            log.error("Error convering peak data", e);
+            throw new RuntimeException("Failed to save peak data", e);
+        }
+        finally {
+            if(stmt != null) try { stmt.close(); } catch (SQLException e){}
+            if(conn != null) try { conn.close(); } catch (SQLException e){}
+        }
+    }
+
+    private <T extends MsScanIn> List<Integer> insertAllScans(List<T> scans, int runId) {
+        String sql = "INSERT INTO msScan (runID, startScanNumber, endScanNumber, ";
+        sql +=       "level, preMZ, preScanID, prescanNumber, ";
+        sql +=       "retentionTime, fragmentationType, isCentroid, peakCount) ";
+        sql +=       "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+        
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            conn = ConnectionFactory.getMsDataConnection();
+            stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            conn.setAutoCommit(false);
+            
+            for(MsScanIn scan: scans) {
+                if(runId == 0)  stmt.setNull(1, Types.INTEGER);
+                else            stmt.setInt(1, runId);
+                
+                if(scan.getStartScanNum() == -1)    stmt.setNull(2, Types.INTEGER);
+                else                                stmt.setInt(2, scan.getStartScanNum());
+                
+                if(scan.getEndScanNum() == -1)      stmt.setNull(3, Types.INTEGER);
+                else                                stmt.setInt(3, scan.getEndScanNum());
+                
+                if(scan.getMsLevel() == 0)          stmt.setNull(4, Types.INTEGER);
+                else                                stmt.setInt(4, scan.getMsLevel());
+                
+                stmt.setBigDecimal(5, scan.getPrecursorMz());
+                
+                int precursorScanId = this.loadScanIdForScanNumRun(scan.getPrecursorScanNum(), runId);
+                if(precursorScanId > 0)
+                    stmt.setInt(6, precursorScanId);
+                else 
+                    stmt.setNull(6, Types.INTEGER); // precursorScanId
+                
+                if(scan.getPrecursorScanNum() == -1)    stmt.setNull(7, Types.INTEGER);
+                else                                    stmt.setInt(7, scan.getPrecursorScanNum());
+                
+                stmt.setBigDecimal(8, scan.getRetentionTime());
+                stmt.setString(9, scan.getFragmentationType());
+                
+                String dataConvType = getDataConversionTypeString(scan.getDataConversionType());
+                stmt.setString(10, dataConvType);
+                
+                if(scan.getPeakCount() == -1)       stmt.setNull(11, Types.INTEGER);
+                else                                stmt.setInt(11, scan.getPeakCount());
+                
+                stmt.addBatch();
+            }
+            
+            int[] counts = stmt.executeBatch();
+            conn.commit();
+            
+            int numInserted = 0;
+            for(int cnt: counts)    numInserted += cnt;
+            
+            if(numInserted != scans.size())
+                throw new RuntimeException("Number of scans inserted ("+numInserted+") does not equal number input ("+scans.size()+")");
+                
+            
+            // check that we inserted everything and get the generated ids
+            rs = stmt.getGeneratedKeys();
+            List<Integer> generatedKeys = new ArrayList<Integer>(scans.size());
+            while(rs.next())
+                generatedKeys.add(rs.getInt(1));
+            
+            if(generatedKeys.size() != numInserted)
+                throw new RuntimeException("Failed to get auto_increment key for all scans inserted. Number of keys returned: "
+                        +generatedKeys.size());
+            
+            return generatedKeys;
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute sql: "+sql, e);
+            throw new RuntimeException("Failed to execute sql: "+sql, e);
+        }
+        finally {
+            if(rs != null) try { rs.close(); } catch (SQLException e){}
+            if(stmt != null) try { stmt.close(); } catch (SQLException e){}
+            if(conn != null) try { conn.close(); } catch (SQLException e){}
+        }
+    }
+    
+    private String getDataConversionTypeString(DataConversionType type) {
+        if (DataConversionType.CENTROID == type)                 return "T";
+        else if (DataConversionType.NON_CENTROID == type)        return "F";
+        else                                                     return null;
+    }
+    
+    private void prepareScanDataInsertStatement(PreparedStatement stmt, MsScanDataSqlMapParam scan, int scanId) throws SQLException, IOException {
+        stmt.setInt(1, scanId);
+        if(peakStorageType == null)
+            stmt.setString(2, null);
+        else
+            stmt.setString(2, peakStorageType.getCode());
+        
+        byte[] peakData = scan.getPeakData();
+        stmt.setBytes(3, peakData);
     }
 
     /**
@@ -265,6 +423,70 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
             if(type == null)
                 throw new IllegalArgumentException("Cannot convert "+val+" to PeakStorageType");
             return type;
+        }
+    }
+    
+    /**
+     * Convenience class for encapsulating data for a row in the msScanData table.
+     */
+    public static class MsScanDataSqlMapParam {
+        private int scanId;
+        private byte[] peakData;
+        private PeakStorageType peakStorageType;
+        
+        public MsScanDataSqlMapParam(int scanId, MsScanIn scan, PeakStorageType storageType) throws IOException {
+            this.scanId = scanId;
+            
+            if(storageType == PeakStorageType.DOUBLE_FLOAT)
+                this.peakData = getPeakBinaryData(scan);
+            else if(storageType == PeakStorageType.STRING)
+                this.peakData = getPeakDataString(scan);
+            
+            this.peakStorageType = storageType;
+        }
+        
+        public int getScanId() {
+            return scanId;
+        }
+        
+        public PeakStorageType getPeakStorageType() {
+            return peakStorageType;
+        }
+        
+        public byte[] getPeakData() {
+            return peakData;
+        }
+        
+        private byte[] getPeakDataString(MsScanIn scan) {
+            List<String[]> peaksStr = scan.getPeaksString();
+            PeakStringBuilder builder = new PeakStringBuilder();
+            for(String[] peak: peaksStr) {
+                builder.addPeak(peak[0], peak[1]);
+            }
+            return builder.getPeaksAsString().getBytes();
+        }
+        
+        private byte[] getPeakBinaryData(MsScanIn scan) throws IOException {
+            
+            ByteArrayOutputStream bos = null;
+            DataOutputStream dos = null;
+            
+            List<Peak> peaks = scan.getPeaks();
+            try {
+                bos = new ByteArrayOutputStream();
+                dos = new DataOutputStream(bos);
+                for(Peak peak: peaks) {
+                    dos.writeDouble(peak.getMz());
+                    dos.writeFloat(peak.getIntensity());
+                }
+                dos.flush();
+            }
+            finally {
+                if(dos != null) dos.close();
+                if(bos != null) bos.close();
+            }
+            byte [] data = bos.toByteArray();
+            return data;
         }
     }
 }

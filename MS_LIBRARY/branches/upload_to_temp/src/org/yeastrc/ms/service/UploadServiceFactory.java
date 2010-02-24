@@ -15,7 +15,7 @@ import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.pepxml.PepXmlGenericFileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
-import org.yeastrc.ms.service.ms2file.MS2DataUploadService2;
+import org.yeastrc.ms.service.ms2file.MS2DataUploadService;
 import org.yeastrc.ms.service.mzxml.MzXmlDataUploadService;
 import org.yeastrc.ms.service.pepxml.PepXmlMascotDataUploadService;
 import org.yeastrc.ms.service.pepxml.PepXmlSequestDataUploadService;
@@ -24,7 +24,7 @@ import org.yeastrc.ms.service.pepxml.PepxmlAnalysisDataUploadService;
 import org.yeastrc.ms.service.protxml.ProtxmlDataUploadService;
 import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.ProlucidSQTDataUploadService;
-import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService2;
+import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService;
 
 /**
  * 
@@ -85,7 +85,7 @@ public class UploadServiceFactory {
         
         RunFileFormat format = formats.iterator().next();
         if(format == RunFileFormat.MS2 || format == RunFileFormat.CMS2) {
-            SpectrumDataUploadService service = new MS2DataUploadService2();
+            SpectrumDataUploadService service = new MS2DataUploadService();
             service.setDirectory(dataDirectory);
             return service;
         }
@@ -165,8 +165,9 @@ public class UploadServiceFactory {
             // now figure out which program generated these files.
             SearchFileFormat sqtFormat = getSqtType(dataDirectory, filenames);
             if (sqtFormat == SearchFileFormat.SQT_SEQ) {
-                SearchDataUploadService service = new SequestSQTDataUploadService2(sqtFormat);
+                SearchDataUploadService service = new SequestSQTDataUploadService(sqtFormat);
                 service.setDirectory(dataDirectory);
+                service.setDecoyDirectory(dataDirectory+File.separator+"decoy");
                 return service;
             }
             else if (sqtFormat == SearchFileFormat.SQT_PLUCID) {

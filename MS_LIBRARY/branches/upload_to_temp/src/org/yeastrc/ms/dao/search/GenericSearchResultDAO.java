@@ -74,6 +74,9 @@ public interface GenericSearchResultDAO <I extends MsSearchResultIn, O extends M
      */
     public abstract int saveResultOnly(MsSearchResultIn searchResult, int runSearchId, int scanId);
     
+    
+    public abstract <T extends MsSearchResult> List<Integer> saveResultsOnly(List<T> results);
+    
     /**
      * Deletes this search result (msRunSearchResult table) along with any 
      * associated protein matches (msProteinMatch)

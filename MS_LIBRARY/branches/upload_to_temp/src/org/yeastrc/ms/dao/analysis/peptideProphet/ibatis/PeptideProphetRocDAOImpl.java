@@ -36,7 +36,7 @@ public class PeptideProphetRocDAOImpl extends BaseSqlMapDAO implements PeptidePr
     }
 
     @Override
-    public void saveRocPoint(PeptideProphetROC roc) {
+    public void saveRoc(PeptideProphetROC roc) {
         for(PeptideProphetROCPoint point: roc.getRocPoints()) {
             save(namespace+".insert",point);
         }

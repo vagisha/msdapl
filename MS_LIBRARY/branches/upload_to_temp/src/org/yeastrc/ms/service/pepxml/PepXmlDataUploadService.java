@@ -14,7 +14,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.dao.run.MsRunDAO;
+import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
+import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.domain.analysis.peptideProphet.GenericPeptideProphetResultIn;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.search.MsResidueModification;
@@ -47,15 +54,6 @@ import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.service.database.fasta.PeptideProteinMatch;
 import org.yeastrc.ms.service.database.fasta.PeptideProteinMatchingService;
-import org.yeastrc.ms.upload.dao.UploadDAOFactory;
-import org.yeastrc.ms.upload.dao.run.MsRunUploadDAO;
-import org.yeastrc.ms.upload.dao.run.MsScanUploadDAO;
-import org.yeastrc.ms.upload.dao.search.MsRunSearchUploadDAO;
-import org.yeastrc.ms.upload.dao.search.MsSearchDatabaseUploadDAO;
-import org.yeastrc.ms.upload.dao.search.MsSearchModificationUploadDAO;
-import org.yeastrc.ms.upload.dao.search.MsSearchResultProteinUploadDAO;
-import org.yeastrc.ms.upload.dao.search.MsSearchResultUploadDAO;
-import org.yeastrc.ms.upload.dao.search.MsSearchUploadDAO;
 import org.yeastrc.ms.util.TimeUtils;
 
 public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R>,
@@ -82,14 +80,14 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
 
     
 
-    private final MsRunUploadDAO runDao;
-    private final MsScanUploadDAO scanDao;
-    private final MsSearchDatabaseUploadDAO sequenceDbDao;
-    private final MsRunSearchUploadDAO runSearchDao;
-    private final MsSearchResultProteinUploadDAO proteinMatchDao;
-    private final MsSearchModificationUploadDAO modDao;
-    private final MsSearchResultUploadDAO resultDao;
-    private final MsSearchUploadDAO searchDao;
+    private final MsRunDAO runDao;
+    private final MsScanDAO scanDao;
+    private final MsSearchDatabaseDAO sequenceDbDao;
+    private final MsRunSearchDAO runSearchDao;
+    private final MsSearchResultProteinDAO proteinMatchDao;
+    private final MsSearchModificationDAO modDao;
+    private final MsSearchResultDAO resultDao;
+    private final MsSearchDAO searchDao;
 
     private List<MsSearchResultProtein> proteinMatchList;
     private List<MsResultResidueModIds> resultResidueModList;
@@ -121,7 +119,7 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
 
         proteinMatches = new HashMap<String, List<PeptideProteinMatch>>();
 
-        UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
+        DAOFactory daoFactory = DAOFactory.instance();
 
         this.runDao = daoFactory.getMsRunDAO(); 
         this.scanDao = daoFactory.getMsScanDAO();

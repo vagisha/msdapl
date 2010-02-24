@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.peptideProphet.SequestPeptideProphetResultIn;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
@@ -38,9 +39,6 @@ import org.yeastrc.ms.parser.pepxml.PepXmlSequestFileReader;
 import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.upload.dao.UploadDAOFactory;
-import org.yeastrc.ms.upload.dao.search.sequest.SequestSearchResultUploadDAO;
-import org.yeastrc.ms.upload.dao.search.sequest.SequestSearchUploadDAO;
 
 /**
  * 
@@ -50,7 +48,7 @@ public class PepXmlSequestDataUploadService extends PepXmlDataUploadService<PepX
                                                                             SequestSearchResultIn,
                                                                             SequestSearchIn> {
 
-    private final SequestSearchResultUploadDAO sqtResultDao;
+    private final SequestSearchResultDAO sqtResultDao;
     
     private List<SequestResultDataWId> sequestResultDataList; // sequest scores
     
@@ -63,7 +61,7 @@ public class PepXmlSequestDataUploadService extends PepXmlDataUploadService<PepX
         
         this.sequestResultDataList = new ArrayList<SequestResultDataWId>(BUF_SIZE);
         
-        UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
+        DAOFactory daoFactory = DAOFactory.instance();
         this.sqtResultDao = daoFactory.getSequestResultDAO();
     }
     
@@ -253,7 +251,7 @@ public class PepXmlSequestDataUploadService extends PepXmlDataUploadService<PepX
     @Override
     protected int saveSearch(SequestSearchIn search, int experimentId,
             int sequenceDatabaseId) {
-        SequestSearchUploadDAO searchDAO = UploadDAOFactory.getInstance().getSequestSearchDAO();
+        SequestSearchDAO searchDAO = DAOFactory.instance().getSequestSearchDAO();
         return searchDAO.saveSearch(search, experimentId, sequenceDatabaseId);
     }
 

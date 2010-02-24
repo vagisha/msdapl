@@ -16,6 +16,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorParamsDAO;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
+import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.impl.RunSearchAnalysisBean;
 import org.yeastrc.ms.domain.analysis.impl.SearchAnalysisBean;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultDataWId;
@@ -39,15 +48,6 @@ import org.yeastrc.ms.parser.sqtFile.percolator.PercolatorSQTFileReader;
 import org.yeastrc.ms.service.AnalysisDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.upload.dao.UploadDAOFactory;
-import org.yeastrc.ms.upload.dao.analysis.MsRunSearchAnalysisUploadDAO;
-import org.yeastrc.ms.upload.dao.analysis.MsSearchAnalysisUploadDAO;
-import org.yeastrc.ms.upload.dao.analysis.percolator.PercolatorParamsUploadDAO;
-import org.yeastrc.ms.upload.dao.analysis.percolator.PercolatorResultUploadDAO;
-import org.yeastrc.ms.upload.dao.run.MsScanUploadDAO;
-import org.yeastrc.ms.upload.dao.search.MsRunSearchUploadDAO;
-import org.yeastrc.ms.upload.dao.search.MsSearchResultUploadDAO;
-import org.yeastrc.ms.upload.dao.search.MsSearchUploadDAO;
 
 /**
  * 
@@ -57,13 +57,13 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     
     private static final Logger log = Logger.getLogger(PercolatorSQTDataUploadService.class);
 
-    private final MsSearchResultUploadDAO resultDao;
-    private final MsSearchAnalysisUploadDAO analysisDao;
-    private final MsRunSearchUploadDAO runSearchDao;
-    private final PercolatorParamsUploadDAO paramDao;
-    private final MsSearchUploadDAO searchDao;
-    private final MsRunSearchAnalysisUploadDAO runSearchAnalysisDao;
-    private final PercolatorResultUploadDAO percResultDao;
+    private final MsSearchResultDAO resultDao;
+    private final MsSearchAnalysisDAO analysisDao;
+    private final MsRunSearchDAO runSearchDao;
+    private final PercolatorParamsDAO paramDao;
+    private final MsSearchDAO searchDao;
+    private final MsRunSearchAnalysisDAO runSearchAnalysisDao;
+    private final PercolatorResultDAO percResultDao;
 
     private static final int BUF_SIZE = 1000;
 
@@ -105,7 +105,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         uploadedResultIds = new HashSet<Integer>();
         filenames = new ArrayList<String>();
         
-        UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
+        DAOFactory daoFactory = DAOFactory.instance();
         this.analysisDao = daoFactory.getMsSearchAnalysisDAO();
         this.runSearchDao = daoFactory.getMsRunSearchDAO();
         this.paramDao  = daoFactory.getPercoltorParamsDAO();
@@ -556,7 +556,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
 
     static int getScanId(int runId, int scanNumber) throws UploadException {
 
-        MsScanUploadDAO scanDao = UploadDAOFactory.getInstance().getMsScanDAO();
+        MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
         int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
         if (scanId == 0) {
             UploadException ex = new UploadException(ERROR_CODE.NO_SCANID_FOR_SCAN);
