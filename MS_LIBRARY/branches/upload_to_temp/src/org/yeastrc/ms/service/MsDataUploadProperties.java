@@ -22,13 +22,6 @@ public class MsDataUploadProperties {
 
     private static final Logger log = Logger.getLogger(MsDataUploadProperties.class.getName());
     
-//    private static boolean uploadToTempTables = false;
-//    private static boolean uploadOneExperiment = false;
-//    private static int uploadSyncHour;
-//    private static int uploadSyncMinutes;
-//    
-//    private static String mysqlTempDirectory;
-    
     private static String backupDirectory;
     
     private static PeakStorageType peakStorageType;
@@ -52,22 +45,6 @@ public class MsDataUploadProperties {
         peakStorageType = PeakStorageType.instance(value);
         log.info("PeakStorageType is "+peakStorageType.name());
         
-//        value = props.getProperty("upload.usetemp");
-//        uploadToTempTables = Boolean.valueOf(value);
-//        log.info("Upload to temp tables: "+uploadToTempTables);
-//        
-//        value = props.getProperty("upload.sync.single_experiment");
-//        uploadOneExperiment = Boolean.valueOf(value);
-//        log.info("Uploader will sync databases after one experiment: "+uploadOneExperiment);
-//        
-//        value = props.getProperty("upload.sync.hour");
-//        uploadSyncHour = Integer.parseInt(value);
-//        
-//        value = props.getProperty("upload.sync.minutes");
-//        uploadSyncMinutes = Integer.parseInt(value);
-//        
-//        mysqlTempDirectory = props.getProperty("upload.temp.dir");
-        
         backupDirectory = props.getProperty("backup.dir");
         
         value = props.getProperty("interact.pepxml.checkpeptideproteinmatches");
@@ -82,36 +59,13 @@ public class MsDataUploadProperties {
         value = props.getProperty("use.single.query");
         useSingleQuery = Boolean.parseBoolean(value);
         
-//        log.info("Uploader will sync databases at time: "+uploadSyncHour+":"+uploadSyncMinutes);
-        
     }
     
     private MsDataUploadProperties() {}
     
-//    public static boolean uploadToTempTables() {
-//        return uploadToTempTables;
-//    }
-//    
-//    public static boolean uploadOneExperiment() {
-//        return uploadOneExperiment;
-//    }
-    
-//    public static Timestamp uploadTime() {
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.set(Calendar.HOUR_OF_DAY, uploadSyncHour);
-//        calendar.set(Calendar.MINUTE, uploadSyncMinutes);
-//        calendar.set(Calendar.SECOND, 0);
-//        calendar.set(Calendar.MILLISECOND, 0);
-//        return new Timestamp(calendar.getTimeInMillis());
-//    }
-    
     public static PeakStorageType getPeakStorageType() {
         return peakStorageType;
     }
-    
-//    public static String getMysqlTempDirectory() {
-//        return mysqlTempDirectory;
-//    }
     
     public static String getBackupDirectory() {
         return backupDirectory;
