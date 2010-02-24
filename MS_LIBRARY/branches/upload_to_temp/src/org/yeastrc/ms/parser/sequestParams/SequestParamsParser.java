@@ -44,6 +44,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
     private List<Param> paramList;
 
     private boolean reportEvalue = false;
+    private boolean printDuplicateReferences = false;
     private MsSearchDatabaseIn database;
     private String enzymeCode;
     private MsEnzymeIn enzyme;
@@ -102,6 +103,10 @@ public class SequestParamsParser implements SearchParamsDataProvider {
     
     public boolean reportEvalue() {
         return reportEvalue;
+    }
+    
+    public boolean printDuplicateReferences() {
+        return printDuplicateReferences;
     }
 
     public List<Param> getParamList() {
@@ -229,6 +234,12 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         }
         else if (parsedStaticTerminalModParam(param.getParamName(), param.getParamValue())) return;
         else if (parsedStaticResidueModParam(param.getParamName(), param.getParamValue()))  return;
+        
+        // print_duplicate_references
+        if (param.getParamName().equalsIgnoreCase("print_duplicate_references")) {
+            if (param.getParamValue().equals("1"))
+                printDuplicateReferences = true;
+        }
     }
 
     boolean parsedStaticTerminalModParam(String paramName, String paramValue) throws DataProviderException {
