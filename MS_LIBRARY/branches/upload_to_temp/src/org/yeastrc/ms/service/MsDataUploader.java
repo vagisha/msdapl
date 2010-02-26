@@ -20,7 +20,7 @@ public class MsDataUploader {
 
     private static final Logger log = Logger.getLogger(MsDataUploader.class);
     
-    private List<Integer> uploadedAnalysisIds;
+    private List<Integer> uploadedAnalysisIds = new ArrayList<Integer>();
     private int uploadedSearchId;
     private int uploadedExptId;
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
@@ -44,6 +44,7 @@ public class MsDataUploader {
     
     private void resetUploader() {
         uploadExceptionList.clear();
+        uploadedAnalysisIds.clear();
         uploadedSearchId = 0;
         uploadedExptId = 0;
     }

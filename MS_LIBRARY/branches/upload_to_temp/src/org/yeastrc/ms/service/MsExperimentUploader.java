@@ -268,6 +268,7 @@ public class MsExperimentUploader {
             adus.setSearchId(searchId);
             adus.setSearchDataFileNames(sdus.getFileNames());
             adus.upload();
+            uploadedAnalysisIds = adus.getUploadedAnalysisIds();
         }
         else {
             log.error("No AnalysisDataUploadService found");
