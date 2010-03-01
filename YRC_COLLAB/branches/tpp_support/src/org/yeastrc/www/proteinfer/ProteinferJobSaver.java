@@ -135,7 +135,7 @@ public class ProteinferJobSaver {
             List<ProteinInferIputFile> inputfiles = new ArrayList<ProteinInferIputFile>(1);
             inputfiles.add(runSearch);
             submitProtInferJob(submitterId, params, inputType, inputSummary.getInputGroupId(), 
-            		inputSummary.getInputFiles(), comment);
+            		inputfiles, comment);
             
         }
     }
