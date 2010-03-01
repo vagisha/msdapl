@@ -25,6 +25,7 @@ public class ProteinInferenceForm extends ActionForm {
     private ProteinInferInputSummary inputSummary;
     private InputType inputType;
     private String comments;
+    private boolean individualRuns = false;
     
     public String getComments() {
         return comments;
@@ -129,5 +130,13 @@ public class ProteinInferenceForm extends ActionForm {
     
     public void setProjectId(int projectId) {
         this.projectId = projectId;
+    }
+    
+    public boolean isIndividualRuns() {
+        return individualRuns;
+    }
+    
+    public void setIndividualRuns(boolean individual) {
+        this.individualRuns = individual;
     }
 }
