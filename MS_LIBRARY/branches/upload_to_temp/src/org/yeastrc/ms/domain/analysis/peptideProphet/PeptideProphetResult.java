@@ -13,7 +13,7 @@ import org.yeastrc.ms.domain.search.MsSearchResult;
  */
 public interface PeptideProphetResult extends MsSearchResult {
 
-    public abstract int getSearchResultId();
+    public abstract int getPeptideProphetResultId();
     
     public abstract int getRunSearchAnalysisId();
     

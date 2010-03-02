@@ -15,7 +15,7 @@ import org.yeastrc.ms.domain.search.impl.SearchResultBean;
 public class PeptideProphetResultBean extends SearchResultBean implements PeptideProphetResult {
 
     private PeptideProphetResultData data = new PeptideProphetResultData();
-    private int searchResultId;
+    private int peptideProphetResultId;
     private int runSearchAnalysisId;
     
     public boolean hasAllNttProb() {
@@ -123,11 +123,11 @@ public class PeptideProphetResultBean extends SearchResultBean implements Peptid
     }
     
     @Override
-    public int getSearchResultId() {
-        return this.searchResultId;
+    public int getPeptideProphetResultId() {
+        return this.peptideProphetResultId;
     }
     
-    public void setSearchResultId(int resultId) {
-        this.searchResultId = resultId;
+    public void setPeptideProphetResultId(int peptideProphetResultId) {
+        this.peptideProphetResultId = peptideProphetResultId;
     }
 }

@@ -6,6 +6,11 @@ public interface PercolatorResultDataWId {
 
     public abstract int getRunSearchAnalysisId();
     
+    /**
+     * This will return the ID of the base search results which the Percolator result is based on
+     * (id column in the msRunSearchResult table).
+     * @return
+     */
     public abstract int getSearchResultId();
     
     /**

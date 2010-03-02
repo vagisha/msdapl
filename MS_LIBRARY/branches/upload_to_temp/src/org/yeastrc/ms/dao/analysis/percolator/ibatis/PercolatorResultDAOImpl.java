@@ -835,11 +835,11 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         }
     }
     
-    private PercolatorResultBean makePercolatorResult(ResultSet rs)
+	private PercolatorResultBean makePercolatorResult(ResultSet rs)
             throws SQLException {
         PercolatorResultBean result = new PercolatorResultBean();
-        result.setId(rs.getInt("presID"));
-        result.setSearchResultId(rs.getInt("sresID"));
+        result.setId(rs.getInt("sresID"));
+        result.setPercolatorResultId(rs.getInt("presID"));
         result.setRunSearchId(rs.getInt("runSearchID"));
         result.setRunSearchAnalysisId(rs.getInt("runSearchAnalysisID"));
         result.setScanId(rs.getInt("scanID"));

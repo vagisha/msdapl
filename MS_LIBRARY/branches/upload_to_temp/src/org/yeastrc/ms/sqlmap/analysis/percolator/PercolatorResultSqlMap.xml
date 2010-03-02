@@ -11,8 +11,8 @@
 	<!-- All properties of the "super" resultMap will be included as part of this resultMap, 			-->
 	<!-- and values from the "super" resultMap  are set before any values specified by this resultMap 	-->
 	<resultMap class="PercolatorResultOut" id="percolatorResultResult" extends="MsSearchResult.msSearchBaseResult">
-		<result property="id" column="presID" />
-		<result property="searchResultId" column="sresID" />
+		<result property="id" column="sresID" />
+		<result property="percolatorResultId" column="presID" />
 		<result property="runSearchAnalysisId" column="runSearchAnalysisID" nullValue="0"/>
 		<result property="qvalue" column="qvalue" nullValue="-1.0"/>
 		<result property="posteriorErrorProbability" column="pep" nullValue="-1.0"/>
