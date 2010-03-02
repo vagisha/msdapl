@@ -156,8 +156,8 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
             }
             
             SpectrumMatchNoFDRImpl specMatch = new SpectrumMatchNoFDRImpl();
-            specMatch.setResultId(result.getId());
-            specMatch.setSearchResultId(result.getSearchResultId());
+            specMatch.setResultId(result.getPercolatorResultId());
+            specMatch.setSearchResultId(result.getId());
             specMatch.setScanId(result.getScanId());
             specMatch.setCharge(result.getCharge());
             specMatch.setSourceId(result.getRunSearchAnalysisId());
