@@ -104,6 +104,8 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MS2RunDAO {
     @Override
     public boolean isGeneratedByBullseye(int runId) {
         MS2Run run = loadRun(runId);
+        if(run == null) // we did not find a MS2 run with this runId
+        	return false;
         List<MS2NameValuePair> headers = run.getHeaderList();
         // get the value of the file header with name "FileGenerator"
         for(MS2NameValuePair header: headers) {
