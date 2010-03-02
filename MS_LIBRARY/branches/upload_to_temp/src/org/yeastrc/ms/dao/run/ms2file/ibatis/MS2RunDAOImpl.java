@@ -7,6 +7,7 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2HeaderDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
+import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsRunLocation;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
@@ -57,7 +58,11 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MS2RunDAO {
     public MS2Run loadRun(int runId) {
         // MsRun.select has a discriminator and will instantiate the
         // appropriate type of run object
-        return (MS2Run) queryForObject("MsRun.select", runId);
+        MsRun run = (MsRun)queryForObject("MsRun.select", runId);
+        if(run instanceof MS2Run)
+        	return (MS2Run)run;
+        else
+        	return null;
     }
 
     @Override
