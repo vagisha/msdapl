@@ -37,6 +37,7 @@ import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerResultSummary;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
+import org.yeastrc.www.util.RoundingUtils;
 
 import edu.uwpr.protinfer.idpicker.IDPickerParams;
 import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
@@ -205,7 +206,8 @@ public class ViewProteinInferenceResultAction extends Action {
         request.setAttribute("totalDecoyHits", totalDecoyHits);
         request.setAttribute("totalTargetHits", totalTargetHits);
         request.setAttribute("filteredTargetHits", filteredTargetHits);
-        request.setAttribute("filteredPercent", round(filteredTargetHits*100.0/(double)totalTargetHits));
+        request.setAttribute("filteredPercent", 
+        		RoundingUtils.getInstance().roundTwo(filteredTargetHits*100.0/(double)totalTargetHits));
         request.setAttribute("filteredUniquePeptideCount", IdPickerResultsLoader.getUniquePeptideCount(pinferId));
         
         // Results summary
@@ -257,9 +259,4 @@ public class ViewProteinInferenceResultAction extends Action {
         }
         return false;
     }
-    
-    private static double round(double num) {
-        return Math.round(num*100.0)/100.0;
-    }
-
 }
