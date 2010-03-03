@@ -207,6 +207,9 @@ function fold(foldable) {
  <logic:equal name="dir" scope="request" value="upload">
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>
+ <logic:equal name="dir" scope="request" value="search">
+ 	<%home_class = "current"; home_menus = true;%>
+ </logic:equal>
  
  <logic:equal name="dir" scope="request" value="account">
  	<%account_class = "current"; account_menus = true;%>
@@ -246,6 +249,8 @@ function fold(foldable) {
         <yrcwww:member group="any">
    			<li><html:link action="uploadMSDataFormAction.do"><span>Upload Data</span></html:link></li>
    			<li><html:link action="listUploadJobs.do"><span>List Uploads</span></html:link></li>
+   			<li><html:link action="availableFasta.do"><span>Available FASTA</span></html:link></li>
+   			<li><a href="<yrcwww:link path='pages/admin/search/searchProjects.jsp'/>" title="Search Projects" class="<%=home_class %>"><span>Search Projects</span></a></li>
    		</yrcwww:member>
    <%} %>
    <%if(admin_menus) { %>
