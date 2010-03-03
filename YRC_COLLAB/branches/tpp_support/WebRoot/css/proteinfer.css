@@ -42,11 +42,11 @@
 	border-width: medium 1px 1px medium;
 	border-color: #FFFFFF #CBCBCB #F2F2F2 #FFFFFF;
 	padding: 3 3 3 3;
-	text-align: center;
+	text-align: left;
 }
 
-.table_pinfer td.left_align {
-	text-align: left;
+.table_pinfer td.center_align {
+	text-align: center;
 }
 
 .table_pinfer TD.no-border {

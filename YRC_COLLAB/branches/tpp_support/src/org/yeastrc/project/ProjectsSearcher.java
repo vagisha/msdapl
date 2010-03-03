@@ -28,13 +28,10 @@ import org.yeastrc.db.DBConnectionManager;
 public class ProjectsSearcher {
 
     // The Strings we are using to conduct the search
-    private Set searchTokens;
-    
-    // The project types to include in the results
-    private Set types;
+    private Set<String> searchTokens;
     
     // The groups to which the projects belong to include in the results
-    private Set groups;
+    private Set<String> groups;
     
     // The researcher requesting the list, or just the researcher who's access privledges are taken into account when making the list
     private Researcher researcher;
@@ -50,13 +47,12 @@ public class ProjectsSearcher {
      * Get a new ProjectSearch
      */
     public ProjectsSearcher() {
-        this.searchTokens = new HashSet();
-        this.types = new HashSet();
-        this.groups = new HashSet();
+        this.searchTokens = new HashSet<String>();
+        this.groups = new HashSet<String>();
     }
 
-    public List search() throws SQLException {
-        ArrayList retList = new ArrayList();
+    public List<Project> search() throws SQLException {
+        ArrayList<Project> retList = new ArrayList<Project>();
         
         // Get our connection to the database.
         Connection conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
@@ -71,24 +67,6 @@ public class ProjectsSearcher {
             sqlStr += "LEFT OUTER JOIN tblResearchers AS RPI ON RPI.researcherID = P.projectPI ";
             sqlStr += "LEFT OUTER JOIN tblResearchers AS R ON R.researcherID = PR.researcherID";
             
-            // We have a project type constraint
-            if (this.types.size() > 0) {
-                sqlStr += " WHERE";
-                haveConstraint = true;
-                
-                sqlStr += " (";
-                
-                Iterator iter = this.types.iterator();
-                String type = (String)(iter.next());
-                sqlStr += "P.projectType = '" + type + "'";
-                
-                while (iter.hasNext()) {
-                    type = (String)(iter.next());
-                    sqlStr += " OR P.projectType = '" + type + "'";
-                }
-                
-                sqlStr += ")";
-            }
 
             // We have search tokens
             if (this.searchTokens.size() > 0) {
@@ -99,16 +77,17 @@ public class ProjectsSearcher {
                     haveConstraint = true;
                 }
                 
-                Iterator iter = this.searchTokens.iterator();
-                String tok = (String)(iter.next());
+                Iterator<String> iter = this.searchTokens.iterator();
+                String tok = iter.next();
                 String tokSearchStr = "(RPI.researcherLastName LIKE '%" + tok + "%' OR ";
                 tokSearchStr += "RPI.researcherFirstName LIKE '%" + tok + "%' OR ";
                 tokSearchStr += "R.researcherLastName LIKE '%" + tok + "%' OR ";
                 tokSearchStr += "R.researcherFirstName LIKE '%" + tok + "%' OR ";
                 tokSearchStr += "P.projectAbstract LIKE '%" + tok + "%' OR ";
-                tokSearchStr += "P.publicAbstract LIKE '%" + tok + "%' OR ";
-                tokSearchStr += "P.projectKeywords LIKE '%" + tok + "%' OR ";
+//                tokSearchStr += "P.publicAbstract LIKE '%" + tok + "%' OR ";
+//                tokSearchStr += "P.projectKeywords LIKE '%" + tok + "%' OR ";
                 tokSearchStr += "P.projectProgress LIKE '%" + tok + "%' OR ";
+                tokSearchStr += "P.projectComments LIKE '%" + tok + "%' OR ";
                 tokSearchStr += "P.projectTitle LIKE '%" + tok + "%')";
 
                 
@@ -123,9 +102,10 @@ public class ProjectsSearcher {
                     tokSearchStr += "R.researcherLastName LIKE '%" + tok + "%' OR ";
                     tokSearchStr += "R.researcherFirstName LIKE '%" + tok + "%' OR ";
                     tokSearchStr += "P.projectAbstract LIKE '%" + tok + "%' OR ";
-                    tokSearchStr += "P.publicAbstract LIKE '%" + tok + "%' OR ";
-                    tokSearchStr += "P.projectKeywords LIKE '%" + tok + "%' OR ";
+//                    tokSearchStr += "P.publicAbstract LIKE '%" + tok + "%' OR ";
+//                    tokSearchStr += "P.projectKeywords LIKE '%" + tok + "%' OR ";
                     tokSearchStr += "P.projectProgress LIKE '%" + tok + "%' OR ";
+                    tokSearchStr += "P.projectComments LIKE '%" + tok + "%' OR ";
                     tokSearchStr += "P.projectTitle LIKE '%" + tok + "%')";
     
                     sqlStr += " AND " + tokSearchStr;
@@ -239,15 +219,6 @@ public class ProjectsSearcher {
         this.searchTokens.add(phrase);
     }
     
-    /**
-     * Add a project type to search by.
-     * @param type
-     */
-    public void addType(String type) {
-        if (type == null) return;
-        this.types.add(type);
-    }
-
     /**
      * Add a YRC group to search by
      * @param group

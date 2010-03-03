@@ -27,7 +27,7 @@ $(document).ready(function() {
 });
 </script>
 
-<yrcwww:contentbox title="Available Fasta Files" centered="true" width="850">
+<yrcwww:contentbox title="Available Fasta Files" centered="true" width="90" widthRel="true">
 <center>
 <table width="98%" class="table_basic sortable_table stripe_table">	
 

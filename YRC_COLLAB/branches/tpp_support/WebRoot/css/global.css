@@ -207,22 +207,22 @@ DIV.pinfer_header_small {
 	border-width: medium 1px 1px medium;
 	border-collapse: separate;
 }
-.table_basic TH.sortable:hover {
+.table_basic TH.sortable:hover, .sortable_table TH.sortable:hover {
 	color:#D74D2D;
 	cursor:pointer;
 }
-.table_basic TH.sorted-asc {
+.table_basic TH.sorted-asc, .sortable_table TH.sorted-asc{
 	background: #D8D8DA url(../images/sprite.png) repeat-x scroll 0 -1502px;
 	color: #FFFFFF;
 }
-.table_basic TH.sorted-asc:hover {
+.table_basic TH.sorted-asc:hover, .sortable_table TH.sorted-asc:hover {
 	color: #FFFFFF;
 }
-.table_basic TH.sorted-desc {
+.table_basic TH.sorted-desc, .sortable_table TH.sorted-desc {
 	background: #D8D8DA url(../images/sprite.png) repeat-x scroll 0 -1502px;
 	color: #FFFFFF;
 }
-.table_basic TH.sorted-desc:hover {
+.table_basic TH.sorted-desc:hover, .sortable_table TH.sorted-desc:hover {
 	color: #FFFFFF;
 }
 
@@ -238,11 +238,11 @@ DIV.pinfer_header_small {
 	border-width: medium 1px 1px medium;
 	border-color: #FFFFFF #CBCBCB #F2F2F2 #FFFFFF;
 	padding: 3 3 3 3;
-	text-align: center;
+	text-align: left;
 }
 
-.table_basic td.left_align, .table_compare_grp td.left_align {
-	text-align: left;
+.table_basic td.center_align, .table_compare_grp td.center_align{
+	text-align: center;
 }
 
 .table_compare_grp td {

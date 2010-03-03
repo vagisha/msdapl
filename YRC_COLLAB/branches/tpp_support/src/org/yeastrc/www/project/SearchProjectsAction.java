@@ -16,6 +16,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectsSearcher;
 import org.yeastrc.project.Researcher;
 import org.yeastrc.www.user.User;
@@ -37,7 +38,6 @@ public class SearchProjectsAction extends Action {
 	throws Exception {
 		String searchString;
 		String[] groups;
-		String[] types;
 		
 		HttpSession session = request.getSession();
 		
@@ -56,7 +56,6 @@ public class SearchProjectsAction extends Action {
 		// Get our search parameters
 		searchString = ((SearchProjectsForm)(form)).getSearchString();
 		groups = ((SearchProjectsForm)(form)).getGroups();
-		types = ((SearchProjectsForm)(form)).getTypes();
 		
 		// Get our project search orject
 		ProjectsSearcher ps = new ProjectsSearcher();
@@ -76,18 +75,11 @@ public class SearchProjectsAction extends Action {
 			}
 		}
 		
-		// Add our types
-		if (types != null) {
-			for (int i = 0; i < types.length; i++) {
-				ps.addType(types[i]);
-			}
-		}
-
 		// Put the access constraint on the search
 		ps.setResearcher(researcher);
 		
 		// Get our list of projects
-		List projects = ps.search();
+		List<Project> projects = ps.search();
 		
 		// Set this list into the request
 		session.setAttribute("projectsSearch", projects);
