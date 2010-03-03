@@ -56,6 +56,7 @@
 	<form-bean name="MSCommentsForm" type="org.yeastrc.www.yates.MSCommentsForm"/>
 	<form-bean name="editGrantForm" type="org.yeastrc.www.project.EditGrantForm"></form-bean>
 	<form-bean name="addInstrumentForm" type="org.yeastrc.www.admin.AddInstrumentForm"/>
+	<form-bean name="qcPlotsFilterForm" type="org.yeastrc.www.project.experiment.stats.QcPlotsFilterForm"></form-bean>
 	<form-bean name="filterPercolatorResultsForm" type="org.yeastrc.www.project.experiment.PercolatorFilterResultsForm" />
 	<form-bean name="filterPeptideProphetResultsForm" type="org.yeastrc.www.project.experiment.PeptideProphetFilterResultsForm" />
 	<form-bean name="filterSequestResultsForm" type="org.yeastrc.www.project.experiment.SequestFilterResultsForm" />
@@ -449,6 +450,28 @@
 	  input="/pages/internal/project/xtandem/viewXtandemResults.jsp">
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	  <forward name="Success" path="/pages/internal/project/xtandem/viewXtandemResults.jsp" redirect="false"/>
+	</action>
+	
+	<!-- ================================================================================== -->
+	<!-- Actions related to QC results -->
+	<!-- ================================================================================== -->
+	<action
+	  path="/viewQCPlots"
+	  type="org.yeastrc.www.project.experiment.stats.ViewAnalysisStats"
+	  name="qcPlotsFilterForm"
+	  validate="false">
+	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+	  <forward name="Success" path="/pages/internal/project/stats/viewQCResults.jsp" redirect="false"/>
+	</action>
+	
+	<action
+	  path="/updateQCPlots"
+	  type="org.yeastrc.www.project.experiment.stats.UpdateAnalysisStats"
+	  name="qcPlotsFilterForm"
+	  validate="true"
+	  input="/pages/internal/project/stats/viewQCResults.jsp">
+	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+	  <forward name="Success" path="/pages/internal/project/stats/viewQCResults.jsp" redirect="false"/>
 	</action>
 	
 	<!-- ================================================================================== -->
