@@ -76,7 +76,7 @@
 				<td align="left" valign="top" style="width:8%;font-size:8pt;">
 
 					<logic:equal name="job" property="status" value="4">
-						<a href="<yrcwww:link path='viewYatesRun.do?'/>id=<bean:write name="job" property="runID" />"><bean:write name="job" property="statusDescription" /></a>
+						<a href="<yrcwww:link path='viewProject.do?ID='/><bean:write name="job" property="projectID" />#Expt<bean:write name="job" property="experimentID" />"><bean:write name="job" property="statusDescription" /></a>
 					</logic:equal>
 					<logic:notEqual name="job" property="status" value="4">
 						<bean:write name="job" property="statusDescription" />
