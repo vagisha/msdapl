@@ -257,6 +257,20 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
                                 // group only by indistinct group ID
         
         
+        // If the user if filtering on peptide charge states
+        List<Integer> ids_chargeStates = null;
+        if(filterCriteria.getChargeStates().size() > 0 || filterCriteria.getChargeGreaterThan() != -1) {
+            ids_chargeStates = proteinIdsByPeptideChargeState(pinferId, filterCriteria.getChargeStates(),
+                    filterCriteria.getChargeGreaterThan());
+        }
+        
+        // If the user wants to exclude indistinguishable protein groups get the protein IDs that are not
+        // in a indistinguishable protein group.
+        List<Integer> notInGroup = null;
+        if(filterCriteria.isExcludeIndistinGroups()) {
+            notInGroup = proteinsNotInGroup(pinferId);
+        }
+        
         // If the user is only interested in proteins with a certain peptide
         List<Integer> peptideMatches = null;
         if(filterCriteria.getPeptide() != null) {
@@ -267,52 +281,59 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         // that returned sorted results
         if(filterCriteria.getSortBy() == SORT_BY.COVERAGE) {
             Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, 
-                    ids_probability_grp, ids_probability_prot, peptideMatches);
+                    ids_probability_grp, ids_probability_prot, ids_chargeStates, notInGroup, peptideMatches);
             return getCommonIds(ids_cov, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_SPECTRA) {
             Set<Integer> others = combineLists(ids_cov, ids_pept, ids_uniq_pept, ids_validation_status, 
-                    ids_probability_grp, ids_probability_prot, peptideMatches);
+                    ids_probability_grp, ids_probability_prot, ids_chargeStates, notInGroup, peptideMatches);
             return getCommonIds(ids_spec_count, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_PEPT) {
             Set<Integer> others = combineLists(ids_spec_count, ids_cov, ids_uniq_pept, ids_validation_status, 
-                    ids_probability_grp, ids_probability_prot, peptideMatches);
+                    ids_probability_grp, ids_probability_prot, ids_chargeStates, notInGroup, peptideMatches);
             return getCommonIds(ids_pept, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_UNIQ_PEPT) {
             Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_validation_status, 
-                    ids_probability_grp, ids_probability_prot, peptideMatches);
+                    ids_probability_grp, ids_probability_prot, ids_chargeStates, notInGroup, peptideMatches);
             return getCommonIds(ids_uniq_pept, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.PROTEIN_PROPHET_GROUP) {
             Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, 
-                    ids_probability_grp, ids_probability_prot, peptideMatches);
+                    ids_probability_grp, ids_probability_prot, ids_chargeStates, notInGroup, peptideMatches);
             List<Integer> idsbyGroup = sortProteinIdsByProteinProphetGroup(pinferId);
             return getCommonIds(idsbyGroup, others);
         }
         else if(filterCriteria.getSortBy() == SORT_BY.VALIDATION_STATUS) {
             Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, 
-                    ids_probability_grp, ids_probability_prot, peptideMatches);
+                    ids_probability_grp, ids_probability_prot, ids_chargeStates, notInGroup, peptideMatches);
             return getCommonIds(ids_validation_status, others);
         }
         else if(filterCriteria.getSortBy() == SORT_BY.PROBABILITY_GRP) {
             Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status,
-                    ids_probability_prot, peptideMatches);
+                    ids_probability_prot, ids_chargeStates, notInGroup, peptideMatches);
             return getCommonIds(ids_probability_grp, others);
         }
         else if(filterCriteria.getSortBy() == SORT_BY.PROBABILITY_PROT) {
             Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status,
-                    ids_probability_grp, peptideMatches);
+                    ids_probability_grp, ids_chargeStates, notInGroup, peptideMatches);
             return getCommonIds(ids_probability_prot, others);
         }
         else {
             Set<Integer> combineLists = combineLists(ids_cov, ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, 
-                    ids_probability_grp, ids_probability_prot, peptideMatches);
+                    ids_probability_grp, ids_probability_prot, ids_chargeStates, notInGroup, peptideMatches);
             return new ArrayList<Integer>(combineLists);
         }
     }
     
+    public List<Integer> proteinsNotInGroup(int pinferId) {
+        return queryForList(sqlMapNameSpace+".proteinsNotInGroup", pinferId);
+    }
+    
+    // -----------------------------------------------------------------------------------
+    // FILTER NRSEQ PROTEIN IDS 
+    // -----------------------------------------------------------------------------------
     public List<Integer> getFilteredNrseqIds(int pinferId, ProteinProphetFilterCriteria filterCriteria) {
         
         // Get a list of protein ids filtered by sequence coverage
@@ -618,6 +639,27 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         if(sort)                    map.put("sort", 1);
         if(sort && groupProteins)   map.put("groupProteins", 1);
         return queryForList(sqlMapNameSpace+".filterBySpecCount", map);
+    }
+    
+    // -----------------------------------------------------------------------------------
+    // PEPTIDE CHARGE STATE
+    // -----------------------------------------------------------------------------------
+    private List<Integer> proteinIdsByPeptideChargeState(int pinferId,
+            List<Integer> chargeStates, int chargeGreaterThan) {
+        Map<String, Object> map = new HashMap<String, Object>(6);
+        map.put("pinferId", pinferId);
+        if(chargeStates != null && chargeStates.size() > 0) {
+            String cs = "";
+            for(Integer c: chargeStates)
+                cs += ","+c;
+            if(cs.length() > 0) cs = cs.substring(1); // remove first comma
+            cs = "("+cs+")";
+            map.put("chargeStates", cs);
+        }
+        if(chargeGreaterThan != -1) {
+            map.put("chargeGreaterThan", chargeGreaterThan);
+        }
+        return queryForList(sqlMapNameSpace+".filterByChargeStates", map);
     }
     
     // -----------------------------------------------------------------------------------------------

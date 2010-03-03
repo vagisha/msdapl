@@ -197,6 +197,13 @@
     	</isPropertyAvailable>
     </select>
     
+     <select id="proteinsNotInGroup" resultClass="Integer" parameterClass="Integer">
+    	SELECT id, count(*) AS cnt FROM msProteinInferProtein AS prot, ProteinProphetProtein as ppProt
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = ppProt.piProteinID
+    	GROUP BY ppProt.groupID HAVING cnt = 1
+    </select>
+    
     <select id="filterByCoverage" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT id FROM msProteinInferProtein 
     	WHERE piRunID=#pinferId#
@@ -251,6 +258,27 @@
     	</isPropertyAvailable>
     </select>
 
+	<select id="filterByChargeStates" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT DISTINCT(m.piProteinID) 
+    	FROM msProteinInferProteinPeptideMatch AS m, 
+    	msProteinInferPeptide AS pept, 
+    	msProteinInferIon AS ion 
+    	WHERE pept.piRunID=#pinferId#
+    	AND pept.id = ion.piPeptideID 
+    	AND pept.id = m.piPeptideID
+    	AND (
+    	<isPropertyAvailable property="chargeStates">
+    		ion.charge IN $chargeStates$ 
+    		<isPropertyAvailable property="chargeGreaterThan">
+    			OR
+    		</isPropertyAvailable>
+    	</isPropertyAvailable>
+    	<isPropertyAvailable property="chargeGreaterThan">
+    		ion.charge > #chargeGreaterThan#
+    	</isPropertyAvailable>
+    	)
+    </select>
+    
     <select id="filterBySpecCount" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT prot.id, count(*) AS cnt 
     	FROM msProteinInferProtein AS prot, 
