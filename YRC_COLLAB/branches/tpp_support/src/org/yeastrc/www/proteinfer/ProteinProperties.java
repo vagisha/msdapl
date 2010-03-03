@@ -20,11 +20,10 @@ public final class ProteinProperties {
     private double molecularWt;
     private double pi;
     
-    public ProteinProperties(int pinferProteinId, int pinferProteinGroupId) {
+    public ProteinProperties(int pinferProteinId) {
         this.pinferProteinId = pinferProteinId;
-        this.proteinGroupId = pinferProteinGroupId;
     }
-
+    
     public int getPinferProteinId() {
         return pinferProteinId;
     }
@@ -44,7 +43,7 @@ public final class ProteinProperties {
     public int getProteinGroupId() {
         return proteinGroupId;
     }
-
+    
     public void setProteinGroupId(int proteinGroupId) {
         this.proteinGroupId = proteinGroupId;
     }

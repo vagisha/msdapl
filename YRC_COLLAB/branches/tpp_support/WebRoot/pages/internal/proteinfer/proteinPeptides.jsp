@@ -26,6 +26,8 @@
      <th class="sort-alpha" align="left">Peptide</th>
      <th class="sort-int" align="left">Charge</th>
      <th class="sort-int" align="left"># Spectra</th>
+     <th class="sort-float" align="left">RT</th>
+     
      <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
      	<th class="sort-float" align="left">Best FDR</th>
      </logic:equal>
@@ -42,6 +44,9 @@
      	<th class="sort-float" align="left">Primary Score</th>
      </logic:equal>
      <logic:equal name="inputGenerator" value="<%=Program.PERCOLATOR.name() %>">
+     	<logic:equal name="hasPrecursorArea" value="true">
+     		<th class="sort-alpha" align="left">Area</th>
+     	</logic:equal>
      	<th class="sort-float" align="left">qValue</th>
      	<logic:notPresent name="oldPercolator">
      		<th class="sort-float" align="left">PEP</th>
@@ -79,6 +84,7 @@
      		<td class="left_align"><bean:write name="ion" property="ionSequence" /></td>
      		<td><bean:write name="ion" property="charge" /></td>
      		<td><bean:write name="ion" property="spectrumCount" /></td>
+     		<td><bean:write name="ion" property="retentionTime" /></td>
      		
      		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
      			<bean:define name="ion" property="ion.bestSpectrumMatch" id="psm_idp" type="org.yeastrc.ms.domain.protinfer.idpicker.IdPickerSpectrumMatch"/>
@@ -115,6 +121,9 @@
      		</logic:equal>
      		 
      		<logic:equal name="inputGenerator" value="<%=Program.PERCOLATOR.name() %>">
+     			<logic:equal name="hasPrecursorArea" value="true">
+     				<td><bean:write name="ion" property="precursorArea" /></td>
+     			</logic:equal>
      		 	<bean:define name="ion" property="bestSpectrumMatch" id="psm_perc" type="org.yeastrc.ms.domain.analysis.percolator.PercolatorResult"/>
      		 	<td><bean:write name="psm_perc" property="qvalueRounded" /></td>
      		 	<logic:notPresent name="oldPercolator">
@@ -125,7 +134,7 @@
 	     		</logic:present>
 	     		<td>
 	     		<span style="text-decoration: underline; cursor: pointer;" 
-				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_perc" property="searchResultId" />)" >
+				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_perc" property="id" />)" >
 				View
 				</span>
 				</td>
@@ -149,7 +158,7 @@
 	     		<td><bean:write name="psm_peptProphet" property="fValRounded" /></td>
 	     		<td>
 	     		<span style="text-decoration: underline; cursor: pointer;" 
-				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_peptProphet" property="searchResultId" />)" >
+				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_peptProphet" property="id" />)" >
 				View
 				</span>
 				</td>

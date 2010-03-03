@@ -105,12 +105,16 @@ public class UpdateProteinProphetResultAjaxAction extends Action {
         filterCriteria.setSortOrder(filterCritSession == null ? 
                 ProteinProphetFilterCriteria.defaultSortOrder() : 
                 filterCritSession.getSortOrder());
+        filterCriteria.setExcludeIndistinGroups(filterForm.isExcludeIndistinProteinGroups());
         filterCriteria.setGroupProteins(filterForm.isJoinProphetGroupProteins());
-        if(!filterForm.isShowAllProteins())
+        if(filterForm.isExcludeSubsumed())
             filterCriteria.setParsimoniousOnly();
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
+        filterCriteria.setChargeStates(filterForm.getChargeStateList());
+        filterCriteria.setChargeGreaterThan(filterForm.getChargeGreaterThan());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
+        filterCriteria.setDescriptionNotLike(filterForm.getDescriptionNotLike());
         filterCriteria.setPeptide(filterForm.getPeptide());
         filterCriteria.setExactPeptideMatch(filterForm.getExactPeptideMatch());
         

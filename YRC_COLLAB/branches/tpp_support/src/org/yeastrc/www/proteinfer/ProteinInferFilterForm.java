@@ -1,5 +1,8 @@
 package org.yeastrc.www.proteinfer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionErrors;
@@ -28,11 +31,14 @@ public class ProteinInferFilterForm extends ActionForm {
     private boolean showAllProteins = true;
     private boolean collapseGroups = false; // Used for downloads only
     private boolean printPeptides = false; // Used for downloads only
+    private boolean printDescription = false; // used for downloads only
     
     private String accessionLike = null;
     private String descriptionLike = null;
     private String descriptionNotLike = null;
     private String[] validationStatus = new String[]{"All"};
+    
+    private String[] chargeStates = new String[]{"All"};
     
     private boolean excludeIndistinGroups = false;
     
@@ -46,7 +52,6 @@ public class ProteinInferFilterForm extends ActionForm {
     public ProteinInferFilterForm () {}
     
     public void reset() {
-        
         // These need to be set to false because if a checkbox is not checked the browser does not
         // send its value in the request.
         // http://struts.apache.org/1.1/faqs/newbie.html#checkboxes
@@ -63,6 +68,7 @@ public class ProteinInferFilterForm extends ActionForm {
         accessionLike = null;
         descriptionLike = null;
         descriptionNotLike = null;
+        
     }
     
     /**
@@ -364,6 +370,49 @@ public class ProteinInferFilterForm extends ActionForm {
             buf.deleteCharAt(0);
         return buf.toString();
     }
+    
+    // CHARGE STATES
+    public String[] getChargeStates() {
+        return chargeStates;
+    }
+
+    public void setChargeStates(String[] chargeStates) {
+        this.chargeStates = chargeStates;
+    }
+    
+    public List<Integer> getChargeStateList() {
+        List<Integer> chgList = new ArrayList<Integer>(chargeStates.length);
+        for(String chg: chargeStates) {
+            if(chg.equals("All"))
+                return new ArrayList<Integer>(0);
+            if(!chg.startsWith(">")) {
+                chgList.add(Integer.parseInt(chg));
+            }
+        }
+        return chgList;
+    }
+    
+    public int getChargeGreaterThan() {
+        for(String chg: chargeStates) {
+            if(chg.startsWith(">")) {
+                return Integer.parseInt(chg.substring(1));
+            }
+        }
+        return -1;
+    }
+    
+    public String getChargeStatesString() {
+        if(this.chargeStates == null)
+            return null;
+        StringBuilder buf = new StringBuilder();
+        for(String chg: chargeStates) {
+            buf.append(",");
+            buf.append(chg);
+        }
+        if(buf.length() > 0)
+            buf.deleteCharAt(0);
+        return buf.toString();
+    }
 
     public boolean isCollapseGroups() {
         return collapseGroups;
@@ -379,6 +428,14 @@ public class ProteinInferFilterForm extends ActionForm {
 
     public void setPrintPeptides(boolean printPeptides) {
         this.printPeptides = printPeptides;
+    }
+    
+    public boolean isPrintDescriptions() {
+        return printDescription;
+    }
+
+    public void setPrintDescriptions(boolean printDescription) {
+        this.printDescription = printDescription;
     }
    
     //-----------------------------------------------------------------------------

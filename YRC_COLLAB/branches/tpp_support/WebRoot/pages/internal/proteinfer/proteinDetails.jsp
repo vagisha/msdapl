@@ -212,7 +212,7 @@
      			<td><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
      			<td>
 	     		<span style="text-decoration: underline; cursor: pointer;" 
-				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_perc" property="searchResultId" />)" >
+				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_perc" property="id" />)" >
 				View
 				</span>
 				</td>
@@ -234,7 +234,7 @@
 	     		<td><bean:write name="psm_peptProphet" property="fValRounded" /></td>
 	     		<td>
 	     		<span style="text-decoration: underline; cursor: pointer;" 
-				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_peptProphet" property="searchResultId" />)" >
+				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_peptProphet" property="id" />)" >
 				View
 				</span>
 				</td>

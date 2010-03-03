@@ -23,6 +23,7 @@ import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerSpectrumMatch;
 import org.yeastrc.www.proteinfer.proteinProphet.ProteinProphetResultsLoader;
+import org.yeastrc.www.proteinfer.proteinProphet.ProteinProphetSpectrumMatch;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -84,7 +85,7 @@ public class PsmListAjaxAction extends Action {
             return mapping.findForward("Success");
         }
         else if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {
-            List<WIdPickerSpectrumMatch> ionsWAllSpectra = ProteinProphetResultsLoader.getHitsForIon(pinferIonId, run.getInputGenerator());
+            List<ProteinProphetSpectrumMatch> ionsWAllSpectra = ProteinProphetResultsLoader.getHitsForIon(pinferIonId, run.getInputGenerator());
             request.setAttribute("psmList", ionsWAllSpectra);
             request.setAttribute("pinferIonId", pinferIonId);
             long e = System.currentTimeMillis();

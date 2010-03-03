@@ -41,6 +41,7 @@ import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetGroup;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptide;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon;
+import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.util.TimeUtils;
@@ -54,7 +55,10 @@ import org.yeastrc.www.proteinfer.MsResultLoader;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
 import org.yeastrc.www.proteinfer.ProteinAccessionSorter;
 import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerSpectrumMatch;
+import org.yeastrc.www.proteinfer.ProteinProperties;
+import org.yeastrc.www.proteinfer.ProteinPropertiesFilter;
+import org.yeastrc.www.proteinfer.ProteinPropertiesSorter;
+import org.yeastrc.www.proteinfer.ProteinPropertiesStore;
 
 /**
  * 
@@ -99,7 +103,31 @@ public class ProteinProphetResultsLoader {
         // filter by description, if required
         if(filterCriteria.getDescriptionLike() != null) {
             log.info("Filtering by description: "+filterCriteria.getDescriptionLike());
-            proteinIds = ProteinDescriptionFilter.filterByProteinDescription(pinferId, proteinIds, filterCriteria.getDescriptionLike());
+            proteinIds = ProteinDescriptionFilter.filterByProteinDescription(pinferId, proteinIds, 
+            		filterCriteria.getDescriptionLike(), true);
+        }
+        
+        if(filterCriteria.getDescriptionNotLike() != null) {
+        	log.info("Filtering by description (NOT like): "+filterCriteria.getDescriptionLike());
+            proteinIds = ProteinDescriptionFilter.filterByProteinDescription(pinferId, proteinIds, 
+            		filterCriteria.getDescriptionNotLike(), false);
+        }
+        
+        // filter by molecular wt, if required
+        if(filterCriteria.hasMolecularWtFilter()) {
+            proteinIds = ProteinPropertiesFilter.filterByMolecularWt(pinferId, proteinIds,
+                    filterCriteria.getMinMolecularWt(), filterCriteria.getMaxMolecularWt());
+            if(filterCriteria.getSortBy() == SORT_BY.MOL_WT)
+                proteinIds = ProteinPropertiesSorter.sortIdsByMolecularWt(proteinIds, pinferId, filterCriteria.isGroupProteins());
+        }
+        
+        // filter by pI, if required
+        if(filterCriteria.hasPiFilter()) {
+            proteinIds = ProteinPropertiesFilter.filterByPi(pinferId, proteinIds,
+                    filterCriteria.getMinPi(), filterCriteria.getMaxPi());
+            if(filterCriteria.getSortBy() == SORT_BY.PI)
+                proteinIds = ProteinPropertiesSorter.sortIdsByPi(proteinIds, pinferId, filterCriteria.isGroupProteins());
+                    
         }
         
         long e = System.currentTimeMillis();
@@ -278,6 +306,10 @@ public class ProteinProphetResultsLoader {
         // set the accession and description for the proteins.  
         // This requires querying the NRSEQ database
         assignProteinAccessionDescription(wProt, databaseIds);
+        
+
+        // get the molecular weight for the protein
+        assignProteinProperties(wProt);
         return wProt;
     }
     
@@ -307,7 +339,7 @@ public class ProteinProphetResultsLoader {
         if(getCommonName) {
 
             try {
-                commonName = CommonNameLookupUtil.getInstance().getProteinListing(nrseqProteinId).getName();
+                commonName = CommonNameLookupUtil.getInstance().getProteinListing(nrseqProteinId).getAllNames();
             }
             catch (Exception e) {
                 log.error("Exception getting common name for protein Id: "+nrseqProteinId, e);
@@ -315,6 +347,15 @@ public class ProteinProphetResultsLoader {
         }
         return new String[] {accession, description, commonName};
         
+    }
+    
+    private static void assignProteinProperties(WProteinProphetProtein wProt) {
+        
+        ProteinProperties props = ProteinPropertiesStore.getInstance().getProteinProperties(wProt.getProtein().getProteinferId(), wProt.getProtein());
+        if(props != null) {
+            wProt.setMolecularWeight( (float) (Math.round(props.getMolecularWt()*100) / 100.0));
+            wProt.setPi( (float) (Math.round(props.getPi()*100) / 100.0));
+        }
     }
     
     //---------------------------------------------------------------------------------------------------
@@ -413,7 +454,8 @@ public class ProteinProphetResultsLoader {
         
         ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
         MsSearchResult origResult = resLoader.getResult(psm.getResultId(), inputGenerator);
-        return new WProteinProphetIon(ion, origResult);
+        MsScan scan = scanDao.loadScanLite(origResult.getScanId());
+        return new WProteinProphetIon(ion, origResult, scan);
     }
 
     private static void sortIonList(List<? extends GenericProteinferIon<?>> ions) {
@@ -524,6 +566,19 @@ public class ProteinProphetResultsLoader {
             log.info("Time for resorting filtered IDs: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
             return sortedIds;
         }
+        if(sortBy == SORT_BY.MOL_WT) {
+            List<Integer> sortedIds = ProteinPropertiesSorter.sortIdsByMolecularWt(proteinIds, pinferId, groupProteins);
+            long e = System.currentTimeMillis();
+            log.info("Time for resorting filtered IDs: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+            return sortedIds;
+        }
+        if(sortBy == SORT_BY.PI) {
+            List<Integer> sortedIds = ProteinPropertiesSorter.sortIdsByPi(proteinIds, pinferId, groupProteins);
+            long e = System.currentTimeMillis();
+            log.info("Time for resorting filtered IDs: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+            return sortedIds;
+        }
+        
         else if (sortBy == SORT_BY.PROTEIN_PROPHET_GROUP) {
             allIds = ppProtDao.sortProteinIdsByProteinProphetGroup(pinferId);
         }
@@ -573,16 +628,16 @@ public class ProteinProphetResultsLoader {
     //---------------------------------------------------------------------------------------------------
     // Get a list PSMs for a ion
     //---------------------------------------------------------------------------------------------------
-    public static List<WIdPickerSpectrumMatch> getHitsForIon(int pinferIonId, Program inputGenerator) {
+    public static List<ProteinProphetSpectrumMatch> getHitsForIon(int pinferIonId, Program inputGenerator) {
         
         List<? extends ProteinferSpectrumMatch> psmList = psmDao.loadSpectrumMatchesForIon(pinferIonId);
         
-        List<WIdPickerSpectrumMatch> wPsmList = new ArrayList<WIdPickerSpectrumMatch>(psmList.size());
+        List<ProteinProphetSpectrumMatch> wPsmList = new ArrayList<ProteinProphetSpectrumMatch>(psmList.size());
         for(ProteinferSpectrumMatch psm: psmList) {
             MsSearchResult origResult = resLoader.getResult(psm.getResultId(), inputGenerator);
-            WIdPickerSpectrumMatch wPsm = new WIdPickerSpectrumMatch(psm, origResult);
-            int scanNum = scanDao.load(origResult.getScanId()).getStartScanNum();
-            wPsm.setScanNumber(scanNum);
+            ProteinProphetSpectrumMatch wPsm = null;
+            MsScan scan = scanDao.load(origResult.getScanId());
+            wPsm = new ProteinProphetSpectrumMatch(psm, origResult, scan);
             wPsmList.add(wPsm);
         }
         

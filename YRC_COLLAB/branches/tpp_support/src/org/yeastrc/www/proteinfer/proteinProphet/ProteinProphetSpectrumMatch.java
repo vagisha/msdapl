@@ -1,29 +1,33 @@
-package org.yeastrc.www.proteinfer.idpicker;
+/**
+ * ProteinProphetSpectrumMatch.java
+ * @author Vagisha Sharma
+ * Mar 1, 2010
+ * @version 1.0
+ */
+package org.yeastrc.www.proteinfer.proteinProphet;
 
 import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
 import org.yeastrc.ms.domain.run.MsScan;
-import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 
-public class WIdPickerSpectrumMatch {
-    
-    private final int scanNumber;
+/**
+ * 
+ */
+public class ProteinProphetSpectrumMatch {
+
+	private final int scanNumber;
     private final double retentionTime;
-    private double precursorArea = -1.0;
     private MsSearchResult spectrumMatch;
     private ProteinferSpectrumMatch idpPsm;
     
-    public WIdPickerSpectrumMatch(ProteinferSpectrumMatch idpPsm, MsSearchResult psm, MsScan scan) {
+    public ProteinProphetSpectrumMatch(ProteinferSpectrumMatch idpPsm, MsSearchResult psm, MsScan scan) {
         this.idpPsm = idpPsm;
         this.spectrumMatch = psm;
         this.scanNumber = scan.getStartScanNum();
         this.retentionTime = round(scan.getRetentionTime());
-        if(scan instanceof MS2Scan) {
-            precursorArea = round(((MS2Scan)scan).getBullsEyeArea());
-        }
     }
 
     public int getScanNumber() {
@@ -34,12 +38,8 @@ public class WIdPickerSpectrumMatch {
         return retentionTime;
     }
 
-    public double getPrecursorArea() {
-        return precursorArea;
-    }
-    
     public boolean hasPrecursorArea() {
-        return (this.precursorArea != -1.0);
+        return false;
     }
     
     public int getScanId() {

@@ -17,6 +17,8 @@ public class WProteinProphetProtein {
     private String accession = "";
     private String description = "";
     private String commonName = "";
+    private float molecularWeight = -1.0f;
+    private float pi = -1.0f;
     
     public String getCommonName() {
         return commonName;
@@ -62,5 +64,21 @@ public class WProteinProphetProtein {
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+    
+    public void setMolecularWeight(float weight) {
+        this.molecularWeight = weight;
+    }
+    
+    public float getMolecularWeight() {
+        return this.molecularWeight;
+    }
+    
+    public float getPi() {
+        return pi;
+    }
+    
+    public void setPi(float pi) {
+        this.pi = pi;
     }
 }

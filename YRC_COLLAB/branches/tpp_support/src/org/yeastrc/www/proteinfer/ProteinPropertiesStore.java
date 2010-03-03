@@ -16,8 +16,10 @@ import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
+import org.yeastrc.ms.domain.protinfer.GenericProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
+import org.yeastrc.ms.domain.protinfer.idpicker.GenericIdPickerProtein;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProtein;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
 import org.yeastrc.ms.util.ProteinUtils;
@@ -28,6 +30,7 @@ import org.yeastrc.ms.util.TimeUtils;
  */
 public class ProteinPropertiesStore {
 
+    // This maps protein inference run IDs to a map of its protein IDs (protein inference IDs) and protein properties
     private LinkedHashMap<Integer, Map<Integer, ProteinProperties>> store;
     private final int size = 3;
     
@@ -83,18 +86,14 @@ public class ProteinPropertiesStore {
             
             List<IdPickerProtein> proteins = proteinDao.loadProteins(pinferId);
             map = new HashMap<Integer, ProteinProperties>((int) (proteins.size() * 1.5));
+            
             long e = System.currentTimeMillis();
             log.info("Time to get all proteins: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
             
             s = System.currentTimeMillis();
             for(IdPickerProtein protein: proteins) {
-                String sequence = NrSeqLookupUtil.getProteinSequence(protein.getNrseqProteinId());
-                
-                ProteinProperties props = new ProteinProperties(protein.getId(), protein.getGroupId());
-                props.setNrseqId(protein.getNrseqProteinId());
-                props.setMolecularWt(ProteinUtils.calculateMolWt(sequence));
-                props.setPi(ProteinUtils.calculatePi(sequence));
-                
+                ProteinProperties props = makeProteinProperties(protein);
+                props.setProteinGroupId(protein.getGroupId());
                 map.put(protein.getId(), props);
             }
             e = System.currentTimeMillis();
@@ -114,13 +113,9 @@ public class ProteinPropertiesStore {
             
             s = System.currentTimeMillis();
             for(ProteinProphetProtein protein: proteins) {
-                String sequence = NrSeqLookupUtil.getProteinSequence(protein.getNrseqProteinId());
-                
-                ProteinProperties props = new ProteinProperties(protein.getId(), protein.getGroupId());
-                props.setNrseqId(protein.getNrseqProteinId());
-                props.setMolecularWt(ProteinUtils.calculateMolWt(sequence));
-                props.setPi(ProteinUtils.calculatePi(sequence));
-                
+            	
+            	ProteinProperties props = makeProteinProperties(protein);
+            	props.setProteinGroupId(protein.getGroupId());
                 map.put(protein.getId(), props);
             }
             e = System.currentTimeMillis();
@@ -128,5 +123,25 @@ public class ProteinPropertiesStore {
         }
         
         return map;
+    }
+    
+    private ProteinProperties makeProteinProperties(GenericProteinferProtein<?> protein) {
+    	
+        String sequence = NrSeqLookupUtil.getProteinSequence(protein.getNrseqProteinId());
+        
+        ProteinProperties props = new ProteinProperties(protein.getId());
+        props.setNrseqId(protein.getNrseqProteinId());
+        props.setMolecularWt(ProteinUtils.calculateMolWt(sequence));
+        props.setPi(ProteinUtils.calculatePi(sequence));
+        return props;
+    }
+    
+    public ProteinProperties getProteinProperties(int pinferId, GenericProteinferProtein<?> protein) {
+        Map<Integer, ProteinProperties> map = this.getPropertiesMapForProteinInference(pinferId, false);
+        if(map == null) {
+            return makeProteinProperties(protein);
+        }
+        else
+            return map.get(protein.getId());
     }
 }

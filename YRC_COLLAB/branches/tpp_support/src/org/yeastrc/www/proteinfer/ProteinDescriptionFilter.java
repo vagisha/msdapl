@@ -14,11 +14,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
-import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
-import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
+import org.yeastrc.www.compare.util.FastaProteinLookupUtil;
 
 /**
  * 
@@ -31,31 +29,33 @@ public class ProteinDescriptionFilter {
     
     
     public static List<Integer> filterByProteinDescription(int pinferId,
-            List<Integer> proteinIds, String descriptionLike) {
+            List<Integer> proteinIds, String descriptionLike, boolean includeMatching) {
         
-        List<Integer> searchDbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
-        List<NrDbProtein> nrProteins = NrSeqLookupUtil.getDbProteinsForDescription(searchDbIds, descriptionLike);
+    	Set<String> reqDescriptions = new HashSet<String>();
+        String[] tokens = descriptionLike.split(",");
+        for(String tok: tokens)
+            // In MySQL string comparisons are NOT case sensitive unless one of the operands is a binary string
+            reqDescriptions.add(tok.trim()); 
         
-        NrDbProtComparator comparator = new NrDbProtComparator();
-        Collections.sort(nrProteins, comparator);
-           
-        List<ProteinferProtein> proteins = protDao.loadProteins(pinferId);
-        Set<Integer> accepted = new HashSet<Integer>();
-        for(ProteinferProtein protein: proteins) {
-            NrDbProtein nrp = new NrDbProtein();
-            nrp.setProteinId(protein.getNrseqProteinId());
-            int idx = Collections.binarySearch(nrProteins, nrp, comparator);
-            if(idx >= 0) {
-                accepted.add(protein.getId());
+        // First get the NRSEQ protein IDs that match the description terms
+        List<Integer> found = FastaProteinLookupUtil.getInstance().getProteinIdsForDescriptions(new ArrayList<String>(reqDescriptions), pinferId);
+        
+        List<Integer> filtered = new ArrayList<Integer>();
+        
+        if(found.size() > 0) {
+            // Get the protein inference IDs corresponding to the matching NRSEQ IDs.
+            List<Integer> piProteinIds = protDao.getProteinIdsForNrseqIds(pinferId, new ArrayList<Integer>(found));
+            Collections.sort(piProteinIds);
+            for(int id: proteinIds) {
+                int contains = Collections.binarySearch(piProteinIds, id);
+                if(includeMatching && contains >= 0)
+                    filtered.add(id);
+                else if(!includeMatching && contains < 0)
+                    filtered.add(id);
             }
         }
         
-        List<Integer> acceptedProteinIds = new ArrayList<Integer>(accepted.size());
-        for(int id: proteinIds) {
-            if(accepted.contains(id))
-                acceptedProteinIds.add(id);
-        }
-        return acceptedProteinIds;
+        return filtered;
     }
     
     private static class NrDbProtComparator implements Comparator<NrDbProtein> {

@@ -81,6 +81,14 @@ public class ProteinPeptidesAjaxAction extends Action {
         if(ProteinInferenceProgram.isIdPicker(run.getProgram())) {
             List<WIdPickerIon> ionList = IdPickerResultsLoader.getPeptideIonsForProteinGroup(pinferId, proteinGroupId);
             request.setAttribute("proteinPeptideIons", ionList);
+            boolean hasPrecursorArea = false;
+            for(WIdPickerIon ion: ionList) {
+                if(ion.hasPrecursorArea()) {
+                    hasPrecursorArea = true;
+                    break;
+                }
+            }
+            request.setAttribute("hasPrecursorArea", hasPrecursorArea);
             return mapping.findForward("Success");
         }
         else if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {

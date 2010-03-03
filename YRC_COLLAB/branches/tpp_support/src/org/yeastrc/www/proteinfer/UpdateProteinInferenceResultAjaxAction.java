@@ -87,6 +87,10 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
         filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
         filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
+        filterCriteria.setMinMolecularWt(filterForm.getMinMolecularWtDouble());
+        filterCriteria.setMaxMolecularWt(filterForm.getMaxMolecularWtDouble());
+        filterCriteria.setMinPi(filterForm.getMinPiDouble());
+        filterCriteria.setMaxPi(filterForm.getMaxPiDouble());
         filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
         filterCriteria.setNumMaxPeptides(filterForm.getMaxPeptidesInteger());
         filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptidesInteger());
@@ -101,11 +105,15 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
                 ProteinFilterCriteria.defaultSortOrder() : 
                 filterCritSession.getSortOrder());
         filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
+        filterCriteria.setExcludeIndistinGroups(filterForm.isExcludeIndistinProteinGroups());
         if(!filterForm.isShowAllProteins())
             filterCriteria.setParsimoniousOnly();
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
+        filterCriteria.setChargeStates(filterForm.getChargeStateList());
+        filterCriteria.setChargeGreaterThan(filterForm.getChargeGreaterThan());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
+        filterCriteria.setDescriptionNotLike(filterForm.getDescriptionNotLike());
         filterCriteria.setPeptide(filterForm.getPeptide());
         filterCriteria.setExactPeptideMatch(filterForm.getExactPeptideMatch());
         

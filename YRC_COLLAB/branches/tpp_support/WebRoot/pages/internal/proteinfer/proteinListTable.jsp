@@ -84,6 +84,20 @@
 		
 		
 		<% colSortedClass = "";
+		 if(sortBy == SORT_BY.MOL_WT) colSortedClass = sortedClass;
+		%>
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.MOL_WT.name()%>">
+			<b><font size="2pt">Mol.Wt.</font></b>
+		</th>
+		
+		<% colSortedClass = "";
+		 if(sortBy == SORT_BY.PI) colSortedClass = sortedClass;
+		%>
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.PI.name()%>">
+			<b><font size="2pt">pI</font></b>
+		</th>
+		
+		<% colSortedClass = "";
 		 if(sortBy == SORT_BY.COVERAGE) colSortedClass = sortedClass;
 		%>
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.COVERAGE.name()%>">
@@ -171,7 +185,7 @@
 			</td>
 			
 			<!-- Protein accesion -->
-			<td class="left_align"> 
+			<td> 
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
@@ -184,7 +198,7 @@
 			</td>
 			
 			<!-- Protein common name -->
-			<td class="left_align"> 
+			<td> 
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
@@ -196,7 +210,9 @@
 			</td>
 			
 			<!-- Protein description -->
-			<td style="font-size: 8pt;" class="left_align"><bean:write name="protein" property="shortDescription"/></td>
+			<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
+			<td><bean:write name="protein" property="molecularWeight"/></td>
+			<td><bean:write name="protein" property="pi"/></td>
 			<td><bean:write name="protein" property="protein.coverage"/></td>
 			<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
 		
@@ -227,7 +243,7 @@
 				  id="<bean:write name="protein" property="protein.id" />"
 				  title="<bean:write name="proteinGroup" property="groupId" />"
 				  >Show Peptides</span></nobr></td>
-		<td colspan="9" class="pinfer_filler">
+		<td colspan="11" class="pinfer_filler">
 			<!--  peptides table will go here: proteinPeptides.jsp -->
 			<div id="peptforprot_<bean:write name="protein" property="protein.id" />_<bean:write name="proteinGroup" property="groupId" />"></div>
 		</td>
@@ -286,7 +302,7 @@
 		</td>
 		
 		<!-- Protein accession -->
-		<td class="left_align">
+		<td>
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
@@ -299,7 +315,7 @@
 		</td>
 		
 		<!-- Protein common name -->
-			<td class="left_align"> 
+			<td> 
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
@@ -311,9 +327,11 @@
 			</td>
 			
 		<!-- Protein Description -->
-		<td style="font-size: 8pt;" class="left_align"><bean:write name="protein" property="shortDescription"/></td>
+		<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
 		
 		
+		<td><bean:write name="protein" property="molecularWeight"/></td>
+		<td><bean:write name="protein" property="pi"/></td>
 		<td><bean:write name="protein" property="protein.coverage"/></td>
 		<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
 		
@@ -346,7 +364,7 @@
 					  style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #000000;" 
 					  id="<bean:write name="proteinGroup" property="groupId" />"
 					  >Show Peptides</span></nobr></td>
-			<td colspan="9" class="pinfer_filler">
+			<td colspan="11" class="pinfer_filler">
 				<!--  peptides table will go here: proteinPeptides.jsp -->
 				<div id="peptforprot_<bean:write name="proteinGroup" property="groupId" />"></div>
 			</td>

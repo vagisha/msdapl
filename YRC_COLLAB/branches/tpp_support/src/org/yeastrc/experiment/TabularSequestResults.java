@@ -18,28 +18,18 @@ import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
+import org.yeastrc.www.util.RoundingUtils;
 
 public class TabularSequestResults implements Tabular, Pageable {
 
     
-    private SORT_BY[] columns = new SORT_BY[] {
-        SORT_BY.FILE_SEARCH,
-        SORT_BY.SCAN, 
-        SORT_BY.CHARGE, 
-        SORT_BY.MASS, 
-        SORT_BY.RT, 
-        SORT_BY.XCORR_RANK,
-        SORT_BY.XCORR, 
-        SORT_BY.DELTACN, 
-        SORT_BY.SP, 
-        SORT_BY.PEPTIDE,
-        SORT_BY.PROTEIN
-    };
+	private List<SORT_BY> columns = new ArrayList<SORT_BY>();
     
     private SORT_BY sortColumn;
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
     
     private boolean useEvalue;
+    private boolean hasBullsEyeArea = false;
     
     private List<SequestResultPlus> results;
     
@@ -47,35 +37,43 @@ public class TabularSequestResults implements Tabular, Pageable {
     private int lastPage = currentPage;
     private List<Integer> displayPageNumbers;
     
+    private RoundingUtils rounder;
     
-    public TabularSequestResults(List<SequestResultPlus> results, boolean useEvalue) {
+    public TabularSequestResults(List<SequestResultPlus> results, boolean useEvalue, boolean hasBullsEyeArea) {
         this.results = results;
         displayPageNumbers = new ArrayList<Integer>();
         displayPageNumbers.add(currentPage);
         
         this.useEvalue = useEvalue;
+        this.hasBullsEyeArea = hasBullsEyeArea;
         
-        if(useEvalue) {
-            columns = new SORT_BY[] {
-                    SORT_BY.FILE_SEARCH,
-                    SORT_BY.SCAN, 
-                    SORT_BY.CHARGE, 
-                    SORT_BY.MASS, 
-                    SORT_BY.RT, 
-                    SORT_BY.XCORR_RANK,
-                    SORT_BY.XCORR, 
-                    SORT_BY.DELTACN, 
-                    SORT_BY.EVAL, 
-                    SORT_BY.PEPTIDE,
-                    SORT_BY.PROTEIN
-                };
+        columns.add(SORT_BY.FILE_SEARCH);
+        columns.add(SORT_BY.SCAN);
+        columns.add(SORT_BY.CHARGE);
+        columns.add(SORT_BY.MASS);
+        columns.add(SORT_BY.RT);
+        if(this.hasBullsEyeArea) {
+        	columns.add(SORT_BY.AREA);
         }
+        columns.add(SORT_BY.XCORR_RANK);
+        columns.add(SORT_BY.XCORR);
+        columns.add(SORT_BY.DELTACN);
+        if(useEvalue) {
+        	columns.add(SORT_BY.EVAL);
+        }
+        else {
+        	columns.add(SORT_BY.SP);
+        }
+        columns.add(SORT_BY.PEPTIDE);
+        columns.add(SORT_BY.PROTEIN);
+        
+        rounder = RoundingUtils.getInstance();
     }
     
     
     @Override
     public int columnCount() {
-        return columns.length;
+        return columns.size();
     }
 
     public SORT_BY getSortedColumn() {
@@ -96,14 +94,14 @@ public class TabularSequestResults implements Tabular, Pageable {
     
     @Override
     public List<TableHeader> tableHeaders() {
-        List<TableHeader> headers = new ArrayList<TableHeader>(columns.length);
+        List<TableHeader> headers = new ArrayList<TableHeader>(columnCount());
         for(SORT_BY col: columns) {
             TableHeader header = new TableHeader(col.getDisplayName(), col.name());
             if(col == sortColumn) {
                 header.setSorted(true);
                 header.setSortOrder(sortOrder);
             }
-            if(col == SORT_BY.PROTEIN)
+            if(col == SORT_BY.PROTEIN || col == SORT_BY.AREA)
                 header.setSortable(false);
             headers.add(header);
         }
@@ -119,11 +117,10 @@ public class TabularSequestResults implements Tabular, Pageable {
         
         // row.addCell(new TableCell(String.valueOf(result.getId())));
         TableCell cell = new TableCell(result.getFilename());
-        cell.setClassName("left_align");
         row.addCell(cell);
         row.addCell(new TableCell(String.valueOf(result.getScanNumber())));
         row.addCell(new TableCell(String.valueOf(result.getCharge())));
-        row.addCell(new TableCell(String.valueOf(round(result.getObservedMass()))));
+        row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getObservedMass()))));
         
         // Retention time
         BigDecimal temp = result.getRetentionTime();
@@ -131,11 +128,15 @@ public class TabularSequestResults implements Tabular, Pageable {
             row.addCell(new TableCell(""));
         }
         else
-            row.addCell(new TableCell(String.valueOf(round(temp))));
+            row.addCell(new TableCell(String.valueOf(rounder.roundFour(temp))));
         
+        // Area of the precursor ion
+        if(this.hasBullsEyeArea) {
+            row.addCell(new TableCell(String.valueOf(rounder.roundTwo(result.getArea()))));
+        }
         
         row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getxCorrRank())));
-        row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getxCorr()))));
+        row.addCell(new TableCell(String.valueOf(rounder.roundTwo(result.getSequestResultData().getxCorr()))));
         row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getDeltaCN())));
         if(useEvalue)
             row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getEvalue())));
@@ -165,13 +166,6 @@ public class TabularSequestResults implements Tabular, Pageable {
         return row;
     }
     
-    private static double round(BigDecimal number) {
-        return round(number.doubleValue());
-    }
-    private static double round(double num) {
-        return Math.round(num*100.0)/100.0;
-    }
-
     @Override
     public int rowCount() {
         return results.size();

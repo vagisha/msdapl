@@ -23,7 +23,9 @@ import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerPeptideDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerRunDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerSpectrumMatchDAO;
+import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferIon;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
@@ -40,6 +42,8 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerPeptide;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerPeptideBase;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
+import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.util.TimeUtils;
@@ -53,14 +57,18 @@ import org.yeastrc.www.proteinfer.MsResultLoader;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
 import org.yeastrc.www.proteinfer.ProteinAccessionSorter;
 import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
+import org.yeastrc.www.proteinfer.ProteinProperties;
 import org.yeastrc.www.proteinfer.ProteinPropertiesFilter;
 import org.yeastrc.www.proteinfer.ProteinPropertiesSorter;
+import org.yeastrc.www.proteinfer.ProteinPropertiesStore;
 
 public class IdPickerResultsLoader {
 
     private static final ProteinferDAOFactory pinferDaoFactory = ProteinferDAOFactory.instance();
     private static final org.yeastrc.ms.dao.DAOFactory msDataDaoFactory = org.yeastrc.ms.dao.DAOFactory.instance();
     private static final MsScanDAO scanDao = msDataDaoFactory.getMsScanDAO();
+    private static final MsRunDAO runDao = msDataDaoFactory.getMsRunDAO();
+    private static final MS2ScanDAO ms2ScanDao = msDataDaoFactory.getMS2FileScanDAO();
     private static final MsRunSearchDAO rsDao = msDataDaoFactory.getMsRunSearchDAO();
     private static final MsRunSearchAnalysisDAO rsaDao = msDataDaoFactory.getMsRunSearchAnalysisDAO();
     
@@ -74,7 +82,7 @@ public class IdPickerResultsLoader {
     private static final ProteinferProteinDAO protDao = pinferDaoFactory.getProteinferProteinDao();
     private static final IdPickerInputDAO inputDao = pinferDaoFactory.getIdPickerInputDao();
     private static final IdPickerRunDAO idpRunDao = pinferDaoFactory.getIdPickerRunDao();
-    private static final ProteinferRunDAO runDao = pinferDaoFactory.getProteinferRunDao();
+    private static final ProteinferRunDAO piRunDao = pinferDaoFactory.getProteinferRunDao();
     
     private static final Logger log = Logger.getLogger(IdPickerResultsLoader.class);
     
@@ -96,22 +104,34 @@ public class IdPickerResultsLoader {
         
         // filter by description, if required
         if(filterCriteria.getDescriptionLike() != null) {
-            log.info("Filtering by description: "+filterCriteria.getDescriptionLike());
-            proteinIds = ProteinDescriptionFilter.filterByProteinDescription(pinferId, proteinIds, filterCriteria.getDescriptionLike());
+            log.info("Filtering by description (like): "+filterCriteria.getDescriptionLike());
+            proteinIds = ProteinDescriptionFilter.filterByProteinDescription(pinferId, proteinIds, 
+            		filterCriteria.getDescriptionLike(), true);
         }
         
-        // filter by molecular wt., if required
+        if(filterCriteria.getDescriptionNotLike() != null) {
+        	log.info("Filtering by description (NOT like): "+filterCriteria.getDescriptionLike());
+            proteinIds = ProteinDescriptionFilter.filterByProteinDescription(pinferId, proteinIds, 
+            		filterCriteria.getDescriptionNotLike(), false);
+        }
+        
+        // filter by molecular wt, if required
         if(filterCriteria.hasMolecularWtFilter()) {
-            log.info("Filtering by molecular wt.");
-            proteinIds = ProteinPropertiesFilter.filterByMolecularWt(pinferId, proteinIds, 
+        	log.info("Filtering by molecular wt.");
+            proteinIds = ProteinPropertiesFilter.filterByMolecularWt(pinferId, proteinIds,
                     filterCriteria.getMinMolecularWt(), filterCriteria.getMaxMolecularWt());
+            if(filterCriteria.getSortBy() == SORT_BY.MOL_WT)
+                proteinIds = ProteinPropertiesSorter.sortIdsByMolecularWt(proteinIds, pinferId, filterCriteria.isGroupProteins());
         }
         
         // filter by pI, if required
         if(filterCriteria.hasPiFilter()) {
-            log.info("Filtering by pI");
-            proteinIds = ProteinPropertiesFilter.filterByPi(pinferId, proteinIds, 
+        	log.info("Filtering by pI");
+            proteinIds = ProteinPropertiesFilter.filterByPi(pinferId, proteinIds,
                     filterCriteria.getMinPi(), filterCriteria.getMaxPi());
+            if(filterCriteria.getSortBy() == SORT_BY.PI)
+                proteinIds = ProteinPropertiesSorter.sortIdsByPi(proteinIds, pinferId, filterCriteria.isGroupProteins());
+                    
         }
         
         long e = System.currentTimeMillis();
@@ -226,6 +246,9 @@ public class IdPickerResultsLoader {
         // set the accession and description for the proteins.  
         // This requires querying the NRSEQ database
         assignProteinAccessionDescription(wProt, databaseIds);
+        
+        // get the molecular weight for the protein
+        assignProteinProperties(wProt);
         return wProt;
     }
     
@@ -352,7 +375,7 @@ public class IdPickerResultsLoader {
         if(getCommonName) {
 
             try {
-                commonName = CommonNameLookupUtil.getInstance().getProteinListing(nrseqProteinId).getName();
+                commonName = CommonNameLookupUtil.getInstance().getProteinListing(nrseqProteinId).getAllNames();
             }
             catch (Exception e) {
                 log.error("Exception getting common name for protein Id: "+nrseqProteinId, e);
@@ -362,12 +385,21 @@ public class IdPickerResultsLoader {
         
     }
     
+    private static void assignProteinProperties(WIdPickerProtein wProt) {
+        
+        ProteinProperties props = ProteinPropertiesStore.getInstance().getProteinProperties(wProt.getProtein().getProteinferId(), wProt.getProtein());
+        if(props != null) {
+            wProt.setMolecularWeight( (float) (Math.round(props.getMolecularWt()*100) / 100.0));
+            wProt.setPi( (float) (Math.round(props.getPi()*100) / 100.0));
+        }
+    }
+    
     //---------------------------------------------------------------------------------------------------
     // IDPicker input summary
     //---------------------------------------------------------------------------------------------------
     public static List<WIdPickerInputSummary> getIDPickerInputSummary(int pinferId) {
         
-        ProteinferRun run = runDao.loadProteinferRun(pinferId);
+        ProteinferRun run = piRunDao.loadProteinferRun(pinferId);
         List<IdPickerInput> inputSummary = inputDao.loadProteinferInputList(pinferId);
         List<WIdPickerInputSummary> wInputList = new ArrayList<WIdPickerInputSummary>(inputSummary.size());
         
@@ -507,9 +539,16 @@ public class IdPickerResultsLoader {
     private static <I extends GenericProteinferIon<? extends ProteinferSpectrumMatch>>
             WIdPickerIon makeWIdPickerIon(I ion, Program inputGenerator) {
         ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
-        MsSearchResult origResult = resLoader.getResult(psm.getId(), inputGenerator);
-//        MsSearchResult origResult = getOriginalResult(psm.getMsRunSearchResultId(), inputGenerator);
-        return new WIdPickerIon(ion, origResult);
+        MsSearchResult origResult = resLoader.getResult(psm.getResultId(), inputGenerator);
+        // If this scan was processed with Bullseye it will have extra information in the scan headers.
+        if(ms2ScanDao.isGeneratedByBullseye(origResult.getScanId())) {
+            MS2Scan scan = ms2ScanDao.loadScanLite(origResult.getScanId());
+            return new WIdPickerIon(ion, origResult, scan);
+        }
+        else {
+            MsScan scan = scanDao.loadScanLite(origResult.getScanId());
+            return new WIdPickerIon(ion, origResult, scan);
+        }
     }
 
     private static void sortIonList(List<? extends GenericProteinferIon<?>> ions) {
@@ -628,7 +667,8 @@ public class IdPickerResultsLoader {
             WIdPickerIonForProtein makeWIdPickerIonForProtein(I ion, Program inputGenerator) {
         ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
         MsSearchResult origResult = resLoader.getResult(psm.getResultId(), inputGenerator);
-        return new WIdPickerIonForProtein(ion, origResult);
+        MsScan scan = scanDao.loadScanLite(origResult.getScanId());
+        return new WIdPickerIonForProtein(ion, origResult, scan);
     }
 
     public static List<WIdPickerSpectrumMatch> getHitsForIon(int pinferIonId, Program inputGenerator, ProteinInferenceProgram pinferProgram) {
@@ -649,9 +689,16 @@ public class IdPickerResultsLoader {
         List<WIdPickerSpectrumMatch> wPsmList = new ArrayList<WIdPickerSpectrumMatch>(psmList.size());
         for(ProteinferSpectrumMatch psm: psmList) {
             MsSearchResult origResult = resLoader.getResult(psm.getResultId(), inputGenerator);
-            WIdPickerSpectrumMatch wPsm = new WIdPickerSpectrumMatch(psm, origResult);
-            int scanNum = scanDao.load(origResult.getScanId()).getStartScanNum();
-            wPsm.setScanNumber(scanNum);
+            WIdPickerSpectrumMatch wPsm = null;
+            int scanId = origResult.getScanId();
+            if(ms2ScanDao.isGeneratedByBullseye(scanId)) {
+                MS2Scan scan = ms2ScanDao.load(scanId);
+                wPsm = new WIdPickerSpectrumMatch(psm, origResult, scan);
+            }
+            else {
+                MsScan scan = scanDao.load(origResult.getScanId());
+                wPsm = new WIdPickerSpectrumMatch(psm, origResult, scan);
+            }
             wPsmList.add(wPsm);
         }
         

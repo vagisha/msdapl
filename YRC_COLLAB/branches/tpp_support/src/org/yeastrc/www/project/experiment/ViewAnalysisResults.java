@@ -33,6 +33,9 @@ import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.mascot.MascotSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
@@ -41,6 +44,7 @@ import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SORT_BY;
@@ -259,14 +263,38 @@ public class ViewAnalysisResults extends Action {
         MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
         SequestSearchResultDAO seqResDao = DAOFactory.instance().getSequestResultDAO();
         
+        // Do we have Bullseye results for the searched files
+        boolean hasBullsEyeArea = false;
+        List<Integer> searchIds = DAOFactory.instance().getMsSearchAnalysisDAO().getSearchIdsForAnalysis(analysis.getId());
+        MsRunSearchDAO rsDao = DAOFactory.instance().getMsRunSearchDAO();
+        MS2RunDAO runDao = DAOFactory.instance().getMS2FileRunDAO();
+        List<Integer> runSearchIds = rsDao.loadRunSearchIdsForSearch(searchIds.get(0));
+        for(int runSearchId: runSearchIds) {
+            int runId = rsDao.loadRunSearch(runSearchId).getRunId();
+            if(runDao.isGeneratedByBullseye(runId)) {
+                hasBullsEyeArea = true;
+                break;
+            }
+        }
+        
         PercolatorResultDAO presDao = DAOFactory.instance().getPercolatorResultDAO();
+        MS2ScanDAO ms2ScanDao = DAOFactory.instance().getMS2FileScanDAO();
         List<PercolatorResultPlus> results = new ArrayList<PercolatorResultPlus>(numResultsPerPage);
         for(Integer percResultId: forPage) {
             PercolatorResult result = presDao.loadForPercolatorResultId(percResultId);
-            MsScan scan = scanDao.loadScanLite(result.getScanId());
-            PercolatorResultPlus resPlus = new PercolatorResultPlus(result, scan);
+            PercolatorResultPlus resPlus = null;
+            
+            if(hasBullsEyeArea) {
+                MS2Scan scan = ms2ScanDao.loadScanLite(result.getScanId());
+                resPlus = new PercolatorResultPlus(result, scan);
+            }
+            else {
+                MsScan scan = scanDao.loadScanLite(result.getScanId());
+                resPlus = new PercolatorResultPlus(result, scan);
+            }
+            
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
-            resPlus.setSequestData(seqResDao.load(result.getSearchResultId()).getSequestResultData());
+            resPlus.setSequestData(seqResDao.load(result.getId()).getSequestResultData());
             results.add(resPlus);
         }
 
@@ -278,10 +306,11 @@ public class ViewAnalysisResults extends Action {
             if(vf < 1.06)   hasPEP = false;
         }
         catch(NumberFormatException e){
-            log.error("Cannot detrmine if this version of Percolator prints PEP. Version: "+version);
+            log.error("Cannot determine if this version of Percolator prints PEP. Version: "+version);
         }
 
-        TabularPercolatorResults tabResults = new TabularPercolatorResults(results, hasPEP);
+        
+        TabularPercolatorResults tabResults = new TabularPercolatorResults(results, hasPEP, hasBullsEyeArea);
         tabResults.setSortedColumn(myForm.getSortBy());
         tabResults.setSortOrder(myForm.getSortOrder());
         
@@ -305,7 +334,7 @@ public class ViewAnalysisResults extends Action {
             MsScan scan = scanDao.loadScanLite(result.getScanId());
             PeptideProphetResultPlusSequest resPlus = new PeptideProphetResultPlusSequest(result, scan);
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
-            resPlus.setSequestData(seqResDao.load(result.getSearchResultId()).getSequestResultData());
+            resPlus.setSequestData(seqResDao.load(result.getId()).getSequestResultData());
             results.add(resPlus);
         }
 
@@ -333,7 +362,7 @@ public class ViewAnalysisResults extends Action {
             MsScan scan = scanDao.loadScanLite(result.getScanId());
             PeptideProphetResultPlusMascot resPlus = new PeptideProphetResultPlusMascot(result, scan);
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
-            resPlus.setMascotData(mascotResDao.load(result.getSearchResultId()).getMascotResultData());
+            resPlus.setMascotData(mascotResDao.load(result.getId()).getMascotResultData());
             results.add(resPlus);
         }
 
@@ -361,7 +390,7 @@ public class ViewAnalysisResults extends Action {
             MsScan scan = scanDao.loadScanLite(result.getScanId());
             PeptideProphetResultPlusXtandem resPlus = new PeptideProphetResultPlusXtandem(result, scan);
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
-            resPlus.setXtandemData(xtandemResDao.load(result.getSearchResultId()).getXtandemResultData());
+            resPlus.setXtandemData(xtandemResDao.load(result.getId()).getXtandemResultData());
             results.add(resPlus);
         }
 

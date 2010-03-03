@@ -63,7 +63,7 @@
      			<td><bean:write name="psm_seq" property="sequestResultData.xCorr" /></td>
      			<td>
      			<span style="text-decoration: underline; cursor: pointer;" 
-				onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm" property="id" />)" >
+				onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm_seq" property="id" />)" >
 				View
 				</span>
 				</td>
@@ -75,7 +75,7 @@
 				<td><bean:write name="psm_plc" property="prolucidResultData.deltaCN" /></td>
 				<td>
      			<span style="text-decoration: underline; cursor: pointer;" 
-				onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm" property="id" />)" >
+				onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm_plc" property="id" />)" >
 				View
 				</span>
 				</td>
@@ -86,7 +86,7 @@
      		 	<td><bean:write name="psm_perc" property="qvalueRounded" /></td>
      			<td><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
      			<td><span style="text-decoration: underline; cursor: pointer;"
-				onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm" property="runSearchResultId" />)" >
+				onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm_perc" property="id" />)" >
 				View
 			</span>
 			</td>
@@ -101,7 +101,7 @@
 	     		<td><bean:write name="psm_peptProphet" property="fValRounded" /></td>
 	     		<td>
 	     		<span style="text-decoration: underline; cursor: pointer;" 
-				onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm_peptProphet" property="searchResultId" />)" >
+				onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm_peptProphet" property="id" />)" >
 				View
 				</span>
 				</td>

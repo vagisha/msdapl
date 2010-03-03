@@ -6,12 +6,15 @@
  */
 package org.yeastrc.www.proteinfer.proteinProphet;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon;
+import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
+import org.yeastrc.www.util.RoundingUtils;
 
 /**
  * 
@@ -20,14 +23,20 @@ public class WProteinProphetIon {
 
     private ProteinProphetProteinPeptideIon ion;
     private MsSearchResult bestSpectrumMatch;
+    private MsScan bestScan;
     private boolean uniqueToProteinGrp = false;
+    private double precursorArea = -2.0; // -2.0 == we have not hit the database yet to get this info
+    									 // -1.0 == we have hit the database and area was not found
+    
+    private static RoundingUtils rounder = RoundingUtils.getInstance();
     
     private List<Character> ntermResidues = new ArrayList<Character>();
     private List<Character> cTermResidues = new ArrayList<Character>();
     
-    public WProteinProphetIon(ProteinProphetProteinPeptideIon ion, MsSearchResult psm) {
+    public WProteinProphetIon(ProteinProphetProteinPeptideIon ion, MsSearchResult psm, MsScan bestScan) {
         this.ion = ion;
         this.bestSpectrumMatch = psm;
+        this.bestScan = bestScan;
     }
 
     public void addTerminalResidues(char nterm, char cterm) {
@@ -45,6 +54,14 @@ public class WProteinProphetIon {
     
     public MsSearchResult getBestSpectrumMatch() {
         return bestSpectrumMatch;
+    }
+    
+    public BigDecimal getRetentionTime() {
+        BigDecimal rt = bestScan.getRetentionTime();
+        if(rt != null) {
+        	rt = new BigDecimal(String.valueOf(rounder.roundFour(bestScan.getRetentionTime())));
+        }
+        return rt;
     }
 
     public boolean getIsUniqueToProteinGroup() {

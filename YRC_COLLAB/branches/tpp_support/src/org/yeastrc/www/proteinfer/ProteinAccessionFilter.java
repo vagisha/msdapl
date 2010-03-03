@@ -72,7 +72,7 @@ public class ProteinAccessionFilter {
         
         // Look in the database for matching ids.
         else {
-            List<Integer> found = FastaProteinLookupUtil.getInstance().getProteinIds(new ArrayList<String>(reqAcc), pinferId);
+            List<Integer> found = FastaProteinLookupUtil.getInstance().getProteinIdsForNames(new ArrayList<String>(reqAcc), pinferId);
             
             // get the corresponding protein inference protein ids
             if(found.size() > 0) {

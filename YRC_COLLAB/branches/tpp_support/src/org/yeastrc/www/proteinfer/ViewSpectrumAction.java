@@ -60,6 +60,7 @@ import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
+import org.yeastrc.www.util.RoundingUtils;
 
 public class ViewSpectrumAction extends Action {
 
@@ -243,6 +244,8 @@ public class ViewSpectrumAction extends Action {
         
         private final List<SequestResultPlus> results;
         
+        private RoundingUtils rounder = RoundingUtils.getInstance();
+        
         public TabularSequestResults() {
             this.results = new ArrayList<SequestResultPlus>();
         }
@@ -278,8 +281,8 @@ public class ViewSpectrumAction extends Action {
             SequestResultPlus result = results.get(index);
             TableRow row = new TableRow();
             
-            row.addCell(new TableCell(String.valueOf(round(result.getObservedMass()))));
-            row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getCalculatedMass())), null));
+            row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getObservedMass()))));
+            row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getSequestResultData().getCalculatedMass())), null));
             row.addCell(new TableCell(String.valueOf(result.getCharge())));
             
             // Retention time
@@ -288,16 +291,16 @@ public class ViewSpectrumAction extends Action {
                 row.addCell(new TableCell("", null));
             }
             else
-                row.addCell(new TableCell(String.valueOf(round(temp)), null));
+                row.addCell(new TableCell(String.valueOf(rounder.roundFour(temp)), null));
             
             row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getxCorrRank()), null));
-            row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getxCorr())), null));
+            row.addCell(new TableCell(String.valueOf(rounder.roundTwo(result.getSequestResultData().getxCorr())), null));
             row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getDeltaCN()), null));
             if(!useEvalue)
-                row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getSp())), null));
+                row.addCell(new TableCell(String.valueOf(rounder.roundTwo(result.getSequestResultData().getSp())), null));
             else {
                 if(result.getSequestResultData().getEvalue() != null)
-                    row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getEvalue())), null));
+                    row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getSequestResultData().getEvalue())), null));
                 else
                     row.addCell(new TableCell("NULL", null));
             }
@@ -350,6 +353,8 @@ public class ViewSpectrumAction extends Action {
         
         private int highlightedRow = -1;
         
+        private RoundingUtils rounder = RoundingUtils.getInstance();
+        
         private final List<MascotResultPlus> results;
         
         public TabularMascotResults() {
@@ -372,8 +377,8 @@ public class ViewSpectrumAction extends Action {
             MascotResultPlus result = results.get(index);
             TableRow row = new TableRow();
             
-            row.addCell(new TableCell(String.valueOf(round(result.getObservedMass()))));
-            row.addCell(new TableCell(String.valueOf(round(result.getMascotResultData().getCalculatedMass())), null));
+            row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getObservedMass()))));
+            row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getMascotResultData().getCalculatedMass())), null));
             row.addCell(new TableCell(String.valueOf(result.getCharge())));
             
             // Retention time
@@ -382,10 +387,10 @@ public class ViewSpectrumAction extends Action {
                 row.addCell(new TableCell("", null));
             }
             else
-                row.addCell(new TableCell(String.valueOf(round(temp)), null));
+                row.addCell(new TableCell(String.valueOf(rounder.roundFour(temp)), null));
             
             row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getRank()), null));
-            row.addCell(new TableCell(String.valueOf(round(result.getMascotResultData().getIonScore())), null));
+            row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getMascotResultData().getIonScore())), null));
             row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getIdentityScore()), null));
             row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getHomologyScore()), null));
             row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getExpect()), null));
@@ -438,6 +443,8 @@ public class ViewSpectrumAction extends Action {
         
         private int highlightedRow = -1;
         
+        private RoundingUtils rounder = RoundingUtils.getInstance();
+        
         private final List<XtandemResultPlus> results;
         
         public TabularXtandemResults() {
@@ -460,8 +467,8 @@ public class ViewSpectrumAction extends Action {
             XtandemResultPlus result = results.get(index);
             TableRow row = new TableRow();
             
-            row.addCell(new TableCell(String.valueOf(round(result.getObservedMass()))));
-            row.addCell(new TableCell(String.valueOf(round(result.getXtandemResultData().getCalculatedMass())), null));
+            row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getObservedMass()))));
+            row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getXtandemResultData().getCalculatedMass())), null));
             row.addCell(new TableCell(String.valueOf(result.getCharge())));
             
             // Retention time
@@ -470,7 +477,7 @@ public class ViewSpectrumAction extends Action {
                 row.addCell(new TableCell("", null));
             }
             else
-                row.addCell(new TableCell(String.valueOf(round(temp)), null));
+                row.addCell(new TableCell(String.valueOf(rounder.roundFour(temp)), null));
             
             row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getRank()), null));
             row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getHyperScore()), null));
@@ -508,12 +515,7 @@ public class ViewSpectrumAction extends Action {
         }
     }
 
-    private static double round(BigDecimal number) {
-        return round(number.doubleValue());
-    }
-    private static double round(double num) {
-        return Math.round(num*100.0)/100.0;
-    }
+    
     
     private List<String> makeAppletParams(int scanId, int runSearchResultId, ActionMapping mapping, HttpServletRequest request) 
         throws Exception {

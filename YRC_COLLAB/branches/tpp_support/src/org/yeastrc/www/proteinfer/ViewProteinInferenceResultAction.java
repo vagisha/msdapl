@@ -145,6 +145,7 @@ public class ViewProteinInferenceResultAction extends Action {
         filterCriteria.setPeptideDefinition(peptideDef);
         filterCriteria.setSortBy(ProteinFilterCriteria.defaultSortBy());
         filterCriteria.setSortOrder(ProteinFilterCriteria.defaultSortOrder());
+        filterCriteria.setExcludeIndistinGroups(filterForm.isExcludeIndistinProteinGroups());
         filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
         if(!filterForm.isShowAllProteins())
             filterCriteria.setParsimoniousOnly();

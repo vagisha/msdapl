@@ -18,6 +18,7 @@ import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
+import org.yeastrc.www.util.RoundingUtils;
 
 /**
  * 
@@ -49,11 +50,14 @@ public class TabularMascotResults implements Tabular, Pageable {
         private int lastPage = currentPage;
         private List<Integer> displayPageNumbers;
         
+        private RoundingUtils rounder = RoundingUtils.getInstance();
         
         public TabularMascotResults(List<MascotResultPlus> results, boolean useEvalue) {
             this.results = results;
             displayPageNumbers = new ArrayList<Integer>();
             displayPageNumbers.add(currentPage);
+            
+            rounder = RoundingUtils.getInstance();
         }
         
         
@@ -107,7 +111,7 @@ public class TabularMascotResults implements Tabular, Pageable {
             row.addCell(cell);
             row.addCell(new TableCell(String.valueOf(result.getScanNumber())));
             row.addCell(new TableCell(String.valueOf(result.getCharge())));
-            row.addCell(new TableCell(String.valueOf(round(result.getObservedMass()))));
+            row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getObservedMass()))));
             
             // Retention time
             BigDecimal temp = result.getRetentionTime();
@@ -115,11 +119,11 @@ public class TabularMascotResults implements Tabular, Pageable {
                 row.addCell(new TableCell(""));
             }
             else
-                row.addCell(new TableCell(String.valueOf(round(temp))));
+                row.addCell(new TableCell(String.valueOf(rounder.roundFour(temp))));
             
             
             row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getRank())));
-            row.addCell(new TableCell(String.valueOf(round(result.getMascotResultData().getIonScore()))));
+            row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getMascotResultData().getIonScore()))));
             row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getIdentityScore())));
             row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getHomologyScore())));
             row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getExpect())));
@@ -147,13 +151,6 @@ public class TabularMascotResults implements Tabular, Pageable {
             return row;
         }
         
-        private static double round(BigDecimal number) {
-            return round(number.doubleValue());
-        }
-        private static double round(double num) {
-            return Math.round(num*100.0)/100.0;
-        }
-
         @Override
         public int rowCount() {
             return results.size();

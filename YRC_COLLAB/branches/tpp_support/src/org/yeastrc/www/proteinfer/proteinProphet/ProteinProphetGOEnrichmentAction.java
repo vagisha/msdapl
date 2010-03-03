@@ -139,12 +139,14 @@ public class ProteinProphetGOEnrichmentAction extends Action {
         filterCriteria.setMaxGroupProbability(filterForm.getMaxGroupProbabilityDouble());
         filterCriteria.setMinProteinProbability(filterForm.getMinProteinProbabilityDouble());
         filterCriteria.setMaxProteinProbability(filterForm.getMaxProteinProbabilityDouble());
+        filterCriteria.setExcludeIndistinGroups(filterForm.isExcludeIndistinProteinGroups());
         filterCriteria.setGroupProteins(filterForm.isJoinProphetGroupProteins());
-        if(!filterForm.isShowAllProteins())
+        if(filterForm.isExcludeSubsumed())
             filterCriteria.setParsimoniousOnly();
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
+        filterCriteria.setDescriptionNotLike(filterForm.getDescriptionNotLike());
         filterCriteria.setPeptide(filterForm.getPeptide());
         filterCriteria.setExactPeptideMatch(filterForm.getExactPeptideMatch());
         

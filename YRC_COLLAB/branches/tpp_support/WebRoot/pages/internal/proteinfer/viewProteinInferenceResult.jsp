@@ -522,29 +522,6 @@ function removeProteinAndPeptideHighlights() {
 }
 
 
-  
-// ---------------------------------------------------------------------------------------
-// SHOW SPECTRUM MATCHES
-// ---------------------------------------------------------------------------------------    
-function showSpectrumMatches(runSearchId, runName) {
-	$(".input_psm").hide();
-	$("#psm_"+runSearchId).show();
-	
-	if($("#psm_"+runSearchId).html().length == 0) {
-		$("#psm_"+runSearchId).html("<b>Loading Peptide Spectrum Matches for: "+runName+"...</b>");
-		$("#psm_"+runSearchId).load("<yrcwww:link path='psmMatches.do'/>", //url
-								{'pinferId': <%=pinferId%>, 'runSearchId': runSearchId},
-								function(responseText, status, xhr) {						// callback
-							  		// stripe the table
-									$("#psmtbl_"+runSearchId+" th").addClass("pinfer_A");
-									$("#psmtbl_"+runSearchId+" tr:even").addClass("pinfer_A");
-									makeSortable($("#psmtbl_"+runSearchId));
-									$(this).show();
-							  });
-	}
-} 
-  
-
 // ---------------------------------------------------------------------------------------
 // MAKE PROTEIN LIST TABLE SORTABLE
 // ---------------------------------------------------------------------------------------
@@ -926,6 +903,7 @@ function downloadResults() {
 
 	$("#downloadForm  input[name='accessionLike']").val($("#filterForm  input[name='accessionLike']").val());
 	$("#downloadForm  input[name='descriptionLike']").val($("#filterForm input[name='descriptionLike']").val());
+	$("#downloadForm  input[name='descriptionNotLike']").val($("#filterForm input[name='descriptionNotLike']").val());
 	
 	var validationStatus = "";
 	$("#filterForm  input[name='validationStatus']:checked").each(function() {validationStatus += ","+$(this).val();});
@@ -975,6 +953,7 @@ function doGoEnrichmentAnalysis() {
 
 	$("#goEnrichmentForm  input[name='accessionLike']").val($("#filterForm  input[name='accessionLike']").val());
 	$("#goEnrichmentForm  input[name='descriptionLike']").val($("#filterForm input[name='descriptionLike']").val());
+	$("#goEnrichmentForm  input[name='descriptionNotLike']").val($("#filterForm input[name='descriptionNotLike']").val());
 	
 	var validationStatus = "";
 	$("#filterForm  input[name='validationStatus']:checked").each(function() {validationStatus += ","+$(this).val();});

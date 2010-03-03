@@ -17,6 +17,17 @@
 				this.checked = false;
 			});
 		});
+		
+		$("input[name='chargeStates'][value='All']").click(function() {
+			$("input[name='chargeStates'][value!='All']").each(function() {
+				this.checked = false;
+			});
+		});
+		$("input[name='chargeStates'][value!='All']").click(function() {
+			$("input[name='chargeStates'][value='All']").each(function() {
+				this.checked = false;
+			});
+		});
 	});
 </script>
 
@@ -43,6 +54,13 @@
   	Max <html:text name="proteinInferFilterForm" property="maxUniquePeptides" size="3"></html:text>
   </td>
   </tr>
+  <tr>
+  <td>Protein Mol. Wt.: </td>
+  <td>
+  	Min <html:text name="proteinInferFilterForm" property="minMolecularWt" size="3"></html:text>
+  	Max <html:text name="proteinInferFilterForm" property="maxMolecularWt" size="3"></html:text>
+  </td>
+  </tr>
   </table></td>
   
   <td><table>
@@ -60,9 +78,16 @@
   	Max <html:text name="proteinInferFilterForm" property="maxSpectrumMatches" size="3"></html:text>
   </td>
   </tr>
+  <tr>
+  <td>Protein pI: </td>
+  <td>
+  	Min <html:text name="proteinInferFilterForm" property="minPi" size="3"></html:text>
+  	Max <html:text name="proteinInferFilterForm" property="maxPi" size="3"></html:text>
+  </td>
+  </tr>
   </table></td>
   
-  <td><table>
+  <td valign="top"><table>
   <tr>
   	<td colspan="2">Group Indistinguishable Proteins: </td>
   	<td>
@@ -97,6 +122,21 @@
   		<html:multibox name="proteinInferFilterForm" property="validationStatus"  
   		               value="<%=String.valueOf(ProteinUserValidation.NOT_SURE.getStatusChar()) %>"/> Not Sure
   	</td>
+  	<td>
+  		Exclude Indistinguishable Groups: <html:checkbox name="proteinInferFilterForm" property="excludeIndistinProteinGroups" value="true"/>
+  	</td>
+  </tr>
+  
+  <tr>
+  	<td colspan="2">
+  		Include Charge: &nbsp;&nbsp;
+  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="All"/> All &nbsp;
+  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="1"/> +1 &nbsp;
+  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="2"/> +2 &nbsp;
+  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="3"/> +3 &nbsp;
+  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="4"/> +4 &nbsp;
+  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value=">4"/> &gt; +4   
+  	</td>
   </tr>
   
   <tr>
@@ -107,22 +147,29 @@
   			<td valign="top"><html:text name="proteinInferFilterForm" property="accessionLike" size="40"></html:text><br>
   				<span style="font-size:8pt;">Enter a comma-separated list of complete or partial identifiers</span>
   			</td>
-  			<td valign="top">Description: </td>
-  			<td valign="top">
-  				<html:text name="proteinInferFilterForm" property="descriptionLike" size="40"></html:text>
-  			</td>
-  		</tr>
-  		<tr>
   			<td valign="top">Peptide: </td>
   			<td valign="top">
-  				<html:text name="proteinInferFilterForm" property="peptide" size="40"></html:text><br>
+  				<html:text name="proteinInferFilterForm" property="peptide" size="40"></html:text>
   				<span style="font-size:8pt;">Exact Match:<html:checkbox property="proteinInferFilterForm" property="exactPeptideMatch"></html:checkbox></span>
+  			</td>
+  			
+  		</tr>
+  		<tr>
+  			<td valign="top">Description Include: </td>
+  			<td valign="top"><html:text name="proteinInferFilterForm" property="descriptionLike" size="40"></html:text><br>
+  				<span style="font-size:8pt;">Enter a comma-separated list of terms</span>
+  			</td>
+  			<td valign="top">Exclude: </td>
+  			<td valign="top">
+  				<html:text name="proteinInferFilterForm" property="descriptionNotLike" size="40"></html:text><br>
+  				<span style="font-size:8pt;">Enter a comma-separated list of terms</span>
   			</td>
   		</tr>
   	</table>
   	</td>
   </tr>
   
+ 
   <tr>
     	<td colspan="3" align="center">
     		<html:submit styleClass="plain_button" style="margin-top:2px;">Update</html:submit>

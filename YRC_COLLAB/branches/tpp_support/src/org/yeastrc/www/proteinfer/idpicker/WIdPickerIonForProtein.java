@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.protinfer.GenericProteinferIon;
 import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
+import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 
@@ -13,8 +14,9 @@ public class WIdPickerIonForProtein extends WIdPickerIon {
     private List<Character> ntermResidues = new ArrayList<Character>();
     private List<Character> cTermResidues = new ArrayList<Character>();
     
-    public WIdPickerIonForProtein(GenericProteinferIon<? extends ProteinferSpectrumMatch> ion, MsSearchResult psm) {
-        super(ion, psm);
+    public WIdPickerIonForProtein(GenericProteinferIon<? extends ProteinferSpectrumMatch> ion, 
+            MsSearchResult psm, MsScan bestScan) {
+        super(ion, psm, bestScan);
     }
     
     public void addTerminalResidues(char nterm, char cterm) {

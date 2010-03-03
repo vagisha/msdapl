@@ -144,8 +144,9 @@ private static final Logger log = Logger.getLogger(ViewProteinProphetResultActio
         filterCriteria.setPeptideDefinition(peptideDef);
         filterCriteria.setSortBy(ProteinProphetFilterCriteria.defaultSortBy());
         filterCriteria.setSortOrder(ProteinProphetFilterCriteria.defaultSortOrder());
+        filterCriteria.setExcludeIndistinGroups(filterForm.isExcludeIndistinProteinGroups());
         filterCriteria.setGroupProteins(filterForm.isJoinProphetGroupProteins());
-        if(!filterForm.isShowAllProteins())
+        if(filterForm.isExcludeSubsumed())
             filterCriteria.setParsimoniousOnly();
         
         // Get the protein Ids that fulfill the criteria.

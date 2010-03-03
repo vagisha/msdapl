@@ -405,29 +405,6 @@ function saveProtDetailCookie(pinferId, proteinId) {
     date.setTime(date.getTime() + (2 * 60 * 60 * 1000)); // expire in two hours
     $.cookie(COOKIE_NAME, pinferId+"_"+proteinId, { path: '/', expires: date });
 }
-  
-  
-// ---------------------------------------------------------------------------------------
-// SHOW SPECTRUM MATCHES
-// ---------------------------------------------------------------------------------------    
-function showSpectrumMatches(runSearchId, runName) {
-	$(".input_psm").hide();
-	$("#psm_"+runSearchId).show();
-	
-	if($("#psm_"+runSearchId).html().length == 0) {
-		$("#psm_"+runSearchId).html("<b>Loading Peptide Spectrum Matches for: "+runName+"...</b>");
-		$("#psm_"+runSearchId).load("<yrcwww:link path='psmMatches.do'/>", //url
-								{'pinferId': <%=pinferId%>, 'runSearchId': runSearchId},
-								function(responseText, status, xhr) {						// callback
-							  		// stripe the table
-									$("#psmtbl_"+runSearchId+" th").addClass("pinfer_A");
-									$("#psmtbl_"+runSearchId+" tr:even").addClass("pinfer_A");
-									makeSortable($("#psmtbl_"+runSearchId));
-									$(this).show();
-							  });
-	}
-} 
-  
 
 // ---------------------------------------------------------------------------------------
 // MAKE PROTEIN LIST TABLE SORTABLE
@@ -781,6 +758,12 @@ function validateForm() {
     valid = validateFloat(value, "Max. Protein Probability", minProb, 1.0);
     if(!valid)	return false;
     
+    // Molecular Wt.
+    value = $('form#filterForm input[@name=minMolecularWt]').fieldValue();
+    valid = validateFloat(value, "Min. Molecular Wt.", 0);
+    if(!valid)	return false;
+    $('form#filterForm input[@name=minMolecularWt]').val(parseInt(value));
+    
     return true;
 }
 
@@ -850,6 +833,12 @@ function doGoEnrichmentAnalysis() {
 	$("#goEnrichmentForm  input[name='minSpectrumMatches']").val($("#filterForm  input[name='minSpectrumMatches']").val());
 	$("#goEnrichmentForm  input[name='maxSpectrumMatches']").val($("#filterForm  input[name='maxSpectrumMatches']").val());
 	
+	$("#goEnrichmentForm  input[name='minMolecularWt']").val($("#filterForm  input[name='minMolecularWt']").val());
+	$("#goEnrichmentForm  input[name='maxMolecularWt']").val($("#filterForm  input[name='maxMolecularWt']").val());
+	
+	$("#goEnrichmentForm  input[name='minPi']").val($("#filterForm  input[name='minPi']").val());
+	$("#goEnrichmentForm  input[name='maxPi']").val($("#filterForm  input[name='maxPi']").val());
+	
 	$("#goEnrichmentForm  input[name='minGroupProbability']").val($("#filterForm  input[name='minGroupProbability']").val());
 	$("#goEnrichmentForm  input[name='maxGroupProbability']").val($("#filterForm  input[name='maxGroupProbability']").val());
 	
@@ -861,6 +850,7 @@ function doGoEnrichmentAnalysis() {
 
 	$("#goEnrichmentForm  input[name='accessionLike']").val($("#filterForm  input[name='accessionLike']").val());
 	$("#goEnrichmentForm  input[name='descriptionLike']").val($("#filterForm input[name='descriptionLike']").val());
+	$("#goEnrichmentForm  input[name='descriptionNotLike']").val($("#filterForm input[name='descriptionNotLike']").val());
 	
 	var validationStatus = "";
 	$("#filterForm  input[name='validationStatus']:checked").each(function() {validationStatus += ","+$(this).val();});

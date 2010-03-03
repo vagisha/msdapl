@@ -50,8 +50,8 @@ public class PeptideProphetResultPlus implements PeptideProphetResult {
     }
 
     @Override
-    public int getSearchResultId() {
-        return result.getSearchResultId();
+    public int getPeptideProphetResultId() {
+        return result.getPeptideProphetResultId();
     }
 
     @Override

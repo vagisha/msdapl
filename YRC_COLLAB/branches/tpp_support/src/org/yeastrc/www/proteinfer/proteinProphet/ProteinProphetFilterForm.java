@@ -1,5 +1,8 @@
 package org.yeastrc.www.proteinfer.proteinProphet;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionErrors;
@@ -25,12 +28,14 @@ public class ProteinProphetFilterForm extends ActionForm {
     private String maxSpectrumMatches;
     
     private boolean joinProphetGroupProteins = true;
-    private boolean showAllProteins = true;
+    private boolean excludeSubsumed = false;
     
     private String accessionLike = null;
     private String descriptionLike = null;
     private String descriptionNotLike = null;
     private String[] validationStatus = new String[]{"All"};
+    
+    private String[] chargeStates = new String[]{"All"};
     
     private boolean excludeIndistinGroups = false;
     
@@ -59,7 +64,7 @@ public class ProteinProphetFilterForm extends ActionForm {
         joinProphetGroupProteins = true;
         excludeIndistinGroups = false;
         exactMatch = false;
-        showAllProteins = true;
+        excludeSubsumed = false;
         
         minCoverage = "0.0";
         minMolecularWt = "0.0";
@@ -333,12 +338,12 @@ public class ProteinProphetFilterForm extends ActionForm {
         this.excludeIndistinGroups = exclude;
     }
 
-    public boolean isShowAllProteins() {
-        return showAllProteins;
+    public boolean isExcludeSubsumed() {
+        return excludeSubsumed;
     }
 
-    public void setShowAllProteins(boolean showAllProteins) {
-        this.showAllProteins = showAllProteins;
+    public void setExcludeSubsumed(boolean excludeSubsumed) {
+        this.excludeSubsumed = excludeSubsumed;
     }
     
     // ACCESSION
@@ -428,6 +433,36 @@ public class ProteinProphetFilterForm extends ActionForm {
         if(buf.length() > 0)
             buf.deleteCharAt(0);
         return buf.toString();
+    }
+    
+    // CHARGE STATES
+    public String[] getChargeStates() {
+        return chargeStates;
+    }
+
+    public void setChargeStates(String[] chargeStates) {
+        this.chargeStates = chargeStates;
+    }
+    
+    public List<Integer> getChargeStateList() {
+        List<Integer> chgList = new ArrayList<Integer>(chargeStates.length);
+        for(String chg: chargeStates) {
+            if(chg.equals("All"))
+                return new ArrayList<Integer>(0);
+            if(!chg.startsWith(">")) {
+                chgList.add(Integer.parseInt(chg));
+            }
+        }
+        return chgList;
+    }
+    
+    public int getChargeGreaterThan() {
+        for(String chg: chargeStates) {
+            if(chg.startsWith(">")) {
+                return Integer.parseInt(chg.substring(1));
+            }
+        }
+        return -1;
     }
     
     //-----------------------------------------------------------------------------

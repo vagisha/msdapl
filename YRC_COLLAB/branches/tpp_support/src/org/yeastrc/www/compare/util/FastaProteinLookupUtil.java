@@ -53,9 +53,23 @@ public class FastaProteinLookupUtil {
         return listing;
     }
     
-    public List<Integer> getProteinIds(String fastaProteinName, int pinferId) {
+    public List<Integer> getProteinIdsForName(String fastaProteinName, int pinferId) {
         
         List<Integer> dbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
+        return getProteinIdsForName(fastaProteinName, dbIds);
+    }
+
+    public List<Integer> getProteinIdsForNames(List<String> fastaProteinNames, int pinferId) {
+        
+        List<Integer> dbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
+        Set<Integer> found = new HashSet<Integer>();
+        for(String ra: fastaProteinNames) {
+            found.addAll(getProteinIdsForName(ra, dbIds));
+        }
+        return new ArrayList<Integer>(found);
+    }
+    
+    private List<Integer> getProteinIdsForName(String fastaProteinName, List<Integer> dbIds) {
         Set<Integer> found = new HashSet<Integer>();
         List<NrDbProtein> matching = NrSeqLookupUtil.getDbProteinsForAccession(dbIds, fastaProteinName);
         for(NrDbProtein prot: matching)
@@ -63,16 +77,28 @@ public class FastaProteinLookupUtil {
         return new ArrayList<Integer>(found);
     }
     
-    public List<Integer> getProteinIds(List<String> fastaProteinNames, int pinferId) {
+    public List<Integer> getProteinIdsForDescription(String descriptionTerm, int pinferId) {
+        
+        List<Integer> dbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
+        return getProteinIdsForDescription(descriptionTerm, dbIds);
+    }
+
+    public List<Integer> getProteinIdsForDescriptions(List<String> descriptionTerms, int pinferId) {
         
         List<Integer> dbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
         Set<Integer> found = new HashSet<Integer>();
-        for(String ra: fastaProteinNames) {
-            List<NrDbProtein> matching = NrSeqLookupUtil.getDbProteinsForAccession(dbIds, ra);
-            for(NrDbProtein prot: matching)
-                found.add(prot.getProteinId());
+        for(String descTerm: descriptionTerms) {
+            found.addAll(getProteinIdsForDescription(descTerm, dbIds));
         }
         return new ArrayList<Integer>(found);
     }
     
+    private List<Integer> getProteinIdsForDescription(String descriptionTerm,List<Integer> dbIds) {
+        
+        Set<Integer> found = new HashSet<Integer>();
+        List<NrDbProtein> matching = NrSeqLookupUtil.getDbProteinsForDescription(dbIds, descriptionTerm);
+        for(NrDbProtein prot: matching)
+            found.add(prot.getProteinId());
+        return new ArrayList<Integer>(found);
+    }
 }

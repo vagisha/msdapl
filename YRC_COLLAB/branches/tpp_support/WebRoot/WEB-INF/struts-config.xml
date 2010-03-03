@@ -954,13 +954,6 @@
 	</action>
 	
 	<action 
-		path="/psmMatches"
-		type="org.yeastrc.www.proteinfer.PeptideSequenceMatchesAjaxAction"
-	>
-		<forward name="Success" path="/pages/internal/proteinfer/psmMatches.jsp" redirect="false" />
-	</action>
-	
-	<action 
 		path="/viewSpectrum"
 		type="org.yeastrc.www.proteinfer.ViewSpectrumAction"
 	>

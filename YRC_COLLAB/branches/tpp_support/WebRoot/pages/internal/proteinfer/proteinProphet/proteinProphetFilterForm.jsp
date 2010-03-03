@@ -16,6 +16,17 @@
 				this.checked = false;
 			});
 		});
+		
+		$("input[name='chargeStates'][value='All']").click(function() {
+			$("input[name='chargeStates'][value!='All']").each(function() {
+				this.checked = false;
+			});
+		});
+		$("input[name='chargeStates'][value!='All']").click(function() {
+			$("input[name='chargeStates'][value='All']").each(function() {
+				this.checked = false;
+			});
+		});
 	});
 </script>
 
@@ -43,6 +54,13 @@
   </td>
   </tr>
   <tr>
+  <td>Protein Mol. Wt.: </td>
+  <td>
+  	Min <html:text name="proteinProphetFilterForm" property="minMolecularWt" size="3"></html:text>
+  	Max <html:text name="proteinProphetFilterForm" property="maxMolecularWt" size="3"></html:text>
+  </td>
+  </tr>
+  <tr>
   	<td valign="bottom">ProteinProphet<br>Group Probability:</td>
   	<td valign="bottom">
   		Min <html:text name="proteinProphetFilterForm" property="minGroupProbability" size="3"></html:text>
@@ -66,6 +84,13 @@
   	Max <html:text name="proteinProphetFilterForm" property="maxSpectrumMatches" size="3"></html:text>
   </td>
   </tr>
+   <tr>
+  <td>Protein pI: </td>
+  <td>
+  	Min <html:text name="proteinProphetFilterForm" property="minPi" size="3"></html:text>
+  	Max <html:text name="proteinProphetFilterForm" property="maxPi" size="3"></html:text>
+  </td>
+  </tr>
   <tr>
   	<td valign="bottom">ProteinProphet<br>Protein Probability:</td>
   	<td valign="bottom">
@@ -77,7 +102,7 @@
   
   <td valign="top"><table>
   <tr>
-  	<td colspan="2" align="left">ProteinProphet Groups: </td>
+  	<td colspan="2" align="left">Display<br>ProteinProphet Groups: </td>
   	<td align="left">
   		<html:radio name="proteinProphetFilterForm" property="joinProphetGroupProteins" value="true">Yes</html:radio>
   	</td>
@@ -86,11 +111,13 @@
   	</td>
   </tr>
   <tr>
-  	<td colspan="2" align="left">
-  		<html:radio name="proteinProphetFilterForm" property="showAllProteins" value="true">Show All Proteins</html:radio>
+  	<td colspan="4" align="left">
+  		<html:checkbox name="proteinProphetFilterForm" property="excludeSubsumed" >Exclude Subsumed</html:checkbox>
   	</td>
-  	<td colspan="2" align="left">
-  		<html:radio name="proteinProphetFilterForm" property="showAllProteins" value="false">Exclude Subsumed</html:radio>
+  </tr>
+  <tr>
+  	<td colspan="4" align="left">
+  		<html:checkbox name="proteinProphetFilterForm" property="excludeIndistinProteinGroups" /> Exclude Indistinguishable Groups
   	</td>
   </tr>
   </table></td>
@@ -110,6 +137,19 @@
   		<html:multibox name="proteinProphetFilterForm" property="validationStatus"  
   		               value="<%=String.valueOf(ProteinUserValidation.NOT_SURE.getStatusChar()) %>"/> Not Sure
   	</td>
+  	
+  </tr>
+  
+  <tr>
+  	<td colspan="2">
+  		Include Charge: &nbsp;&nbsp;
+  		<html:multibox name="proteinProphetFilterForm" property="chargeStates" value="All"/> All &nbsp;
+  		<html:multibox name="proteinProphetFilterForm" property="chargeStates" value="1"/> +1 &nbsp;
+  		<html:multibox name="proteinProphetFilterForm" property="chargeStates" value="2"/> +2 &nbsp;
+  		<html:multibox name="proteinProphetFilterForm" property="chargeStates" value="3"/> +3 &nbsp;
+  		<html:multibox name="proteinProphetFilterForm" property="chargeStates" value="4"/> +4 &nbsp;
+  		<html:multibox name="proteinProphetFilterForm" property="chargeStates" value=">4"/> &gt; +4   
+  	</td>
   </tr>
   
   <tr>
@@ -120,16 +160,22 @@
   			<td valign="top"><html:text name="proteinProphetFilterForm" property="accessionLike" size="40"></html:text><br>
   				<span style="font-size:8pt;">Enter a comma-separated list of complete or partial identifiers</span>
   			</td>
-  			<td valign="top">Description: </td>
-  			<td valign="top">
-  				<html:text name="proteinProphetFilterForm" property="descriptionLike" size="40"></html:text>
-  			</td>
-  		</tr>
-  		<tr>
   			<td valign="top">Peptide: </td>
   			<td valign="top">
   				<html:text name="proteinProphetFilterForm" property="peptide" size="40"></html:text><br>
   				<span style="font-size:8pt;">Exact Match:<html:checkbox property="proteinProphetFilterForm" property="exactPeptideMatch"></html:checkbox></span>
+  			</td>
+  		</tr>
+  		
+  		<tr>
+  			<td valign="top">Description Include: </td>
+  			<td valign="top"><html:text name="proteinProphetFilterForm" property="descriptionLike" size="40"></html:text><br>
+  				<span style="font-size:8pt;">Enter a comma-separated list of terms</span>
+  			</td>
+  			<td valign="top">Exclude: </td>
+  			<td valign="top">
+  				<html:text name="proteinProphetFilterForm" property="descriptionNotLike" size="40"></html:text><br>
+  				<span style="font-size:8pt;">Enter a comma-separated list of terms</span>
   			</td>
   		</tr>
   	</table>

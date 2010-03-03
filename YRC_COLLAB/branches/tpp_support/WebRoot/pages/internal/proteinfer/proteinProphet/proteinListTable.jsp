@@ -120,6 +120,20 @@
 		
 		
 		<% colSortedClass = "";
+		 if(sortBy == SORT_BY.MOL_WT) colSortedClass = sortedClass;
+		%>
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.MOL_WT.name()%>">
+			<b><font size="2pt">Mol.Wt.</font></b>
+		</th>
+		
+		<% colSortedClass = "";
+		 if(sortBy == SORT_BY.PI) colSortedClass = sortedClass;
+		%>
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.PI.name()%>">
+			<b><font size="2pt">pI</font></b>
+		</th>
+		
+		<% colSortedClass = "";
 		 if(sortBy == SORT_BY.COVERAGE) colSortedClass = sortedClass;
 		%>
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.COVERAGE.name()%>">
@@ -234,7 +248,7 @@
 		</td>
 		
 		<!-- Protein accession -->
-		<td class="left_align">
+		<td>
 			<logic:equal name="protein" property="protein.subsumed" value="false"><b></logic:equal>
 			<logic:equal name="protein" property="protein.subsumed" value="true"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
@@ -247,7 +261,7 @@
 		</td>
 		
 		<!-- Protein common name -->
-			<td class="left_align"> 
+			<td> 
 			<logic:equal name="protein" property="protein.subsumed" value="false"><b></logic:equal>
 			<logic:equal name="protein" property="protein.subsumed" value="true"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
@@ -259,11 +273,11 @@
 			</td>
 			
 		<!-- Protein Description -->
-		<td style="font-size: 8pt;" class="left_align"><bean:write name="protein" property="shortDescription"/></td>
-		
-		
-		
+		<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
+		<td><bean:write name="protein" property="molecularWeight"/></td>
+		<td><bean:write name="protein" property="pi"/></td>
 		<td><bean:write name="protein" property="protein.coverage"/></td>
+		
 		
 		<%if(begin_i_grp) { begin_i_grp = false;%>
 		<td rowspan="<bean:write name="grp_rowspan" />" valign="middle">
@@ -290,10 +304,10 @@
 					  >Show Peptides</span></nobr></td>
 			
 			<logic:equal name="groupProteins" value="true">
-				<td colspan="8" class="pinfer_filler">
+				<td colspan="10" class="pinfer_filler">
 			</logic:equal>
 			<logic:equal name="groupProteins" value="false">
-				<td colspan="10" class="pinfer_filler">
+				<td colspan="12" class="pinfer_filler">
 			</logic:equal>
 				<!--  peptides table will go here: proteinPeptides.jsp -->
 				<div id="peptforprot_<bean:write name="iGroup" property="groupId" />"></div>

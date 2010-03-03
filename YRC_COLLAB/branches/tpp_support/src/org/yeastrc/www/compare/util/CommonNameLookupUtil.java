@@ -75,11 +75,15 @@ public class CommonNameLookupUtil {
           NRProteinFactory nrpf = NRProteinFactory.getInstance();
           NRProtein nrseqProt = null;
           nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
-          ProteinNameDescription cnd = new ProteinNameDescription();
-          cnd.setName(nrseqProt.getListing());
-          cnd.setDescription(nrseqProt.getDescription());
+          
           List<ProteinNameDescription> list = new ArrayList<ProteinNameDescription>();
-          list.add(cnd);
+          String[] names = nrseqProt.getListing().split(",");
+          for(String name: names) {
+              ProteinNameDescription cnd = new ProteinNameDescription();
+              cnd.setName(name.trim());
+              cnd.setDescription(nrseqProt.getFullDescription());
+              list.add(cnd);
+          }
           listing.setNameAndDescription(list);
         }
         
@@ -145,7 +149,7 @@ public class CommonNameLookupUtil {
         
         try {
             conn = DAOFactory.instance().getConnection();
-            String sql = "SELECT proteinID FROM YRC_NRSEQ.tblProteinDatabase WHERE accessionString LIKE '"+commonName+"%'";
+            String sql = "SELECT proteinID FROM nrseqProteinCache WHERE name LIKE '"+commonName+"%'";
             stmt = conn.createStatement();
             
             rs = stmt.executeQuery(sql);

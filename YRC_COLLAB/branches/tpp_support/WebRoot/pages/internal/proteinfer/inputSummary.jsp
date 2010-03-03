@@ -41,9 +41,6 @@
 	 	<logic:iterate name="inputSummary"  id="input">
  			<tr>
  				<td class="left_align">
- 					<!--  <span style="text-decoration: underline; cursor: pointer;"
- 								onclick="showSpectrumMatches(<bean:write name="input" property="input.inputId" />, '<bean:write name="input" property="fileName" />')">
- 					-->
  					<bean:write name="input" property="fileName" />
  					<!-- </span> -->
  				</td>

@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.ValidationStatus;
@@ -24,12 +25,17 @@ public class SequestResultPlus implements SequestSearchResult {
     private final SequestSearchResult result;
     private final int scanNumber;
     private final BigDecimal retentionTime;
+    private double area = -1.0;
     private String filename;
     
     public SequestResultPlus(SequestSearchResult result, MsScan scan) {
         this.result = result;
         this.scanNumber = scan.getStartScanNum();
         this.retentionTime = scan.getRetentionTime();
+        if(scan instanceof MS2Scan) {
+            MS2Scan scan2 = (MS2Scan) scan;
+            area = scan2.getBullsEyeArea();
+        }
     }
     
     public String getFilename() {
@@ -117,6 +123,10 @@ public class SequestResultPlus implements SequestSearchResult {
         return retentionTime;
     }
 
+    public double getArea() {
+        return area;
+    }
+    
     @Override
     public void setCharge(int charge) {
         throw new UnsupportedOperationException();
@@ -131,4 +141,5 @@ public class SequestResultPlus implements SequestSearchResult {
     public void setResultPeptide(MsSearchResultPeptide resultPeptide) {
         throw new UnsupportedOperationException();
     }
+    
 }

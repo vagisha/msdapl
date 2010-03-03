@@ -19,6 +19,7 @@ import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
+import org.yeastrc.www.util.RoundingUtils;
 
 public class TabularPeptideProphetResults implements Tabular, Pageable {
 
@@ -35,6 +36,7 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
         private int lastPage = currentPage;
         private List<Integer> displayPageNumbers;
         
+        private RoundingUtils rounder;
         
         public TabularPeptideProphetResults(List<? extends PeptideProphetResultPlus> results, 
                 Program searchProgram) {
@@ -43,6 +45,8 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
             displayPageNumbers = new ArrayList<Integer>();
             displayPageNumbers.add(currentPage);
             this.searchProgram = searchProgram;
+            
+            rounder = RoundingUtils.getInstance();
             
             if(searchProgram == Program.SEQUEST) {
                 columns = new SORT_BY[] {
@@ -147,13 +151,13 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
             PeptideProphetResultPlus result = results.get(index);
             TableRow row = new TableRow();
             
-            // row.addCell(new TableCell(String.valueOf(result.getId())));
+            // row.addCell(new TableCell(String.valueOf(result.getPeptideProphetResultId())));
             TableCell cell = new TableCell(result.getFilename());
             cell.setClassName("left_align");
             row.addCell(cell);
             row.addCell(new TableCell(String.valueOf(result.getScanNumber())));
             row.addCell(new TableCell(String.valueOf(result.getCharge())));
-            row.addCell(new TableCell(String.valueOf(round(result.getObservedMass()))));
+            row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getObservedMass()))));
             
             // Retention time
             BigDecimal temp = result.getRetentionTime();
@@ -161,7 +165,7 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
                 row.addCell(new TableCell(""));
             }
             else
-                row.addCell(new TableCell(String.valueOf(round(temp))));
+                row.addCell(new TableCell(String.valueOf(rounder.roundFour(temp))));
             
             
             row.addCell(new TableCell(String.valueOf(result.getProbabilityRounded())));
@@ -169,30 +173,30 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
             // Sequest data
             if(searchProgram == Program.SEQUEST) {
                 row.addCell(new TableCell(String.valueOf(((PeptideProphetResultPlusSequest)result).getSequestData().getxCorrRank())));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusSequest)result).getSequestData().getxCorr()))));
+                row.addCell(new TableCell(String.valueOf(rounder.roundTwo(((PeptideProphetResultPlusSequest)result).getSequestData().getxCorr()))));
 //            row.addCell(new TableCell(String.valueOf(round(result.getSequestData().getDeltaCN()))));
             }
             
             // Mascot data
             else if(searchProgram == Program.MASCOT) {
                 row.addCell(new TableCell(String.valueOf(((PeptideProphetResultPlusMascot)result).getMascotData().getRank())));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusMascot)result).getMascotData().getIonScore()))));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusMascot)result).getMascotData().getIdentityScore()))));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusMascot)result).getMascotData().getHomologyScore()))));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusMascot)result).getMascotData().getExpect()))));
+                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusMascot)result).getMascotData().getIonScore()))));
+                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusMascot)result).getMascotData().getIdentityScore()))));
+                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusMascot)result).getMascotData().getHomologyScore()))));
+                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusMascot)result).getMascotData().getExpect()))));
             }
             
             // Xtandem data
             else if(searchProgram == Program.XTANDEM) {
                 row.addCell(new TableCell(String.valueOf(((PeptideProphetResultPlusXtandem)result).getXtandemData().getRank())));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusXtandem)result).getXtandemData().getHyperScore()))));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusXtandem)result).getXtandemData().getNextScore()))));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusXtandem)result).getXtandemData().getBscore()))));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusXtandem)result).getXtandemData().getYscore()))));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusXtandem)result).getXtandemData().getExpect()))));
+                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusXtandem)result).getXtandemData().getHyperScore()))));
+                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusXtandem)result).getXtandemData().getNextScore()))));
+                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusXtandem)result).getXtandemData().getBscore()))));
+                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusXtandem)result).getXtandemData().getYscore()))));
+                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusXtandem)result).getXtandemData().getExpect()))));
             }
             
-            String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getSearchResultId();
+            String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
             try {
                 cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptide()), url, true);
             }
@@ -205,22 +209,16 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
             String cellContents = result.getOneProtein();
             if(result.getProteinCount() > 1) {
                 cellContents += " <span class=\"underline clickable\" "+
-                "onClick=javascript:toggleProteins("+result.getId()+") "+
+                "onClick=javascript:toggleProteins("+result.getPeptideProphetResultId()+") "+
                 ">("+result.getProteinCount()+")</span>";
-                cellContents += " \n<div style=\"display: none;\" id=\"proteins_for_"+result.getId()+"\">"+result.getOtherProteinsHtml()+"</div>";
+                cellContents += " \n<div style=\"display: none;\" id=\"proteins_for_"
+                			 +result.getPeptideProphetResultId()+"\">"+result.getOtherProteinsHtml()+"</div>";
             }
             cell = new TableCell(cellContents);
             cell.setClassName("left_align");
             row.addCell(cell);
             
             return row;
-        }
-        
-        private static double round(BigDecimal number) {
-            return round(number.doubleValue());
-        }
-        private static double round(double num) {
-            return Math.round(num*100.0)/100.0;
         }
 
         @Override
@@ -232,8 +230,6 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
         public void tabulate() {
             // nothing to do here?
         }
-
-        
         
         @Override
         public int getCurrentPage() {

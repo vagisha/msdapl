@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.ValidationStatus;
@@ -25,6 +26,7 @@ public class PercolatorResultPlus implements PercolatorResult {
     private SequestResultData sequestData;
     private final int scanNumber;
     private final BigDecimal retentionTime;
+    private double area = -1.0;
     private String filename;
     
    
@@ -32,6 +34,10 @@ public class PercolatorResultPlus implements PercolatorResult {
         this.result = result;
         this.scanNumber = scan.getStartScanNum();
         this.retentionTime = scan.getRetentionTime();
+        if(scan instanceof MS2Scan) {
+            MS2Scan scan2 = (MS2Scan) scan;
+            area = scan2.getBullsEyeArea();
+        }
     }
     
     public String getFilename() {
@@ -52,6 +58,10 @@ public class PercolatorResultPlus implements PercolatorResult {
     
     public BigDecimal getRetentionTime() {
         return retentionTime;
+    }
+    
+    public double getArea() {
+        return area;
     }
     
     @Override
@@ -100,8 +110,8 @@ public class PercolatorResultPlus implements PercolatorResult {
     }
 
     @Override
-    public int getSearchResultId() {
-        return result.getSearchResultId();
+    public int getPercolatorResultId() {
+        return result.getPercolatorResultId();
     }
     
     @Override
