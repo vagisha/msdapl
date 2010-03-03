@@ -42,10 +42,10 @@ public class ExperimentDeleter {
         return instance;
     }
     
-    public synchronized void addExperimentId(int experimentId, boolean unlinkFirst) throws SQLException {
+    public synchronized void addExperimentId(int experimentId, int projectId, boolean unlinkFirst) throws SQLException {
         if(!deletionList.contains(experimentId)) {
             deletionList.add(experimentId);
-            log.info("Got request to delete experiment ID: "+experimentId);
+            log.info("Got request to delete experiment ID: "+experimentId+" for project ID: "+projectId);
         }
         else {
             log.info("Experiment ID: "+experimentId+" already in deletion queue");
@@ -92,9 +92,9 @@ public class ExperimentDeleter {
             log.info("Deleting experiment ID: "+experimentId);
             
             // delete all protein inferences for this experiment
-            List<Integer> piRunIds = ProteinInferJobSearcher.instance().getProteinferIdsForMsExperiment(experimentId);
-            for(int piRunId: piRunIds)
-                deleteProteinInference(piRunId);
+//            List<Integer> piRunIds = ProteinInferJobSearcher.instance().getProteinferIdsForMsExperiment(experimentId);
+//            for(int piRunId: piRunIds)
+//                deleteProteinInference(piRunId);
             
             // delete all analyses for this experiment
             

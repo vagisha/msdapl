@@ -70,7 +70,7 @@ public class DeleteProjectAction extends Action {
 		List<Integer> experimentIds = ProjectExperimentDAO.instance().getExperimentIdsForProject(projectID);
 		ExperimentDeleter deleter = ExperimentDeleter.getInstance();
 		for(int exptId: experimentIds)
-		    deleter.addExperimentId(exptId, true);
+            deleter.addExperimentId(exptId, projectID, true);
 		
 		try {
 			ProjectDAO.instance().delete(projectID);

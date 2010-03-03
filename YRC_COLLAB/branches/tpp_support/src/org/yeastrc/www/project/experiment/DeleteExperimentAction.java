@@ -128,7 +128,7 @@ public class DeleteExperimentAction extends Action {
         // add to experiment deleter.
         // project and experiment will be unlinked first so that they don't show up on the project page.
         try {
-            ExperimentDeleter.getInstance().addExperimentId(experimentId, true);
+            ExperimentDeleter.getInstance().addExperimentId(experimentId, projectId, true);
         }
         catch(SQLException e) {
             ActionErrors errors = new ActionErrors();
