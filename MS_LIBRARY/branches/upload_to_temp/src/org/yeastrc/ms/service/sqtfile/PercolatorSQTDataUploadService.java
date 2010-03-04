@@ -498,6 +498,9 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
                     numMatching = 0;
                     String myPeptide = result.getResultPeptide().getModifiedPeptidePS();
                     for(MsSearchResult res: matchingResults) {
+                        // If this does not have the same observed mass as our result skip it
+                        if(result.getObservedMass().doubleValue() != res.getObservedMass().doubleValue())
+                            continue;
                         if(myPeptide.equals(res.getResultPeptide().getModifiedPeptidePS())) {
                             searchResult = res;
                             numMatching++;
