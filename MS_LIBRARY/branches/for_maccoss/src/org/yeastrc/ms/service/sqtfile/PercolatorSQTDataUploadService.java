@@ -464,7 +464,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             
             else if(matchingResults.size() > 1) { // this can happen if 
                                                   // 1. scan searched with same charge but different M+H (due to Bullseye) results in same peptide match
-                                                  // 2. we have the same sequence with different mods (TODO will this ever happen??)
+                                                  // 2. we have the same sequence with different mods
                 // check for 1. first
                 int numMatching = 0;
                 for(MsSearchResult res: matchingResults) {
@@ -480,6 +480,9 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
                     numMatching = 0;
                     String myPeptide = result.getResultPeptide().getModifiedPeptidePS();
                     for(MsSearchResult res: matchingResults) {
+                        // If this does not have the same observed mass as our result skip it
+                        if(result.getObservedMass().doubleValue() != res.getObservedMass().doubleValue())
+                            continue;
                         if(myPeptide.equals(res.getResultPeptide().getModifiedPeptidePS())) {
                             searchResult = res;
                             numMatching++;
