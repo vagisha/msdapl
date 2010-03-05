@@ -7,8 +7,10 @@ public class NrDbProtein {
     private String accessionString;
     private int proteinId;
     private String description;
+    private String url;
+    private boolean isCurrent;
     
-    public int getId() {
+	public int getId() {
         return id;
     }
     public void setId(int id) {
@@ -38,4 +40,22 @@ public class NrDbProtein {
     public void setDescription(String description) {
         this.description = description;
     }
+    public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public boolean isCurrent() {
+		return isCurrent;
+	}
+	public void setCurrent(boolean isCurrent) {
+		this.isCurrent = isCurrent;
+	}
+	public void setIsCurrentChar(String str) {
+		if(str.equals("T"))
+			setCurrent(true);
+		else
+			setCurrent(false);
+	}
 }

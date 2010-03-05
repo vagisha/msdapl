@@ -13,6 +13,8 @@
 		<result property="databaseId" column="databaseID" />
 		<result property="accessionString" column="accessionString" />
 		<result property="description" column="description" />
+		<result property="url" column="URL" />
+		<result property="isCurrentChar" column="isCurrent" jdbcType="CHAR" javaType="String"/>
 	</resultMap>
 	
 	<resultMap class="NrDbProteinFull" id="nrDbProtFullResult">
