@@ -5,6 +5,7 @@
 
 	<typeAlias alias="NrDbProtein" type="org.yeastrc.ms.domain.nrseq.NrDbProtein"/>
 	<typeAlias alias="NrDbProteinFull" type="org.yeastrc.ms.domain.nrseq.NrDbProteinFull"/>
+	<typeAlias alias="NrProtein" type="org.yeastrc.ms.domain.nrseq.NrProtein"/>
 	<typeAlias alias="NrDatabase" type="org.yeastrc.ms.domain.nrseq.NrDatabase"/>
 
 	<resultMap class="NrDbProtein" id="nrDbProtResult">
@@ -23,6 +24,14 @@
 		<result property="databaseId" column="databaseID" />
 		<result property="accessionString" column="accessionString" />
 		<result property="description" column="description" />
+		<result property="url" column="URL" />
+		<result property="isCurrentChar" column="isCurrent" jdbcType="CHAR" javaType="String"/>
+		<result property="speciesId" column="speciesID" />
+		<result property="sequenceId" column="sequenceID" />
+	</resultMap>
+	
+	<resultMap class="NrProtein" id="nrProtResult">
+		<result property="id" column="id" />
 		<result property="speciesId" column="speciesID" />
 		<result property="sequenceId" column="sequenceID" />
 	</resultMap>
@@ -111,6 +120,12 @@
         AND pr.id = pd.proteinID
     </select>
     
+    <select id="selectNrProtein" resultMap="nrProtResult" parameterClass="Integer"> 
+        SELECT *
+        FROM tblProtein 
+        WHERE id = #id#
+    </select>
+        
     <select id="selectDbProteinFull" resultMap="nrDbProtFullResult" parameterClass="Integer"> 
         SELECT pd.*, p.sequenceID, p.speciesID
         FROM tblProteinDatabase AS pd, tblProtein AS p
@@ -124,7 +139,7 @@
         WHERE id = #id#
     </select>
     
-    <select id="selectProtein" resultMap="nrDbProtResult" parameterClass="java.util.Map"> 
+    <select id="selectDbProteins" resultMap="nrDbProtResult" parameterClass="java.util.Map"> 
         SELECT *
         FROM tblProteinDatabase 
         WHERE databaseID IN $databaseIds$ 

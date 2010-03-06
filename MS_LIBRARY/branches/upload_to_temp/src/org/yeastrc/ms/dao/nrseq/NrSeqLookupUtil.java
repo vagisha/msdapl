@@ -18,6 +18,7 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.domain.nrseq.NrDatabase;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.nrseq.NrDbProteinFull;
+import org.yeastrc.ms.domain.nrseq.NrProtein;
 import org.yeastrc.ms.util.StringUtils;
 
 import com.ibatis.common.resources.Resources;
@@ -230,6 +231,20 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         }
     }
     
+    public static NrProtein getNrProtein(int proteinId) {
+        String statementName = "NrSeq.selectNrProtein";
+        try {
+        	NrProtein dbProt = (NrProtein) sqlMap.queryForObject(statementName, proteinId);
+            if (dbProt == null)
+                throw new NrSeqLookupException(proteinId, false);
+            return dbProt;
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
     public static NrDbProtein getDbProtein(int dbProtId) {
         String statementName = "NrSeq.selectDbProtein";
         try {
@@ -259,22 +274,8 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
     }
     
     
-//    public static NrDbProtein getDbProtein(int databaseId, int proteinId) {
-//        Map<String, Integer> map = new HashMap<String, Integer>(2);
-//        map.put("dbId", databaseId);
-//        map.put("proteinId", proteinId);
-//        String statementName = "NrSeq.selectDbProteinForDbIdProteinId";
-//        try {
-//            return  (NrDbProtein) sqlMap.queryForObject(statementName, map);
-//        }
-//        catch (SQLException e) {
-//            log.error("Failed to execute select statement: ", e);
-//            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
-//        }
-//    }
-    
-    public static List<NrDbProtein> getProtein(int proteinId, List<Integer> dbIds) {
-        String statementName = "NrSeq.selectProtein";
+    public static List<NrDbProtein> getDbProteins(int proteinId, List<Integer> dbIds) {
+        String statementName = "NrSeq.selectDbProteins";
         
         if(dbIds == null || dbIds.size() == 0)
             throw new IllegalArgumentException("At least one database ID is required to search for protein");

@@ -24,7 +24,11 @@ public class NrSeqLookupException extends RuntimeException {
     }
     
     public NrSeqLookupException(int dbProtId) {
-        super("No entry found with dbProtid: "+dbProtId);
+    	super("No entry found with dbProteinId: "+dbProtId);
+    }
+    
+    public NrSeqLookupException(int proteinId, boolean dummyVar) {
+    	super("No entry found with proteinId: "+proteinId);
     }
     
     public NrSeqLookupException(int databaseId, int proteinId) {
