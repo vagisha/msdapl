@@ -139,10 +139,17 @@
         WHERE id = #id#
     </select>
     
-    <select id="selectDbProteins" resultMap="nrDbProtResult" parameterClass="java.util.Map"> 
+    <select id="selectDbProteinsForDatabases" resultMap="nrDbProtResult" parameterClass="java.util.Map"> 
         SELECT *
         FROM tblProteinDatabase 
         WHERE databaseID IN $databaseIds$ 
+        AND proteinID = #proteinId#
+    </select>
+    
+    <select id="selectDbProteinsForDatabase" resultMap="nrDbProtResult" parameterClass="java.util.Map"> 
+        SELECT *
+        FROM tblProteinDatabase 
+        WHERE databaseID = #databaseId# 
         AND proteinID = #proteinId#
     </select>
     

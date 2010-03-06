@@ -275,7 +275,7 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
     
     
     public static List<NrDbProtein> getDbProteins(int proteinId, List<Integer> dbIds) {
-        String statementName = "NrSeq.selectDbProteins";
+        String statementName = "NrSeq.selectDbProteinsForDatabases";
         
         if(dbIds == null || dbIds.size() == 0)
             throw new IllegalArgumentException("At least one database ID is required to search for protein");
@@ -288,6 +288,21 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         
         Map<String, Object> map = new HashMap<String, Object>(4);
         map.put("databaseIds", dbIdStr);
+        map.put("proteinId", proteinId);
+        try {
+            return sqlMap.queryForList(statementName, map);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
+    public static List<NrDbProtein> getDbProteins(int proteinId, int dbId) {
+        String statementName = "NrSeq.selectDbProteinsForDatabase";
+        
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("databaseId", dbId);
         map.put("proteinId", proteinId);
         try {
             return sqlMap.queryForList(statementName, map);
