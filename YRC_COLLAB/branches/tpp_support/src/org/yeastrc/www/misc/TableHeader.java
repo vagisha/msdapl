@@ -19,6 +19,7 @@ public class TableHeader {
     private boolean sortable = true;
     private boolean isSorted;
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
+    private SORT_ORDER defaultSortOrder = SORT_ORDER.ASC;
     private int width;
     private int colspan = 0;
     private SORT_CLASS sortClass = SORT_CLASS.SORT_ALPHA;
@@ -88,6 +89,14 @@ public class TableHeader {
         this.sortOrder = sortOrder;
     }
 
+    public SORT_ORDER getDefaultSortOrder() {
+    	return this.defaultSortOrder;
+    }
+    
+    public void setDefaultSortOrder(SORT_ORDER sortOrder) {
+    	this.defaultSortOrder = sortOrder;
+    }
+    
     public boolean isSortable() {
         return sortable;
     }

@@ -192,8 +192,6 @@ public class DoComparison extends Action {
                 request.setAttribute("chart", googleChartUrl);
             }
             
-            comparison.setShowFullDescriptions(myForm.isShowFullDescriptions());
-            
             // create a list of the dataset ids being compared
             request.setAttribute("datasetIds", makeCommaSeparated(allRunIds));
             

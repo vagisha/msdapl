@@ -63,9 +63,6 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     private SORT_BY sortBy = SORT_BY.NUM_PEPT;
     private SORT_ORDER sortOrder = SORT_ORDER.DESC;
     
-    private boolean showFullDescriptions = false;
-    private boolean fullProteinName = false;
-    
     private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
     
 
@@ -74,14 +71,6 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         this.datasets = new ArrayList<Dataset>();
         this.proteins = new ArrayList<ComparisonProtein>();
         this.displayPageNumbers = new ArrayList<Integer>();
-    }
-    
-    public void setPrintFullProteinName(boolean printFull) {
-        this.fullProteinName = printFull;
-    }
-    
-    public void setShowFullDescriptions(boolean show) {
-        this.showFullDescriptions = show;
     }
     
     private int  getOffset() {
@@ -270,12 +259,6 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
             row.addCell(cell);
         }
         
-        // Peptide count
-        TableCell peptCount = new TableCell(String.valueOf(protein.getMaxPeptideCount()));
-        peptCount.setClassName("pept_count clickable underline");
-        peptCount.setId(String.valueOf(protein.getNrseqId()));
-        row.addCell(peptCount);
-        
         // Protein accession
         TableCell protName = new TableCell(getAccessionContents(protein));
         protName.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
@@ -305,6 +288,12 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         protDescr.setClassName("prot_descr");
         protDescr.setData(getDescriptionContents(protein));
         row.addCell(protDescr);
+        
+        // Peptide count
+        TableCell peptCount = new TableCell(String.valueOf(protein.getMaxPeptideCount()));
+        peptCount.setClassName("pept_count clickable underline");
+        peptCount.setId(String.valueOf(protein.getNrseqId()));
+        row.addCell(peptCount);
         
         // Spectrum counts in each dataset
         for(Dataset dataset: datasets) {
@@ -355,15 +344,20 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 
 	private String getDescriptionContents(ComparisonProtein protein) {
 		
+    	String shortId = "short_desc_"+protein.getNrseqId();
+    	String fullId = "full_desc_"+protein.getNrseqId();
+    	
 		String fullContents = "";
-        fullContents += "<span style=\"display:none;\" class=\"full_description\">";
+        fullContents += "<span style=\"display:none;\" class=\"full_description\" id=\""+fullId+"\">";
         String shortContents = "";
-        shortContents += "<span class=\"short_name clickable underline\">";
+        shortContents += "<span class=\"short_description\" id=\""+shortId+"\">";
         List<ProteinReference> allReferences;
-        List<ProteinReference> fourReferences;
+        // List<ProteinReference> uniqueDbRefs;
+        ProteinReference oneRef;
 		try {
 			allReferences = protein.getDescriptionReferences();
-			fourReferences = protein.getFourDescriptionReferences();
+			// uniqueDbRefs = protein.getUniqueDbDescriptionReferences();
+			oneRef = protein.getOneDescriptionReference();
 		} catch (SQLException e) {
 			log.error("Error getting description", e);
 			return "ERROR";
@@ -375,12 +369,23 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         	fullContents += "<span style=\"color:#000080;\"<b>["+dbName+"]</b></span>&nbsp;&nbsp;"+ref.getDescription();
         	fullContents += "<br>";
         }
-        for(ProteinReference ref: fourReferences) {
+        if(allReferences.size() > 1) { // uniqueDbRefs.size()) {
+        	fullContents += "<br><b><span class=\"clickable\" onclick=\"hideAllDescriptionsForProtein("+
+        	protein.getNrseqId()+")\">[-]</span></b>";
+        }
+        // for(ProteinReference ref: uniqueDbRefs) {
         	String dbName = null;
-        	try {dbName = ref.getDatabaseName();}
+        	// try {dbName = ref.getDatabaseName();}
+        	try {dbName = oneRef.getDatabaseName();}
         	catch(SQLException e){log.error("Error getting database name"); dbName="ERROR";}
-        	shortContents += "<span style=\"color:#000080;\"<b>["+dbName+"]</span></b>&nbsp;&nbsp;"+ref.getDescription();
+        	// shortContents += "<span style=\"color:#000080;\"<b>["+dbName+"]</span></b>&nbsp;&nbsp;"+ref.getShortDescription();
+        	shortContents += "<span style=\"color:#000080;\"<b>["+dbName+"]</span></b>&nbsp;&nbsp;"+oneRef.getShortDescription();
         	shortContents += "<br>";
+        // }
+        // if(uniqueDbRefs.size() < allReferences.size()) {
+        if(allReferences.size() > 1) {
+        	shortContents += "<br><b><span class=\"clickable\" onclick=\"showAllDescriptionsForProtein("+
+        	protein.getNrseqId()+")\">[+]</span></b>";
         }
         
         fullContents += "</span>";
@@ -388,14 +393,15 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         return fullContents+"\n"+shortContents;
 	}
 
+
 	private String getCommonNameContents(ComparisonProtein protein) {
 		
 		String contents = "";
         contents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+"\")";
-    	contents += " style=\"display:none;\" class=\"full_name clickable underline\">";
+        contents += " class=\"clickable underline\">";
         List<ProteinCommonReference> commonRefs = protein.getCommonReferences();
         for(ProteinCommonReference ref: commonRefs) {
-        	contents += ref.getName();
+        	contents += ref.getName()+"<br>";
         }
         contents += "</span>";
 		return contents;
@@ -417,8 +423,8 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 			return "ERROR";
 		}
         for(ProteinReference ref: references) {
-        	fullContents += ref.getAccession();
-        	shortContents += ref.getShortAccession();
+        	fullContents += ref.getAccession()+"<br>";
+        	shortContents += ref.getShortAccession()+"<br>";
         }
         fullContents += "</span>";
         shortContents += "</span>";
@@ -473,17 +479,6 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
             headers.add(header);
         }
         
-        header = new TableHeader("#Pept");
-        header.setWidth(5);
-        header.setSortable(true);
-        header.setSortClass(SORT_CLASS.SORT_INT);
-        header.setHeaderId(SORT_BY.NUM_PEPT.name());
-        if(this.sortBy == SORT_BY.NUM_PEPT) {
-            header.setSorted(true);
-            header.setSortOrder(this.sortOrder);
-        }
-        headers.add(header);
-        
         header = new TableHeader("Name");
         header.setWidth(10);
         header.setSortable(false);
@@ -503,6 +498,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         header.setWidth(8);
         header.setSortable(true);
         header.setSortClass(SORT_CLASS.SORT_FLOAT);
+        header.setDefaultSortOrder(SORT_ORDER.ASC);
         header.setHeaderId(SORT_BY.MOL_WT.name());
         if(this.sortBy == SORT_BY.MOL_WT) {
             header.setSorted(true);
@@ -513,6 +509,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         header = new TableHeader("pI");
         header.setWidth(5);
         header.setSortClass(SORT_CLASS.SORT_FLOAT);
+        header.setDefaultSortOrder(SORT_ORDER.ASC);
         header.setHeaderId(SORT_BY.PI.name());
         if(this.sortBy == SORT_BY.PI) {
             header.setSorted(true);
@@ -525,6 +522,18 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         header.setSortable(false);
         headers.add(header);
         
+        // Peptide count
+        header = new TableHeader("#Pept");
+        header.setWidth(5);
+        header.setSortable(true);
+        header.setSortClass(SORT_CLASS.SORT_INT);
+        header.setDefaultSortOrder(SORT_ORDER.DESC);
+        header.setHeaderId(SORT_BY.NUM_PEPT.name());
+        if(this.sortBy == SORT_BY.NUM_PEPT) {
+            header.setSorted(true);
+            header.setSortOrder(this.sortOrder);
+        }
+        headers.add(header);
         
         // spectrum counts
         for(Dataset dataset: datasets) {
@@ -592,8 +601,9 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
             }
         }
         
-//            // get the (max)number of peptides identified for this protein
-//            protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
+            // get the (max)number of peptides identified for this protein
+        if(this.sortBy != SORT_BY.NUM_PEPT)
+        	protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
         
         // Get the NSAF information for the protein in the different datasets
         // NSAF is available only for ProteinInference proteins

@@ -29,7 +29,7 @@
 <div style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%">
 <table align="center">
 	<tr>
-		<td valign="middle" style="padding-bottom:10px;">Filter: </td>
+		<td valign="middle" style="padding: 0 0 10 5;">Filter: </td>
 		<td style="padding-bottom:10px;"  align="left">
 		<table>
 		<tr>
@@ -147,25 +147,13 @@
 		
 		<!-- ################## GROUP PROTEINS CHECKBOX	  ########################### -->
 		<logic:notPresent name="goEnrichmentView">
-			<td valign="top"><html:checkbox name="proteinSetComparisonForm" property="groupIndistinguishableProteins">Group Indistinguishable Proteins</html:checkbox> </td>
+			<td valign="top" colspan="2"><html:checkbox name="proteinSetComparisonForm" property="groupIndistinguishableProteins">Group Indistinguishable Proteins</html:checkbox> </td>
 		</logic:notPresent>
+		<td></td>
 	</tr>
 	
 	<!-- ################## PARSIMONIOUS ONLY CHECKBOX	  ########################### -->
-	<tr>
-		<td valign="top" style="padding-bottom: 10px;">Include Proteins:</td>
-		<td valign="top" colspan="2" style="padding-bottom: 10px;">
-			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="0"><b>All</b></html:radio>
-			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="1"><b>Parsimonious in >= 1 Dataset</b></html:radio>
-			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="2"><b>Parsimonious in ALL Datasets</b></html:radio>
-			<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
-			<br>
-			<span style="font-size:8pt;">
-				NOTE: For ProteinProphet datasets "parsimonious" = NOT "subsumed"
-			</span>
-			</logic:equal>
-		</td>
-	</tr>
+	
 	
 	<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
 	<tr>
@@ -186,18 +174,31 @@
 			</span>
 		</td>
 	</tr>
-	</logic:equal>
+	<tr>
+		<td valign="top" style="padding-bottom: 10px;">Include Proteins:</td>
+		<td valign="top" colspan="3" style="padding-bottom: 10px;">
+			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="0"><b>All</b></html:radio>
+			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="1"><b>Parsimonious in >= 1 Dataset</b></html:radio>
+			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="2"><b>Parsimonious in ALL Datasets</b></html:radio>
+			<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
+			<br>
+			<span style="font-size:8pt;">
+				NOTE: For ProteinProphet datasets "parsimonious" = NOT "subsumed"
+			</span>
+			</logic:equal>
+		</td>
+	</tr></logic:equal>
 	
 	
 	<!-- ################## MOLECULAR WT. AND pI FILTERS	  ########################################### -->
 	<tr>
-		<td colspan="2" style="padding: 0 5 5 0;">
-			<b>Mol. Wt.</b> 
+		<td style="padding: 0 0 5 5;"><b>Mol. Wt:</b> </td>
+		<td style="padding: 0 5 5 0" align="left">
 			Min. <html:text name="proteinSetComparisonForm" property="minMolecularWt" size="8"></html:text> 
 		    Max. <html:text name="proteinSetComparisonForm" property="maxMolecularWt" size="8"></html:text>
 		</td>
-		<td colspan="2" style="padding:0 0 5 5;">
-			<b>pI</b>
+		<td style="padding:0 0 5 5;"><b>pI:</b></td>
+		<td style="padding:0 0 5 0;" align="left">
 			Min. <html:text name="proteinSetComparisonForm" property="minPi" size="8"></html:text> 
 			Max. <html:text name="proteinSetComparisonForm" property="maxPi" size="8"></html:text>
 		</td>
@@ -205,30 +206,60 @@
 	
 	<tr>
 		<!-- ################## SEARCH BOX	  ########################################### -->
-		<td valign="top">
-			Search:
-		</td>
-		<td style="padding-left:5px;"> 
-			Fasta ID(s): <html:text name="proteinSetComparisonForm" property="accessionLike" size="40"></html:text><br>
+		<td style="padding-left:5px;" valign="top">Fasta ID(s):</td>
+		<td style="padding:0 5 5 0;" colspan="3"> 
+			<html:text name="proteinSetComparisonForm" property="accessionLike" size="40"></html:text><br>
  			<span style="font-size:8pt;">Enter a comma-separated list of complete or partial FASTA identifiers.</span>
  		</td>
- 		<td style="padding-left:5px;" colspan="2"> 
-			Description: <html:text name="proteinSetComparisonForm" property="descriptionLike" size="40"></html:text><br>
+ 		<td></td>
+ 	</tr>
+ 	<tr>
+ 		<td style="padding-left:5px;" valign="top">Description Include: </td>
+ 		<td style="padding:0 5 5 0;"> 
+			<html:text name="proteinSetComparisonForm" property="descriptionLike" size="40"></html:text><br>
+ 			<span style="font-size:8pt;">Enter a comma-separated list of terms.</span>
+ 		</td>
+ 		<td style="padding-left:5px;" valign="top"> Exclude:</td>
+ 		<td> 
+			<html:text name="proteinSetComparisonForm" property="descriptionNotLike" size="40"></html:text><br>
  			<span style="font-size:8pt;">Enter a comma-separated list of terms.</span>
  		</td>
  	</tr>
  	
+ 	
  	<logic:notPresent name="goEnrichmentView">
+	<tr>
+		<td valign="top" align="left" colspan="4" style="padding-top:5px;">
+			<html:checkbox name="proteinSetComparisonForm" property="keepProteinGroups">Keep Protein Groups</html:checkbox><br>
+			<span style="font-size:8pt;">Display ALL protein group members even if some of them do not pass the filtering criteria.</span>
+ 		</td>
+ 	</tr>
  	<tr>
- 		<td valign="top" align="center" colspan="4">
- 			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button"></html:submit> &nbsp;
-			<span style="color:red; font-size:8pt; text-decoration:underline;" class="clickable" onclick="javascript:downloadResults(); return false;">[Download Results]</span>
+ 		<td valign="top" align="center" colspan="4" style="padding-top:5px;">	
+ 			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button"></html:submit>
+ 			
 		</td>
 	</tr>
-	</logic:notPresent>
+ 	</logic:notPresent>
+ 	
+	
 </table>
 </div>
 
+
+<!-- DOWNLOAD RESULTS -->
+<logic:notPresent name="goEnrichmentView">
+<div align="center" style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%; margin-top:10px;">
+		<b>Download:</b>
+		<html:checkbox name="proteinSetComparisonForm" property="collapseProteinGroups">Collapse Protein Groups</html:checkbox>
+		&nbsp;
+		<html:checkbox name="proteinSetComparisonForm" property="includeDescriptions">Include Description</html:checkbox>
+		<html:submit value="Download" onclick="javascript:downloadResults(); return false;" styleClass="plain_button" style="margin-top:0px;"></html:submit>
+		&nbsp;
+</div>
+</logic:notPresent>
+
+<!-- GO ENRICHMENT -->
 <logic:equal name="speciesIsYeast" value="true">
 <br>
 <div align="center"

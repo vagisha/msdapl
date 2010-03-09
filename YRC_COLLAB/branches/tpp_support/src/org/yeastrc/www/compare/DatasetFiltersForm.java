@@ -40,7 +40,6 @@ public class DatasetFiltersForm extends ActionForm {
     private String descriptionLike = null;
     private String descriptionNotLike = null;
     
-    private boolean showFullDescriptions = false;
     private boolean keepProteinGroups = false;
 
     // FOR PROTEIN-PROPHET
@@ -58,16 +57,7 @@ public class DatasetFiltersForm extends ActionForm {
         groupIndistinguishableProteins = false;
         useProteinGroupProbability = false;
         
-        showFullDescriptions = false;
         keepProteinGroups = false;
-    }
-    
-    public boolean isShowFullDescriptions() {
-        return showFullDescriptions;
-    }
-
-    public void setShowFullDescriptions(boolean showFullDescriptions) {
-        this.showFullDescriptions = showFullDescriptions;
     }
     
     public boolean isKeepProteinGroups() {

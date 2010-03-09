@@ -1151,7 +1151,9 @@ function makeSortable(table) {
   });
 }
 
-
+// ---------------------------------------------------------------------------------------
+// TOGGLE FULL PROTEIN NAMES
+// ---------------------------------------------------------------------------------------
 function toggleFullNames() {
 	if($("#full_names").text() == "[Full Names]") {
 		$("#full_names").text("[Short Names]");
@@ -1165,6 +1167,9 @@ function toggleFullNames() {
 	}
 }
 
+// ---------------------------------------------------------------------------------------
+// TOGGLE FULL PROTEIN DESCRIPTIONS
+// ---------------------------------------------------------------------------------------
 function toggleFullDescriptions() {
 	if($("#full_descriptions").text() == "[Full Descriptions]") {
 		$("#full_descriptions").text("[Short Descriptions]");

@@ -2,7 +2,8 @@
 <%@page import="org.yeastrc.www.compare.ProteinComparisonDataset"%>
 <%@page import="org.yeastrc.www.compare.dataset.DatasetColor"%>
 <%@page import="org.yeastrc.www.compare.dataset.Dataset"%>
-<%@page import="org.yeastrc.www.compare.dataset.DatasetSource"%><%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
+<%@page import="org.yeastrc.www.compare.dataset.DatasetSource"%>
+<%@page import="org.yeastrc.ms.domain.search.SORT_ORDER"%><%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -60,14 +61,17 @@
 // ---------------------------------------------------------------------------------------
 $(document).ready(function() {
 	
-    
-   $("#compare_results_pager1").attr('width', "80%").attr('align', 'center');
-   $("#compare_results_pager2").attr('width', "80%").attr('align', 'center');
+   
+   // make the table sortable
+   makeSortable();
+   
+   $("#compare_results_pager1").attr('width', "95%").attr('align', 'center');
+   $("#compare_results_pager2").attr('width', "95%").attr('align', 'center');
    
    var colCount = <%=comparison.tableHeaders().size()%>
    $("#compare_results").each(function() {
    		var $table = $(this);
-   		$table.attr('width', "80%");
+   		$table.attr('width', "95%");
    		$table.attr('align', 'center');
    		$('.prot_descr', $table).css("font-size", "8pt");
    		
@@ -216,21 +220,74 @@ function  setupPeptidesTable(table){
 }
 
 // ---------------------------------------------------------------------------------------
+// MAKE TABLE SORTABLE
+// ---------------------------------------------------------------------------------------
+function makeSortable() {
+   $(".sortable_table").each(function() {
+   		var $table = $(this);
+   		$table.attr('width', "100%");
+   		$table.attr('align', 'center');
+   		//$('tbody > tr:odd', $table).addClass("tr_odd");
+   		//$('tbody > tr:even', $table).addClass("tr_even");
+   		
+   		$('th', $table).each(function() {
+   		
+   				if($(this).is('.sortable')) {
+      					
+      				$(this).click(function() {
+						var sortBy = $(this).attr('id');
+						// sorting direction
+						var sortOrder = "<%=SORT_ORDER.ASC.name()%>";
+						// is the column already sorted?
+						if ($(this).is('.sorted-asc')) {
+		          			sortOrder = "<%=SORT_ORDER.DESC.name()%>";
+		        		}
+		        		else if ($(this).is('.sorted-desc')) {
+		          			sortOrder = "<%=SORT_ORDER.ASC.name()%>";
+		        		}
+		        		// do we have a default sorting order?
+		        		else if ($(this).is('.def-sorted-desc')) { 
+		          			sortOrder = "<%=SORT_ORDER.DESC.name()%>";
+		        		}
+		        		else if ($(this).is('.def-sorted-asc')) {
+		          			sortOrder = "<%=SORT_ORDER.ASC.name()%>";
+		        		}
+	        			sortResults(sortBy, sortOrder);
+      			});
+      		}
+      	});
+   });
+}
+// ---------------------------------------------------------------------------------------
 // PAGE RESULTS
 // ---------------------------------------------------------------------------------------
 function pageResults(pageNum) {
   	$("input#pageNum").val(pageNum);
   	$("input#download").val("false");
+  	$("input#goEnrichment").val("false");
   	//alert("setting to "+pageNum+" value set to: "+$("input#pageNum").val());
   	$("form[name='proteinSetComparisonForm']").submit();
 }
 
+// ---------------------------------------------------------------------------------------
+// SORT RESULTS
+// ---------------------------------------------------------------------------------------
+function sortResults(sortBy, sortOrder) {
+  	$("input#pageNum").val(1);
+  	$("input#download").val("false");
+  	$("input#goEnrichment").val("false");
+  	$("input#sortBy").val(sortBy);
+  	$("input#sortOrder").val(sortOrder);
+  	$("form[name='proteinSetComparisonForm']").attr('target', '');
+  	$("form[name='proteinSetComparisonForm']").submit();
+}
 // ---------------------------------------------------------------------------------------
 // UPDATE RESULTS
 // ---------------------------------------------------------------------------------------
 function updateResults() {
   	$("input#pageNum").val(1);
   	$("input#download").val("false");
+  	$("input#goEnrichment").val("false");
   	$("form[name='proteinSetComparisonForm']").attr('target', '');
   	$("form[name='proteinSetComparisonForm']").submit();
 }
@@ -240,6 +297,7 @@ function updateResults() {
 // ---------------------------------------------------------------------------------------
 function downloadResults() {
   	$("input#download").val("true");
+  	$("input#goEnrichment").val("false");
   	$("form[name='proteinSetComparisonForm']").attr('target', '_blank');
   	$("form[name='proteinSetComparisonForm']").submit();
 }
@@ -304,6 +362,46 @@ function toggleXorSelect(dsIndex) {
 		$("input#"+id).val("true");	
 		$("td#XOR_"+dsIndex+"_td").css("background-color", colors[dsIndex]);
 	}
+}
+
+// ---------------------------------------------------------------------------------------
+// TOGGLE FULL PROTEIN NAMES
+// ---------------------------------------------------------------------------------------
+function toggleFullNames() {
+	if($("#full_names").text() == "[Full Names]") {
+		$("#full_names").text("[Short Names]");
+		$(".full_name").show();
+		$(".short_name").hide();
+	}
+	else if($("#full_names").text() == "[Short Names]") {
+		$("#full_names").text("[Full Names]");
+		$(".full_name").hide();
+		$(".short_name").show();
+	}
+}
+
+// ---------------------------------------------------------------------------------------
+// TOGGLE FULL PROTEIN DESCRIPTIONS
+// ---------------------------------------------------------------------------------------
+function toggleFullDescriptions() {
+	if($("#full_descriptions").text() == "[Full Descriptions]") {
+		$("#full_descriptions").text("[Short Descriptions]");
+		$(".full_description").show();
+		$(".short_description").hide();
+	}
+	else if($("#full_descriptions").text() == "[Short Descriptions]") {
+		$("#full_descriptions").text("[Full Descriptions]");
+		$(".full_description").hide();
+		$(".short_description").show();
+	}
+}
+function showAllDescriptionsForProtein(nrseqId) {
+	$("#short_desc_"+nrseqId).hide();
+	$("#full_desc_"+nrseqId).show();
+}
+function hideAllDescriptionsForProtein(nrseqId) {
+	$("#short_desc_"+nrseqId).show();
+	$("#full_desc_"+nrseqId).hide();
 }
 </script>
 
@@ -439,6 +537,14 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 <%@include file="/pages/internal/pager.jsp" %>
 </td>
 </tr>
+<tr>
+<td>
+<div style="margin:top: 3px;">
+<span class="underline clickable" style="font-size:8pt;color:red;" id="full_names" onclick="toggleFullNames()">[Full Names]</span> &nbsp; &nbsp;
+<span class="underline clickable" style="font-size:8pt;color:red;" id="full_descriptions" onclick="toggleFullDescriptions()">[Full Descriptions]</span>
+</div>
+</td>
+</tr>
 </table>
 		
 <!-- RESULTS TABLE -->
@@ -446,6 +552,7 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 <yrcwww:table name="comparison" tableId='compare_results' tableClass="table_basic sortable_table" center="true" />
 </div>
 
+<!-- PAGE RESULTS -->
 <table id="compare_results_pager2">
 <tr>
 <td>

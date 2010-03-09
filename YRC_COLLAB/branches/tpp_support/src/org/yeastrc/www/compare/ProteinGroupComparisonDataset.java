@@ -23,8 +23,6 @@ import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.ms.util.ProteinUtils;
-import org.yeastrc.nrseq.CommonNameLookupUtil;
-import org.yeastrc.nrseq.FastaProteinLookupUtil;
 import org.yeastrc.nrseq.ProteinCommonReference;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.nrseq.ProteinListingBuilder;
@@ -74,8 +72,6 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     
     private String rowCssClass = "tr_even";
     
-    private boolean showFullDescriptions = false;
-    
     private SORT_BY sortBy = SORT_BY.NUM_PEPT;
     private SORT_ORDER sortOrder = SORT_ORDER.DESC;
     
@@ -121,10 +117,6 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         this.rowCount = count;
     }
     
-    public void setShowFullDescriptions(boolean show) {
-        this.showFullDescriptions = show;
-    }
-
     public ProteinGroupComparisonDataset() {
         this.datasets = new ArrayList<Dataset>();
         this.proteinGroups = new ArrayList<ComparisonProteinGroup>();
@@ -379,19 +371,14 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
             row.addCell(cell);
         }
         
+        boolean newRow = false;
         if(currentGroupId == -1 || currentGroupId != protein.getGroupId()) {
             currentGroupId = protein.getGroupId();
             
-            TableCell groupId = new TableCell(String.valueOf(currentGroupId));
-            groupId.setRowSpan(groupMemberCount.get(currentGroupId));
-            row.addCell(groupId);
-            
-            // Peptide count
-            TableCell peptCount = new TableCell(String.valueOf(protein.getMaxPeptideCount()));
-            peptCount.setRowSpan(groupMemberCount.get(currentGroupId));
-            peptCount.setClassName("pept_count clickable underline");
-            peptCount.setId(String.valueOf(protein.getNrseqId()));
-            row.addCell(peptCount);
+            newRow = true;
+//            TableCell groupId = new TableCell(String.valueOf(currentGroupId));
+//            groupId.setRowSpan(groupMemberCount.get(currentGroupId));
+//            row.addCell(groupId);
             
             rowCssClass = rowCssClass.equals("tr_even") ? "tr_odd" : "tr_even";
             
@@ -431,23 +418,36 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         row.addCell(protDescr);
         
         
-        // Spectrum counts in each dataset
-        for(Dataset dataset: datasets) {
-            DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
-            TableCell cell = new TableCell();
-            
-            if(dpi == null || !dpi.isPresent()) { // dataset does not contain this protein
-                cell.setClassName("prot-not-found");
-            }
-            else {
-                String className = "prot-found";
-                cell.setClassName(className);
-                cell.setData(dpi.getSpectrumCount()+"("+dpi.getNormalizedSpectrumCountRounded()+")");
-                cell.setTextColor("#FFFFFF");
-                float scaledCount = getScaledSpectrumCount(dpi.getNormalizedSpectrumCount());
-                cell.setBackgroundColor(getScaledColor(scaledCount));
-            }
-            row.addCell(cell);
+        // These values are identical for all members of a protein group
+        if(newRow) {
+        	// Peptide count
+        	TableCell peptCount = new TableCell(String.valueOf(protein.getMaxPeptideCount()));
+        	peptCount.setRowSpan(groupMemberCount.get(currentGroupId));
+        	peptCount.setClassName("pept_count clickable underline");
+        	peptCount.setId(String.valueOf(protein.getNrseqId()));
+        	row.addCell(peptCount);
+        
+        
+        	// Spectrum counts in each dataset
+        	for(Dataset dataset: datasets) {
+        		DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+        		TableCell cell = new TableCell();
+
+        		if(dpi == null || !dpi.isPresent()) { // dataset does not contain this protein
+        			cell.setClassName("prot-not-found");
+        			cell.setRowSpan(groupMemberCount.get(currentGroupId));
+        		}
+        		else {
+        			String className = "prot-found";
+        			cell.setClassName(className);
+        			cell.setData(dpi.getSpectrumCount()+"("+dpi.getNormalizedSpectrumCountRounded()+")");
+        			cell.setTextColor("#FFFFFF");
+        			float scaledCount = getScaledSpectrumCount(dpi.getNormalizedSpectrumCount());
+        			cell.setBackgroundColor(getScaledColor(scaledCount));
+        			cell.setRowSpan(groupMemberCount.get(currentGroupId));
+        		}
+        		row.addCell(cell);
+        	}
         }
         return row;
     }
@@ -477,17 +477,22 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 		return contents;
 	}
 
-private String getDescriptionContents(ComparisonProtein protein) {
+    private String getDescriptionContents(ComparisonProtein protein) {
 		
+    	String shortId = "short_desc_"+protein.getNrseqId();
+    	String fullId = "full_desc_"+protein.getNrseqId();
+    	
 		String fullContents = "";
-        fullContents += "<span style=\"display:none;\" class=\"full_description\">";
+        fullContents += "<span style=\"display:none;\" class=\"full_description\" id=\""+fullId+"\">";
         String shortContents = "";
-        shortContents += "<span class=\"short_name clickable underline\">";
+        shortContents += "<span class=\"short_description\" id=\""+shortId+"\">";
         List<ProteinReference> allReferences;
-        List<ProteinReference> fourReferences;
+        // List<ProteinReference> uniqueDbRefs;
+        ProteinReference oneRef;
 		try {
 			allReferences = protein.getDescriptionReferences();
-			fourReferences = protein.getFourDescriptionReferences();
+			// uniqueDbRefs = protein.getUniqueDbDescriptionReferences();
+			oneRef = protein.getOneDescriptionReference();
 		} catch (SQLException e) {
 			log.error("Error getting description", e);
 			return "ERROR";
@@ -499,12 +504,23 @@ private String getDescriptionContents(ComparisonProtein protein) {
         	fullContents += "<span style=\"color:#000080;\"<b>["+dbName+"]</b></span>&nbsp;&nbsp;"+ref.getDescription();
         	fullContents += "<br>";
         }
-        for(ProteinReference ref: fourReferences) {
+        if(allReferences.size() > 1) { // uniqueDbRefs.size()) {
+        	fullContents += "<br><b><span class=\"clickable\" onclick=\"hideAllDescriptionsForProtein("+
+        	protein.getNrseqId()+")\">[-]</span></b>";
+        }
+        // for(ProteinReference ref: uniqueDbRefs) {
         	String dbName = null;
-        	try {dbName = ref.getDatabaseName();}
+        	// try {dbName = ref.getDatabaseName();}
+        	try {dbName = oneRef.getDatabaseName();}
         	catch(SQLException e){log.error("Error getting database name"); dbName="ERROR";}
-        	shortContents += "<span style=\"color:#000080;\"<b>["+dbName+"]</span></b>&nbsp;&nbsp;"+ref.getDescription();
+        	// shortContents += "<span style=\"color:#000080;\"<b>["+dbName+"]</span></b>&nbsp;&nbsp;"+ref.getShortDescription();
+        	shortContents += "<span style=\"color:#000080;\"<b>["+dbName+"]</span></b>&nbsp;&nbsp;"+oneRef.getShortDescription();
         	shortContents += "<br>";
+        // }
+        // if(uniqueDbRefs.size() < allReferences.size()) {
+        if(allReferences.size() > 1) {
+        	shortContents += "<b><span class=\"clickable\" onclick=\"showAllDescriptionsForProtein("+
+        	protein.getNrseqId()+")\">[+]</span></b>";
         }
         
         fullContents += "</span>";
@@ -516,10 +532,10 @@ private String getDescriptionContents(ComparisonProtein protein) {
 		
 		String contents = "";
         contents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+"\")";
-    	contents += " style=\"display:none;\" class=\"full_name clickable underline\">";
+    	contents += " class=\"clickable underline\">";
         List<ProteinCommonReference> commonRefs = protein.getCommonReferences();
         for(ProteinCommonReference ref: commonRefs) {
-        	contents += ref.getName();
+        	contents += ref.getName()+"<br>";
         }
         contents += "</span>";
 		return contents;
@@ -541,8 +557,8 @@ private String getDescriptionContents(ComparisonProtein protein) {
 			return "ERROR";
 		}
         for(ProteinReference ref: references) {
-        	fullContents += ref.getAccession();
-        	shortContents += ref.getShortAccession();
+        	fullContents += ref.getAccession()+"<br>";
+        	shortContents += ref.getShortAccession()+"<br>";
         }
         fullContents += "</span>";
         shortContents += "</span>";
@@ -595,21 +611,10 @@ private String getDescriptionContents(ComparisonProtein protein) {
             headers.add(header);
         }
         
-        header = new TableHeader("GID");
-        header.setWidth(5);
-        header.setSortable(false);
-        headers.add(header);
-        
-        header = new TableHeader("#Pept");
-        header.setWidth(5);
-        header.setSortable(true);
-        header.setSortClass(SORT_CLASS.SORT_INT);
-        header.setHeaderId(SORT_BY.NUM_PEPT.name());
-        if(this.sortBy == SORT_BY.NUM_PEPT) {
-            header.setSorted(true);
-            header.setSortOrder(this.sortOrder);
-        }
-        headers.add(header);
+//        header = new TableHeader("GID");
+//        header.setWidth(5);
+//        header.setSortable(false);
+//        headers.add(header);
         
         header = new TableHeader("Name");
         header.setWidth(10);
@@ -630,6 +635,7 @@ private String getDescriptionContents(ComparisonProtein protein) {
         header.setWidth(8);
         header.setSortable(true);
         header.setSortClass(SORT_CLASS.SORT_FLOAT);
+        header.setDefaultSortOrder(SORT_ORDER.ASC);
         header.setHeaderId(SORT_BY.MOL_WT.name());
         if(this.sortBy == SORT_BY.MOL_WT) {
             header.setSorted(true);
@@ -640,6 +646,7 @@ private String getDescriptionContents(ComparisonProtein protein) {
         header = new TableHeader("pI");
         header.setWidth(5);
         header.setSortClass(SORT_CLASS.SORT_FLOAT);
+        header.setDefaultSortOrder(SORT_ORDER.ASC);
         header.setHeaderId(SORT_BY.PI.name());
         if(this.sortBy == SORT_BY.PI) {
             header.setSorted(true);
@@ -652,6 +659,18 @@ private String getDescriptionContents(ComparisonProtein protein) {
         header.setSortable(false);
         headers.add(header);
         
+        // Peptide count
+        header = new TableHeader("#Pept");
+        header.setWidth(5);
+        header.setSortable(true);
+        header.setSortClass(SORT_CLASS.SORT_INT);
+        header.setDefaultSortOrder(SORT_ORDER.DESC);
+        header.setHeaderId(SORT_BY.NUM_PEPT.name());
+        if(this.sortBy == SORT_BY.NUM_PEPT) {
+            header.setSorted(true);
+            header.setSortOrder(this.sortOrder);
+        }
+        headers.add(header);
         
         // spectrum counts
         for(Dataset dataset: datasets) {

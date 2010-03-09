@@ -104,7 +104,10 @@ public class TableTag extends TagSupport {
                     styleClass += "sortable "+header.getSortClass().getCssClass()+" ";
                     if(header.isSorted()) {
                         String headerClass = header.getSortOrder() == SORT_ORDER.ASC ? "sorted-asc" : "sorted-desc";
-                        styleClass += headerClass;
+                        styleClass += headerClass+" ";
+                    }
+                    if(header.getDefaultSortOrder() != null) {
+                    	styleClass += header.getDefaultSortOrder() == SORT_ORDER.ASC ? "def-sorted-asc" : "def-sorted-desc";
                     }
                     
                 }

@@ -93,6 +93,20 @@ public class ProteinListing {
     	return unique;
     }
     
+    public List<ProteinReference> getReferencesForUniqueDatabases() {
+    	
+    	Set<Integer> seen = new HashSet<Integer>();
+    	List<ProteinReference> unique = new ArrayList<ProteinReference>();
+    	for(ProteinReference ref: references) {
+    		if(seen.contains(ref.getDatabaseId()))
+    			continue;
+    		seen.add(ref.getDatabaseId());
+    		unique.add(ref);
+    	}
+    	return unique;
+    }
+    
+    
     List<ProteinReference> getReferencesForDatabase(String dbName) throws SQLException {
     	
     	List<ProteinReference> refs = new ArrayList<ProteinReference>();
