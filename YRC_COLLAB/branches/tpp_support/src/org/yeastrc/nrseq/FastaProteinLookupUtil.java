@@ -4,7 +4,7 @@
  * May 16, 2009
  * @version 1.0
  */
-package org.yeastrc.www.compare.util;
+package org.yeastrc.nrseq;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,28 +30,28 @@ public class FastaProteinLookupUtil {
         return instance;
     }
 
-    public ProteinListing getProteinListing(int nrseqProteinId, List<Integer> dbIds) {
-        
-        ProteinListing listing = new ProteinListing();
-        listing.setNrseqProteinId(nrseqProteinId);
-        
-        List<NrDbProtein> nrDbProtList = NrSeqLookupUtil.getProtein(nrseqProteinId, dbIds);
-        
-        List<ProteinNameDescription> cndList = new ArrayList<ProteinNameDescription>();
-        
-        for(NrDbProtein nrp: nrDbProtList) {
-            String acc  = nrp.getAccessionString();
-            String description = nrp.getDescription();
-            
-            ProteinNameDescription cnd = new ProteinNameDescription();
-            cnd.setName(acc);
-            cnd.setDescription(description);
-            cndList.add(cnd);
-        }
-        listing.setNameAndDescription(cndList);
-        
-        return listing;
-    }
+//    public ProteinListing getProteinListing(int nrseqProteinId, List<Integer> dbIds) {
+//        
+//        ProteinListing listing = new ProteinListing();
+//        listing.setNrseqProteinId(nrseqProteinId);
+//        
+//        List<NrDbProtein> nrDbProtList = NrSeqLookupUtil.getProtein(nrseqProteinId, dbIds);
+//        
+//        List<ProteinNameDescription> cndList = new ArrayList<ProteinNameDescription>();
+//        
+//        for(NrDbProtein nrp: nrDbProtList) {
+//            String acc  = nrp.getAccessionString();
+//            String description = nrp.getDescription();
+//            
+//            ProteinNameDescription cnd = new ProteinNameDescription();
+//            cnd.setName(acc);
+//            cnd.setDescription(description);
+//            cndList.add(cnd);
+//        }
+//        listing.setNameAndDescription(cndList);
+//        
+//        return listing;
+//    }
     
     public List<Integer> getProteinIdsForName(String fastaProteinName, int pinferId) {
         

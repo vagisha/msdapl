@@ -6,18 +6,25 @@
  */
 package org.yeastrc.www.proteinfer;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
+import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
+import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.ms.util.TimeUtils;
+import org.yeastrc.nrseq.FastaProteinLookupUtil;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
-import org.yeastrc.www.compare.util.FastaProteinLookupUtil;
 
 /**
  * 
@@ -76,12 +83,17 @@ public class ProteinAccessionStore {
         
         s = System.currentTimeMillis();
         
-        FastaProteinLookupUtil fplUtil = FastaProteinLookupUtil.getInstance();
         List<Integer> dbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
         
         for(ProteinferProtein protein: proteins) {
-            String accession = fplUtil.getProteinListing(protein.getNrseqProteinId(), dbIds).getAllNames();
-            map.put(protein.getId(), accession);
+        	List<NrDbProtein> matchingProteins = NrSeqLookupUtil.getDbProteins(protein.getNrseqProteinId(), dbIds);
+        	Set<String> accessions = new HashSet<String>();
+        	for(NrDbProtein prot: matchingProteins)
+        		accessions.add(prot.getAccessionString());
+        	
+        	ArrayList<String> accList = new ArrayList<String>(accessions);
+        	Collections.sort(accList);
+            map.put(protein.getId(), StringUtils.makeCommaSeparated(accList));
         }
         e = System.currentTimeMillis();
         log.info("Time to assign protein accessions: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");

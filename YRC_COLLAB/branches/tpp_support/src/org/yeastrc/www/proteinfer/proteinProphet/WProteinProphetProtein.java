@@ -6,7 +6,15 @@
  */
 package org.yeastrc.www.proteinfer.proteinProphet;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
+import org.yeastrc.ms.util.StringUtils;
+import org.yeastrc.nrseq.ProteinCommonReference;
+import org.yeastrc.nrseq.ProteinListing;
+import org.yeastrc.nrseq.ProteinNameDescription;
 
 /**
  * 
@@ -14,56 +22,57 @@ import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
 public class WProteinProphetProtein {
 
     private ProteinProphetProtein prophetProtein;
-    private String accession = "";
-    private String description = "";
-    private String commonName = "";
+    private ProteinListing listing;
     private float molecularWeight = -1.0f;
     private float pi = -1.0f;
     
-    public String getCommonName() {
-        return commonName;
-    }
-    public String getCommonNameShort() {
-        if(commonName == null)
-            return "";
-        if(commonName.length() <= 15)
-            return commonName;
-        return commonName.substring(0, 15)+"...";
-    }
-    public void setCommonName(String commonName) {
-        this.commonName = commonName;
-    }
     public WProteinProphetProtein(ProteinProphetProtein prot) {
         this.prophetProtein = prot;
     }
     public ProteinProphetProtein getProtein() {
         return prophetProtein;
     }
-    public String getAccession() {
-        return accession;
+    
+    public void setProteinListing(ProteinListing listing) {
+    	this.listing = listing;
     }
-    public String getShortAccession() {
-        if(accession == null)
-            return "No Accession";
-        if(accession.length() <= 15)
-            return accession;
-        return accession.substring(0, 15)+"...";
+    
+    public List<ProteinNameDescription> getFastaReferences() throws SQLException {
+    	return listing.getUniqueReferencesForNonStandardDatabases();
     }
-    public void setAccession(String accession) {
-        this.accession = accession;
+    
+    public String getAccessionsCommaSeparated() throws SQLException {
+    	List<String> accessions = new ArrayList<String>();
+    	List<ProteinNameDescription> refs = getFastaReferences();
+    	for(ProteinNameDescription ref: refs)
+    		accessions.add(ref.getAccession());
+    	return StringUtils.makeCommaSeparated(accessions);
     }
-    public String getDescription() {
-        return description;
+    
+    public List<ProteinNameDescription> getExternalReferences() throws SQLException {
+    	return listing.getUniqueExternalReferences();
     }
-    public String getShortDescription() {
-        if(description == null)
-            return "No Description";
-        if(description.length() <= 90)
-            return description;
-        return description.substring(0, 90)+"...";
+    
+    public List<ProteinNameDescription> getDescriptionReferences() throws SQLException {
+    	return listing.getReferencesForUniqueDescriptions();
     }
-    public void setDescription(String description) {
-        this.description = description;
+    
+    public List<ProteinNameDescription> getFourDescriptionReferences() throws SQLException {
+    	List<ProteinNameDescription> refs = listing.getReferencesForUniqueDescriptions();
+    	int min = Math.min(4, refs.size());
+    	return refs.subList(0, min);
+    }
+    
+    public List<ProteinCommonReference> getCommonReferences() {
+    	return listing.getCommonReferences();
+    }
+    
+    public String getCommonNamesCommaSeparated() throws SQLException {
+    	List<String> names = new ArrayList<String>();
+    	List<ProteinCommonReference> refs = getCommonReferences();
+    	for(ProteinCommonReference ref: refs)
+    		names.add(ref.getName());
+    	return StringUtils.makeCommaSeparated(names);
     }
     
     public void setMolecularWeight(float weight) {

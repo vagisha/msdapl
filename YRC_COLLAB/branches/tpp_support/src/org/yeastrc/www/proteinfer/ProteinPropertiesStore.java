@@ -19,7 +19,6 @@ import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
-import org.yeastrc.ms.domain.protinfer.idpicker.GenericIdPickerProtein;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProtein;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
 import org.yeastrc.ms.util.ProteinUtils;

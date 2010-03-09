@@ -61,7 +61,8 @@
 $(document).ready(function() {
 	
     
-   $("#compare_results_pager").attr('width', "80%").attr('align', 'center');
+   $("#compare_results_pager1").attr('width', "80%").attr('align', 'center');
+   $("#compare_results_pager2").attr('width', "80%").attr('align', 'center');
    
    var colCount = <%=comparison.tableHeaders().size()%>
    $("#compare_results").each(function() {
@@ -432,7 +433,7 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 
 <!-- PAGE RESULTS -->
 <bean:define name="comparison" id="pageable" />
-<table id="compare_results_pager">
+<table id="compare_results_pager1">
 <tr>
 <td>
 <%@include file="/pages/internal/pager.jsp" %>
@@ -444,6 +445,14 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 <div > 
 <yrcwww:table name="comparison" tableId='compare_results' tableClass="table_basic sortable_table" center="true" />
 </div>
+
+<table id="compare_results_pager2">
+<tr>
+<td>
+<%@include file="/pages/internal/pager.jsp" %>
+</td>
+</tr>
+</table>
 
 </yrcwww:contentbox>
 

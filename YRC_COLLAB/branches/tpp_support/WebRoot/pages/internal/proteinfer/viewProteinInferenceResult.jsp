@@ -246,52 +246,96 @@ function philiusAnnotations(pinferProteinId, nrseqProteinId) {
 
 	var button = $("#philiusbutton_"+pinferProteinId);
 	
-	if(button.text() == "[Get Annotations]") {
+	if(button.text() == "[Get Predictions]") {
 		// submit a Philius job, get a job token and display a status message.
 		//alert("Submitting Philius job...");
 		button.text("[Processing...]");
 		
 		
 		var token = 0;
-		//$.post("<yrcwww:link path='submitPhiliusJob.do'/>",
-    	//				{'nrseqId': nrseqProteinId},
-    	//				function(data) {
-    	//					token = data;
-    	//		});
-		
-		alert("token is: "+token);
-		
-		// show the status text with a link for fetching the results with the returned token.
 		var statusText = "Your request has been submitted to the Philius Server.  ";
-		statusText += "Processing typically takes about <b>10 minutes</b>.  ";
-		statusText += "To get your results click on <b>REFRESH</b>."
-		$("#philius_status_"+pinferProteinId).text(statusText);
-		$("#philius_status_"+pinferProteinId).show();
+		statusText += "Processing typically takes about <b>10 seconds</b>.  ";
+		statusText += "To get your results click ";
+		statusText += "<span id=\"philius_refresher\" style=\"text-decoration: underline; cursor: pointer;\" ";
 		
+		$.post("<yrcwww:link path='submitPhiliusJob.do'/>",
+   					{'nrseqId': nrseqProteinId},
+   					function(data) {
+   						token = data;
+   						if(token.substr(0,6) == "FAILED") {
+   							statusText = "Philius Job Submission failed!<br>"+token;
+   							button.text("[Failed...]");
+   						}
+   						else {
+   							//alert("Returned token is: "+token);
+   							statusText += " onclick=philiusAnnotations("+pinferProteinId+","+nrseqProteinId+") >";
+   							statusText += "<b>REFRESH</b></span>.";
+   							button.attr('name', token);
+						}
+						// show the status text with a link for fetching the results with the returned token.
+						// OR the failure message.
+						$("#philius_status_"+pinferProteinId).html(statusText);
+						$("#philius_status_"+pinferProteinId).show();
+   					}
+    		);
 	}
 	else if (button.text() == "[Processing...]") {
 		// hide the philius status text
 		$("#philius_status_"+pinferProteinId).hide();
 		// request the results 
-		// if results are still not available
-		// show philius status again
-		
-		// otherwise show the Philius annotations and hide the protein sequence.
-		$("#protsequence_"+pinferProteinId).hide();
-		$("#philiusannot_"+pinferProteinId).text("Placeholder for Philius results");
-		$("#philiusannot_"+pinferProteinId).show();
+		var token = button.attr('name');
+		$.post("<yrcwww:link path='getPhiliusResults.do'/>",
+   					{'pinferProteinId': pinferProteinId,
+   					 'philiusToken': token},
+   					function(data) {
+   						// if results are still not available
+   						if(data == "WAIT") {
+   							// show philius status again
+   							$("#philius_status_"+pinferProteinId).show();
+   						}
+   						// if the request failed
+   						else if (data.substr(0,6) == "FAILED") {
+   							var statusText = "Philius Job Submission failed!<br>"+data;
+   							$("#philius_status_"+pinferProteinId).html(statusText);
+   							$("#philius_status_"+pinferProteinId).show();
+   							button.text("[Failed...]");
+   						}
+   						// Philius did not find any segments
+   						else if (data == "NONE") {
+   							var statusText = "Philius did not predict any segments";
+   							$("#philius_status_"+pinferProteinId).html(statusText);
+   							$("#philius_status_"+pinferProteinId).show();
+   							button.text("[Hide Annotations]");
+   						}
+   						// request succeeded; display the results
+   						else {
+   							// show the Philius annotations and hide the protein sequence.
+							$("#protsequence_"+pinferProteinId).hide();
+							$("#philiusannot_"+pinferProteinId).html(data);
+							$("#philiusannot_"+pinferProteinId).show();
+							button.text("[Hide Annotations]");
+   						}
+   					}
+   				);
 	}
 	else if (button.text() == "[Hide Annotations]") {
+		// If the Philius status is visible hide it too
+		$("#philius_status_"+pinferProteinId).hide();
 		$("#philiusannot_"+pinferProteinId).hide();
 		$("#protsequence_"+pinferProteinId).show();
-		button.text("[Show Sequence]");
+		button.text("[Show Annotations]");
 	}
-	else if (button.text() == "[Show Annotations}") {
+	else if (button.text() == "[Show Annotations]") {
 		$("#philiusannot_"+pinferProteinId).show();
 		$("#protsequence_"+pinferProteinId).hide();
 		button.text("[Hide Annotations]");
 	}
+	else if (button.text() == "[Failed...]") {
+		button.text("[Get Predictions]");
+		$("#philius_status_"+pinferProteinId).hide();
+	}
 }
+
 
 // ---------------------------------------------------------------------------------------
 // SHOW/HIDE HITS FOR AN ION
@@ -1006,6 +1050,9 @@ function pageResults(pageNum) {
   							function(responseText, status, xhr) {			// callback
   										$.unblockUI();
   										refreshProteinList(responseText);
+  										// go to the top of the protein list table
+										var offset = $("#resultPager1").offset();
+										scroll(offset.left, offset.top);
   								   });	
   	
   	return false;
@@ -1105,14 +1152,31 @@ function makeSortable(table) {
 }
 
 
-function toggleDivVisibility(mydiv) {
-  	if($(mydiv).is(':visible'))
-  		$(mydiv).hide();
-  	else
-  		$(mydiv).show();
+function toggleFullNames() {
+	if($("#full_names").text() == "[Full Names]") {
+		$("#full_names").text("[Short Names]");
+		$(".full_name").show();
+		$(".short_name").hide();
+	}
+	else if($("#full_names").text() == "[Short Names]") {
+		$("#full_names").text("[Full Names]");
+		$(".full_name").hide();
+		$(".short_name").show();
+	}
 }
 
-
+function toggleFullDescriptions() {
+	if($("#full_descriptions").text() == "[Full Descriptions]") {
+		$("#full_descriptions").text("[Short Descriptions]");
+		$(".full_description").show();
+		$(".short_description").hide();
+	}
+	else if($("#full_descriptions").text() == "[Short Descriptions]") {
+		$("#full_descriptions").text("[Full Descriptions]");
+		$(".full_description").hide();
+		$(".short_description").show();
+	}
+}
 
 </script>
 

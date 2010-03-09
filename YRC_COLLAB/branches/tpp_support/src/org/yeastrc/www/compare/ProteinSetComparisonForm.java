@@ -12,6 +12,8 @@ import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.bio.go.GOUtils;
+import org.yeastrc.ms.domain.protinfer.SORT_BY;
+import org.yeastrc.ms.domain.search.SORT_ORDER;
 
 /**
  * 
@@ -20,14 +22,21 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 
     private int pageNum = 1;
     
+    // DOWNLOAD options
     private boolean download = false;
+    private boolean collapseProteinGroups = false; // used only for downloading results
+    private boolean includeDescription = false; // used only when downloading results
+    
+    // GO ENRICHMENT
     private boolean goEnrichment = false;
     private boolean goEnrichmentGraph = false;
-    
-    
     private int goAspect = GOUtils.BIOLOGICAL_PROCESS;
     private int speciesId;
     private String goEnrichmentPVal = "0.01";
+    
+    // SORTING
+    private SORT_BY sortBy = SORT_BY.NUM_PEPT;
+    private SORT_ORDER sortOrder = SORT_ORDER.DESC;
     
     
     public void reset() {
@@ -68,6 +77,22 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 
     public void setDownload(boolean download) {
         this.download = download;
+    }
+    
+    public boolean isCollapseProteinGroups() {
+        return this.collapseProteinGroups;
+    }
+    
+    public void setCollapseProteinGroups(boolean collapse) {
+        this.collapseProteinGroups = collapse;
+    }
+    
+    public boolean isIncludeDescriptions() {
+        return this.includeDescription;
+    }
+    
+    public void setIncludeDescriptions(boolean include) {
+        this.includeDescription = include;
     }
 
     //-----------------------------------------------------------------------------
@@ -111,5 +136,38 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 
     public void setGoEnrichmentGraph(boolean goEnrichmentGraph) {
         this.goEnrichmentGraph = goEnrichmentGraph;
+    }
+    
+    //-----------------------------------------------------------------------------
+    // Sorting
+    //-----------------------------------------------------------------------------
+    public SORT_BY getSortBy() {
+        return this.sortBy;
+    }
+    public String getSortByString() {
+        if(sortBy == null)  return null;
+        return this.sortBy.name();
+    }
+    
+    public void setSortBy(SORT_BY sortBy) {
+        this.sortBy = sortBy;
+    }
+    public void setSortByString(String sortBy) {
+        this.sortBy = SORT_BY.getSortByForString(sortBy);
+    }
+    
+    public SORT_ORDER getSortOrder() {
+        return this.sortOrder;
+    }
+    public String getSortOrderString() {
+        if(sortOrder == null)   return null;
+        return this.sortOrder.name();
+    }
+    
+    public void setSortOrder(SORT_ORDER sortOrder) {
+        this.sortOrder = sortOrder;
+    }
+    public void setSortOrderString(String sortOrder) {
+        this.sortOrder = SORT_ORDER.getSortByForName(sortOrder);
     }
 }

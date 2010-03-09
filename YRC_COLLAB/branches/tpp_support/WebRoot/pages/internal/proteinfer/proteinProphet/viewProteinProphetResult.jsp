@@ -903,6 +903,9 @@ function pageResults(pageNum) {
   							function(responseText, status, xhr) {			// callback
   										$.unblockUI();
   										refreshProteinList(responseText);
+  										// go to the top of the protein list table
+										var offset = $("#resultPager1").offset();
+										scroll(offset.left, offset.top);
   								   });	
   	
   	return false;
@@ -1002,14 +1005,33 @@ function makeSortable(table) {
 }
 
 
-function toggleDivVisibility(mydiv) {
-  	if($(mydiv).is(':visible'))
-  		$(mydiv).hide();
-  	else
-  		$(mydiv).show();
+
+
+function toggleFullNames() {
+	if($("#full_names").text() == "[Full Names]") {
+		$("#full_names").text("[Short Names]");
+		$(".full_name").show();
+		$(".short_name").hide();
+	}
+	else if($("#full_names").text() == "[Short Names]") {
+		$("#full_names").text("[Full Names]");
+		$(".full_name").hide();
+		$(".short_name").show();
+	}
 }
 
-
+function toggleFullDescriptions() {
+	if($("#full_descriptions").text() == "[Full Descriptions]") {
+		$("#full_descriptions").text("[Short Descriptions]");
+		$(".full_description").show();
+		$(".short_description").hide();
+	}
+	else if($("#full_descriptions").text() == "[Short Descriptions]") {
+		$("#full_descriptions").text("[Full Descriptions]");
+		$(".full_description").hide();
+		$(".short_description").show();
+	}
+}
 
 </script>
 

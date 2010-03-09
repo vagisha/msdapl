@@ -6,6 +6,7 @@
  */
 package org.yeastrc.www.compare.dataset;
 
+import java.text.DecimalFormat;
 
 /**
  * 
@@ -16,6 +17,7 @@ public class DatasetProteinInformation {
     private boolean parsimonious;
     private boolean grouped;
     private int spectrumCount;
+    private double nsaf = -1.0;
     private final Dataset dataset;
     
     public DatasetProteinInformation(Dataset dataset) {
@@ -69,5 +71,19 @@ public class DatasetProteinInformation {
 
     public void setGrouped(boolean grouped) {
         this.grouped = grouped;
+    }
+
+    public double getNsaf() {
+        return nsaf;
+    }
+
+    public void setNsaf(double nsaf) {
+        this.nsaf = nsaf;
+    }
+    
+    public String getNsafFormatted() {
+        String format = "0.000000";
+        DecimalFormat df = new DecimalFormat(format);
+        return df.format(nsaf);
     }
 }

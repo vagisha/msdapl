@@ -1,6 +1,7 @@
 package org.yeastrc.www.proteinfer;
 
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -210,8 +211,18 @@ public class DownloadProteinferResultsAction extends Action {
                 writer.write("P\t");
             else
                 writer.write("\t");
-            writer.write(wProt.getAccession()+"\t");
-            writer.write(wProt.getCommonName()+"\t");
+            try {
+				writer.write(wProt.getAccessionsCommaSeparated()+"\t");
+			} catch (SQLException e) {
+				log.error("Error getting accessions", e);
+				writer.write("ERROR");
+			}
+            try {
+				writer.write(wProt.getCommonNamesCommaSeparated()+"\t");
+			} catch (SQLException e) {
+				log.error("Error getting common names", e);
+				writer.write("ERROR");
+			}
             writer.write(wProt.getProtein().getCoverage()+"\t");
             writer.write(wProt.getProtein().getSpectrumCount()+"\t");
             writer.write(wProt.getProtein().getNsafFormatted()+"\t");
@@ -289,7 +300,12 @@ public class DownloadProteinferResultsAction extends Action {
                     peptides = getPeptides(proteinId);
                 }
             }
-            fastaIds += ","+wProt.getAccession();
+            try {
+				fastaIds += ","+wProt.getAccessionsCommaSeparated();
+			} catch (SQLException e) {
+				log.error("Error getting accessions", e);
+				fastaIds += ",ERROR";
+			}
         }
         // write the last one
         writer.write(currentGroupId+"\t");

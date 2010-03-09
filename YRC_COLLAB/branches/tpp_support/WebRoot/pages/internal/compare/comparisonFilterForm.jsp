@@ -15,9 +15,12 @@
 	
 	<!-- Does the user want to do GO Enrichment analysis-->
 	<html:hidden name="proteinSetComparisonForm" property="goEnrichmentGraph" value="false" styleId="goEnrichmentGraph" />
-	
-	
 
+	<!-- Sorting criteria for the results -->
+	<html:hidden name="proteinSetComparisonForm" property="sortByString"  styleId="sortBy" />
+	<html:hidden name="proteinSetComparisonForm" property="sortOrderString"  styleId="sortOrder" />
+	
+	
 	<html:hidden name="proteinSetComparisonForm" property="pageNum" styleId="pageNum" />
 	
 <center>
@@ -185,7 +188,21 @@
 	</tr>
 	</logic:equal>
 	
-	<logic:notPresent name="goEnrichmentView">
+	
+	<!-- ################## MOLECULAR WT. AND pI FILTERS	  ########################################### -->
+	<tr>
+		<td colspan="2" style="padding: 0 5 5 0;">
+			<b>Mol. Wt.</b> 
+			Min. <html:text name="proteinSetComparisonForm" property="minMolecularWt" size="8"></html:text> 
+		    Max. <html:text name="proteinSetComparisonForm" property="maxMolecularWt" size="8"></html:text>
+		</td>
+		<td colspan="2" style="padding:0 0 5 5;">
+			<b>pI</b>
+			Min. <html:text name="proteinSetComparisonForm" property="minPi" size="8"></html:text> 
+			Max. <html:text name="proteinSetComparisonForm" property="maxPi" size="8"></html:text>
+		</td>
+	</tr>
+	
 	<tr>
 		<!-- ################## SEARCH BOX	  ########################################### -->
 		<td valign="top">
@@ -200,6 +217,8 @@
  			<span style="font-size:8pt;">Enter a comma-separated list of terms.</span>
  		</td>
  	</tr>
+ 	
+ 	<logic:notPresent name="goEnrichmentView">
  	<tr>
  		<td valign="top" align="center" colspan="4">
  			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button"></html:submit> &nbsp;

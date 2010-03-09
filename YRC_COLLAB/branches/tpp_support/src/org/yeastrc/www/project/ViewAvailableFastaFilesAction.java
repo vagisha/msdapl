@@ -18,8 +18,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.project.NrseqDatabase;
-import org.yeastrc.project.NrseqDatabaseDAO;
+import org.yeastrc.ms.domain.nrseq.NrDatabase;
+import org.yeastrc.nrseq.NrseqDatabaseDAO;
 import org.yeastrc.project.Projects;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
@@ -56,18 +56,18 @@ public class ViewAvailableFastaFilesAction extends Action {
         }
         
         // Get a list of the available fasta files for the groups the user is a member of
-        List<NrseqDatabase> databases = null;
+        List<NrDatabase> databases = null;
         if(groupMan.isMember(researcherId, "administrators")) {
-            databases = NrseqDatabaseDAO.instance().getDatabases(null); // this will return a list of ALL fasta files in the database
+            databases = NrseqDatabaseDAO.getInstance().getDatabases(null); // this will return a list of ALL fasta files in the database
         }
         else if(groupMan.isMember(researcherId, Projects.MACCOSS)) {
-            databases = NrseqDatabaseDAO.instance().getDatabases("MacCoss Lab-generated FASTA file for MS/MS analysis.");
+            databases = NrseqDatabaseDAO.getInstance().getDatabases("MacCoss Lab-generated FASTA file for MS/MS analysis.");
         }
         else if(groupMan.isMember(researcherId, Projects.YATES)) {
-            databases = NrseqDatabaseDAO.instance().getDatabases("Yates Lab-generated FASTA file for MS/MS analysis.");
+            databases = NrseqDatabaseDAO.getInstance().getDatabases("Yates Lab-generated FASTA file for MS/MS analysis.");
         }
         else
-            databases = new ArrayList<NrseqDatabase>(0);
+            databases = new ArrayList<NrDatabase>(0);
         
         request.setAttribute("databaseList", databases);
 

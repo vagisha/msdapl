@@ -10,22 +10,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
+import org.yeastrc.ms.util.ProteinUtils;
+
 /**
  * 
  */
 public class ProteinPropertiesFilter {
 
+	private static ProteinPropertiesFilter instance = null;
+	
     private ProteinPropertiesFilter() {}
     
-    public static List<Integer> filterByMolecularWt(int pinferId,
+    public static ProteinPropertiesFilter getInstance() {
+    	if(instance == null) 
+    		instance = new ProteinPropertiesFilter();
+    	return instance;
+    }
+    
+    public List<Integer> filterForProtInferByMolecularWt(int pinferId,
             List<Integer> allProteinIds, double minWt, double maxWt) {
         
         // get a map of the protein ids and protein properties
         Map<Integer, ProteinProperties> propsMap = ProteinPropertiesStore.getInstance().getPropertiesMapForProteinInference(pinferId);
-        return filterByMolecularWt(pinferId, allProteinIds, propsMap, minWt, maxWt);
+        return filterForProtInferByMolecularWt(pinferId, allProteinIds, propsMap, minWt, maxWt);
     }
     
-    private static List<Integer> filterByMolecularWt(int pinferId,
+    private List<Integer> filterForProtInferByMolecularWt(int pinferId,
             List<Integer> allProteinIds,
             Map<Integer, ProteinProperties> proteinPropertiesMap, double minWt, double maxWt) {
         
@@ -44,15 +56,15 @@ public class ProteinPropertiesFilter {
         return filtered;
     }
     
-    public static List<Integer> filterByPi(int pinferId,
+    public List<Integer> filterForProtInferByPi(int pinferId,
             List<Integer> allProteinIds, double minPi, double maxPi) {
         
         // get a map of the protein ids and protein properties
         Map<Integer, ProteinProperties> propsMap = ProteinPropertiesStore.getInstance().getPropertiesMapForProteinInference(pinferId);
-        return filterByPi(pinferId, allProteinIds, propsMap, minPi, maxPi);
+        return filterForProtInferByPi(pinferId, allProteinIds, propsMap, minPi, maxPi);
     }
     
-    private static List<Integer> filterByPi(int pinferId,
+    private List<Integer> filterForProtInferByPi(int pinferId,
             List<Integer> allProteinIds,
             Map<Integer, ProteinProperties> proteinPropertiesMap, double minPi, double maxPi) {
         
@@ -66,6 +78,30 @@ public class ProteinPropertiesFilter {
                 if(props.getPi() >= minPi && props.getPi() <= maxPi)
                     filtered.add(id);
             }
+        }
+        return filtered;
+    }
+    
+    
+    public List<Integer> filterNrseqIdsyMolecularWtAndPi(List<Integer> allProteinIds, ProteinFilterCriteria filterCriteria) {
+        
+    	double minWt = filterCriteria.getMinMolecularWt();
+    	double maxWt = filterCriteria.getMaxMolecularWt();
+    	
+    	double minPi = filterCriteria.getMinPi();
+    	double maxPi = filterCriteria.getMaxPi();
+    	
+        List<Integer> filtered = new ArrayList<Integer>();
+        
+        for(int nrseqId: allProteinIds) {
+        	String sequence = NrSeqLookupUtil.getProteinSequence(nrseqId);
+        	double molWt = ProteinUtils.calculateMolWt(sequence);
+        	double pi = ProteinUtils.calculatePi(sequence);
+        	
+        	if(molWt >= minWt && molWt <= maxWt)
+        		filtered.add(nrseqId);
+        	if(pi >= minPi && pi <= maxPi)
+        		filtered.add(nrseqId);
         }
         return filtered;
     }

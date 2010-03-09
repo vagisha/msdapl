@@ -49,10 +49,9 @@ import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
+import org.yeastrc.nrseq.ProteinListing;
+import org.yeastrc.nrseq.ProteinListingBuilder;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
-import org.yeastrc.www.compare.util.CommonNameLookupUtil;
-import org.yeastrc.www.compare.util.FastaProteinLookupUtil;
-import org.yeastrc.www.compare.util.ProteinListing;
 import org.yeastrc.www.proteinfer.MsResultLoader;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
 import org.yeastrc.www.proteinfer.ProteinAccessionSorter;
@@ -99,26 +98,26 @@ public class IdPickerResultsLoader {
         // filter by accession, if required
         if(filterCriteria.getAccessionLike() != null) {
             log.info("Filtering by accession: "+filterCriteria.getAccessionLike());
-            proteinIds = ProteinAccessionFilter.filterByProteinAccession(pinferId, proteinIds, filterCriteria.getAccessionLike());
+            proteinIds = ProteinAccessionFilter.getInstance().filterForProtInferByProteinAccession(pinferId, proteinIds, filterCriteria.getAccessionLike());
         }
         
         // filter by description, if required
         if(filterCriteria.getDescriptionLike() != null) {
             log.info("Filtering by description (like): "+filterCriteria.getDescriptionLike());
-            proteinIds = ProteinDescriptionFilter.filterByProteinDescription(pinferId, proteinIds, 
+            proteinIds = ProteinDescriptionFilter.getInstance().filterForProtInferByProteinDescription(pinferId, proteinIds, 
             		filterCriteria.getDescriptionLike(), true);
         }
         
         if(filterCriteria.getDescriptionNotLike() != null) {
         	log.info("Filtering by description (NOT like): "+filterCriteria.getDescriptionLike());
-            proteinIds = ProteinDescriptionFilter.filterByProteinDescription(pinferId, proteinIds, 
+            proteinIds = ProteinDescriptionFilter.getInstance().filterForProtInferByProteinDescription(pinferId, proteinIds, 
             		filterCriteria.getDescriptionNotLike(), false);
         }
         
         // filter by molecular wt, if required
         if(filterCriteria.hasMolecularWtFilter()) {
         	log.info("Filtering by molecular wt.");
-            proteinIds = ProteinPropertiesFilter.filterByMolecularWt(pinferId, proteinIds,
+            proteinIds = ProteinPropertiesFilter.getInstance().filterForProtInferByMolecularWt(pinferId, proteinIds,
                     filterCriteria.getMinMolecularWt(), filterCriteria.getMaxMolecularWt());
             if(filterCriteria.getSortBy() == SORT_BY.MOL_WT)
                 proteinIds = ProteinPropertiesSorter.sortIdsByMolecularWt(proteinIds, pinferId, filterCriteria.isGroupProteins());
@@ -127,7 +126,7 @@ public class IdPickerResultsLoader {
         // filter by pI, if required
         if(filterCriteria.hasPiFilter()) {
         	log.info("Filtering by pI");
-            proteinIds = ProteinPropertiesFilter.filterByPi(pinferId, proteinIds,
+            proteinIds = ProteinPropertiesFilter.getInstance().filterForProtInferByPi(pinferId, proteinIds,
                     filterCriteria.getMinPi(), filterCriteria.getMaxPi());
             if(filterCriteria.getSortBy() == SORT_BY.PI)
                 proteinIds = ProteinPropertiesSorter.sortIdsByPi(proteinIds, pinferId, filterCriteria.isGroupProteins());
@@ -245,7 +244,7 @@ public class IdPickerResultsLoader {
         WIdPickerProtein wProt = new WIdPickerProtein(protein);
         // set the accession and description for the proteins.  
         // This requires querying the NRSEQ database
-        assignProteinAccessionDescription(wProt, databaseIds);
+        assignProteinListing(wProt, databaseIds);
         
         // get the molecular weight for the protein
         assignProteinProperties(wProt);
@@ -352,39 +351,15 @@ public class IdPickerResultsLoader {
     //---------------------------------------------------------------------------------------------------
     // NR_SEQ lookup 
     //---------------------------------------------------------------------------------------------------
-    private static void assignProteinAccessionDescription(WIdPickerProtein wProt, List<Integer> databaseIds) {
+    private static void assignProteinListing(WIdPickerProtein wProt, List<Integer> databaseIds) {
         
-        String[] acc_descr = getProteinAccessionDescription(wProt.getProtein().getNrseqProteinId(), databaseIds);
-        wProt.setAccession(acc_descr[0]);
-        wProt.setDescription(acc_descr[1]);
-        wProt.setCommonName(acc_descr[2]);
+    	ProteinListing listing = ProteinListingBuilder.getInstance().build(wProt.getProtein().getNrseqProteinId(), databaseIds);
+    	wProt.setProteinListing(listing);
     }
     
-    private static String[] getProteinAccessionDescription(int nrseqProteinId, List<Integer> databaseIds) {
-        return getProteinAccessionDescription(nrseqProteinId, databaseIds, true);
-    }
-
-    private static String[] getProteinAccessionDescription(int nrseqProteinId, List<Integer> databaseIds,
-            boolean getCommonName) {
-        
-        ProteinListing listing = FastaProteinLookupUtil.getInstance().getProteinListing(nrseqProteinId, databaseIds);
-        String accession = listing.getAllNames();
-        String description = listing.getAllDescriptions();
-        
-        String commonName = "";
-        if(getCommonName) {
-
-            try {
-                commonName = CommonNameLookupUtil.getInstance().getProteinListing(nrseqProteinId).getAllNames();
-            }
-            catch (Exception e) {
-                log.error("Exception getting common name for protein Id: "+nrseqProteinId, e);
-            }
-        }
-        return new String[] {accession, description, commonName};
-        
-    }
-    
+    //---------------------------------------------------------------------------------------------------
+    // Protein properties
+    //---------------------------------------------------------------------------------------------------
     private static void assignProteinProperties(WIdPickerProtein wProt) {
         
         ProteinProperties props = ProteinPropertiesStore.getInstance().getProteinProperties(wProt.getProtein().getProteinferId(), wProt.getProtein());

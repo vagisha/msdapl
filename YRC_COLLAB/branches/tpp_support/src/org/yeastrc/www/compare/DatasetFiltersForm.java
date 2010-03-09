@@ -11,7 +11,10 @@ import java.util.List;
 
 import org.apache.struts.action.ActionForm;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
 import org.yeastrc.www.compare.dataset.Dataset;
+import org.yeastrc.www.compare.dataset.FilterableDataset;
+import org.yeastrc.www.compare.dataset.ProteinProphetDataset;
 import org.yeastrc.www.compare.dataset.SelectableDataset;
 
 /**
@@ -24,153 +27,60 @@ public class DatasetFiltersForm extends ActionForm {
     private List<SelectableDataset> notList = new ArrayList<SelectableDataset>();
     private List<SelectableDataset> xorList = new ArrayList<SelectableDataset>();
     
-    private int parsimoniousParam = ProteinDatasetComparer.PARSIM_ONE; // parsimonious in at least one
+    private int parsimoniousParam = ProteinDatasetComparer.PARSIM.ONE.getNumericValue(); // parsimonious in at least one
     
     private boolean groupIndistinguishableProteins = false;
     
-    private String minCoverage = "0.0";
-    private String maxCoverage = "100.0";
-    private String minPeptides = "1";
-    private String maxPeptides;
-    private String minUniquePeptides = "0";
-    private String maxUniquePeptides;
-    private String minSpectrumMatches = "1";
-    private String maxSpectrumMatches;
+    private String minMolWt;
+    private String maxMolWt;
+    private String minPi;
+    private String maxPi;
     
     private String accessionLike = null;
     private String descriptionLike = null;
-    private String[] validationStatus = new String[]{"All"};
+    private String descriptionNotLike = null;
+    
+    private boolean showFullDescriptions = false;
+    private boolean keepProteinGroups = false;
 
+    // FOR PROTEIN-PROPHET
     private boolean hasProteinProphetDatasets = false;
     private String errorRate = "0.01";
     private boolean useProteinGroupProbability = false;
     
+    
+    
     public void reset() {
-        minCoverage = "0.0";
-        minPeptides = "1";
-        minUniquePeptides = "0";
-        minSpectrumMatches = "1";
-        
         accessionLike = null;
         descriptionLike = null;
         errorRate = "0.01";
         
         groupIndistinguishableProteins = false;
         useProteinGroupProbability = false;
+        
+        showFullDescriptions = false;
+        keepProteinGroups = false;
     }
     
+    public boolean isShowFullDescriptions() {
+        return showFullDescriptions;
+    }
+
+    public void setShowFullDescriptions(boolean showFullDescriptions) {
+        this.showFullDescriptions = showFullDescriptions;
+    }
+    
+    public boolean isKeepProteinGroups() {
+        return keepProteinGroups;
+    }
+
+    public void setKeepProteinGroups(boolean keepProteinGroups) {
+        this.keepProteinGroups = keepProteinGroups;
+    }
     
     // ------------------------------------------------------------------------------------
     // FILTERING OPTIONS
     // ------------------------------------------------------------------------------------
-    // MIN COVERAGE
-    public String getMinCoverage() {
-        return minCoverage;
-    }
-    public double getMinCoverageDouble() {
-        if(minCoverage == null || minCoverage.trim().length() == 0)
-            return 0.0;
-        else
-            return Double.parseDouble(minCoverage);
-    }
-    public void setMinCoverage(String minCoverage) {
-        this.minCoverage = minCoverage;
-    }
-    
-    // MAX COVERAGE
-    public String getMaxCoverage() {
-        return maxCoverage;
-    }
-    public double getMaxCoverageDouble() {
-        if(maxCoverage == null || maxCoverage.trim().length() == 0)
-            return 100.0;
-        else
-            return Double.parseDouble(maxCoverage);
-    }
-    public void setMaxCoverage(String maxCoverage) {
-        this.maxCoverage = maxCoverage;
-    }
-    
-    // MIN PEPTIDES
-    public String getMinPeptides() {
-        return minPeptides;
-    }
-    public int getMinPeptidesInteger() {
-        if(minPeptides == null || minPeptides.trim().length() == 0)
-            return 1;
-        return Integer.parseInt(minPeptides);
-    }
-    public void setMinPeptides(String minPeptides) {
-        this.minPeptides = minPeptides;
-    }
-
-    // MAX PEPTIDES
-    public String getMaxPeptides() {
-        return maxPeptides;
-    }
-    public int getMaxPeptidesInteger() {
-        if(maxPeptides == null || maxPeptides.trim().length() == 0)
-            return Integer.MAX_VALUE;
-        return Integer.parseInt(maxPeptides);
-    }
-    public void setMaxPeptides(String maxPeptides) {
-        this.maxPeptides = maxPeptides;
-    }
-    
-    // MIN UNIQUE PEPTIDES
-    public String getMinUniquePeptides() {
-        return minUniquePeptides;
-    }
-    public int getMinUniquePeptidesInteger() {
-        if(minUniquePeptides == null || minUniquePeptides.trim().length() == 0)
-            return 0;
-        else
-            return Integer.parseInt(minUniquePeptides);
-    }
-    public void setMinUniquePeptides(String minUniquePeptides) {
-        this.minUniquePeptides = minUniquePeptides;
-    }
-
-    // MAX UNIQUE PEPTIDES
-    public String getMaxUniquePeptides() {
-        return maxUniquePeptides;
-    }
-    public int getMaxUniquePeptidesInteger() {
-        if(maxUniquePeptides == null || maxUniquePeptides.trim().length() == 0)
-            return Integer.MAX_VALUE;
-        else
-            return Integer.parseInt(maxUniquePeptides);
-    }
-    public void setMaxUniquePeptides(String maxUniquePeptides) {
-        this.maxUniquePeptides = maxUniquePeptides;
-    }
-
-    // MIN SPECTRUM MATCHES
-    public String getMinSpectrumMatches() {
-        return minSpectrumMatches;
-    }
-    public int getMinSpectrumMatchesInteger() {
-        if(minSpectrumMatches == null || minSpectrumMatches.trim().length() == 0)
-            return 1;
-        else
-            return Integer.parseInt(minSpectrumMatches);
-    }
-    public void setMinSpectrumMatches(String minSpectrumMatches) {
-        this.minSpectrumMatches = minSpectrumMatches;
-    }
-    
-    // MAX SPECTRUM MATCHES
-    public String getMaxSpectrumMatches() {
-        return maxSpectrumMatches;
-    }
-    public int getMaxSpectrumMatchesInteger() {
-        if(maxSpectrumMatches == null || maxSpectrumMatches.trim().length() == 0)
-            return Integer.MAX_VALUE;
-        return Integer.parseInt(maxSpectrumMatches);
-    }
-    public void setMaxSpectrumMatches(String maxSpectrumMatches) {
-        this.maxSpectrumMatches = maxSpectrumMatches;
-    }
     
     // USE PARSIMONIOUS AND NON-PARSIMONIOUS PROTEINS
     public int getParsimoniousParam() {
@@ -216,63 +126,74 @@ public class DatasetFiltersForm extends ActionForm {
     public void setDescriptionLike(String descriptionLike) {
         this.descriptionLike = descriptionLike;
     }
-
-    // VALIDATION STATUS
-    public String[] getValidationStatus() {
-        return validationStatus;
-    }
-
-    public void setValidationStatus(String[] validationStatus) {
-        this.validationStatus = validationStatus;
-    }
     
-    public void setValidationStatusString(String validationStatus) {
-        if(validationStatus == null)
-            this.validationStatus = new String[0];
-        validationStatus = validationStatus.trim();
-        String tokens[] = validationStatus.split(",");
-        this.validationStatus = new String[tokens.length];
-        int idx = 0;
-        for(String tok: tokens) {
-            this.validationStatus[idx++] = tok.trim();
-        }
-    }
-    
-    public String getValidationStatusString() {
-        if(this.validationStatus == null)
+    public String getDescriptionNotLike() {
+        if(descriptionNotLike == null || descriptionNotLike.trim().length() == 0)
             return null;
-        StringBuilder buf = new StringBuilder();
-        for(String status: validationStatus) {
-            buf.append(",");
-            buf.append(status);
-        }
-        if(buf.length() > 0)
-            buf.deleteCharAt(0);
-        return buf.toString();
-    }
-    
-    // -------------------------------------------------------------------------------
-    // FILTER CRITERIA
-    // -------------------------------------------------------------------------------
-    public ProteinFilterCriteria getFilterCriteria() {
-        ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
-        filterCriteria.setCoverage(this.getMinCoverageDouble());
-        filterCriteria.setMaxCoverage(this.getMaxCoverageDouble());
-        filterCriteria.setNumPeptides(this.getMinPeptidesInteger());
-        filterCriteria.setNumMaxPeptides(this.getMaxPeptidesInteger());
-        filterCriteria.setNumUniquePeptides(this.getMinUniquePeptidesInteger());
-        filterCriteria.setNumMaxUniquePeptides(this.getMaxUniquePeptidesInteger());
-        filterCriteria.setNumSpectra(this.getMinSpectrumMatchesInteger());
-        filterCriteria.setNumMaxSpectra(this.getMaxSpectrumMatchesInteger());
-        if(this.parsimoniousParam == ProteinDatasetComparer.PARSIM_NONE)
-            filterCriteria.setParsimonious(false);
         else
-            filterCriteria.setParsimonious(true);
-        filterCriteria.setAccessionLike(this.getAccessionLike());
-        filterCriteria.setDescriptionLike(this.getDescriptionLike());
-        return filterCriteria;
+            return descriptionNotLike.trim();
+            
     }
     
+    public void setDescriptionNotLike(String descriptionNotLike) {
+        this.descriptionNotLike = descriptionNotLike;
+    }
+    
+    //-----------------------------------------------------------------------------
+    // Molecular Weight
+    //-----------------------------------------------------------------------------
+    public String getMinMolecularWt() {
+        return minMolWt;
+    }
+    public Double getMinMolecularWtDouble() {
+        if(minMolWt != null && minMolWt.trim().length() > 0)
+            return Double.parseDouble(minMolWt);
+        return 0.0;
+    }
+    public void setMinMolecularWt(String molWt) {
+        this.minMolWt = molWt;
+    }
+    
+    public String getMaxMolecularWt() {
+        return maxMolWt;
+    }
+    public Double getMaxMolecularWtDouble() {
+        if(maxMolWt != null && maxMolWt.trim().length() > 0)
+            return Double.parseDouble(maxMolWt);
+        return Double.MAX_VALUE;
+    }
+    public void setMaxMolecularWt(String molWt) {
+        this.maxMolWt = molWt;
+    }
+    
+    //-----------------------------------------------------------------------------
+    // pI
+    //-----------------------------------------------------------------------------
+    public String getMinPi() {
+        return minPi;
+    }
+    public Double getMinPiDouble() {
+        if(minPi != null && minPi.trim().length() > 0)
+            return Double.parseDouble(minPi);
+        return 0.0;
+    }
+    public void setMinPi(String pi) {
+        this.minPi = pi;
+    }
+    
+    public String getMaxPi() {
+        return maxPi;
+    }
+    public Double getMaxPiDouble() {
+        if(maxPi != null && maxPi.trim().length() > 0)
+            return Double.parseDouble(maxPi);
+        return Double.MAX_VALUE;
+    }
+    public void setMaxPi(String pi) {
+        this.maxPi = pi;
+    }
+
+
     // -------------------------------------------------------------------------------
     // DATASET FILTERS
     // -------------------------------------------------------------------------------
@@ -381,6 +302,7 @@ public class DatasetFiltersForm extends ActionForm {
         this.useProteinGroupProbability = useProteinGroupProbability;
     }
     
+    
     //-----------------------------------------------------------------------------
     // Total
     //-----------------------------------------------------------------------------
@@ -397,8 +319,10 @@ public class DatasetFiltersForm extends ActionForm {
         return all;
     }
     
-    
-    public ProteinDatasetComparisonFilters getSelectedBooleanFilters() {
+    // -------------------------------------------------------------------------------
+    // BOOLEAN FILTERS
+    // -------------------------------------------------------------------------------
+    public DatasetBooleanFilters getSelectedBooleanFilters() {
         
         List<SelectableDataset> andDataset = getAndList();
         List<SelectableDataset> orDataset = getOrList();
@@ -425,12 +349,59 @@ public class DatasetFiltersForm extends ActionForm {
             if(sds.isSelected())    xorFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
         }
         
-        ProteinDatasetComparisonFilters filters = new ProteinDatasetComparisonFilters();
+        DatasetBooleanFilters filters = new DatasetBooleanFilters();
         filters.setAndFilters(andFilters);
         filters.setOrFilters(orFilters);
         filters.setNotFilters(notFilters);
         filters.setXorFilters(xorFilters);
         return filters;
     }
+    
+    // -------------------------------------------------------------------------------
+    // PROTEIN PROPERTIES FILTERS
+    // -------------------------------------------------------------------------------
+    public ProteinPropertiesFilters getProteinPropertiesFilters() {
+    	
+        ProteinPropertiesFilters filters = new ProteinPropertiesFilters();
+        
+        filters.setMinMolecularWt(this.getMinMolecularWtDouble());
+        filters.setMaxMolecularWt(this.getMaxMolecularWtDouble());
+        filters.setMinPi(this.getMinMolecularWtDouble());
+        filters.setMaxPi(this.getMaxPiDouble());
+        
+        filters.setAccessionLike(this.getAccessionLike());
+        filters.setDescriptionLike(this.getDescriptionLike());
+        filters.setDescriptionNotLike(this.getDescriptionNotLike());
+        
+        return filters;
+    }
+    
+    // -------------------------------------------------------------------------------
+    // FILTER CRITERIA
+    // -------------------------------------------------------------------------------
+    public ProteinFilterCriteria getFilterCriteria() {
+        ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
+        
+        if(this.parsimoniousParam == ProteinDatasetComparer.PARSIM.NONE.getNumericValue())
+            filterCriteria.setParsimonious(false);
+        else
+            filterCriteria.setParsimonious(true);
+       
+        return filterCriteria;
+    }
+    
+    public ProteinProphetFilterCriteria getProteinProphetFilterCriteria(FilterableDataset dataset) {
+    	
+        ProteinProphetFilterCriteria filterCriteria = new ProteinProphetFilterCriteria(this.getFilterCriteria());
+        
+        double minProbability = ((ProteinProphetDataset)dataset).getRoc().getMinProbabilityForError(this.getErrorRateDouble());
+        if(this.getUseProteinGroupProbability())
+            filterCriteria.setMinGroupProbability(minProbability);
+        else filterCriteria.setMinProteinProbability(minProbability);
+        ((ProteinProphetDataset)dataset).setProteinFilterCriteria(filterCriteria);
+        
+        return filterCriteria;
+    }
+    
     
 }

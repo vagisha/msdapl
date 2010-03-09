@@ -47,10 +47,9 @@ import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
+import org.yeastrc.nrseq.ProteinListing;
+import org.yeastrc.nrseq.ProteinListingBuilder;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
-import org.yeastrc.www.compare.util.CommonNameLookupUtil;
-import org.yeastrc.www.compare.util.FastaProteinLookupUtil;
-import org.yeastrc.www.compare.util.ProteinListing;
 import org.yeastrc.www.proteinfer.MsResultLoader;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
 import org.yeastrc.www.proteinfer.ProteinAccessionSorter;
@@ -97,25 +96,25 @@ public class ProteinProphetResultsLoader {
         // filter by accession, if required
         if(filterCriteria.getAccessionLike() != null) {
             log.info("Filtering by accession: "+filterCriteria.getAccessionLike());
-            proteinIds = ProteinAccessionFilter.filterByProteinAccession(pinferId, proteinIds, filterCriteria.getAccessionLike());
+            proteinIds = ProteinAccessionFilter.getInstance().filterForProtInferByProteinAccession(pinferId, proteinIds, filterCriteria.getAccessionLike());
         }
         
         // filter by description, if required
         if(filterCriteria.getDescriptionLike() != null) {
             log.info("Filtering by description: "+filterCriteria.getDescriptionLike());
-            proteinIds = ProteinDescriptionFilter.filterByProteinDescription(pinferId, proteinIds, 
+            proteinIds = ProteinDescriptionFilter.getInstance().filterForProtInferByProteinDescription(pinferId, proteinIds, 
             		filterCriteria.getDescriptionLike(), true);
         }
         
         if(filterCriteria.getDescriptionNotLike() != null) {
         	log.info("Filtering by description (NOT like): "+filterCriteria.getDescriptionLike());
-            proteinIds = ProteinDescriptionFilter.filterByProteinDescription(pinferId, proteinIds, 
+            proteinIds = ProteinDescriptionFilter.getInstance().filterForProtInferByProteinDescription(pinferId, proteinIds, 
             		filterCriteria.getDescriptionNotLike(), false);
         }
         
         // filter by molecular wt, if required
         if(filterCriteria.hasMolecularWtFilter()) {
-            proteinIds = ProteinPropertiesFilter.filterByMolecularWt(pinferId, proteinIds,
+            proteinIds = ProteinPropertiesFilter.getInstance().filterForProtInferByMolecularWt(pinferId, proteinIds,
                     filterCriteria.getMinMolecularWt(), filterCriteria.getMaxMolecularWt());
             if(filterCriteria.getSortBy() == SORT_BY.MOL_WT)
                 proteinIds = ProteinPropertiesSorter.sortIdsByMolecularWt(proteinIds, pinferId, filterCriteria.isGroupProteins());
@@ -123,7 +122,7 @@ public class ProteinProphetResultsLoader {
         
         // filter by pI, if required
         if(filterCriteria.hasPiFilter()) {
-            proteinIds = ProteinPropertiesFilter.filterByPi(pinferId, proteinIds,
+            proteinIds = ProteinPropertiesFilter.getInstance().filterForProtInferByPi(pinferId, proteinIds,
                     filterCriteria.getMinPi(), filterCriteria.getMaxPi());
             if(filterCriteria.getSortBy() == SORT_BY.PI)
                 proteinIds = ProteinPropertiesSorter.sortIdsByPi(proteinIds, pinferId, filterCriteria.isGroupProteins());
@@ -318,35 +317,8 @@ public class ProteinProphetResultsLoader {
     //---------------------------------------------------------------------------------------------------
     private static void assignProteinAccessionDescription(WProteinProphetProtein wProt, List<Integer> databaseIds) {
         
-        String[] acc_descr = getProteinAccessionDescription(wProt.getProtein().getNrseqProteinId(), databaseIds);
-        wProt.setAccession(acc_descr[0]);
-        wProt.setDescription(acc_descr[1]);
-        wProt.setCommonName(acc_descr[2]);
-    }
-    
-    private static String[] getProteinAccessionDescription(int nrseqProteinId, List<Integer> databaseIds) {
-        return getProteinAccessionDescription(nrseqProteinId, databaseIds, true);
-    }
-
-    private static String[] getProteinAccessionDescription(int nrseqProteinId, List<Integer> databaseIds,
-            boolean getCommonName) {
-        
-        ProteinListing listing = FastaProteinLookupUtil.getInstance().getProteinListing(nrseqProteinId, databaseIds);
-        String accession = listing.getAllNames();
-        String description = listing.getAllDescriptions();
-        
-        String commonName = "";
-        if(getCommonName) {
-
-            try {
-                commonName = CommonNameLookupUtil.getInstance().getProteinListing(nrseqProteinId).getAllNames();
-            }
-            catch (Exception e) {
-                log.error("Exception getting common name for protein Id: "+nrseqProteinId, e);
-            }
-        }
-        return new String[] {accession, description, commonName};
-        
+    	ProteinListing listing = ProteinListingBuilder.getInstance().build(wProt.getProtein().getNrseqProteinId(), databaseIds);
+    	wProt.setProteinListing(listing);
     }
     
     private static void assignProteinProperties(WProteinProphetProtein wProt) {

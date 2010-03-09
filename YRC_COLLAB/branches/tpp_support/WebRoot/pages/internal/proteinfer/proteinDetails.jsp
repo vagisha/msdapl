@@ -11,9 +11,49 @@
 <div align="center" style="padding:5px;font-size: 10pt;width: 90%; color: black;">
 
 <div style="background-color:#F8F8FF; border: 1px solid #F5F5F5; width:100%" align="center">
-<b><bean:write name="protein" property="accession"/></b>
-<br>
-<span style="color: #888888; font-size: 9pt;"><bean:write name="protein" property="description" /></span>
+<table align="center" width="90%">
+<tr>
+	<td valign="top" align="left"><b>Accession:</b></td>
+	<td valign="top" align="left">
+		<logic:iterate name="protein" property="fastaReferences" id="reference">
+			<bean:write name="reference" property="accession"/>
+			<br/>
+		</logic:iterate>
+	</td>
+</tr>
+<tr>
+	<td valign="top" align="left"><b>Common Name:</b></td>
+	<td valign="top" align="left">
+		<logic:iterate name="protein" property="commonReferences" id="reference">
+			<bean:write name="reference" property="name"/>
+			<br/>
+		</logic:iterate>
+	</td>
+</tr>
+<tr>
+	<td valign="top" align="left"><b>External Links:</b></td>
+	<td valign="top" align="left">
+		<logic:iterate name="protein" property="externalReferences" id="reference">
+			<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;">
+			[<bean:write name="reference" property="databaseName"/>]
+			</a>
+			<br/>
+		</logic:iterate>
+	</td>
+</tr>
+<tr>
+	<td valign="top" align="left"><b>Description:</b></td>
+	<td valign="top" align="left">
+		<span style="color: #888888; font-size: 9pt;">
+		<logic:iterate name="protein" property="descriptionReferences" id="reference">
+			<b>[<bean:write name="reference" property="databaseName"/>]</b> &nbsp; &nbsp; <bean:write name="reference" property="description"/>
+			<br/>
+		</logic:iterate>
+		</span>
+	</td>
+</tr>
+</table>
+
 
 <br>
 <span style="font-size: 8pt; color: red;">
@@ -55,7 +95,7 @@
 	<logic:iterate name="groupProteins" id="prot">
 		<span onclick="showProteinDetails(<bean:write name="prot" property="protein.id" />)" 
 						style="text-decoration: underline; cursor: pointer">
-		<bean:write name="prot" property="accession" />
+		<bean:write name="prot" property="accessionsCommaSeparated" />
 		</span><br>
 	</logic:iterate>
 	</td>

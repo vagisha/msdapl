@@ -5,7 +5,7 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
 
-<div id="resultPager"  style="margin-top: 10px; margin-left: 10px;">
+<div id="resultPager1"  style="margin-top: 10px; margin-left: 10px;">
 
 	<%int currPage = (Integer)(request.getAttribute("currentPage")); %>
 	
@@ -36,6 +36,11 @@
 			Last</span>
 	</logic:notEqual>
 	&nbsp; &nbsp; Page <bean:write name="currentPage" /> of <bean:write name="pageCount" />
+</div>
+
+<div style="margin:top: 3px;">
+<span class="underline clickable" style="font-size:8pt;color:red;" id="full_names" onclick="toggleFullNames()">[Full Names]</span> &nbsp; &nbsp;
+<span class="underline clickable" style="font-size:8pt;color:red;" id="full_descriptions" onclick="toggleFullDescriptions()">[Full Descriptions]</span>
 </div>
 
 <%
@@ -115,6 +120,9 @@
 		
 		
 		<th width="10%"><b><font size="2pt">Common<br>Name</font></b></th>
+		<th width="1%">
+			<b><font size="2pt">Links</font></b>
+		</th>
 		<th width="40%"><b><font size="2pt">Description</font></b></th>
 		
 		
@@ -220,7 +228,7 @@
 		<!-- User Validation -->
 		<td>
 		<span id="<bean:write name="protein" property="protein.id" />"
-				title="<bean:write name="protein" property="accession" />" 
+				title="<bean:write name="protein" property="accessionsCommaSeparated" />" 
 				class="editprotannot"
 				style="text-decoration: underline; cursor: pointer" >
 				
@@ -252,8 +260,20 @@
 			<logic:equal name="protein" property="protein.subsumed" value="false"><b></logic:equal>
 			<logic:equal name="protein" property="protein.subsumed" value="true"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
-					style="text-decoration: underline; cursor: pointer">
-			<bean:write name="protein" property="shortAccession" />
+					style="display:none;"
+					class="full_name clickable underline">
+			<logic:iterate name="protein" property="fastaReferences" id="reference">
+				<bean:write name="reference" property="accession"/>
+				<br/>
+			</logic:iterate>
+			</span>
+			
+			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
+					class="short_name clickable underline">
+			<logic:iterate name="protein" property="fastaReferences" id="reference">
+				<bean:write name="reference" property="shortAccession"/>
+				<br/>
+			</logic:iterate>
 			</span>
 			<logic:equal name="protein" property="protein.subsumed" value="true"></font></logic:equal>
 			<logic:equal name="protein" property="protein.subsumed" value="false"></b></logic:equal>
@@ -266,14 +286,46 @@
 			<logic:equal name="protein" property="protein.subsumed" value="true"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
 					style="text-decoration: underline; cursor: pointer">
-				<bean:write name="protein" property="commonName" />
+			<logic:iterate name="protein" property="commonReferences" id="reference">
+				<bean:write name="reference" property="name"/>
+				<br/>
+			</logic:iterate>
 			</span>
 			<logic:equal name="protein" property="protein.subsumed" value="true"></font></logic:equal>
 			<logic:equal name="protein" property="protein.subsumed" value="false"></b></logic:equal>
 			</td>
-			
+		
+		<!-- External Links -->
+			<td>
+			<logic:iterate name="protein" property="externalReferences" id="reference">
+				<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;">
+				[<bean:write name="reference" property="databaseName"/>]
+				</a>
+				<br/>
+			</logic:iterate>
+			</td>
+				
 		<!-- Protein Description -->
-		<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
+		<td style="font-size: 8pt;">
+		<span class="full_description" style="display:none;">
+			<logic:iterate name="protein" property="descriptionReferences" id="reference">
+			<b>[<bean:write name="reference" property="databaseName"/>]</b> &nbsp; &nbsp; <bean:write name="reference" property="description"/>
+			<br/>
+			</logic:iterate>
+			</span>
+		
+			<span class="short_description">
+			<logic:iterate name="protein" property="fourDescriptionReferences" id="reference">
+				<b>[<bean:write name="reference" property="databaseName"/>]</b> &nbsp; &nbsp;<bean:write name="reference" property="shortDescription"/>
+				<br/>
+			</logic:iterate>
+			<bean:size name="protein" property="descriptionReferences" id="refCount"/>
+			<logic:greaterThan value="4" name="refCount">
+				<br/>
+				<b>[More...]</b>
+			</logic:greaterThan>
+		</span>
+		</td>
 		<td><bean:write name="protein" property="molecularWeight"/></td>
 		<td><bean:write name="protein" property="pi"/></td>
 		<td><bean:write name="protein" property="protein.coverage"/></td>
@@ -304,10 +356,10 @@
 					  >Show Peptides</span></nobr></td>
 			
 			<logic:equal name="groupProteins" value="true">
-				<td colspan="10" class="pinfer_filler">
+				<td colspan="11" class="pinfer_filler">
 			</logic:equal>
 			<logic:equal name="groupProteins" value="false">
-				<td colspan="12" class="pinfer_filler">
+				<td colspan="13" class="pinfer_filler">
 			</logic:equal>
 				<!--  peptides table will go here: proteinPeptides.jsp -->
 				<div id="peptforprot_<bean:write name="iGroup" property="groupId" />"></div>
@@ -318,3 +370,35 @@
 	</logic:iterate>
 	</tbody>
 </table>
+
+
+<div id="resultPager2"  style="margin-top: 10px; margin-left: 10px;">
+
+	<logic:notEqual name="onFirst" value="true">
+		<span style="text-decoration: underline; cursor: pointer;" onclick="pageResults(1)">
+			First</span> &nbsp;
+		<span style="cursor: pointer;" onclick="pageResults(<%=currPage - 1%>)">
+			&lt;&lt;
+		</span>
+	</logic:notEqual>
+	
+	<logic:iterate name="pages" id="pg">
+		<logic:notEqual name="pg" value="<%=String.valueOf(currPage) %>">
+			<span style="text-decoration: underline; cursor: pointer;" onclick="pageResults(<bean:write name="pg"/>)">
+				<bean:write name="pg"/>
+			</span> &nbsp;
+		</logic:notEqual>
+		<logic:equal name="pg" value="<%=String.valueOf(currPage) %>">
+			<bean:write name="pg"/> &nbsp;
+		</logic:equal>
+	</logic:iterate>
+	
+	<logic:notEqual name="onLast" value="true">
+		<span style="cursor: pointer;" onclick="pageResults(<%=currPage + 1%>)">
+			&gt;&gt;
+		</span>  &nbsp;
+		<span style="text-decoration: underline; cursor: pointer;" onclick="pageResults(<bean:write name="pageCount" />)">
+			Last</span>
+	</logic:notEqual>
+	&nbsp; &nbsp; Page <bean:write name="currentPage" /> of <bean:write name="pageCount" />
+</div>

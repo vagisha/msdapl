@@ -20,7 +20,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.www.compare.dataset.DatasetBuilder;
-import org.yeastrc.www.compare.dataset.DatasetSource;
 import org.yeastrc.www.compare.dataset.SelectableDataset;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -92,6 +91,7 @@ public class CompareProteinSetsAction extends Action {
         // Form we will use
         ProteinSetComparisonForm myForm = (ProteinSetComparisonForm)form; // new ProteinSetComparisonForm();
         myForm.setGroupIndistinguishableProteins(groupProteins);
+       
         
         // ANY AND, OR, NOT, XOR filters
         myForm.setAndList(datasets);

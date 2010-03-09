@@ -10,19 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.www.compare.dataset.Dataset;
-import org.yeastrc.www.compare.dataset.SelectableDataset;
 
 /**
  * 
  */
-public class ProteinDatasetComparisonFilters {
+public class DatasetBooleanFilters {
 
     private List<Dataset> andFilters;
     private List<Dataset> orFilters;
     private List<Dataset> notFilters;
     private List<Dataset> xorFilters;
     
-    public ProteinDatasetComparisonFilters() {
+    public DatasetBooleanFilters() {
         andFilters = new ArrayList<Dataset>();
         orFilters = new ArrayList<Dataset>();
         notFilters = new ArrayList<Dataset>();

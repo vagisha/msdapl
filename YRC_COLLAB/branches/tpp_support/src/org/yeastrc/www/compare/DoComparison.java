@@ -7,8 +7,6 @@
 package org.yeastrc.www.compare;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -29,11 +27,12 @@ import org.yeastrc.jobqueue.MSJobFactory;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
-import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferSpectrumMatchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
-import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.ms.util.TimeUtils;
+import org.yeastrc.www.compare.ProteinDatasetComparer.PARSIM;
 import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetBuilder;
 import org.yeastrc.www.compare.dataset.DatasetSource;
@@ -100,12 +99,7 @@ public class DoComparison extends Action {
                 ((ProteinferDataset)dataset).setProteinFilterCriteria(myForm.getFilterCriteria());
             }
             else if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
-                ProteinProphetFilterCriteria filterCriteria = new ProteinProphetFilterCriteria(myForm.getFilterCriteria());
-                double minProbability = ((ProteinProphetDataset)dataset).getRoc().getMinProbabilityForError(myForm.getErrorRateDouble());
-                if(myForm.getUseProteinGroupProbability())
-                    filterCriteria.setMinGroupProbability(minProbability);
-                else filterCriteria.setMinProteinProbability(minProbability);
-                ((ProteinProphetDataset)dataset).setProteinFilterCriteria(filterCriteria);
+                ((ProteinProphetDataset)dataset).setProteinFilterCriteria(myForm.getProteinProphetFilterCriteria(dataset));
             }
             datasets.add(dataset);
         }
@@ -120,54 +114,50 @@ public class DoComparison extends Action {
             }
         }
         
-        // ANY AND, OR, NOT, XOR filters
-        ProteinDatasetComparisonFilters filters = myForm.getSelectedBooleanFilters();
-        
-        
         // Do the comparison
         long s = System.currentTimeMillis();
-        ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, myForm.getParsimoniousParam());
+        ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, 
+        		PARSIM.getForValue(myForm.getParsimoniousParam()));
         long e = System.currentTimeMillis();
         log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
-        // If the user is searching for some proteins by name, filter the list
-        String searchString = myForm.getAccessionLike();
-        if(searchString != null && searchString.trim().length() > 0) {
-            ProteinDatasetComparer.instance().applySearchNameFilter(comparison, searchString);
-        }
         
-        // If the user is searching for some proteins by description, filter the list
-        String descSearchString = myForm.getDescriptionLike();
-        if(descSearchString != null && descSearchString.trim().length() > 0) {
-            ProteinDatasetComparer.instance().applyDescriptionFilter(comparison, descSearchString);
-        }
-        
+        // ANY AND, OR, NOT, XOR filters
+        DatasetBooleanFilters filters = myForm.getSelectedBooleanFilters();
         // Apply AND, OR, NOT, XOR filters
         s = System.currentTimeMillis();
-        ProteinDatasetComparer.instance().applyFilters(comparison, filters); // now apply all the filters
+        ProteinDatasetBooleanFilterer.getInstance().applyBooleanFilters(comparison, filters);
         e = System.currentTimeMillis();
-        log.info("Time to filter results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        log.info("Time to apply boolean filters: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
-        
-        // GO ENRICHMENT ANALYSIS?
+        // If the user requested GO enrichment we will not group indistinguishable proteins even if that
+        // option was checked in the form. For GO enrichment we only care about a list of proteins
         if(myForm.isGoEnrichment()) {
-            log.info("DOING GENE ONTOLOGY ENRICHMENT ANALYSIS...");
-            comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
-            request.setAttribute("comparisonForm", myForm);
-            request.setAttribute("comparisonDataset", comparison);
-            return mapping.findForward("GOAnalysis");
+        	myForm.setGroupIndistinguishableProteins(false);
         }
         
-        
+        // Indistinguishable proteins are NOT being grouped.
         if(!myForm.getGroupIndistinguishableProteins()) {
-            // Sort by peptide count
-            s = System.currentTimeMillis();
-            ProteinDatasetSorter sorter = ProteinDatasetSorter.instance();
-            sorter.sortByPeptideCount(comparison);
-            e = System.currentTimeMillis();
-            log.info("Time to sort results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        	
+        	// apply other filters
+        	ProteinPropertiesFilterer.getInstance().applyProteinPropertiesFilters(comparison.getProteins(), 
+        			myForm.getProteinPropertiesFilters(), datasets);
+        	
+        	// sorting order
+            comparison.setSortBy(myForm.getSortBy());
+            comparison.setSortOrder(myForm.getSortOrder());
             
-            comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
+        	comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
+        	
+        	// If User requested GO enrichment analysis forward to another action class
+        	// GO ENRICHMENT ANALYSIS?
+            if(myForm.isGoEnrichment()) {
+                log.info("DOING GENE ONTOLOGY ENRICHMENT ANALYSIS...");
+                comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
+                request.setAttribute("comparisonForm", myForm);
+                request.setAttribute("comparisonDataset", comparison);
+                return mapping.findForward("GOAnalysis");
+            }
             
             // IS THE USER DOWNLOADING?
             if(myForm.isDownload()) {
@@ -177,6 +167,22 @@ public class DoComparison extends Action {
                 return mapping.findForward("Download");
             }
             
+        	// sort the results
+        	s = System.currentTimeMillis();
+        	
+        	ComparisonProteinSorter sorter = ComparisonProteinSorter.getInstance();
+        	SORT_BY sortBy = myForm.getSortBy();
+            SORT_ORDER sortOrder = myForm.getSortOrder();
+        	if(sortBy == SORT_BY.MOL_WT)
+                sorter.sortByMolecularWeight(comparison.getProteins(), sortOrder);
+            else if (sortBy == SORT_BY.PI)
+                sorter.sortByPi(comparison.getProteins(), sortOrder);
+            else
+                sorter.sortByPeptideCount(comparison.getProteins(), sortOrder);
+            
+            e = System.currentTimeMillis();
+            log.info("Time to sort results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        	
             // Set the page number
             comparison.setCurrentPage(myForm.getPageNum());
             
@@ -186,16 +192,26 @@ public class DoComparison extends Action {
                 request.setAttribute("chart", googleChartUrl);
             }
             
+            comparison.setShowFullDescriptions(myForm.isShowFullDescriptions());
+            
             // create a list of the dataset ids being compared
             request.setAttribute("datasetIds", makeCommaSeparated(allRunIds));
             
             request.setAttribute("comparison", comparison);
+            request.setAttribute("speciesIsYeast", isSpeciesYeast(datasets));
             return mapping.findForward("ProteinList");
         }
         
-        
-        
         else {
+        	
+        	// If the user IS NOT interested in keeping protein groups intact after filtering 
+            // apply filters now
+        	if(!myForm.isKeepProteinGroups()) {
+        		ProteinPropertiesFilterer.getInstance().applyProteinPropertiesFilters(comparison.getProteins(), 
+            			myForm.getProteinPropertiesFilters(), datasets);
+        	}
+        	
+        	// Do graph analysis to get indistinguishable protein groups
             s = System.currentTimeMillis();
             GraphBuilder graphBuilder = new GraphBuilder();
             BipartiteGraph<ComparisonProteinGroup, PeptideVertex> graph = 
@@ -212,13 +228,6 @@ public class DoComparison extends Action {
             int groupId = 1;
             for(ComparisonProteinGroup group: proteinGroups)
                 group.setGroupId(groupId++);
-            // sort
-            Collections.sort(proteinGroups, new Comparator<ComparisonProteinGroup>() {
-                @Override
-                public int compare(ComparisonProteinGroup o1,
-                        ComparisonProteinGroup o2) {
-                    return Integer.valueOf(o2.getMaxPeptideCount()).compareTo(o1.getMaxPeptideCount());
-                }});
             
             // remove protein groups that do not have any parsimonious proteins
             Iterator<ComparisonProteinGroup> iter = proteinGroups.iterator();
@@ -232,26 +241,41 @@ public class DoComparison extends Action {
             e = System.currentTimeMillis();
             log.info("Time to do graph analysis: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
             
+            // If the user IS interested in keeping protein groups intact after filtering 
+            // apply filters now
+            if(myForm.isKeepProteinGroups()) {
+            	ProteinPropertiesFilterer.getInstance().applyProteinPropertiesFiltersToGroup(proteinGroups, 
+            			myForm.getProteinPropertiesFilters(), datasets);
+            }
+            
+            // Sort the results
+            s = System.currentTimeMillis();
+            
+            ComparisonProteinSorter sorter = ComparisonProteinSorter.getInstance();
+            SORT_BY sortBy = myForm.getSortBy();
+            SORT_ORDER sortOrder = myForm.getSortOrder();
+            if(sortBy == SORT_BY.MOL_WT)
+                sorter.sortGroupsByMolecularWeight(proteinGroups, sortOrder);
+            else if (sortBy == SORT_BY.PI)
+                sorter.sortGroupsByPi(proteinGroups, sortOrder);
+            else
+                sorter.sortGroupsByPeptideCount(proteinGroups, sortOrder);
+            
+            e = System.currentTimeMillis();
+            log.info("Time to sort results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+            
+            // Create the group comparison dataset
             ProteinGroupComparisonDataset grpComparison = new ProteinGroupComparisonDataset();
             for(ComparisonProteinGroup grp: proteinGroups)
                 grpComparison.addProteinGroup(grp);
             
             grpComparison.setDatasets(datasets);
             
-            
-            // set the information for displaying normalized spectrum counts
-            ProteinferSpectrumMatchDAO specDao = ProteinferDAOFactory.instance().getProteinferSpectrumMatchDao();
-            for(Dataset dataset: grpComparison.getDatasets()) {
-                if(dataset.getSource() != DatasetSource.DTA_SELECT) {
-                    int spectrumCount = specDao.getSpectrumCountForPinferRun(dataset.getDatasetId());
-                    dataset.setSpectrumCount(spectrumCount);
-                }
-            }
-            
             grpComparison.initSummary(); // initialize the summary -- 
                                         // (totalProteinCount, # common proteins)
                                         // spectrum count normalization factors
                                         // calculate min/max normalized spectrum counts for scaling
+            
             
             // IS THE USER DOWNLOADING?
             if(myForm.isDownload()) {
@@ -263,6 +287,10 @@ public class DoComparison extends Action {
             
             // Set the page number
             grpComparison.setCurrentPage(myForm.getPageNum());
+            
+            // sorting order
+            grpComparison.setSortBy(myForm.getSortBy());
+            grpComparison.setSortOrder(myForm.getSortOrder());
             
             
             // Create Venn Diagram only if 2 or 3 datasets are being compared

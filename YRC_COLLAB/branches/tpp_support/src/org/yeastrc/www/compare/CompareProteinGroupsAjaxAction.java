@@ -19,16 +19,16 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
+import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
 import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetSource;
-import org.yeastrc.www.compare.util.FastaProteinLookupUtil;
-import org.yeastrc.www.compare.util.ProteinListing;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
@@ -136,8 +136,10 @@ public class CompareProteinGroupsAjaxAction extends Action{
                 
                 StringBuilder buf = new StringBuilder();
                 for(int nrseqId: groupNrseqIds) {
-                    ProteinListing listing = FastaProteinLookupUtil.getInstance().getProteinListing(nrseqId, dbIds);
-                    buf.append(", "+listing.getOneName());
+                	List<NrDbProtein> prots = NrSeqLookupUtil.getDbProteins(nrseqId, dbIds);
+                	// There may be multiple entries for the given nrseqId, display the first one only
+                	if(prots != null && prots.size() >0)
+                		buf.append(", "+prots.get(0).getAccessionString());
                 }
                 if(buf.length() > 0) buf.deleteCharAt(0);
                 groupProteinNames.add(buf.toString());

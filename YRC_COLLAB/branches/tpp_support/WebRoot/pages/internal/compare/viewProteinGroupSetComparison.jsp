@@ -62,7 +62,8 @@
 $(document).ready(function() {
 	
     
-   $("#compare_results_pager").attr('width', "80%").attr('align', 'center');
+   $("#compare_results_page1").attr('width', "80%").attr('align', 'center');
+   $("#compare_results_page2").attr('width', "80%").attr('align', 'center');
    
    var colCount = <%=comparison.tableHeaders().size()%>
    $("#compare_results").each(function() {
@@ -93,7 +94,7 @@ $(document).ready(function() {
    					else {
    						// append a div to the description cell for the protein groups to go into
    						var newDiv = "<div align='center' width='90%' style='margin-top:5px; margin-bottom:5px' id='proteins_"+nrseqId+"' class='prot_groups'></div></td></tr>"
-   						$(row).children(".prot_descr").append(newDiv);
+   						$(row).children(".prot_accession").append(newDiv);
    						
    						// send a request for the peptides
    						$.blockUI();
@@ -110,7 +111,7 @@ $(document).ready(function() {
    				else {
    					$(row).removeClass('prot_open');
    					$(row).addClass('prot_closed');
-   					$(row).children(".prot_descr").children(".prot_groups").hide();
+   					$(row).children(".prot_accession").children(".prot_groups").hide();
    				}
    			});
    		});
@@ -461,7 +462,7 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 
 <!-- PAGE RESULTS -->
 <bean:define name="comparison" id="pageable" />
-<table id="compare_results_pager">
+<table id="compare_results_pager1">
 <tr>
 <td>
 <%@include file="/pages/internal/pager.jsp" %>
@@ -474,6 +475,13 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 <yrcwww:table name="comparison" tableId='compare_results' tableClass="table_compare_grp" center="true" />
 </div>
 
+<table id="compare_results_pager2">
+<tr>
+<td>
+<%@include file="/pages/internal/pager.jsp" %>
+</td>
+</tr>
+</table>
 </yrcwww:contentbox>
 
 </CENTER>
