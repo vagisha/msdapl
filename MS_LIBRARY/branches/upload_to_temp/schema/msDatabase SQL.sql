@@ -221,7 +221,7 @@ ALTER TABLE msRunSearchResult ADD INDEX(runSearchID);
 ALTER TABLE msRunSearchResult ADD INDEX(scanID);
 # ALTER TABLE msRunSearchResult ADD INDEX(charge);
 ALTER TABLE msRunSearchResult ADD INDEX(peptide(10));
-alter table msRunSearchResult add index (runSearchID, scanID);
+ALTER TABLE msRunSearchResult add index (runSearchID, scanID);
 # DO I WANT ALL THESE INDICES?
 
 CREATE TABLE msProteinMatch (
@@ -513,7 +513,7 @@ CREATE TABLE msProteinInferProtein (
 );
 ALTER TABLE  msProteinInferProtein ADD INDEX (piRunID);
 ALTER TABLE  msProteinInferProtein ADD INDEX (nrseqProteinID);
-alter table msProteinInferProtein add index (nrseqProteinID, piRunID);
+ALTER TABLE msProteinInferProtein add index (nrseqProteinID, piRunID);
 
 
 CREATE TABLE msProteinInferPeptide (

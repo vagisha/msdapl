@@ -6,14 +6,14 @@
  */
 package org.yeastrc.ms.util;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * 
  */
 public class StringUtils {
 
-    public static <T extends Object>  String makeCommaSeparated(List<T> entries) {
+    public static <T extends Object>  String makeCommaSeparated(Collection<T> entries) {
         StringBuilder buf = new StringBuilder();
         for(T entry: entries)
             buf.append(","+entry.toString());
@@ -23,7 +23,7 @@ public class StringUtils {
         return buf.toString();
     }
     
-    public static <T extends Object>  String makeQuotedCommaSeparated(List<T> entries) {
+    public static <T extends Object>  String makeQuotedCommaSeparated(Collection<T> entries) {
         StringBuilder buf = new StringBuilder();
         for(T entry: entries)
             buf.append(",'"+entry.toString()+"'");
