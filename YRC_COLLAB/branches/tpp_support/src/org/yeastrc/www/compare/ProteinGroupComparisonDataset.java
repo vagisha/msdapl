@@ -28,7 +28,7 @@ import org.yeastrc.nrseq.FastaProteinLookupUtil;
 import org.yeastrc.nrseq.ProteinCommonReference;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.nrseq.ProteinListingBuilder;
-import org.yeastrc.nrseq.ProteinNameDescription;
+import org.yeastrc.nrseq.ProteinReference;
 import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
 import org.yeastrc.www.compare.dataset.DatasetSource;
@@ -454,7 +454,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     
     private String getExternalLinks(ComparisonProtein protein) {
 		
-		List<ProteinNameDescription> references;
+		List<ProteinReference> references;
 		try {
 			references = protein.getExternalReferences();
 		} catch (SQLException e) {
@@ -462,7 +462,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 			return "ERROR";
 		}
 		String contents = "";
-		for(ProteinNameDescription ref: references) {
+		for(ProteinReference ref: references) {
 			String dbName;
 			try {
 				dbName = ref.getDatabaseName();
@@ -483,8 +483,8 @@ private String getDescriptionContents(ComparisonProtein protein) {
         fullContents += "<span style=\"display:none;\" class=\"full_description\">";
         String shortContents = "";
         shortContents += "<span class=\"short_name clickable underline\">";
-        List<ProteinNameDescription> allReferences;
-        List<ProteinNameDescription> fourReferences;
+        List<ProteinReference> allReferences;
+        List<ProteinReference> fourReferences;
 		try {
 			allReferences = protein.getDescriptionReferences();
 			fourReferences = protein.getFourDescriptionReferences();
@@ -492,14 +492,14 @@ private String getDescriptionContents(ComparisonProtein protein) {
 			log.error("Error getting description", e);
 			return "ERROR";
 		}
-        for(ProteinNameDescription ref: allReferences) {
+        for(ProteinReference ref: allReferences) {
         	String dbName = null;
         	try {dbName = ref.getDatabaseName();}
         	catch(SQLException e){log.error("Error getting database name"); dbName="ERROR";}
         	fullContents += "<span style=\"color:#000080;\"<b>["+dbName+"]</b></span>&nbsp;&nbsp;"+ref.getDescription();
         	fullContents += "<br>";
         }
-        for(ProteinNameDescription ref: fourReferences) {
+        for(ProteinReference ref: fourReferences) {
         	String dbName = null;
         	try {dbName = ref.getDatabaseName();}
         	catch(SQLException e){log.error("Error getting database name"); dbName="ERROR";}
@@ -533,14 +533,14 @@ private String getDescriptionContents(ComparisonProtein protein) {
         String shortContents = "";
         shortContents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+"\")";
         shortContents += " class=\"short_name clickable underline\">";
-        List<ProteinNameDescription> references;
+        List<ProteinReference> references;
 		try {
 			references = protein.getFastaReferences();
 		} catch (SQLException e) {
 			log.error("Error getting accession", e);
 			return "ERROR";
 		}
-        for(ProteinNameDescription ref: references) {
+        for(ProteinReference ref: references) {
         	fullContents += ref.getAccession();
         	shortContents += ref.getShortAccession();
         }

@@ -21,19 +21,19 @@ public class ProteinListing {
 
     private int nrseqProteinId;
     private List<ProteinCommonReference> commonReferences;
-    private List<ProteinNameDescription> references;
+    private List<ProteinReference> references;
     
     
     public ProteinListing(int nrseqId) {
     	this.nrseqProteinId = nrseqId;
     	commonReferences = new ArrayList<ProteinCommonReference>();
-    	references = new ArrayList<ProteinNameDescription>();
+    	references = new ArrayList<ProteinReference>();
     }
-    public void addReference(ProteinNameDescription reference) {
+    public void addReference(ProteinReference reference) {
     	references.add(reference);
     }
     
-    public List<ProteinNameDescription> getReferences() {
+    public List<ProteinReference> getReferences() {
     	return this.references;
     }
     
@@ -49,11 +49,11 @@ public class ProteinListing {
     	return this.commonReferences.size();
     }
     
-    public List<ProteinNameDescription> getUniqueReferencesForNonStandardDatabases() throws SQLException {
+    public List<ProteinReference> getUniqueReferencesForNonStandardDatabases() throws SQLException {
     	
-    	List<ProteinNameDescription> refs = new ArrayList<ProteinNameDescription>();
+    	List<ProteinReference> refs = new ArrayList<ProteinReference>();
     	Set<String> seen = new HashSet<String>();
-    	for(ProteinNameDescription ref: this.references) {
+    	for(ProteinReference ref: this.references) {
     		if(StandardDatabase.isStandardDatabase(ref.getDatabaseName()))
     			continue;
     		if(seen.contains(ref.getAccession()))
@@ -64,11 +64,11 @@ public class ProteinListing {
     	return refs;
     }
     
-    public List<ProteinNameDescription> getUniqueExternalReferences() throws SQLException {
+    public List<ProteinReference> getUniqueExternalReferences() throws SQLException {
     	
-    	List<ProteinNameDescription> refs = new ArrayList<ProteinNameDescription>();
+    	List<ProteinReference> refs = new ArrayList<ProteinReference>();
     	Set<Integer> seen = new HashSet<Integer>();
-    	for(ProteinNameDescription ref: this.references) {
+    	for(ProteinReference ref: this.references) {
     		if(ref.getUrl() == null) // no link to an external source
     			continue;
     		if(seen.contains(ref.getDatabaseId()))
@@ -80,11 +80,11 @@ public class ProteinListing {
     }
     
     
-    public List<ProteinNameDescription> getReferencesForUniqueDescriptions() {
+    public List<ProteinReference> getReferencesForUniqueDescriptions() {
     	
     	Set<String> seen = new HashSet<String>();
-    	List<ProteinNameDescription> unique = new ArrayList<ProteinNameDescription>();
-    	for(ProteinNameDescription ref: references) {
+    	List<ProteinReference> unique = new ArrayList<ProteinReference>();
+    	for(ProteinReference ref: references) {
     		if(seen.contains(ref.getDescription()))
     			continue;
     		seen.add(ref.getDescription());
@@ -93,10 +93,10 @@ public class ProteinListing {
     	return unique;
     }
     
-    List<ProteinNameDescription> getReferencesForDatabase(String dbName) throws SQLException {
+    List<ProteinReference> getReferencesForDatabase(String dbName) throws SQLException {
     	
-    	List<ProteinNameDescription> refs = new ArrayList<ProteinNameDescription>();
-    	for(ProteinNameDescription ref: references) {
+    	List<ProteinReference> refs = new ArrayList<ProteinReference>();
+    	for(ProteinReference ref: references) {
     		if(ref.getDatabaseName().equals(dbName))
     			refs.add(ref);
     	}
@@ -105,9 +105,9 @@ public class ProteinListing {
     
     List<String> getAccessionsForDatabase(String databaseName) throws SQLException {
     	
-    	List<ProteinNameDescription> refs = getReferencesForDatabase(databaseName);
+    	List<ProteinReference> refs = getReferencesForDatabase(databaseName);
     	Set<String> accessions = new HashSet<String>();
-    	for(ProteinNameDescription ref: refs) {
+    	for(ProteinReference ref: refs) {
     		accessions.add(ref.getAccession());
     	}
     	return new ArrayList<String>(accessions);
@@ -115,9 +115,9 @@ public class ProteinListing {
     
     List<String> getAccessionsForNotStandardDatabases() throws SQLException {
     	
-    	List<ProteinNameDescription> refs = getUniqueReferencesForNonStandardDatabases();
+    	List<ProteinReference> refs = getUniqueReferencesForNonStandardDatabases();
     	Set<String> accessions = new HashSet<String>();
-    	for(ProteinNameDescription ref: refs) {
+    	for(ProteinReference ref: refs) {
     		accessions.add(ref.getAccession());
     	}
     	return new ArrayList<String>(accessions);

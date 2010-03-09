@@ -13,7 +13,7 @@ import java.util.List;
 import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.nrseq.ProteinCommonReference;
 import org.yeastrc.nrseq.ProteinListing;
-import org.yeastrc.nrseq.ProteinNameDescription;
+import org.yeastrc.nrseq.ProteinReference;
 import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
 
@@ -117,28 +117,28 @@ public class ComparisonProtein {
         return molecularWeight != -1.0f && pi != -1.0;
     }
     
-    public List<ProteinNameDescription> getFastaReferences() throws SQLException {
+    public List<ProteinReference> getFastaReferences() throws SQLException {
     	return listing.getUniqueReferencesForNonStandardDatabases();
     }
     
     public String getAccessionsCommaSeparated() throws SQLException {
     	List<String> accessions = new ArrayList<String>();
-    	List<ProteinNameDescription> refs = getFastaReferences();
-    	for(ProteinNameDescription ref: refs)
+    	List<ProteinReference> refs = getFastaReferences();
+    	for(ProteinReference ref: refs)
     		accessions.add(ref.getAccession());
     	return StringUtils.makeCommaSeparated(accessions);
     }
     
-    public List<ProteinNameDescription> getExternalReferences() throws SQLException {
+    public List<ProteinReference> getExternalReferences() throws SQLException {
     	return listing.getUniqueExternalReferences();
     }
     
-    public List<ProteinNameDescription> getDescriptionReferences() throws SQLException {
+    public List<ProteinReference> getDescriptionReferences() throws SQLException {
     	return listing.getReferencesForUniqueDescriptions();
     }
     
-    public List<ProteinNameDescription> getFourDescriptionReferences() throws SQLException {
-    	List<ProteinNameDescription> refs = listing.getReferencesForUniqueDescriptions();
+    public List<ProteinReference> getFourDescriptionReferences() throws SQLException {
+    	List<ProteinReference> refs = listing.getReferencesForUniqueDescriptions();
     	int min = Math.min(4, refs.size());
     	return refs.subList(0, min);
     }

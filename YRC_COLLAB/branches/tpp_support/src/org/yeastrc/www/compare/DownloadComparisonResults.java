@@ -23,7 +23,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.util.TimeUtils;
-import org.yeastrc.nrseq.ProteinNameDescription;
+import org.yeastrc.nrseq.ProteinReference;
 import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
@@ -396,7 +396,7 @@ public class DownloadComparisonResults extends Action {
             }
         }
         if(printDescription) {
-        	List<ProteinNameDescription> descRefs = new ArrayList<ProteinNameDescription>();
+        	List<ProteinReference> descRefs = new ArrayList<ProteinReference>();
         	try {
         		descRefs = protein.getDescriptionReferences();
         	} catch (SQLException e) {
@@ -447,7 +447,7 @@ public class DownloadComparisonResults extends Action {
                 piString += ","+protein.getPi();
                 
                 if(includeDescription) {
-                	List<ProteinNameDescription> descRefs = new ArrayList<ProteinNameDescription>();
+                	List<ProteinReference> descRefs = new ArrayList<ProteinReference>();
                 	try {
                 		descRefs = protein.getDescriptionReferences();
                 	} catch (SQLException e) {

@@ -14,7 +14,7 @@ import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 /**
  * 
  */
-public class ProteinNameDescription {
+public class ProteinReference {
 
 	private int databaseId;
 	private String databaseName;
@@ -23,10 +23,10 @@ public class ProteinNameDescription {
 	private String accession;
 	private String description;
     
-	public ProteinNameDescription() {}
+	public ProteinReference() {}
 	
 
-	public ProteinNameDescription(NrDbProtein protein) {
+	public ProteinReference(NrDbProtein protein) {
     	this.databaseId = protein.getDatabaseId();
     	this.isCurrent = protein.isCurrent();
     	this.url = protein.getUrl();

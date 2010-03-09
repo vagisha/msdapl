@@ -84,7 +84,7 @@ public class ProteinListingBuilder {
 		List<NrDbProtein> matchingProteins = NrSeqLookupUtil.getDbProteins(nrseqId, fastaDatabaseIds);
 		for(NrDbProtein prot: matchingProteins) {
 			if(prot.isCurrent()) // add only current references
-				listing.addReference(new ProteinNameDescription(prot));
+				listing.addReference(new ProteinReference(prot));
 		}
 		
 		// now do a lookup for the given standard databases
@@ -100,7 +100,7 @@ public class ProteinListingBuilder {
 				matchingProteins = NrSeqLookupUtil.getDbProteins(nrseqId, db.getId());
 				for(NrDbProtein prot: matchingProteins) {
 					if(prot.isCurrent()) // add only current references
-						listing.addReference(new ProteinNameDescription(prot));
+						listing.addReference(new ProteinReference(prot));
 				}
 			}
 		}
@@ -126,14 +126,14 @@ public class ProteinListingBuilder {
 			List<ProteinCommonReference> commonRefs = null;
 			// TODO This is temporary till I figure out how HGNC lookups should work
 			if(db == StandardDatabase.HGNC) {
-				List<ProteinNameDescription> refs = null;
+				List<ProteinReference> refs = null;
 				try {
 					refs = listing.getReferencesForDatabase(db.getDatabaseName());
 				} catch (SQLException e) {
 					log.error("Error getting references for database: "+db.getDatabaseName(), e);
 				}
 				if(refs != null) {
-					for(ProteinNameDescription ref: refs) {
+					for(ProteinReference ref: refs) {
 						ProteinCommonReference cref = new ProteinCommonReference();
 						cref.setDatabase(db);
 						cref.setName(ref.getAccession());
