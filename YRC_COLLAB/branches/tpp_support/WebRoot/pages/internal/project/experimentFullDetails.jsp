@@ -110,7 +110,7 @@
 				</b>
 			</td>
 			<td width="33%">
-				<b><a href="<yrcwww:link path='newPercolatorProteinInference.do?'/>searchAnalysisId=<bean:write name='analysis' property='id' />&projectId=<bean:write name='project' property='ID'/>"> 
+				<b><a href="<yrcwww:link path='newPercolatorProteinInference.do?'/>searchAnalysisId=<bean:write name='analysis' property='id' />&projectId=<bean:write name='experiment' property='projectId'/>"> 
 				[Infer Proteins]</a></b>
 			</td>
 			</logic:equal>
@@ -270,13 +270,13 @@
 			</logic:equal>
 			<!-- Job FAILED -->
 			<logic:equal name="piJob" property="job.failed" value="true">
-				<a href="<yrcwww:link path='viewProteinInferenceJob.do?'/>pinferId=<bean:write name='piJob' property='job.pinferId'/>&projectId=<bean:write name='project' property='ID'/>">
+				<a href="<yrcwww:link path='viewProteinInferenceJob.do?'/>pinferId=<bean:write name='piJob' property='job.pinferId'/>&projectId=<bean:write name='experiment' property='projectId'/>">
 				<b><font color="red"><bean:write name="piJob" property="job.statusDescription"/></font></b>
 				</a>
 			</logic:equal>
 			<!-- Job RUNNING -->
 			<logic:equal name="piJob" property="job.running" value="true">
-				<a href="<yrcwww:link path='viewProteinInferenceJob.do?'/>pinferId=<bean:write name='piJob' property='job.pinferId'/>&projectId=<bean:write name='project' property='ID'/>">
+				<a href="<yrcwww:link path='viewProteinInferenceJob.do?'/>pinferId=<bean:write name='piJob' property='job.pinferId'/>&projectId=<bean:write name='experiment' property='projectId'/>">
 				<b><font color="#000000"><bean:write name="piJob" property="job.statusDescription"/></font></b>
 				</a>
 			</logic:equal>

@@ -29,7 +29,9 @@ import org.yeastrc.yates.YatesRun;
  */
 public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperiment>, Tabular {
 
-    private final MsExperiment experiment;
+	private int projectId;
+
+	private final MsExperiment experiment;
     private List<MsFile> ms1Files;
     private List<MsFile> ms2Files;
     private List<ExperimentSearch> searches;
@@ -52,6 +54,14 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     public boolean getHasFullInformation() {
     	return this.hasFullInformation;
     }
+    
+    public int getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(int projectId) {
+		this.projectId = projectId;
+	}
     
     public int getUploadJobId() {
         return uploadJobId;

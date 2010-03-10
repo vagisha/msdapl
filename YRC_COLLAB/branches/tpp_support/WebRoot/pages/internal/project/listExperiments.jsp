@@ -395,8 +395,17 @@ function confirmDeleteExperiment(experimentId) {
 	<logic:notEmpty name="experiments">
 		
 		<bean:size name="experiments" id="exptCount"/>
-		<logic:greaterThan name="exptCount" value="5">
-		<div align="center">Available Experiments</div>
+		<logic:greaterThan name="exptCount" value="1">
+		
+		<div style="border:1px dotted gray;margin:5 5 5 5; padding:0 0 5 0;">
+		<div style="background-color:#ED9A2E;width:100%; margin:0; padding:3 0 3 0; color:white;" >
+		<span style="margin-left:10;" 
+			  class="foldable fold-close" id="exptlist_fold">
+				&nbsp;&nbsp;&nbsp;&nbsp;
+		</span>
+		<span style="padding-left:10;"><b>All Available Experiments</b></span>
+		</div>
+		<div id="exptlist_fold_target" style="display:none; padding:10 0 5 0;"> 
 		<table class="table_basic stripe_table sortable" align="center">
 			<thead>
 				<tr>
@@ -418,6 +427,8 @@ function confirmDeleteExperiment(experimentId) {
 				</logic:iterate>
 			</tbody>
 		</table>
+		</div>
+		</div>
 		</logic:greaterThan>
 		<br/>
 		

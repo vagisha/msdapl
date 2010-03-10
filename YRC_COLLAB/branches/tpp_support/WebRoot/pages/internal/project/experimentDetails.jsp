@@ -22,7 +22,6 @@
 				<span style="margin-left:10;" 
 				      class="foldable fold-open" id="expt_fold_<bean:write name="experiment" property="id"/>" 
 				      onclick="showExperimentDetails(<bean:write name="experiment" property="id"/>)">
-				      >
 				&nbsp;&nbsp;&nbsp;&nbsp;</span>
 				</logic:equal>
 				
