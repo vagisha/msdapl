@@ -145,7 +145,7 @@ public class ViewProjectAction extends Action {
 		request.setAttribute("writeAccess", writeAccess);
 		
 		// Check for experiment data for this project
-		List<ProjectExperiment> experiments = getProjectExperiments(projectID);
+		List<ProjectExperiment> experiments = getProjectExperiments(projectID, 5); // get the last 5 uploaded
 		
 		
 		// load the dtaselect results;
@@ -198,10 +198,10 @@ public class ViewProjectAction extends Action {
 	}
 
 
-    private List<ProjectExperiment> getProjectExperiments(int projectId) throws Exception {
+    private List<ProjectExperiment> getProjectExperiments(int projectId, int limitCount) throws Exception {
         
         List<Integer> experimentIds = ProjectExperimentDAO.instance().getExperimentIdsForProject(projectId);
-        Collections.sort(experimentIds);
+        Collections.sort(experimentIds, Collections.reverseOrder());
         
         if(experimentIds.size() == 0)
             return new ArrayList<ProjectExperiment>(0);
@@ -209,7 +209,9 @@ public class ViewProjectAction extends Action {
         
         List<ProjectExperiment> experiments = new ArrayList<ProjectExperiment>(experimentIds.size());
         
+        int count = 0;
         for(int experimentId: experimentIds) {
+        	
             MsExperiment expt = daoFactory.getMsExperimentDAO().loadExperiment(experimentId);
             
             // First check if this experiment is still getting uploaded
@@ -229,6 +231,16 @@ public class ViewProjectAction extends Action {
             pExpt.setUploadJobId(job.getId());
             if(status != JobUtils.STATUS_COMPLETE)
                 pExpt.setUploadSuccess(false);
+            
+            experiments.add(pExpt);
+            
+            count++;
+            if(count > limitCount) {
+            	pExpt.setHasFullInformation(false);
+            	continue; // don't get the details if we have hit the limit
+            }
+            else
+            	pExpt.setHasFullInformation(true);
             
             // load the searches
             List<Integer> searchIds = daoFactory.getMsSearchDAO().getSearchIdsForExperiment(experimentId);
@@ -290,11 +302,9 @@ public class ViewProjectAction extends Action {
             }
             pExpt.setProtInferRuns(piRuns);
             
-            experiments.add(pExpt);
         }
         return experiments;
     }
-    
     
     private ExperimentSearch getExperimentSearch(int searchId) {
         
@@ -322,6 +332,8 @@ public class ViewProjectAction extends Action {
         // Create a map of searchId and experimentId
         Map<Integer, Integer> searchIdToExperimentId = new HashMap<Integer, Integer>();
         for(ProjectExperiment experiment: experiments) {
+        	if(!experiment.getHasFullInformation())
+        		continue;
             for(ExperimentSearch search: experiment.getSearches())
                 searchIdToExperimentId.put(search.getId(), experiment.getId());
         }

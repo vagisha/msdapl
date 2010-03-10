@@ -308,6 +308,11 @@
 		type="org.yeastrc.www.project.experiment.ViewExperimentFilesAjaxAction">
 		<forward name="Success" path="/pages/internal/project/experimentFiles.jsp" redirect="false" />
 	</action>
+	
+	<action path="/getDetailsForExperiment"
+		type="org.yeastrc.www.project.experiment.ViewExperimentDetailsAjaxAction">
+		<forward name="Success" path="/pages/internal/project/experimentFullDetails.jsp" redirect="false" />
+	</action>
 
 	
 	<action

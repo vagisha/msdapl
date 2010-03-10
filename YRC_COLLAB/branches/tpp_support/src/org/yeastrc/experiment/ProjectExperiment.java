@@ -38,10 +38,20 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     private List<ExperimentProteinProphetRun> prophetRuns;
     private List<ExperimentProteinferRun> protInferRuns;
     
+    private boolean hasFullInformation = false;
+    
     private List<TableRow> rows;
     
     private boolean uploadSuccess = true;
     private int uploadJobId;
+    
+    public void setHasFullInformation(boolean full) {
+    	this.hasFullInformation = full;
+    }
+    
+    public boolean getHasFullInformation() {
+    	return this.hasFullInformation;
+    }
     
     public int getUploadJobId() {
         return uploadJobId;

@@ -55,7 +55,7 @@ import org.yeastrc.yates.YatesRunMsSearchLinker;
  */
 public class ViewExperimentFilesAjaxAction extends Action {
 
-private static DAOFactory daoFactory = DAOFactory.instance();
+	private static DAOFactory daoFactory = DAOFactory.instance();
     
     public ActionForward execute( ActionMapping mapping,
                                   ActionForm form,
