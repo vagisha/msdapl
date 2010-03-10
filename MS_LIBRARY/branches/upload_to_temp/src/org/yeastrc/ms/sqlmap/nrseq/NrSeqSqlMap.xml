@@ -177,6 +177,14 @@
     	AND description LIKE #description#
     </select>
     
+    <select id="proteinMatchesDescriptionTerm" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT proteinID
+    	FROM tblProteinDatabase 
+    	WHERE proteinID = #nrseqId#
+    	AND description LIKE #description#
+    	LIMIT 1;
+    </select>
+    
     <select id="selectDbProteinIdsForAccession" resultMap="nrDbProtResult" parameterClass="java.util.Map">
     	SELECT * 
     	FROM tblProteinDatabase 

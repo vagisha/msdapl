@@ -409,6 +409,25 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         }
     }
     
+    public static boolean proteinMatchesDescriptionTerm(int nrseqId, String descriptionTerm) {
+    	
+    	 String statementName = "NrSeq.proteinMatchesDescriptionTerm";
+         Map<String, Object> map = new HashMap<String, Object>(4);
+         map.put("nrseqId", nrseqId);
+         map.put("description", "%"+descriptionTerm+"%");
+         
+         try {
+        	 Integer id = (Integer)sqlMap.queryForObject(statementName, map);
+        	 if(id != null && id > 0)
+            	 return true;
+        	 return false;
+         }
+         catch (SQLException e) {
+             log.error("Failed to execute select statement: ", e);
+             throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+         }
+    }
+    
     public static List<NrDbProtein> getDbProteinsForAccession(List<Integer> dbIds, String accession) {
         
         if(dbIds == null || dbIds.size() == 0)
