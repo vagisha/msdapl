@@ -20,6 +20,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
@@ -72,6 +73,7 @@ public class ViewProjectAction extends Action {
 
     
     private static DAOFactory daoFactory = DAOFactory.instance();
+    private static final Logger log = Logger.getLogger(ViewProjectAction.class.getName());
     
 	public ActionForward execute( ActionMapping mapping,
 								  ActionForm form,
@@ -225,7 +227,10 @@ public class ViewProjectAction extends Action {
                    || status == JobUtils.STATUS_PENDING_UPLOAD)
                     continue;
             }
-            catch(Exception e) {continue;} // because job with experimentID does not exist. Should not really happen.
+            catch(Exception e) {
+            	log.error("No job found for experimentID: "+experimentId, e);
+            	continue;
+            } 
             
             ProjectExperiment pExpt = new ProjectExperiment(expt);
             pExpt.setUploadJobId(job.getId());
@@ -341,6 +346,7 @@ public class ViewProjectAction extends Action {
         List<Integer> experimentIds = new ArrayList<Integer>(experiments.size());
         for(ProjectExperiment pe: experiments)
             experimentIds.add(pe.getId());
+        Collections.sort(experimentIds);
         
         
         // put the DTASelect results in the appropriate experiments
@@ -353,9 +359,13 @@ public class ViewProjectAction extends Action {
                 if(experimentId != null) {
                     
                     int idx = Collections.binarySearch(experimentIds, experimentId);
-                    if(idx != -1) {
+                    if(idx >= 0) {
                         ProjectExperiment pe = experiments.get(idx);
                         pe.setDtaSelect(run);
+                    }
+                    else {
+                    	log.error("Could not link DTASelect run to experiment. Yates runID: "
+                    			+runId+"; searchID: "+searchId+"; experimentID: "+experimentId);
                     }
                 }
             }

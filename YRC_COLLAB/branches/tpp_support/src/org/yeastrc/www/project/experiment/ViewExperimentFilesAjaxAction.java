@@ -6,18 +6,15 @@
  */
 package org.yeastrc.www.project.experiment;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -47,8 +44,6 @@ import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-import org.yeastrc.yates.YatesRun;
-import org.yeastrc.yates.YatesRunMsSearchLinker;
 
 /**
  * 
@@ -56,6 +51,7 @@ import org.yeastrc.yates.YatesRunMsSearchLinker;
 public class ViewExperimentFilesAjaxAction extends Action {
 
 	private static DAOFactory daoFactory = DAOFactory.instance();
+    private static final Logger log = Logger.getLogger(ViewExperimentFilesAjaxAction.class.getName());
     
     public ActionForward execute( ActionMapping mapping,
                                   ActionForm form,
@@ -221,39 +217,5 @@ public class ViewExperimentFilesAjaxAction extends Action {
         
         sAnalysis.setFiles(files);
         return sAnalysis;
-    }
-    
-    private void linkExperimentsAndDtaSelect(List<ProjectExperiment> experiments, List<YatesRun> yatesRuns) throws SQLException {
-        
-        // We will get the searchIds from the tblYatesRun* tables
-        // Create a map of searchId and experimentId
-        Map<Integer, Integer> searchIdToExperimentId = new HashMap<Integer, Integer>();
-        for(ProjectExperiment experiment: experiments) {
-            for(ExperimentSearch search: experiment.getSearches())
-                searchIdToExperimentId.put(search.getId(), experiment.getId());
-        }
-        
-        List<Integer> experimentIds = new ArrayList<Integer>(experiments.size());
-        for(ProjectExperiment pe: experiments)
-            experimentIds.add(pe.getId());
-        
-        
-        // put the DTASelect results in the appropriate experiments
-        for(YatesRun run: yatesRuns) {
-            int runId = run.getId();
-            int searchId = YatesRunMsSearchLinker.linkYatesRunToMsSearch(runId);
-
-            if(searchId > 0) {
-                Integer experimentId = searchIdToExperimentId.get(searchId);
-                if(experimentId != null) {
-                    
-                    int idx = Collections.binarySearch(experimentIds, experimentId);
-                    if(idx != -1) {
-                        ProjectExperiment pe = experiments.get(idx);
-                        pe.setDtaSelect(run);
-                    }
-                }
-            }
-        }
     }
 }
