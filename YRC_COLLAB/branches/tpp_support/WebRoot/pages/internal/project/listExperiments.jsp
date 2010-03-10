@@ -394,6 +394,8 @@ function confirmDeleteExperiment(experimentId) {
 
 	<logic:notEmpty name="experiments">
 		
+		<bean:size name="experiments" id="exptCount"/>
+		<logic:greaterThan name="exptCount" value="5">
 		<div align="center">Available Experiments</div>
 		<table class="table_basic stripe_table sortable" align="center">
 			<thead>
@@ -416,7 +418,7 @@ function confirmDeleteExperiment(experimentId) {
 				</logic:iterate>
 			</tbody>
 		</table>
-		
+		</logic:greaterThan>
 		<br/>
 		
 		<logic:iterate name="experiments" id="experiment" scope="request">

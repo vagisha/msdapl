@@ -51,10 +51,12 @@ public class WIdPickerProtein {
     	return listing.getReferencesForUniqueDescriptions();
     }
     
-    public List<ProteinReference> getFourDescriptionReferences() throws SQLException {
-    	List<ProteinReference> refs = listing.getReferencesForUniqueDescriptions();
-    	int min = Math.min(4, refs.size());
-    	return refs.subList(0, min);
+    public ProteinReference getOneDescriptionReference() throws SQLException {
+    	return listing.getReferences().get(0);
+    }
+    
+    public List<ProteinReference> getUniqueDbDescriptionReferences() throws SQLException {
+    	return listing.getReferencesForUniqueDatabases();
     }
     
     public List<ProteinCommonReference> getCommonReferences() {

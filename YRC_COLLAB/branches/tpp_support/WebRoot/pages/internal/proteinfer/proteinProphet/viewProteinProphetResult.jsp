@@ -1033,6 +1033,15 @@ function toggleFullDescriptions() {
 	}
 }
 
+function showAllDescriptionsForProtein(proteinId) {
+	$("#short_desc_"+proteinId).hide();
+	$("#full_desc_"+proteinId).show();
+}
+function hideAllDescriptionsForProtein(proteinId) {
+	$("#short_desc_"+proteinId).show();
+	$("#full_desc_"+proteinId).hide();
+}
+
 </script>
 
 

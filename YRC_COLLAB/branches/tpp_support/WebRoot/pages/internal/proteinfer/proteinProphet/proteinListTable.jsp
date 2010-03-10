@@ -306,23 +306,27 @@
 			</td>
 				
 		<!-- Protein Description -->
+		<bean:size name="protein" property="descriptionReferences" id="refCount"/>
 		<td style="font-size: 8pt;">
-		<span class="full_description" style="display:none;">
+		<span class="full_description" style="display:none;" id="full_desc_<bean:write name="protein" property="protein.id" />">
 			<logic:iterate name="protein" property="descriptionReferences" id="reference">
-			<b>[<bean:write name="reference" property="databaseName"/>]</b> &nbsp; &nbsp; <bean:write name="reference" property="description"/>
-			<br/>
+				<span style="color:#000080;"><b>[<bean:write name="reference" property="databaseName"/>]</b></span> &nbsp; &nbsp; <bean:write name="reference" property="description"/>
+				<br/>
 			</logic:iterate>
-			</span>
+			<logic:greaterThan value="1" name="refCount">
+				<span class="clickable" onclick="hideAllDescriptionsForProtein(<bean:write name="protein" property="protein.id" />)"><b>[-]</b></span>
+			</logic:greaterThan>
+		</span>
 		
-			<span class="short_description">
-			<logic:iterate name="protein" property="fourDescriptionReferences" id="reference">
-				<b>[<bean:write name="reference" property="databaseName"/>]</b> &nbsp; &nbsp;<bean:write name="reference" property="shortDescription"/>
+		<span class="short_description" id="short_desc_<bean:write name="protein" property="protein.id" />">
+			<logic:present name="protein" property="oneDescriptionReference">
+				<span style="color:#000080;"><b>[<bean:write name="protein" property="oneDescriptionReference.databaseName"/>]</b></span> 
+				&nbsp; &nbsp;<bean:write name="protein" property="oneDescriptionReference.shortDescription"/>
 				<br/>
-			</logic:iterate>
-			<bean:size name="protein" property="descriptionReferences" id="refCount"/>
-			<logic:greaterThan value="4" name="refCount">
-				<br/>
-				<b>[More...]</b>
+			</logic:present>
+		
+			<logic:greaterThan value="1" name="refCount">
+				<span class="clickable" onclick="showAllDescriptionsForProtein(<bean:write name="protein" property="protein.id" />)"><b>[+]</b></span>
 			</logic:greaterThan>
 		</span>
 		</td>
