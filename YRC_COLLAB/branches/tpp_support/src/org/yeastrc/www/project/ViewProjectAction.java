@@ -11,6 +11,7 @@ package org.yeastrc.www.project;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -233,6 +234,7 @@ public class ViewProjectAction extends Action {
             } 
             
             ProjectExperiment pExpt = new ProjectExperiment(expt);
+            pExpt.setProjectId(projectId);
             pExpt.setUploadJobId(job.getId());
             if(status != JobUtils.STATUS_COMPLETE)
                 pExpt.setUploadSuccess(false);
@@ -346,19 +348,19 @@ public class ViewProjectAction extends Action {
         List<Integer> experimentIds = new ArrayList<Integer>(experiments.size());
         for(ProjectExperiment pe: experiments)
             experimentIds.add(pe.getId());
-        Collections.sort(experimentIds);
         
         
         // put the DTASelect results in the appropriate experiments
         for(YatesRun run: yatesRuns) {
             int runId = run.getId();
             int searchId = YatesRunMsSearchLinker.linkYatesRunToMsSearch(runId);
-
+            
             if(searchId > 0) {
                 Integer experimentId = searchIdToExperimentId.get(searchId);
                 if(experimentId != null) {
                     
-                    int idx = Collections.binarySearch(experimentIds, experimentId);
+                	// ProjectExperiments are sorted in reverse order
+                    int idx = Collections.binarySearch(experimentIds, experimentId, Collections.reverseOrder());
                     if(idx >= 0) {
                         ProjectExperiment pe = experiments.get(idx);
                         pe.setDtaSelect(run);
@@ -368,6 +370,9 @@ public class ViewProjectAction extends Action {
                     			+runId+"; searchID: "+searchId+"; experimentID: "+experimentId);
                     }
                 }
+            }
+            else {
+            	log.error("Could not associate a search ID with DTASelect run: "+runId);
             }
         }
     }
