@@ -51,8 +51,8 @@ public class WIdPickerProtein {
     	return listing.getReferencesForUniqueDescriptions();
     }
     
-    public ProteinReference getOneDescriptionReference() throws SQLException {
-    	return listing.getReferences().get(0);
+    public ProteinReference getBestDescriptionReference() throws SQLException {
+    	return listing.getBestReference();
     }
     
     public List<ProteinReference> getUniqueDbDescriptionReferences() throws SQLException {

@@ -260,9 +260,9 @@
 			</span>
 		
 			<span class="short_description" id="short_desc_<bean:write name="protein" property="protein.id" />">
-			<logic:present name="protein" property="oneDescriptionReference">
-				<span style="color:#000080;"><b>[<bean:write name="protein" property="oneDescriptionReference.databaseName"/>]</b></span> 
-				&nbsp; &nbsp;<bean:write name="protein" property="oneDescriptionReference.shortDescription"/>
+			<logic:present name="protein" property="bestDescriptionReference">
+				<span style="color:#000080;"><b>[<bean:write name="protein" property="bestDescriptionReference.databaseName"/>]</b></span> 
+				&nbsp; &nbsp;<bean:write name="protein" property="bestDescriptionReference.shortDescription"/>
 				<br/>
 			</logic:present>
 		
@@ -430,9 +430,9 @@
 		</span>
 		
 		<span class="short_description" id="short_desc_<bean:write name="protein" property="protein.id" />">
-		<logic:present name="protein" property="oneDescriptionReference">
-				<span style="color:#000080;"><b>[<bean:write name="protein" property="oneDescriptionReference.databaseName"/>]</b></span> 
-				&nbsp; &nbsp;<bean:write name="protein" property="oneDescriptionReference.shortDescription"/>
+		<logic:present name="protein" property="bestDescriptionReference">
+				<span style="color:#000080;"><b>[<bean:write name="protein" property="bestDescriptionReference.databaseName"/>]</b></span> 
+				&nbsp; &nbsp;<bean:write name="protein" property="bestDescriptionReference.shortDescription"/>
 				<br/>
 			</logic:present>
 		

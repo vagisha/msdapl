@@ -61,8 +61,8 @@ public class WProteinProphetProtein {
     	return listing.getReferencesForUniqueDatabases();
     }
     
-    public ProteinReference getOneDescriptionReference() throws SQLException {
-    	return listing.getReferences().get(0);
+    public ProteinReference getBestDescriptionReference() throws SQLException {
+    	return listing.getBestReference();
     }
     
     public List<ProteinCommonReference> getCommonReferences() {

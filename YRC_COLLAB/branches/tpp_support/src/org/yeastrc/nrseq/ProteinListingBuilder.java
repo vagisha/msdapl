@@ -78,7 +78,7 @@ public class ProteinListingBuilder {
 			StandardDatabase...sdbList) {
 		
 		int nrseqId = protein.getId();
-		ProteinListing listing = new ProteinListing(nrseqId);
+		ProteinListing listing = new ProteinListing(nrseqId, protein.getSpeciesId());
 
 		// first get the references for the given fasta databaseIDs
 		List<NrDbProtein> matchingProteins = NrSeqLookupUtil.getDbProteins(nrseqId, fastaDatabaseIds);

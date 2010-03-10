@@ -17,6 +17,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -60,7 +61,8 @@ import org.yeastrc.yates.YatesRunSearcher;
 public class ViewExperimentDetailsAjaxAction extends Action {
 
 	private static DAOFactory daoFactory = DAOFactory.instance();
-	
+	private static final Logger log = Logger.getLogger(ViewExperimentDetailsAjaxAction.class.getName());
+
 	public ActionForward execute( ActionMapping mapping,
 			ActionForm form,
 			HttpServletRequest request,
@@ -157,6 +159,7 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 		 catch(Exception e) {return null;} // because job with experimentID does not exist. Should not really happen.
 
 		 ProjectExperiment pExpt = new ProjectExperiment(expt);
+		 pExpt.setProjectId(projectId);
 		 pExpt.setUploadJobId(job.getId());
 		 if(status != JobUtils.STATUS_COMPLETE)
 			 pExpt.setUploadSuccess(false);

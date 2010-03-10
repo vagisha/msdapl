@@ -16,6 +16,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.bio.taxonomy.TaxonomyUtils;
 import org.yeastrc.databases.flybase.FlyBaseUtils;
+import org.yeastrc.databases.sangerpombe.PombeUtils;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.sgd.SGDUtils;
 import org.yeastrc.wormbase.WormbaseUtils;
@@ -69,21 +70,12 @@ public class CommonNameLookupUtil {
     	}
     	else if(speciesId == TaxonomyUtils.SCHIZOSACCHAROMYCES_POMBE) {
     		try {
-				commonName = SGDUtils.getStandardName(accession);
-				description = SGDUtils.getDescription(accession);
+				commonName = PombeUtils.getStandardName(accession);
+				description = PombeUtils.getDescription(accession);
 			} catch (SQLException e) {
 				log.error("Error using PombeUtils", e);
 			}
     		db = StandardDatabase.S_POMBE;
-    	}
-    	else if (speciesId == TaxonomyUtils.CAENORHABDITIS_ELEGANS) {
-    		try {
-				commonName = WormbaseUtils.getStandardName(accession);
-				description = WormbaseUtils.getDescription(accession);
-			} catch (SQLException e) {
-				log.error("Error using WormbaseUtils", e);
-			}
-    		db = StandardDatabase.WORMBASE;
     	}
     	else if (speciesId == TaxonomyUtils.CAENORHABDITIS_ELEGANS) {
     		try {
@@ -99,9 +91,9 @@ public class CommonNameLookupUtil {
 				commonName = FlyBaseUtils.getStandardName(accession);
 				description = FlyBaseUtils.getDescription(accession);
 			} catch (SQLException e) {
-				log.error("Error using WormbaseUtils", e);
+				log.error("Error using FlyBaseUtils", e);
 			}
-    		db = StandardDatabase.WORMBASE;
+    		db = StandardDatabase.FLYBASE;
     	}
     	else if(speciesId == TaxonomyUtils.HOMO_SAPIENS) {
     		// TODO  For now there is not external database for human common name lookup
@@ -113,6 +105,7 @@ public class CommonNameLookupUtil {
 			ref.setName(commonName);
 			ref.setDescription(description);
 			ref.setDatabase(db);
+			return ref;
 		}
 		return null;
 	}

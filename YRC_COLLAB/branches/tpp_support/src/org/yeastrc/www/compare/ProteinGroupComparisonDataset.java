@@ -492,7 +492,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 		try {
 			allReferences = protein.getDescriptionReferences();
 			// uniqueDbRefs = protein.getUniqueDbDescriptionReferences();
-			oneRef = protein.getOneDescriptionReference();
+			oneRef = protein.getBestDescriptionReference();
 		} catch (SQLException e) {
 			log.error("Error getting description", e);
 			return "ERROR";
@@ -627,7 +627,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         headers.add(header);
         
         header = new TableHeader("Links");
-        header.setWidth(10);
+        header.setWidth(5);
         header.setSortable(false);
         headers.add(header);
         

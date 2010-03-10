@@ -20,12 +20,14 @@ import java.util.Set;
 public class ProteinListing {
 
     private int nrseqProteinId;
+    private int speciesId;
     private List<ProteinCommonReference> commonReferences;
     private List<ProteinReference> references;
     
     
-    public ProteinListing(int nrseqId) {
+    public ProteinListing(int nrseqId, int speciesId) {
     	this.nrseqProteinId = nrseqId;
+    	this.speciesId = speciesId;
     	commonReferences = new ArrayList<ProteinCommonReference>();
     	references = new ArrayList<ProteinReference>();
     }
@@ -85,12 +87,43 @@ public class ProteinListing {
     	Set<String> seen = new HashSet<String>();
     	List<ProteinReference> unique = new ArrayList<ProteinReference>();
     	for(ProteinReference ref: references) {
+    		// ignore empty descriptions
+    		if(ref.getDescription() == null || ref.getDescription().trim().length() == 0)
+    			continue;
     		if(seen.contains(ref.getDescription()))
     			continue;
     		seen.add(ref.getDescription());
     		unique.add(ref);
     	}
     	return unique;
+    }
+    
+    public ProteinReference getBestReference() throws SQLException {
+    	
+    	// First check if there is a standard database for this species
+    	StandardDatabase standardDatabase = StandardDatabase.getStandardDatabaseForSpecies(this.speciesId);
+    	if(standardDatabase != null) {
+    		List<ProteinReference> references = getReferencesForDatabase(standardDatabase.getDatabaseName());
+    		if(references.size() > 0)
+    			return references.get(0); // return the first one
+    	}
+    	
+    	// If we did not find reference to a standard database, return the first reference we have --
+    	// this should be for the fasta file used for the search
+    	String desc = references.get(0).getDescription();
+    	if(desc != null && desc.trim().length() > 0)
+    		return references.get(0);
+    	
+    	// If the fasta file used for the search did not have a non-empty description, return a description
+    	// from one of the other standard database (NCBI-NR or Swiss-Prot).
+    	List<ProteinReference> references = getUniqueReferencesForNonStandardDatabases();
+    	for(ProteinReference ref: references) {
+    		if(ref.getDescription() != null && ref.getDescription().trim().length() > 0)
+    			return ref;
+    	}
+    	
+    	// We did not find anything
+    	return null;
     }
     
     public List<ProteinReference> getReferencesForUniqueDatabases() {
