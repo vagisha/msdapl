@@ -102,6 +102,7 @@ public class CommonNameLookupUtil {
     	}
 		if(commonName != null) {
 			ProteinCommonReference ref = new ProteinCommonReference();
+			ref.setAccession(accession);
 			ref.setName(commonName);
 			ref.setDescription(description);
 			ref.setDatabase(db);

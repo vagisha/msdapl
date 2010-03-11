@@ -12,6 +12,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.yeastrc.bio.taxonomy.TaxonomySearcher;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.domain.nrseq.NrProtein;
+
 
 
 /**
@@ -19,15 +23,14 @@ import java.util.Set;
  */
 public class ProteinListing {
 
-    private int nrseqProteinId;
-    private int speciesId;
+	private NrProtein protein;
     private List<ProteinCommonReference> commonReferences;
     private List<ProteinReference> references;
     
     
-    public ProteinListing(int nrseqId, int speciesId) {
-    	this.nrseqProteinId = nrseqId;
-    	this.speciesId = speciesId;
+    public ProteinListing(NrProtein protein) {
+    	
+    	this.protein = protein;
     	commonReferences = new ArrayList<ProteinCommonReference>();
     	references = new ArrayList<ProteinReference>();
     }
@@ -101,7 +104,7 @@ public class ProteinListing {
     public ProteinReference getBestReference() throws SQLException {
     	
     	// First check if there is a standard database for this species
-    	StandardDatabase standardDatabase = StandardDatabase.getStandardDatabaseForSpecies(this.speciesId);
+    	StandardDatabase standardDatabase = StandardDatabase.getStandardDatabaseForSpecies(protein.getSpeciesId());
     	if(standardDatabase != null) {
     		List<ProteinReference> references = getReferencesForDatabase(standardDatabase.getDatabaseName());
     		if(references.size() > 0)
@@ -124,6 +127,41 @@ public class ProteinListing {
     	
     	// We did not find anything
     	return null;
+    }
+    
+    public List<ProteinReference> getBestReferences() throws SQLException {
+    	
+    	// First check if there is a standard database for this species
+    	StandardDatabase standardDatabase = StandardDatabase.getStandardDatabaseForSpecies(protein.getSpeciesId());
+    	if(standardDatabase != null) {
+    		List<ProteinReference> refs = getReferencesForDatabase(standardDatabase.getDatabaseName());
+    		if(refs.size() > 0)
+    			return refs;
+    	}
+    	
+    	// If we did not find reference to a standard database for the species
+    	// Look for a SwissProt reference
+    	List<ProteinReference> refs = getReferencesForDatabase(standardDatabase.SWISSPROT.getDatabaseName());
+		if(refs.size() > 0)
+			return refs;
+		
+		// If we did not find a Swiss-Prot reference look for a NCBI-NR reference
+		refs = getReferencesForDatabase(standardDatabase.NCBI_NR.getDatabaseName());
+		if(refs.size() > 0)
+			return refs;
+    	
+    	// We did not find anything
+    	return null;
+    }
+    
+    public List<String> getBestReferenceAccessions() throws SQLException {
+    	
+    	List<ProteinReference> refs = getBestReferences();
+    	Set<String> accessions = new HashSet<String>();
+    	for(ProteinReference ref: refs) {
+    		accessions.add(ref.getAccession());
+    	}
+    	return new ArrayList<String>(accessions);
     }
     
     public List<ProteinReference> getReferencesForUniqueDatabases() {
@@ -175,7 +213,18 @@ public class ProteinListing {
     }
     
     public int getNrseqProteinId() {
-        return nrseqProteinId;
+        return protein.getId();
     }
     
+    public String getSpeciesName() throws SQLException {
+    	return TaxonomySearcher.getInstance().getName(getSpeciesId());
+    }
+    
+    public int getSpeciesId() {
+    	return protein.getSpeciesId();
+    }
+    
+    public String getSequence() {
+    	return NrSeqLookupUtil.getProteinSequence(protein.getId());
+    }
 }

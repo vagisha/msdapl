@@ -1,8 +1,10 @@
 package org.yeastrc.www.proteinfer;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +24,7 @@ import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerPeptideBase;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptide;
 import org.yeastrc.ms.util.TimeUtils;
+import org.yeastrc.nrseq.GOSearcher;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerIonForProtein;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
@@ -101,7 +104,20 @@ public class ProteinDetailsAjaxAction extends Action {
             // get the protein 
             WIdPickerProtein iProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, pinferProtId, peptideDef);
             request.setAttribute("protein", iProt);
+            
+            // Gene Ontology information
+            Map goterms = GOSearcher.getGONodes(iProt.getProteinListing());
+    		
+    		if ( ((Collection)goterms.get("P")).size() > 0)
+    			request.setAttribute("processes", goterms.get("P"));
 
+    		if ( ((Collection)goterms.get("C")).size() > 0)
+    			request.setAttribute("components", goterms.get("C"));
+    		
+    		if ( ((Collection)goterms.get("F")).size() > 0)
+    			request.setAttribute("functions", goterms.get("F"));
+
+    		
             // get other proteins in this group
             List<WIdPickerProtein> groupProteins = IdPickerResultsLoader.getGroupProteins(pinferId, 
                     iProt.getProtein().getGroupId(), 
@@ -137,7 +153,21 @@ public class ProteinDetailsAjaxAction extends Action {
             // get the protein 
             WProteinProphetProtein pProt = ProteinProphetResultsLoader.getWProteinProphetProtein(pinferId, pinferProtId, peptideDef);
             request.setAttribute("protein", pProt);
+            
+            // Gene Ontology information
+            Map goterms = GOSearcher.getGONodes(pProt.getProteinListing());
+    		
+    		if ( ((Collection)goterms.get("P")).size() > 0)
+    			request.setAttribute("processes", goterms.get("P"));
 
+    		if ( ((Collection)goterms.get("C")).size() > 0)
+    			request.setAttribute("components", goterms.get("C"));
+    		
+    		if ( ((Collection)goterms.get("F")).size() > 0)
+    			request.setAttribute("functions", goterms.get("F"));
+
+    		
+    		
             // get other proteins in this group
             List<WProteinProphetProtein> groupProteins = ProteinProphetResultsLoader.getGroupProteins(pinferId, 
                     pProt.getProtein().getGroupId(), 
@@ -173,6 +203,7 @@ public class ProteinDetailsAjaxAction extends Action {
         String proteinSequenceHtml = ProteinSequenceHtmlBuilder.getInstance().build(sequence, peptideSequences);
         request.setAttribute("proteinSequenceHtml", proteinSequenceHtml);
         request.setAttribute("proteinSequence", sequence);
+        
         
         
         long e = System.currentTimeMillis();

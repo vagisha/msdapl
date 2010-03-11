@@ -40,6 +40,10 @@ public class ComparisonProtein {
     	this.listing = listing;
     }
     
+    public ProteinListing getProteinListing() {
+    	return this.listing;
+    }
+    
     public int getNrseqId() {
         return nrseqId;
     }

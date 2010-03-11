@@ -11,9 +11,9 @@
 <div align="center" style="padding:5px;font-size: 10pt;width: 90%; color: black;">
 
 <div style="background-color:#F8F8FF; border: 1px solid #F5F5F5; width:100%" align="center">
-<table align="center" width="90%">
+<table align="center">
 <tr>
-	<td valign="top" align="left"><b>Accession:</b></td>
+	<td valign="top" align="left"><b>Accession(s):</b></td>
 	<td valign="top" align="left">
 		<logic:iterate name="protein" property="fastaReferences" id="reference">
 			<bean:write name="reference" property="accession"/>
@@ -21,47 +21,162 @@
 		</logic:iterate>
 	</td>
 </tr>
+<logic:notEmpty name="protein" property="commonReferences">
 <tr>
-	<td valign="top" align="left"><b>Common Name:</b></td>
+	<td valign="top" align="left"><b>Common Name(s):</b></td>
 	<td valign="top" align="left">
 		<logic:iterate name="protein" property="commonReferences" id="reference">
 			<bean:write name="reference" property="name"/>
-			<br/>
+			&nbsp; &nbsp;
 		</logic:iterate>
 	</td>
 </tr>
+</logic:notEmpty>
+<logic:notEmpty name="protein" property="externalReferences">
 <tr>
-	<td valign="top" align="left"><b>External Links:</b></td>
+	<td valign="top" align="left"><b>External Link(s):</b></td>
 	<td valign="top" align="left">
 		<logic:iterate name="protein" property="externalReferences" id="reference">
 			<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;">
-			[<bean:write name="reference" property="databaseName"/>]
-			</a>
-			<br/>
+			[<bean:write name="reference" property="databaseName"/>]</a>
+			&nbsp; &nbsp;
 		</logic:iterate>
+	</td>
+</tr>
+</logic:notEmpty>
+<tr>
+	<td valign="top" align="left"><b>Organism:</b></td>
+	<td valign="top" align="left">
+		<a target="ncbi_window" href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=<bean:write name="protein" property="proteinListing.speciesId"/>">
+    	<i><bean:write name="protein" property="proteinListing.speciesName" /></i></a>
 	</td>
 </tr>
 <tr>
-	<td valign="top" align="left"><b>Description:</b></td>
+	<td valign="top" align="left"><b>Molecular Wt.:</b></td>
 	<td valign="top" align="left">
-		<span style="color: #888888; font-size: 9pt;">
-		<logic:iterate name="protein" property="descriptionReferences" id="reference">
-			<b>[<bean:write name="reference" property="databaseName"/>]</b> &nbsp; &nbsp; <bean:write name="reference" property="description"/>
-			<br/>
-		</logic:iterate>
-		</span>
+    	<bean:write name="protein" property="molecularWeight" />
 	</td>
 </tr>
-</table>
+<tr>
+	<td valign="top" align="left"><b>pI:</b></td>
+	<td valign="top" align="left">
+    	<bean:write name="protein" property="pi" />
+	</td>
+</tr>
+<tr>
+	<td valign="top" align="left"><b>Description(s):</b></td>
+	<td valign="top" align="left" style="color: #888888; font-size: 9pt;">
+		<ul>
+		<logic:iterate name="protein" property="descriptionReferences" id="reference">
+			<li>
+				<bean:write name="reference" property="description"/>
+				&nbsp; &nbsp;
+				<b>[<bean:write name="reference" property="databaseName"/>]</b>
+			</li>
+		</logic:iterate>
+		</ul>
+	</td>
+</tr>
 
+<!-- GENE ONTOLOGY -->
+<tr>
+   <td valign="top" align="left"><b>GO Cellular Component:</b></td>
+   <td valign="top" align="left">
+    <logic:empty name="components">
+     NONE FOUND
+    </logic:empty>
+    <logic:notEmpty name="components">
+     <logic:iterate name="components" id="gonode">
+	 <a target="go_window"
+	    href="http://www.godatabase.org/cgi-bin/amigo/go.cgi?action=query&view=query&search_constraint=terms&query=<bean:write name="gonode" property="accession"/>">
+      <bean:write name="gonode" property="name"/></a><br>
+     </logic:iterate>    
+    </logic:notEmpty>
+    </td>
+</tr>
+<tr>
+   <td valign="top" align="left"><b>GO Biological Process:</b></td>
+   <td valign="top" align="left">
+    
+    <logic:empty name="processes">
+     NONE FOUND
+    </logic:empty>
+    <logic:notEmpty name="processes">
+     <logic:iterate name="processes" id="gonode">
+	 <a target="go_window"
+	    href="http://www.godatabase.org/cgi-bin/amigo/go.cgi?action=query&view=query&search_constraint=terms&query=<bean:write name="gonode" property="accession"/>">
+      <bean:write name="gonode" property="name"/></a><br>
+     </logic:iterate>    
+    </logic:notEmpty>
+    
+   </td>
+</tr>
+
+<tr>
+   <td valign="top" align="left"><b>GO Molecular Function:</b></td>
+   <td valign="top" align="left">
+    <logic:empty name="functions">
+     NONE FOUND
+    </logic:empty>
+    <logic:notEmpty name="functions">
+     <logic:iterate name="functions" id="gonode">
+	 <a target="go_window"
+	    href="http://www.godatabase.org/cgi-bin/amigo/go.cgi?action=query&view=query&search_constraint=terms&query=<bean:write name="gonode" property="accession"/>">
+      <bean:write name="gonode" property="name"/></a><br>
+     </logic:iterate>    
+    </logic:notEmpty>
+    
+   </td>
+</tr>
+
+</table>
 
 <br>
 <span style="font-size: 8pt; color: red;">
-<a  style="color:red;"   href="<yrcwww:link path='viewProtein.do?id'/>=<bean:write name='protein' property='protein.nrseqProteinId'/>">[Protein Details]</a>
+<a  style="color:red;"   href="<yrcwww:link path='viewProtein.do?id'/>=<bean:write name='protein' property='protein.nrseqProteinId'/>">[List Experiments With ThisProtein]</a>
 </span>
 <br>
+
 </div>
 <br>
+
+<!-- PROTEIN SEQUENCE -->
+<div align="center">
+<table  align="center" width="60%" id="protseqtbl_<bean:write name='protein' property='protein.id'/>" style="border:1px solid gray;">
+	<tr>
+	<td valign="top">
+	<font style="font-size:9pt;">
+     [<a target="blast_window"
+         href="http://www.ncbi.nlm.nih.gov/blast/Blast.cgi?CMD=Web&LAYOUT=TwoWindows&AUTO_FORMAT=Semiauto&ALIGNMENTS=50&ALIGNMENT_VIEW=Pairwise&CDD_SEARCH=on&CLIENT=web&COMPOSITION_BASED_STATISTICS=on&DATABASE=nr&DESCRIPTIONS=100&ENTREZ_QUERY=(none)&EXPECT=1000&FILTER=L&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML&I_THRESH=0.005&MATRIX_NAME=BLOSUM62&NCBI_GI=on&PAGE=Proteins&PROGRAM=blastp&SERVICE=plain&SET_DEFAULTS.x=41&SET_DEFAULTS.y=5&SHOW_OVERVIEW=on&END_OF_HTTPGET=Yes&SHOW_LINKOUT=yes&QUERY=<bean:write name="proteinSequence"/>">NCBI BLAST</a>]
+
+	<BR><br>
+	<b>YRC Philius</b><br>
+	<span><a href="http://www.ncbi.nlm.nih.gov/sites/entrez?cmd=Search&db=pubmed&term=18989393">Reynolds <I>et al.</I></a></span>
+	<br/>
+	<span style="text-decoration: underline; cursor: pointer;"
+      onclick="philiusAnnotations(<bean:write name="protein" property="protein.id" />,<bean:write name="protein" property="protein.nrseqProteinId" />)"
+      id="philiusbutton_<bean:write name="protein" property="protein.id"/>">[Get Predictions]</span>
+    </font>
+	</td>
+	<td align="left" valign="top">
+	<div id="protsequence_<bean:write name="protein" property="protein.id"/>">
+	<!-- Protein sequwnce -->
+	<pre><bean:write name="proteinSequenceHtml" filter="false"/></pre>
+	</div>
+	<!-- Place holder for Philius Annotations -->
+	<div id="philiusannot_<bean:write name="protein" property="protein.id"/>"></div>
+	</td>
+	</tr>
+	<tr>
+		<td colspan="2" align="center">
+		<div id="philius_status_<bean:write name="protein" property="protein.id"/>" 
+			 style="display:none;font-size:10pt;color:red;"></div>
+		</td>
+	</tr>
+</table>
+</div>
+<br><br>
+
 
 <table align="center" cellpadding="2" style="border: 1px solid gray; border-spacing: 2px">
 <tr class="pinfer_A">
@@ -114,41 +229,7 @@
 
 <br><br>
 
-<div align="center">
-<table  align="center" width="60%" id="protseqtbl_<bean:write name='protein' property='protein.id'/>" style="border:1px solid gray;">
-	<tr>
-	<td valign="top">
-	<font style="font-size:9pt;">
-     [<a target="blast_window"
-         href="http://www.ncbi.nlm.nih.gov/blast/Blast.cgi?CMD=Web&LAYOUT=TwoWindows&AUTO_FORMAT=Semiauto&ALIGNMENTS=50&ALIGNMENT_VIEW=Pairwise&CDD_SEARCH=on&CLIENT=web&COMPOSITION_BASED_STATISTICS=on&DATABASE=nr&DESCRIPTIONS=100&ENTREZ_QUERY=(none)&EXPECT=1000&FILTER=L&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML&I_THRESH=0.005&MATRIX_NAME=BLOSUM62&NCBI_GI=on&PAGE=Proteins&PROGRAM=blastp&SERVICE=plain&SET_DEFAULTS.x=41&SET_DEFAULTS.y=5&SHOW_OVERVIEW=on&END_OF_HTTPGET=Yes&SHOW_LINKOUT=yes&QUERY=<bean:write name="proteinSequence"/>">NCBI BLAST</a>]
 
-	<BR><br>
-	<b>YRC Philius</b><br>
-	<span><a href="http://www.ncbi.nlm.nih.gov/sites/entrez?cmd=Search&db=pubmed&term=18989393">Reynolds <I>et al.</I></a></span>
-	<br/>
-	<span style="text-decoration: underline; cursor: pointer;"
-      onclick="philiusAnnotations(<bean:write name="protein" property="protein.id" />,<bean:write name="protein" property="protein.nrseqProteinId" />)"
-      id="philiusbutton_<bean:write name="protein" property="protein.id"/>">[Get Predictions]</span>
-    </font>
-	</td>
-	<td align="left" valign="top">
-	<div id="protsequence_<bean:write name="protein" property="protein.id"/>">
-	<!-- Protein sequwnce -->
-	<pre><bean:write name="proteinSequenceHtml" filter="false"/></pre>
-	</div>
-	<!-- Place holder for Philius Annotations -->
-	<div id="philiusannot_<bean:write name="protein" property="protein.id"/>"></div>
-	</td>
-	</tr>
-	<tr>
-		<td colspan="2" align="center">
-		<div id="philius_status_<bean:write name="protein" property="protein.id"/>" 
-			 style="display:none;font-size:10pt;color:red;"></div>
-		</td>
-	</tr>
-</table>
-</div>
-<br><br>
 
 	
 <table align="center" width="95%" id="protdetailstbl_<bean:write name="protein" property="protein.id"/>" class="table_pinfer">

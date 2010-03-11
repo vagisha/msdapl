@@ -119,11 +119,11 @@
 		</logic:equal>
 		
 		
-		<th width="10%"><b><font size="2pt">Common<br>Name</font></b></th>
+		<th width="5%"><b><font size="2pt">Common<br>Name</font></b></th>
 		<th width="1%">
 			<b><font size="2pt">Links</font></b>
 		</th>
-		<th width="40%"><b><font size="2pt">Description</font></b></th>
+		<th><b><font size="2pt">Description</font></b></th>
 		
 		
 		
@@ -137,15 +137,15 @@
 		<% colSortedClass = "";
 		 if(sortBy == SORT_BY.PI) colSortedClass = sortedClass;
 		%>
-		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.PI.name()%>">
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.PI.name()%>">
 			<b><font size="2pt">pI</font></b>
 		</th>
 		
 		<% colSortedClass = "";
 		 if(sortBy == SORT_BY.COVERAGE) colSortedClass = sortedClass;
 		%>
-		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.COVERAGE.name()%>">
-			<b><font size="2pt">Coverage (%)</font></b>
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.COVERAGE.name()%>">
+			<b><font size="2pt">Cov.<br/>(%)</font></b>
 		</th>
 		
 			
@@ -153,14 +153,14 @@
 			 if(sortBy == SORT_BY.NUM_PEPT) colSortedClass = sortedClass;
 		%>
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.NUM_PEPT.name()%>">
-			<b><font size="2pt"># Peptides</font></b>
+			<b><font size="2pt"># Pept.</font></b>
 		</th>
 		
 		<% colSortedClass = "";
 			 if(sortBy == SORT_BY.NUM_UNIQ_PEPT) colSortedClass = sortedClass;
 		%>
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.NUM_UNIQ_PEPT.name()%>">
-			<b><font size="2pt"># Uniq. Peptides</font></b></th>
+			<b><font size="2pt"># Uniq. Pept.</font></b></th>
 		
 		<% colSortedClass = "";
 			 if(sortBy == SORT_BY.NUM_SPECTRA) colSortedClass = sortedClass;

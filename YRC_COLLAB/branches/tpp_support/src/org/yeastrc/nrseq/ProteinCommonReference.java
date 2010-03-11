@@ -15,8 +15,10 @@ public class ProteinCommonReference {
 
 	private StandardDatabase database;
 	private String name;
+	private String accession;
 	private String description;
     
+
 	public ProteinCommonReference() {}
 	
 	public String getDatabaseName() throws SQLException {
@@ -48,5 +50,13 @@ public class ProteinCommonReference {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public String getAccession() {
+		return accession;
+	}
+
+	public void setAccession(String accession) {
+		this.accession = accession;
 	}
 }

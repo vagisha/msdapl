@@ -846,7 +846,8 @@ function doGoEnrichmentAnalysis() {
 	$("#goEnrichmentForm  input[name='maxProteinProbability']").val($("#filterForm  input[name='maxProteinProbability']").val());
 	
 	$("#goEnrichmentForm  input[name='joinProphetGroupProteins']").val($("#filterForm  input[name='joinProphetGroupProteins']:checked").val());
-	$("#goEnrichmentForm  input[name='showAllProteins']").val($("#filterForm  input[name='showAllProteins']:checked").val());
+	$("#goEnrichmentForm  input[name='excludeSubsumed']").val($("#filterForm  input[name='excludeSubsumed']:checked").val());
+	$("#goEnrichmentForm  input[name='excludeIndistinProteinGroups']").val($("#filterForm  input[name='excludeIndistinProteinGroups']:checked").val());
 
 	$("#goEnrichmentForm  input[name='accessionLike']").val($("#filterForm  input[name='accessionLike']").val());
 	$("#goEnrichmentForm  input[name='descriptionLike']").val($("#filterForm input[name='descriptionLike']").val());

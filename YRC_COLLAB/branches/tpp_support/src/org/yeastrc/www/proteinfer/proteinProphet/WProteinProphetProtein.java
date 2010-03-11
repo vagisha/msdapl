@@ -37,6 +37,10 @@ public class WProteinProphetProtein {
     	this.listing = listing;
     }
     
+    public ProteinListing getProteinListing() {
+    	return this.listing;
+    }
+    
     public List<ProteinReference> getFastaReferences() throws SQLException {
     	return listing.getUniqueReferencesForNonStandardDatabases();
     }
