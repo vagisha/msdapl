@@ -60,6 +60,8 @@
 	<yrcwww:table name="results" tableId='perc_results' tableClass="table_basic sortable_table" center="true" />
 	</div>
 	
+	<%@include file="/pages/internal/pager.jsp" %>
+	
 </center>	
 </yrcwww:contentbox>
 

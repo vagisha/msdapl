@@ -55,6 +55,8 @@
 	<yrcwww:table name="results" tableId='mascot_results' tableClass="table_basic sortable_table" center="true" />
 	</div>
 	
+	<%@include file="/pages/internal/pager.jsp" %>
+	
 </center>	
 </yrcwww:contentbox>
 
