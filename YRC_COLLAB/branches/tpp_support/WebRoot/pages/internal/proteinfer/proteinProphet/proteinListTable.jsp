@@ -120,9 +120,6 @@
 		
 		
 		<th width="5%"><b><font size="2pt">Common<br>Name</font></b></th>
-		<th width="1%">
-			<b><font size="2pt">Links</font></b>
-		</th>
 		<th><b><font size="2pt">Description</font></b></th>
 		
 		
@@ -295,39 +292,38 @@
 			<logic:equal name="protein" property="protein.subsumed" value="false"></b></logic:equal>
 			</td>
 		
-		<!-- External Links -->
-			<td>
-			<logic:iterate name="protein" property="externalReferences" id="reference">
-				<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;">
-				[<bean:write name="reference" property="databaseName"/>]
-				</a>
-				<br/>
-			</logic:iterate>
-			</td>
 				
 		<!-- Protein Description -->
-		<bean:size name="protein" property="descriptionReferences" id="refCount"/>
+		<bean:size name="protein" property="allReferences" id="refCount"/>
+			
 		<td style="font-size: 8pt;">
 		<span class="full_description" style="display:none;" id="full_desc_<bean:write name="protein" property="protein.id" />">
-			<logic:iterate name="protein" property="descriptionReferences" id="reference">
-				<span style="color:#000080;"><b>[<bean:write name="reference" property="databaseName"/>]</b></span> &nbsp; &nbsp; <bean:write name="reference" property="description"/>
-				<br/>
-			</logic:iterate>
-			<logic:greaterThan value="1" name="refCount">
-				<span class="clickable" onclick="hideAllDescriptionsForProtein(<bean:write name="protein" property="protein.id" />)"><b>[-]</b></span>
-			</logic:greaterThan>
+		<logic:iterate name="protein" property="allReferences" id="reference">
+			<logic:equal name="reference" property="hasExternalLink" value="true">
+				<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;" target="External Link">
+					[<bean:write name="reference" property="databaseName"/>]
+				</a>
+			</logic:equal>
+			<logic:equal name="reference" property="hasExternalLink" value="false">
+				<span style="color:#000080;"><b>[<bean:write name="reference" property="databaseName"/>]</b></span>
+			</logic:equal>
+			 &nbsp; &nbsp; <bean:write name="reference" property="description"/>
+			<br/>
+		</logic:iterate>
+		<logic:greaterThan value="1" name="refCount">
+			<span class="clickable" onclick="hideAllDescriptionsForProtein(<bean:write name="protein" property="protein.id" />)"><b>[-]</b></span>
+		</logic:greaterThan>
 		</span>
-		
+	
 		<span class="short_description" id="short_desc_<bean:write name="protein" property="protein.id" />">
-			<logic:present name="protein" property="bestDescriptionReference">
-				<span style="color:#000080;"><b>[<bean:write name="protein" property="bestDescriptionReference.databaseName"/>]</b></span> 
-				&nbsp; &nbsp;<bean:write name="protein" property="bestDescriptionReference.shortDescription"/>
-				<br/>
-			</logic:present>
-		
-			<logic:greaterThan value="1" name="refCount">
-				<span class="clickable" onclick="showAllDescriptionsForProtein(<bean:write name="protein" property="protein.id" />)"><b>[+]</b></span>
-			</logic:greaterThan>
+		<logic:present name="protein" property="oneBestReference">
+			<bean:write name="protein" property="oneBestReference.shortDescription"/>
+			<br/>
+		</logic:present>
+	
+		<logic:greaterThan value="1" name="refCount">
+			<span class="clickable" onclick="showAllDescriptionsForProtein(<bean:write name="protein" property="protein.id" />)"><b>[+]</b></span>
+		</logic:greaterThan>
 		</span>
 		</td>
 		<td><bean:write name="protein" property="molecularWeight"/></td>
@@ -360,10 +356,10 @@
 					  >Show Peptides</span></nobr></td>
 			
 			<logic:equal name="groupProteins" value="true">
-				<td colspan="11" class="pinfer_filler">
+				<td colspan="10" class="pinfer_filler">
 			</logic:equal>
 			<logic:equal name="groupProteins" value="false">
-				<td colspan="13" class="pinfer_filler">
+				<td colspan="12" class="pinfer_filler">
 			</logic:equal>
 				<!--  peptides table will go here: proteinPeptides.jsp -->
 				<div id="peptforprot_<bean:write name="iGroup" property="groupId" />"></div>
