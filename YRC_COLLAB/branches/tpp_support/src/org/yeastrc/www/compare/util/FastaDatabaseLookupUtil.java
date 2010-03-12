@@ -21,12 +21,17 @@ public class FastaDatabaseLookupUtil {
 	private FastaDatabaseLookupUtil() {}
 	
 	public static List<Integer> getFastaDatabaseIds(List<? extends Dataset> datasets) {
+		return getFastaDatabaseIds(datasets, false); // don't add standard databases
+	}
+	
+	public static List<Integer> getFastaDatabaseIds(List<? extends Dataset> datasets, boolean addStandardDatabases) {
 		List<Integer> fastaDatabaseIds = new ArrayList<Integer>();
         List<Integer> pinferIds = new ArrayList<Integer>();
         for(Dataset dataset: datasets)
             if(dataset.getSource() != DatasetSource.DTA_SELECT)
                 pinferIds.add(dataset.getDatasetId());
-        fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferIds);
+        fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferIds,
+        		addStandardDatabases);
         return fastaDatabaseIds;
 	}
 }

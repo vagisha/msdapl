@@ -103,6 +103,20 @@ public class ProteinDatabaseLookupUtil {
                 databaseIds.add(db.getSequenceDatabaseId());
             }
         }
+        
+        if(addStandardDatabases) {
+	        NrseqDatabaseDAO dbDao = NrseqDatabaseDAO.getInstance();
+	        
+	        for (StandardDatabase sdb: StandardDatabase.values()) {
+	        	try {
+					int dbId = dbDao.getDatabase(sdb.getDatabaseName()).getId();
+					databaseIds.add(dbId);
+				} catch (SQLException e) {
+					log.error("Could not find database for sandard database: "+sdb.getDatabaseName());
+				}
+	        }
+        }
+        
         return new ArrayList<Integer>(databaseIds);
     }
 }

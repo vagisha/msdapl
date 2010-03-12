@@ -17,6 +17,7 @@ import java.util.Set;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
+import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.nrseq.CommonNameLookupUtil;
 import org.yeastrc.nrseq.FastaProteinLookupUtil;
 
@@ -101,9 +102,10 @@ public class ProteinAccessionFilter {
         return filtered;
     }
     
-    public List<Integer> filterNrseqIdsByAccession(List<Integer> allNrseqIds, String searchString) throws SQLException {
+    public List<Integer> filterNrseqIdsByAccession(List<Integer> allNrseqIds, 
+    		String searchString, List<Integer> fastaDbIds) throws SQLException {
         
-    	List<Integer> sortedIds = getSortedNrseqIdsMatchingAccession(searchString);
+    	List<Integer> sortedIds = getSortedNrseqIdsMatchingAccession(searchString, fastaDbIds);
         if(sortedIds == null || sortedIds.size() == 0)
             return new ArrayList<Integer>(0); // no matching nrseq IDs found
 
@@ -111,7 +113,7 @@ public class ProteinAccessionFilter {
         return getMatching(allNrseqIds, sortedIds);
     }
     
-    private List<Integer> getSortedNrseqIdsMatchingAccession(String searchString) throws SQLException {
+    private List<Integer> getSortedNrseqIdsMatchingAccession(String searchString, List<Integer> fastaDbIds) throws SQLException {
 
     	if(searchString == null || searchString.trim().length() == 0)
     		return null;
@@ -121,21 +123,22 @@ public class ProteinAccessionFilter {
     	String tokens[] = searchString.split(",");
 
     	//Do a common name lookup first.  
-    	// TODO This comes from the nrseqProteinCache table which may not be be upto date. 
-    	for(String token: tokens) {
-    		String name = token.trim();
-    		if(name.length() > 0) {
-    			List<Integer> ids = CommonNameLookupUtil.getInstance().getProteinIdsFromCache(name);
-    			proteinIds.addAll(ids);
-    		}
-    	}
+//    	// TODO This comes from the nrseqProteinCache table which may not be be upto date. 
+//    	for(String token: tokens) {
+//    		String name = token.trim();
+//    		if(name.length() > 0) {
+//    			List<Integer> ids = CommonNameLookupUtil.getInstance().getProteinIdsFromCache(name);
+//    			proteinIds.addAll(ids);
+//    		}
+//    	}
     	
     	// Now look at the accession strings in tblProteinDatabase;
     	for(String token: tokens) {
-    		String name = token.trim();
-    		if(name.length() > 0) {
-    			List<Integer> ids = NrSeqLookupUtil.getProteinIdsForAccession(name);
-    			proteinIds.addAll(ids);
+    		String accession = token.trim();
+    		if(accession.length() > 0) {
+    			List<NrDbProtein> proteins = NrSeqLookupUtil.getDbProteinsForAccession(fastaDbIds, accession);
+    			for(NrDbProtein prot: proteins)
+    				proteinIds.add(prot.getProteinId());
     		}
     	}
 

@@ -17,6 +17,7 @@ import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
+import org.yeastrc.www.compare.util.FastaDatabaseLookupUtil;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
 import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
 import org.yeastrc.www.proteinfer.ProteinPropertiesFilter;
@@ -52,7 +53,11 @@ public class ProteinPropertiesFilterer {
 		// apply accession filter
 		if(filters.hasAccessionFilter()) {
 			s = System.currentTimeMillis();
-			nrseqIds = ProteinAccessionFilter.getInstance().filterNrseqIdsByAccession(nrseqIds, filters.getAccessionLike());
+			
+			List<Integer> fastaDbIds = FastaDatabaseLookupUtil.getFastaDatabaseIds(datasets);
+			
+			nrseqIds = ProteinAccessionFilter.getInstance().filterNrseqIdsByAccession(nrseqIds, 
+					filters.getAccessionLike(), fastaDbIds);
 			e = System.currentTimeMillis();
 			log.info("Time to filter on accession: "+TimeUtils.timeElapsedSeconds(e, e)+" seconds");
 		}
@@ -61,8 +66,11 @@ public class ProteinPropertiesFilterer {
 		// apply description LIKE filter
 		if(filters.hasDescriptionLikeFilter()) {
 			s = System.currentTimeMillis();
+			
+			List<Integer> fastaDbIds = FastaDatabaseLookupUtil.getFastaDatabaseIds(datasets, true); // add standard databases
+			
 			nrseqIds = ProteinDescriptionFilter.getInstance().filterNrseqIdsMatchingDescription(nrseqIds,
-					filters.getDescriptionLike());
+					filters.getDescriptionLike(), fastaDbIds);
 			e = System.currentTimeMillis();
 			log.info("Time to filter on description (LIKE): "+TimeUtils.timeElapsedSeconds(e, e)+" seconds");
 		}
@@ -71,8 +79,11 @@ public class ProteinPropertiesFilterer {
 		// apply description NOT LIKE filter
 		if(filters.hasDescriptionNotLikeFilter()) {
 			s = System.currentTimeMillis();
+			
+			List<Integer> fastaDbIds = FastaDatabaseLookupUtil.getFastaDatabaseIds(datasets, true); // add standard databases
+			
 			nrseqIds = ProteinDescriptionFilter.getInstance().filterNrseqIdsNotMatchingDescription(nrseqIds,
-					filters.getDescriptionNotLike());
+					filters.getDescriptionNotLike(), fastaDbIds);
 			e = System.currentTimeMillis();
 			log.info("Time to filter on description NOT LIKE): "+TimeUtils.timeElapsedSeconds(e, e)+" seconds");
 		}
@@ -117,7 +128,11 @@ public class ProteinPropertiesFilterer {
 		// apply accession filter
 		if(filters.hasAccessionFilter()) {
 			s = System.currentTimeMillis();
-			nrseqIds = ProteinAccessionFilter.getInstance().filterNrseqIdsByAccession(nrseqIds, filters.getAccessionLike());
+			
+			List<Integer> fastaDbIds = FastaDatabaseLookupUtil.getFastaDatabaseIds(datasets);
+			
+			nrseqIds = ProteinAccessionFilter.getInstance().filterNrseqIdsByAccession(nrseqIds, 
+					filters.getAccessionLike(), fastaDbIds);
 			e = System.currentTimeMillis();
 			log.info("Time to filter on accession: "+TimeUtils.timeElapsedSeconds(e, e)+" seconds");
 		}
@@ -126,8 +141,11 @@ public class ProteinPropertiesFilterer {
 		// apply description LIKE filter
 		if(filters.hasDescriptionLikeFilter()) {
 			s = System.currentTimeMillis();
+			
+			List<Integer> fastaDbIds = FastaDatabaseLookupUtil.getFastaDatabaseIds(datasets, true); // add standard databases
+			
 			nrseqIds = ProteinDescriptionFilter.getInstance().filterNrseqIdsMatchingDescription(nrseqIds,
-					filters.getDescriptionLike());
+					filters.getDescriptionLike(), fastaDbIds);
 			e = System.currentTimeMillis();
 			log.info("Time to filter on description (LIKE): "+TimeUtils.timeElapsedSeconds(e, e)+" seconds");
 		}
@@ -136,8 +154,11 @@ public class ProteinPropertiesFilterer {
 		// apply description NOT LIKE filter
 		if(filters.hasDescriptionNotLikeFilter()) {
 			s = System.currentTimeMillis();
+			
+			List<Integer> fastaDbIds = FastaDatabaseLookupUtil.getFastaDatabaseIds(datasets, true); // add standard databases
+			
 			nrseqIds = ProteinDescriptionFilter.getInstance().filterNrseqIdsNotMatchingDescription(nrseqIds,
-					filters.getDescriptionNotLike());
+					filters.getDescriptionNotLike(), fastaDbIds);
 			e = System.currentTimeMillis();
 			log.info("Time to filter on description NOT LIKE): "+TimeUtils.timeElapsedSeconds(e, e)+" seconds");
 		}

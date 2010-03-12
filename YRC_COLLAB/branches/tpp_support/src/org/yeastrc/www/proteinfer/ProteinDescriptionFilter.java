@@ -113,7 +113,8 @@ public class ProteinDescriptionFilter {
         return sortedIds;
     }
     
-    public List<Integer> filterNrseqIdsMatchingDescription(List<Integer> nrseqIds, String searchString) {
+    public List<Integer> filterNrseqIdsMatchingDescription(List<Integer> nrseqIds, String searchString,
+    		List<Integer> databaseIds) {
         if(searchString == null || searchString.trim().length() == 0)
             return null;
 
@@ -125,7 +126,7 @@ public class ProteinDescriptionFilter {
         	for(String token: tokens) {
                 String description = token.trim();
                 if(description.length() > 0) {
-                	if(NrSeqLookupUtil.proteinMatchesDescriptionTerm(nrseqId, token)) {
+                	if(NrSeqLookupUtil.proteinMatchesDescriptionTerm(nrseqId, databaseIds, token)) {
                 		matchingIds.add(nrseqId);
                 		break;  // We have a match for one of the description terms
                 	}
@@ -136,7 +137,8 @@ public class ProteinDescriptionFilter {
         return matchingIds;
     }
     
-    public List<Integer> filterNrseqIdsNotMatchingDescription(List<Integer> nrseqIds, String searchString) {
+    public List<Integer> filterNrseqIdsNotMatchingDescription(List<Integer> nrseqIds, String searchString,
+    		List<Integer> databaseIds) {
         if(searchString == null || searchString.trim().length() == 0)
             return null;
 
@@ -149,7 +151,7 @@ public class ProteinDescriptionFilter {
         	for(String token: tokens) {
                 String description = token.trim();
                 if(description.length() > 0) {
-                	if(NrSeqLookupUtil.proteinMatchesDescriptionTerm(nrseqId, token)) {
+                	if(NrSeqLookupUtil.proteinMatchesDescriptionTerm(nrseqId, databaseIds, token)) {
                 		foundMatch = true;
                 		break;  // We have a match for one of the description terms
                 	}
@@ -162,12 +164,12 @@ public class ProteinDescriptionFilter {
         return notMatchingIds;
     }
     
-    public boolean proteinMatchesDescriptionTerms(int nrseqId, String searchString) {
+    public boolean proteinMatchesDescriptionTerms(int nrseqId, String searchString, List<Integer> databaseIds) {
     	String tokens[] = searchString.split(",");
     	for(String token: tokens) {
             String description = token.trim();
             if(description.length() > 0) {
-            	if(NrSeqLookupUtil.proteinMatchesDescriptionTerm(nrseqId, token)) {
+            	if(NrSeqLookupUtil.proteinMatchesDescriptionTerm(nrseqId, databaseIds, token)) {
             		return true;  // We have a match for one of the description terms
             	}
             }
