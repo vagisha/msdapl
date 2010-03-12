@@ -85,7 +85,7 @@ public class ProteinAccessionFilter {
         
         // Look in the database for matching ids.
         else {
-            List<Integer> found = FastaProteinLookupUtil.getInstance().getProteinIdsForNames(new ArrayList<String>(reqAcc), pinferId);
+            List<Integer> found = FastaProteinLookupUtil.getInstance().getProteinIdsForAccessions(new ArrayList<String>(reqAcc), pinferId);
             
             // get the corresponding protein inference protein ids
             if(found.size() > 0) {
@@ -101,9 +101,9 @@ public class ProteinAccessionFilter {
         return filtered;
     }
     
-    public List<Integer> filterNrseqIdsByName(List<Integer> allNrseqIds, String searchString) throws SQLException {
+    public List<Integer> filterNrseqIdsByAccession(List<Integer> allNrseqIds, String searchString) throws SQLException {
         
-    	List<Integer> sortedIds = getSortedNrseqIdsMatchingName(searchString);
+    	List<Integer> sortedIds = getSortedNrseqIdsMatchingAccession(searchString);
         if(sortedIds == null || sortedIds.size() == 0)
             return new ArrayList<Integer>(0); // no matching nrseq IDs found
 
@@ -111,7 +111,7 @@ public class ProteinAccessionFilter {
         return getMatching(allNrseqIds, sortedIds);
     }
     
-    private List<Integer> getSortedNrseqIdsMatchingName(String searchString) throws SQLException {
+    private List<Integer> getSortedNrseqIdsMatchingAccession(String searchString) throws SQLException {
 
     	if(searchString == null || searchString.trim().length() == 0)
     		return null;
@@ -125,7 +125,7 @@ public class ProteinAccessionFilter {
     	for(String token: tokens) {
     		String name = token.trim();
     		if(name.length() > 0) {
-    			List<Integer> ids = CommonNameLookupUtil.getInstance().getProteinIds(name);
+    			List<Integer> ids = CommonNameLookupUtil.getInstance().getProteinIdsFromCache(name);
     			proteinIds.addAll(ids);
     		}
     	}

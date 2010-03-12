@@ -1,25 +1,49 @@
 package org.yeastrc.nrseq;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.yeastrc.bio.taxonomy.TaxonomyUtils;
 
 public enum StandardDatabase {
 
-	SGD ("SGD"),
-	S_POMBE("Sanger Pombe"),
-	WORMBASE("WormBase"),
-	FLYBASE("FlyBase"),
-	HGNC ("HGNC (HUGO)"),
-	NCBI_NR("NCBI NR"),
-	SWISSPROT("Swiss-Prot");
+	SGD ("SGD", 1, TaxonomyUtils.SACCHAROMYCES_CEREVISIAE),
+	S_POMBE("Sanger Pombe", 1, TaxonomyUtils.SCHIZOSACCHAROMYCES_POMBE),
+	WORMBASE("WormBase", 1, TaxonomyUtils.CAENORHABDITIS_ELEGANS),
+	FLYBASE("FlyBase", 1, TaxonomyUtils.DROSOPHILA_MELANOGASTER),
+	HGNC ("HGNC (HUGO)", 1, TaxonomyUtils.HOMO_SAPIENS),
+	SWISSPROT("Swiss-Prot", 2, 0),
+	NCBI_NR("NCBI NR", 3, 0);
 	
 	
 	private String name;
-	private StandardDatabase(String name) {
+	private int taxonomyId;
+	private int tier;
+	
+	private StandardDatabase(String name, int tier, int taxonomyId) {
 		this.name = name;
+		this.tier = tier;
+		this.taxonomyId = taxonomyId;
 	}
 	
 	public String getDatabaseName() {
 		return name;
+	}
+	
+	public int getTaxonomyId() {
+		return taxonomyId;
+	}
+	
+	public boolean isTierOne() {
+		return tier == 1;
+	}
+	
+	public boolean isTierTwo() {
+		return tier == 2;
+	}
+	
+	public boolean isTierThree() {
+		return tier == 3;
 	}
 	
 	public static StandardDatabase getStandardDatabaseForSpecies(int speciesId) {
@@ -34,12 +58,30 @@ public enum StandardDatabase {
 		}
 	}
 	
-	public static boolean isStandardDatabase(String name) {
-		
+//	public static boolean isStandardDatabase(String name) {
+//		
+//		for(StandardDatabase db: StandardDatabase.values()) {
+//			if(db.getDatabaseName().equals(name))
+//				return true;
+//		}
+//		return false;
+//	}
+	
+	public static List<StandardDatabase> getTierTwoDatabases() {
+		List<StandardDatabase> dbs = new ArrayList<StandardDatabase>();
 		for(StandardDatabase db: StandardDatabase.values()) {
-			if(db.getDatabaseName().equals(name))
-				return true;
+			if(db.isTierTwo()) 
+				dbs.add(db);
 		}
-		return false;
+		return dbs;
+	}
+	
+	public static List<StandardDatabase> getTierThreeDatabases() {
+		List<StandardDatabase> dbs = new ArrayList<StandardDatabase>();
+		for(StandardDatabase db: StandardDatabase.values()) {
+			if(db.isTierThree()) 
+				dbs.add(db);
+		}
+		return dbs;
 	}
 }

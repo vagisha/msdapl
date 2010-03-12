@@ -10,10 +10,11 @@
 <center>
 <div align="center" style="padding:5px;font-size: 10pt;width: 90%; color: black;">
 
-<div style="background-color:#F8F8FF; border: 1px solid #F5F5F5; width:100%" align="center">
-<table align="center">
+<div align="center">
+<table align="center" 
+      style="background-color:#F8F8FF; border: 1px solid #CBCBCB; cellspacing="0" cellpadding="2">
 <tr>
-	<td valign="top" align="left"><b>Accession(s):</b></td>
+	<td valign="top" align="left" width="20%"><b>Accession(s):</b></td>
 	<td valign="top" align="left">
 		<logic:iterate name="protein" property="fastaReferences" id="reference">
 			<bean:write name="reference" property="accession"/>
@@ -26,24 +27,17 @@
 	<td valign="top" align="left"><b>Common Name(s):</b></td>
 	<td valign="top" align="left">
 		<logic:iterate name="protein" property="commonReferences" id="reference">
-			<bean:write name="reference" property="name"/>
-			&nbsp; &nbsp;
+			<bean:write name="reference" property="commonReference.name"/> / <bean:write name="reference" property="accession"/>
+			<logic:equal name="reference" property="hasExternalLink" value="true">
+				<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;">
+				[<bean:write name="reference" property="databaseName"/>]</a>
+			</logic:equal>
+			<br/>
 		</logic:iterate>
 	</td>
 </tr>
 </logic:notEmpty>
-<logic:notEmpty name="protein" property="externalReferences">
-<tr>
-	<td valign="top" align="left"><b>External Link(s):</b></td>
-	<td valign="top" align="left">
-		<logic:iterate name="protein" property="externalReferences" id="reference">
-			<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;">
-			[<bean:write name="reference" property="databaseName"/>]</a>
-			&nbsp; &nbsp;
-		</logic:iterate>
-	</td>
-</tr>
-</logic:notEmpty>
+
 <tr>
 	<td valign="top" align="left"><b>Organism:</b></td>
 	<td valign="top" align="left">
@@ -66,15 +60,21 @@
 <tr>
 	<td valign="top" align="left"><b>Description(s):</b></td>
 	<td valign="top" align="left" style="color: #888888; font-size: 9pt;">
-		<ul>
-		<logic:iterate name="protein" property="descriptionReferences" id="reference">
+		<logic:iterate name="protein" property="allReferences" id="reference">
 			<li>
-				<bean:write name="reference" property="description"/>
-				&nbsp; &nbsp;
-				<b>[<bean:write name="reference" property="databaseName"/>]</b>
+				<logic:equal name="reference" property="hasExternalLink" value="true">
+					<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;" target="External Link">
+						[<bean:write name="reference" property="databaseName"/>]
+					</a>
+				</logic:equal>
+				<logic:equal name="reference" property="hasExternalLink" value="false">
+					<span style="color:#000080;"><b>[<bean:write name="reference" property="databaseName"/>]</b></span>
+				</logic:equal>
+				 &nbsp; &nbsp; <bean:write name="reference" property="description"/>
+				<br/>
+				
 			</li>
 		</logic:iterate>
-		</ul>
 	</td>
 </tr>
 
@@ -129,15 +129,15 @@
    </td>
 </tr>
 
+<tr>
+<td colspan="2" style="font-size: 8pt; color: red;" align="center">
+<a  style="color:red;"   href="<yrcwww:link path='viewProtein.do?id'/>=<bean:write name='protein' property='protein.nrseqProteinId'/>">[List experiments with this protein]</a>
+</td>
+</tr>
 </table>
 
-<br>
-<span style="font-size: 8pt; color: red;">
-<a  style="color:red;"   href="<yrcwww:link path='viewProtein.do?id'/>=<bean:write name='protein' property='protein.nrseqProteinId'/>">[List Experiments With ThisProtein]</a>
-</span>
-<br>
-
 </div>
+
 <br>
 
 <!-- PROTEIN SEQUENCE -->

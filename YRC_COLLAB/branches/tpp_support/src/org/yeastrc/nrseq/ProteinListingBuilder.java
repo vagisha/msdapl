@@ -7,6 +7,7 @@
 package org.yeastrc.nrseq;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -74,7 +75,7 @@ public class ProteinListingBuilder {
 		
 	}
 	
-	private ProteinListing build(NrProtein protein, List<Integer> fastaDatabaseIds, 
+	private ProteinListing build(NrProtein protein, List<Integer> fastaDatabaseIds,
 			StandardDatabase...sdbList) {
 		
 		int nrseqId = protein.getId();
@@ -84,29 +85,40 @@ public class ProteinListingBuilder {
 		List<NrDbProtein> matchingProteins = NrSeqLookupUtil.getDbProteins(nrseqId, fastaDatabaseIds);
 		for(NrDbProtein prot: matchingProteins) {
 			if(prot.isCurrent()) // add only current references
-				listing.addReference(new ProteinReference(prot));
+				listing.addFastaReference(new ProteinReference(prot));
 		}
 		
-		// now do a lookup for the given standard databases
-		NrseqDatabaseDAO dbDao = NrseqDatabaseDAO.getInstance();
-		for(StandardDatabase sdb: sdbList) {
-			NrDatabase db = null;
-			try {
-				db = dbDao.getDatabase(sdb.getDatabaseName());
-			} catch (SQLException e) {
-				log.error("Lookup of standard database "+sdb.getDatabaseName()+" failed", e);
+		// get references to tier-one (species specific) database
+		List<ProteinReference> tierOneRefs = getReferences(protein, getDatabases(true, false, false, sdbList));
+		for(ProteinReference ref: tierOneRefs)
+			listing.addTierOneReference(ref);
+		
+		// get references to tier-two databases (for now only Swiss-Prot)
+		List<ProteinReference> tierTwoRefs = getReferences(protein, getDatabases(false, true, false, sdbList));
+		for(ProteinReference ref: tierTwoRefs)
+			listing.addTierTwoReference(ref);
+		
+		// get references to tier-three databases (for now only NCBI-NR) if no references were found
+		// for tier-one and two databases
+		if(protein.getSpeciesId() != TaxonomyUtils.DROSOPHILA_MELANOGASTER) {
+			if(tierOneRefs.size() == 0 && tierTwoRefs.size() == 0) {
+				List<ProteinReference> tierThreeRefs = getReferences(protein, getDatabases(false, false, true, sdbList));
+				for(ProteinReference ref: tierThreeRefs)
+					listing.addTierThreeReference(ref);
 			}
-			if(db != null) {
-				matchingProteins = NrSeqLookupUtil.getDbProteins(nrseqId, db.getId());
-				for(NrDbProtein prot: matchingProteins) {
-					if(prot.isCurrent()) // add only current references
-						listing.addReference(new ProteinReference(prot));
-				}
+		}
+		else {
+			// FlyBase descriptions are not very useful, so if we did not get a SwissProt reference
+			// look for NCBI references.
+			if(tierTwoRefs.size() == 0) { 
+				List<ProteinReference> tierThreeRefs = getReferences(protein, getDatabases(false, false, true, sdbList));
+				for(ProteinReference ref: tierThreeRefs)
+					listing.addTierThreeReference(ref);
 			}
 		}
 		
 		
-		// Get the appropriate common name and description from species specific database
+		
 		// YRC_NRSEQ incorporates species specific databases: eg. SGD, WORMBASE etc. 
 		// In addition, we also have species specific databases external to YRC_NRSEQ. e.g. sgd_static_200709
 		// Suppose we want the common name for a yeast protein, the common name lookup will work like this: 
@@ -119,56 +131,94 @@ public class ProteinListingBuilder {
 		//    These will typically be the database ID(s) of the fasta file(s) used for a search. 
 		// TODO? If we do not find a common name even after 4 we could look at all accession strings associated with this 
 		// protein and try to find a matching entry in sgd_static_200709
-		StandardDatabase db = StandardDatabase.getStandardDatabaseForSpecies(protein.getSpeciesId());
-		if(db != null) {
-			
-			
-			List<ProteinCommonReference> commonRefs = null;
-			// TODO This is temporary till I figure out how HGNC lookups should work
-			if(db == StandardDatabase.HGNC) {
-				List<ProteinReference> refs = null;
-				try {
-					refs = listing.getReferencesForDatabase(db.getDatabaseName());
-				} catch (SQLException e) {
-					log.error("Error getting references for database: "+db.getDatabaseName(), e);
-				}
-				if(refs != null) {
-					for(ProteinReference ref: refs) {
-						ProteinCommonReference cref = new ProteinCommonReference();
-						cref.setDatabase(db);
-						cref.setName(ref.getAccession());
-						cref.setDescription(ref.getDescription());
-						listing.addCommonReference(cref);
-					}
-				}
-			}
-			else {
-				// Get the accession strings from table: YRC_NRSEQ.tblProteinDatabase for our species specific database name.
-				List<String> accessions = null;
-				try {
-					accessions = listing.getAccessionsForDatabase(db.getDatabaseName());
-				} catch (SQLException e) {
-					log.error("Error getting accesions for database: "+db.getDatabaseName(), e);
-				}
-				commonRefs = CommonNameLookupUtil.getInstance().getCommonReferences(accessions, protein.getSpeciesId());
-				// If we did not find a common name based on the accessions above look for a match with other accession we have for this protein.
-				if(commonRefs.size() == 0) {
-					try {
-						accessions = listing.getAccessionsForNotStandardDatabases();
-					} catch (SQLException e) {
-						log.error("Error getting accesions for non standard databases: "+db.getDatabaseName(), e);
-					}
-					commonRefs = CommonNameLookupUtil.getInstance().getCommonReferences(accessions, protein.getSpeciesId());
-				}
-			}
-			
-			if(commonRefs != null) {
-				for(ProteinCommonReference ref: commonRefs)
-					listing.addCommonReference(ref);
+		
+		// We should already have found common references when adding tier-one references
+		// If we did not find a common name associated with those references
+		// look for common names associated with the fasta file(s) used for the search
+		List<StandardDatabase> tierOneDbs = getDatabases(true, false, false, sdbList);
+		for(ProteinReference ref: tierOneRefs) {
+			for(StandardDatabase db: tierOneDbs) {
+				// skip HGNC(HUGO). If there was a common name we would have found it already
+				if(db == StandardDatabase.HGNC)
+					continue;
+				getCommonReference(db, ref);
 			}
 		}
 		
+		
 		return listing;
+	}
+	
+	private List<StandardDatabase> getDatabases(boolean tierOne, boolean tierTwo, boolean tierThree, 
+			StandardDatabase...sdbList) {
+		
+		List<StandardDatabase> list = new ArrayList<StandardDatabase>();
+		for(StandardDatabase sdb: sdbList) {
+			if(tierOne && sdb.isTierOne())
+				list.add(sdb);
+			if(tierTwo && sdb.isTierTwo())
+				list.add(sdb);
+			if(tierThree && sdb.isTierThree())
+				list.add(sdb);
+		}
+		
+		return list;
+	}
+	
+	private List<ProteinReference> getReferences(NrProtein protein, List<StandardDatabase> sdbList) {
+		
+		List<ProteinReference> refs = new ArrayList<ProteinReference>();
+		
+		NrseqDatabaseDAO dbDao = NrseqDatabaseDAO.getInstance();
+		for(StandardDatabase sdb: sdbList) {
+			
+			NrDatabase db = null;
+			try {
+				db = dbDao.getDatabase(sdb.getDatabaseName());
+			} catch (SQLException e) {
+				log.error("Lookup of standard database "+sdb.getDatabaseName()+" failed", e);
+			}
+			if(db != null) {
+				List<NrDbProtein> proteins = NrSeqLookupUtil.getDbProteins(protein.getId(), db.getId());
+				for(NrDbProtein prot: proteins) {
+					if(prot.isCurrent())  {// add only current references
+						ProteinReference ref = new ProteinReference(prot);
+						
+						// if this is a tier one database try to get a common name
+						if(sdb.isTierOne()) {
+							getCommonReference(sdb, ref); // get a common name/description if one can be found
+						}
+						
+						refs.add(ref);
+					}
+				}
+			}
+		}
+		return refs;
+	}
+	
+	private boolean getCommonReference(StandardDatabase db, ProteinReference reference) {
+		
+		ProteinCommonReference commonRef = null;
+		// HGNC common names are in YRC_NRSQ -- accessionString == commonName
+		if(db == StandardDatabase.HGNC) {
+			
+			commonRef = new ProteinCommonReference();
+			commonRef.setDatabase(db);
+			commonRef.setName(reference.getAccession());
+			commonRef.setDescription(reference.getDescription());
+			
+		}
+		else {
+			commonRef = CommonNameLookupUtil.getInstance().getCommonReference(reference.getAccession(), 
+					db.getTaxonomyId());
+		}
+		
+		if(commonRef != null) {
+			reference.setCommonReference(commonRef);
+			return true; // we found a common reference
+		}
+		return false;
 	}
 	
 }

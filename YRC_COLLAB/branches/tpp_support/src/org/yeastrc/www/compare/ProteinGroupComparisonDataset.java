@@ -23,7 +23,6 @@ import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.ms.util.ProteinUtils;
-import org.yeastrc.nrseq.ProteinCommonReference;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.nrseq.ProteinListingBuilder;
 import org.yeastrc.nrseq.ProteinReference;
@@ -398,8 +397,8 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         row.addCell(protCommonName);
         
         // External Links
-        TableCell extLinks = new TableCell(getExternalLinks(protein));
-        row.addCell(extLinks);
+//        TableCell extLinks = new TableCell(getExternalLinks(protein));
+//        row.addCell(extLinks);
         
         // Protein molecular wt.
         TableCell molWt = new TableCell();
@@ -490,9 +489,8 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         // List<ProteinReference> uniqueDbRefs;
         ProteinReference oneRef;
 		try {
-			allReferences = protein.getDescriptionReferences();
-			// uniqueDbRefs = protein.getUniqueDbDescriptionReferences();
-			oneRef = protein.getBestDescriptionReference();
+			allReferences = protein.getAllReferences();
+			oneRef = protein.getOneBestReference();
 		} catch (SQLException e) {
 			log.error("Error getting description", e);
 			return "ERROR";
@@ -501,11 +499,18 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         	String dbName = null;
         	try {dbName = ref.getDatabaseName();}
         	catch(SQLException e){log.error("Error getting database name"); dbName="ERROR";}
-        	fullContents += "<span style=\"color:#000080;\"<b>["+dbName+"]</b></span>&nbsp;&nbsp;"+ref.getDescription();
+        	fullContents += "<span style=\"color:#000080;\"<b>";//["+dbName+"]</b></span>&nbsp;&nbsp;"+ref.getDescription();
+        	if(ref.getHasExternalLink()) {
+        		fullContents += "<a href=\""+ref.getUrl()+"\" style=\"font-size:8pt;\" target=\"External Link\">["+dbName+"]</a>";
+        	}
+        	else {
+        		fullContents += "["+dbName+"]";
+        	}
+        	fullContents += "</b></span>&nbsp;&nbsp;"+ref.getDescription();
         	fullContents += "<br>";
         }
         if(allReferences.size() > 1) { // uniqueDbRefs.size()) {
-        	fullContents += "<br><b><span class=\"clickable\" onclick=\"hideAllDescriptionsForProtein("+
+        	fullContents += "<b><span class=\"clickable\" onclick=\"hideAllDescriptionsForProtein("+
         	protein.getNrseqId()+")\">[-]</span></b>";
         }
         // for(ProteinReference ref: uniqueDbRefs) {
@@ -514,7 +519,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         	try {dbName = oneRef.getDatabaseName();}
         	catch(SQLException e){log.error("Error getting database name"); dbName="ERROR";}
         	// shortContents += "<span style=\"color:#000080;\"<b>["+dbName+"]</span></b>&nbsp;&nbsp;"+ref.getShortDescription();
-        	shortContents += "<span style=\"color:#000080;\"<b>["+dbName+"]</span></b>&nbsp;&nbsp;"+oneRef.getShortDescription();
+        	shortContents += oneRef.getShortDescription();
         	shortContents += "<br>";
         // }
         // if(uniqueDbRefs.size() < allReferences.size()) {
@@ -533,9 +538,9 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 		String contents = "";
         contents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+"\")";
     	contents += " class=\"clickable underline\">";
-        List<ProteinCommonReference> commonRefs = protein.getCommonReferences();
-        for(ProteinCommonReference ref: commonRefs) {
-        	contents += ref.getName()+"<br>";
+        List<ProteinReference> commonRefs = protein.getCommonReferences();
+        for(ProteinReference ref: commonRefs) {
+        	contents += ref.getCommonReference().getName()+"<br>";
         }
         contents += "</span>";
 		return contents;
@@ -626,10 +631,10 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         header.setSortable(false);
         headers.add(header);
         
-        header = new TableHeader("Links");
-        header.setWidth(5);
-        header.setSortable(false);
-        headers.add(header);
+//        header = new TableHeader("Links");
+//        header.setWidth(5);
+//        header.setSortable(false);
+//        headers.add(header);
         
         header = new TableHeader("Mol. Wt.");
         header.setWidth(8);

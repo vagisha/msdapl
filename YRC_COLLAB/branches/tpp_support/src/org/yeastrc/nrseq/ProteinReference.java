@@ -22,6 +22,8 @@ public class ProteinReference {
 	private String url;
 	private String accession;
 	private String description;
+	
+	private ProteinCommonReference commonReference;
     
 	public ProteinReference() {}
 	
@@ -53,6 +55,10 @@ public class ProteinReference {
 	
 	public String getUrl() {
 		return this.url;
+	}
+	
+	public boolean getHasExternalLink() {
+		return getUrl() != null;
 	}
 	
 	public String getAccession() {
@@ -101,5 +107,17 @@ public class ProteinReference {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public ProteinCommonReference getCommonReference() {
+		return commonReference;
+	}
+
+	public void setCommonReference(ProteinCommonReference commonReference) {
+		this.commonReference = commonReference;
+	}
+	
+	public boolean hasCommonReference() {
+		return commonReference != null;
 	}
 }

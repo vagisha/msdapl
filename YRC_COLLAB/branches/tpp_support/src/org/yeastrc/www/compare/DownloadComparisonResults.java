@@ -398,7 +398,7 @@ public class DownloadComparisonResults extends Action {
         if(printDescription) {
         	List<ProteinReference> descRefs = new ArrayList<ProteinReference>();
         	try {
-        		descRefs = protein.getDescriptionReferences();
+        		descRefs = protein.getBestReferences();
         	} catch (SQLException e) {
         		log.error("Error getting description", e);
         		writer.write("ERROR\t");
@@ -449,7 +449,7 @@ public class DownloadComparisonResults extends Action {
                 if(includeDescription) {
                 	List<ProteinReference> descRefs = new ArrayList<ProteinReference>();
                 	try {
-                		descRefs = protein.getDescriptionReferences();
+                		descRefs = protein.getBestReferences();
                 	} catch (SQLException e) {
                 		log.error("Error getting description", e);
                 		descriptionString += ",ERROR";

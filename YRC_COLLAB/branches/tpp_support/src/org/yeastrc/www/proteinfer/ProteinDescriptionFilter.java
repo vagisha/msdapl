@@ -39,6 +39,8 @@ public class ProteinDescriptionFilter {
     }
     
     
+    // This will look for matching description terms in the databases associated with 
+    // this protein inference as well as all standard databases. 
     public List<Integer> filterForProtInferByProteinDescription(int pinferId,
             List<Integer> proteinIds, String descriptionLike, boolean includeMatching) {
         
@@ -109,6 +111,68 @@ public class ProteinDescriptionFilter {
         sortedIds.addAll(proteinIds);
         Collections.sort(sortedIds);
         return sortedIds;
+    }
+    
+    public List<Integer> filterNrseqIdsMatchingDescription(List<Integer> nrseqIds, String searchString) {
+        if(searchString == null || searchString.trim().length() == 0)
+            return null;
+
+        // filter the given nrseqIds that have matching description terms
+        List<Integer> matchingIds = new ArrayList<Integer>();
+        String tokens[] = searchString.split(",");
+
+        for(int nrseqId: nrseqIds) {
+        	for(String token: tokens) {
+                String description = token.trim();
+                if(description.length() > 0) {
+                	if(NrSeqLookupUtil.proteinMatchesDescriptionTerm(nrseqId, token)) {
+                		matchingIds.add(nrseqId);
+                		break;  // We have a match for one of the description terms
+                	}
+                }
+            }
+        }
+        
+        return matchingIds;
+    }
+    
+    public List<Integer> filterNrseqIdsNotMatchingDescription(List<Integer> nrseqIds, String searchString) {
+        if(searchString == null || searchString.trim().length() == 0)
+            return null;
+
+        // filter the given nrseqIds that have matching description terms
+        List<Integer> notMatchingIds = new ArrayList<Integer>();
+        String tokens[] = searchString.split(",");
+
+        for(int nrseqId: nrseqIds) {
+        	boolean foundMatch = false;
+        	for(String token: tokens) {
+                String description = token.trim();
+                if(description.length() > 0) {
+                	if(NrSeqLookupUtil.proteinMatchesDescriptionTerm(nrseqId, token)) {
+                		foundMatch = true;
+                		break;  // We have a match for one of the description terms
+                	}
+                }
+            }
+        	if(!foundMatch)
+        		notMatchingIds.add(nrseqId);
+        }
+        
+        return notMatchingIds;
+    }
+    
+    public boolean proteinMatchesDescriptionTerms(int nrseqId, String searchString) {
+    	String tokens[] = searchString.split(",");
+    	for(String token: tokens) {
+            String description = token.trim();
+            if(description.length() > 0) {
+            	if(NrSeqLookupUtil.proteinMatchesDescriptionTerm(nrseqId, token)) {
+            		return true;  // We have a match for one of the description terms
+            	}
+            }
+        }
+    	return false;
     }
     
     private List<Integer> getMatching(List<Integer> allNrseqIds, List<Integer> sortedMatchingIds) {

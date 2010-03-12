@@ -174,6 +174,7 @@
 			</span>
 		</td>
 	</tr>
+	</logic:equal>
 	<tr>
 		<td valign="top" style="padding-bottom: 10px;">Include Proteins:</td>
 		<td valign="top" colspan="3" style="padding-bottom: 10px;">
@@ -187,7 +188,7 @@
 			</span>
 			</logic:equal>
 		</td>
-	</tr></logic:equal>
+	</tr>
 	
 	
 	<!-- ################## MOLECULAR WT. AND pI FILTERS	  ########################################### -->

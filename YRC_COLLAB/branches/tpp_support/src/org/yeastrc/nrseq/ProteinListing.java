@@ -24,192 +24,133 @@ import org.yeastrc.ms.domain.nrseq.NrProtein;
 public class ProteinListing {
 
 	private NrProtein protein;
-    private List<ProteinCommonReference> commonReferences;
-    private List<ProteinReference> references;
-    
+	private List<ProteinReference> fastaReferences;
+	private List<ProteinReference> tierOneReferences;
+	private List<ProteinReference> tierTwoReferences;
+	private List<ProteinReference> tierThreeReferences;
+	
     
     public ProteinListing(NrProtein protein) {
     	
     	this.protein = protein;
-    	commonReferences = new ArrayList<ProteinCommonReference>();
-    	references = new ArrayList<ProteinReference>();
-    }
-    public void addReference(ProteinReference reference) {
-    	references.add(reference);
-    }
-    
-    public List<ProteinReference> getReferences() {
-    	return this.references;
+    	tierOneReferences = new ArrayList<ProteinReference>();
+    	fastaReferences = new ArrayList<ProteinReference>();
+    	tierTwoReferences = new ArrayList<ProteinReference>();
+    	tierThreeReferences = new ArrayList<ProteinReference>();
     }
     
-    public void addCommonReference(ProteinCommonReference commonReference) {
-    	commonReferences.add(commonReference);
+    void addTierOneReference(ProteinReference reference) {
+    	tierOneReferences.add(reference);
+    }
+    void addTierTwoReference(ProteinReference reference) {
+    	tierTwoReferences.add(reference);
+    }
+    void addTierThreeReference(ProteinReference reference) {
+    	tierThreeReferences.add(reference);
+    }
+    void addFastaReference(ProteinReference reference) {
+    	fastaReferences.add(reference);
     }
     
-    public int getReferenceCount() {
-        return this.references.size();
-    }
-    
-    public int getCommonReferenceCount() {
-    	return this.commonReferences.size();
-    }
-    
-    public List<ProteinReference> getUniqueReferencesForNonStandardDatabases() throws SQLException {
+    public List<ProteinReference> getCommonReferences() {
     	
-    	List<ProteinReference> refs = new ArrayList<ProteinReference>();
-    	Set<String> seen = new HashSet<String>();
-    	for(ProteinReference ref: this.references) {
-    		if(StandardDatabase.isStandardDatabase(ref.getDatabaseName()))
-    			continue;
-    		if(seen.contains(ref.getAccession()))
-    			continue;
-    		seen.add(ref.getAccession());
-    		refs.add(ref);
-    	}
-    	return refs;
-    }
-    
-    public List<ProteinReference> getUniqueExternalReferences() throws SQLException {
-    	
-    	List<ProteinReference> refs = new ArrayList<ProteinReference>();
-    	Set<Integer> seen = new HashSet<Integer>();
-    	for(ProteinReference ref: this.references) {
-    		if(ref.getUrl() == null) // no link to an external source
-    			continue;
-    		if(seen.contains(ref.getDatabaseId()))
-    			continue;
-    		seen.add(ref.getDatabaseId());
-    		refs.add(ref);
-    	}
-    	return refs;
-    }
-    
-    
-    public List<ProteinReference> getReferencesForUniqueDescriptions() {
-    	
-    	Set<String> seen = new HashSet<String>();
-    	List<ProteinReference> unique = new ArrayList<ProteinReference>();
-    	for(ProteinReference ref: references) {
-    		// ignore empty descriptions
-    		if(ref.getDescription() == null || ref.getDescription().trim().length() == 0)
-    			continue;
-    		if(seen.contains(ref.getDescription()))
-    			continue;
-    		seen.add(ref.getDescription());
-    		unique.add(ref);
-    	}
-    	return unique;
-    }
-    
-    public ProteinReference getBestReference() throws SQLException {
-    	
-    	// First check if there is a standard database for this species
-    	StandardDatabase standardDatabase = StandardDatabase.getStandardDatabaseForSpecies(protein.getSpeciesId());
-    	if(standardDatabase != null) {
-    		List<ProteinReference> references = getReferencesForDatabase(standardDatabase.getDatabaseName());
-    		if(references.size() > 0)
-    			return references.get(0); // return the first one
+    	// common references will be in the tier one references
+    	List<ProteinReference> commonRefs = new ArrayList<ProteinReference>();
+    	for(ProteinReference ref: tierOneReferences) {
+    		if(ref.hasCommonReference()) {
+    			commonRefs.add(ref);
+    		}
     	}
     	
-    	// If we did not find reference to a standard database, return the first reference we have --
-    	// this should be for the fasta file used for the search
-    	String desc = references.get(0).getDescription();
-    	if(desc != null && desc.trim().length() > 0)
-    		return references.get(0);
-    	
-    	// If the fasta file used for the search did not have a non-empty description, return a description
-    	// from one of the other standard database (NCBI-NR or Swiss-Prot).
-    	List<ProteinReference> references = getUniqueReferencesForNonStandardDatabases();
-    	for(ProteinReference ref: references) {
-    		if(ref.getDescription() != null && ref.getDescription().trim().length() > 0)
-    			return ref;
+    	// If there were no tier one databases OR no common references found in tier one references
+    	// look in the fasta references
+    	if(commonRefs.size() == 0) {
+    		for(ProteinReference ref: fastaReferences) {
+        		if(ref.hasCommonReference()) {
+        			commonRefs.add(ref);
+        		}
+        	}
     	}
     	
-    	// We did not find anything
-    	return null;
+    	return commonRefs;
     }
     
-    public List<ProteinReference> getBestReferences() throws SQLException {
+    public List<String> getCommonNames() {
     	
-    	// First check if there is a standard database for this species
-    	StandardDatabase standardDatabase = StandardDatabase.getStandardDatabaseForSpecies(protein.getSpeciesId());
-    	if(standardDatabase != null) {
-    		List<ProteinReference> refs = getReferencesForDatabase(standardDatabase.getDatabaseName());
-    		if(refs.size() > 0)
-    			return refs;
-    	}
-    	
-    	// If we did not find reference to a standard database for the species
-    	// Look for a SwissProt reference
-    	List<ProteinReference> refs = getReferencesForDatabase(standardDatabase.SWISSPROT.getDatabaseName());
-		if(refs.size() > 0)
-			return refs;
-		
-		// If we did not find a Swiss-Prot reference look for a NCBI-NR reference
-		refs = getReferencesForDatabase(standardDatabase.NCBI_NR.getDatabaseName());
-		if(refs.size() > 0)
-			return refs;
-    	
-    	// We did not find anything
-    	return null;
+    	List<ProteinReference> commonRefs = getFastaReferences();
+    	Set<String> names = new HashSet<String>();
+    	for(ProteinReference ref: commonRefs)
+    		names.add(ref.getCommonReference().getName());
+    	return new ArrayList<String>(names);
     }
     
-    public List<String> getBestReferenceAccessions() throws SQLException {
+    public List<ProteinReference> getFastaReferences() {
+    	return fastaReferences;
+    }
+    
+    public List<String> getFastaReferenceAccessions() {
     	
-    	List<ProteinReference> refs = getBestReferences();
+    	List<ProteinReference> fastaRefs = getFastaReferences();
     	Set<String> accessions = new HashSet<String>();
-    	for(ProteinReference ref: refs) {
+    	for(ProteinReference ref: fastaRefs)
     		accessions.add(ref.getAccession());
-    	}
     	return new ArrayList<String>(accessions);
     }
     
-    public List<ProteinReference> getReferencesForUniqueDatabases() {
+    public List<ProteinReference> getBestReferences() {
     	
-    	Set<Integer> seen = new HashSet<Integer>();
-    	List<ProteinReference> unique = new ArrayList<ProteinReference>();
-    	for(ProteinReference ref: references) {
-    		if(seen.contains(ref.getDatabaseId()))
-    			continue;
-    		seen.add(ref.getDatabaseId());
-    		unique.add(ref);
+    	if(tierOneReferences.size() > 0)
+    		return tierOneReferences;
+    	else if(tierTwoReferences.size() > 0) {
+    		return tierTwoReferences;
     	}
-    	return unique;
+    	else if(fastaReferences.size() > 0)
+    		return fastaReferences;
+    	else 
+    		return tierThreeReferences; // NCBI NR 
     }
     
-    
-    List<ProteinReference> getReferencesForDatabase(String dbName) throws SQLException {
+    public List<String> getBestReferenceAccessions() {
     	
-    	List<ProteinReference> refs = new ArrayList<ProteinReference>();
-    	for(ProteinReference ref: references) {
-    		if(ref.getDatabaseName().equals(dbName))
-    			refs.add(ref);
-    	}
-    	return refs;
-    }
-    
-    List<String> getAccessionsForDatabase(String databaseName) throws SQLException {
-    	
-    	List<ProteinReference> refs = getReferencesForDatabase(databaseName);
+    	List<ProteinReference> bestRefs = getBestReferences();
     	Set<String> accessions = new HashSet<String>();
-    	for(ProteinReference ref: refs) {
+    	for(ProteinReference ref: bestRefs)
     		accessions.add(ref.getAccession());
-    	}
     	return new ArrayList<String>(accessions);
     }
     
-    List<String> getAccessionsForNotStandardDatabases() throws SQLException {
+    public List<ProteinReference> getExternalReferences() {
     	
-    	List<ProteinReference> refs = getUniqueReferencesForNonStandardDatabases();
-    	Set<String> accessions = new HashSet<String>();
-    	for(ProteinReference ref: refs) {
-    		accessions.add(ref.getAccession());
+    	List<ProteinReference> exernalRefs = new ArrayList<ProteinReference>();
+    	for(ProteinReference ref: tierOneReferences) {
+    		if(ref.getHasExternalLink()) {
+    			exernalRefs.add(ref);
+    		}
     	}
-    	return new ArrayList<String>(accessions);
+    	
+    	for(ProteinReference ref: tierTwoReferences) {
+    		if(ref.getHasExternalLink()) {
+    			exernalRefs.add(ref);
+    		}
+    	}
+    	
+    	for(ProteinReference ref: tierThreeReferences) {
+    		if(ref.getHasExternalLink()) {
+    			exernalRefs.add(ref);
+    		}
+    	}
+    	return exernalRefs;
     }
     
-    public List<ProteinCommonReference> getCommonReferences() {
-    	return this.commonReferences;
+    public List<ProteinReference> getAllReferences() {
+    	
+    	List<ProteinReference> allRefs = new ArrayList<ProteinReference>();
+    	allRefs.addAll(tierOneReferences);
+    	allRefs.addAll(tierTwoReferences);
+    	allRefs.addAll(fastaReferences);
+    	allRefs.addAll(tierThreeReferences);
+    	
+    	return allRefs;
     }
     
     public int getNrseqProteinId() {
