@@ -43,7 +43,7 @@ $(document).ready(function() {
 	<logic:iterate name="databaseList" id="db">
 	<tr>
 		<td><bean:write name="db" property="id"/></td>
-		<td><bean:write name="db" property="fastaFileName"/></td>
+		<td><bean:write name="db" property="name"/></td>
 		<td><bean:write name="db" property="description"/></td>
 	</tr>
 	</logic:iterate>

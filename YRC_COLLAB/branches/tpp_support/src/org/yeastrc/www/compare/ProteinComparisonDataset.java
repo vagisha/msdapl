@@ -268,9 +268,9 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 		TableCell protCommonName = new TableCell(getCommonNameContents(protein));
 		row.addCell(protCommonName);
 
-		// External Links
-		TableCell extLinks = new TableCell(getExternalLinks(protein));
-		row.addCell(extLinks);
+//		// External Links
+//		TableCell extLinks = new TableCell(getExternalLinks(protein));
+//		row.addCell(extLinks);
 
 		// Protein molecular wt.
 		TableCell molWt = new TableCell();
@@ -489,15 +489,15 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 		header.setSortable(false);
 		headers.add(header);
 
-		header = new TableHeader("Common Name");
+		header = new TableHeader("Common<br>Name");
 		header.setWidth(10);
 		header.setSortable(false);
 		headers.add(header);
 
-		header = new TableHeader("Links");
-		header.setWidth(5);
-		header.setSortable(false);
-		headers.add(header);
+//		header = new TableHeader("Links");
+//		header.setWidth(5);
+//		header.setSortable(false);
+//		headers.add(header);
 
 		header = new TableHeader("Mol. Wt.");
 		header.setWidth(8);
