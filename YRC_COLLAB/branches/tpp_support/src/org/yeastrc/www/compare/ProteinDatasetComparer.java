@@ -21,9 +21,6 @@ import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
 import org.yeastrc.www.compare.dataset.DatasetSource;
 import org.yeastrc.www.compare.dataset.FilterableDataset;
-import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
-import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
-import org.yeastrc.www.proteinfer.ProteinPropertiesFilter;
 
 /**
  * 

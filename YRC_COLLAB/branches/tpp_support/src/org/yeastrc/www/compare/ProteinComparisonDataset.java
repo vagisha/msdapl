@@ -317,17 +317,17 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 	}
 
 	private String getDescriptionContents(ComparisonProtein protein) {
-
-		String shortId = "short_desc_"+protein.getNrseqId();
-		String fullId = "full_desc_"+protein.getNrseqId();
-
+		
+    	String shortId = "short_desc_"+protein.getNrseqId();
+    	String fullId = "full_desc_"+protein.getNrseqId();
+    	
 		String fullContents = "";
-		fullContents += "<span style=\"display:none;\" class=\"full_description\" id=\""+fullId+"\">";
-		String shortContents = "";
-		shortContents += "<span class=\"short_description\" id=\""+shortId+"\">";
-		List<ProteinReference> allReferences;
-		// List<ProteinReference> uniqueDbRefs;
-		ProteinReference oneRef;
+        fullContents += "<span style=\"display:none;\" class=\"full_description\" id=\""+fullId+"\">";
+        String shortContents = "";
+        shortContents += "<span class=\"short_description\" id=\""+shortId+"\">";
+        List<ProteinReference> allReferences;
+        // List<ProteinReference> uniqueDbRefs;
+        ProteinReference oneRef;
 		try {
 			allReferences = protein.getProteinListing().getDescriptionReferences();
 			oneRef = protein.getOneDescriptionReference();
@@ -335,42 +335,36 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 			log.error("Error getting description", e);
 			return "ERROR";
 		}
-		for(ProteinReference ref: allReferences) {
-			String dbName = null;
-			try {dbName = ref.getDatabaseName();}
-			catch(SQLException e){log.error("Error getting database name"); dbName="ERROR";}
-			fullContents += "<span style=\"color:#000080;\"<b>";//["+dbName+"]</b></span>&nbsp;&nbsp;"+ref.getDescription();
-			if(ref.getHasExternalLink()) {
-				fullContents += "<a href=\""+ref.getUrl()+"\" style=\"font-size:8pt;\" target=\"External Link\">["+dbName+"]</a>";
-			}
-			else {
-				fullContents += "["+dbName+"]";
-			}
-			fullContents += "</b></span>&nbsp;&nbsp;"+ref.getDescription();
-			fullContents += "<br>";
-		}
-		if(allReferences.size() > 1) { // uniqueDbRefs.size()) {
-			fullContents += "<b><span class=\"clickable\" onclick=\"hideAllDescriptionsForProtein("+
-			protein.getNrseqId()+")\">[-]</span></b>";
-		}
-		// for(ProteinReference ref: uniqueDbRefs) {
-		String dbName = null;
-		// try {dbName = ref.getDatabaseName();}
-		try {dbName = oneRef.getDatabaseName();}
-		catch(SQLException e){log.error("Error getting database name"); dbName="ERROR";}
-		// shortContents += "<span style=\"color:#000080;\"<b>["+dbName+"]</span></b>&nbsp;&nbsp;"+ref.getShortDescription();
-		shortContents += oneRef.getShortDescription();
-		shortContents += "<br>";
-		// }
-		// if(uniqueDbRefs.size() < allReferences.size()) {
-		if(allReferences.size() > 1) {
-			shortContents += "<b><span class=\"clickable\" onclick=\"showAllDescriptionsForProtein("+
-			protein.getNrseqId()+")\">[+]</span></b>";
-		}
-
-		fullContents += "</span>";
-		shortContents += "</span>";
-		return fullContents+"\n"+shortContents;
+        for(ProteinReference ref: allReferences) {
+        	String dbName = null;
+        	try {dbName = ref.getDatabaseName();}
+        	catch(SQLException e){log.error("Error getting database name"); dbName="ERROR";}
+        	fullContents += "<span style=\"color:#000080;\"<b>";//["+dbName+"]</b></span>&nbsp;&nbsp;"+ref.getDescription();
+        	if(ref.getHasExternalLink()) {
+        		fullContents += "<a href=\""+ref.getUrl()+"\" style=\"font-size:8pt;\" target=\"External Link\">["+dbName+"]</a>";
+        	}
+        	else {
+        		fullContents += "["+dbName+"]";
+        	}
+        	fullContents += "</b></span>&nbsp;&nbsp;"+ref.getDescription();
+        	fullContents += "<br>";
+        }
+        if(allReferences.size() > 1) { // uniqueDbRefs.size()) {
+        	fullContents += "<b><span class=\"clickable\" onclick=\"hideAllDescriptionsForProtein("+
+        	protein.getNrseqId()+")\">[-]</span></b>";
+        }
+        if(oneRef != null)
+        	shortContents += oneRef.getShortDescription();
+        shortContents += "<br>";
+        	
+        if(allReferences.size() > 1) {
+        	shortContents += "<b><span class=\"clickable\" onclick=\"showAllDescriptionsForProtein("+
+        	protein.getNrseqId()+")\">[+]</span></b>";
+        }
+        
+        fullContents += "</span>";
+        shortContents += "</span>";
+        return fullContents+"\n"+shortContents;
 	}
 
 

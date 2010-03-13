@@ -488,16 +488,10 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         	fullContents += "<b><span class=\"clickable\" onclick=\"hideAllDescriptionsForProtein("+
         	protein.getNrseqId()+")\">[-]</span></b>";
         }
-        // for(ProteinReference ref: uniqueDbRefs) {
-        	String dbName = null;
-        	// try {dbName = ref.getDatabaseName();}
-        	try {dbName = oneRef.getDatabaseName();}
-        	catch(SQLException e){log.error("Error getting database name"); dbName="ERROR";}
-        	// shortContents += "<span style=\"color:#000080;\"<b>["+dbName+"]</span></b>&nbsp;&nbsp;"+ref.getShortDescription();
+        if(oneRef != null)
         	shortContents += oneRef.getShortDescription();
-        	shortContents += "<br>";
-        // }
-        // if(uniqueDbRefs.size() < allReferences.size()) {
+        shortContents += "<br>";
+        	
         if(allReferences.size() > 1) {
         	shortContents += "<b><span class=\"clickable\" onclick=\"showAllDescriptionsForProtein("+
         	protein.getNrseqId()+")\">[+]</span></b>";

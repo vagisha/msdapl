@@ -372,10 +372,15 @@ public class DatasetFiltersForm extends ActionForm {
     public ProteinFilterCriteria getFilterCriteria() {
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
         
-        if(this.parsimoniousParam == ProteinDatasetComparer.PARSIM.NONE.getNumericValue())
-            filterCriteria.setParsimonious(false);
-        else
+        if(this.parsimoniousParam == ProteinDatasetComparer.PARSIM.NONE.getNumericValue()) {
+        	// get everything
             filterCriteria.setParsimonious(true);
+            filterCriteria.setNonParsimonious(true);
+        }
+        else {
+            filterCriteria.setParsimonious(true);
+            filterCriteria.setNonParsimonious(false);
+        }
        
         return filterCriteria;
     }
