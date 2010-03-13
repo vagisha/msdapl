@@ -9,6 +9,7 @@ package org.yeastrc.nrseq;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -77,7 +78,10 @@ public class ProteinListing {
     
     public List<String> getCommonNames() {
     	
-    	List<ProteinReference> commonRefs = getFastaReferences();
+    	List<ProteinReference> commonRefs = getCommonReferences();
+    	if(commonRefs.size() == 0)
+    		return new ArrayList<String>(0);
+    	
     	Set<String> names = new HashSet<String>();
     	for(ProteinReference ref: commonRefs)
     		names.add(ref.getCommonReference().getName());
@@ -88,9 +92,12 @@ public class ProteinListing {
     	return fastaReferences;
     }
     
-    public List<String> getFastaReferenceAccessions() {
+    public List<String> getFastaAccessions() {
     	
     	List<ProteinReference> fastaRefs = getFastaReferences();
+    	if(fastaRefs.size() == 0)
+    		return new ArrayList<String>(0);
+    	
     	Set<String> accessions = new HashSet<String>();
     	for(ProteinReference ref: fastaRefs)
     		accessions.add(ref.getAccession());
@@ -119,30 +126,7 @@ public class ProteinListing {
     	return new ArrayList<String>(accessions);
     }
     
-    public List<ProteinReference> getExternalReferences() {
-    	
-    	List<ProteinReference> exernalRefs = new ArrayList<ProteinReference>();
-    	for(ProteinReference ref: tierOneReferences) {
-    		if(ref.getHasExternalLink()) {
-    			exernalRefs.add(ref);
-    		}
-    	}
-    	
-    	for(ProteinReference ref: tierTwoReferences) {
-    		if(ref.getHasExternalLink()) {
-    			exernalRefs.add(ref);
-    		}
-    	}
-    	
-    	for(ProteinReference ref: tierThreeReferences) {
-    		if(ref.getHasExternalLink()) {
-    			exernalRefs.add(ref);
-    		}
-    	}
-    	return exernalRefs;
-    }
-    
-    public List<ProteinReference> getAllReferences() {
+    private List<ProteinReference> getAllReferences() {
     	
     	List<ProteinReference> allRefs = new ArrayList<ProteinReference>();
     	allRefs.addAll(tierOneReferences);
@@ -151,6 +135,31 @@ public class ProteinListing {
     	allRefs.addAll(tierThreeReferences);
     	
     	return allRefs;
+    }
+    
+    public List<ProteinReference> getDescriptionReferences() {
+    	
+    	List<ProteinReference> allRefs = getAllReferences();
+    	allRefs = ReferenceSorter.sort(allRefs, DescriptionOrder.getOrder(this.getSpeciesId()));
+    	Set<String> seen = new HashSet<String>();
+    	
+    	Iterator<ProteinReference> iter = allRefs.iterator();
+    	while(iter.hasNext()) {
+    		ProteinReference ref = iter.next();
+    		if(!keepReference(ref, seen))
+    			iter.remove();
+    	}
+    	
+    	return allRefs;
+    }
+    
+    private boolean keepReference(ProteinReference ref, Set<String> seen) {
+    	if(ref.getDescription() == null || ref.getDescription().trim().length() == 0)
+    		return false;
+    	if(seen.contains(ref.getDescription()))
+    		return false;
+    	seen.add(ref.getDescription());
+    	return true;
     }
     
     public int getNrseqProteinId() {

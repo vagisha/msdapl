@@ -35,6 +35,15 @@ public class ProteinReference {
     	this.accession = protein.getAccessionString();
     	this.description = protein.getDescription();
     }
+	
+	public ProteinReference(NrDbProtein protein, StandardDatabase sdb) {
+    	this.databaseId = protein.getDatabaseId();
+    	this.databaseName = sdb.getDatabaseName();
+    	this.isCurrent = protein.isCurrent();
+    	this.url = protein.getUrl();
+    	this.accession = protein.getAccessionString();
+    	this.description = protein.getDescription();
+    }
     
 	public boolean isCurrent() {
 		return isCurrent;

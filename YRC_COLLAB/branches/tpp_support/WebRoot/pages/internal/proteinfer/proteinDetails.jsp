@@ -16,17 +16,17 @@
 <tr>
 	<td valign="top" align="left" width="20%"><b>Accession(s):</b></td>
 	<td valign="top" align="left">
-		<logic:iterate name="protein" property="fastaReferences" id="reference">
+		<logic:iterate name="protein" property="proteinListing.fastaReferences" id="reference">
 			<bean:write name="reference" property="accession"/>
 			<br/>
 		</logic:iterate>
 	</td>
 </tr>
-<logic:notEmpty name="protein" property="commonReferences">
+<logic:notEmpty name="protein" property="proteinListing.commonReferences">
 <tr>
 	<td valign="top" align="left"><b>Common Name(s):</b></td>
 	<td valign="top" align="left">
-		<logic:iterate name="protein" property="commonReferences" id="reference">
+		<logic:iterate name="protein" property="proteinListing.commonReferences" id="reference">
 			<bean:write name="reference" property="commonReference.name"/> / <bean:write name="reference" property="accession"/>
 			<logic:equal name="reference" property="hasExternalLink" value="true">
 				<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;">
@@ -60,11 +60,11 @@
 <tr>
 	<td valign="top" align="left"><b>Description(s):</b></td>
 	<td valign="top" align="left" style="color: #888888; font-size: 9pt;">
-		<logic:iterate name="protein" property="allReferences" id="reference">
+		<logic:iterate name="protein" property="proteinListing.descriptionReferences" id="reference">
 			<li>
 				<logic:equal name="reference" property="hasExternalLink" value="true">
 					<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;" target="External Link">
-						[<bean:write name="reference" property="databaseName"/>]
+						<b>[<bean:write name="reference" property="databaseName"/>]</b>
 					</a>
 				</logic:equal>
 				<logic:equal name="reference" property="hasExternalLink" value="false">

@@ -259,7 +259,7 @@
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
 					style="display:none;"
 					class="full_name clickable underline">
-			<logic:iterate name="protein" property="fastaReferences" id="reference">
+			<logic:iterate name="protein" property="proteinListing.fastaReferences" id="reference">
 				<bean:write name="reference" property="accession"/>
 				<br/>
 			</logic:iterate>
@@ -267,7 +267,7 @@
 			
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
 					class="short_name clickable underline">
-			<logic:iterate name="protein" property="fastaReferences" id="reference">
+			<logic:iterate name="protein" property="proteinListing.fastaReferences" id="reference">
 				<bean:write name="reference" property="shortAccession"/>
 				<br/>
 			</logic:iterate>
@@ -283,7 +283,7 @@
 			<logic:equal name="protein" property="protein.subsumed" value="true"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
 					style="text-decoration: underline; cursor: pointer">
-			<logic:iterate name="protein" property="commonReferences" id="reference">
+			<logic:iterate name="protein" property="proteinListing.commonReferences" id="reference">
 				<bean:write name="reference" property="name"/>
 				<br/>
 			</logic:iterate>
@@ -294,14 +294,14 @@
 		
 				
 		<!-- Protein Description -->
-		<bean:size name="protein" property="allReferences" id="refCount"/>
+		<bean:size name="protein" property="proteinListing.descriptionReferences" id="refCount"/>
 			
 		<td style="font-size: 8pt;">
 		<span class="full_description" style="display:none;" id="full_desc_<bean:write name="protein" property="protein.id" />">
-		<logic:iterate name="protein" property="allReferences" id="reference">
+		<logic:iterate name="protein" property="proteinListing.descriptionReferences" id="reference">
 			<logic:equal name="reference" property="hasExternalLink" value="true">
 				<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;" target="External Link">
-					[<bean:write name="reference" property="databaseName"/>]
+					<b>[<bean:write name="reference" property="databaseName"/>]</b>
 				</a>
 			</logic:equal>
 			<logic:equal name="reference" property="hasExternalLink" value="false">
@@ -316,8 +316,8 @@
 		</span>
 	
 		<span class="short_description" id="short_desc_<bean:write name="protein" property="protein.id" />">
-		<logic:present name="protein" property="oneBestReference">
-			<bean:write name="protein" property="oneBestReference.shortDescription"/>
+		<logic:present name="protein" property="oneDescriptionReference">
+			<bean:write name="protein" property="oneDescriptionReference.shortDescription"/>
 			<br/>
 		</logic:present>
 	

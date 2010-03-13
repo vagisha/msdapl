@@ -396,13 +396,8 @@ public class DownloadComparisonResults extends Action {
             }
         }
         if(printDescription) {
-        	List<ProteinReference> descRefs = new ArrayList<ProteinReference>();
-        	try {
-        		descRefs = protein.getBestReferences();
-        	} catch (SQLException e) {
-        		log.error("Error getting description", e);
-        		writer.write("ERROR\t");
-        	}
+        	List<ProteinReference> descRefs = protein.getProteinListing().getDescriptionReferences();
+        	
         	if(descRefs != null && descRefs.size() > 0) {
         		// TODO Which descriptions do we want to print??
         		writer.write(descRefs.get(0).getDescription());
@@ -447,13 +442,8 @@ public class DownloadComparisonResults extends Action {
                 piString += ","+protein.getPi();
                 
                 if(includeDescription) {
-                	List<ProteinReference> descRefs = new ArrayList<ProteinReference>();
-                	try {
-                		descRefs = protein.getBestReferences();
-                	} catch (SQLException e) {
-                		log.error("Error getting description", e);
-                		descriptionString += ",ERROR";
-                	}
+                	List<ProteinReference> descRefs = protein.getProteinListing().getDescriptionReferences();
+                	
                 	if(descRefs != null && descRefs.size() > 0) {
                 		// TODO Which descriptions do we want to print??
                 		descriptionString += ","+descRefs.get(0).getDescription();

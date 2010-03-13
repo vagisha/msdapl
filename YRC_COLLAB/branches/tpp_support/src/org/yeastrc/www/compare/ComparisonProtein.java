@@ -120,35 +120,15 @@ public class ComparisonProtein {
         return molecularWeight != -1.0f && pi != -1.0;
     }
     
-    public List<ProteinReference> getFastaReferences() throws SQLException {
-    	return listing.getFastaReferences();
-    }
-    
     public String getAccessionsCommaSeparated() throws SQLException {
-    	List<String> accessions = listing.getFastaReferenceAccessions();
+    	List<String> accessions = listing.getFastaAccessions();
     	return StringUtils.makeCommaSeparated(accessions);
     }
     
-    public List<ProteinReference> getExternalReferences() throws SQLException {
-    	return listing.getExternalReferences();
-    }
-    
-    public List<ProteinReference> getAllReferences() throws SQLException {
-    	return listing.getAllReferences();
-    }
-    
-    public ProteinReference getOneBestReference() throws SQLException {
-    	if(listing.getBestReferences().size() > 0)
-    		return listing.getBestReferences().get(0);
+    public ProteinReference getOneDescriptionReference() throws SQLException {
+    	if(listing.getDescriptionReferences().size() > 0)
+    		return listing.getDescriptionReferences().get(0);
     	return null;
-    }
-    
-    public List<ProteinReference> getBestReferences() throws SQLException {
-    	return listing.getBestReferences();
-    }
-    
-    public List<ProteinReference> getCommonReferences() {
-    	return listing.getCommonReferences();
     }
     
     public String getCommonNamesCommaSeparated() throws SQLException {

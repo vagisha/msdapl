@@ -451,31 +451,6 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         return row;
     }
     
-    private String getExternalLinks(ComparisonProtein protein) {
-		
-		List<ProteinReference> references;
-		try {
-			references = protein.getExternalReferences();
-		} catch (SQLException e) {
-			log.error("Error getting external links", e);
-			return "ERROR";
-		}
-		String contents = "";
-		for(ProteinReference ref: references) {
-			String dbName;
-			try {
-				dbName = ref.getDatabaseName();
-			} catch (SQLException e) {
-				log.error("Error getting database name: "+e);
-				dbName = "ERROR";
-				e.printStackTrace();
-			}
-			contents += "<a href=\""+ref.getUrl()+"\" style=\"font-size:8pt;\">["+dbName+"]</a>";
-			contents += "<br>";
-		}
-		return contents;
-	}
-
     private String getDescriptionContents(ComparisonProtein protein) {
 		
     	String shortId = "short_desc_"+protein.getNrseqId();
@@ -489,8 +464,8 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         // List<ProteinReference> uniqueDbRefs;
         ProteinReference oneRef;
 		try {
-			allReferences = protein.getAllReferences();
-			oneRef = protein.getOneBestReference();
+			allReferences = protein.getProteinListing().getDescriptionReferences();
+			oneRef = protein.getOneDescriptionReference();
 		} catch (SQLException e) {
 			log.error("Error getting description", e);
 			return "ERROR";
@@ -538,7 +513,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 		String contents = "";
         contents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+"\")";
     	contents += " class=\"clickable underline\">";
-        List<ProteinReference> commonRefs = protein.getCommonReferences();
+        List<ProteinReference> commonRefs = protein.getProteinListing().getCommonReferences();
         for(ProteinReference ref: commonRefs) {
         	contents += ref.getCommonReference().getName()+"<br>";
         }
@@ -555,12 +530,8 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         shortContents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+"\")";
         shortContents += " class=\"short_name clickable underline\">";
         List<ProteinReference> references;
-		try {
-			references = protein.getFastaReferences();
-		} catch (SQLException e) {
-			log.error("Error getting accession", e);
-			return "ERROR";
-		}
+        references = protein.getProteinListing().getFastaReferences();
+        
         for(ProteinReference ref: references) {
         	fullContents += ref.getAccession()+"<br>";
         	shortContents += ref.getShortAccession()+"<br>";

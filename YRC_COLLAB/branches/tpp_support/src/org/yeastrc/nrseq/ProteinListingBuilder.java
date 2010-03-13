@@ -41,42 +41,31 @@ public class ProteinListingBuilder {
 		int speciesId = nrProtein.getSpeciesId();
 		if(speciesId == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
 			
-			return build(nrProtein, fastaDatabaseIds, StandardDatabase.SGD, 
-													  StandardDatabase.SWISSPROT,
-													  StandardDatabase.NCBI_NR);
+			return build(nrProtein, fastaDatabaseIds, StandardDatabase.SGD);
 		}
 		else if(speciesId == TaxonomyUtils.SCHIZOSACCHAROMYCES_POMBE) {
 
-			return build(nrProtein, fastaDatabaseIds, StandardDatabase.S_POMBE, 
-					  StandardDatabase.SWISSPROT,
-					  StandardDatabase.NCBI_NR);
+			return build(nrProtein, fastaDatabaseIds, StandardDatabase.S_POMBE);
 		}
 		else if(speciesId == TaxonomyUtils.CAENORHABDITIS_ELEGANS) {
 
-			return build(nrProtein, fastaDatabaseIds, StandardDatabase.WORMBASE, 
-					  StandardDatabase.SWISSPROT,
-					  StandardDatabase.NCBI_NR);
+			return build(nrProtein, fastaDatabaseIds, StandardDatabase.WORMBASE);
 		}
 		else if(speciesId == TaxonomyUtils.DROSOPHILA_MELANOGASTER) {
 
-			return build(nrProtein, fastaDatabaseIds, StandardDatabase.FLYBASE, 
-					  StandardDatabase.SWISSPROT,
-					  StandardDatabase.NCBI_NR);
+			return build(nrProtein, fastaDatabaseIds, StandardDatabase.FLYBASE);
 		}
 		else if(speciesId == TaxonomyUtils.HOMO_SAPIENS) {
 
-			return build(nrProtein, fastaDatabaseIds, StandardDatabase.HGNC, 
-					  StandardDatabase.SWISSPROT,
-					  StandardDatabase.NCBI_NR);
+			return build(nrProtein, fastaDatabaseIds, StandardDatabase.HGNC);
 		}
 		else
-			return build(nrProtein, fastaDatabaseIds, StandardDatabase.SWISSPROT,
-					  StandardDatabase.NCBI_NR);
+			return build(nrProtein, fastaDatabaseIds, null);
 		
 	}
 	
 	private ProteinListing build(NrProtein protein, List<Integer> fastaDatabaseIds,
-			StandardDatabase...sdbList) {
+			StandardDatabase sdb) {
 		
 		int nrseqId = protein.getId();
 		ProteinListing listing = new ProteinListing(protein);
@@ -88,21 +77,27 @@ public class ProteinListingBuilder {
 				listing.addFastaReference(new ProteinReference(prot));
 		}
 		
-		// get references to tier-one (species specific) database
-		List<ProteinReference> tierOneRefs = getReferences(protein, getDatabases(true, false, false, sdbList));
+		// get references to species specific database
+		// This will also get any available common names from the tier-one databases
+		List<ProteinReference> tierOneRefs = getReferences(protein, sdb);
 		for(ProteinReference ref: tierOneRefs)
 			listing.addTierOneReference(ref);
 		
-		// get references to tier-two databases (for now only Swiss-Prot)
-		List<ProteinReference> tierTwoRefs = getReferences(protein, getDatabases(false, true, false, sdbList));
-		for(ProteinReference ref: tierTwoRefs)
-			listing.addTierTwoReference(ref);
+		// get references to Swiss-Prot
+		// We will always try to get Swiss-Prot references for Drosophila proteins
+		// since we want to display meaning ful descriptions.  Descriptions in FlyBase are 
+		// not very useful.
+		List<ProteinReference> tierTwoRefs = null;
+		if(tierOneRefs.size() == 0 || protein.getSpeciesId() == TaxonomyUtils.DROSOPHILA_MELANOGASTER) {
+			tierTwoRefs = getReferences(protein, StandardDatabase.SWISSPROT);
+			for(ProteinReference ref: tierTwoRefs)
+				listing.addTierTwoReference(ref);
+		}
 		
-		// get references to tier-three databases (for now only NCBI-NR) if no references were found
-		// for tier-one and two databases
+		// get references to NCBI-NR if no tier-one or tier-two references were found
 		if(protein.getSpeciesId() != TaxonomyUtils.DROSOPHILA_MELANOGASTER) {
 			if(tierOneRefs.size() == 0 && tierTwoRefs.size() == 0) {
-				List<ProteinReference> tierThreeRefs = getReferences(protein, getDatabases(false, false, true, sdbList));
+				List<ProteinReference> tierThreeRefs = getReferences(protein, StandardDatabase.NCBI_NR);
 				for(ProteinReference ref: tierThreeRefs)
 					listing.addTierThreeReference(ref);
 			}
@@ -111,7 +106,7 @@ public class ProteinListingBuilder {
 			// FlyBase descriptions are not very useful, so if we did not get a SwissProt reference
 			// look for NCBI references.
 			if(tierTwoRefs.size() == 0) { 
-				List<ProteinReference> tierThreeRefs = getReferences(protein, getDatabases(false, false, true, sdbList));
+				List<ProteinReference> tierThreeRefs = getReferences(protein, StandardDatabase.NCBI_NR);
 				for(ProteinReference ref: tierThreeRefs)
 					listing.addTierThreeReference(ref);
 			}
@@ -135,62 +130,44 @@ public class ProteinListingBuilder {
 		// We should already have found common references when adding tier-one references
 		// If we did not find a common name associated with those references
 		// look for common names associated with the fasta file(s) used for the search
-		List<StandardDatabase> tierOneDbs = getDatabases(true, false, false, sdbList);
-		for(ProteinReference ref: tierOneRefs) {
-			for(StandardDatabase db: tierOneDbs) {
-				// skip HGNC(HUGO). If there was a common name we would have found it already
-				if(db == StandardDatabase.HGNC)
-					continue;
-				getCommonReference(db, ref);
+		// skip HGNC(HUGO). If there was a common name we would have found it already
+		if(listing.getCommonReferences().size() == 0 && sdb != StandardDatabase.HGNC) {
+			for(ProteinReference ref: listing.getFastaReferences()) {
+				getCommonReference(sdb, ref);
 			}
 		}
-		
 		
 		return listing;
 	}
-	
-	private List<StandardDatabase> getDatabases(boolean tierOne, boolean tierTwo, boolean tierThree, 
-			StandardDatabase...sdbList) {
 		
-		List<StandardDatabase> list = new ArrayList<StandardDatabase>();
-		for(StandardDatabase sdb: sdbList) {
-			if(tierOne && sdb.isTierOne())
-				list.add(sdb);
-			if(tierTwo && sdb.isTierTwo())
-				list.add(sdb);
-			if(tierThree && sdb.isTierThree())
-				list.add(sdb);
-		}
-		
-		return list;
-	}
 	
-	private List<ProteinReference> getReferences(NrProtein protein, List<StandardDatabase> sdbList) {
+	private List<ProteinReference> getReferences(NrProtein protein, StandardDatabase sdb) {
 		
 		List<ProteinReference> refs = new ArrayList<ProteinReference>();
 		
+		if(sdb == null)
+			return refs;
+		
 		NrseqDatabaseDAO dbDao = NrseqDatabaseDAO.getInstance();
-		for(StandardDatabase sdb: sdbList) {
 			
-			NrDatabase db = null;
-			try {
-				db = dbDao.getDatabase(sdb.getDatabaseName());
-			} catch (SQLException e) {
-				log.error("Lookup of standard database "+sdb.getDatabaseName()+" failed", e);
-			}
-			if(db != null) {
-				List<NrDbProtein> proteins = NrSeqLookupUtil.getDbProteins(protein.getId(), db.getId());
-				for(NrDbProtein prot: proteins) {
-					if(prot.isCurrent())  {// add only current references
-						ProteinReference ref = new ProteinReference(prot);
-						
-						// if this is a tier one database try to get a common name
-						if(sdb.isTierOne()) {
-							getCommonReference(sdb, ref); // get a common name/description if one can be found
-						}
-						
-						refs.add(ref);
+		NrDatabase db = null;
+		try {
+			db = dbDao.getDatabase(sdb.getDatabaseName());
+		} catch (SQLException e) {
+			log.error("Lookup of standard database "+sdb.getDatabaseName()+" failed", e);
+		}
+		if(db != null) {
+			List<NrDbProtein> proteins = NrSeqLookupUtil.getDbProteins(protein.getId(), db.getId());
+			for(NrDbProtein prot: proteins) {
+				if(prot.isCurrent())  {// add only current references
+					ProteinReference ref = new ProteinReference(prot, sdb);
+
+					// if this is a tier one database try to get a common name
+					if(sdb.isTierOne()) {
+						getCommonReference(sdb, ref); // get a common name/description if one can be found
 					}
+
+					refs.add(ref);
 				}
 			}
 		}
@@ -211,7 +188,7 @@ public class ProteinListingBuilder {
 		}
 		else {
 			commonRef = CommonNameLookupUtil.getInstance().getCommonReference(reference.getAccession(), 
-					db.getTaxonomyId());
+					db);
 		}
 		
 		if(commonRef != null) {

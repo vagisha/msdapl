@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.bio.taxonomy.TaxonomyUtils;
 import org.yeastrc.databases.flybase.FlyBaseUtils;
 import org.yeastrc.databases.sangerpombe.PombeUtils;
 import org.yeastrc.ms.dao.DAOFactory;
@@ -38,39 +37,35 @@ public class CommonNameLookupUtil {
         return instance;
     }
 
-    public ProteinCommonReference getCommonReference(String accession, int speciesId) {
+    public ProteinCommonReference getCommonReference(String accession, StandardDatabase db) {
 		
     	String commonName = null;
     	String description = null;
-    	StandardDatabase db = null;
-    	if(speciesId == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
+    	if(db == StandardDatabase.SGD) {
     		try {
 				commonName = SGDUtils.getStandardName(accession);
 				description = SGDUtils.getDescription(accession);
 			} catch (SQLException e) {
 				log.error("Error using SGDUtils", e);
 			}
-    		db = StandardDatabase.SGD;
     	}
-    	else if(speciesId == TaxonomyUtils.SCHIZOSACCHAROMYCES_POMBE) {
+    	else if(db == StandardDatabase.S_POMBE) {
     		try {
 				commonName = PombeUtils.getStandardName(accession);
 				description = PombeUtils.getDescription(accession);
 			} catch (SQLException e) {
 				log.error("Error using PombeUtils", e);
 			}
-    		db = StandardDatabase.S_POMBE;
     	}
-    	else if (speciesId == TaxonomyUtils.CAENORHABDITIS_ELEGANS) {
+    	else if (db == StandardDatabase.WORMBASE) {
     		try {
 				commonName = WormbaseUtils.getStandardName(accession);
 				description = WormbaseUtils.getDescription(accession);
 			} catch (SQLException e) {
 				log.error("Error using WormbaseUtils", e);
 			}
-    		db = StandardDatabase.WORMBASE;
     	}
-    	else if (speciesId == TaxonomyUtils.DROSOPHILA_MELANOGASTER) {
+    	else if (db == StandardDatabase.FLYBASE) {
     		try {
 				commonName = FlyBaseUtils.getStandardName(accession);
 				description = FlyBaseUtils.getDescription(accession);
@@ -79,7 +74,7 @@ public class CommonNameLookupUtil {
 			}
     		db = StandardDatabase.FLYBASE;
     	}
-    	else if(speciesId == TaxonomyUtils.HOMO_SAPIENS) {
+    	else if(db == StandardDatabase.HGNC) {
     		// TODO  For now there is not external database for human common name lookup
     		// the "HGNC (HUGO)" database in YRC_NRSEQ has common names in the
     		// accessionString column of tblProteinDatabase. That is what is being used. 
