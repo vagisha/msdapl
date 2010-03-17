@@ -409,23 +409,34 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         }
     }
     
-    public static boolean proteinMatchesDescriptionTerm(int nrseqId, String descriptionTerm) {
+    public static boolean proteinMatchesDescriptionTerm(int nrseqId, 
+    		List<Integer> dbIds, String descriptionTerm) {
     	
-    	 String statementName = "NrSeq.proteinMatchesDescriptionTerm";
-         Map<String, Object> map = new HashMap<String, Object>(4);
-         map.put("nrseqId", nrseqId);
-         map.put("description", "%"+descriptionTerm+"%");
-         
-         try {
-        	 Integer id = (Integer)sqlMap.queryForObject(statementName, map);
-        	 if(id != null && id > 0)
-            	 return true;
-        	 return false;
-         }
-         catch (SQLException e) {
-             log.error("Failed to execute select statement: ", e);
-             throw new RuntimeException("Failed to execute select statement: "+statementName, e);
-         }
+    	if(dbIds == null || dbIds.size() == 0)
+    		throw new IllegalArgumentException("At least one database ID is required");
+
+    	String dbIdStr = "";
+    	for(int id: dbIds)
+    		dbIdStr += ","+id;
+    	dbIdStr = dbIdStr.substring(1); // remove first comma
+    	dbIdStr = "("+dbIdStr+")";
+        
+    	String statementName = "NrSeq.proteinMatchesDescriptionTerm";
+    	Map<String, Object> map = new HashMap<String, Object>(4);
+    	map.put("nrseqId", nrseqId);
+    	map.put("databaseIds", dbIdStr);
+    	map.put("description", "%"+descriptionTerm+"%");
+
+    	try {
+    		Integer id = (Integer)sqlMap.queryForObject(statementName, map);
+    		if(id != null && id > 0)
+    			return true;
+    		return false;
+    	}
+    	catch (SQLException e) {
+    		log.error("Failed to execute select statement: ", e);
+    		throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+    	}
     }
     
     public static List<NrDbProtein> getDbProteinsForAccession(List<Integer> dbIds, String accession) {

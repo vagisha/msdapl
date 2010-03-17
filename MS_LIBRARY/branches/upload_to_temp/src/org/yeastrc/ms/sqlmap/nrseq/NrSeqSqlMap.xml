@@ -181,6 +181,7 @@
     	SELECT proteinID
     	FROM tblProteinDatabase 
     	WHERE proteinID = #nrseqId#
+    	AND databaseID in $databaseIds$ 
     	AND description LIKE #description#
     	LIMIT 1;
     </select>
