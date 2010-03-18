@@ -17,7 +17,7 @@
 	<br/><br/>
 	
 	
-	MSDaPl support data from two proteomic pipelines:
+	MSDaPl supports data from two proteomic pipelines:
 	<li><b>MacCoss Lab's pipeline</b></li>
 	<li><b>Trans-Proteomic Pipeline (TPP)</b></li>
 	<br/><br/>

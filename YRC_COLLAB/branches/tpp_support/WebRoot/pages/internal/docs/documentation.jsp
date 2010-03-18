@@ -15,6 +15,9 @@
 <td align="center" valign="top">
 <!-- Available documents table -->
 <table class="table_basic" width="95%" align="center">
+<thead>
+	<tr><th>Topics</th></tr>
+</thead>
 <tbody>
 	<tr>
 	<td>

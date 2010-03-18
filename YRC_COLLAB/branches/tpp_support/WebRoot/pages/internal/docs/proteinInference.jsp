@@ -38,26 +38,66 @@
 	
 	<li><b>Step 3:</b></li>
 	Proteins that match the same set of peptide are merged into a single node in the graph. These proteins comprise
-	an <b>indistinguishable protein group</b>. <br/>
-	<img src="images/protinfer3.png"/> <br/> <br/>
+	an <span style="color:red;"><b>indistinguishable protein group</b></span>. <br/>
+	<div align="center" style="margin: 5px;">
+	<img src="<yrcwww:link path='images/docs/protinfer3.png'/>" border="1"/>
+	</div> <br/> <br/>
 	
 	<li><b>Step 4:</b></li>
 	The graph is then resolved into its connected components, or proteins that share peptides. 
 	Each connected component is referred to as a <b>protein cluster</b>.<br/>
-	<img src="images/protinfer4png"/> <br/> <br/>
+	<div align="center" style="margin: 5px;">
+	<img src="<yrcwww:link path='images/docs/protinfer4.png'/>" border="1"/>
+	</div> <br/> <br/>
 	
-	
+	<li><b>Step 5:</b></li>
+	The smallest set of proteins sufficient to explain the peptides in each cluster are marked as parsimonious.<br/>
+	<div align="center" style="margin: 5px;">
+	<img src="<yrcwww:link path='images/docs/protinfer5.png'/>" border="1"/>
+	</div> <br/> <br/>
 	
 	<br/>
 	<br/>
 	<div style="font-weight:bold; background-color:#FFEF7F; border: 1px gray dotted;">
 	Program Options<br/></div>
-	Coming soon...
+	Protein inference implemented in MSDaPl takes <a href="http://noble.gs.washington.edu/proj/percolator/" target="_blank">Percolator</a>
+	results as input.<br><br/>
+	Results can be filtered on <i>q-value</i> and <i>Posterior Error Probability (PEP)</i> calculated by Percolator.
+	<br/><br/>
+	Proteins (indistinguishable protein groups) can be filtered on the number of peptides and number of unique peptides identified.
+	<br/>
+	The number of peptides can be calculated as one of the following:<br/>
+	<table>
+	<tr>
+	<td valign="top">
+		<li>unique peptide sequences</li>
+		<li>unique modified peptide sequence</li>
+		<li>Unique combination of peptide sequence + charge</li>
+		<li>Unique ions (sequence + charge + modifications)</li>
+	</td>
+	<td valign="top">
+		<img src="<yrcwww:link path='images/docs/protinfer_opts1.png'/>" border="1" align="middle"/>
+	</td>
+	</tr>
+	</table>
+	<br/><br/>
+	If the "Remove Ambiguous Spectra" option is checked <br/>
+	<img src="<yrcwww:link path='images/docs/protinfer_opts2.png'/>" border="1"/>
+	<br/>
+	all spectra that have 2 or more Percolator results that pass the q-value threshold are removed from the analysis.
+	<br/>
+	
 	
 	<br/>
 	<br/>
 	<div style="font-weight:bold; background-color:#FFEF7F; border: 1px gray dotted;">
-	NSAF<br/></div>
+	Results View<br/></div>
+	Coming Soon...
+	
+	<br/>
+	<br/>
+	<div style="font-weight:bold; background-color:#FFEF7F; border: 1px gray dotted;">
+	Normalized Spectrum Abundance Factor (NSAF)<br/></div>
 	Coming Soon...
 	
 </yrcwww:contentbox>
