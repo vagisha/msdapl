@@ -8,8 +8,9 @@
  <link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='/css/global.css' />">
 </head>
 
-<yrcwww:contentbox centered="true" width="70" widthRel="true" title="Protein inference">
+<yrcwww:contentbox centered="true" width="90" widthRel="true" title="Protein inference">
 
+	<!-- PROTEIN INFERENCE PROCESS -->
 	<div style="border: 1px dotted; margin:10x; padding:10px;">
 	This document is for the protein inference program implemented in MSDaPl.
 	It is available for use with <a href="http://noble.gs.washington.edu/proj/percolator/" target="_blank">Percolator</a> 
@@ -58,6 +59,9 @@
 	
 	<br/>
 	<br/>
+	
+	<!-- OPTIONS -->
+	<a name="PI_OPTIONS"></a>
 	<div style="font-weight:bold; background-color:#FFEF7F; border: 1px gray dotted;">
 	Program Options<br/></div>
 	Protein inference implemented in MSDaPl takes <a href="http://noble.gs.washington.edu/proj/percolator/" target="_blank">Percolator</a>

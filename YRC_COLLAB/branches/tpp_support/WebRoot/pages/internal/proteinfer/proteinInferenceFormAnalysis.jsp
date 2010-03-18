@@ -183,6 +183,10 @@ function validateFormForAnalysisInput() {
     <tr>
     <th colspan="2">
   		Parameters
+  		
+  		<a href="" onclick="openInformationPopup('<yrcwww:link path='pages/internal/docs/proteinInference.jsp#PI_OPTIONS'/>'); return false;">
+   				<img src="<yrcwww:link path='images/info_16.png'/>" align="bottom" border="0"/></a>
+   				
   		<html:hidden name="proteinInferenceFormAnalysis" property="programParams.programName" />
   	</th>
   	</tr>

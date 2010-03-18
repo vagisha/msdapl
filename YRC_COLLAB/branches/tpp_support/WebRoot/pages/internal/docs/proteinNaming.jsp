@@ -8,7 +8,7 @@
  <link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='/css/global.css' />">
 </head>
 
-<yrcwww:contentbox centered="true" width="70" widthRel="true" title="Protein Common Names & Descriptions">
+<yrcwww:contentbox centered="true" width="90" widthRel="true" title="Protein Common Names & Descriptions">
 	
 	<div style="border: 1px dotted; margin:10x; padding:10px;">
 		This document applies to the names and descriptions displayed in the protein inference and 

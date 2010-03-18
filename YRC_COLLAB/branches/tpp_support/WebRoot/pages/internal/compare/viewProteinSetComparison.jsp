@@ -540,8 +540,20 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 <tr>
 <td>
 <div style="margin:top: 3px;">
-<span class="underline clickable" style="font-size:8pt;color:red;" id="full_names" onclick="toggleFullNames()">[Full Names]</span> &nbsp; &nbsp;
-<span class="underline clickable" style="font-size:8pt;color:red;" id="full_descriptions" onclick="toggleFullDescriptions()">[Full Descriptions]</span>
+<table align="center" width="100%">
+<tr>
+	<td align="left" valign="bottom">
+		<span class="underline clickable" style="font-size:8pt;color:red;" id="full_names" onclick="toggleFullNames()">[Full Names]</span> &nbsp; &nbsp;
+		<span class="underline clickable" style="font-size:8pt;color:red;" id="full_descriptions" onclick="toggleFullDescriptions()">[Full Descriptions]</span>
+	</td>
+	<td align="right" valign="bottom">
+		<a href="" onclick="openInformationPopup('<yrcwww:link path='pages/internal/docs/comparison.jsp'/>'); return false;">
+   				<img src="<yrcwww:link path='images/info_16.png'/>" align="bottom" border="0"/></a>	
+   		<span style="background-color:yellow; font-weight:bold; padding:3px;"><a href="#LEGEND">Legend</a></span>
+	</td>
+</tr>
+</table>
+
 </div>
 </td>
 </tr>
@@ -562,7 +574,9 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 </table>
 
 
+
 <!-- LEGEND -->
+<a name="LEGEND"></a>
 <table class="table_compare_grp" align="center">
 <tr>
 	<td class="centered" 

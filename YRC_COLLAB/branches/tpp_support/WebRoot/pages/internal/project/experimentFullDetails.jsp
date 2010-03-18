@@ -112,6 +112,8 @@
 			<td width="33%">
 				<b><a href="<yrcwww:link path='newPercolatorProteinInference.do?'/>searchAnalysisId=<bean:write name='analysis' property='id' />&projectId=<bean:write name='experiment' property='projectId'/>"> 
 				[Infer Proteins]</a></b>
+				<a href="" onclick="openInformationPopup('<yrcwww:link path='pages/internal/docs/proteinInference.jsp'/>'); return false;">
+   				<img src="<yrcwww:link path='images/info_16.png'/>" align="bottom" border="0"/></a>
 			</td>
 			</logic:equal>
 			

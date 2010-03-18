@@ -42,6 +42,7 @@
 
 <br/>
 <br/>
+<div align="center" width="80%">
 <a name="UPLOAD"></a>
 <%@ include file="uploadingData.jsp" %>
 
@@ -63,5 +64,6 @@
 
 <br/>
 <br/>
+</div>
 
 <%@ include file="/includes/footer.jsp" %>

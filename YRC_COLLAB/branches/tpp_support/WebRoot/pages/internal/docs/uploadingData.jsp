@@ -7,7 +7,7 @@
  <title>MSDaPl Docs: Data Upload</title>
  <link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='/css/global.css' />">
 </head>
-<yrcwww:contentbox centered="true" width="70" widthRel="true" title="Uploading Data">
+<yrcwww:contentbox centered="true" width="90" widthRel="true" title="Uploading Data">
 	
 	<div style="border: 1px dotted; margin:10x; padding:10px;">
 	

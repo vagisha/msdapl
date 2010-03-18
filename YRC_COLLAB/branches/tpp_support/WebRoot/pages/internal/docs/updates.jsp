@@ -44,7 +44,7 @@
 	<li>Displaying common names and descriptions in the protein inference and comparison pages has been updated.
 	Click <a href="<yrcwww:link path='/pages/internal/docs/documentation.jsp#PROT_NAMES'/>">here</a> for details.</li>
 	<li>A couple of new filtering options have been added to the protein comparison page. 
-	    Some details on the available options are available 
+	    Some details on the available options  
 		<a href="<yrcwww:link path='/pages/internal/docs/documentation.jsp#COMPARISON'/>">here</a>.</li>
 	</ul>
 	

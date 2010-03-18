@@ -8,7 +8,7 @@
  <link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='/css/global.css' />">
 </head>
 
-<yrcwww:contentbox centered="true" width="70" widthRel="true" title="Protein inference comparison">
+<yrcwww:contentbox centered="true" width="90" widthRel="true" title="Protein inference comparison">
 	
 	<div style="border: 1px dotted; margin:10x; padding:10px;">
 	MSDaPl supports comparing results from two or more protein inference runs.  These can be results from the protein inference
