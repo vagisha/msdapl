@@ -138,6 +138,12 @@ function fold(foldable) {
 	}
 }
 
+function openInformationPopup(url) {
+	window.open(
+		url,
+		'MSDaPl_info',
+		'height=500,width=700,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no,status=yes');
+}
 </script>
 
 <div class="mainContainer"> 
@@ -166,6 +172,7 @@ function fold(foldable) {
 	String home_class = ""; boolean home_menus = false;
 	String account_class = ""; boolean account_menus = false;
 	String admin_class = ""; boolean admin_menus = false;
+	String docs_class = "";
  %>
  
  <logic:equal name="dir" scope="request" value="internal">
@@ -213,6 +220,9 @@ function fold(foldable) {
  <logic:equal name="dir" scope="request" value="search">
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>
+ <logic:equal name="dir" scope="request" value="docs">
+ 	<%docs_class = "current"; home_menus = true;%>
+ </logic:equal>
  
  <logic:equal name="dir" scope="request" value="account">
  	<%account_class = "current"; account_menus = true;%>
@@ -226,6 +236,10 @@ function fold(foldable) {
 		<li><a href="<yrcwww:link path='pages/internal/front.jsp'/>" title="Home" class="<%=home_class %>"><span>Home</span></a></li>
 		<li><html:link  action="editInformation.do" styleClass="<%=account_class %>"><span>Account</span></html:link></li>
 		<li><html:link action="manageGroups.do" styleClass="<%=admin_class %>"><span>Admin</span></html:link></li>
+		<li><a href="<yrcwww:link path='pages/internal/docs/documentation.jsp'/>" 
+		       title="DOCS" 
+		       class="<%=docs_class %>">
+		       <span>Docs</span></a></li>
 	
 	</ul>
 	

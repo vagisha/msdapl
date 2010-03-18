@@ -221,6 +221,8 @@ function onCancel(projectId) {
 
  <p>
 <nobr>
+<a href="" onclick="openInformationPopup('<yrcwww:link path='pages/internal/docs/uploadingData.jsp'/>')">
+   <img src="<yrcwww:link path='images/info_24.png'/>" align="bottom" border="0"/></a>
 <html:submit styleClass="plain_button" value="Upload Data"/>
 <input type="button" class="plain_button" onclick="javascript:onCancel(<bean:write name='uploadMSDataForm' property='projectID' />);" value="Cancel" />
  </nobr>
