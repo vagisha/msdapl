@@ -5,63 +5,41 @@
 
 <%@ include file="/includes/header.jsp" %>
 
-<yrcwww:notauthenticated>
- <logic:forward name="authenticate" />
-</yrcwww:notauthenticated>
 
-<table align="center" width="70%">
-<tr>
-
-<td align="center" valign="top">
 <!-- Available documents table -->
-<table class="table_basic" width="95%" align="center">
+<table class="table_basic" width="60%" align="center">
 <thead>
-	<tr><th>Topics</th></tr>
+	<tr><th></th>
+	<th>Topics</th></tr>
 </thead>
 <tbody>
 	<tr>
+	<td>1</td>
 	<td>
 		<a href="#UPLOAD">Uploading data</a>
 	</td>
 	</tr>
 	<tr>
+	<td>2</td>
 	<td>
 		<a href="#PROTINFER">Protein inference</a>
 	</td>
 	</tr>
 	<tr>
+	<td>3</td>
 	<td>
 		<a href="#COMPARISON">Protein inference comparison</a>
 	</td>
 	</tr>
-</tbody>
-</table>
-<!--END  Available documents table -->
-</td>
-
-<td align="center" valign="top">
-<!-- Updates table -->
-<table class="table_basic" width="95%" align="center">
-<thead>
 	<tr>
-		<th>MSDaPl Updates</th>
-	</tr>
-</thead>
-<tbody>
-	<tr>
-	<td class="center_align">
-		<b>03/18/10</b> &nbsp; &nbsp; <span class="clickable underline">[Info]</span>
+	<td>4</td>
+	<td>
+		<a href="#PROT_NAMES">Protein common names and descriptions</a>
 	</td>
 	</tr>
 </tbody>
 </table>
-<!-- END Updates table -->
 
-
-</td>
-</tr>
-
-</table>
 <br/>
 <br/>
 <a name="UPLOAD"></a>
@@ -76,6 +54,12 @@
 <br/>
 <a name="COMPARISON"></a>
 <%@ include file="comparison.jsp" %>
+
+<br/>
+<br/>
+
+<a name="PROT_NAMES"></a>
+<%@ include file="proteinNaming.jsp" %>
 
 <br/>
 <br/>

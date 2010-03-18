@@ -172,7 +172,7 @@ function openInformationPopup(url) {
 	String home_class = ""; boolean home_menus = false;
 	String account_class = ""; boolean account_menus = false;
 	String admin_class = ""; boolean admin_menus = false;
-	String docs_class = "";
+	String docs_class = ""; boolean docs_menus = false;
  %>
  
  <logic:equal name="dir" scope="request" value="internal">
@@ -221,7 +221,7 @@ function openInformationPopup(url) {
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>
  <logic:equal name="dir" scope="request" value="docs">
- 	<%docs_class = "current"; home_menus = true;%>
+ 	<%docs_class = "current"; docs_menus = true;%>
  </logic:equal>
  
  <logic:equal name="dir" scope="request" value="account">
@@ -277,6 +277,10 @@ function openInformationPopup(url) {
       <yrcwww:member group="administrators">
         <li><html:link action="manageInstruments.do"><span>Instruments</span></html:link></li>
       </yrcwww:member>
+   <%} %>
+   <%if(docs_menus) { %>
+   		<li><a href="<yrcwww:link path='pages/internal/docs/documentation.jsp'/>" title="Help Topics" class="<%=docs_class %>"><span>Help Topics</span></a></li>
+   		<li><a href="<yrcwww:link path='pages/internal/docs/updates.jsp'/>" title="Updates" class="<%=docs_class %>"><span>Updates</span></a></li>
    <%} %>
   </ul>
 </div>

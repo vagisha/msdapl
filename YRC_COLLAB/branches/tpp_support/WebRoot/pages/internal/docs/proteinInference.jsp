@@ -81,10 +81,11 @@
 	</tr>
 	</table>
 	<br/><br/>
-	If the "Remove Ambiguous Spectra" option is checked <br/>
+	If the "Remove Ambiguous Spectra" option is checked <br/><br/>
 	<img src="<yrcwww:link path='images/docs/protinfer_opts2.png'/>" border="1"/>
 	<br/>
-	all spectra that have 2 or more Percolator results that pass the q-value threshold are removed from the analysis.
+	<br/>
+	any spectra that have 2 or more Percolator results that pass the q-value threshold are removed from the analysis.
 	<br/>
 	
 	
