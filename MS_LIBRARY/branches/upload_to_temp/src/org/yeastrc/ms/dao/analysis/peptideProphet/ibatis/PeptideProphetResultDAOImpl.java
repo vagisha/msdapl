@@ -47,7 +47,7 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
     public PeptideProphetResult loadForRunSearchAnalysis(int searchResultId, int runSearchAnalysisId) {
        Map<String, Integer> map = new HashMap<String, Integer>(4);
        map.put("searchResultId", searchResultId);
-       map.put("runSearchResultId", runSearchAnalysisId);
+       map.put("runSearchAnalysisId", runSearchAnalysisId);
        return (PeptideProphetResult) queryForObject(namespace+".selectForRunSearchAnalysis", map);
     }
 
@@ -564,6 +564,38 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
     @Override
     public void saveAllPeptideProphetResultData(
             List<PeptideProphetResultDataWId> dataList) {
-        throw new UnsupportedOperationException();
+    	
+    	 if(dataList == null || dataList.size() == 0)
+             return;
+         StringBuilder values = new StringBuilder();
+         for ( PeptideProphetResultDataWId data: dataList) {
+             values.append(",(");
+             values.append(data.getSearchResultId() == 0 ? "NULL" : data.getSearchResultId());
+             values.append(",");
+             values.append(data.getRunSearchAnalysisId() == 0 ? "NULL" : data.getRunSearchAnalysisId());
+             values.append(",");
+             double probability = data.getProbability();
+             values.append(probability == -1.0 ? "NULL" : probability);
+             values.append(",");
+             double fVal = data.getfVal();
+             values.append(fVal == -1.0 ? "NULL" : fVal);
+             values.append(",");
+             int ntt = data.getNumEnzymaticTermini();
+             values.append(ntt == -1 ? "NULL" : ntt);
+             values.append(",");
+             int nmc = data.getNumMissedCleavages();
+             values.append(nmc == -1 ? "NULL" : nmc);
+             values.append(",");
+             values.append(data.getMassDifference());
+             values.append(",");
+             values.append(data.getProbabilityNet_0() == -1.0 ? "NULL" : data.getProbabilityNet_0());
+             values.append(",");
+             values.append(data.getProbabilityNet_1() == -1.0 ? "NULL" : data.getProbabilityNet_1());
+             values.append(",");
+             values.append(data.getProbabilityNet_2() == -1.0 ? "NULL" : data.getProbabilityNet_2());
+             values.append(")");
+         }
+         values.deleteCharAt(0);
+         save(namespace+".insertAll", values.toString());
     }
 }
