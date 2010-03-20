@@ -1098,7 +1098,7 @@
 	
 	<action 
 		path="/doComparison"
-		type="org.yeastrc.www.compare.DoComparison"
+		type="org.yeastrc.www.compare.DoComparisonAction"
 		name="proteinSetComparisonForm"
 		scope="request"
 		validate="false"
