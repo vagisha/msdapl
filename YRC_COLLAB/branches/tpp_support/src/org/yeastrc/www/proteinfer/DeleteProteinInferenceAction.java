@@ -20,6 +20,8 @@ import org.yeastrc.jobqueue.JobDeleter;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
+import org.yeastrc.www.proteinfer.job.ProteinInferJobSearcher;
+import org.yeastrc.www.proteinfer.job.ProteinferJob;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 

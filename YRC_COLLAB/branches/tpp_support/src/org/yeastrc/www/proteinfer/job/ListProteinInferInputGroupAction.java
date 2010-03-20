@@ -4,7 +4,7 @@
  * Jan 30, 2009
  * @version 1.0
  */
-package org.yeastrc.www.proteinfer;
+package org.yeastrc.www.proteinfer.job;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -32,6 +32,8 @@ import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.project.Project;
+import org.yeastrc.www.proteinfer.ExperimentSearcher;
+import org.yeastrc.www.proteinfer.ProteinInferInputSummary;
 import org.yeastrc.www.proteinfer.ProteinInferInputSummary.ProteinInferIputFile;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;

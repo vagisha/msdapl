@@ -4,7 +4,7 @@
  * Jan 30, 2009
  * @version 1.0
  */
-package org.yeastrc.www.proteinfer;
+package org.yeastrc.www.proteinfer.job;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,6 +18,7 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.www.proteinfer.ProteinInferInputSummary;
 import org.yeastrc.www.proteinfer.ProteinInferInputSummary.ProteinInferIputFile;
 
 /**

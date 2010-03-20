@@ -1,10 +1,10 @@
 <%@page import="org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram"%>
 <%@page import="org.yeastrc.ms.domain.protinfer.ProgramParam"%>
-<%@page import="org.yeastrc.www.proteinfer.ProteinInferenceForm"%>
 <%@page import="org.yeastrc.ms.domain.protinfer.ProgramParam.TYPE"%>
 <%@page import="org.yeastrc.ms.domain.protinfer.ProgramParam.ParamValidator"%>
 <%@page import="org.yeastrc.ms.domain.protinfer.ProgramParam.DoubleValidator"%>
 <%@page import="org.yeastrc.ms.domain.protinfer.ProgramParam.IntegerValidator"%>
+<%@page import="org.yeastrc.www.proteinfer.job.ProteinInferenceForm"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -107,16 +107,13 @@ function validateFormForAnalysisInput() {
 	var allowNull;
 	var errorMessage = "";
 	
-	<%
-		ProteinInferenceForm form_a = (ProteinInferenceForm)request.getAttribute("proteinInferenceFormAnalysis");
+	<%ProteinInferenceForm form_a = (ProteinInferenceForm)request.getAttribute("proteinInferenceFormAnalysis");
 		String programName_a = form_a.getProgramParams().getProgramName();
         ProteinInferenceProgram program_a = ProteinInferenceProgram.getProgramForName(programName_a);
 		for(ProgramParam param: program_a.getProgramParams()) {
 			if(param.getType() == ProgramParam.TYPE.BOOLEAN || param.getType() == TYPE.CHOICE)
 				continue;
-			ParamValidator validator = param.getValidator();
-			
-	%>
+			ParamValidator validator = param.getValidator();%>
 		fieldName = '<%=param.getDisplayName()%>';
 		value = $("form[id='form_a'] input:text[id='<%=param.getName()%>']").val();
 		// alert(value);
@@ -194,7 +191,7 @@ function validateFormForAnalysisInput() {
   	
   	<tbody>
   	<logic:iterate name="proteinInferenceFormAnalysis" property="programParams.paramList" id="param"
-  			type="org.yeastrc.www.proteinfer.ProgramParameters.Param">
+  			type="org.yeastrc.www.proteinfer.job.ProgramParameters.Param">
     <tr>
     
     <td WIDTH="20%" VALIGN="top">

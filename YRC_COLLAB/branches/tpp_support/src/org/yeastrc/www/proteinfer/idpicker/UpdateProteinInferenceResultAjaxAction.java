@@ -4,7 +4,7 @@
  * Jan 9, 2009
  * @version 1.0
  */
-package org.yeastrc.www.proteinfer;
+package org.yeastrc.www.proteinfer.idpicker;
 
 import java.util.List;
 
@@ -22,9 +22,7 @@ import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
-import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerResultSummary;
+import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 

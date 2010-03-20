@@ -1,4 +1,4 @@
-package org.yeastrc.www.proteinfer;
+package org.yeastrc.www.proteinfer.job;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -23,8 +23,9 @@ import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerParam;
 import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.www.proteinfer.ProgramParameters.Param;
+import org.yeastrc.www.proteinfer.ProteinInferInputSummary;
 import org.yeastrc.www.proteinfer.ProteinInferInputSummary.ProteinInferIputFile;
+import org.yeastrc.www.proteinfer.job.ProgramParameters.Param;
 
 public class ProteinferJobSaver {
 

@@ -1,4 +1,4 @@
-package org.yeastrc.www.proteinfer;
+package org.yeastrc.www.proteinfer.job;
 
 import java.util.ArrayList;
 import java.util.List;

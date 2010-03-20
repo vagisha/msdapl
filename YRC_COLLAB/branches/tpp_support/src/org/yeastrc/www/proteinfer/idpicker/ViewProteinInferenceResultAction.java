@@ -1,4 +1,4 @@
-package org.yeastrc.www.proteinfer;
+package org.yeastrc.www.proteinfer.idpicker;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,10 +31,7 @@ import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.www.misc.ResultsPager;
-import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerResultSummary;
+import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.www.util.RoundingUtils;

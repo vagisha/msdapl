@@ -4,7 +4,7 @@
  * Nov 3, 2008
  * @version 1.0
  */
-package org.yeastrc.www.proteinfer;
+package org.yeastrc.www.proteinfer.job;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +19,8 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.domain.protinfer.ProgramParam;
 import org.yeastrc.ms.domain.protinfer.ProgramParam.ParamMaker;
 import org.yeastrc.project.Projects;
-import org.yeastrc.www.proteinfer.ProgramParameters.Param;
+import org.yeastrc.www.proteinfer.ProteinInferInputSummary;
+import org.yeastrc.www.proteinfer.job.ProgramParameters.Param;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;

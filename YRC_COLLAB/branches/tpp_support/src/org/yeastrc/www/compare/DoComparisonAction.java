@@ -50,9 +50,9 @@ import edu.uwpr.protinfer.infer.graph.PeptideVertex;
 /**
  * 
  */
-public class DoComparison extends Action {
+public class DoComparisonAction extends Action {
 
-    private static final Logger log = Logger.getLogger(DoComparison.class);
+    private static final Logger log = Logger.getLogger(DoComparisonAction.class);
     
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,

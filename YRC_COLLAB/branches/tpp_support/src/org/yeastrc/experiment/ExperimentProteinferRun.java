@@ -6,7 +6,7 @@
  */
 package org.yeastrc.experiment;
 
-import org.yeastrc.www.proteinfer.ProteinferJob;
+import org.yeastrc.www.proteinfer.job.ProteinferJob;
 
 /**
  * 

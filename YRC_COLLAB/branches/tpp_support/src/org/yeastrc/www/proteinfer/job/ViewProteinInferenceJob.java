@@ -4,7 +4,7 @@
  * Feb 5, 2009
  * @version 1.0
  */
-package org.yeastrc.www.proteinfer;
+package org.yeastrc.www.proteinfer.job;
 
 
 import java.util.List;

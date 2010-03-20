@@ -17,8 +17,8 @@ import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
-import org.yeastrc.www.proteinfer.ProteinInferJobSearcher;
-import org.yeastrc.www.proteinfer.ProteinferJob;
+import org.yeastrc.www.proteinfer.job.ProteinInferJobSearcher;
+import org.yeastrc.www.proteinfer.job.ProteinferJob;
 
 /**
  * 

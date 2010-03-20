@@ -1,4 +1,4 @@
-package org.yeastrc.www.proteinfer;
+package org.yeastrc.www.proteinfer.idpicker;
 
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -26,10 +26,7 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerParam;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
-import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerResultSummary;
+import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 

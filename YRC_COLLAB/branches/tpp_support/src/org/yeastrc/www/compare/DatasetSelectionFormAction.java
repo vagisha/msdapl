@@ -27,8 +27,8 @@ import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectsSearcher;
-import org.yeastrc.www.proteinfer.ProteinInferJobSearcher;
-import org.yeastrc.www.proteinfer.ProteinferJob;
+import org.yeastrc.www.proteinfer.job.ProteinInferJobSearcher;
+import org.yeastrc.www.proteinfer.job.ProteinferJob;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 

@@ -1,4 +1,4 @@
-package org.yeastrc.www.proteinfer;
+package org.yeastrc.www.proteinfer.idpicker;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +26,7 @@ import org.yeastrc.www.go.GOEnrichmentCalculator;
 import org.yeastrc.www.go.GOEnrichmentInput;
 import org.yeastrc.www.go.GOEnrichmentOutput;
 import org.yeastrc.www.go.GOEnrichmentTabular;
-import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
+import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 

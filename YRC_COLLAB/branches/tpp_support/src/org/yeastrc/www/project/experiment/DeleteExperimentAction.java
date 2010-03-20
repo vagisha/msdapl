@@ -24,8 +24,8 @@ import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
-import org.yeastrc.www.proteinfer.ProteinInferJobSearcher;
-import org.yeastrc.www.proteinfer.ProteinferJob;
+import org.yeastrc.www.proteinfer.job.ProteinInferJobSearcher;
+import org.yeastrc.www.proteinfer.job.ProteinferJob;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
