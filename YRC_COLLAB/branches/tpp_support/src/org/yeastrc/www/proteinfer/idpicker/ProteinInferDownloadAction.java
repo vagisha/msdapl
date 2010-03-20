@@ -66,8 +66,14 @@ public class ProteinInferDownloadAction extends Action {
         writer.write("Max. Spectrum Matches: "+filterForm.getMaxSpectrumMatches()+"\n");
         writer.write("Min. Coverage(%): "+filterForm.getMinCoverage()+"\n");
         writer.write("Max. Coverage(%): "+filterForm.getMaxCoverage()+"\n");
-        writer.write("Show all Proteins: "+filterForm.isShowAllProteins()+"\n");
+        writer.write("Min. Molecular Wt.: "+filterForm.getMinMolecularWt()+"\n");
+        writer.write("Max. Molecular Wt.: "+filterForm.getMaxMolecularWt()+"\n");
+        writer.write("Min. pI: "+filterForm.getMinPi()+"\n");
+        writer.write("Max. pI: "+filterForm.getMaxPi()+"\n");
+        writer.write("Show Non-parsimonious Proteins: "+filterForm.isShowAllProteins()+"\n");
+        writer.write("Exclude Indistinguishable Groups: "+filterForm.isExcludeIndistinProteinGroups()+"\n");
         writer.write("Validation Status: "+filterForm.getValidationStatusString()+"\n");
+        writer.write("Include proteins with peptide charge states: "+filterForm.getChargeStatesString()+"\n");
         writer.write("Fasta ID filter: "+filterForm.getAccessionLike()+"\n");
         writer.write("Description filter: "+filterForm.getDescriptionLike()+"\n");
     }

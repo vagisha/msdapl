@@ -72,13 +72,17 @@ public class IdPickerFilterForm extends ProteinInferFilterForm {
     public ProteinFilterCriteria getFilterCriteria(PeptideDefinition peptideDef) {
     	
     	ProteinFilterCriteria filterCriteria = super.getFilterCriteria(peptideDef);
+    	
+    	filterCriteria.setGroupProteins(isJoinGroupProteins());
+    	 if(!isShowAllProteins())
+             filterCriteria.setParsimoniousOnly();
+    	 
         if(isCollapseGroups()) 
             filterCriteria.setSortBy(SORT_BY.GROUP_ID);
         else
             filterCriteria.setSortBy(ProteinFilterCriteria.defaultSortBy());
         
-        if(!isShowAllProteins())
-            filterCriteria.setParsimoniousOnly();
+       
         
         return filterCriteria;
     }

@@ -452,10 +452,10 @@ public class ProteinInferFilterForm extends ActionForm {
         filterCriteria.setNumMaxSpectra(getMaxSpectrumMatchesInteger());
         filterCriteria.setPeptideDefinition(peptideDef);
         filterCriteria.setSortOrder(ProteinFilterCriteria.defaultSortOrder());
-        filterCriteria.setGroupProteins(true);
         filterCriteria.setValidationStatus(getValidationStatus());
         filterCriteria.setAccessionLike(getAccessionLike());
         filterCriteria.setDescriptionLike(getDescriptionLike());
+        filterCriteria.setExcludeIndistinGroups(isExcludeIndistinProteinGroups());
         filterCriteria.setPeptide(getPeptide());
         filterCriteria.setExactPeptideMatch(getExactPeptideMatch());
         

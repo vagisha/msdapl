@@ -902,7 +902,7 @@ function updateResults() {
     		 	// load the result
     		 	$('#protlist_table').html(result);
     		 	$.unblockUI();
-  				refreshProteinList(response);
+  				refreshProteinList(result);
     		 });
 }
 
