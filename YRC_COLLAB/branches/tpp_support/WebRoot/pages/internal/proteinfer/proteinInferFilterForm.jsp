@@ -35,6 +35,10 @@
   <html:form action="/proteinInferGateway" method="post" styleId="filterForm" >
   
   <html:hidden name="proteinInferFilterForm" property="pinferId" />
+  <html:hidden name="proteinInferFilterForm" property="doDownload" />
+  <html:hidden name="proteinInferFilterForm" property="doGoEnrichment" />
+  
+  
   <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;">
   
   <!-- Filtering options -->
@@ -174,12 +178,9 @@
   	</td>
   </tr>
   
- 
- <logic:notPresent name="showGoForm">
+ <logic:notPresent name="goView">
   <tr>
     	<td colspan="3" align="center">
-    		<html:hidden name="proteinInferFilterForm" property="doDownload" />
-    		<html:hidden name="proteinInferFilterForm" property="doGoEnrichment" />
     		<button class="plain_button" style="margin-top:2px;" 
     		        onclick="javascript:updateResults();return false;">Update</button>
     		<!--<html:submit styleClass="plain_button" style="margin-top:2px;">Update</html:submit>-->
@@ -191,8 +192,8 @@
  </TABLE>
  
 
-<logic:notPresent name="showGoForm">
- <div align="center" style="margin:10 0 10 0;">
+<logic:notPresent name="goView">
+ <div align="center" style="margin:10 0 5 0;">
    	<a href="" onclick="javascript:downloadResults();return false;" ><b>Download Results</b></a> &nbsp; 
    	<html:checkbox name="proteinInferFilterForm"property="printPeptides" >Include Peptides</html:checkbox>
    	<html:checkbox name="proteinInferFilterForm"property="printDescriptions" >Include Descriptions</html:checkbox>
@@ -201,9 +202,9 @@
 </logic:notPresent>
 
 
-<logic:equal name="speciesIsYeast" value="true">
+<logic:equal name="showGoForm" value="true">
  <div align="center"
-		style="padding: 5; border: 1px dashed gray; background-color: #F0F8FF;">
+		style="padding: 5; border: 1px dashed gray; background-color: #F0F8FF; margin:5 0 5 0">
 		<b>GO Enrichment:</b>
 		<html:select name="proteinInferFilterForm" property="goAspect">
 			<html:option

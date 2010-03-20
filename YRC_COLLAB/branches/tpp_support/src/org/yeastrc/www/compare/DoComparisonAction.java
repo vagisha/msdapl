@@ -61,6 +61,8 @@ public class DoComparisonAction extends Action {
     throws Exception {
         
         
+    	log.info("Got request to compare protein inferences");
+    	
         // Form we will use
         ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) form; // request.getAttribute("comparisonFrom");
         if(myForm == null) {
@@ -115,6 +117,7 @@ public class DoComparisonAction extends Action {
         }
         
         // Do the comparison
+        log.info("Starting comparison");
         long s = System.currentTimeMillis();
         ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, 
         		PARSIM.getForValue(myForm.getParsimoniousParam()));

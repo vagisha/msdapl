@@ -55,42 +55,56 @@ $(document).ready(function() {
 // ---------------------------------------------------------------------------------------
 function doGoEnrichmentAnalysis() {
 
-	// validate the current entries in the form
-	var validated = validateForm();
-	if(!validated)	return false;
+	// validate form
+	if(!validateForm())
+    	return false;
 	
-	$("#goEnrichmentForm").submit();
+	$("form#filterForm input[name='doDownload']").val("false");
+    $("form#filterForm input[name='doGoEnrichment']").val("true");
+    
+	$("form#filterForm").submit();
 	
 }
 
+// ---------------------------------------------------------------------------------------
+// FORM VALIDATION
+// ---------------------------------------------------------------------------------------
 function validateForm() {
 
 	// fieldValue is a Form Plugin method that can be invoked to find the 
     // current value of a field 
     
-    var value = $("form#goEnrichmentForm input[name='minPeptides']").fieldValue();
+    // validate pvalue cutoff for enrichment calculation
+	var value = $('form#filterForm input[name=goEnrichmentPVal]').fieldValue();
+    var valid = validateFloat(value, "P-Value", 0.0, 1.0);
+    if(!valid)	return false;
+	
+	
+    var value = $("form#filterForm input[name='minPeptides']").fieldValue();
     var valid = validateInt(value, "Min. Peptides", 1);
     if(!valid)	return false;
     var minPept = parseInt(value);
-    $('form#goEnrichmentForm input[name=minPeptides]').val(minPept);
+    $('form#filterForm input[name=minPeptides]').val(minPept);
     
-    value = $('form#goEnrichmentForm input[@name=minUniquePeptides]').fieldValue();
+    value = $('form#filterForm input[@name=minUniquePeptides]').fieldValue();
     valid = validateInt(value, "Min. Unique Peptides", 0, minPept);
     if(!valid)	return false;
-    $('form#goEnrichmentForm input[@name=minUniquePeptides]').val(parseInt(value));
+    $('form#filterForm input[@name=minUniquePeptides]').val(parseInt(value));
     
-    value = $('form#goEnrichmentForm input[@name=minCoverage]').fieldValue();
+    value = $('form#filterForm input[@name=minCoverage]').fieldValue();
     valid = validateFloat(value, "Min. Coverage", 0.0, 100.0);
     if(!valid)	return false;
     
-    value = $('form#goEnrichmentForm input[@name=minSpectrumMatches]').fieldValue();
+    value = $('form#filterForm input[@name=minSpectrumMatches]').fieldValue();
     valid = validateInt(value, "Min. Spectrum Matches", 1);
     if(!valid)	return false;
-    $('form#goEnrichmentForm input[@name=minSpectrumMatches]').val(parseInt(value));
+    $('form#filterForm input[@name=minSpectrumMatches]').val(parseInt(value));
     
-    value = $('form#goEnrichmentForm input[@name=goEnrichmentPVal]').fieldValue();
-    valid = validateFloat(value, "P-Value", 0.0, 1.0);
+    value = $('form#filterForm input[@name=minMolecularWt]').fieldValue();
+    valid = validateFloat(value, "Min. Molecular Wt.", 0);
     if(!valid)	return false;
+    $('form#filterForm input[@name=minMolecularWt]').val(parseInt(value));
+    
     
     return true;
 }

@@ -177,7 +177,9 @@ public class ProteinInferViewAction extends Action {
         request.setAttribute("sortBy", filterCriteria.getSortBy());
         request.setAttribute("sortOrder", filterCriteria.getSortOrder());
         
-        request.setAttribute("speciesIsYeast", isSpeciesYeast(pinferId));
+        if(isSpeciesYeast(pinferId)) {
+        	request.setAttribute("showGoForm", true);
+        }
         
         long e = System.currentTimeMillis();
         log.info("Total time (ProteinInferViewAction): "+TimeUtils.timeElapsedSeconds(s, e));

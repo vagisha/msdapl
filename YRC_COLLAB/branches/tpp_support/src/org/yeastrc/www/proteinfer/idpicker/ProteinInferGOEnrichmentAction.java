@@ -92,6 +92,7 @@ public class ProteinInferGOEnrichmentAction extends Action {
         request.setAttribute("species", Species.getInstance(speciesId));
         request.setAttribute("proteinInferFilterForm", filterForm);
         request.setAttribute("showGoForm", true);
+        request.setAttribute("goView", true);
         
         
         long e = System.currentTimeMillis();
