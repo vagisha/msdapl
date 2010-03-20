@@ -1,5 +1,6 @@
 
 <%@page import="org.yeastrc.ms.domain.protinfer.ProteinUserValidation"%>
+<%@page import="org.yeastrc.bio.go.GOUtils"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -31,7 +32,7 @@
 	});
 </script>
 
-  <html:form action="/updateProteinInferenceResult" method="post" styleId="filterForm" >
+  <html:form action="/proteinInferGateway" method="post" styleId="filterForm" >
   
   <html:hidden name="proteinInferFilterForm" property="pinferId" />
   <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;">
@@ -88,6 +89,8 @@
   </table></td>
   
   <td valign="top"><table>
+  
+  <logic:notPresent name="showGoForm">
   <tr>
   	<td colspan="2">Group Indistinguishable Proteins: </td>
   	<td>
@@ -97,6 +100,8 @@
   		<html:radio name="proteinInferFilterForm" property="joinGroupProteins" value="false">No</html:radio>
   	</td>
   </tr>
+  </logic:notPresent>
+  
   <tr>
   	<td colspan="2">Show Proteins: </td>
   	<td>
@@ -170,12 +175,54 @@
   </tr>
   
  
+ <logic:notPresent name="showGoForm">
   <tr>
     	<td colspan="3" align="center">
-    		<html:submit styleClass="plain_button" style="margin-top:2px;">Update</html:submit>
+    		<html:hidden name="proteinInferFilterForm" property="doDownload" />
+    		<html:hidden name="proteinInferFilterForm" property="doGoEnrichment" />
+    		<button class="plain_button" style="margin-top:2px;" 
+    		        onclick="javascript:updateResults();return false;">Update</button>
+    		<!--<html:submit styleClass="plain_button" style="margin-top:2px;">Update</html:submit>-->
     	</td>
     	 
-    	 
   </tr>
+  </logic:notPresent>
+  
  </TABLE>
+ 
+
+<logic:notPresent name="showGoForm">
+ <div align="center" style="margin:10 0 10 0;">
+   	<a href="" onclick="javascript:downloadResults();return false;" ><b>Download Results</b></a> &nbsp; 
+   	<html:checkbox name="proteinInferFilterForm"property="printPeptides" >Include Peptides</html:checkbox>
+   	<html:checkbox name="proteinInferFilterForm"property="printDescriptions" >Include Descriptions</html:checkbox>
+   	<html:checkbox name="proteinInferFilterForm"property="collapseGroups" >Collapse Protein Groups</html:checkbox>
+  </div>
+</logic:notPresent>
+
+
+<logic:equal name="speciesIsYeast" value="true">
+ <div align="center"
+		style="padding: 5; border: 1px dashed gray; background-color: #F0F8FF;">
+		<b>GO Enrichment:</b>
+		<html:select name="proteinInferFilterForm" property="goAspect">
+			<html:option
+				value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">Cellular Component</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
+		</html:select>
+		&nbsp; &nbsp; 
+		Species:
+		<html:select name="proteinInferFilterForm" property="speciesId">
+			<html:option value="4932">Saccharomyces cerevisiae </html:option>
+		</html:select>
+		&nbsp; &nbsp;
+		P-Value: <html:text name="proteinInferFilterForm" property="goEnrichmentPVal"></html:text>
+		&nbsp; &nbsp;
+		<a href=""
+			onclick="javascript:doGoEnrichmentAnalysis();return false;">Calculate</a>
+	</div>
+</logic:equal>
 </html:form>

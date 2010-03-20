@@ -63,7 +63,7 @@
 	<form-bean name="filterMascotResultsForm" type="org.yeastrc.www.project.experiment.MascotFilterResultsForm" />
 	<form-bean name="filterXtandemResultsForm" type="org.yeastrc.www.project.experiment.XtandemFilterResultsForm" />
 	<form-bean name="proteinInferenceFormPercolator" type="org.yeastrc.www.proteinfer.job.ProteinInferenceForm"></form-bean>
-	<form-bean name="proteinInferFilterForm" type="org.yeastrc.www.proteinfer.ProteinInferFilterForm"></form-bean>
+	<form-bean name="idPickerFilterForm" type="org.yeastrc.www.proteinfer.idpicker.IdPickerFilterForm"></form-bean>
 	<form-bean name="proteinProphetFilterForm" type="org.yeastrc.www.proteinfer.proteinProphet.ProteinProphetFilterForm"></form-bean>
 	<form-bean name="proteinSetComparisonForm" type="org.yeastrc.www.compare.ProteinSetComparisonForm"></form-bean>
 	<form-bean name="datasetSelectionForm" type="org.yeastrc.www.compare.DatasetSelectionForm"></form-bean>
@@ -780,7 +780,7 @@
 	<!-- ================================================================================== -->
 	
 	<!-- ================================================================================== -->
-	<!-- Actions related to protein inference -->
+	<!-- Actions related to protein inference IDPicker-->
 	<!-- ================================================================================== -->
 	<action 
 		path="/newPercolatorProteinInference"
@@ -821,7 +821,32 @@
 	<action 
 		path="/viewProteinInferenceResult"
 		type="org.yeastrc.www.proteinfer.idpicker.ViewProteinInferenceResultAction"
-		name="proteinInferFilterForm"
+		name="idPickerFilterForm"
+		scope="request"
+		validate="true"
+	>
+		<forward name="Success" path="/proteinInferGateway.do" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/proteinInferGateway"
+		type="org.yeastrc.www.proteinfer.idpicker.ProteinInferenceResultGatewayAction"
+		name="idPickerFilterForm"
+		scope="request"
+		validate="true"
+	>
+		<forward name="ViewResults" path="/viewNewResult.do" redirect="false" />
+		<forward name="Update" path="/updateProteinInferenceResult.do" redirect="false" />
+		<forward name="Download" path="/downloadProtInferResults.do" redirect="false" />
+		<forward name="GOEnrichment" path="/protInferGoEnrichment.do" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/viewNewResult"
+		type="org.yeastrc.www.proteinfer.idpicker.ProteinInferViewAction"
+		name="idPickerFilterForm"
 		scope="request"
 		validate="true"
 	>
@@ -829,6 +854,61 @@
 		<forward name="Failure" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
 	</action>
 	
+	
+	<action 
+		path="/updateProteinInferenceResult"
+		type="org.yeastrc.www.proteinfer.idpicker.UpdateProteinInferenceResultAjaxAction"
+		name="idPickerFilterForm"
+		scope="request"
+		validate="true"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinlist.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/downloadProtInferResults"
+		name="idPickerFilterForm"
+		scope="request"
+		validate="true"
+		type="org.yeastrc.www.proteinfer.idpicker.ProteinInferDownloadAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
+	</action>
+	
+	
+	<action 
+		path="/protInferGoEnrichment"
+		name="idPickerFilterForm"
+		scope="request"
+		validate="true"
+		type="org.yeastrc.www.proteinfer.idpicker.ProteinInferGOEnrichmentAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/viewProtInferGoEnrichment.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/viewProtInferGoEnrichment.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/pageProteinInferenceResult"
+		type="org.yeastrc.www.proteinfer.idpicker.PageProteinferResultsAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinListTable.jsp" redirect="false" />
+		<forward name="ViewNewResults" path="/viewProteinInferenceResult.do" redirect="false" />
+	</action>
+	
+	<action 
+		path="/sortProteinInferenceResult"
+		type="org.yeastrc.www.proteinfer.idpicker.SortProteinferResultsAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinListTable.jsp" redirect="false" />
+		<forward name="ViewNewResults" path="/viewProteinInferenceResult.do" redirect="false" />
+	</action>
+	
+	
+	
+	<!-- ================================================================================== -->
+	<!-- Actions related to protein inference ProteinProphet-->
+	<!-- ================================================================================== -->
 	<action 
 		path="/viewProteinProphetResult"
 		type="org.yeastrc.www.proteinfer.proteinProphet.ViewProteinProphetResultAction"
@@ -838,34 +918,6 @@
 	>
 		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
 		<forward name="Failure" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
-	</action>
-	
-	<action
-	  path="/saveProtInferComments"
-	  type="org.yeastrc.www.proteinfer.SaveProtInferCommentsAjaxAction"
-	  >
-	</action>
-	
-	<action 
-		path="/downloadProtInferResults"
-		name="proteinInferFilterForm"
-		scope="request"
-		validate="true"
-		type="org.yeastrc.www.proteinfer.idpicker.DownloadProteinferResultsAction"
-	>
-		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
-		<forward name="Failure" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
-	</action>
-	
-	<action 
-		path="/protInferGoEnrichment"
-		name="proteinInferFilterForm"
-		scope="request"
-		validate="true"
-		type="org.yeastrc.www.proteinfer.idpicker.ProteinInferGOEnrichmentAction"
-	>
-		<forward name="Success" path="/pages/internal/proteinfer/viewProtInferGoEnrichment.jsp" redirect="false" />
-		<forward name="Failure" path="/pages/internal/proteinfer/viewProtInferGoEnrichment.jsp" redirect="false" />
 	</action>
 	
 	<action 
@@ -880,17 +932,6 @@
 	</action>
 	
 	<action 
-		path="/updateProteinInferenceResult"
-		type="org.yeastrc.www.proteinfer.idpicker.UpdateProteinInferenceResultAjaxAction"
-		name="proteinInferFilterForm"
-		scope="request"
-		validate="true"
-	>
-		<forward name="ViewNewResults" path="/viewProteinInferenceResult.do" redirect="false" />
-		<forward name="Success" path="/pages/internal/proteinfer/proteinlist.jsp" redirect="false" />
-	</action>
-	
-	<action 
 		path="/updateProteinProphetResult"
 		type="org.yeastrc.www.proteinfer.proteinProphet.UpdateProteinProphetResultAjaxAction"
 		name="proteinProphetFilterForm"
@@ -901,13 +942,6 @@
 		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/proteinlist.jsp" redirect="false" />
 	</action>
 	
-	<action 
-		path="/pageProteinInferenceResult"
-		type="org.yeastrc.www.proteinfer.idpicker.PageProteinferResultsAjaxAction"
-	>
-		<forward name="Success" path="/pages/internal/proteinfer/proteinListTable.jsp" redirect="false" />
-		<forward name="ViewNewResults" path="/viewProteinInferenceResult.do" redirect="false" />
-	</action>
 	
 	<action 
 		path="/pageProteinProphetResult"
@@ -917,13 +951,6 @@
 		<forward name="ViewNewResults" path="/viewProteinProphetResult.do" redirect="false" />
 	</action>
 	
-	<action 
-		path="/sortProteinInferenceResult"
-		type="org.yeastrc.www.proteinfer.idpicker.SortProteinferResultsAjaxAction"
-	>
-		<forward name="Success" path="/pages/internal/proteinfer/proteinListTable.jsp" redirect="false" />
-		<forward name="ViewNewResults" path="/viewProteinInferenceResult.do" redirect="false" />
-	</action>
 	
 	<action 
 		path="/sortProteinProphetResult"
@@ -933,7 +960,15 @@
 		<forward name="ViewNewResults" path="/viewProteinProphetResult.do" redirect="false" />
 	</action>
 	
+	<!-- ================================================================================== -->
+	<!-- Actions related to protein inference: General -->
+	<!-- ================================================================================== -->
 	
+	<action
+	  path="/saveProtInferComments"
+	  type="org.yeastrc.www.proteinfer.SaveProtInferCommentsAjaxAction"
+	  >
+	</action>
 	<action 
 		path="/getProteinPeptides"
 		type="org.yeastrc.www.proteinfer.ProteinPeptidesAjaxAction"
@@ -1007,13 +1042,6 @@
 		
 	</action>
 	
-	<action 
-		path="/filterProteinferResults"
-		type="org.yeastrc.www.proteinfer.FilterProteinferResultsAjaxAction"
-	>
-		<forward name="Success" path="/pages/internal/proteinfer/proteinlist.jsp" redirect="false" />
-		
-	</action>
 	
 	<action
 		path="/listInputGroups"

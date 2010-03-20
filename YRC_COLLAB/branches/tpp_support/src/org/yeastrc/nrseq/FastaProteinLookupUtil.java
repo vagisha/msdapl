@@ -53,7 +53,7 @@ public class FastaProteinLookupUtil {
         
     	// get a list of databases associated with this protein inference
     	// Add the standard databases to the list too.
-        List<Integer> dbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId, true);
+        List<Integer> dbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId, false);
         
         Set<Integer> found = new HashSet<Integer>();
         for(String descTerm: descriptionTerms) {

@@ -42,7 +42,6 @@
 
 <%
 	int pinferId = (Integer)request.getAttribute("pinferId");
-	//int clusterCount = ((List<Integer>)request.getAttribute("clusterIds")).size();
 %>
 
 <script>
@@ -824,25 +823,8 @@ function makeProteinListSortable() {
 }
 
 // ---------------------------------------------------------------------------------------
-// UPDATE RESULTS
+// FORM VALIDATION
 // ---------------------------------------------------------------------------------------
-$(document).ready(function() { 
-
-	var options = {
-		target:   '#protlist_table',
-		beforeSubmit: beforeSubmit,
-		success:  updateResults
-	};
-    // bind 'filterForm' and provide a callback function 
-    $('#filterForm').ajaxForm(options); 
-});
-// validate the form parameters before submit.
-function beforeSubmit() {
-	
-    if(!validateForm())
-    	return false;
-	$.blockUI();
-}
 function validateForm() {
 
 	// fieldValue is a Form Plugin method that can be invoked to find the 
@@ -901,9 +883,27 @@ function validateFloat(value, fieldName, min, max) {
 	}
 	return valid;
 }
-function updateResults(responseText, statusText) {
-	$.unblockUI();
-  	refreshProteinList(responseText);
+
+// ---------------------------------------------------------------------------------------
+// UPDATE RESULTS
+// ---------------------------------------------------------------------------------------
+function updateResults() {
+
+	if(!validateForm())
+    	return false;
+    
+    $("form#filterForm input[name='doDownload']").val("false");
+    $("form#filterForm input[name='doGoEnrichment']").val("false");
+    	
+    $.blockUI();
+    $.post( "<yrcwww:link path='proteinInferGateway.do'/>", 	//url, 
+    		 $("form#filterForm").serialize(), // data to submit
+    		 function(result, status) {
+    		 	// load the result
+    		 	$('#protlist_table').html(result);
+    		 	$.unblockUI();
+  				refreshProteinList(response);
+    		 });
 }
 
 function refreshProteinList(responseText) {
@@ -915,50 +915,19 @@ function refreshProteinList(responseText) {
 	}
 	//setupProteinListTable();
 }
+
 // ---------------------------------------------------------------------------------------
 // DOWNLOAD RESULTS
 // ---------------------------------------------------------------------------------------
 function downloadResults() {
 
-	// validate the current entries in the form
-	var validated = validateForm();
-	if(!validated)	return false;
-	
-	// copy the values from the filter form to the download form
-	$("#downloadForm  input[name='minPeptides']").val($("#filterForm  input[name='minPeptides']").val());
-	$("#downloadForm  input[name='maxPeptides']").val($("#filterForm  input[name='maxPeptides']").val());
-	
-	$("#downloadForm  input[name='minUniquePeptides']").val($("#filterForm input[name='minUniquePeptides']").val());
-	$("#downloadForm  input[name='maxUniquePeptides']").val($("#filterForm input[name='maxUniquePeptides']").val());
-	
-	$("#downloadForm  input[name='minCoverage']").val($("#filterForm  input[name='minCoverage']").val());
-	$("#downloadForm  input[name='maxCoverage']").val($("#filterForm  input[name='maxCoverage']").val());
-	
-	$("#downloadForm  input[name='minMolecularWt']").val($("#filterForm  input[name='minMolecularWt']").val());
-	$("#downloadForm  input[name='maxMolecularWt']").val($("#filterForm  input[name='maxMolecularWt']").val());
-	
-	$("#downloadForm  input[name='minPi']").val($("#filterForm  input[name='minPi']").val());
-	$("#downloadForm  input[name='maxPi']").val($("#filterForm  input[name='maxPi']").val());
-	
-	$("#downloadForm  input[name='minSpectrumMatches']").val($("#filterForm  input[name='minSpectrumMatches']").val());
-	$("#downloadForm  input[name='maxSpectrumMatches']").val($("#filterForm  input[name='maxSpectrumMatches']").val());
-	
-	$("#downloadForm  input[name='showAllProteins']").val($("#filterForm  input[name='showAllProteins']:checked").val());
-
-	$("#downloadForm  input[name='accessionLike']").val($("#filterForm  input[name='accessionLike']").val());
-	$("#downloadForm  input[name='descriptionLike']").val($("#filterForm input[name='descriptionLike']").val());
-	$("#downloadForm  input[name='descriptionNotLike']").val($("#filterForm input[name='descriptionNotLike']").val());
-	
-	var validationStatus = "";
-	$("#filterForm  input[name='validationStatus']:checked").each(function() {validationStatus += ","+$(this).val();});
-	if(validationStatus.length) {
-		validationStatus = validationStatus.substring(1); // remove first comma
-	}
-	$("#downloadForm  input[name='validationStatusString']").val(validationStatus);
-	
-	
-	$("#downloadForm").submit();
-	
+	// validate form
+	if(!validateForm())
+    	return false;
+	$("form#filterForm input[name='doDownload']").val("true");
+    $("form#filterForm input[name='doGoEnrichment']").val("false");
+    
+	$("form#filterForm").submit();
 }
 
 // ---------------------------------------------------------------------------------------
@@ -966,48 +935,18 @@ function downloadResults() {
 // ---------------------------------------------------------------------------------------
 function doGoEnrichmentAnalysis() {
 
-	// validate the current entries in the form
-	var validated = validateForm();
-	if(!validated)	return false;
+	// validate form
+	if(!validateForm())
+    	return false;
 	// validate pvalue cutoff for enrichment calculation
-	var value = $('form#goEnrichmentForm input[@name=goEnrichmentPVal]').fieldValue();
+	var value = $('form#filterForm input[name=goEnrichmentPVal]').fieldValue();
     var valid = validateFloat(value, "P-Value", 0.0, 1.0);
     if(!valid)	return false;
 	
-	// copy the values from the filter form to the GO enrichment form
-	$("#goEnrichmentForm  input[name='minPeptides']").val($("#filterForm  input[name='minPeptides']").val());
-	$("#goEnrichmentForm  input[name='maxPeptides']").val($("#filterForm  input[name='maxPeptides']").val());
-	
-	$("#goEnrichmentForm  input[name='minUniquePeptides']").val($("#filterForm input[name='minUniquePeptides']").val());
-	$("#goEnrichmentForm  input[name='maxUniquePeptides']").val($("#filterForm input[name='maxUniquePeptides']").val());
-	
-	$("#goEnrichmentForm  input[name='minCoverage']").val($("#filterForm  input[name='minCoverage']").val());
-	$("#goEnrichmentForm  input[name='maxCoverage']").val($("#filterForm  input[name='maxCoverage']").val());
-	
-	$("#goEnrichmentForm  input[name='minMolecularWt']").val($("#filterForm  input[name='minMolecularWt']").val());
-	$("#goEnrichmentForm  input[name='maxMolecularWt']").val($("#filterForm  input[name='maxMolecularWt']").val());
-	
-	$("#goEnrichmentForm  input[name='minPi']").val($("#filterForm  input[name='minPi']").val());
-	$("#goEnrichmentForm  input[name='maxPi']").val($("#filterForm  input[name='maxPi']").val());
-	
-	$("#goEnrichmentForm  input[name='minSpectrumMatches']").val($("#filterForm  input[name='minSpectrumMatches']").val());
-	$("#goEnrichmentForm  input[name='maxSpectrumMatches']").val($("#filterForm  input[name='maxSpectrumMatches']").val());
-	
-	$("#goEnrichmentForm  input[name='showAllProteins']").val($("#filterForm  input[name='showAllProteins']:checked").val());
-
-	$("#goEnrichmentForm  input[name='accessionLike']").val($("#filterForm  input[name='accessionLike']").val());
-	$("#goEnrichmentForm  input[name='descriptionLike']").val($("#filterForm input[name='descriptionLike']").val());
-	$("#goEnrichmentForm  input[name='descriptionNotLike']").val($("#filterForm input[name='descriptionNotLike']").val());
-	
-	var validationStatus = "";
-	$("#filterForm  input[name='validationStatus']:checked").each(function() {validationStatus += ","+$(this).val();});
-	if(validationStatus.length) {
-		validationStatus = validationStatus.substring(1); // remove first comma
-	}
-	$("#goEnrichmentForm  input[name='validationStatusString']").val(validationStatus);
-	
-	
-	$("#goEnrichmentForm").submit();
+	$("form#filterForm input[name='doDownload']").val("false");
+    $("form#filterForm input[name='doGoEnrichment']").val("true");
+    
+	$("form#filterForm").submit();
 	
 }
 
@@ -1273,11 +1212,6 @@ function hideAllDescriptionsForProtein(proteinId) {
 		</div>
 	
 		<%@ include file="proteinInferFilterForm.jsp" %>
-		<%@include file="proteinInferDownloadForm.jsp" %>
-		
-		<logic:equal name="speciesIsYeast" value="true">
-		<%@include file="goEnrichmentInputForm.jsp" %>
-		</logic:equal>
 		
 		</td></tr></table>
 		</CENTER>

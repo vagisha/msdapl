@@ -23,7 +23,6 @@ import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.ms.util.TimeUtils;
-import org.yeastrc.nrseq.FastaProteinLookupUtil;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 
 /**

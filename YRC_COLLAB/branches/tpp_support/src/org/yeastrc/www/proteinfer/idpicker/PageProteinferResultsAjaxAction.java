@@ -85,7 +85,7 @@ public class PageProteinferResultsAjaxAction extends Action {
         if(storedProteinIds == null || storedProteinIds.size() == 0) {
          // redirect to the /viewProteinInferenceResult action if no proteinIds are stored in the session
             ActionForward newResults = mapping.findForward( "ViewNewResults" ) ;
-            newResults = new ActionForward( newResults.getPath() + "inferId="+pinferId, newResults.getRedirect() ) ;
+            newResults = new ActionForward( newResults.getPath() + "pinferId="+pinferId, newResults.getRedirect() ) ;
             return newResults;
         }
         

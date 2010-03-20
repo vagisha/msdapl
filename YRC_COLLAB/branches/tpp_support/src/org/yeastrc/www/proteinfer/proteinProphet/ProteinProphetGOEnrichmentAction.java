@@ -31,7 +31,6 @@ import org.yeastrc.www.go.GOEnrichmentCalculator;
 import org.yeastrc.www.go.GOEnrichmentInput;
 import org.yeastrc.www.go.GOEnrichmentOutput;
 import org.yeastrc.www.go.GOEnrichmentTabular;
-import org.yeastrc.www.proteinfer.ProteinInferGOEnrichmentAction;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -41,7 +40,7 @@ import org.yeastrc.www.user.UserUtils;
  */
 public class ProteinProphetGOEnrichmentAction extends Action {
 
- private static final Logger log = Logger.getLogger(ProteinInferGOEnrichmentAction.class.getName());
+ private static final Logger log = Logger.getLogger(ProteinProphetGOEnrichmentAction.class.getName());
     
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,

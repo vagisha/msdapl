@@ -9,6 +9,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
+import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -37,15 +38,6 @@ public class ProteinClusterAjaxAction extends Action{
             response.setContentType("text/html");
             response.getWriter().write("<b>Invalid Protein Inference ID: "+pinferId+"</b>");
             return null;
-        }
-        // make sure protein inference ID in the request matches the ID for results stored in the session
-        Integer pinferId_session = (Integer)request.getSession().getAttribute("pinferId");
-        if(pinferId_session == null || pinferId_session != pinferId) {
-            // redirect to the /viewProteinInferenceResult action if this different from the
-            // protein inference ID stored in the session
-            ActionForward newResults = mapping.findForward( "ViewNewResults" ) ;
-            newResults = new ActionForward( newResults.getPath() + "inferId="+pinferId, newResults.getRedirect() ) ;
-            return newResults;
         }
         
 

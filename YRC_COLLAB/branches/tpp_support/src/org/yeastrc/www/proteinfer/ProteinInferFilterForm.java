@@ -9,6 +9,8 @@ import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.bio.go.GOUtils;
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 
 public class ProteinInferFilterForm extends ActionForm {
 
@@ -27,12 +29,6 @@ public class ProteinInferFilterForm extends ActionForm {
     private String minSpectrumMatches = "1";
     private String maxSpectrumMatches;
     
-    private boolean joinGroupProteins = true;
-    private boolean showAllProteins = true;
-    private boolean collapseGroups = false; // Used for downloads only
-    private boolean printPeptides = false; // Used for downloads only
-    private boolean printDescription = false; // used for downloads only
-    
     private String accessionLike = null;
     private String descriptionLike = null;
     private String descriptionNotLike = null;
@@ -49,6 +45,9 @@ public class ProteinInferFilterForm extends ActionForm {
     private int speciesId;
     private String goEnrichmentPVal = "0.01";           // Used for GO enrichment only
     
+    private boolean doDownload = false;
+    private boolean doGoEnrichment = false;
+    
     public ProteinInferFilterForm () {}
     
     public void reset() {
@@ -57,8 +56,6 @@ public class ProteinInferFilterForm extends ActionForm {
         // http://struts.apache.org/1.1/faqs/newbie.html#checkboxes
         excludeIndistinGroups = false;
         exactMatch = false;
-        joinGroupProteins = true;
-        showAllProteins = true;
         
         minCoverage = "0.0";
         minMolecularWt = "0.0";
@@ -91,6 +88,22 @@ public class ProteinInferFilterForm extends ActionForm {
         this.pinferId = pinferId;
     }
 
+    public boolean isDoDownload() {
+		return doDownload;
+	}
+
+	public void setDoDownload(boolean doDownload) {
+		this.doDownload = doDownload;
+	}
+
+	public boolean isDoGoEnrichment() {
+		return doGoEnrichment;
+	}
+
+	public void setDoGoEnrichment(boolean doGoEnrichment) {
+		this.doGoEnrichment = doGoEnrichment;
+	}
+	
     // MIN COVERAGE
     public String getMinCoverage() {
         return minCoverage;
@@ -257,14 +270,6 @@ public class ProteinInferFilterForm extends ActionForm {
         this.maxSpectrumMatches = maxSpectrumMatches;
     }
 
-    // PROTEIN GROUPS
-    public boolean isJoinGroupProteins() {
-        return joinGroupProteins;
-    }
-
-    public void setJoinGroupProteins(boolean joinGroupProteins) {
-        this.joinGroupProteins = joinGroupProteins;
-    }
 
     public boolean isExcludeIndistinProteinGroups() {
         return this.excludeIndistinGroups;
@@ -274,13 +279,6 @@ public class ProteinInferFilterForm extends ActionForm {
         this.excludeIndistinGroups = exclude;
     }
     
-    public boolean isShowAllProteins() {
-        return showAllProteins;
-    }
-
-    public void setShowAllProteins(boolean showAllProteins) {
-        this.showAllProteins = showAllProteins;
-    }
     
     // ACCESSION
     public String getAccessionLike() {
@@ -414,30 +412,6 @@ public class ProteinInferFilterForm extends ActionForm {
         return buf.toString();
     }
 
-    public boolean isCollapseGroups() {
-        return collapseGroups;
-    }
-
-    public void setCollapseGroups(boolean collapseGroups) {
-        this.collapseGroups = collapseGroups;
-    }
-
-    public boolean isPrintPeptides() {
-        return printPeptides;
-    }
-
-    public void setPrintPeptides(boolean printPeptides) {
-        this.printPeptides = printPeptides;
-    }
-    
-    public boolean isPrintDescriptions() {
-        return printDescription;
-    }
-
-    public void setPrintDescriptions(boolean printDescription) {
-        this.printDescription = printDescription;
-    }
-   
     //-----------------------------------------------------------------------------
     // GO Enrichment
     //-----------------------------------------------------------------------------
@@ -463,5 +437,28 @@ public class ProteinInferFilterForm extends ActionForm {
 
     public void setSpeciesId(int speciesId) {
         this.speciesId = speciesId;
+    }
+    
+    public ProteinFilterCriteria getFilterCriteria(PeptideDefinition peptideDef) {
+    	
+    	ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
+        filterCriteria.setCoverage(getMinCoverageDouble());
+        filterCriteria.setMaxCoverage(getMaxCoverageDouble());
+        filterCriteria.setNumPeptides(getMinPeptidesInteger());
+        filterCriteria.setNumMaxPeptides(getMaxPeptidesInteger());
+        filterCriteria.setNumUniquePeptides(getMinUniquePeptidesInteger());
+        filterCriteria.setNumMaxUniquePeptides(getMaxUniquePeptidesInteger());
+        filterCriteria.setNumSpectra(getMinSpectrumMatchesInteger());
+        filterCriteria.setNumMaxSpectra(getMaxSpectrumMatchesInteger());
+        filterCriteria.setPeptideDefinition(peptideDef);
+        filterCriteria.setSortOrder(ProteinFilterCriteria.defaultSortOrder());
+        filterCriteria.setGroupProteins(true);
+        filterCriteria.setValidationStatus(getValidationStatus());
+        filterCriteria.setAccessionLike(getAccessionLike());
+        filterCriteria.setDescriptionLike(getDescriptionLike());
+        filterCriteria.setPeptide(getPeptide());
+        filterCriteria.setExactPeptideMatch(getExactPeptideMatch());
+        
+        return filterCriteria;
     }
 }

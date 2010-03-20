@@ -149,7 +149,7 @@ function validateFloat(value, fieldName, min, max) {
 	</table>
 </div>
 
-<%@include file="goEnrichmentInputForm.jsp" %>
+<%@include file="proteinInferFilterForm.jsp" %>
 
 <!-- BIOLOGICAL PROCESS -->
 <logic:present name="bioProcessTerms">

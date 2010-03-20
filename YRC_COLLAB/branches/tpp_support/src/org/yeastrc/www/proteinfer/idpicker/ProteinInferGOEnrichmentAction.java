@@ -7,11 +7,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
 import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.bio.taxonomy.Species;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
@@ -19,16 +17,12 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
-import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.go.GOEnrichmentCalculator;
 import org.yeastrc.www.go.GOEnrichmentInput;
 import org.yeastrc.www.go.GOEnrichmentOutput;
 import org.yeastrc.www.go.GOEnrichmentTabular;
-import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
-import org.yeastrc.www.user.User;
-import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.idpicker.IDPickerParams;
 import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
@@ -53,27 +47,11 @@ public class ProteinInferGOEnrichmentAction extends Action {
             HttpServletResponse response )
     throws Exception {
         
-        // User making this request
-        User user = UserUtils.getUser(request);
-        if (user == null) {
-            ActionErrors errors = new ActionErrors();
-            errors.add("username", new ActionMessage("error.login.notloggedin"));
-            saveErrors( request, errors );
-            return mapping.findForward("authenticate");
-        }
-        
-        ProteinInferFilterForm filterForm = (ProteinInferFilterForm) form;
+    	IdPickerFilterForm filterForm = (IdPickerFilterForm)form;
+    	
         // get the protein inference id
         int pinferId = filterForm.getPinferId();
-        // if we  do not have a valid protein inference run id
-        // return an error.
-        if(pinferId <= 0) {
-            log.error("Invalid protein inference run id: "+pinferId);
-            ActionErrors errors = new ActionErrors();
-            errors.add("proteinfer", new ActionMessage("error.proteinfer.invalid.pinferId", pinferId));
-            saveErrors( request, errors );
-            return mapping.findForward("Failure");
-        }
+       
         
         long s = System.currentTimeMillis();
         
@@ -121,36 +99,14 @@ public class ProteinInferGOEnrichmentAction extends Action {
         return mapping.findForward("Success");
     }
     
-    private GOEnrichmentOutput doGoEnrichmentAnalysis(int pinferId, int speciesId, ProteinInferFilterForm filterForm) throws Exception {
+    private GOEnrichmentOutput doGoEnrichmentAnalysis(int pinferId, int speciesId, IdPickerFilterForm filterForm) throws Exception {
         
         IdPickerRun idpRun = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
         IDPickerParams idpParams = IdPickerParamsMaker.makeIdPickerParams(idpRun.getParams());
         PeptideDefinition peptideDef = idpParams.getPeptideDefinition();
         
         // Get the filtering criteria
-        ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
-        filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
-        filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
-        filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
-        filterCriteria.setNumMaxPeptides(filterForm.getMaxPeptidesInteger());
-        filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptidesInteger());
-        filterCriteria.setNumMaxUniquePeptides(filterForm.getMaxUniquePeptidesInteger());
-        filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatchesInteger());
-        filterCriteria.setNumMaxSpectra(filterForm.getMaxSpectrumMatchesInteger());
-        filterCriteria.setPeptideDefinition(peptideDef);
-        if(filterForm.isCollapseGroups()) 
-            filterCriteria.setSortBy(SORT_BY.GROUP_ID);
-        else
-            filterCriteria.setSortBy(ProteinFilterCriteria.defaultSortBy());
-        filterCriteria.setSortOrder(ProteinFilterCriteria.defaultSortOrder());
-        filterCriteria.setGroupProteins(true);
-        if(!filterForm.isShowAllProteins())
-            filterCriteria.setParsimoniousOnly();
-        filterCriteria.setValidationStatus(filterForm.getValidationStatus());
-        filterCriteria.setAccessionLike(filterForm.getAccessionLike());
-        filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
-        filterCriteria.setPeptide(filterForm.getPeptide());
-        filterCriteria.setExactPeptideMatch(filterForm.getExactPeptideMatch());
+        ProteinFilterCriteria filterCriteria = filterForm.getFilterCriteria(peptideDef);
         
         // Get the protein Ids that fulfill the criteria.
         List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
