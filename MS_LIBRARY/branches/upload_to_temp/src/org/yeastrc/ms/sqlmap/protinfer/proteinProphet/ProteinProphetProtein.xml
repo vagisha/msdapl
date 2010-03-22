@@ -75,7 +75,7 @@
     	AND ppProt.subsumed = 0
     </select>
     
-    <resultMap class="org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO$ProteinAndGroup" 
+    <resultMap class="org.yeastrc.ms.dao.protinfer.ibatis.ProteinAndGroupId" 
     				id="protAndGroupResult">
 		<result property="proteinId" jdbcType="INTEGER"/>
 		<result property="groupId" jdbcType="INTEGER"/>

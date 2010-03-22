@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.protinfer.GenericProteinferProteinDAO;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinAndGroupId;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
@@ -919,26 +920,13 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         Map<String, Number> map = new HashMap<String, Number>(8);
         map.put("pinferId", pinferId);
         if(parsimonious)          map.put("isSubsumed", 0);
-        List<ProteinAndGroup> protGrps = queryForList(sqlMapNameSpace+".selectProteinAndGroupIds", map);
+        List<ProteinAndGroupId> protGrps = queryForList(sqlMapNameSpace+".selectProteinAndGroupIds", map);
         
         Map<Integer, Integer> protGrpmap = new HashMap<Integer, Integer>((int) (protGrps.size() * 1.5));
-        for(ProteinAndGroup pg: protGrps) {
-            protGrpmap.put(pg.proteinId, pg.groupId);
+        for(ProteinAndGroupId pg: protGrps) {
+            protGrpmap.put(pg.getProteinId(), pg.getGroupId());
         }
         return protGrpmap;
-    }
-    
-    public static final class ProteinAndGroup {
-        private int proteinId;
-        private int groupId;
-        
-        public void setProteinId(int proteinId) {
-            this.proteinId = proteinId;
-        }
-        
-        public void setGroupId(int groupId) {
-            this.groupId = groupId;
-        }
     }
 
 }
