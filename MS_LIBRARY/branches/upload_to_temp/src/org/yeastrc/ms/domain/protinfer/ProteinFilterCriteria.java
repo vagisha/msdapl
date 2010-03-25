@@ -43,6 +43,7 @@ public class ProteinFilterCriteria {
     private String accessionLike;
     private String descriptionLike;
     private String descriptionNotLike;
+    private boolean searchAllDescriptions = false;
     
     private double minMolWt = 0.0;
     private double maxMolWt = Double.MAX_VALUE;
@@ -200,6 +201,14 @@ public class ProteinFilterCriteria {
         this.descriptionNotLike = descriptionNotLike;
     }
     
+    public boolean isSearchAllDescriptions() {
+		return searchAllDescriptions;
+	}
+
+	public void setSearchAllDescriptions(boolean searchAllDescriptions) {
+		this.searchAllDescriptions = searchAllDescriptions;
+	}
+	
     public List<ProteinUserValidation> getValidationStatus() {
         return validationStatus;
     }
@@ -389,6 +398,9 @@ public class ProteinFilterCriteria {
             if(!this.descriptionNotLike.equalsIgnoreCase(that.descriptionNotLike))
                 return false;
         }
+        
+        if(this.searchAllDescriptions != that.searchAllDescriptions)
+        	return false;
         
         if(peptide == null) {
             if(that.peptide != null)  return false;

@@ -43,4 +43,12 @@ public enum SORT_BY {
         else    return NONE;
         
     }
+    
+    public static boolean isProteinSpecific(SORT_BY sortBy) {
+    	return (sortBy == ACCESSION ||
+    			sortBy == MOL_WT ||
+    			sortBy == PI ||
+    			sortBy == COVERAGE ||
+    			sortBy == NSAF);
+    }
 }

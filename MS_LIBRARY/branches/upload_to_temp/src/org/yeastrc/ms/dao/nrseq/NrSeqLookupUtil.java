@@ -421,10 +421,31 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
     	dbIdStr = dbIdStr.substring(1); // remove first comma
     	dbIdStr = "("+dbIdStr+")";
         
-    	String statementName = "NrSeq.proteinMatchesDescriptionTerm";
+    	String statementName = "NrSeq.proteinMatchesDescriptionTermForDbs";
     	Map<String, Object> map = new HashMap<String, Object>(4);
     	map.put("nrseqId", nrseqId);
     	map.put("databaseIds", dbIdStr);
+    	map.put("description", "%"+descriptionTerm+"%");
+
+    	try {
+    		Integer id = (Integer)sqlMap.queryForObject(statementName, map);
+    		if(id != null && id > 0)
+    			return true;
+    		return false;
+    	}
+    	catch (SQLException e) {
+    		log.error("Failed to execute select statement: ", e);
+    		throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+    	}
+    }
+    
+    public static boolean proteinMatchesDescriptionTerm(int nrseqId, 
+    	 int dbId, String descriptionTerm) {
+    	
+    	String statementName = "NrSeq.proteinMatchesDescriptionTerm";
+    	Map<String, Object> map = new HashMap<String, Object>(4);
+    	map.put("nrseqId", nrseqId);
+    	map.put("databaseId", dbId);
     	map.put("description", "%"+descriptionTerm+"%");
 
     	try {

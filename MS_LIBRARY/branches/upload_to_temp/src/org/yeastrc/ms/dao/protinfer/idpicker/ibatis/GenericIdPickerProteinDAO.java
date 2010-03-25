@@ -6,6 +6,7 @@ import java.util.Map;
 import org.yeastrc.ms.dao.protinfer.GenericProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.domain.protinfer.idpicker.GenericIdPickerProtein;
 
 
@@ -37,9 +38,9 @@ public interface GenericIdPickerProteinDAO <P extends GenericIdPickerProtein<?>>
     
     public abstract List<Integer> getFilteredNrseqIds(int pinferId, ProteinFilterCriteria filterCriteria);
 
-    public abstract List<Integer> sortProteinIdsByCoverage(int pinferId, boolean groupProteins);
+    public abstract List<Integer> sortProteinIdsByCoverage(int pinferId, boolean groupProteins, SORT_ORDER sortOrder);
     
-    public abstract List<Integer> sortProteinsByNSAF(int pinferId, boolean groupProteins);
+    public abstract List<Integer> sortProteinsByNSAF(int pinferId, boolean groupProteins, SORT_ORDER sortOrder);
     
     public abstract List<Integer> sortProteinIdsByValidationStatus(int pinferId);
     
