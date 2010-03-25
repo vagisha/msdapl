@@ -39,6 +39,7 @@ public class DatasetFiltersForm extends ActionForm {
     private String accessionLike = null;
     private String descriptionLike = null;
     private String descriptionNotLike = null;
+    private boolean searchAllDescriptions = false;
     
     private boolean keepProteinGroups = false;
 
@@ -128,6 +129,14 @@ public class DatasetFiltersForm extends ActionForm {
     public void setDescriptionNotLike(String descriptionNotLike) {
         this.descriptionNotLike = descriptionNotLike;
     }
+    
+    public boolean isSearchAllDescriptions() {
+		return searchAllDescriptions;
+	}
+
+	public void setSearchAllDescriptions(boolean searchAllDescriptions) {
+		this.searchAllDescriptions = searchAllDescriptions;
+	}
     
     //-----------------------------------------------------------------------------
     // Molecular Weight
@@ -362,6 +371,7 @@ public class DatasetFiltersForm extends ActionForm {
         filters.setAccessionLike(this.getAccessionLike());
         filters.setDescriptionLike(this.getDescriptionLike());
         filters.setDescriptionNotLike(this.getDescriptionNotLike());
+        filters.setSearchAllDescriptions(this.isSearchAllDescriptions());
         
         return filters;
     }
@@ -372,15 +382,10 @@ public class DatasetFiltersForm extends ActionForm {
     public ProteinFilterCriteria getFilterCriteria() {
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
         
-        if(this.parsimoniousParam == ProteinDatasetComparer.PARSIM.NONE.getNumericValue()) {
-        	// get everything
-            filterCriteria.setParsimonious(true);
-            filterCriteria.setNonParsimonious(true);
-        }
-        else {
-            filterCriteria.setParsimonious(true);
-            filterCriteria.setNonParsimonious(false);
-        }
+        filterCriteria.setParsimonious(true);
+        filterCriteria.setNonParsimonious(false);
+        
+        filterCriteria.setSearchAllDescriptions(this.isSearchAllDescriptions());
        
         return filterCriteria;
     }

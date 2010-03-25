@@ -30,7 +30,7 @@ public class FastaDatabaseLookupUtil {
         for(Dataset dataset: datasets)
             if(dataset.getSource() != DatasetSource.DTA_SELECT)
                 pinferIds.add(dataset.getDatasetId());
-        fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferIds,
+        fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInferences(pinferIds,
         		addStandardDatabases);
         return fastaDatabaseIds;
 	}

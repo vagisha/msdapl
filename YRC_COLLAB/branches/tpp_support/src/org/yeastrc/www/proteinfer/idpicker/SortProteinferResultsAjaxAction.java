@@ -63,8 +63,7 @@ public class SortProteinferResultsAjaxAction extends Action{
         ProteinFilterCriteria filterCriteria_session = sessionManager.getFilterCriteriaForIdPicker(request, pinferId);
         List<Integer> storedProteinIds = sessionManager.getStoredProteinIds(request, pinferId);
         
-        // If we don't have a filtering criteria in the session we are starting from scratch
-        // Get the protein Ids that fulfill the criteria.
+        // If we don't have a filtering criteria in the session return an error
         if(filterCriteria_session == null || storedProteinIds == null) {
         	
         	log.info("NO information in session for: "+pinferId);
@@ -85,41 +84,66 @@ public class SortProteinferResultsAjaxAction extends Action{
         request.setAttribute("groupProteins", group);
 
 
-
-        SORT_BY sortBy_session = filterCriteria_session.getSortBy();
-
-        String sortBy_request = (String) request.getParameter("sortBy");
-
-        String sortOrder_request = (String) request.getParameter("sortOrder");
-        if(sortOrder_request != null) {
-            SORT_ORDER sortOrder_r = SORT_ORDER.getSortByForString(sortOrder_request);
-            filterCriteria_session.setSortOrder(sortOrder_r);
+        SORT_BY sortBy_request = null;
+        SORT_ORDER sortOrder_request = null;
+        
+        if((String) request.getParameter("sortBy") != null) {
+            sortBy_request = SORT_BY.getSortByForString((String) request.getParameter("sortBy"));
+        }
+        if((String) request.getParameter("sortOrder") != null) {
+        	sortOrder_request = SORT_ORDER.getSortByForString((String) request.getParameter("sortOrder"));
         }
 
 
         long s = System.currentTimeMillis();
-        log.info("Sorting results for protein inference: "+pinferId+"; sort by: "+sortBy_request+"; sort order: "+sortOrder_request);
+        log.info("Got request to sort results for protein inference: "+pinferId+"; sort by: "+sortBy_request+"; sort order: "+sortOrder_request);
 
-        if(sortBy_request != null){
-            SORT_BY sortBy_r = SORT_BY.getSortByForString(sortBy_request);
+        if(sortBy_request == null)
+        	sortBy_request = filterCriteria_session.getSortBy();
+        if(sortOrder_request == null)
+        	sortOrder_request = filterCriteria_session.getSortOrder();
+        
+        boolean doResort = false;
+        
+        // figure out if we will be resorting the results
+        // We will resort the results if:
+        // 1. the column select for sorting (SORT_BY) has changed
+        // 2. the sorting order (SORT_ORDER) has changed 
+        //    AND we are grouping proteins
+        //    AND we are sorting on a protein specific column (e.g. coverage, NSAF, mol. Wt. etc)
+        // If proteins are not being grouped AND SORT_BY has not changed we don't need to 
+        // resort as we can just use the existing list of proteins displayed in reverse order
+        if(sortBy_request != filterCriteria_session.getSortBy()) {
+        	log.info("SORT_BY has changed; SORT_BY in session: "+filterCriteria_session.getSortBy()+
+        			", SORT_BY in request: "+sortBy_request);
+        	doResort = true;
+        	log.info("RE-SORTING....");
+        	filterCriteria_session.setSortBy(sortBy_request);
+        }
+        if(sortOrder_request != filterCriteria_session.getSortOrder()) {
+        	log.info("SORT_ORDER has changed; SORT_ORDER in session: "+filterCriteria_session.getSortOrder()+
+        			", SORT_ORDER in request: "+sortOrder_request);
+        	filterCriteria_session.setSortOrder(sortOrder_request);
+        	
+        	if(group && SORT_BY.isProteinSpecific(sortBy_request)) {
+        		doResort = true;
+            	log.info("RE-SORTING grouped proteins....");
+        	}
+        }
+        
+        if(doResort){
+        	List<Integer> newSortedIds = null;
 
-            if(sortBy_r != sortBy_session) {
-                log.info("Sorting results by "+sortBy_r.name()+"; order: "+filterCriteria_session.getSortOrder().name());
+        	// resort  the results based on the given criteria
+        	newSortedIds = IdPickerResultsLoader.getSortedProteinIds(pinferId, 
+        			peptideDef, 
+        			storedProteinIds, 
+        			filterCriteria_session.getSortBy(),
+        			filterCriteria_session.getSortOrder(),
+        			group);
 
-
-                List<Integer> newOrderIds = null;
-
-                // resort  the results based on the given criteria
-                newOrderIds = IdPickerResultsLoader.getSortedProteinIds(pinferId, 
-                        peptideDef, 
-                        storedProteinIds, 
-                        sortBy_r, 
-                        group);
-
-                filterCriteria_session.setSortBy(sortBy_r);
-                sessionManager.putForIdPicker(request, pinferId, filterCriteria_session, newOrderIds);
-                storedProteinIds = newOrderIds;
-            }
+        	sessionManager.putForIdPicker(request, pinferId, filterCriteria_session, newSortedIds);
+        	storedProteinIds = newSortedIds;
         }
 
         // page number is now 1
@@ -127,13 +151,28 @@ public class SortProteinferResultsAjaxAction extends Action{
 
 
         // determine the list of proteins we will be displaying
+        
+        // We can use the pager to page the results in the reverse order (SORT_ORDER == DESC)
+        // However, if we are grouping indistinguishable proteins 
+        // AND the sorting column is protein specific
+        // we must have already sorted the results in descending order
+        boolean doReversePage = filterCriteria_session.getSortOrder() == SORT_ORDER.DESC;
+        if(group && SORT_BY.isProteinSpecific(filterCriteria_session.getSortBy()))
+        	doReversePage = false;
+        
+        if(doReversePage)
+        	log.info("REVERSE PAGING...");
+        
+        // get the index range that is to be displayed in this page
         ResultsPager pager = ResultsPager.instance();
-        List<Integer> proteinIds = pager.page(storedProteinIds, pageNum, 
-                filterCriteria_session.getSortOrder() == SORT_ORDER.DESC);
+        int[] pageIndices = pager.getPageIndices(storedProteinIds, pageNum, 
+                doReversePage);
+        // sublist to be displayed
+        List<Integer> proteinIds = IdPickerResultsLoader.getPageSublist(storedProteinIds, pageIndices, group, doReversePage);
+       
 
         // get the protein groups
-        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, 
-                group, peptideDef);
+        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, peptideDef);
         request.setAttribute("proteinGroups", proteinGroups);
 
 

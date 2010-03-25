@@ -217,15 +217,25 @@
  	<tr>
  		<td style="padding-left:5px;" valign="top">Description Include: </td>
  		<td style="padding:0 5 5 0;"> 
-			<html:text name="proteinSetComparisonForm" property="descriptionLike" size="40"></html:text><br>
- 			<span style="font-size:8pt;">Enter a comma-separated list of terms.</span>
+			<html:text name="proteinSetComparisonForm" property="descriptionLike" size="40"></html:text>
  		</td>
  		<td style="padding-left:5px;" valign="top"> Exclude:</td>
  		<td> 
-			<html:text name="proteinSetComparisonForm" property="descriptionNotLike" size="40"></html:text><br>
- 			<span style="font-size:8pt;">Enter a comma-separated list of terms.</span>
+			<html:text name="proteinSetComparisonForm" property="descriptionNotLike" size="40"></html:text>
+			<span style="font-size:8pt;">Search All:<html:checkbox property="proteinSetComparisonForm" property="searchAllDescriptions"></html:checkbox></span>
  		</td>
  	</tr>
+ 	<tr>
+  		<td></td>
+  		<td colspan="3" ">
+  			<div style="font-size:8pt;" align="left">Enter a comma-separated list of terms.
+  			Descriptions will be included from the fasta file(s) associated with the data-sets <br>
+  			being compared, as well as species specific databases (e.g. SGD) 
+  			for any associated target species.
+  			<br>Check "Search All" to include descriptions from Swiss-Prot and NCBI-NR. 
+  			<br/><font color="red">NOTE: Description searches can be time consuming, especially when "Search All" is checked.</font></div>
+  		</td>
+  		</tr>
  	
  	
  	<logic:notPresent name="goEnrichmentView">

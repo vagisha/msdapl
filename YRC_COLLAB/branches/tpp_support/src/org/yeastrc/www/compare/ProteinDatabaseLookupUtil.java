@@ -17,10 +17,12 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.domain.nrseq.NrDatabase;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.nrseq.NrseqDatabaseDAO;
 import org.yeastrc.nrseq.StandardDatabase;
+import org.yeastrc.nrseq.StandardDatabaseCache;
 
 /**
  * 
@@ -63,26 +65,22 @@ public class ProteinDatabaseLookupUtil {
         }
         
         if(addStandardDatabases) {
-	        NrseqDatabaseDAO dbDao = NrseqDatabaseDAO.getInstance();
 	        
 	        for (StandardDatabase sdb: StandardDatabase.values()) {
-	        	try {
-					int dbId = dbDao.getDatabase(sdb.getDatabaseName()).getId();
-					databaseIds.add(dbId);
-				} catch (SQLException e) {
-					log.error("Could not find database for sandard database: "+sdb.getDatabaseName());
-				}
+	        	NrDatabase ndb = StandardDatabaseCache.getNrDatabase(sdb);
+	        	if(ndb != null)
+	        		databaseIds.add(ndb.getId());
 	        }
         }
         return new ArrayList<Integer>(databaseIds);
     }
     
-    public List<Integer> getDatabaseIdsForProteinInference(List<Integer> pinferIds) {
+    public List<Integer> getDatabaseIdsForProteinInferences(List<Integer> pinferIds) {
         
-       return getDatabaseIdsForProteinInference(pinferIds, false); // do not add any standard databases
+       return getDatabaseIdsForProteinInferences(pinferIds, false); // do not add any standard databases
     }
     
-    public List<Integer> getDatabaseIdsForProteinInference(List<Integer> pinferIds, boolean addStandardDatabases) {
+    public List<Integer> getDatabaseIdsForProteinInferences(List<Integer> pinferIds, boolean addStandardDatabases) {
         
         ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
         MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
@@ -105,15 +103,11 @@ public class ProteinDatabaseLookupUtil {
         }
         
         if(addStandardDatabases) {
-	        NrseqDatabaseDAO dbDao = NrseqDatabaseDAO.getInstance();
 	        
 	        for (StandardDatabase sdb: StandardDatabase.values()) {
-	        	try {
-					int dbId = dbDao.getDatabase(sdb.getDatabaseName()).getId();
-					databaseIds.add(dbId);
-				} catch (SQLException e) {
-					log.error("Could not find database for sandard database: "+sdb.getDatabaseName());
-				}
+	        	NrDatabase ndb = StandardDatabaseCache.getNrDatabase(sdb);
+	        	if(ndb != null)
+	        		databaseIds.add(ndb.getId());
 	        }
         }
         

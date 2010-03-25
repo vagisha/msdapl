@@ -18,7 +18,6 @@ import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
-import org.yeastrc.nrseq.CommonNameLookupUtil;
 import org.yeastrc.nrseq.FastaProteinLookupUtil;
 
 /**
@@ -44,16 +43,16 @@ public class ProteinAccessionFilter {
             List<Integer> allProteinIds, String accessionLike) {
         
         // get the protein accession map if we have one
-        // but don't create a new one if it does not exit
+        // but don't create a new one if it does not exist for
         // the protein inference we are looking at right now. 
-        Map<Integer, String> proteinAccessionMap = ProteinAccessionStore.getInstance().getAccessionMapForProteinInference(pinferId, false);
+    	Map<Integer, ProteinProperties> propsMap = ProteinPropertiesStore.getInstance().getPropertiesMapForAccession(pinferId, false);
         
-        return filterForProtInferByProteinAccession(pinferId, allProteinIds, proteinAccessionMap, accessionLike);
+        return filterForProtInferByProteinAccession(pinferId, allProteinIds, propsMap, accessionLike);
     }
     
     private List<Integer> filterForProtInferByProteinAccession(int pinferId,
             List<Integer> allProteinIds,
-            Map<Integer, String> proteinAccessionMap, String accessionLike) {
+            Map<Integer, ProteinProperties> propsMap, String accessionLike) {
         
         Set<String> reqAcc = new HashSet<String>();
         String[] tokens = accessionLike.split(",");
@@ -63,20 +62,13 @@ public class ProteinAccessionFilter {
         List<Integer> filtered = new ArrayList<Integer>();
         
         
-        // If we have a accession map look in there
-        if(proteinAccessionMap != null) {
+        // If we have a properties map look in there
+        if(propsMap != null) {
         
             for(int id: allProteinIds) {
-                String acc = proteinAccessionMap.get(id);
-                if(acc != null) acc = acc.toLowerCase();
-                // first check if the exact accession is given to us
-                if(reqAcc.contains(acc)) {
-                    filtered.add(id);
-                    continue;
-                }
-                // we may have a partial accession
+                ProteinProperties props = propsMap.get(id);
                 for(String ra: reqAcc) {
-                    if(acc.contains(ra)) {
+                    if(props.hasPartialAccession(ra)) {
                         filtered.add(id);
                         break;
                     }
@@ -122,15 +114,6 @@ public class ProteinAccessionFilter {
     	Set<Integer> proteinIds = new HashSet<Integer>();
     	String tokens[] = searchString.split(",");
 
-    	//Do a common name lookup first.  
-//    	// TODO This comes from the nrseqProteinCache table which may not be be upto date. 
-//    	for(String token: tokens) {
-//    		String name = token.trim();
-//    		if(name.length() > 0) {
-//    			List<Integer> ids = CommonNameLookupUtil.getInstance().getProteinIdsFromCache(name);
-//    			proteinIds.addAll(ids);
-//    		}
-//    	}
     	
     	// Now look at the accession strings in tblProteinDatabase;
     	for(String token: tokens) {

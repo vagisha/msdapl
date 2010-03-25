@@ -6,23 +6,10 @@
  */
 package org.yeastrc.www.proteinfer;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
-import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinDAO;
-import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferProtein;
-import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
-import org.yeastrc.ms.domain.protinfer.ProteinferRun;
-import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProtein;
-import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
-import org.yeastrc.ms.util.ProteinUtils;
-import org.yeastrc.ms.util.TimeUtils;
 
 /**
  * 
@@ -32,8 +19,6 @@ public class ProteinPropertiesStore {
     // This maps protein inference run IDs to a map of its protein IDs (protein inference IDs) and protein properties
     private LinkedHashMap<Integer, Map<Integer, ProteinProperties>> store;
     private final int size = 3;
-    
-    private final Logger log = Logger.getLogger(ProteinPropertiesStore.class.getName());
     
     private static ProteinPropertiesStore instance = null;
     
@@ -48,99 +33,138 @@ public class ProteinPropertiesStore {
         };
     }
     
-    public static ProteinPropertiesStore getInstance() {
+    public static synchronized ProteinPropertiesStore getInstance() {
         if(instance == null)
             instance = new ProteinPropertiesStore();
         return instance;
     }
     
-    public Map<Integer, ProteinProperties> getPropertiesMapForProteinInference(int pinferId) {
-        return getPropertiesMapForProteinInference(pinferId, true);
+    public synchronized Map<Integer, ProteinProperties> getPropertiesMapForAccession(int pinferId) {
+        return getPropertiesMapForAccession(pinferId, true);
     }
     
-    private Map<Integer, ProteinProperties> getPropertiesMapForProteinInference(int pinferId, boolean createNew) {
+    public synchronized Map<Integer, ProteinProperties> getPropertiesMapForPi(int pinferId) {
+        return getPropertiesMapForPi(pinferId, true);
+    }
+    
+    public synchronized Map<Integer, ProteinProperties> getPropertiesMapForMolecularWt(int pinferId) {
+        return getPropertiesMapForMolWt(pinferId, true);
+    }
+    
+    synchronized Map<Integer, ProteinProperties> getPropertiesMapForAccession(int pinferId, boolean createNew) {
+    	
         Map<Integer, ProteinProperties> map = store.get(pinferId);
         if(map == null) {
             if(createNew) {
-                map = buildMap(pinferId);
+            	ProteinPropertiesMapBuilder builder = new ProteinPropertiesMapBuilder();
+            	builder.setGetAccession(true);
+                map = builder.buildMap(pinferId);
                 store.put(pinferId, map);
             }
+        }
+        else {
+        	// we have a map; make sure the right information is available
+        	// check one of the entries in the map 
+        	for(Integer piProteinId: map.keySet()) {
+        		ProteinProperties props = map.get(piProteinId);
+        		if(!props.accessionInitialized()) {
+        			
+        			// If we are not told to create a new map return null
+        			if(!createNew)
+        				return null;
+        		
+        			ProteinPropertiesMapBuilder builder = new ProteinPropertiesMapBuilder();
+        			builder.setGetAccession(true);
+        			builder.updateMap(pinferId, map);
+        		}
+        		break;
+        	}
         }
         return map;
     }
 
-    private Map<Integer, ProteinProperties> buildMap(int pinferId) {
-        
-        Map<Integer, ProteinProperties> map = null;
-        log.info("Building Protein Properties map");
-        long s = System.currentTimeMillis();
-        
-        ProteinferRun run = ProteinferDAOFactory.instance().getProteinferRunDao().loadProteinferRun(pinferId);
-        
-        // If this is a IDPicker run we will load the protein from the IDPicker tables so that 
-        // we have the IDPicker groupIDs.
-        if(ProteinInferenceProgram.isIdPicker(run.getProgram())) {
-            
-            IdPickerProteinDAO proteinDao = ProteinferDAOFactory.instance().getIdPickerProteinDao();
-            
-            List<IdPickerProtein> proteins = proteinDao.loadProteins(pinferId);
-            map = new HashMap<Integer, ProteinProperties>((int) (proteins.size() * 1.5));
-            
-            long e = System.currentTimeMillis();
-            log.info("Time to get all proteins: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
-            
-            s = System.currentTimeMillis();
-            for(IdPickerProtein protein: proteins) {
-                ProteinProperties props = makeProteinProperties(protein);
-                props.setProteinGroupId(protein.getGroupId());
-                map.put(protein.getId(), props);
+    private Map<Integer, ProteinProperties> getPropertiesMapForPi(int pinferId, boolean createNew) {
+    	
+        Map<Integer, ProteinProperties> map = store.get(pinferId);
+        if(map == null) {
+            if(createNew) {
+            	ProteinPropertiesMapBuilder builder = new ProteinPropertiesMapBuilder();
+            	builder.setGetPi(true);
+                map = builder.buildMap(pinferId);
+                store.put(pinferId, map);
             }
-            e = System.currentTimeMillis();
-            log.info("Time to assign protein properties: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         }
-        
-        // If this a ProteinProphet run we will load proteins from the ProteinProphet tables 
-        // so that we have ProteinProphet protein group Ids.
-        else if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {
-            
-            ProteinProphetProteinDAO proteinDao = ProteinferDAOFactory.instance().getProteinProphetProteinDao();
-            
-            List<ProteinProphetProtein> proteins = proteinDao.loadProteins(pinferId);
-            map = new HashMap<Integer, ProteinProperties>((int) (proteins.size() * 1.5));
-            long e = System.currentTimeMillis();
-            log.info("Time to get all proteins: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
-            
-            s = System.currentTimeMillis();
-            for(ProteinProphetProtein protein: proteins) {
-            	
-            	ProteinProperties props = makeProteinProperties(protein);
-            	props.setProteinGroupId(protein.getGroupId());
-                map.put(protein.getId(), props);
-            }
-            e = System.currentTimeMillis();
-            log.info("Time to assign protein properties: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        else {
+        	// we have a map; make sure the right information is available
+        	// check one of the entries in the map 
+        	for(Integer piProteinId: map.keySet()) {
+        		ProteinProperties props = map.get(piProteinId);
+        		if(!props.piInitialized()) {
+        			
+        			// If we are not told to create a new map return null
+        			if(!createNew)
+        				return null;
+        			
+        			ProteinPropertiesMapBuilder builder = new ProteinPropertiesMapBuilder();
+        			builder.setGetPi(true);
+        			builder.updateMap(pinferId, map);
+        		}
+        		break;
+        	}
+        	
         }
-        
         return map;
     }
     
-    private ProteinProperties makeProteinProperties(GenericProteinferProtein<?> protein) {
+    private Map<Integer, ProteinProperties> getPropertiesMapForMolWt(int pinferId, boolean createNew) {
     	
-        String sequence = NrSeqLookupUtil.getProteinSequence(protein.getNrseqProteinId());
-        
-        ProteinProperties props = new ProteinProperties(protein.getId());
-        props.setNrseqId(protein.getNrseqProteinId());
-        props.setMolecularWt(ProteinUtils.calculateMolWt(sequence));
-        props.setPi(ProteinUtils.calculatePi(sequence));
-        return props;
+    	Map<Integer, ProteinProperties> map = store.get(pinferId);
+    	if(map == null) {
+    		if(createNew) {
+    			ProteinPropertiesMapBuilder builder = new ProteinPropertiesMapBuilder();
+    			builder.setGetMolWt(true);
+    			map = builder.buildMap(pinferId);
+    			store.put(pinferId, map);
+    		}
+    	}
+    	else {
+    		// we have a map; make sure the right information is available
+    		// check one of the entries in the map 
+    		for(Integer piProteinId: map.keySet()) {
+    			ProteinProperties props = map.get(piProteinId);
+    			if(!props.molecularWtInitialized()) {
+
+    				// If we are not told to create a new map return null
+    				if(!createNew)
+    					return null;
+
+    				ProteinPropertiesMapBuilder builder = new ProteinPropertiesMapBuilder();
+    				builder.setGetMolWt(true);
+    				builder.updateMap(pinferId, map);
+    			}
+    			break;
+    		}
+
+    	}
+    	return map;
     }
     
-    public ProteinProperties getProteinProperties(int pinferId, GenericProteinferProtein<?> protein) {
-        Map<Integer, ProteinProperties> map = this.getPropertiesMapForProteinInference(pinferId, false);
+    public synchronized ProteinProperties getProteinMolecularWtPi(int pinferId, GenericProteinferProtein<?> protein) {
+    	
+        Map<Integer, ProteinProperties> map = this.store.get(pinferId);
+        
+        ProteinPropertiesBuilder builder = new ProteinPropertiesBuilder();
+        builder.setGetMolWt(true);
+        builder.setGetPi(true);
         if(map == null) {
-            return makeProteinProperties(protein);
+            return builder.build(pinferId, protein);
         }
-        else
-            return map.get(protein.getId());
+        else {
+            ProteinProperties props = map.get(protein.getId());
+            if(!props.molecularWtInitialized() || !props.piInitialized()) {
+            	builder.update(props);
+            }
+            return props;
+        }
     }
 }

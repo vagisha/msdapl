@@ -19,7 +19,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
 import org.yeastrc.ms.dao.DAOFactory;
@@ -28,7 +27,6 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
-import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.util.TimeUtils;
@@ -36,6 +34,7 @@ import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
+import org.yeastrc.www.proteinfer.ProteinInferToProjectMapper;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.www.util.RoundingUtils;
@@ -71,17 +70,7 @@ public class ProteinInferViewAction extends Action {
         // Get a list of projects for this protein inference run.  If the user making the request to view this
         // protein inference run is not affiliated with the projects, they should not be able to edit any of 
         // the editable fields
-        List<Integer> searchIds = ProteinferDAOFactory.instance().getProteinferRunDao().loadSearchIdsForProteinferRun(pinferId);
-        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
-        ProjectExperimentDAO projExptDao = ProjectExperimentDAO.instance();
-        List<Integer> projectIds = new ArrayList<Integer>();
-        for(int searchId: searchIds) {
-            MsSearch search = searchDao.loadSearch(searchId);
-            int experimentId = search.getExperimentId();
-            int projectId = projExptDao.getProjectIdForExperiment(experimentId);
-            if(projectId > 0)
-                projectIds.add(projectId);
-        }
+        List<Integer> projectIds = ProteinInferToProjectMapper.map(pinferId);
         boolean writeAccess = false;
         ProjectDAO projDao = ProjectDAO.instance();
         for(int projectId: projectIds) {
@@ -118,16 +107,22 @@ public class ProteinInferViewAction extends Action {
         int pageNum = 1;
         
         
-        // limit to the proteins that will be displayed on this page
-        List<Integer> proteinIdsPage = ResultsPager.instance().page(proteinIds, pageNum,
-                filterCriteria.getSortOrder() == SORT_ORDER.DESC);
+        List<Integer> proteinIdsPage = null;
+        if(proteinIds.size() > 0) {
+        	// get the index range that is to be displayed in this page
+        	int[] pageIndices = ResultsPager.instance().getPageIndices(proteinIds, pageNum,false);
+
+        	// sublist to be displayed
+        	proteinIdsPage = IdPickerResultsLoader.getPageSublist(proteinIds, pageIndices,
+        			filterCriteria.isGroupProteins(), false);
+        }
+        else {
+        	proteinIdsPage = new ArrayList<Integer>(0);
+        }
         
         // get the protein groups 
         List<WIdPickerProteinGroup> proteinGroups = null;
-        if(filterCriteria.isGroupProteins())
-            proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIdsPage, peptideDef);
-        else
-            proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIdsPage, false, peptideDef);
+        proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIdsPage, peptideDef);
         
         request.setAttribute("proteinGroups", proteinGroups);
         

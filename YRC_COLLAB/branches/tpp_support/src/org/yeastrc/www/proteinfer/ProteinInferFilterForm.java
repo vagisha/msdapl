@@ -32,6 +32,7 @@ public class ProteinInferFilterForm extends ActionForm {
     private String accessionLike = null;
     private String descriptionLike = null;
     private String descriptionNotLike = null;
+    private boolean searchAllDescriptions = false;
     private String[] validationStatus = new String[]{"All"};
     
     private String[] chargeStates = new String[]{"All"};
@@ -65,10 +66,12 @@ public class ProteinInferFilterForm extends ActionForm {
         accessionLike = null;
         descriptionLike = null;
         descriptionNotLike = null;
+        searchAllDescriptions = false;
         
     }
     
-    /**
+
+	/**
      * Validate the properties that have been sent from the HTTP request,
      * and return an ActionErrors object that encapsulates any
      * validation errors that have been found.  If no errors are found, return
@@ -316,6 +319,14 @@ public class ProteinInferFilterForm extends ActionForm {
     public void setDescriptionNotLike(String descriptionNotLike) {
         this.descriptionNotLike = descriptionNotLike;
     }
+    
+    public boolean isSearchAllDescriptions() {
+		return searchAllDescriptions;
+	}
+
+	public void setSearchAllDescriptions(boolean searchAllDescriptions) {
+		this.searchAllDescriptions = searchAllDescriptions;
+	}
 
     // PEPTIDE 
     public String getPeptide() {
@@ -455,6 +466,8 @@ public class ProteinInferFilterForm extends ActionForm {
         filterCriteria.setValidationStatus(getValidationStatus());
         filterCriteria.setAccessionLike(getAccessionLike());
         filterCriteria.setDescriptionLike(getDescriptionLike());
+        filterCriteria.setDescriptionNotLike(getDescriptionNotLike());
+        filterCriteria.setSearchAllDescriptions(isSearchAllDescriptions());
         filterCriteria.setExcludeIndistinGroups(isExcludeIndistinProteinGroups());
         filterCriteria.setPeptide(getPeptide());
         filterCriteria.setExactPeptideMatch(getExactPeptideMatch());

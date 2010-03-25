@@ -48,60 +48,7 @@ public class ProteinPropertiesFilterer {
 			nrseqIds.add(protein.getNrseqId());
 		}
 		
-		long s, e;
-		
-		// apply accession filter
-		if(filters.hasAccessionFilter()) {
-			s = System.currentTimeMillis();
-			
-			List<Integer> fastaDbIds = FastaDatabaseLookupUtil.getFastaDatabaseIds(datasets);
-			
-			nrseqIds = ProteinAccessionFilter.getInstance().filterNrseqIdsByAccession(nrseqIds, 
-					filters.getAccessionLike(), fastaDbIds);
-			e = System.currentTimeMillis();
-			log.info("Time to filter on accession: "+TimeUtils.timeElapsedSeconds(e, e)+" seconds");
-		}
-		
-		
-		// apply description LIKE filter
-		if(filters.hasDescriptionLikeFilter()) {
-			s = System.currentTimeMillis();
-			
-			List<Integer> fastaDbIds = FastaDatabaseLookupUtil.getFastaDatabaseIds(datasets, true); // add standard databases
-			
-			nrseqIds = ProteinDescriptionFilter.getInstance().filterNrseqIdsMatchingDescription(nrseqIds,
-					filters.getDescriptionLike(), fastaDbIds);
-			e = System.currentTimeMillis();
-			log.info("Time to filter on description (LIKE): "+TimeUtils.timeElapsedSeconds(e, e)+" seconds");
-		}
-		
-		
-		// apply description NOT LIKE filter
-		if(filters.hasDescriptionNotLikeFilter()) {
-			s = System.currentTimeMillis();
-			
-			List<Integer> fastaDbIds = FastaDatabaseLookupUtil.getFastaDatabaseIds(datasets, true); // add standard databases
-			
-			nrseqIds = ProteinDescriptionFilter.getInstance().filterNrseqIdsNotMatchingDescription(nrseqIds,
-					filters.getDescriptionNotLike(), fastaDbIds);
-			e = System.currentTimeMillis();
-			log.info("Time to filter on description NOT LIKE): "+TimeUtils.timeElapsedSeconds(e, e)+" seconds");
-		}
-		
-		
-		// apply molecular wt and pI filters
-		if(filters.hasMolecularWtFilter() || filters.hasPiFilter()) {
-			s = System.currentTimeMillis();
-			ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
-			filterCriteria.setMinMolecularWt(filters.getMinMolecularWt());
-			filterCriteria.setMaxMolecularWt(filters.getMaxMolecularWt());
-			filterCriteria.setMinPi(filters.getMinPi());
-			filterCriteria.setMaxPi(filters.getMaxPi());
-			nrseqIds = ProteinPropertiesFilter.getInstance().filterNrseqIdsyMolecularWtAndPi(nrseqIds, filterCriteria);
-			e = System.currentTimeMillis();
-			log.info("Time to filter on Mol. Wt. and pI: "+TimeUtils.timeElapsedSeconds(e, e)+" seconds");
-		}
-		
+		nrseqIds = filterNrseqIds(filters, datasets, nrseqIds);
 		
 		// sort the filtered Ids
 		Collections.sort(nrseqIds);
@@ -113,6 +60,7 @@ public class ProteinPropertiesFilterer {
 				iter.remove();
 		}
 	}
+
 	
 	public void applyProteinPropertiesFiltersToGroup(List<ComparisonProteinGroup> proteinGroups, 
 			ProteinPropertiesFilters filters, List<? extends Dataset> datasets) throws SQLException {
@@ -123,69 +71,18 @@ public class ProteinPropertiesFilterer {
 				nrseqIds.add(protein.getNrseqId());
 		}
 		
-		long s, e;
-		
-		// apply accession filter
-		if(filters.hasAccessionFilter()) {
-			s = System.currentTimeMillis();
-			
-			List<Integer> fastaDbIds = FastaDatabaseLookupUtil.getFastaDatabaseIds(datasets);
-			
-			nrseqIds = ProteinAccessionFilter.getInstance().filterNrseqIdsByAccession(nrseqIds, 
-					filters.getAccessionLike(), fastaDbIds);
-			e = System.currentTimeMillis();
-			log.info("Time to filter on accession: "+TimeUtils.timeElapsedSeconds(e, e)+" seconds");
-		}
-		
-		
-		// apply description LIKE filter
-		if(filters.hasDescriptionLikeFilter()) {
-			s = System.currentTimeMillis();
-			
-			List<Integer> fastaDbIds = FastaDatabaseLookupUtil.getFastaDatabaseIds(datasets, true); // add standard databases
-			
-			nrseqIds = ProteinDescriptionFilter.getInstance().filterNrseqIdsMatchingDescription(nrseqIds,
-					filters.getDescriptionLike(), fastaDbIds);
-			e = System.currentTimeMillis();
-			log.info("Time to filter on description (LIKE): "+TimeUtils.timeElapsedSeconds(e, e)+" seconds");
-		}
-		
-		
-		// apply description NOT LIKE filter
-		if(filters.hasDescriptionNotLikeFilter()) {
-			s = System.currentTimeMillis();
-			
-			List<Integer> fastaDbIds = FastaDatabaseLookupUtil.getFastaDatabaseIds(datasets, true); // add standard databases
-			
-			nrseqIds = ProteinDescriptionFilter.getInstance().filterNrseqIdsNotMatchingDescription(nrseqIds,
-					filters.getDescriptionNotLike(), fastaDbIds);
-			e = System.currentTimeMillis();
-			log.info("Time to filter on description NOT LIKE): "+TimeUtils.timeElapsedSeconds(e, e)+" seconds");
-		}
-		
-		
-		// apply molecular wt and pI filters
-		if(filters.hasMolecularWtFilter() || filters.hasPiFilter()) {
-			s = System.currentTimeMillis();
-			ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
-			filterCriteria.setMinMolecularWt(filters.getMinMolecularWt());
-			filterCriteria.setMaxMolecularWt(filters.getMaxMolecularWt());
-			filterCriteria.setMinPi(filters.getMinPi());
-			filterCriteria.setMaxPi(filters.getMaxPi());
-			nrseqIds = ProteinPropertiesFilter.getInstance().filterNrseqIdsyMolecularWtAndPi(nrseqIds, filterCriteria);
-			e = System.currentTimeMillis();
-			log.info("Time to filter on Mol. Wt. and pI: "+TimeUtils.timeElapsedSeconds(e, e)+" seconds");
-		}
+		nrseqIds = filterNrseqIds(filters, datasets, nrseqIds);
 		
 		
 		// sort the filtered Ids
 		Collections.sort(nrseqIds);
-		// keep the ComparisonProteins that are in the filtered IDs
+		// keep the ComparisonProteinGroups that are in the filtered IDs
 		Iterator<ComparisonProteinGroup> iter = proteinGroups.iterator();
 		while(iter.hasNext()) {
 			ComparisonProteinGroup protGrp = iter.next();
 			
 			boolean matches = false;
+			// If any one member of the group matches we will keep the entire group
 			for(ComparisonProtein prot: protGrp.getProteins()) {
 				if(Collections.binarySearch(nrseqIds, prot.getNrseqId()) >= 0) {
 					matches = true;
@@ -195,5 +92,115 @@ public class ProteinPropertiesFilterer {
 			if(!matches)
 				iter.remove();
 		}
+	}
+	
+	// ----------------------------------------------------------------------
+	// ALL FILTERS
+	// ----------------------------------------------------------------------
+	private List<Integer> filterNrseqIds(ProteinPropertiesFilters filters,
+			List<? extends Dataset> datasets, List<Integer> nrseqIds)
+			throws SQLException {
+		log.info("Number of nrseq IDs BEFORE filtering: "+nrseqIds.size());
+		// apply accession filter
+		nrseqIds = applyAccessionFilter(filters, datasets, nrseqIds);
+		
+		// apply description LIKE filter
+		nrseqIds = applyDescriptionLikeFilter(filters, datasets, nrseqIds);
+		
+		
+		// apply description NOT LIKE filter
+		nrseqIds = applyDescriptionNotLikeFilter(filters, datasets, nrseqIds);
+		
+		
+		// apply molecular wt and pI filters
+		nrseqIds = applyMolWtAndPiFilters(filters, nrseqIds);
+		log.info("Number of nrseq IDs AFTER filtering: "+nrseqIds.size());
+		return nrseqIds;
+	}
+	
+	// ----------------------------------------------------------------------
+	// MOLECULAR WT. AND PI
+	// ----------------------------------------------------------------------
+	private List<Integer> applyMolWtAndPiFilters(
+			ProteinPropertiesFilters filters, List<Integer> nrseqIds) {
+		long s;
+		long e;
+		if(filters.hasMolecularWtFilter() || filters.hasPiFilter()) {
+			s = System.currentTimeMillis();
+			ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
+			filterCriteria.setMinMolecularWt(filters.getMinMolecularWt());
+			filterCriteria.setMaxMolecularWt(filters.getMaxMolecularWt());
+			filterCriteria.setMinPi(filters.getMinPi());
+			filterCriteria.setMaxPi(filters.getMaxPi());
+			nrseqIds = ProteinPropertiesFilter.getInstance().filterNrseqIdsyMolecularWtAndPi(nrseqIds, filterCriteria);
+			e = System.currentTimeMillis();
+			log.info("Time to filter on Mol. Wt. and pI: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+		}
+		return nrseqIds;
+	}
+	
+	// ----------------------------------------------------------------------
+	// DESCRIPTION NOT LIKE
+	// ----------------------------------------------------------------------
+	private List<Integer> applyDescriptionNotLikeFilter(
+			ProteinPropertiesFilters filters, List<? extends Dataset> datasets,
+			List<Integer> nrseqIds) {
+		long s;
+		long e;
+		if(filters.hasDescriptionNotLikeFilter()) {
+			s = System.currentTimeMillis();
+			
+			List<Integer> pinferIds = new ArrayList<Integer>(datasets.size());
+			for(Dataset ds: datasets)
+				pinferIds.add(ds.getDatasetId());
+			
+			nrseqIds = ProteinDescriptionFilter.getInstance().filterNrseqIdsByDescriptionNotLike(pinferIds, nrseqIds, 
+					filters.getDescriptionNotLike(), filters.isSearchAllDescriptions());
+			e = System.currentTimeMillis();
+			log.info("Time to filter on description (NOT LIKE): "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+		}
+		return nrseqIds;
+	}
+	
+	// ----------------------------------------------------------------------
+	// DESCRIPTION LIKE
+	// ----------------------------------------------------------------------
+	private List<Integer> applyDescriptionLikeFilter(
+			ProteinPropertiesFilters filters, List<? extends Dataset> datasets,
+			List<Integer> nrseqIds) {
+		if(filters.hasDescriptionLikeFilter()) {
+			long s = System.currentTimeMillis();
+			
+			List<Integer> pinferIds = new ArrayList<Integer>(datasets.size());
+			for(Dataset ds: datasets)
+				pinferIds.add(ds.getDatasetId());
+			
+			nrseqIds = ProteinDescriptionFilter.getInstance().filterNrseqIdsByDescriptionLike(pinferIds, nrseqIds, 
+					filters.getDescriptionLike(), filters.isSearchAllDescriptions());
+			long e = System.currentTimeMillis();
+			log.info("Time to filter on description (LIKE): "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+		}
+		return nrseqIds;
+	}
+
+	// ----------------------------------------------------------------------
+	// ACCESSION
+	// ----------------------------------------------------------------------
+	private List<Integer> applyAccessionFilter(
+			ProteinPropertiesFilters filters, List<? extends Dataset> datasets,
+			List<Integer> nrseqIds) throws SQLException {
+		
+		if(filters.hasAccessionFilter()) {
+			long s = System.currentTimeMillis();
+			
+			List<Integer> fastaDbIds = FastaDatabaseLookupUtil.getFastaDatabaseIds(datasets);
+			
+			nrseqIds = ProteinAccessionFilter.getInstance().filterNrseqIdsByAccession(nrseqIds, 
+					filters.getAccessionLike(), fastaDbIds);
+			long e = System.currentTimeMillis();
+			
+			log.info("Time to filter on accession: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+		}
+		return nrseqIds;
 	}
 }

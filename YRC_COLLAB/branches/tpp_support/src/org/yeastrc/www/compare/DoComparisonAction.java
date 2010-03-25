@@ -8,7 +8,6 @@ package org.yeastrc.www.compare;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -119,6 +118,7 @@ public class DoComparisonAction extends Action {
         // Do the comparison
         log.info("Starting comparison");
         long s = System.currentTimeMillis();
+        long start = s;
         ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, 
         		PARSIM.getForValue(myForm.getParsimoniousParam()));
         long e = System.currentTimeMillis();
@@ -231,13 +231,13 @@ public class DoComparisonAction extends Action {
                 group.setGroupId(groupId++);
             
             // remove protein groups that do not have any parsimonious proteins
-            Iterator<ComparisonProteinGroup> iter = proteinGroups.iterator();
-            while(iter.hasNext()) {
-                ComparisonProteinGroup proteinGroup = iter.next();
-                if(!proteinGroup.hasParsimoniousProtein())
-                    iter.remove();
-            }
-            log.info("AFTER removing non-parsimonious groups: "+proteinGroups.size());
+//            Iterator<ComparisonProteinGroup> iter = proteinGroups.iterator();
+//            while(iter.hasNext()) {
+//                ComparisonProteinGroup proteinGroup = iter.next();
+//                if(!proteinGroup.hasParsimoniousProtein())
+//                    iter.remove();
+//            }
+//            log.info("AFTER removing non-parsimonious groups: "+proteinGroups.size());
             
             e = System.currentTimeMillis();
             log.info("Time to do graph analysis: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
@@ -272,10 +272,13 @@ public class DoComparisonAction extends Action {
             
             grpComparison.setDatasets(datasets);
             
+            s = System.currentTimeMillis();
             grpComparison.initSummary(); // initialize the summary -- 
                                         // (totalProteinCount, # common proteins)
                                         // spectrum count normalization factors
                                         // calculate min/max normalized spectrum counts for scaling
+            e = System.currentTimeMillis();
+            log.info("Time to initialize summary: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
             
             
             // IS THE USER DOWNLOADING?
@@ -299,6 +302,9 @@ public class DoComparisonAction extends Action {
                 String googleChartUrl = VennDiagramCreator.instance().getChartUrl(grpComparison);
                 request.setAttribute("chart", googleChartUrl);
             }
+            
+            long end = System.currentTimeMillis();
+            log.info("DoComparisonAction finished in: "+TimeUtils.timeElapsedSeconds(start, end)+" seconds");
             
             // create a list of the dataset ids being compared
             request.setAttribute("datasetIds", makeCommaSeparated(allRunIds));

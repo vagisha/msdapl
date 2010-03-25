@@ -11,7 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 
@@ -49,21 +51,58 @@ public class FastaProteinLookupUtil {
         return new ArrayList<Integer>(found);
     }
     
-    public List<Integer> getProteinIdsForDescriptions(List<String> descriptionTerms, int pinferId) {
+    public List<Integer> getNrseqIdsForDescriptions(List<String> descriptionTerms, int pinferId) {
         
     	// get a list of databases associated with this protein inference
     	// Add the standard databases to the list too.
         List<Integer> dbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId, false);
         
-        Set<Integer> found = new HashSet<Integer>();
-        for(String descTerm: descriptionTerms) {
-            found.addAll(getProteinIdsForDescription(descTerm, dbIds));
-        }
-        return new ArrayList<Integer>(found);
+        return getNrseqIdsForDescriptions(descriptionTerms, dbIds);
     }
     
-    private List<Integer> getProteinIdsForDescription(String descriptionTerm, List<Integer> dbIds) {
+    public List<Integer> getPiProteinIdsForDescriptions(List<String> descriptionTerms, int pinferId) {
         
+    	// get a list of databases associated with this protein inference
+        List<Integer> dbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId, false);
+        
+        List<Integer> nrseqIds = getNrseqIdsForDescriptions(descriptionTerms, dbIds);
+        
+        ProteinferProteinDAO protDao = ProteinferDAOFactory.instance().getProteinferProteinDao();
+        
+        // Get the protein inference IDs corresponding to the matching NRSEQ IDs.
+        return protDao.getProteinIdsForNrseqIds(pinferId, new ArrayList<Integer>(nrseqIds));
+    }
+
+	public List<Integer> getNrseqIdsForDescriptions(List<String> descriptionTerms, List<Integer> dbIds) {
+		if(dbIds.size() == 0)
+			return new ArrayList<Integer>(0);
+		
+		Set<Integer> found = new HashSet<Integer>();
+        for(String descTerm: descriptionTerms) {
+            found.addAll(getNrSeqIdsForDescription(descTerm, dbIds));
+        }
+        return new ArrayList<Integer>(found);
+	}
+	
+	public List<Integer> getPiProteinIdsForDescriptions(List<String> descriptionTerms, List<Integer> dbIds, int pinferId) {
+		if(dbIds.size() == 0)
+			return new ArrayList<Integer>(0);
+		
+		Set<Integer> nrseqIds = new HashSet<Integer>();
+        for(String descTerm: descriptionTerms) {
+        	nrseqIds.addAll(getNrSeqIdsForDescription(descTerm, dbIds));
+        }
+        
+        ProteinferProteinDAO protDao = ProteinferDAOFactory.instance().getProteinferProteinDao();
+        // Get the protein inference IDs corresponding to the matching NRSEQ IDs.
+        return protDao.getProteinIdsForNrseqIds(pinferId, new ArrayList<Integer>(nrseqIds));
+	}
+    
+    private List<Integer> getNrSeqIdsForDescription(String descriptionTerm, List<Integer> dbIds) {
+        
+    	if(dbIds.size() == 0)
+			return new ArrayList<Integer>(0);
+    	
         Set<Integer> found = new HashSet<Integer>();
         List<NrDbProtein> matching = NrSeqLookupUtil.getDbProteinsForDescription(dbIds, descriptionTerm);
         for(NrDbProtein prot: matching)

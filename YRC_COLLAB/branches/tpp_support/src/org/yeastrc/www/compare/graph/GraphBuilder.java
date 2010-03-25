@@ -14,6 +14,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
+import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.compare.ComparisonProtein;
 
 import edu.uwpr.protinfer.infer.Peptide;
@@ -30,6 +31,8 @@ public class GraphBuilder {
     public BipartiteGraph<ComparisonProteinGroup, PeptideVertex> 
         buildGraph(List<ComparisonProtein> proteins, List<Integer> pinferIds) {
         
+    	long s = System.currentTimeMillis();
+    	log.info("Building graph for comparison");
         Map<String, Peptide> peptideIdMap = new HashMap<String, Peptide>();
         int peptideId = 1;
         
@@ -60,6 +63,9 @@ public class GraphBuilder {
                 }
             }
         }
+        long e = System.currentTimeMillis();
+        log.info("Time to build graph: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        
         return graph;
     }
 

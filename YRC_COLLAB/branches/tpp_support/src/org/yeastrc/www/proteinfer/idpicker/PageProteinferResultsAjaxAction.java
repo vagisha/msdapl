@@ -19,6 +19,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
@@ -64,8 +65,7 @@ public class PageProteinferResultsAjaxAction extends Action {
         List<Integer> storedProteinIds = sessionManager.getStoredProteinIds(request, pinferId);
         
         
-        // If we don't have a filtering criteria in the session we are starting from scratch
-        // Get the protein Ids that fulfill the criteria.
+        // If we don't have a filtering criteria in the session return an error
         if(filterCriteria_session == null || storedProteinIds == null) {
         	
         	log.info("NO information in session for: "+pinferId);
@@ -99,14 +99,27 @@ public class PageProteinferResultsAjaxAction extends Action {
         		+filterCriteria_session.getSortOrder() );
         
         
-        // determine the list of proteins we will be displaying
+        // We can use the pager to page the results in the reverse order (SORT_ORDER == DESC)
+        // However, if we are grouping indistinguishable proteins 
+        // AND the sorting column is protein specific
+        // we must have already sorted the results in descending order
+        boolean doReversePage = filterCriteria_session.getSortOrder() == SORT_ORDER.DESC;
+        if(group && SORT_BY.isProteinSpecific(filterCriteria_session.getSortBy()))
+        	doReversePage = false;
+        
+        if(doReversePage)
+        	log.info("REVERSE PAGING...");
+        
+        // get the index range that is to be displayed in this page
         ResultsPager pager = ResultsPager.instance();
-        List<Integer> proteinIds = pager.page(storedProteinIds, pageNum, 
-                filterCriteria_session.getSortOrder() == SORT_ORDER.DESC);
+        int[] pageIndices = pager.getPageIndices(storedProteinIds, pageNum, 
+                doReversePage);
+        // sublist to be displayed
+        List<Integer> proteinIds = IdPickerResultsLoader.getPageSublist(storedProteinIds, pageIndices, group, doReversePage);
+        
         
         // get the protein groups
-        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, 
-                group, peptideDef);
+        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, peptideDef);
         request.setAttribute("proteinGroups", proteinGroups);
         
         // get the list of page numbers to display

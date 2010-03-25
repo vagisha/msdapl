@@ -58,15 +58,6 @@ public enum StandardDatabase {
 		}
 	}
 	
-//	public static boolean isStandardDatabase(String name) {
-//		
-//		for(StandardDatabase db: StandardDatabase.values()) {
-//			if(db.getDatabaseName().equals(name))
-//				return true;
-//		}
-//		return false;
-//	}
-	
 	public static List<StandardDatabase> getTierTwoDatabases() {
 		List<StandardDatabase> dbs = new ArrayList<StandardDatabase>();
 		for(StandardDatabase db: StandardDatabase.values()) {

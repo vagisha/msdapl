@@ -165,14 +165,24 @@
   		</tr>
   		<tr>
   			<td valign="top">Description Include: </td>
-  			<td valign="top"><html:text name="proteinInferFilterForm" property="descriptionLike" size="40"></html:text><br>
-  				<span style="font-size:8pt;">Enter a comma-separated list of terms</span>
+  			<td valign="top"><html:text name="proteinInferFilterForm" property="descriptionLike" size="40"></html:text>
   			</td>
   			<td valign="top">Exclude: </td>
   			<td valign="top">
-  				<html:text name="proteinInferFilterForm" property="descriptionNotLike" size="40"></html:text><br>
-  				<span style="font-size:8pt;">Enter a comma-separated list of terms</span>
+  				<html:text name="proteinInferFilterForm" property="descriptionNotLike" size="40"></html:text>
+  				<span style="font-size:8pt;">Search All:<html:checkbox property="proteinInferFilterForm" property="searchAllDescriptions"></html:checkbox></span>
   			</td>
+  		</tr>
+  		<tr>
+  		<td></td>
+  		<td colspan="3" ">
+  			<div style="font-size:8pt;" align="left">Enter a comma-separated list of terms.
+  			Descriptions will be included from the fasta file(s) associated with the experiment(s) <br>for
+  			this protein inference as well as species specific databases (e.g. SGD) 
+  			if a target species is associated with the experiment(s).
+  			<br>Check "Search All" to include descriptions from Swiss-Prot and NCBI-NR. 
+  			<br/><font color="red">NOTE: Description searches can be time consuming, especially when "Search All" is checked.</font></div>
+  		</td>
   		</tr>
   	</table>
   	</td>

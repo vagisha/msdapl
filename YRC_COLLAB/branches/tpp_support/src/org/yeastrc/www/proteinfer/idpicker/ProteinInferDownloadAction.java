@@ -75,7 +75,8 @@ public class ProteinInferDownloadAction extends Action {
         writer.write("Validation Status: "+filterForm.getValidationStatusString()+"\n");
         writer.write("Include proteins with peptide charge states: "+filterForm.getChargeStatesString()+"\n");
         writer.write("Fasta ID filter: "+filterForm.getAccessionLike()+"\n");
-        writer.write("Description filter: "+filterForm.getDescriptionLike()+"\n");
+        writer.write("Description filter (Like): "+filterForm.getDescriptionLike()+"\n");
+        writer.write("Description filter (Not Like): "+filterForm.getDescriptionNotLike()+"\n");
     }
 
     private void writeResults(PrintWriter writer, int pinferId, IdPickerFilterForm filterForm) {

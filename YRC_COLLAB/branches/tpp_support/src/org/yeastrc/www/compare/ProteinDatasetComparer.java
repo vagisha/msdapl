@@ -80,18 +80,19 @@ public class ProteinDatasetComparer {
 		
 		Map<Integer, ComparisonProtein> proteinMap = new HashMap<Integer, ComparisonProtein>();
 		
-		boolean parsimoniousOnly = !(parsimoniousCount == PARSIM.NONE);
         
-        // If parsimoniousCount == PARSIM.NONE this will get all the proteins that pass through the filter criteria
-        // for each dataset.
-        // If parsimoniousCount == PARSIM.ONE || parsimoniousCount == PARSIM.ALL this will get only parsimonious proteins
-        // that pass through the filter criteria
-        // The filter criteria, so far, is used individually only on ProteinProphet datasets (filtering on 
+		// This will get ONLY the parsimonious proteins from each dataset that pass through the filter criteria
+		// since the default ProteinFilterCriteria in the FilterableDataset has sets nonParsimonious to false
+		// NOTE: The filter criteria, so far, is used individually only on ProteinProphet datasets (filtering on 
         // protein and group probabilities).  Other filters in the filter criteria (mol. wt., pI, accession, description terms)
         // are applied after the ProteinComparisionDataset has been created. This is because these filters are not 
         // specific to a particular dataset (unlike protein probabilities etc.).
         for(FilterableDataset dataset: datasets) {
             
+        	log.info("Getting proteins from pinferID: "+dataset.getDatasetId()+ " for comparison "+
+        			"; parsimonious: "+dataset.getProteinFilterCrteria().getParsimonious()+", "+
+        			" non-parsimonious: "+dataset.getProteinFilterCrteria().getNonParsimonious());
+        	
             List<Integer> nrseqProteinIds = new ArrayList<Integer>(0);
             
             if(dataset.getSource() != DatasetSource.DTA_SELECT)
@@ -116,7 +117,8 @@ public class ProteinDatasetComparer {
         // filtering criteria) it should already be in the map.
         if(parsimoniousCount == PARSIM.ONE) {
             
-            for(Dataset dataset: datasets) {
+        	log.info("Getting proteins parsimonious in one or more datasets");
+            for(FilterableDataset dataset: datasets) {
                 
             	// get only non-parsimonious
                 List<Integer> nrseqProteinIds = getAllNonParsimoniousProteinIdsForDataset(dataset); 
@@ -135,6 +137,38 @@ public class ProteinDatasetComparer {
                     dpi.setPresent(true);
                     protein.addDatasetInformation(dpi);
                 }
+            }
+        }
+        // If we want ALL proteins regardless of parsimonious state, get all the filtered
+        // non-parsimonious proteins for each dataset now.
+        else if (parsimoniousCount == PARSIM.NONE) {
+        	
+        	log.info("Getting all non-parsimonious proteins that pass through the filter criteria");
+        	for(FilterableDataset dataset: datasets) {
+                
+        		dataset.getProteinFilterCrteria().setParsimonious(false);
+        		dataset.getProteinFilterCrteria().setNonParsimonious(true);
+        		
+        		List<Integer> nrseqProteinIds = new ArrayList<Integer>(0);
+                
+                if(dataset.getSource() != DatasetSource.DTA_SELECT)
+                    nrseqProteinIds = getProteinIdsForDataset(dataset);
+                
+                for(int nrseqId: nrseqProteinIds) {
+                    ComparisonProtein protein = proteinMap.get(nrseqId);
+                    if(protein == null) {
+                        protein = new ComparisonProtein(nrseqId);
+                        proteinMap.put(nrseqId, protein);
+                    }
+                    DatasetProteinInformation dpi = new DatasetProteinInformation(dataset);
+                    dpi.setParsimonious(false);
+                    dpi.setPresent(true);
+                    protein.addDatasetInformation(dpi);
+                }
+                
+                // reset
+                dataset.getProteinFilterCrteria().setParsimonious(true);
+        		dataset.getProteinFilterCrteria().setNonParsimonious(false);
             }
         }
         

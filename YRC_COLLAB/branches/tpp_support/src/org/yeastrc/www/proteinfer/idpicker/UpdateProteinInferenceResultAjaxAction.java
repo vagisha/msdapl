@@ -6,6 +6,7 @@
  */
 package org.yeastrc.www.proteinfer.idpicker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +26,8 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
+
+import sun.tools.tree.ArrayAccessExpression;
 
 import edu.uwpr.protinfer.idpicker.IDPickerParams;
 import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
@@ -55,7 +58,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         IDPickerParams idpParams = IdPickerParamsMaker.makeIdPickerParams(idpRun.getParams());
         PeptideDefinition peptideDef = idpParams.getPeptideDefinition();
         
-        // filtering criteria from teh request
+        // filtering criteria from the request
         ProteinFilterCriteria filterCriteria_request = filterForm.getFilterCriteria(peptideDef);
         
         // protein Ids
@@ -70,8 +73,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         proteinIds = sessionManager.getStoredProteinIds(request, pinferId);
         
         
-        // If we don't have a filtering criteria in the session we are starting from scratch
-        // Get the protein Ids that fulfill the criteria.
+        // If we don't have a filtering criteria in the session return an error
         if(filterCriteria_session == null || proteinIds == null) {
         	
         	log.info("NO information in session for: "+pinferId);
@@ -88,7 +90,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         	log.info("Found information in session for: "+pinferId);
         	System.out.println("stored protein ids: "+proteinIds.size());
         	 
-        	// compare the filtering criteria in the session with what we have in the form
+        	// we will use the sorting column and sorting order from the filter criteria in the session.
         	filterCriteria_request.setSortBy(filterCriteria_session.getSortBy());
         	filterCriteria_request.setSortOrder(filterCriteria_session.getSortOrder());
         	
@@ -97,20 +99,15 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         	// check if the protein grouping has changed. If so we may have to resort the proteins. 
             boolean resort = false;
             if(filterCriteria_session.isGroupProteins() != filterCriteria_request.isGroupProteins()) {
-                // If the filter criteria has proteins GROUPED and the sort_by is
-                // on one of the protein specific columns change it to group_id
-                if(filterCriteria_request.isGroupProteins()) {
-                    SORT_BY sortby = filterCriteria_request.getSortBy();
-                    if(sortby == SORT_BY.ACCESSION || sortby == SORT_BY.VALIDATION_STATUS)
-                        filterCriteria_request.setSortBy(ProteinFilterCriteria.defaultSortBy());
-                    filterCriteria_request.setSortOrder(ProteinFilterCriteria.defaultSortOrder());
-                }
-                resort = true; // if the grouping has changed we will resort proteins (UNLESS the filtering criteria has also changed).
+            	
+            	resort = true; // if the grouping has changed we will resort proteins 
             }
             
             // if the filtering criteria has changed we need to filter the results again
             if(!match)  {
                 
+            	log.info("Filtering criteria has changed");
+            	
                 resort = false; // no need to re-sort.  The method below will take that into account.
                 // Get a list of filtered and sorted proteins
                 proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria_request);
@@ -122,6 +119,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
                         peptideDef, 
                         proteinIds, 
                         filterCriteria_request.getSortBy(), 
+                        filterCriteria_request.getSortOrder(),
                         filterCriteria_request.isGroupProteins());
             }
         }
@@ -137,14 +135,38 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         // page number is now 1
         int pageNum = 1;
         
+        boolean group = filterCriteria_request.isGroupProteins();
         
-        // limit to the proteins that will be displayed on this page
-        List<Integer> pageProteinIds = ResultsPager.instance().page(proteinIds, pageNum, 
-                filterCriteria_request.getSortOrder() == SORT_ORDER.DESC);
+        List<Integer> pageProteinIds = null;
+        if(proteinIds.size() > 0) {
+        	// determine the list of proteins we will be displaying
+
+        	// We can use the pager to page the results in the reverse order (SORT_ORDER == DESC)
+        	// However, if we are grouping indistinguishable proteins 
+        	// AND the sorting column is protein specific
+        	// we must have already sorted the results in descending order
+        	boolean doReversePage = filterCriteria_request.getSortOrder() == SORT_ORDER.DESC;
+        	if(group && SORT_BY.isProteinSpecific(filterCriteria_request.getSortBy()))
+        		doReversePage = false;
+
+        	if(doReversePage)
+        		log.info("REVERSE PAGING...");
+
+        	// get the index range that is to be displayed in this page
+        	ResultsPager pager = ResultsPager.instance();
+        	int[] pageIndices = pager.getPageIndices(proteinIds, pageNum, 
+        			doReversePage);
+
+        	// sublist to be displayed
+        	pageProteinIds = IdPickerResultsLoader.getPageSublist(proteinIds, pageIndices, group, doReversePage);
+        }
+        else {
+        	pageProteinIds = new ArrayList<Integer>(0);
+        }
+        
         
         // get the protein groups 
-        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, pageProteinIds, 
-                                                        filterCriteria_request.isGroupProteins(), peptideDef);
+        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, pageProteinIds, peptideDef);
         
         request.setAttribute("proteinGroups", proteinGroups);
         

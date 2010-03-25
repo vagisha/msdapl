@@ -14,6 +14,7 @@ public class ProteinPropertiesFilters {
 	private String accessionLike;
     private String descriptionLike;
     private String descriptionNotLike;
+    private boolean searchAllDescriptions = false;
     
     private double minMolWt = 0.0;
     private double maxMolWt = Double.MAX_VALUE;
@@ -59,6 +60,14 @@ public class ProteinPropertiesFilters {
     	return (this.descriptionNotLike != null && this.descriptionNotLike.trim().length() > 0);
     }
     
+    public boolean isSearchAllDescriptions() {
+		return searchAllDescriptions;
+	}
+
+	public void setSearchAllDescriptions(boolean searchAllDescriptions) {
+		this.searchAllDescriptions = searchAllDescriptions;
+	}
+	
     public void setMinMolecularWt(double molWt) {
         this.minMolWt = molWt;
     }

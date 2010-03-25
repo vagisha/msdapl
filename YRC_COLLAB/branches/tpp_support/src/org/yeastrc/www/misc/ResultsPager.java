@@ -30,6 +30,45 @@ public class ResultsPager {
      * @param descending
      * @return
      */
+    public int[] getPageIndices(List<Integer> ids, int pageNum, int numPerPage, boolean descending) {
+        
+        if(!descending) {
+            int s = (pageNum - 1) * numPerPage;
+            if(s >= ids.size())
+                throw new IllegalArgumentException("start index is greater than list size. Start index: "+
+                		s+", list size: "+ids.size());
+            int e = Math.min(ids.size(), s+numPerPage) - 1;
+            return new int[]{s,e};
+        }
+        else {
+            int s = ids.size() - ((pageNum - 1) * numPerPage) - 1;
+            if(s < 0)
+            	throw new IllegalArgumentException("Error calculating start index (descending). List size:: "+
+                		ids.size()+", pageNum: "+pageNum+"; numPerPage: "+numPerPage);
+            int e = Math.max(0, (s - numPerPage -1));
+            return new int[]{s,e};
+        }
+    }
+    
+    /**
+     * Page numbers start with 1; Default number of results per page is 50.
+     * @param ids
+     * @param pageNum
+     * @param descending
+     * @return
+     */
+    public int[] getPageIndices(List<Integer> ids, int pageNum, boolean descending) {
+        return getPageIndices(ids, pageNum, 50, descending);
+    }
+    
+    /**
+     * page numbers start with 1
+     * @param ids
+     * @param pageNum
+     * @param numPerPage
+     * @param descending
+     * @return
+     */
     public List<Integer> page(List<Integer> ids, int pageNum, int numPerPage, boolean descending) {
         
         List<Integer> sublist = new ArrayList<Integer>(numPerPage);

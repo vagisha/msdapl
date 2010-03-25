@@ -29,11 +29,14 @@ public class ProteinPropertiesFilter {
     	return instance;
     }
     
+    // -------------------------------------------------------------------------------------------------
+    // FILTER PROTEIN INFER PROTEIN-IDS BY MOLECULAR WT.
+    // -------------------------------------------------------------------------------------------------
     public List<Integer> filterForProtInferByMolecularWt(int pinferId,
             List<Integer> allProteinIds, double minWt, double maxWt) {
         
         // get a map of the protein ids and protein properties
-        Map<Integer, ProteinProperties> propsMap = ProteinPropertiesStore.getInstance().getPropertiesMapForProteinInference(pinferId);
+        Map<Integer, ProteinProperties> propsMap = ProteinPropertiesStore.getInstance().getPropertiesMapForMolecularWt(pinferId);
         return filterForProtInferByMolecularWt(pinferId, allProteinIds, propsMap, minWt, maxWt);
     }
     
@@ -56,11 +59,15 @@ public class ProteinPropertiesFilter {
         return filtered;
     }
     
+
+    // -------------------------------------------------------------------------------------------------
+    // FILTER PROTEIN INFER PROTEIN-IDS BY PI.
+    // -------------------------------------------------------------------------------------------------
     public List<Integer> filterForProtInferByPi(int pinferId,
             List<Integer> allProteinIds, double minPi, double maxPi) {
         
         // get a map of the protein ids and protein properties
-        Map<Integer, ProteinProperties> propsMap = ProteinPropertiesStore.getInstance().getPropertiesMapForProteinInference(pinferId);
+        Map<Integer, ProteinProperties> propsMap = ProteinPropertiesStore.getInstance().getPropertiesMapForPi(pinferId);
         return filterForProtInferByPi(pinferId, allProteinIds, propsMap, minPi, maxPi);
     }
     
@@ -83,6 +90,10 @@ public class ProteinPropertiesFilter {
     }
     
     
+
+    // -------------------------------------------------------------------------------------------------
+    // FILTER NRSEQ IDS.
+    // -------------------------------------------------------------------------------------------------
     public List<Integer> filterNrseqIdsyMolecularWtAndPi(List<Integer> allProteinIds, ProteinFilterCriteria filterCriteria) {
         
     	double minWt = filterCriteria.getMinMolecularWt();

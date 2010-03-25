@@ -6,7 +6,6 @@
  */
 package org.yeastrc.nrseq;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -148,14 +147,8 @@ public class ProteinListingBuilder {
 		if(sdb == null)
 			return refs;
 		
-		NrseqDatabaseDAO dbDao = NrseqDatabaseDAO.getInstance();
-			
-		NrDatabase db = null;
-		try {
-			db = dbDao.getDatabase(sdb.getDatabaseName());
-		} catch (SQLException e) {
-			log.error("Lookup of standard database "+sdb.getDatabaseName()+" failed", e);
-		}
+		NrDatabase db = StandardDatabaseCache.getNrDatabase(sdb);
+		
 		if(db != null) {
 			List<NrDbProtein> proteins = NrSeqLookupUtil.getDbProteins(protein.getId(), db.getId());
 			for(NrDbProtein prot: proteins) {
