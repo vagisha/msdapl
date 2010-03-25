@@ -77,6 +77,7 @@ public class ProteinInferDownloadAction extends Action {
         writer.write("Fasta ID filter: "+filterForm.getAccessionLike()+"\n");
         writer.write("Description filter (Like): "+filterForm.getDescriptionLike()+"\n");
         writer.write("Description filter (Not Like): "+filterForm.getDescriptionNotLike()+"\n");
+        writer.write("Search Swiss-Prot and NCBI-NR: "+filterForm.isSearchAllDescriptions()+"\n");
     }
 
     private void writeResults(PrintWriter writer, int pinferId, IdPickerFilterForm filterForm) {

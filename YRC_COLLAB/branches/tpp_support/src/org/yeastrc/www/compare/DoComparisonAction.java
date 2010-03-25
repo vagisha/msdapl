@@ -230,14 +230,6 @@ public class DoComparisonAction extends Action {
             for(ComparisonProteinGroup group: proteinGroups)
                 group.setGroupId(groupId++);
             
-            // remove protein groups that do not have any parsimonious proteins
-//            Iterator<ComparisonProteinGroup> iter = proteinGroups.iterator();
-//            while(iter.hasNext()) {
-//                ComparisonProteinGroup proteinGroup = iter.next();
-//                if(!proteinGroup.hasParsimoniousProtein())
-//                    iter.remove();
-//            }
-//            log.info("AFTER removing non-parsimonious groups: "+proteinGroups.size());
             
             e = System.currentTimeMillis();
             log.info("Time to do graph analysis: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");

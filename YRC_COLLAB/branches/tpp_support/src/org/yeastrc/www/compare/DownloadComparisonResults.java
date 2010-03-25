@@ -8,7 +8,6 @@ package org.yeastrc.www.compare;
 
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -211,6 +210,13 @@ public class DownloadComparisonResults extends Action {
 		if(filters.hasDescriptionNotLikeFilter()) {
             writer.write("Filtering for description term(s) NOT LIKE: "+filters.getDescriptionNotLike()+"\n\n");
         }
+		
+		// Was "Search All" checked for description search
+		if(filters.hasDescriptionLikeFilter() || filters.hasDescriptionNotLikeFilter()) {
+			if(filters.isSearchAllDescriptions()) {
+				writer.write("Descriptions in Swiss-Prot and NCBI-NR were searched\n\n");
+			}
+		}
         
         // Molecular wt. filter
 		if(filters.hasMolecularWtFilter()) {
