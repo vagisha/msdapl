@@ -27,9 +27,14 @@
 	<td valign="top" align="left"><b>Common Name(s):</b></td>
 	<td valign="top" align="left">
 		<logic:iterate name="protein" property="proteinListing.commonReferences" id="reference">
-			<bean:write name="reference" property="commonReference.name"/> / <bean:write name="reference" property="accession"/>
+			<bean:define name="reference" property="commonReference.name" id="commonName" type="java.lang.String"/>
+			<bean:define name="reference" property="accession" id="accession" type="java.lang.String"/>
+			<bean:write name="commonName"/>
+			<logic:notEqual name="commonName" value="<%=accession.toString() %>">
+			 / <bean:write name="accession" />
+			</logic:notEqual>
 			<logic:equal name="reference" property="hasExternalLink" value="true">
-				<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;">
+				<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;" target="ExternalLink">
 				[<bean:write name="reference" property="databaseName"/>]</a>
 			</logic:equal>
 			<br/>
@@ -210,7 +215,12 @@
 	<logic:iterate name="groupProteins" id="prot">
 		<span onclick="showProteinDetails(<bean:write name="prot" property="protein.id" />)" 
 						style="text-decoration: underline; cursor: pointer">
-		<bean:write name="prot" property="accessionsCommaSeparated" />
+		<li>
+			<logic:iterate name="prot" property="proteinListing.fastaReferences" id="reference" indexId="index">
+				<logic:greaterThan name="index" value="0">,</logic:greaterThan>
+				<bean:write name="reference" property="shortAccession"/>
+			</logic:iterate>
+		</li>
 		</span><br>
 	</logic:iterate>
 	</td>

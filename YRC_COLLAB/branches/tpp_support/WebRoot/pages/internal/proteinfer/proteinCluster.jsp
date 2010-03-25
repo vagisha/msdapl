@@ -35,8 +35,9 @@
             <div onclick="showProteinDetails(<bean:write name="prot" property="protein.id" />)"
                  style="text-decoration: underline; cursor: pointer">
                  <logic:equal name="prot" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
-                 <logic:iterate name="prot" property="proteinListing.fastaReferences" id="reference">
-                 	<bean:write name="reference" property="accession" />
+                 <logic:iterate name="prot" property="proteinListing.fastaReferences" id="reference" indexId="index">
+                 	<logic:greaterThan name="index" value="0">, </logic:greaterThan>
+                 	<bean:write name="reference" property="shortAccession" />
                  </logic:iterate>
                  
                  <logic:equal name="prot" property="protein.isParsimonious" value="false"></font></logic:equal>
