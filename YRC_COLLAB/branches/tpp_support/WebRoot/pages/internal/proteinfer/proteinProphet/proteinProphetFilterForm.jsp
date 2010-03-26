@@ -31,7 +31,7 @@
 	});
 </script>
 
-  <html:form action="/updateProteinProphetResult" method="post" styleId="filterForm" >
+  <html:form action="/proteinProphetGateway" method="post" styleId="filterForm" >
   
   <html:hidden name="proteinProphetFilterForm" property="pinferId" />
   <html:hidden name="proteinProphetFilterForm" property="doGoEnrichment" />
