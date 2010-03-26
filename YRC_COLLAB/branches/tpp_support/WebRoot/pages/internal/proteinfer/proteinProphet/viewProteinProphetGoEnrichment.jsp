@@ -159,7 +159,7 @@ function validateFloat(value, fieldName, min, max) {
 		<tr>
 			<td><b>Protein Inference ID: </b></td>
 			<td>
-				<html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="pinferId"><bean:write name="pinferId" /></html:link>
+				<html:link action="viewProteinProphetResult.do?" paramId="pinferId" paramName="pinferId"><bean:write name="pinferId" /></html:link>
 			</td>
 		</tr>
 		<tr>

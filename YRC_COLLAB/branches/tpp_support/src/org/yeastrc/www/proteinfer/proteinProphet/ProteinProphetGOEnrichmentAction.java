@@ -14,11 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
 import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.bio.taxonomy.Species;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
@@ -31,8 +29,6 @@ import org.yeastrc.www.go.GOEnrichmentCalculator;
 import org.yeastrc.www.go.GOEnrichmentInput;
 import org.yeastrc.www.go.GOEnrichmentOutput;
 import org.yeastrc.www.go.GOEnrichmentTabular;
-import org.yeastrc.www.user.User;
-import org.yeastrc.www.user.UserUtils;
 
 
 /**
@@ -48,27 +44,10 @@ public class ProteinProphetGOEnrichmentAction extends Action {
             HttpServletResponse response )
     throws Exception {
         
-        // User making this request
-        User user = UserUtils.getUser(request);
-        if (user == null) {
-            ActionErrors errors = new ActionErrors();
-            errors.add("username", new ActionMessage("error.login.notloggedin"));
-            saveErrors( request, errors );
-            return mapping.findForward("authenticate");
-        }
         
         ProteinProphetFilterForm filterForm = (ProteinProphetFilterForm) form;
         // get the protein inference id
         int pinferId = filterForm.getPinferId();
-        // if we  do not have a valid protein inference run id
-        // return an error.
-        if(pinferId <= 0) {
-            log.error("Invalid protein inference run id: "+pinferId);
-            ActionErrors errors = new ActionErrors();
-            errors.add("proteinfer", new ActionMessage("error.proteinfer.invalid.pinferId", pinferId));
-            saveErrors( request, errors );
-            return mapping.findForward("Failure");
-        }
         
         long s = System.currentTimeMillis();
         
@@ -107,8 +86,9 @@ public class ProteinProphetGOEnrichmentAction extends Action {
         request.setAttribute("enrichment", enrichment);
         request.setAttribute("pinferId", pinferId);
         request.setAttribute("species", Species.getInstance(speciesId));
-        request.setAttribute("proteinInferFilterForm", filterForm);
+        request.setAttribute("proteinProphetFilterForm", filterForm);
         request.setAttribute("showGoForm", true);
+        request.setAttribute("goView", true);
         
         
         long e = System.currentTimeMillis();
