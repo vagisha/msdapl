@@ -93,9 +93,21 @@ function onCancel(projectId) {
    <tr>
    	<td valign="top" style="padding-bottom: 15px;"><b>Data server:</b></td>
    	<td valign="top">
+   	
    		<html:radio property="dataServer" value="local"><b>Local</b></html:radio>
-   		<html:radio property="dataServer" value="Goodlett"><b>Goodlett</b></html:radio>  
-   		<html:radio property="dataServer" value="Yates"><b>Yates</b></html:radio>
+   		<yrcwww:member group="administrators">
+			<html:radio property="dataServer" value="Goodlett"><b>Goodlett</b></html:radio>
+			<html:radio property="dataServer" value="Bruce"><b>Bruce</b></html:radio>  
+   		</yrcwww:member>
+   		
+   		<yrcwww:notmember group="administrator">
+   			<yrcwww:member group="Goodlett">
+				<html:radio property="dataServer" value="Goodlett"><b>Goodlett</b></html:radio>
+			</yrcwww:member>
+			<yrcwww:member group="Bruce">
+				<html:radio property="dataServer" value="Bruce"><b>Bruce</b></html:radio>
+			</yrcwww:member>
+   		</yrcwww:notmember>
    	</td>
    </tr>
 

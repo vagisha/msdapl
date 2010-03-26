@@ -67,6 +67,9 @@ public class Projects {
 	
 	/** The definition for the Goodlett group */
     public static final String GOODLETT = "Goodlett";
+    
+    /** The definition for the Bruce group */
+    public static final String BRUCE = "Bruce";
 
 	/** The definitioni for the Noble group */
 	public static final String NOBLE = "Noble";

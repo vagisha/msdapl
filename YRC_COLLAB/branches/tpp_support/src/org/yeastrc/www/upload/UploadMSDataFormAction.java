@@ -56,13 +56,21 @@ public class UploadMSDataFormAction extends Action {
 		}
 
 		UploadMSDataForm newForm = new UploadMSDataForm();
-		if(groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS)) {
+		if(groupMan.isMember(user.getResearcher().getID(), "administrators")) {
+		    newForm.setPipeline(Pipeline.TPP);
+		    newForm.setDataServer("local");
+		}
+		else if(groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS)) {
 		    newForm.setPipeline(Pipeline.MACOSS);
 		    newForm.setDataServer("local");
 		}
 		else if (groupMan.isMember(user.getResearcher().getID(), Projects.GOODLETT)){
 		    newForm.setPipeline(Pipeline.TPP);
 		    newForm.setDataServer(Projects.GOODLETT);
+		}
+		else if (groupMan.isMember(user.getResearcher().getID(), Projects.BRUCE)){
+		    newForm.setPipeline(Pipeline.TPP);
+		    newForm.setDataServer(Projects.BRUCE);
 		}
 		else {
 		    newForm.setPipeline(Pipeline.TPP);
