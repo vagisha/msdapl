@@ -836,7 +836,7 @@
 		scope="request"
 		validate="true"
 	>
-		<forward name="ViewResults" path="/viewNewResult.do" redirect="false" />
+		<forward name="ViewResults" path="/viewNewPinferResult.do" redirect="false" />
 		<forward name="Update" path="/updateProteinInferenceResult.do" redirect="false" />
 		<forward name="Download" path="/downloadProtInferResults.do" redirect="false" />
 		<forward name="GOEnrichment" path="/protInferGoEnrichment.do" redirect="false" />
@@ -844,7 +844,7 @@
 	</action>
 	
 	<action 
-		path="/viewNewResult"
+		path="/viewNewPinferResult"
 		type="org.yeastrc.www.proteinfer.idpicker.ProteinInferViewAction"
 		name="idPickerFilterForm"
 		scope="request"
@@ -916,6 +916,30 @@
 		scope="request"
 		validate="true"
 	>
+		<forward name="Success" path="/proteinProphetGateway.do" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/proteinProphetGateway"
+		type="org.yeastrc.www.proteinfer.proteinProphet.ProteinProphetResultGatewayAction"
+		name="proteinProphetFilterForm"
+		scope="request"
+		validate="true"
+	>
+		<forward name="ViewResults" path="/viewNewPProphetResult.do" redirect="false" />
+		<forward name="Update" path="/updateProteinProphetResult.do" redirect="false" />
+		<forward name="GOEnrichment" path="/proteinProphetGoEnrichment.do" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/viewNewPProphetResult"
+		type="org.yeastrc.www.proteinfer.proteinProphet.ProteinProphetViewAction"
+		name="proteinProphetFilterForm"
+		scope="request"
+		validate="true"
+	>
 		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
 		<forward name="Failure" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
 	</action>
@@ -938,7 +962,6 @@
 		scope="request"
 		validate="true"
 	>
-		<forward name="ViewNewResults" path="/viewProteinProphetResult.do" redirect="false" />
 		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/proteinlist.jsp" redirect="false" />
 	</action>
 	

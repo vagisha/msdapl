@@ -27,8 +27,6 @@ import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 
-import sun.tools.tree.ArrayAccessExpression;
-
 import edu.uwpr.protinfer.idpicker.IDPickerParams;
 import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
 

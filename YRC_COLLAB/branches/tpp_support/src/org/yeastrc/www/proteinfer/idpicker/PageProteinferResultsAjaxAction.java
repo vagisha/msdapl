@@ -79,7 +79,6 @@ public class PageProteinferResultsAjaxAction extends Action {
         
         
         // Peptide definition from the session
-        if(filterCriteria_session == null)  filterCriteria_session = new ProteinFilterCriteria();
         PeptideDefinition peptideDef = filterCriteria_session.getPeptideDefinition();
 
         // How are we displaying the results (grouped by protein group or individually)

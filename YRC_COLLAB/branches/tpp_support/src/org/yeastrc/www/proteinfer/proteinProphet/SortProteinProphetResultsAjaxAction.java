@@ -17,11 +17,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
-import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
+import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -53,91 +54,131 @@ public class SortProteinProphetResultsAjaxAction extends Action{
         if(pinferId <= 0) {
             log.error("Invalid protein inference run id: "+pinferId);
             response.setContentType("text/html");
-            response.getWriter().write("ERROR: Invalid protein inference ID: "+pinferId);
+            response.getWriter().write("ERROR: Invalid ProteinProphet ID: "+pinferId);
             return null;
         }
 
-        // make sure protein inference ID in the request matches the ID for results stored in the session
-        Integer pinferId_session = (Integer)request.getSession().getAttribute("pinferId");
-        if(pinferId_session == null || pinferId_session != pinferId) {
-            // redirect to the /viewProteinInferenceResult action if this different from the
+        ProteinInferSessionManager sessionManager = ProteinInferSessionManager.getInstance();
+        // Check if we already have information in the session
+        ProteinFilterCriteria filterCriteria_session = sessionManager.getFilterCriteriaForProteinProphet(request, pinferId);
+        List<Integer> storedProteinIds = sessionManager.getStoredProteinIds(request, pinferId);
+        
+        // If we don't have a filtering criteria in the session return an error
+        if(filterCriteria_session == null || storedProteinIds == null) {
+        	
+        	log.info("NO information in session for: "+pinferId);
+        	// redirect to the /viewProteinInferenceResult action if this different from the
             // protein inference ID stored in the session
-            log.error("Stale protein inference ID: "+pinferId);
+            log.error("Stale ProteinProphet ID: "+pinferId);
             response.setContentType("text/html");
             response.getWriter().write("STALE_ID");
             return null;
         }
 
+
         // Protein filter criteria from the session
-        ProteinProphetFilterCriteria filterCriteria = (ProteinProphetFilterCriteria) request.getSession().getAttribute("proteinProphetFilterCriteria");
-        PeptideDefinition peptideDef = filterCriteria.getPeptideDefinition();
+        PeptideDefinition peptideDef = filterCriteria_session.getPeptideDefinition();
 
 
-        // How are we displaying the results (grouped by ProteinProphet group or individually)
-        boolean group = filterCriteria.isGroupProteins();
+        // How are we displaying the results (grouped by protein group or individually)
+        boolean group = filterCriteria_session.isGroupProteins();
         request.setAttribute("groupProteins", group);
+        
 
-
-        // Get the list of filtered and sorted protein IDs stored in the session
-        List<Integer> storedProteinIds = (List<Integer>) request.getSession().getAttribute("proteinIds");
-        if(storedProteinIds == null || storedProteinIds.size() == 0) {
-            // redirect to the /viewProteinProphetResult action if no proteinIds are stored in the session
-            ActionForward newResults = mapping.findForward( "ViewNewResults" ) ;
-            newResults = new ActionForward( newResults.getPath() + "inferId="+pinferId, newResults.getRedirect() ) ;
-            return newResults;
+        SORT_BY sortBy_request = null;
+        SORT_ORDER sortOrder_request = null;
+        
+        if((String) request.getParameter("sortBy") != null) {
+            sortBy_request = SORT_BY.getSortByForString((String) request.getParameter("sortBy"));
         }
-
-
-
-        SORT_BY sortBy_session = filterCriteria.getSortBy();
-
-        String sortBy_request = (String) request.getParameter("sortBy");
-
-        String sortOrder_request = (String) request.getParameter("sortOrder");
-        if(sortOrder_request != null) {
-            SORT_ORDER sortOrder_r = SORT_ORDER.getSortByForString(sortOrder_request);
-            filterCriteria.setSortOrder(sortOrder_r);
+        if((String) request.getParameter("sortOrder") != null) {
+        	sortOrder_request = SORT_ORDER.getSortByForString((String) request.getParameter("sortOrder"));
         }
 
 
         long s = System.currentTimeMillis();
-        log.info("Sorting results for protein inference (Protein Prophet): "+pinferId+"; sort by: "+sortBy_request+"; sort order: "+sortOrder_request);
+        log.info("Got request to sort results for protein inference: "+pinferId+"; sort by: "+sortBy_request+"; sort order: "+sortOrder_request);
 
-        if(sortBy_request != null){
-            SORT_BY sortBy_r = SORT_BY.getSortByForString(sortBy_request);
+        if(sortBy_request == null)
+        	sortBy_request = filterCriteria_session.getSortBy();
+        if(sortOrder_request == null)
+        	sortOrder_request = filterCriteria_session.getSortOrder();
+        
+        boolean doResort = false;
 
-            if(sortBy_r != sortBy_session) {
-                log.info("Sorting results by "+sortBy_r.name()+"; order: "+filterCriteria.getSortOrder().name());
 
-
-                List<Integer> newOrderIds = null;
-
-                // resort  the results based on the given criteria
-                newOrderIds = ProteinProphetResultsLoader.getSortedProteinIds(pinferId, 
-                        peptideDef, 
-                        storedProteinIds, 
-                        sortBy_r, 
-                        group);
-
-                filterCriteria.setSortBy(sortBy_r);
-                request.getSession().setAttribute("pinferFilterCriteria", filterCriteria);
-                request.getSession().setAttribute("proteinIds", newOrderIds);
-                storedProteinIds = newOrderIds;
-            }
+        // figure out if we will be resorting the results
+        // We will resort the results if:
+        // 1. the column select for sorting (SORT_BY) has changed
+        // 2. the sorting order (SORT_ORDER) has changed 
+        //    AND we are grouping ProteinProphet group proteins
+        //    AND we are NOT sorting on ProteinProphet group specific columns
+        //    ProteinProphet group ID or group probability
+        // If proteins are not being grouped AND SORT_BY has not changed we don't need to 
+        // resort as we can just use the existing list of proteins displayed in reverse order
+        if(sortBy_request != filterCriteria_session.getSortBy()) {
+        	log.info("SORT_BY has changed; SORT_BY in session: "+filterCriteria_session.getSortBy()+
+        			", SORT_BY in request: "+sortBy_request);
+        	doResort = true;
+        	log.info("RE-SORTING....");
+        	filterCriteria_session.setSortBy(sortBy_request);
         }
+        if(sortOrder_request != filterCriteria_session.getSortOrder()) {
+        	log.info("SORT_ORDER has changed; SORT_ORDER in session: "+filterCriteria_session.getSortOrder()+
+        			", SORT_ORDER in request: "+sortOrder_request);
+        	filterCriteria_session.setSortOrder(sortOrder_request);
+        	
+        	if(!(SORT_BY.isProteinProphetGroupSpecific(filterCriteria_session.getSortBy()))) {
+        		doResort = true;
+        		log.info("RE-SORTING....");
+        	}
+        }
+        
+        if(doResort){
+        	List<Integer> newSortedIds = null;
 
+        	// resort  the results based on the given criteria
+        	newSortedIds = ProteinProphetResultsLoader.getSortedProteinIds(pinferId, 
+        			peptideDef, 
+        			storedProteinIds, 
+        			filterCriteria_session.getSortBy(),
+        			filterCriteria_session.getSortOrder(),
+        			group);
+
+        	sessionManager.putForIdPicker(request, pinferId, filterCriteria_session, newSortedIds);
+        	storedProteinIds = newSortedIds;
+        }
+        
+        
         // page number is now 1
         int pageNum = 1;
 
 
         // determine the list of proteins we will be displaying
+        
+        // We can use the pager to page the results in the reverse order (SORT_ORDER == DESC)
+        // However, if we are grouping ProteinProphet groups 
+        // AND the sorting column is NOT ProteinProphetGroup specific
+        // we must have already sorted the results in descending order
+        boolean doReversePage = filterCriteria_session.getSortOrder() == SORT_ORDER.DESC;
+        if(group && !SORT_BY.isProteinProphetGroupSpecific(filterCriteria_session.getSortBy()))
+        	doReversePage = false;
+        
+        if(doReversePage)
+    		log.info("REVERSE PAGING...");
+        
+        // get the index range that is to be displayed in this page
         ResultsPager pager = ResultsPager.instance();
-        List<Integer> proteinIds = pager.page(storedProteinIds, pageNum, 
-                filterCriteria.getSortOrder() == SORT_ORDER.DESC);
+        int[] pageIndices = pager.getPageIndices(storedProteinIds, pageNum, 
+                doReversePage);
+        // sublist to be displayed
+        List<Integer> proteinIds = ProteinProphetResultsLoader.getPageSublist(storedProteinIds, pageIndices, group, doReversePage);
+        
+        
 
         // get the protein groups
         List<WProteinProphetProteinGroup> proteinGroups = ProteinProphetResultsLoader.getProteinProphetGroups(pinferId, proteinIds, 
-                group, peptideDef);
+                peptideDef);
         request.setAttribute("proteinGroups", proteinGroups);
 
 
@@ -151,8 +192,8 @@ public class SortProteinProphetResultsAjaxAction extends Action{
         request.setAttribute("pages", pages);
         request.setAttribute("pageCount", pageCount);
 
-        request.setAttribute("sortBy", filterCriteria.getSortBy());
-        request.setAttribute("sortOrder", filterCriteria.getSortOrder());
+        request.setAttribute("sortBy", filterCriteria_session.getSortBy());
+        request.setAttribute("sortOrder", filterCriteria_session.getSortOrder());
 
         long e = System.currentTimeMillis();
         log.info("Total time (SortProteinProphetResultsAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));

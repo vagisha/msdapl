@@ -4,6 +4,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
 import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
 
 public class ProteinProphetFilterForm extends ProteinInferFilterForm {
@@ -121,4 +124,21 @@ public class ProteinProphetFilterForm extends ProteinInferFilterForm {
         this.excludeSubsumed = excludeSubsumed;
     }
     
+    public ProteinProphetFilterCriteria getFilterCriteria(PeptideDefinition peptideDef) {
+    	
+    	ProteinFilterCriteria pfc = super.getFilterCriteria(peptideDef);
+    	ProteinProphetFilterCriteria filterCriteria = new ProteinProphetFilterCriteria(pfc);
+    	
+    	filterCriteria.setMinProteinProbability(getMinProteinProbabilityDouble());
+    	filterCriteria.setMaxProteinProbability(getMaxProteinProbabilityDouble());
+    	filterCriteria.setMinGroupProbability(getMinGroupProbabilityDouble());
+    	filterCriteria.setMaxGroupProbability(getMaxGroupProbabilityDouble());
+    	
+    	filterCriteria.setGroupProteins(isJoinProphetGroupProteins());
+    	
+    	if(isExcludeSubsumed())
+    		filterCriteria.setParsimoniousOnly();
+    	
+        return filterCriteria;
+    }
 }

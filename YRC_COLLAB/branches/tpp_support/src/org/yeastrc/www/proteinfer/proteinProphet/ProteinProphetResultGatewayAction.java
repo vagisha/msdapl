@@ -1,4 +1,10 @@
-package org.yeastrc.www.proteinfer.idpicker;
+/**
+ * ProteinProphetResultGatewayAction.java
+ * @author Vagisha Sharma
+ * Mar 25, 2010
+ * @version 1.0
+ */
+package org.yeastrc.www.proteinfer.proteinProphet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,9 +19,12 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
-public class ProteinInferenceResultGatewayAction extends Action {
+/**
+ * 
+ */
+public class ProteinProphetResultGatewayAction extends Action {
 
-	private static final Logger log = Logger.getLogger(ProteinInferenceResultGatewayAction.class);
+	private static final Logger log = Logger.getLogger(ProteinProphetResultGatewayAction.class);
 
 	public ActionForward execute( ActionMapping mapping,
 			ActionForm form,
@@ -33,12 +42,12 @@ public class ProteinInferenceResultGatewayAction extends Action {
         }
 
         // form for filtering and display options
-        IdPickerFilterForm filterForm = (IdPickerFilterForm)form;
+        ProteinProphetFilterForm filterForm = (ProteinProphetFilterForm)form;
         
-        if(filterForm.isDoDownload()) {
-        	return mapping.findForward("Download");
-        }
-        else if (filterForm.isDoGoEnrichment()) {
+//        if(filterForm.isDoDownload()) {
+//        	return mapping.findForward("Download");
+//        }
+        if (filterForm.isDoGoEnrichment()) {
         	return mapping.findForward("GOEnrichment");
         }
         else {

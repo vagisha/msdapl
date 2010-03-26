@@ -1,4 +1,5 @@
 <%@page import="org.yeastrc.ms.domain.protinfer.ProteinUserValidation"%>
+<%@page import="org.yeastrc.bio.go.GOUtils"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -33,6 +34,8 @@
   <html:form action="/updateProteinProphetResult" method="post" styleId="filterForm" >
   
   <html:hidden name="proteinProphetFilterForm" property="pinferId" />
+  <html:hidden name="proteinProphetFilterForm" property="doGoEnrichment" />
+  
   <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;">
   
   <!-- Filtering options -->
@@ -162,32 +165,73 @@
   			</td>
   			<td valign="top">Peptide: </td>
   			<td valign="top">
-  				<html:text name="proteinProphetFilterForm" property="peptide" size="40"></html:text><br>
-  				<span style="font-size:8pt;">Exact Match:<html:checkbox property="proteinProphetFilterForm" property="exactPeptideMatch"></html:checkbox></span>
+  				<html:text name="proteinProphetFilterForm" property="peptide" size="40"></html:text>
+  				<nobr><span style="font-size:8pt;">Exact Match:<html:checkbox property="proteinProphetFilterForm" property="exactPeptideMatch"></html:checkbox></span></nobr>
   			</td>
   		</tr>
   		
   		<tr>
   			<td valign="top">Description Include: </td>
-  			<td valign="top"><html:text name="proteinProphetFilterForm" property="descriptionLike" size="40"></html:text><br>
-  				<span style="font-size:8pt;">Enter a comma-separated list of terms</span>
+  			<td valign="top"><html:text name="proteinProphetFilterForm" property="descriptionLike" size="40"></html:text>
   			</td>
   			<td valign="top">Exclude: </td>
   			<td valign="top">
-  				<html:text name="proteinProphetFilterForm" property="descriptionNotLike" size="40"></html:text><br>
-  				<span style="font-size:8pt;">Enter a comma-separated list of terms</span>
+  				<html:text name="proteinProphetFilterForm" property="descriptionNotLike" size="40"></html:text>
+  				<nobr><span style="font-size:8pt;">Search All:<html:checkbox property="proteinProphetFilterForm" property="searchAllDescriptions"></html:checkbox></span></nobr>
   			</td>
+  		</tr>
+  		<tr>
+  		<td></td>
+  		<td colspan="3" ">
+  			<div style="font-size:8pt;" align="left">Enter a comma-separated list of terms.
+  			Descriptions will be included from the fasta file(s) associated with the experiment(s) <br>for
+  			this protein inference as well as species specific databases (e.g. SGD) 
+  			if a target species is associated with the experiment(s).
+  			<br>Check "Search All" to include descriptions from Swiss-Prot and NCBI-NR. 
+  			<br/><font color="red">NOTE: Description searches can be time consuming, especially when "Search All" is checked.</font></div>
+  		</td>
   		</tr>
   	</table>
   	</td>
   </tr>
   
+<logic:notPresent name="goView">
   <tr>
     	<td colspan="3" align="center">
-    		<html:submit styleClass="plain_button" style="margin-top:2px;">Update</html:submit>
+    		<button class="plain_button" style="margin-top:2px;" 
+    		        onclick="javascript:updateResults();return false;">Update</button>
+    		<!--<html:submit styleClass="plain_button" style="margin-top:2px;">Update</html:submit>-->
     	</td>
     	 
-    	 
   </tr>
+  </logic:notPresent>
+  
+  
  </TABLE>
+ 
+ <logic:equal name="showGoForm" value="true">
+ <div align="center"
+		style="padding: 5; border: 1px dashed gray; background-color: #F0F8FF; margin:5 0 5 0">
+		<b>GO Enrichment:</b>
+		<html:select name="proteinProphetFilterForm" property="goAspect">
+			<html:option
+				value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">Cellular Component</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
+		</html:select>
+		&nbsp; &nbsp; 
+		Species:
+		<html:select name="proteinProphetFilterForm" property="speciesId">
+			<html:option value="4932">Saccharomyces cerevisiae </html:option>
+		</html:select>
+		&nbsp; &nbsp;
+		P-Value: <html:text name="proteinProphetFilterForm" property="goEnrichmentPVal"></html:text>
+		&nbsp; &nbsp;
+		<a href=""
+			onclick="javascript:doGoEnrichmentAnalysis();return false;">Calculate</a>
+	</div>
+</logic:equal>
+
 </html:form>

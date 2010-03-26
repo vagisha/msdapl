@@ -1,10 +1,10 @@
 /**
- * ProteinInferViewAction.java
+ * ProteinProphetViewAction.java
  * @author Vagisha Sharma
- * Mar 19, 2010
+ * Mar 25, 2010
  * @version 1.0
  */
-package org.yeastrc.www.proteinfer.idpicker;
+package org.yeastrc.www.proteinfer.proteinProphet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +19,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
-import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
-import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetROC;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
@@ -28,17 +29,14 @@ import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.GOSupportChecker;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 import org.yeastrc.www.proteinfer.ProteinInferToProjectMapper;
+import org.yeastrc.www.proteinfer.idpicker.ViewProteinInferenceResultAction;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-import org.yeastrc.www.util.RoundingUtils;
-
-import edu.uwpr.protinfer.idpicker.IDPickerParams;
-import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
 
 /**
  * 
  */
-public class ProteinInferViewAction extends Action {
+public class ProteinProphetViewAction extends Action {
 
 	private static final Logger log = Logger.getLogger(ViewProteinInferenceResultAction.class);
 
@@ -52,8 +50,8 @@ public class ProteinInferViewAction extends Action {
         User user = UserUtils.getUser(request);
 
         // form for filtering and display options
-        IdPickerFilterForm filterForm = (IdPickerFilterForm)form;
-        request.setAttribute("proteinInferFilterForm", filterForm);
+        ProteinProphetFilterForm filterForm = (ProteinProphetFilterForm)form;
+        request.setAttribute("proteinProphetFilterForm", filterForm);
         
         // look for the protein inference run id in the form first
         int pinferId = filterForm.getPinferId();
@@ -79,25 +77,27 @@ public class ProteinInferViewAction extends Action {
         long s = System.currentTimeMillis();
         
         
-        // Get the peptide definition
-        IdPickerRun idpRun = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
-        IDPickerParams idpParams = IdPickerParamsMaker.makeIdPickerParams(idpRun.getParams());
-        PeptideDefinition peptideDef = idpParams.getPeptideDefinition();
+        // Get the peptide definition; We don't get peptide definition from ProteinProphet params so just
+        // use a dummy one.
+        PeptideDefinition peptideDef = new PeptideDefinition();
+        peptideDef.setUseCharge(true);
+        peptideDef.setUseMods(true);
         
         
         // Get the filtering criteria
-        ProteinFilterCriteria filterCriteria = filterForm.getFilterCriteria(peptideDef);
+        ProteinProphetFilterCriteria filterCriteria = filterForm.getFilterCriteria(peptideDef);
         
         
         // Get the protein Ids that fulfill the criteria.
-        List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
+        List<Integer> proteinIds = ProteinProphetResultsLoader.getProteinIds(pinferId, filterCriteria);
         
         // put the list of filtered and sorted protein IDs in the session, along with the filter criteria
-        ProteinInferSessionManager.getInstance().putForIdPicker(request, pinferId, filterCriteria, proteinIds);
+        ProteinInferSessionManager.getInstance().putForProteinProphet(request, pinferId, filterCriteria, proteinIds);
         
         
         // page number is now 1
         int pageNum = 1;
+        
         
         // limit to the proteins that will be displayed on this page
         List<Integer> proteinIdsPage = null;
@@ -106,7 +106,7 @@ public class ProteinInferViewAction extends Action {
         	int[] pageIndices = ResultsPager.instance().getPageIndices(proteinIds, pageNum,false);
 
         	// sublist to be displayed
-        	proteinIdsPage = IdPickerResultsLoader.getPageSublist(proteinIds, pageIndices,
+        	proteinIdsPage = ProteinProphetResultsLoader.getPageSublist(proteinIds, pageIndices,
         			filterCriteria.isGroupProteins(), false);
         }
         else {
@@ -114,8 +114,8 @@ public class ProteinInferViewAction extends Action {
         }
         
         // get the protein groups 
-        List<WIdPickerProteinGroup> proteinGroups = null;
-        proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIdsPage, peptideDef);
+        List<WProteinProphetProteinGroup> proteinGroups = null;
+        proteinGroups = ProteinProphetResultsLoader.getProteinProphetGroups(pinferId, proteinIdsPage, peptideDef);
         
         request.setAttribute("proteinGroups", proteinGroups);
         
@@ -132,30 +132,14 @@ public class ProteinInferViewAction extends Action {
         
         
         // Run summary
-        IdPickerRun idpickerRun = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
-        request.setAttribute("idpickerRun", idpickerRun);
+        ProteinProphetRun proteinProphetRun = ProteinferDAOFactory.instance().getProteinProphetRunDao().loadProteinferRun(pinferId);
+        request.setAttribute("proteinProphetRun", proteinProphetRun);
         
         // Input summary
-        List<WIdPickerInputSummary> inputSummary = IdPickerResultsLoader.getIDPickerInputSummary(pinferId);
-        request.setAttribute("inputSummary", inputSummary);
-        int totalDecoyHits = 0;
-        int totalTargetHits = 0;
-        int filteredTargetHits = 0;
-        for(WIdPickerInputSummary input: inputSummary) {
-            totalDecoyHits += input.getInput().getNumDecoyHits();
-            totalTargetHits += input.getInput().getNumTargetHits();
-            filteredTargetHits += input.getInput().getNumFilteredTargetHits();
-        }
-        request.setAttribute("totalDecoyHits", totalDecoyHits);
-        request.setAttribute("totalTargetHits", totalTargetHits);
-        request.setAttribute("filteredTargetHits", filteredTargetHits);
-        request.setAttribute("filteredPercent", 
-        		RoundingUtils.getInstance().roundTwo(filteredTargetHits*100.0/(double)totalTargetHits));
-        request.setAttribute("filteredUniquePeptideCount", IdPickerResultsLoader.getUniquePeptideCount(pinferId));
+        request.setAttribute("filteredUniquePeptideCount", ProteinProphetResultsLoader.getUniquePeptideCount(pinferId));
         
         // Results summary
-        WIdPickerResultSummary summary = IdPickerResultsLoader.getIdPickerResultSummary(pinferId, proteinIds);
-//        request.setAttribute("unfilteredProteinCount", summary.getUnfilteredProteinCount());
+        WProteinProphetResultSummary summary = ProteinProphetResultsLoader.getProteinProphetResultSummary(pinferId, proteinIds);
         request.setAttribute("filteredProteinCount", summary.getFilteredProteinCount());
         request.setAttribute("parsimProteinCount", summary.getFilteredParsimoniousProteinCount());
         request.setAttribute("filteredProteinGrpCount", summary.getFilteredProteinGroupCount());
@@ -165,14 +149,20 @@ public class ProteinInferViewAction extends Action {
         request.setAttribute("sortBy", filterCriteria.getSortBy());
         request.setAttribute("sortOrder", filterCriteria.getSortOrder());
         
+        // ROC
+        ProteinProphetROC rocSummary = proteinProphetRun.getRoc();
+        request.setAttribute("rocSummary", rocSummary);
+        
+        
         if(GOSupportChecker.isSupported(pinferId)) {
         	request.setAttribute("showGoForm", true);
         }
         
         long e = System.currentTimeMillis();
-        log.info("Total time (ProteinInferViewAction): "+TimeUtils.timeElapsedSeconds(s, e));
+        log.info("Total time (ProteinProphetViewAction): "+TimeUtils.timeElapsedSeconds(s, e));
         
         // Go!
         return mapping.findForward("Success");
 	}
+	
 }

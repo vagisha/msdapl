@@ -472,6 +472,9 @@ public class ProteinInferFilterForm extends ActionForm {
         filterCriteria.setPeptide(getPeptide());
         filterCriteria.setExactPeptideMatch(getExactPeptideMatch());
         
+        filterCriteria.setSortBy(ProteinFilterCriteria.defaultSortBy());
+        filterCriteria.setSortOrder(ProteinFilterCriteria.defaultSortOrder());
+        
         return filterCriteria;
     }
 }

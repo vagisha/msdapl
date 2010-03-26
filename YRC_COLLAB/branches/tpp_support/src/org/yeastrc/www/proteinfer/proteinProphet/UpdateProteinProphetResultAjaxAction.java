@@ -6,6 +6,7 @@
  */
 package org.yeastrc.www.proteinfer.proteinProphet;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,8 +23,7 @@ import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
-import org.yeastrc.www.user.User;
-import org.yeastrc.www.user.UserUtils;
+import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 
 /**
  * 
@@ -39,14 +39,6 @@ public class UpdateProteinProphetResultAjaxAction extends Action {
     throws Exception {
         
         
-        // User making this request
-        User user = UserUtils.getUser(request);
-        if (user == null) {
-            response.getWriter().write("You are not logged in!");
-            response.setStatus(HttpServletResponse.SC_SEE_OTHER); // Status code (303) indicating that the response to the request can be found under a different URI.
-            return null;
-        }
-
         // form for filtering and display options
         ProteinProphetFilterForm filterForm = (ProteinProphetFilterForm)form;
         request.setAttribute("proteinProphetFilterForm", filterForm);
@@ -54,145 +46,125 @@ public class UpdateProteinProphetResultAjaxAction extends Action {
         // look for the protein inference run id in the form first
         int pinferId = filterForm.getPinferId();
         
-        // if we do not have a valid protein inference run id return an error.
-        if(pinferId <= 0) {
-            log.error("Invalid protein inference run id: "+pinferId);
-            response.setContentType("text/html");
-            response.getWriter().write("ERROR: Invalid protein inference ID: "+pinferId);
-            return null;
-        }
+        // Get the peptide definition; We don't get peptide definition from ProteinProphet params so just
+        // use a dummy one.
+        PeptideDefinition peptideDef = new PeptideDefinition();
+        peptideDef.setUseCharge(true);
+        peptideDef.setUseMods(true);
         
-        // make sure protein inference ID in the request matches the ID for results stored in the session
-        Integer pinferId_session = (Integer)request.getSession().getAttribute("pinferId");
-        if(pinferId_session == null || pinferId_session != pinferId) {
-            // redirect to the /viewProteinInferenceResult action if this different from the
+        // filtering criteria from the request
+        ProteinProphetFilterCriteria filterCriteria_request = filterForm.getFilterCriteria(peptideDef);
+        
+        
+        // protein Ids
+        List<Integer> proteinIds = null;
+        
+        ProteinInferSessionManager sessionManager = ProteinInferSessionManager.getInstance();
+        
+        long s = System.currentTimeMillis();
+        
+        // Check if we already have information in the session
+        ProteinProphetFilterCriteria filterCriteria_session = sessionManager.getFilterCriteriaForProteinProphet(request, pinferId);
+        proteinIds = sessionManager.getStoredProteinIds(request, pinferId);
+        
+        
+        // If we don't have a filtering criteria in the session return an error
+        if(filterCriteria_session == null || proteinIds == null) {
+        	
+        	log.info("NO information in session for: "+pinferId);
+        	// redirect to the /viewProteinInferenceResult action if this different from the
             // protein inference ID stored in the session
-            log.error("Stale protein inference ID: "+pinferId);
+            log.error("Stale ProteinProphet ID: "+pinferId);
             response.setContentType("text/html");
             response.getWriter().write("STALE_ID");
             return null;
         }
-        
-        long s = System.currentTimeMillis();
-        
-        
-        // Check if there a filtering criteria in the session
-        ProteinProphetFilterCriteria filterCritSession = (ProteinProphetFilterCriteria) request.getSession().getAttribute("proteinProphetFilterCriteria");
-        
-        // Get the filtering criteria from the request
-        PeptideDefinition peptideDef = filterCritSession.getPeptideDefinition();
-        ProteinProphetFilterCriteria filterCriteria = new ProteinProphetFilterCriteria();
-        filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
-        filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
-        filterCriteria.setMinMolecularWt(filterForm.getMinMolecularWtDouble());
-        filterCriteria.setMaxMolecularWt(filterForm.getMaxMolecularWtDouble());
-        filterCriteria.setMinPi(filterForm.getMinPiDouble());
-        filterCriteria.setMaxPi(filterForm.getMaxPiDouble());
-        filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
-        filterCriteria.setNumMaxPeptides(filterForm.getMaxPeptidesInteger());
-        filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptidesInteger());
-        filterCriteria.setNumMaxUniquePeptides(filterForm.getMaxUniquePeptidesInteger());
-        filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatchesInteger());
-        filterCriteria.setNumMaxSpectra(filterForm.getMaxSpectrumMatchesInteger());
-        filterCriteria.setMinGroupProbability(filterForm.getMinGroupProbabilityDouble());
-        filterCriteria.setMaxGroupProbability(filterForm.getMaxGroupProbabilityDouble());
-        filterCriteria.setMinProteinProbability(filterForm.getMinProteinProbabilityDouble());
-        filterCriteria.setMaxProteinProbability(filterForm.getMaxProteinProbabilityDouble());
-        filterCriteria.setPeptideDefinition(peptideDef);
-        filterCriteria.setSortBy(filterCritSession == null ? 
-                ProteinProphetFilterCriteria.defaultSortBy() : 
-                filterCritSession.getSortBy());
-        filterCriteria.setSortOrder(filterCritSession == null ? 
-                ProteinProphetFilterCriteria.defaultSortOrder() : 
-                filterCritSession.getSortOrder());
-        filterCriteria.setExcludeIndistinGroups(filterForm.isExcludeIndistinProteinGroups());
-        filterCriteria.setGroupProteins(filterForm.isJoinProphetGroupProteins());
-        if(filterForm.isExcludeSubsumed())
-            filterCriteria.setParsimoniousOnly();
-        filterCriteria.setValidationStatus(filterForm.getValidationStatus());
-        filterCriteria.setChargeStates(filterForm.getChargeStateList());
-        filterCriteria.setChargeGreaterThan(filterForm.getChargeGreaterThan());
-        filterCriteria.setAccessionLike(filterForm.getAccessionLike());
-        filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
-        filterCriteria.setDescriptionNotLike(filterForm.getDescriptionNotLike());
-        filterCriteria.setPeptide(filterForm.getPeptide());
-        filterCriteria.setExactPeptideMatch(filterForm.getExactPeptideMatch());
-        
-        
-        // Get the protein IDs from the session
-        List<Integer> storedProteinIds = (List<Integer>) request.getSession().getAttribute("proteinIds");
-        System.out.println("stored protein ids: "+storedProteinIds.size());
-
-        // check if the protein grouping has changed. If so we may have to resort the proteins. 
-        boolean resort = false;
-        if(filterCritSession.isGroupProteins() != filterCriteria.isGroupProteins()) {
-            SORT_BY sortby = filterCriteria.getSortBy();
-            // If the filter criteria has proteins GROUPED and the sort_by is
-            // on one of the protein specific columns change it to group_id
-            if(filterCriteria.isGroupProteins()) {
-                if(sortby == SORT_BY.ACCESSION || sortby == SORT_BY.VALIDATION_STATUS ||
-                   sortby == SORT_BY.PROBABILITY_PROT) {
-                    filterCriteria.setSortBy(ProteinProphetFilterCriteria.defaultSortBy());
-                    filterCriteria.setSortOrder(ProteinProphetFilterCriteria.defaultSortOrder());
-                }
+        else {
+        	
+        	log.info("Found information in session for: "+pinferId);
+        	System.out.println("stored protein ids: "+proteinIds.size());
+        	 
+        	// we will use the sorting column and sorting order from the filter criteria in the session.
+        	filterCriteria_request.setSortBy(filterCriteria_session.getSortBy());
+        	filterCriteria_request.setSortOrder(filterCriteria_session.getSortOrder());
+        	
+        	boolean match = matchFilterCriteria(filterCriteria_session, filterCriteria_request);
+        	
+        	// check if the protein grouping has changed. If so we may have to resort the proteins. 
+            boolean resort = false;
+            if(filterCriteria_session.isGroupProteins() != filterCriteria_request.isGroupProteins()) {
+            	
+            	resort = true; // if the grouping has changed we will resort proteins 
             }
-            else {
-                if(sortby == SORT_BY.PROBABILITY_GRP) {
-                    filterCriteria.setSortBy(ProteinProphetFilterCriteria.defaultSortBy());
-                    filterCriteria.setSortOrder(ProteinProphetFilterCriteria.defaultSortOrder());
-                }
-            }
-            resort = true; // if the grouping has changed we will resort proteins (UNLESS the filtering criteria has also changed).
-        }
-        
-        // Match this filtering criteria with the one in the request
-        boolean match = false;
-        if(filterCritSession != null) {
-            match = matchFilterCriteria(filterCritSession, filterCriteria);
-        }
-        
-        // if the filtering criteria has changed we need to filter the results again
-        if(!match)  {
             
-            resort = false; // no need to re-sort.  The method below will take that into account.
-            // Get a list of filtered and sorted proteins
-            storedProteinIds = ProteinProphetResultsLoader.getProteinIds(pinferId, filterCriteria);
+            // if the filtering criteria has changed we need to filter the results again
+            if(!match)  {
+                
+            	log.info("Filtering criteria has changed");
+            	
+                resort = false; // no need to re-sort.  The method below will take that into account.
+                // Get a list of filtered and sorted proteins
+                proteinIds = ProteinProphetResultsLoader.getProteinIds(pinferId, filterCriteria_request);
+            }
+            
+            if(resort) {
+                // resort the filtered protein IDs
+                proteinIds = ProteinProphetResultsLoader.getSortedProteinIds(pinferId, 
+                        peptideDef, 
+                        proteinIds, 
+                        filterCriteria_request.getSortBy(), 
+                        filterCriteria_request.getSortOrder(),
+                        filterCriteria_request.isGroupProteins());
+            }
         }
         
-        if(resort) {
-            // resorted the filtered protein IDs
-            storedProteinIds = ProteinProphetResultsLoader.getSortedProteinIds(pinferId, 
-                    peptideDef, 
-                    storedProteinIds, 
-                    filterCriteria.getSortBy(), 
-                    filterCriteria.isGroupProteins());
-        }
+        // put the list of filtered and sorted protein IDs in the session, along with the filter criteria
+    	sessionManager.putForIdPicker(request, pinferId, filterCriteria_request, proteinIds);
+        request.setAttribute("sortBy", filterCriteria_request.getSortBy());
+        request.setAttribute("sortOrder", filterCriteria_request.getSortOrder());
         
-        
-        // update the list of filtered and sorted protein IDs in the session, along with the filter criteria
-        request.getSession().setAttribute("proteinIds", storedProteinIds);
-        request.getSession().setAttribute("proteinProphetFilterCriteria", filterCriteria);
-        
-        request.setAttribute("sortBy", filterCriteria.getSortBy());
-        request.setAttribute("sortOrder", filterCriteria.getSortOrder());
         
         // page number is now 1
         int pageNum = 1;
         
+        boolean group = filterCriteria_request.isGroupProteins();
         
-        // limit to the proteins that will be displayed on this page
-        List<Integer> proteinIds = ResultsPager.instance().page(storedProteinIds, pageNum, 
-                filterCriteria.getSortOrder() == SORT_ORDER.DESC);
+        List<Integer> pageProteinIds = null;
+        if(proteinIds.size() > 0) {
+        	// determine the list of proteins we will be displaying
+
+        	// We can use the pager to page the results in the reverse order (SORT_ORDER == DESC)
+            // However, if we are grouping ProteinProphet groups
+            // AND the sorting column is NOT ProteinProphetGroup specific
+            // we must have already sorted the results in descending order
+            boolean doReversePage = filterCriteria_session.getSortOrder() == SORT_ORDER.DESC;
+            if(group && !SORT_BY.isProteinProphetGroupSpecific(filterCriteria_session.getSortBy()))
+            	doReversePage = false;
+            
+            if(doReversePage)
+        		log.info("REVERSE PAGING...");
+            
+        	// get the index range that is to be displayed in this page
+        	ResultsPager pager = ResultsPager.instance();
+        	int[] pageIndices = pager.getPageIndices(proteinIds, pageNum, 
+        			doReversePage);
+
+        	// sublist to be displayed
+        	pageProteinIds = ProteinProphetResultsLoader.getPageSublist(proteinIds, pageIndices, group, doReversePage);
+        }
+        else {
+        	pageProteinIds = new ArrayList<Integer>(0);
+        }
+        
         
         // get the protein groups 
-        List<WProteinProphetProteinGroup> proteinGroups = ProteinProphetResultsLoader.getProteinProphetGroups(pinferId, proteinIds, 
-                                                        filterCriteria.isGroupProteins(), peptideDef);
-        
+        List<WProteinProphetProteinGroup> proteinGroups = ProteinProphetResultsLoader.getProteinProphetGroups(pinferId, pageProteinIds, 
+                                                        peptideDef);
         request.setAttribute("proteinGroups", proteinGroups);
         
         // get the list of page numbers to display
-        int pageCount = ResultsPager.instance().getPageCount(storedProteinIds.size());
-        List<Integer> pages = ResultsPager.instance().getPageList(storedProteinIds.size(), pageNum);
+        int pageCount = ResultsPager.instance().getPageCount(proteinIds.size());
+        List<Integer> pages = ResultsPager.instance().getPageList(proteinIds.size(), pageNum);
         
         request.setAttribute("currentPage", pageNum);
         request.setAttribute("onFirst", pageNum == 1);
@@ -202,13 +174,11 @@ public class UpdateProteinProphetResultAjaxAction extends Action {
         
         
         // Results summary
-        WProteinProphetResultSummary summary = ProteinProphetResultsLoader.getProteinProphetResultSummary(pinferId, storedProteinIds);
+        WProteinProphetResultSummary summary = ProteinProphetResultsLoader.getProteinProphetResultSummary(pinferId, proteinIds);
         request.setAttribute("filteredProteinCount", summary.getFilteredProteinCount());
         request.setAttribute("parsimProteinCount", summary.getFilteredParsimoniousProteinCount());
         request.setAttribute("filteredProteinGrpCount", summary.getFilteredProteinGroupCount());
         request.setAttribute("parsimProteinGrpCount", summary.getFilteredParsimoniousProteinGroupCount());
-        
-        
         
         
         long e = System.currentTimeMillis();

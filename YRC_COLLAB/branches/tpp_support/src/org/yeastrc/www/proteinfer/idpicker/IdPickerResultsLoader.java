@@ -23,7 +23,6 @@ import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerPeptideDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerRunDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerSpectrumMatchDAO;
-import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
@@ -66,7 +65,7 @@ public class IdPickerResultsLoader {
     private static final ProteinferDAOFactory pinferDaoFactory = ProteinferDAOFactory.instance();
     private static final org.yeastrc.ms.dao.DAOFactory msDataDaoFactory = org.yeastrc.ms.dao.DAOFactory.instance();
     private static final MsScanDAO scanDao = msDataDaoFactory.getMsScanDAO();
-    private static final MsRunDAO runDao = msDataDaoFactory.getMsRunDAO();
+    //private static final MsRunDAO runDao = msDataDaoFactory.getMsRunDAO();
     private static final MS2ScanDAO ms2ScanDao = msDataDaoFactory.getMS2FileScanDAO();
     private static final MsRunSearchDAO rsDao = msDataDaoFactory.getMsRunSearchDAO();
     private static final MsRunSearchAnalysisDAO rsaDao = msDataDaoFactory.getMsRunSearchAnalysisDAO();
@@ -377,34 +376,6 @@ public class IdPickerResultsLoader {
             return new ArrayList<WIdPickerProteinGroup>(0);
         }
         
-        List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
-        
-//        if(append) {
-//            // protein Ids should be sorted by groupID. If the proteins at the top of the list
-//            // does not have all members of the group in the list, add them
-//            int groupId_top = proteins.get(0).getProtein().getGroupId();
-//            List<IdPickerProteinBase> groupProteins = idpProtBaseDao.loadIdPickerGroupProteins(pinferId, groupId_top);
-//            for(IdPickerProteinBase prot: groupProteins) {
-//                if(!proteinIds.contains(prot.getId())) {
-//                    prot.setPeptideDefinition(peptideDef);
-//                    proteins.add(0, getWIdPickerProtein(prot, fastaDatabaseIds));
-//                }
-//            }
-//
-//            // protein Ids should be sorted by groupID. If the proteins at the bottom of the list
-//            // does not have all members of the group in the list, add them
-//            int groupId_last = proteins.get(proteins.size() - 1).getProtein().getGroupId();
-//            if(groupId_last != groupId_top) {
-//                groupProteins = idpProtBaseDao.loadIdPickerGroupProteins(pinferId, groupId_last);
-//                for(IdPickerProteinBase prot: groupProteins) {
-//                    if(!proteinIds.contains(prot.getId())) {
-//                        prot.setPeptideDefinition(peptideDef);
-//                        proteins.add(getWIdPickerProtein(prot, fastaDatabaseIds));
-//                    }
-//                }
-//            }
-//        }
-       
         if(proteins.size() == 0)
             return new ArrayList<WIdPickerProteinGroup>(0);
         
