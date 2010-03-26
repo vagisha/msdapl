@@ -7,8 +7,6 @@
 package org.yeastrc.ms.dao.protinfer.proteinProphet;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,11 +18,13 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.protinfer.GenericProteinferProteinDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinAndGroupId;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinGroupCoverageSorter.ProteinGroupCoverage;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinUserValidation;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.SORT_BY;
+import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
 
@@ -192,10 +192,13 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     public List<Integer> getFilteredSortedProteinIds(int pinferId, ProteinProphetFilterCriteria filterCriteria) {
         
         // Get a list of protein ids filtered by sequence coverage
+    	SORT_ORDER sortOrder = filterCriteria.getSortBy() == SORT_BY.COVERAGE ? 
+ 				filterCriteria.getSortOrder() :
+ 				null;
         boolean sort = filterCriteria.getSortBy() == SORT_BY.COVERAGE;
         List<Integer> ids_cov = proteinIdsByCoverage(pinferId, 
                 filterCriteria.getCoverage(), filterCriteria.getMaxCoverage(),
-                sort, filterCriteria.isGroupProteins());
+                filterCriteria.isGroupProteins(), sortOrder);
         
         // Get a list of protein ids filtered by spectrum count
         sort = filterCriteria.getSortBy() == SORT_BY.NUM_SPECTRA;
@@ -464,19 +467,27 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     // -----------------------------------------------------------------------------------------------
     // COVERAGE
     // -----------------------------------------------------------------------------------------------
-    public List<Integer> sortProteinIdsByCoverage(int pinferId, boolean groupProteins) {
-        return proteinIdsByCoverage(pinferId, 0.0, 100.0, true, groupProteins);
+    public List<Integer> sortProteinIdsByCoverage(int pinferId, boolean groupProteins, SORT_ORDER sortOrder) {
+        return proteinIdsByCoverage(pinferId, 0.0, 100.0, groupProteins, sortOrder);
     }
     
     private List<Integer> proteinIdsByCoverage(int pinferId, 
             double minCoverage, double maxCoverage,
-            boolean sort, boolean groupProteins) {
+            boolean groupProteins, SORT_ORDER sortOrder) {
         
+    	boolean sort = sortOrder != null;
+    	
         Map<String, Number> map = new HashMap<String, Number>(10);
         map.put("pinferId", pinferId);
         map.put("minCoverage", minCoverage);
         map.put("maxCoverage", maxCoverage);
-        if(sort)    map.put("sort", 1);
+        if(sort) {   
+        	map.put("sort", 1);
+        	if(groupProteins) 
+        		map.put("sort_pg", 1);
+        	else
+        		map.put("sort_ig", 1);
+        }
         
         // If we are not sorting on coverage do a simple query and return a list of protien ids that 
         // satisfy the coverage criteria.
@@ -494,99 +505,20 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
             
             // Case 1: grouping by protein prophet group and then indistinguishable group.
             if(groupProteins)
-                return getProteinIdsGroupedByPhrophetGroupAndIGroup(prGrC);
+            	ProteinGroupCoverageSorter.getInstance().sort(prGrC, sortOrder, SORT_BY.PROTEIN_PROPHET_GROUP);
             // Case 2: grouping by indistinguishable group only
             else
-                return getProteinIdsGroupedByIGroup(prGrC);
+            	ProteinGroupCoverageSorter.getInstance().sort(prGrC, sortOrder, SORT_BY.GROUP_ID);
+            
+            List<Integer> proteinIds = new ArrayList<Integer>(prGrC.size());
+            
+            // return the list of protein IDs in the sorted order obove.
+            for(ProteinGroupCoverage pgc: prGrC)
+                proteinIds.add(pgc.getProteinId());
+            return proteinIds;
         }
     }
-    
-    private List<Integer> getProteinIdsGroupedByPhrophetGroupAndIGroup(List<ProteinGroupCoverage> prGrC) {
-        int lastProphetGrp = -1;
-        double lastMaxCoverage = 0.0;
-        // Set the coverage for each protein in a group to be the max coverage in the group.
-        for(ProteinGroupCoverage pgc: prGrC) {
-            if(pgc.proteinProphetGroupId != lastProphetGrp) {
-                pgc.maxGrpCoverage = pgc.coverage;
-                lastProphetGrp = pgc.proteinProphetGroupId;
-                lastMaxCoverage = pgc.coverage; // first protein (for a group) has the max coverage.
-            }
-            else {
-                pgc.maxGrpCoverage = lastMaxCoverage;
-            }
-        }
-        // Sort on coverage then protein prophet group, then indistinguishable group.
-        Collections.sort(prGrC, new Comparator<ProteinGroupCoverage>() {
-            @Override
-            public int compare(ProteinGroupCoverage o1, ProteinGroupCoverage o2) {
-                int val = Double.valueOf(o1.maxGrpCoverage).compareTo(o2.maxGrpCoverage);
-                if(val != 0)    return val;
-                val = Integer.valueOf(o1.proteinProphetGroupId).compareTo(o2.proteinProphetGroupId);
-                if(val != 0)    return val;
-                val = Integer.valueOf(o1.proteinGroupId).compareTo(o2.proteinGroupId);
-                if(val != 0)    return val;
-                return Double.valueOf(o1.coverage).compareTo(o2.coverage);
-            }});
-        List<Integer> proteinIds = new ArrayList<Integer>(prGrC.size());
-        
-        // return the list of protein IDs in the sorted order above.
-        for(ProteinGroupCoverage pgc: prGrC)
-            proteinIds.add(pgc.proteinId);
-        return proteinIds;
-    }
-    
-    private List<Integer> getProteinIdsGroupedByIGroup(List<ProteinGroupCoverage> prGrC) {
-        int lastIGrp = -1;
-        double lastMaxCoverage = 0.0;
-        // Set the coverage for each protein in a group to be the max coverage in the indistinguishable group.
-        for(ProteinGroupCoverage pgc: prGrC) {
-            if(pgc.proteinGroupId != lastIGrp) {
-                pgc.maxGrpCoverage = pgc.coverage;
-                lastIGrp = pgc.proteinProphetGroupId;
-                lastMaxCoverage = pgc.coverage; // first protein (for a group) has the max coverage.
-            }
-            else {
-                pgc.maxGrpCoverage = lastMaxCoverage;
-            }
-        }
-        // Sort on coverage, then indistinguishable group.
-        Collections.sort(prGrC, new Comparator<ProteinGroupCoverage>() {
-            @Override
-            public int compare(ProteinGroupCoverage o1, ProteinGroupCoverage o2) {
-                int val = Double.valueOf(o1.maxGrpCoverage).compareTo(o2.maxGrpCoverage);
-                if(val != 0)    return val;
-                val = Integer.valueOf(o1.proteinGroupId).compareTo(o2.proteinGroupId);
-                if(val != 0)    return val;
-                return Double.valueOf(o1.coverage).compareTo(o2.coverage);
-            }});
-        List<Integer> proteinIds = new ArrayList<Integer>(prGrC.size());
-        
-        // return the list of protein IDs in the sorted order above.
-        for(ProteinGroupCoverage pgc: prGrC)
-            proteinIds.add(pgc.proteinId);
-        return proteinIds;
-    }
-    
-    public static class ProteinGroupCoverage {
-        private int proteinId;
-        private int proteinGroupId;
-        private int proteinProphetGroupId;
-        private double coverage;
-        private double maxGrpCoverage;
-        public void setProteinId(int proteinId) {
-            this.proteinId = proteinId;
-        }
-        public void setProteinGroupId(int proteinGroupId) {
-            this.proteinGroupId = proteinGroupId;
-        }
-        public void setProteinProphetGroupId(int proteinProphetGroupId) {
-            this.proteinProphetGroupId = proteinProphetGroupId;
-        }
-        public void setCoverage(double coverage) {
-            this.coverage = coverage;
-        }
-    }
-    
+
     private List<Integer> nrseqIdsByCoverage(int pinferId, 
             double minCoverage, double maxCoverage) {
         

@@ -51,4 +51,9 @@ public enum SORT_BY {
     			sortBy == COVERAGE ||
     			sortBy == NSAF);
     }
+    
+    public static boolean isProteinProphetGroupSpecific(SORT_BY sortBy) {
+    	return (sortBy == PROTEIN_PROPHET_GROUP ||
+    			sortBy == SORT_BY.PROBABILITY_GRP);
+    }
 }

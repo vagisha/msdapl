@@ -6,8 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -714,13 +712,15 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     public List<Integer> getFilteredSortedProteinIds(int pinferId, ProteinFilterCriteria filterCriteria) {
         
         // Get a list of protein ids filtered by sequence coverage
-        boolean sort = filterCriteria.getSortBy() == SORT_BY.COVERAGE;
+        SORT_ORDER sortOrder = filterCriteria.getSortBy() == SORT_BY.COVERAGE ? 
+        		 				filterCriteria.getSortOrder() :
+        		 				null;
         List<Integer> ids_cov = proteinIdsByCoverage(pinferId, 
                 filterCriteria.getCoverage(), filterCriteria.getMaxCoverage(),
-                filterCriteria.isGroupProteins(), filterCriteria.getSortOrder());
+                filterCriteria.isGroupProteins(), sortOrder);
         
         // Get a list of protein ids filtered by spectrum count
-        sort = filterCriteria.getSortBy() == SORT_BY.NUM_SPECTRA;
+        boolean sort = filterCriteria.getSortBy() == SORT_BY.NUM_SPECTRA;
         List<Integer> ids_spec_count = proteinIdsBySpectrumCount(pinferId, 
                 filterCriteria.getNumSpectra(), filterCriteria.getNumMaxSpectra(),
                 sort, filterCriteria.isGroupProteins());

@@ -223,7 +223,7 @@
     </select>
     
     <select id="filterProteinGroupCoverage" 
-    		resultClass="org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO$ProteinGroupCoverage" 
+    		resultClass="org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinGroupCoverageSorter$ProteinGroupCoverage" 
     		parameterClass="java.util.Map">
     	SELECT prot.id AS proteinId, 
     		   pprot.groupID AS proteinGroupId, 
@@ -233,7 +233,16 @@
     	WHERE prot.id = pprot.piProteinID 
     	AND prot.piRunID = #pinferId# 
     	AND prot.coverage BETWEEN #minCoverage# AND #maxCoverage#
-    	ORDER BY proteinProphetGroupId, coverage DESC
+    	<isPropertyAvailable property="sort">
+    		ORDER BY 
+    		<isPropertyAvailable property="sort_pg">
+    			proteinProphetGroupId, 
+    		</isPropertyAvailable>
+    		<isPropertyAvailable property="sort_ig">
+    			proteinGroupId
+    		</isPropertyAvailable>
+    		coverage DESC
+    	</isPropertyAvailable>
     </select>
     
     <select id="filterByValidationStatus" resultClass="Integer" parameterClass="java.util.Map">

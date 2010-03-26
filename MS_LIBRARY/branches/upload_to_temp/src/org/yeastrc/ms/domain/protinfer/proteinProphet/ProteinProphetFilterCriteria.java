@@ -32,28 +32,48 @@ public class ProteinProphetFilterCriteria extends ProteinFilterCriteria {
     public ProteinProphetFilterCriteria() {}
     
     public ProteinProphetFilterCriteria(ProteinFilterCriteria filterCriteria) {
+    	// coverage
         super.setCoverage(filterCriteria.getCoverage());
         super.setMaxCoverage(filterCriteria.getMaxCoverage());
+        // molecular wt
         super.setMinMolecularWt(filterCriteria.getMinMolecularWt());
         super.setMaxMolecularWt(filterCriteria.getMaxMolecularWt());
+        // pI
         super.setMinPi(filterCriteria.getMinPi());
         super.setMaxPi(filterCriteria.getMaxPi());
+        // num peptides
         super.setNumPeptides(filterCriteria.getNumPeptides());
         super.setNumMaxPeptides(filterCriteria.getNumMaxPeptides());
+        // num unique peptides
         super.setNumUniquePeptides(filterCriteria.getNumUniquePeptides());
         super.setNumMaxUniquePeptides(filterCriteria.getNumMaxUniquePeptides());
+        // num spectra
         super.setNumSpectra(filterCriteria.getNumSpectra());
         super.setNumMaxSpectra(filterCriteria.getNumMaxSpectra());
+        // accession
         super.setAccessionLike(filterCriteria.getAccessionLike());
+        // description
         super.setDescriptionLike(filterCriteria.getDescriptionLike());
+        super.setDescriptionNotLike(filterCriteria.getDescriptionNotLike());
+        super.setSearchAllDescriptions(filterCriteria.isSearchAllDescriptions());
+        // peptide string
         super.setPeptide(filterCriteria.getPeptide());
         super.setExactPeptideMatch(filterCriteria.getExactPeptideMatch());
+        // exclude I-groups
         super.setExcludeIndistinGroups(filterCriteria.isExcludeIndistinGroups());
+        // group proteins
         super.setGroupProteins(filterCriteria.isGroupProteins());
+        // parsimonious-ness
         super.setNonParsimonious(filterCriteria.getNonParsimonious());
         super.setParsimonious(filterCriteria.getParsimonious());
+        // peptide definition
         super.setPeptideDefinition(filterCriteria.getPeptideDefinition());
+        // validation status
         super.setValidationStatus(filterCriteria.getValidationStatus());
+        // charge states
+        super.setChargeStates(filterCriteria.getChargeStates());
+        super.setChargeGreaterThan(filterCriteria.getChargeGreaterThan());
+        // sorting 
         super.setSortOrder(filterCriteria.getSortOrder());
         super.setSortBy(filterCriteria.getSortBy());
     }
