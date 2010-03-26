@@ -284,7 +284,7 @@
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
 					style="text-decoration: underline; cursor: pointer">
 			<logic:iterate name="protein" property="proteinListing.commonReferences" id="reference">
-				<bean:write name="reference" property="name"/>
+				<bean:write name="reference" property="commonReference.name"/>
 				<br/>
 			</logic:iterate>
 			</span>
