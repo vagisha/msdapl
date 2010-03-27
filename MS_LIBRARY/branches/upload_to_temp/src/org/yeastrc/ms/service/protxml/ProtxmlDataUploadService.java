@@ -809,8 +809,10 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
 
     @Override
     public void setAnalysisId(int analysisId) {
-        throw new UnsupportedOperationException("ProxmlDataUploadService determines the analysis ID based "+ 
-                "on source_files attribute in pep.mxl files");
+    	log.warn("ProxmlDataUploadService determines the analysis ID based "+ 
+              "on source_files attribute in pep.mxl files");
+//        throw new UnsupportedOperationException("ProxmlDataUploadService determines the analysis ID based "+ 
+//                "on source_files attribute in pep.mxl files");
 //        this.analysisId = analysisId;
     }
 
