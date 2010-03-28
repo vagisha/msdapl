@@ -87,58 +87,64 @@
 
 <!-- SEARCH ANALYSES FOR THE EXPERIMENT -->
 <logic:notEmpty name="experiment" property="analyses">
-	<logic:iterate name="experiment" property="analyses" id="analysis">
 	<div style="background-color: #F0FFF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
-		<table width="90%">
-		<tr>
-			<td width="33%"><b>Program: </b>&nbsp;
-			<b><bean:write name="analysis" property="analysisProgram"/>
-			&nbsp;
-			<bean:write name="analysis" property="analysisProgramVersion"/></b></td>
-			
-			<!-- !!!!!! PERCOLATOR !!!!!! -->
-			<logic:equal name="analysis" property="analysisProgram" value="<%=Program.PERCOLATOR.toString() %>">
-			<td width="33%" valign="top">
-				<b>
-					<html:link action="viewPercolatorResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link>
-					&nbsp;
+	
+	<!-- !!!!!! PERCOLATOR !!!!!! -->
+	<logic:equal name="experiment" property="analysisProgramName" value="<%=Program.PERCOLATOR.displayName() %>">
+		<table width="100%">
+			<tbody>
+			<logic:iterate name="experiment" property="analyses" id="analysis">
+			<tr>
+				<td width="25%" valign="middle"><b>Program: Percolator <bean:write name="analysis" property="analysisProgramVersionShort"/></b></td>
+				<td width="25%" valign="middle">
+					<b><html:link action="viewPercolatorResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link></b>
+				</td>
+				<td width="25%">
 					<b><a href="<yrcwww:link path='viewQCPlots.do?'/>analysisId=<bean:write name='analysis' property='id' />&experimentId=<bean:write name='experiment' property='id'/>"> 
 					[QC Plots]</a></b>
-					<!-- <html:link action="percolatorPepXmlDownloadForm.do" 
-								paramId="ID" 
-								paramName="search" paramProperty="id">[PepXML]</html:link> -->
-				</b>
+				</td>
+				<td width="25%">
+					<b><a href="<yrcwww:link path='newPercolatorProteinInference.do?'/>searchAnalysisId=<bean:write name='analysis' property='id' />&projectId=<bean:write name='experiment' property='projectId'/>"> 
+					[Infer Proteins]</a></b>
+					<a href="" onclick="openInformationPopup('<yrcwww:link path='pages/internal/docs/proteinInference.jsp'/>'); return false;">
+   					<img src="<yrcwww:link path='images/info_16.png'/>" align="bottom" border="0"/></a>
+				</td>
+			</tr>
+			</logic:iterate>
+			</tbody>
+		</table>
+	</logic:equal>
+	
+	<!-- !!!!!! PEPTIDE PROPHET !!!!!! -->
+	<logic:equal name="experiment" property="analysisProgramName" value="<%=Program.PEPTIDE_PROPHET.displayName() %>">
+	<!-- NAME PF THE ANALYSIS PROGRAM -->
+	<div><b><bean:write name="experiment" property="analysisProgramName"/> Results </b></div> 
+	<table width="100%">
+		<thead>
+		<tr align="left">
+			<th valign="top">ID</th>
+			<th valign="top">Version</th>
+			<th valign="top">File</th>
+			<th valign="top"></th>
+		</thead>
+		<tbody>
+		<logic:iterate name="experiment" property="analyses" id="analysis">
+			<tr>
+			<td width="5%"><bean:write name="analysis" property="id"/></td>
+			<td width="30%"><bean:write name="analysis" property="analysisProgramVersionShort"/></td>
+			<td width="30%" valign="top">
+				<b><bean:write name="analysis" property="analysisName" /></b>
 			</td>
-			<td width="33%">
-				<b><a href="<yrcwww:link path='newPercolatorProteinInference.do?'/>searchAnalysisId=<bean:write name='analysis' property='id' />&projectId=<bean:write name='experiment' property='projectId'/>"> 
-				[Infer Proteins]</a></b>
-				<a href="" onclick="openInformationPopup('<yrcwww:link path='pages/internal/docs/proteinInference.jsp'/>'); return false;">
-   				<img src="<yrcwww:link path='images/info_16.png'/>" align="bottom" border="0"/></a>
-			</td>
-			</logic:equal>
-			
-			<!-- !!!!!! PEPTIDE PROPHET !!!!!! -->
-			<logic:equal name="analysis" property="analysisProgram" value="<%=Program.PEPTIDE_PROPHET.toString() %>">
-			
-			<td width="33%" valign="top">
+			<td width="30%" valign="top">
 				<b>
 					<html:link action="viewPeptideProphetResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link>
-					<!-- <html:link action="percolatorPepXmlDownloadForm.do" 
-								paramId="ID" 
-								paramName="search" paramProperty="id">[PepXML]</html:link> -->
 				</b>
 			</td>
-			
-			<td width="33%" valign="top">
-				<b>File: <bean:write name="analysis" property="analysisName" /></b>
-			</td>
-			
-			</logic:equal>
-			
 		</tr>
+		</logic:iterate>
 		</table>
+		</logic:equal>
 	</div>
-	</logic:iterate>
 </logic:notEmpty>
 
 <!-- PROTEIN INFERENCE RESULTS FOR THE EXPERIMENT -->
@@ -180,7 +186,7 @@
 		<logic:iterate name="experiment" property="proteinProphetRuns" id="prpRun" type="org.yeastrc.experiment.ExperimentProteinProphetRun">
 			<tr>
 			<td valign="top"><b><bean:write name="prpRun" property="proteinProphetRun.id"/></b></td>
-			<td valign="top"><bean:write name="prpRun" property="proteinProphetRun.programVersion"/></td>
+			<td valign="top"><bean:write name="prpRun" property="programVersionShort"/></td>
 			<td valign="top"><b><NOBR><bean:write name="prpRun" property="proteinProphetRun.filename"/></NOBR></b></td>
 			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><nobr><bean:write name="prpRun" property="numParsimoniousProteinGroups"/>(<bean:write name="prpRun" property="numParsimoniousProteins"/>)</nobr></td>
 			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="uniqPeptideSequenceCount"/></td>

@@ -6,7 +6,12 @@
  */
 package org.yeastrc.experiment;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
+import org.yeastrc.ms.domain.search.Program;
 
 /**
  * 
@@ -17,6 +22,8 @@ public class ExperimentProteinProphetRun {
     private int uniqPeptideSequenceCount;
     private int numParsimoniousProteins;
     private int numParsimoniousProteinGroups;
+    
+    private static final Pattern tppVersionPattern = Pattern.compile("(TPP\\s+v\\d+\\.\\d+)");
     
     public ExperimentProteinProphetRun(ProteinProphetRun run) {
         this.run = run;
@@ -48,6 +55,17 @@ public class ExperimentProteinProphetRun {
 
     public void setNumParsimoniousProteinGroups(int numParsimoniousProteinGroups) {
         this.numParsimoniousProteinGroups = numParsimoniousProteinGroups;
+    }
+    
+    public String getProgramVersionShort() {
+    	String version = run.getProgramVersion();
+    	if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {
+    		Matcher m = tppVersionPattern.matcher(version);
+    		if(m.find()) {
+    			version = m.group();
+    		}
+    	}
+    	return version;
     }
     
 }

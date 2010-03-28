@@ -153,6 +153,12 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     public List<SearchAnalysis> getAnalyses() {
         return analyses;
     }
+    
+    public String getAnalysisProgramName() {
+    	if(analyses != null && analyses.size() > 0)
+    		return analyses.get(0).getAnalysisProgram().displayName();
+    	return "";
+    }
 
     public void setAnalyses(List<SearchAnalysis> analyses) {
         this.analyses = analyses;
