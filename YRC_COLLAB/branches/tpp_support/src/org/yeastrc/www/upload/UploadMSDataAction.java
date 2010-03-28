@@ -89,12 +89,15 @@ public class UploadMSDataAction extends Action {
 		boolean maccoss = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.MACCOSS);
         boolean yates = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.YATES);
         boolean goodlett = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.GOODLETT);
+        boolean bruce = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.BRUCE);
         if (yates)
             jobSaver.setGroupID(0);
         else if (maccoss)
             jobSaver.setGroupID(1);
         else if( goodlett )
             jobSaver.setGroupID(2);
+        else if( bruce )
+            jobSaver.setGroupID(3);
 		
 		
 		jobSaver.setProjectID( projectID );
