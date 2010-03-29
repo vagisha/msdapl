@@ -124,6 +124,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     private Map<Pattern, char[]> equivalentAminoAcids = null;
     
     private Map<String, Integer> proteinIdMap;
+    private Map<Integer, Set<String>> subsumedMap;
     
     private static final Logger log = Logger.getLogger(ProtxmlDataUploadService.class.getName());
     
@@ -165,6 +166,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         runSearchAnalysisIds.clear();
         
         proteinIdMap = new HashMap<String, Integer>();
+        subsumedMap = new HashMap<Integer, Set<String>>();
     }
     
     public void upload() throws UploadException {
@@ -263,6 +265,12 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         
         long e = System.currentTimeMillis();
         
+        // save subsumed proteins
+        // Subsumed proteins are not always in the same ProteinProphet group as the subsuming proteins
+        // That is why we have to read through the entire file to have protein name to piProteinID mapping
+        // for all subsuming proteins.
+        saveSubsumedProteins(subsumedMap, proteinIdMap);
+        
         log.info("Uploaded file: "+protxmlFile+"; ID: "+uploadedPinferId+"; #protein groups: "+numProteinGroups+
                 "; Time: "+TimeUtils.timeElapsedSeconds(s, e));
         
@@ -278,7 +286,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         
         int ppGrpId = grpDao.saveGroup(proteinGroup);
         
-        Map<Integer, Set<String>> subsumedMap = new HashMap<Integer, Set<String>>();
+//        Map<Integer, Set<String>> subsumedMap = new HashMap<Integer, Set<String>>();
 //        Map<String, Integer> proteinIdMap = new HashMap<String, Integer>();
         
         for(ProteinProphetProtein protein: proteinGroup.getProteinList()) {
@@ -302,17 +310,18 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             this.indistinguishableProteinGroupId++;
         }
         
-        saveSubsumedProteins(subsumedMap, proteinIdMap);
+//        saveSubsumedProteins(subsumedMap, proteinIdMap);
     }
     
     private void saveSubsumedProteins(Map<Integer, Set<String>> subsumedMap, Map<String, Integer> proteinIdMap) {
         
+    	log.info("Saving subsumed proteins");
         for(int subsumedId: subsumedMap.keySet()) {
             Set<String> subsuming = subsumedMap.get(subsumedId);
             for(String name: subsuming) {
                 Integer subsumingId = proteinIdMap.get(name);
                 if(subsumingId == null) {
-                    log.warn("Subsuming protein not seen yet: "+name);
+                    log.warn("Subsuming protein not seen yet: "+name+" for subsumed proteinID: "+subsumedId);
                     continue;
                 }
                 ppSusumedDao.saveSubsumedProtein(subsumedId, subsumingId);

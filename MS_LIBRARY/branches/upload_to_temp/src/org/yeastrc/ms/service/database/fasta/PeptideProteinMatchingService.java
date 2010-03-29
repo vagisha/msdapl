@@ -238,37 +238,41 @@ public class PeptideProteinMatchingService {
         Statement stmt = null;
         ResultSet rs = null;
         
-        List<String> suffixList = getSuffixList(peptide);
-        String commaSep = StringUtils.makeQuotedCommaSeparated(suffixList);
+        List<List<String>> suffixLists = getSuffixLists(peptide);
         
-        List<Integer> dbProteinIds = new ArrayList<Integer>();
-        try {
-            conn = ConnectionFactory.getNrseqConnection();
-            String sql = "SELECT db.dbProteinID, count(*) AS cnt FROM "+
-            FastaDatabaseSuffixCreator.getDbSuffixTableName(databaseId)+ " AS db, "+
-            FastaDatabaseSuffixCreator.getMainSuffixTableName()+" AS s "+
-            " WHERE s.suffix IN ("+commaSep+") AND s.id = db.suffixID "+
-            " GROUP BY db.dbProteinID HAVING cnt = "+suffixList.size();
-            
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-            while(rs.next()) {
-                dbProteinIds.add((rs.getInt("dbProteinID")));
-            }
-//            if(dbProteinIds.size() == 0) {
-//               System.out.println(sql);
-//            }
+        
+        Set<Integer> dbProteinIds = new HashSet<Integer>();
+        for(List<String> suffixList: suffixLists) {
+        	
+        	String commaSep = StringUtils.makeQuotedCommaSeparated(suffixList);
+        	try {
+        		conn = ConnectionFactory.getNrseqConnection();
+        		String sql = "SELECT db.dbProteinID, count(*) AS cnt FROM "+
+        		FastaDatabaseSuffixCreator.getDbSuffixTableName(databaseId)+ " AS db, "+
+        		FastaDatabaseSuffixCreator.getMainSuffixTableName()+" AS s "+
+        		" WHERE s.suffix IN ("+commaSep+") AND s.id = db.suffixID "+
+        		" GROUP BY db.dbProteinID HAVING cnt = "+suffixList.size();
+
+        		stmt = conn.createStatement();
+        		rs = stmt.executeQuery(sql);
+        		while(rs.next()) {
+        			dbProteinIds.add((rs.getInt("dbProteinID")));
+        		}
+        		//            if(dbProteinIds.size() == 0) {
+        		//               System.out.println(sql);
+        		//            }
+        	}
+        	catch (SQLException e) {
+        		throw new RuntimeException("Exception getting matching proteinIds for suffix: "+peptide+" and database: "+this.databaseId, e);
+        	}
+        	finally {
+
+        		if(conn != null)    try {conn.close();} catch(SQLException e){}
+        		if(stmt != null)    try {stmt.close();} catch(SQLException e){}
+        		if(rs != null)    try {rs.close();} catch(SQLException e){}
+        	}
         }
-        catch (SQLException e) {
-            throw new RuntimeException("Exception getting matching proteinIds for suffix: "+peptide+" and database: "+this.databaseId, e);
-        }
-        finally {
-            
-            if(conn != null)    try {conn.close();} catch(SQLException e){}
-            if(stmt != null)    try {stmt.close();} catch(SQLException e){}
-            if(rs != null)    try {rs.close();} catch(SQLException e){}
-        }
-        return dbProteinIds;
+        return new ArrayList<Integer>(dbProteinIds);
     }
     
     private List<Integer> getDbProteinIdsMultiQuery(String peptide) {
@@ -277,67 +281,80 @@ public class PeptideProteinMatchingService {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         
-        List<String> suffixList = getSuffixList(peptide);
-        Map<Integer, Integer> proteinIdCount = new HashMap<Integer, Integer>();
+        Set<Integer> dbProteinIds = new HashSet<Integer>();
         
-        try {
-            conn = ConnectionFactory.getNrseqConnection();
-            String sql = "SELECT dbProteinID FROM "+
-            FastaDatabaseSuffixCreator.getDbSuffixTableName(databaseId)+
-//            FastaDatabaseSuffixCreator.getMainSuffixTableName()+" AS s "+
-            " WHERE suffixID=?";
-            
-            stmt = conn.prepareStatement(sql);
-            
-            for(String suffix: suffixList) {
-                Integer suffixId = suffixIdMap.get(suffix);
-                if(suffixId == null) {
-                    log.error("No suffixID found for suffix: "+suffix);
-                    continue;
-                }
-                stmt.setInt(1, suffixIdMap.get(suffix));
-                rs = stmt.executeQuery();
-                while(rs.next()) {
-                    int dbProteinId = rs.getInt("dbProteinID");
-                    Integer count = proteinIdCount.get(dbProteinId);
-                    if(count == null) {
-                        count = 0;
-                    }
-                    proteinIdCount.put(dbProteinId, ++count);
-                }
-            }
-        }
-        catch (SQLException e) {
-            throw new RuntimeException("Exception getting matching proteinIds for suffix: "+peptide+" and database: "+this.databaseId, e);
-        }
-        finally {
-            
-            if(conn != null)    try {conn.close();} catch(SQLException e){}
-            if(stmt != null)    try {stmt.close();} catch(SQLException e){}
-            if(rs != null)    try {rs.close();} catch(SQLException e){}
+        List<List<String>> suffixLists = getSuffixLists(peptide);
+        
+        for(List<String> suffixList: suffixLists) {
+        	Map<Integer, Integer> proteinIdCount = new HashMap<Integer, Integer>();
+
+        	try {
+        		conn = ConnectionFactory.getNrseqConnection();
+        		String sql = "SELECT dbProteinID FROM "+
+        		FastaDatabaseSuffixCreator.getDbSuffixTableName(databaseId)+
+        		//            FastaDatabaseSuffixCreator.getMainSuffixTableName()+" AS s "+
+        		" WHERE suffixID=?";
+
+        		stmt = conn.prepareStatement(sql);
+
+        		for(String suffix: suffixList) {
+        			Integer suffixId = suffixIdMap.get(suffix);
+        			if(suffixId == null) {
+        				log.error("No suffixID found for suffix: "+suffix);
+        				continue;
+        			}
+        			stmt.setInt(1, suffixIdMap.get(suffix));
+        			rs = stmt.executeQuery();
+        			while(rs.next()) {
+        				int dbProteinId = rs.getInt("dbProteinID");
+        				Integer count = proteinIdCount.get(dbProteinId);
+        				if(count == null) {
+        					count = 0;
+        				}
+        				proteinIdCount.put(dbProteinId, ++count);
+        			}
+        		}
+        	}
+        	catch (SQLException e) {
+        		throw new RuntimeException("Exception getting matching proteinIds for suffix: "+peptide+" and database: "+this.databaseId, e);
+        	}
+        	finally {
+
+        		if(conn != null)    try {conn.close();} catch(SQLException e){}
+        		if(stmt != null)    try {stmt.close();} catch(SQLException e){}
+        		if(rs != null)    try {rs.close();} catch(SQLException e){}
+        	}
+        	
+        	 
+             int reqCnt = suffixList.size();
+             for(int dbProteinId: proteinIdCount.keySet()) {
+                 if(proteinIdCount.get(dbProteinId) == reqCnt) {
+                     dbProteinIds.add(dbProteinId);
+                 }
+             }
         }
         
-        List<Integer> dbProteinIds = new ArrayList<Integer>();
-        int reqCnt = suffixList.size();
-        for(int dbProteinId: proteinIdCount.keySet()) {
-            if(proteinIdCount.get(dbProteinId) == reqCnt) {
-                dbProteinIds.add(dbProteinId);
-            }
-        }
-        return dbProteinIds;
+        return new ArrayList<Integer>(dbProteinIds);
     }
     
-    private List<String> getSuffixList(String peptide) {
+    private List<List<String>> getSuffixLists(String peptideSeq) {
         
-        Set<String> suffixList = new HashSet<String>();
-        for(int i = 0; i < peptide.length(); i++) {
-            int end = Math.min(i+FastaDatabaseSuffixCreator.SUFFIX_LENGTH, peptide.length());
-            suffixList.add(peptide.substring(i, end));
-            
-            if(i+FastaDatabaseSuffixCreator.SUFFIX_LENGTH >= peptide.length())
-                break;
-        }
-        return new ArrayList<String>(suffixList);
+    	List<String> allPeptides = getAlternateSequences(peptideSeq);
+    	
+    	List<List<String>> suffixSets = new ArrayList<List<String>>();
+    	
+    	for(String peptide: allPeptides) {
+    		Set<String> suffixList = new HashSet<String>();
+    		for(int i = 0; i < peptide.length(); i++) {
+    			int end = Math.min(i+FastaDatabaseSuffixCreator.SUFFIX_LENGTH, peptide.length());
+    			suffixList.add(peptide.substring(i, end));
+
+    			if(i+FastaDatabaseSuffixCreator.SUFFIX_LENGTH >= peptide.length())
+    				break;
+    		}
+    		suffixSets.add(new ArrayList<String>(suffixList));
+    	}
+        return suffixSets;
     }
     
     private List<Integer> getMatchingDbProteinIdsForPeptideFromMemory(String peptide) {
@@ -360,7 +377,7 @@ public class PeptideProteinMatchingService {
             return matchList;
         }
         
-        // suffixes we store are 5 aa long. 
+        // suffixes we store are 4 aa long. 
         Map<Integer, Integer> matches = new HashMap<Integer, Integer>();
         
         int numSuffixesInSeq = 0;
@@ -390,7 +407,7 @@ public class PeptideProteinMatchingService {
                 break;
         }
         
-        // keep only those matches that had all the 5-mers in our peptide.
+        // keep only those matches that had all the 4-mers in our peptide.
         List<Integer> allMatches = new ArrayList<Integer>();
         for(int proteinId: matches.keySet()) {
             int cnt = matches.get(proteinId);
@@ -400,5 +417,70 @@ public class PeptideProteinMatchingService {
         if(allMatches.size() > 10)
             System.out.println("!!!# matches found: "+allMatches.size());
         return allMatches;
+    }
+    
+    private static List<String> getAlternateSequences(String peptide) {
+    	
+    	List<String> list = new ArrayList<String>();
+    	if(peptide.contains("I") || peptide.contains("L")) {
+    		
+    		for(int i = 0; i < peptide.length(); i++) {
+    			char c = peptide.charAt(i);
+
+    			if(list.size() == 0) {
+					list.add(new String());
+				}
+    			
+    			List<String> altList = new ArrayList<String>();
+    			if(c == 'I') {
+    				for(String seq: list)
+    					altList.add(seq+"L");
+    			}
+    			else if (c == 'L') {
+    				for(String seq: list)
+    					altList.add(seq+"I");
+    			}
+    			
+    			for(int j = 0; j < list.size(); j++) {
+					String seq = list.get(j);
+					seq += c;
+					list.set(j, seq);
+				}
+    			
+    			list.addAll(altList);
+    			
+    		}
+    	}
+    	else {
+    		list.add(peptide);
+    	}
+    	return list;
+    }
+    
+    public static void main(String[] args) {
+    	
+    	String sequence = "ABCDIFG";
+    	List<String> alternames = getAlternateSequences(sequence);
+    	System.out.println(alternames);
+    	
+    	sequence = "ABCDLFG";
+    	alternames = getAlternateSequences(sequence);
+    	System.out.println(alternames);
+    	
+    	sequence = "ABCD";
+    	alternames = getAlternateSequences(sequence);
+    	System.out.println(alternames);
+    	
+    	sequence = "IABCL";
+    	alternames = getAlternateSequences(sequence);
+    	System.out.println(alternames);
+    	
+    	sequence = "ABCIFGHLPQRLS";
+    	alternames = getAlternateSequences(sequence);
+    	System.out.println(alternames);
+    	
+    	sequence = "ILL";
+    	alternames = getAlternateSequences(sequence);
+    	System.out.println(alternames);
     }
 }
