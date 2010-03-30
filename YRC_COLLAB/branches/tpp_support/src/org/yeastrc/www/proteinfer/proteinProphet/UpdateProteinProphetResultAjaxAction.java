@@ -179,6 +179,8 @@ public class UpdateProteinProphetResultAjaxAction extends Action {
         request.setAttribute("parsimProteinCount", summary.getFilteredParsimoniousProteinCount());
         request.setAttribute("filteredProteinGrpCount", summary.getFilteredProteinGroupCount());
         request.setAttribute("parsimProteinGrpCount", summary.getFilteredParsimoniousProteinGroupCount());
+        request.setAttribute("filteredProphetGrpCount", summary.getFilteredProphetGroupCount());
+        request.setAttribute("parsimProphetGrpCount", summary.getFilteredParsimoniousProphetGroupCount());
         
         
         long e = System.currentTimeMillis();

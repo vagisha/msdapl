@@ -272,6 +272,8 @@ public class ViewProjectAction extends Action {
             
             // load protein prophet results, if any
             List<Integer> piRunIds = ProteinInferJobSearcher.instance().getProteinferIdsForMsExperiment(experimentId);
+            Collections.sort(piRunIds);
+            
             // loop over and see if any are ProteinProphet runs
             ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
             ProteinProphetRunDAO pRunDao = ProteinferDAOFactory.instance().getProteinProphetRunDao();
@@ -286,8 +288,9 @@ public class ViewProjectAction extends Action {
                     ExperimentProteinProphetRun eppRun = new ExperimentProteinProphetRun(ppRun);
                     eppRun.setNumParsimoniousProteins(prophetProtDao.getProteinferProteinIds(piRunId, true).size());
                     eppRun.setNumParsimoniousProteinGroups(prophetProtDao.getIndistinguishableGroupCount(piRunId, true));
+                    eppRun.setNumParsimoniousProteinProphetGroups(prophetProtDao.getProteinProphetGroupCount(piRunId, true));
                     eppRun.setUniqPeptideSequenceCount(peptDao.getUniquePeptideSequenceCountForRun(piRunId));
-                    
+                    eppRun.setUniqIonCount(peptDao.getUniqueIonCountForRun(piRunId));
                     prophetRunList.add(eppRun);
                 }
             }

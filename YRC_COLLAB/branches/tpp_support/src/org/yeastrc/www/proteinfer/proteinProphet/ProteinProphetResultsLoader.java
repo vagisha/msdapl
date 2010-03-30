@@ -174,6 +174,62 @@ public class ProteinProphetResultsLoader {
     }
     
     //---------------------------------------------------------------------------------------------------
+    // Get subsuming proteins for a protein
+    //---------------------------------------------------------------------------------------------------
+    public static List<WProteinProphetProtein> getSubsumingProteins(int piProteinId, int pinferId) {
+        
+        long s = System.currentTimeMillis();
+        
+        
+        List<Integer> ids = ppProtDao.getSubsumingProteinIds(piProteinId);
+        if(ids.size() == 0)
+        	return new ArrayList<WProteinProphetProtein>(0);
+        
+        List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
+        
+        List<WProteinProphetProtein> proteins = new ArrayList<WProteinProphetProtein>(ids.size());
+        for(int id: ids) {
+        	ProteinProphetProtein protein = ppProtDao.loadProtein(id);
+        	protein.setPeptideDefinition(new PeptideDefinition());
+            proteins.add(getWProteinProphetProtein(protein, fastaDatabaseIds));
+        }
+        
+        
+        long e = System.currentTimeMillis();
+        log.info("Time to get SUBSUMING proteins for piProtenID: "+piProteinId+" was "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        
+        return proteins;
+    }
+    
+    //---------------------------------------------------------------------------------------------------
+    // Get subsumed proteins for a protein
+    //---------------------------------------------------------------------------------------------------
+    public static List<WProteinProphetProtein> getSubsumedProteins(int piProteinId, int pinferId) {
+        
+        long s = System.currentTimeMillis();
+        
+        
+        List<Integer> ids = ppProtDao.getSubsumedProteinIds(piProteinId);
+        if(ids.size() == 0)
+        	return new ArrayList<WProteinProphetProtein>(0);
+        
+        List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
+        
+        List<WProteinProphetProtein> proteins = new ArrayList<WProteinProphetProtein>(ids.size());
+        for(int id: ids) {
+        	ProteinProphetProtein protein = ppProtDao.loadProtein(id);
+        	protein.setPeptideDefinition(new PeptideDefinition());
+            proteins.add(getWProteinProphetProtein(protein, fastaDatabaseIds));
+        }
+        
+        
+        long e = System.currentTimeMillis();
+        log.info("Time to get SUBSUMED proteins for piProtenID: "+piProteinId+" was "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        
+        return proteins;
+    }
+    
+    //---------------------------------------------------------------------------------------------------
     // Get a list of protein groups
     //---------------------------------------------------------------------------------------------------
     public static List<Integer> getPageSublist(List<Integer> allProteinIds, int[] pageIndices, 
@@ -394,18 +450,26 @@ public class ProteinProphetResultsLoader {
         
         WProteinProphetResultSummary summary = new WProteinProphetResultSummary();
         summary.setFilteredProteinCount(proteinIds.size());
+        
         // parsimonious protein IDs
         List<Integer> parsimProteinIds = ppProtDao.getProteinferProteinIds(pinferId, true);
         Map<Integer, Integer> protGroupMap = ppProtDao.getProteinGroupIds(pinferId, false);
+        Map<Integer, Integer> protProphetGroupMap = ppProtDao.getProteinProphetGroupIds(pinferId, false);
         
         
         Set<Integer> groupIds = new HashSet<Integer>((int) (proteinIds.size() * 1.5));
+        Set<Integer> prophetGroupIds = new HashSet<Integer>((int) (proteinIds.size() * 1.5));
+        
         for(int id: proteinIds) {
             groupIds.add(protGroupMap.get(id));
+            prophetGroupIds.add(protProphetGroupMap.get(id));
         }
         summary.setFilteredProteinGroupCount(groupIds.size());
+        summary.setFilteredProphetGroupCount(prophetGroupIds.size());
         
         groupIds.clear();
+        prophetGroupIds.clear();
+        
         int parsimCount = 0;
         Set<Integer> myIds = new HashSet<Integer>((int) (proteinIds.size() * 1.5));
         myIds.addAll(proteinIds);
@@ -413,10 +477,12 @@ public class ProteinProphetResultsLoader {
             if(myIds.contains(id))  {
                 parsimCount++;
                 groupIds.add(protGroupMap.get(id));
+                prophetGroupIds.add(protProphetGroupMap.get(id));
             }
         }
         summary.setFilteredParsimoniousProteinCount(parsimCount);
         summary.setFilteredParsimoniousProteinGroupCount(groupIds.size());
+        summary.setFilteredParsimoniousProphetGroupCount(prophetGroupIds.size());
         
         long e = System.currentTimeMillis();
         log.info("Time to get WProteinProphetResultSummary: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");

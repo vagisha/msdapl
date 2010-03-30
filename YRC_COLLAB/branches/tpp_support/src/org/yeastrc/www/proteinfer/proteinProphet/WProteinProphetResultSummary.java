@@ -14,6 +14,9 @@ public class WProteinProphetResultSummary {
     private int filteredProteinCount;
     private int filteredParsimoniousProteinCount;
     
+    private int filteredProphetGroupCount;
+	private int filteredParsimoniousProphetGroupCount;
+    
     private int filteredProteinGroupCount;
     private int filteredParsimoniousProteinGroupCount;
     
@@ -43,4 +46,17 @@ public class WProteinProphetResultSummary {
             int filteredParsimoniousProteinGroupCount) {
         this.filteredParsimoniousProteinGroupCount = filteredParsimoniousProteinGroupCount;
     }
+    public int getFilteredProphetGroupCount() {
+		return filteredProphetGroupCount;
+	}
+	public void setFilteredProphetGroupCount(int filteredProphetGroupCount) {
+		this.filteredProphetGroupCount = filteredProphetGroupCount;
+	}
+	public int getFilteredParsimoniousProphetGroupCount() {
+		return filteredParsimoniousProphetGroupCount;
+	}
+	public void setFilteredParsimoniousProphetGroupCount(
+			int filteredParsimoniousProphetGroupCount) {
+		this.filteredParsimoniousProphetGroupCount = filteredParsimoniousProphetGroupCount;
+	}
 }

@@ -144,6 +144,8 @@ public class ProteinProphetViewAction extends Action {
         request.setAttribute("parsimProteinCount", summary.getFilteredParsimoniousProteinCount());
         request.setAttribute("filteredProteinGrpCount", summary.getFilteredProteinGroupCount());
         request.setAttribute("parsimProteinGrpCount", summary.getFilteredParsimoniousProteinGroupCount());
+        request.setAttribute("filteredProphetGrpCount", summary.getFilteredProphetGroupCount());
+        request.setAttribute("parsimProphetGrpCount", summary.getFilteredParsimoniousProphetGroupCount());
         
         
         request.setAttribute("sortBy", filterCriteria.getSortBy());

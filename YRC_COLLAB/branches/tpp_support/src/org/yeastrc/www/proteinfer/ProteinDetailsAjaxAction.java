@@ -185,6 +185,18 @@ public class ProteinDetailsAjaxAction extends Action {
                 }
             }
             request.setAttribute("groupProteins", groupProteins);
+            
+            // is this protein subsumed
+            if(pProt.getProtein().getSubsumed()) {
+            	List<WProteinProphetProtein> subsumingProteins = ProteinProphetResultsLoader.getSubsumingProteins(pProt.getProtein().getId(), pinferId);
+            	request.setAttribute("subsumingProteins", subsumingProteins);
+            }
+            
+            // Any proteins this protein is subsuming
+            List<WProteinProphetProtein> subsumedProteins = ProteinProphetResultsLoader.getSubsumedProteins(pProt.getProtein().getId(), pinferId);
+            if(subsumedProteins.size() > 0) {
+            	request.setAttribute("subsumedProteins", subsumedProteins);
+            }
 
             // We will return the best filtered search hit for each peptide ion (along with terminal residues in the protein).
             List<WProteinProphetIon> ionsWAllSpectra = ProteinProphetResultsLoader.getPeptideIonsForProtein(pinferId, pinferProtId);
@@ -209,6 +221,14 @@ public class ProteinDetailsAjaxAction extends Action {
         long e = System.currentTimeMillis();
         log.info("Total time (ProteinDetailsAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));
         
-        return mapping.findForward("Success");
+        if(ProteinInferenceProgram.isIdPicker(run.getProgram()))
+        	return mapping.findForward("SuccessIdPicker");
+        else if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET)
+        	return mapping.findForward("SuccessProphet");
+        else {
+        	response.setContentType("text/html");
+            response.getWriter().write("<b>Unrecognized Protein Inference program: "+run.getProgramString()+"</b>");
+            return null;
+        }
     }
 }

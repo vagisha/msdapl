@@ -130,12 +130,12 @@
 		<tbody>
 		<logic:iterate name="experiment" property="analyses" id="analysis">
 			<tr>
-			<td width="5%"><bean:write name="analysis" property="id"/></td>
-			<td width="30%"><bean:write name="analysis" property="analysisProgramVersionShort"/></td>
-			<td width="30%" valign="top">
+			<td><bean:write name="analysis" property="id"/></td>
+			<td><bean:write name="analysis" property="analysisProgramVersionShort"/></td>
+			<td valign="top">
 				<b><bean:write name="analysis" property="analysisName" /></b>
 			</td>
-			<td width="30%" valign="top">
+			<td valign="top">
 				<b>
 					<html:link action="viewPeptideProphetResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link>
 				</b>
@@ -176,8 +176,11 @@
 			<th valign="top">ID</th>
 			<th valign="top">Version</th>
 			<th valign="top">File</th>
-			<th valign="top" align="center">#Groups<br>(#Proteins)</th>
-			<th valign="top" align="center">#Peptides</th>
+			<th valign="top" align="center">#Prophet<br>Groups</th>
+			<th valign="top" align="center">#Indist.<br>Groups</th>
+			<th valign="top" align="center">#Proteins</th>
+			<th valign="top" align="center">#Pept.<br/>Seq.</th>
+			<th valign="top" align="center">#Ions</th>
 			<th valign="top">Comments</th>
 			<th valign="top"></th>
 			<th valign="top">Compare</th></tr>
@@ -188,8 +191,11 @@
 			<td valign="top"><b><bean:write name="prpRun" property="proteinProphetRun.id"/></b></td>
 			<td valign="top"><bean:write name="prpRun" property="programVersionShort"/></td>
 			<td valign="top"><b><NOBR><bean:write name="prpRun" property="proteinProphetRun.filename"/></NOBR></b></td>
-			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><nobr><bean:write name="prpRun" property="numParsimoniousProteinGroups"/>(<bean:write name="prpRun" property="numParsimoniousProteins"/>)</nobr></td>
+			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="numParsimoniousProteinProphetGroups"/></td>
+			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="numParsimoniousProteinGroups"/></td>
+			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="numParsimoniousProteins"/></td>
 			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="uniqPeptideSequenceCount"/></td>
+			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="uniqIonCount"/></td>
 			<td valign="top">
 				<span id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_text"><bean:write name="prpRun" property="proteinProphetRun.comments"/></span>
 				<logic:equal name="writeAccess" value="true">
@@ -205,7 +211,7 @@
 			</td>
 			</tr>
 			<tr>
-				<td colspan="5" valign="top">
+				<td colspan="11" valign="top">
 				<div id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_edit" align="center"
 			     style="display:none;">
 			     <textarea rows="5" cols="60" class="edit_text"></textarea>
@@ -216,7 +222,13 @@
 				</td>
 			</tr>
 		</logic:iterate>
-		
+		<tr><td colspan="11" style="font-size:8pt;" >
+			<ul>
+			<li>Subsumed proteins are excluded in calculating group and protein counts</li>
+			<li>#Indist. Groups = number of indistinguishable protein groups</li>
+			<li>#Ions = number of unique combinations of sequence + modifications + charge</li>
+			</ul>
+		</td></tr>
 		</tbody>
 		</table>
 	</div>

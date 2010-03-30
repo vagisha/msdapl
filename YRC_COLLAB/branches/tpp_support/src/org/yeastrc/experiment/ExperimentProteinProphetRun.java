@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
-import org.yeastrc.ms.domain.search.Program;
 
 /**
  * 
@@ -20,10 +19,28 @@ public class ExperimentProteinProphetRun {
 
     private final ProteinProphetRun run;
     private int uniqPeptideSequenceCount;
+    private int uniqIonCount;
     private int numParsimoniousProteins;
     private int numParsimoniousProteinGroups;
+    private int numParsimoniousProteinProphetGroups;
     
-    private static final Pattern tppVersionPattern = Pattern.compile("(TPP\\s+v\\d+\\.\\d+)");
+    public int getUniqIonCount() {
+		return uniqIonCount;
+	}
+
+	public void setUniqIonCount(int uniqueIonCount) {
+		this.uniqIonCount = uniqueIonCount;
+	}
+
+	public int getNumParsimoniousProteinProphetGroups() {
+		return numParsimoniousProteinProphetGroups;
+	}
+
+	public void setNumParsimoniousProteinProphetGroups(int numProteinProphetGroups) {
+		this.numParsimoniousProteinProphetGroups = numProteinProphetGroups;
+	}
+
+	private static final Pattern tppVersionPattern = Pattern.compile("(TPP\\s+v\\d+\\.\\d+)");
     
     public ExperimentProteinProphetRun(ProteinProphetRun run) {
         this.run = run;

@@ -161,7 +161,7 @@
   		<tr>
   			<td valign="top">Fasta ID(s): </td>
   			<td valign="top"><html:text name="proteinProphetFilterForm" property="accessionLike" size="40"></html:text><br>
-  				<span style="font-size:8pt;">Enter a comma-separated list of complete or partial identifiers</span>
+  				<span style="font-size:8pt;">Enter a comma-separated list of FASTA accessions</span>
   			</td>
   			<td valign="top">Peptide: </td>
   			<td valign="top">

@@ -1023,7 +1023,8 @@
 		path="/proteinDetails"
 		type="org.yeastrc.www.proteinfer.ProteinDetailsAjaxAction"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/proteinDetails.jsp" redirect="false" />
+		<forward name="SuccessIdPicker" path="/pages/internal/proteinfer/proteinDetails.jsp" redirect="false" />
+		<forward name="SuccessProphet" path="/pages/internal/proteinfer/proteinProphet/proteinDetails.jsp" redirect="false" />
 	</action>
 	
 	<action

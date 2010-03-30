@@ -36,7 +36,7 @@ function makeCommentEditable() {
 		setupSavePiRunComments(this);
 	});
 	$(".cancelPiRunComments").each(function() {
-		setupSavePiRunComments(this);
+		setupCancelPiRunComments(this);
 	});
 }
 function setupEditableComment(editable) {
