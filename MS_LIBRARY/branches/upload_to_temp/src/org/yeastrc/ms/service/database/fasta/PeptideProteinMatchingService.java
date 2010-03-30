@@ -114,6 +114,7 @@ public class PeptideProteinMatchingService {
         
         // find the best protein peptide match based on the given enzyme and num enzymatic termini criteria
         List<PeptideProteinMatch> matchingProteins = new ArrayList<PeptideProteinMatch>(dbProtIds.size());
+        log.debug("Number of matching proteins for peptide : "+peptide+" before applying enzyme rules: "+matchingProteins.size());
         for(int dbProtId: dbProtIds) {
             NrDbProtein dbProt = NrSeqLookupUtil.getDbProtein(dbProtId);
             PeptideProteinMatch match = getPeptideProteinMatch(dbProt, peptide, enzymeRules, numEnzymaticTermini);
@@ -357,66 +358,70 @@ public class PeptideProteinMatchingService {
         return suffixSets;
     }
     
-    private List<Integer> getMatchingDbProteinIdsForPeptideFromMemory(String peptide) {
+    private List<Integer> getMatchingDbProteinIdsForPeptideFromMemory(String peptideSeq) {
         
         int SUFFIX_LENGTH = FastaDatabaseSuffixCreator.SUFFIX_LENGTH;
         
-        if(peptide.length() < SUFFIX_LENGTH) {
-            log.info("LOOKING FOR MATCH FOR SMALL PEPTIDE: "+peptide);
+        if(peptideSeq.length() < SUFFIX_LENGTH) {
+            log.info("LOOKING FOR MATCH FOR SMALL PEPTIDE: "+peptideSeq);
             Set<Integer> allMatches = new HashSet<Integer>();
             for(String suffix: suffixMap.keySet()) {
-                if(suffix.startsWith(peptide)) {
+                if(suffix.startsWith(peptideSeq)) {
                     allMatches.addAll(suffixMap.get(suffix));
                 }
             }
             
             if(allMatches.size() > 10)
-                System.out.println("!!!# matches found: "+allMatches.size());
+                log.debug("!!!# matches found: "+allMatches.size());
             List<Integer> matchList = new ArrayList<Integer>(allMatches.size());
             matchList.addAll(allMatches);
             return matchList;
         }
         
-        // suffixes we store are 4 aa long. 
-        Map<Integer, Integer> matches = new HashMap<Integer, Integer>();
+        Set<Integer> allMatches = new HashSet<Integer>();
         
-        int numSuffixesInSeq = 0;
-        for(int i = 0; i < peptide.length(); i++) {
-            int end = Math.min(i+SUFFIX_LENGTH, peptide.length());
-            String subseq = peptide.substring(i, end);
-            
-            numSuffixesInSeq++;
-//            System.out.println("Looking for match for: "+subseq);
-//            System.out.println("suffix map size: "+suffixMap.size());
-            List<Integer> matchingProteins = suffixMap.get(subseq);
-            if(i == 0) {
-                for(int proteinId: matchingProteins)
-                    matches.put(proteinId, 1);
-            }
-            else {
-                
-                for(int proteinId: matchingProteins) {
+        List<List<String>> suffixLists = getSuffixLists(peptideSeq);
+        for(List<String> suffixList: suffixLists) {
+        	
+        	int numSuffixesInSeq = suffixList.size();
+        	
+        	Map<Integer, Integer> matches = new HashMap<Integer, Integer>();
+        	
+        	int idx = 0;
+        	for(String suffix: suffixList) {
+        		List<Integer> matchingProteins = suffixMap.get(suffix);
+        		
+        		if(matchingProteins == null || matchingProteins.isEmpty()) {
+        			// This can happen since we are looking for I<->L substitutions also
+        			log.debug("No protein matches found for suffix: "+suffix+" for peptide: "+peptideSeq);
+        			continue;	
+        		}
+        		if(idx == 0) {
+                    for(int proteinId: matchingProteins)
+                        matches.put(proteinId, 1);
+                }
+        		
+        		for(int proteinId: matchingProteins) {
                     Integer num = matches.get(proteinId);
                     if(num != null) {
                         matches.put(proteinId, ++num);
                     }
                 }
+        		idx++;
+        	}
+        	
+        	// keep only those matches that had all the suffixes in our peptide.
+            for(int proteinId: matches.keySet()) {
+                int cnt = matches.get(proteinId);
+                if(cnt >= numSuffixesInSeq)
+                    allMatches.add(proteinId);
             }
-            
-            if(i+SUFFIX_LENGTH >= peptide.length())
-                break;
         }
         
-        // keep only those matches that had all the 4-mers in our peptide.
-        List<Integer> allMatches = new ArrayList<Integer>();
-        for(int proteinId: matches.keySet()) {
-            int cnt = matches.get(proteinId);
-            if(cnt == numSuffixesInSeq)
-                allMatches.add(proteinId);
-        }
         if(allMatches.size() > 10)
-            System.out.println("!!!# matches found: "+allMatches.size());
-        return allMatches;
+            log.debug("!!!# matches found: "+allMatches.size()+" for peptide: "+peptideSeq);
+        
+        return new ArrayList<Integer>(allMatches);
     }
     
     private static List<String> getAlternateSequences(String peptide) {

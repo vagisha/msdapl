@@ -27,6 +27,8 @@ public class FastaInMemorySuffixCreator {
     
     public Map<String, List<Integer>> buildInMemorySuffixes(int databaseId) {
         
+    	log.info("Building suffix map in memory");
+    	
         suffixMap = new HashMap<String, List<Integer>>(3200000);
         
         // get all the ids from tblProteinDatabase for the given databaseID
@@ -51,7 +53,7 @@ public class FastaInMemorySuffixCreator {
             
             cnt++;
             if(cnt % 1000 == 0) {
-                System.out.println("Looking at sequence: "+ cnt);
+                log.info("# sequences seen: "+ cnt);
             }
             createSuffixes(sequence, protein.getSequenceId(), dbProteinId);
             

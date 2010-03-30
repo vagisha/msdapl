@@ -388,6 +388,8 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
     private void uploadRunSearch(String filename, int searchId, int runId, PepXmlGenericFileReader<T,G,R,S> parser) 
         throws UploadException {
 
+    	log.info("Loading search results for file: "+filename);
+    	
         int runSearchId = uploadRunSearchHeader(searchId, runId, parser);
 
         // If the refresh parser has not been run we will initialize the PeptideProteinMatchingService
