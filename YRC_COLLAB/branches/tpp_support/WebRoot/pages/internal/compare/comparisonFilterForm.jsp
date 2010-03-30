@@ -222,7 +222,7 @@
  		<td style="padding-left:5px;" valign="top"> Exclude:</td>
  		<td> 
 			<html:text name="proteinSetComparisonForm" property="descriptionNotLike" size="40"></html:text>
-			<span style="font-size:8pt;">Search All:<html:checkbox property="proteinSetComparisonForm" property="searchAllDescriptions"></html:checkbox></span>
+			<span style="font-size:8pt;"><nobr>Search All:<html:checkbox property="proteinSetComparisonForm" property="searchAllDescriptions"></html:checkbox></nobr></span>
  		</td>
  	</tr>
  	<tr>

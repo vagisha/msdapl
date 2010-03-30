@@ -18,7 +18,7 @@ import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 /**
  * 
  */
-public final class ProteinProperties {
+public class ProteinProperties {
 
     private int pinferProteinId;
     private int nrseqId;

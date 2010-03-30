@@ -38,6 +38,7 @@ public class UpdateProteinProphetResultAjaxAction extends Action {
             HttpServletResponse response )
     throws Exception {
         
+        log.info("Got request to update protein inference view");
         
         // form for filtering and display options
         ProteinProphetFilterForm filterForm = (ProteinProphetFilterForm)form;

@@ -17,16 +17,16 @@ import org.yeastrc.ms.domain.protinfer.GenericProteinferProtein;
 public class ProteinPropertiesStore {
 
     // This maps protein inference run IDs to a map of its protein IDs (protein inference IDs) and protein properties
-    private LinkedHashMap<Integer, Map<Integer, ProteinProperties>> store;
+    private LinkedHashMap<Integer, Map<Integer, ? extends ProteinProperties>> store;
     private final int size = 3;
     
     private static ProteinPropertiesStore instance = null;
     
     private ProteinPropertiesStore() {
         int capacity = (int)Math.ceil(size/0.75f) + 1;
-        store = new LinkedHashMap<Integer, Map<Integer,ProteinProperties>>(capacity, 0.75f, true) {
+        store = new LinkedHashMap<Integer, Map<Integer,? extends ProteinProperties>>(capacity, 0.75f, true) {
             @Override
-            protected boolean removeEldestEntry (Map.Entry<Integer, Map<Integer, ProteinProperties>> eldest) {
+            protected boolean removeEldestEntry (Map.Entry<Integer, Map<Integer, ? extends ProteinProperties>> eldest) {
                 // This method is invoked by put and putAll after inserting a new entry into the map.
                 return store.size() > size;  
             }
@@ -39,27 +39,32 @@ public class ProteinPropertiesStore {
         return instance;
     }
     
-    public synchronized Map<Integer, ProteinProperties> getPropertiesMapForAccession(int pinferId) {
+    public Map<Integer, ? extends ProteinProperties> getPropertiesMapForAccession(int pinferId) {
         return getPropertiesMapForAccession(pinferId, true);
     }
     
-    public synchronized Map<Integer, ProteinProperties> getPropertiesMapForPi(int pinferId) {
+    public Map<Integer, ? extends ProteinProperties> getPropertiesMapForPi(int pinferId) {
         return getPropertiesMapForPi(pinferId, true);
     }
     
-    public synchronized Map<Integer, ProteinProperties> getPropertiesMapForMolecularWt(int pinferId) {
+    public Map<Integer, ? extends ProteinProperties> getPropertiesMapForMolecularWt(int pinferId) {
         return getPropertiesMapForMolWt(pinferId, true);
     }
     
-    synchronized Map<Integer, ProteinProperties> getPropertiesMapForAccession(int pinferId, boolean createNew) {
+    Map<Integer, ? extends ProteinProperties> getPropertiesMapForAccession(int pinferId, boolean createNew) {
     	
-        Map<Integer, ProteinProperties> map = store.get(pinferId);
+    	 Map<Integer, ? extends ProteinProperties> map = null;
+         synchronized (store) {
+         	map = store.get(pinferId);
+         }
         if(map == null) {
             if(createNew) {
             	ProteinPropertiesMapBuilder builder = new ProteinPropertiesMapBuilder();
             	builder.setGetAccession(true);
                 map = builder.buildMap(pinferId);
-                store.put(pinferId, map);
+                synchronized(store) {
+                	store.put(pinferId, map);
+                }
             }
         }
         else {
@@ -83,15 +88,20 @@ public class ProteinPropertiesStore {
         return map;
     }
 
-    private Map<Integer, ProteinProperties> getPropertiesMapForPi(int pinferId, boolean createNew) {
+    private Map<Integer, ? extends ProteinProperties> getPropertiesMapForPi(int pinferId, boolean createNew) {
     	
-        Map<Integer, ProteinProperties> map = store.get(pinferId);
+        Map<Integer, ? extends ProteinProperties> map = null;
+        synchronized (store) {
+        	map = store.get(pinferId);
+        }
         if(map == null) {
             if(createNew) {
             	ProteinPropertiesMapBuilder builder = new ProteinPropertiesMapBuilder();
             	builder.setGetPi(true);
                 map = builder.buildMap(pinferId);
-                store.put(pinferId, map);
+                synchronized(store) {
+                	store.put(pinferId, map);
+                }
             }
         }
         else {
@@ -116,15 +126,20 @@ public class ProteinPropertiesStore {
         return map;
     }
     
-    private Map<Integer, ProteinProperties> getPropertiesMapForMolWt(int pinferId, boolean createNew) {
+    private Map<Integer, ? extends ProteinProperties> getPropertiesMapForMolWt(int pinferId, boolean createNew) {
     	
-    	Map<Integer, ProteinProperties> map = store.get(pinferId);
+    	Map<Integer, ? extends ProteinProperties> map = null;
+    	synchronized(store) {
+    		map = store.get(pinferId);
+    	}
     	if(map == null) {
     		if(createNew) {
     			ProteinPropertiesMapBuilder builder = new ProteinPropertiesMapBuilder();
     			builder.setGetMolWt(true);
     			map = builder.buildMap(pinferId);
-    			store.put(pinferId, map);
+    			synchronized(store) {
+    				store.put(pinferId, map);
+    			}
     		}
     	}
     	else {
@@ -149,9 +164,12 @@ public class ProteinPropertiesStore {
     	return map;
     }
     
-    public synchronized ProteinProperties getProteinMolecularWtPi(int pinferId, GenericProteinferProtein<?> protein) {
+    public ProteinProperties getProteinMolecularWtPi(int pinferId, GenericProteinferProtein<?> protein) {
     	
-        Map<Integer, ProteinProperties> map = this.store.get(pinferId);
+    	Map<Integer, ? extends ProteinProperties> map = null;
+    	synchronized(store) {
+    		map = this.store.get(pinferId);
+    	}
         
         ProteinPropertiesBuilder builder = new ProteinPropertiesBuilder();
         builder.setGetMolWt(true);

@@ -12,7 +12,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
+import org.yeastrc.www.proteinfer.ProteinGroupProperties.ProteinGroupPropertiesComparator;
 
 /**
  * 
@@ -28,12 +30,12 @@ public class ProteinPropertiesSorter {
     		SORT_ORDER sortOrder) {
         
     	// A new map will be created if one does not exist.
-        Map<Integer, ProteinProperties> proteinPropertiesMap = ProteinPropertiesStore.getInstance().getPropertiesMapForMolecularWt(pinferId);
+        Map<Integer, ? extends ProteinProperties> proteinPropertiesMap = ProteinPropertiesStore.getInstance().getPropertiesMapForMolecularWt(pinferId);
         return sortIdsByMolecularWt(proteinIds, groupProteins, proteinPropertiesMap, sortOrder);
     }
 
     private  static List<Integer> sortIdsByMolecularWt(List<Integer> proteinIds, boolean groupProteins,
-            Map<Integer, ProteinProperties> proteinPropertiesMap, SORT_ORDER sortOrder) {
+            Map<Integer, ? extends ProteinProperties> proteinPropertiesMap, SORT_ORDER sortOrder) {
         
         if(proteinPropertiesMap == null)
             return new ArrayList<Integer>(0);
@@ -66,49 +68,17 @@ public class ProteinPropertiesSorter {
         // for a protein group (based on sortOrder)
         else {
             
-            // sort by protein group id first
-            Collections.sort(propsList, new Comparator<ProteinProperties>() {
-                @Override
-                public int compare(ProteinProperties o1, ProteinProperties o2) {
-                    return Integer.valueOf(o1.getProteinGroupId()).compareTo(o2.getProteinGroupId());
-                }});
+            // group by indistinguishable proteinID
+            List<ProteinGroupProperties> grpPropsList = createIGroups(
+					sortOrder, propsList);
             
-            // create the protein groups
-            List<ProteinGroupProperties> grpPropsList = new ArrayList<ProteinGroupProperties>();
-            ProteinGroupProperties grpProps = null;
-            for(ProteinProperties props: propsList) {
-                if(grpProps == null || grpProps.getProteinGroupId() != props.getProteinGroupId()) {
-                    grpProps = new ProteinGroupProperties(sortOrder);
-                    grpProps.add(props);
-                    grpPropsList.add(grpProps);
-                }
-                else {
-                    grpProps.add(props);
-                }
-            }
-            
-            // sort the protein groups by group's molecular wt. 
-            if(sortOrder == SORT_ORDER.DESC) {
-            	Collections.sort(grpPropsList, new Comparator<ProteinGroupProperties>() {
-            		@Override
-            		public int compare(ProteinGroupProperties o1,
-            				ProteinGroupProperties o2) {
-            			return Double.valueOf(o2.getGroupMolecularWt()).compareTo(o1.getGroupMolecularWt());
-            		}});
-            }
-            else {
-            	Collections.sort(grpPropsList, new Comparator<ProteinGroupProperties>() {
-            		@Override
-            		public int compare(ProteinGroupProperties o1,
-            				ProteinGroupProperties o2) {
-            			return Double.valueOf(o1.getGroupMolecularWt()).compareTo(o2.getGroupMolecularWt());
-            		}});
-            }
+            // sort each group by sorting criteria
+            Collections.sort(grpPropsList, new ProteinGroupPropertiesComparator(SORT_BY.MOL_WT, sortOrder));
             
             // get a list of sorted ids
             List<Integer> sortedIds = new ArrayList<Integer>(propsList.size());
             for(ProteinGroupProperties gp: grpPropsList) {
-                for(ProteinProperties props: gp.getSortedByMolWt()) 
+                for(ProteinProperties props: gp.getProteinProperties()) 
                     sortedIds.add(props.getPinferProteinId());
             }
             
@@ -116,18 +86,42 @@ public class ProteinPropertiesSorter {
         }
         
     }
+
+	private static List<ProteinGroupProperties> createIGroups(
+			SORT_ORDER sortOrder, List<ProteinProperties> propsList) {
+		Collections.sort(propsList, new Comparator<ProteinProperties>() {
+		    @Override
+		    public int compare(ProteinProperties o1, ProteinProperties o2) {
+		        return Integer.valueOf(o1.getProteinGroupId()).compareTo(o2.getProteinGroupId());
+		    }});
+		
+		// create the protein groups
+		List<ProteinGroupProperties> grpPropsList = new ArrayList<ProteinGroupProperties>();
+		ProteinGroupProperties grpProps = null;
+		for(ProteinProperties props: propsList) {
+		    if(grpProps == null || grpProps.getProteinGroupId() != props.getProteinGroupId()) {
+		        grpProps = new ProteinGroupProperties(sortOrder);
+		        grpProps.add(props);
+		        grpPropsList.add(grpProps);
+		    }
+		    else {
+		        grpProps.add(props);
+		    }
+		}
+		return grpPropsList;
+	}
     
     // -------------------------------------------------------------------------------------------
     // SORT BY PI.
     // -------------------------------------------------------------------------------------------
     public static List<Integer> sortIdsByPi(List<Integer> proteinIds, int pinferId, boolean groupProteins, SORT_ORDER sortOrder) {
         
-        Map<Integer, ProteinProperties> proteinPropertiesMap = ProteinPropertiesStore.getInstance().getPropertiesMapForPi(pinferId);
+        Map<Integer, ? extends ProteinProperties> proteinPropertiesMap = ProteinPropertiesStore.getInstance().getPropertiesMapForPi(pinferId);
         return sortIdsByPi(proteinIds, groupProteins, proteinPropertiesMap, sortOrder);
     }
 
     private  static List<Integer> sortIdsByPi(List<Integer> proteinIds, boolean groupProteins,
-            Map<Integer, ProteinProperties> proteinPropertiesMap, SORT_ORDER sortOrder) {
+            Map<Integer, ? extends ProteinProperties> proteinPropertiesMap, SORT_ORDER sortOrder) {
         
         if(proteinPropertiesMap == null)
             return new ArrayList<Integer>(0);
@@ -159,49 +153,17 @@ public class ProteinPropertiesSorter {
         // for a protein group (based on sortOrder)
         else {
             
-            // sort by protein group id first
-            Collections.sort(propsList, new Comparator<ProteinProperties>() {
-                @Override
-                public int compare(ProteinProperties o1, ProteinProperties o2) {
-                    return Integer.valueOf(o1.getProteinGroupId()).compareTo(o2.getProteinGroupId());
-                }});
+        	// group by indistinguishable proteinID
+            List<ProteinGroupProperties> grpPropsList = createIGroups(
+					sortOrder, propsList);
             
-            // create the protein groups
-            List<ProteinGroupProperties> grpPropsList = new ArrayList<ProteinGroupProperties>();
-            ProteinGroupProperties grpProps = null;
-            for(ProteinProperties props: propsList) {
-                if(grpProps == null || grpProps.getProteinGroupId() != props.getProteinGroupId()) {
-                    grpProps = new ProteinGroupProperties(sortOrder);
-                    grpProps.add(props);
-                    grpPropsList.add(grpProps);
-                }
-                else {
-                    grpProps.add(props);
-                }
-            }
-            
-            // sort the protein groups by pI
-            if(sortOrder == SORT_ORDER.DESC) {
-            	Collections.sort(grpPropsList, new Comparator<ProteinGroupProperties>() {
-            		@Override
-            		public int compare(ProteinGroupProperties o1,
-            				ProteinGroupProperties o2) {
-            			return Double.valueOf(o2.getGroupPi()).compareTo(o1.getGroupPi());
-            		}});
-            }
-            else {
-            	Collections.sort(grpPropsList, new Comparator<ProteinGroupProperties>() {
-            		@Override
-            		public int compare(ProteinGroupProperties o1,
-            				ProteinGroupProperties o2) {
-            			return Double.valueOf(o1.getGroupPi()).compareTo(o2.getGroupPi());
-            		}});
-            }
+            // sort each group by sorting criteria
+            Collections.sort(grpPropsList, new ProteinGroupPropertiesComparator(SORT_BY.PI, sortOrder));
             
             // get a list of sorted ids
             List<Integer> sortedIds = new ArrayList<Integer>(propsList.size());
             for(ProteinGroupProperties gp: grpPropsList) {
-                for(ProteinProperties props: gp.getSortedByPi()) 
+                for(ProteinProperties props: gp.getProteinProperties()) 
                     sortedIds.add(props.getPinferProteinId());
             }
             
@@ -214,11 +176,11 @@ public class ProteinPropertiesSorter {
     // -------------------------------------------------------------------------------------------
     public static List<Integer> sortIdsByAccession(List<Integer> proteinIds, int pinferId, boolean groupProteins, SORT_ORDER sortOrder) {
         
-    	Map<Integer, ProteinProperties> proteinPropertiesMap  = ProteinPropertiesStore.getInstance().getPropertiesMapForAccession(pinferId);
+    	Map<Integer, ? extends ProteinProperties> proteinPropertiesMap  = ProteinPropertiesStore.getInstance().getPropertiesMapForAccession(pinferId);
         return sortIdsByAccession(proteinIds, proteinPropertiesMap, groupProteins, sortOrder);
     }
 
-    private static List<Integer> sortIdsByAccession(List<Integer> proteinIds, Map<Integer, ProteinProperties> proteinPropertiesMap,
+    private static List<Integer> sortIdsByAccession(List<Integer> proteinIds, Map<Integer, ? extends ProteinProperties> proteinPropertiesMap,
     		boolean groupProteins, final SORT_ORDER sortOrder) {
         
     	if(proteinPropertiesMap == null)
@@ -258,48 +220,17 @@ public class ProteinPropertiesSorter {
         else {
             
             // sort by protein group id first
-            Collections.sort(propsList, new Comparator<ProteinProperties>() {
-                @Override
-                public int compare(ProteinProperties o1, ProteinProperties o2) {
-                    return Integer.valueOf(o1.getProteinGroupId()).compareTo(o2.getProteinGroupId());
-                }});
+        	// group by indistinguishable proteinID
+            List<ProteinGroupProperties> grpPropsList = createIGroups(
+					sortOrder, propsList);
             
-            // create the protein groups
-            List<ProteinGroupProperties> grpPropsList = new ArrayList<ProteinGroupProperties>();
-            ProteinGroupProperties grpProps = null;
-            for(ProteinProperties props: propsList) {
-                if(grpProps == null || grpProps.getProteinGroupId() != props.getPinferProteinId()) {
-                    grpProps = new ProteinGroupProperties(sortOrder);
-                    grpProps.add(props);
-                    grpPropsList.add(grpProps);
-                }
-                else {
-                    grpProps.add(props);
-                }
-            }
-            
-            // sort the protein groups by accession
-            if(sortOrder == SORT_ORDER.DESC) {
-            	Collections.sort(grpPropsList, new Comparator<ProteinGroupProperties>() {
-            		@Override
-            		public int compare(ProteinGroupProperties o1,
-            				ProteinGroupProperties o2) {
-            			return o2.getGroupAccession().compareTo(o1.getGroupAccession());
-            		}});
-            }
-            else {
-            	Collections.sort(grpPropsList, new Comparator<ProteinGroupProperties>() {
-            		@Override
-            		public int compare(ProteinGroupProperties o1,
-            				ProteinGroupProperties o2) {
-            			return o1.getGroupAccession().compareTo(o2.getGroupAccession());
-            		}});
-            }
+            // sort each group by sorting criteria
+            Collections.sort(grpPropsList, new ProteinGroupPropertiesComparator(SORT_BY.ACCESSION, sortOrder));
             
             // get a list of sorted ids
             List<Integer> sortedIds = new ArrayList<Integer>(propsList.size());
             for(ProteinGroupProperties gp: grpPropsList) {
-                for(ProteinProperties props: gp.getSortedByPi()) 
+                for(ProteinProperties props: gp.getProteinProperties()) 
                     sortedIds.add(props.getPinferProteinId());
             }
             

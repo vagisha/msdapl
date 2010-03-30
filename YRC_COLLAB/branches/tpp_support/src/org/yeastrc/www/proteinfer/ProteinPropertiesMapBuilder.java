@@ -20,6 +20,7 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProtein;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
+import org.yeastrc.www.proteinfer.proteinProphet.ProphetProteinProperties;
 
 /**
  * 
@@ -44,7 +45,7 @@ public class ProteinPropertiesMapBuilder {
 		this.getAccession = getAccession;
 	}
 
-	public void updateMap(int pinferId, Map<Integer, ProteinProperties> map) {
+	public void updateMap(int pinferId, Map<Integer, ? extends ProteinProperties> map) {
 
 		log.info("Updating Protein Properties map");
 		log.info("\tGetting pI: "+this.getPi);
@@ -70,7 +71,7 @@ public class ProteinPropertiesMapBuilder {
 
 	}
 	
-	public Map<Integer, ProteinProperties> buildMap(int pinferId) {
+	public Map<Integer, ? extends ProteinProperties> buildMap(int pinferId) {
 
 		Map<Integer, ProteinProperties> map = null;
 		log.info("Building Protein Properties map");
@@ -129,8 +130,9 @@ public class ProteinPropertiesMapBuilder {
 			s = System.currentTimeMillis();
 			for(ProteinProphetProtein protein: proteins) {
 
-				ProteinProperties props = propsBuilder.build(pinferId, protein);
+				ProphetProteinProperties props = new ProphetProteinProperties(propsBuilder.build(pinferId, protein));
 				props.setProteinGroupId(protein.getGroupId());
+				props.setProteinProphetGroupId(protein.getProteinProphetGroupId());
 				map.put(protein.getId(), props);
 			}
 			e = System.currentTimeMillis();

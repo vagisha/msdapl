@@ -36,13 +36,13 @@ public class ProteinPropertiesFilter {
             List<Integer> allProteinIds, double minWt, double maxWt) {
         
         // get a map of the protein ids and protein properties
-        Map<Integer, ProteinProperties> propsMap = ProteinPropertiesStore.getInstance().getPropertiesMapForMolecularWt(pinferId);
+        Map<Integer, ? extends ProteinProperties> propsMap = ProteinPropertiesStore.getInstance().getPropertiesMapForMolecularWt(pinferId);
         return filterForProtInferByMolecularWt(pinferId, allProteinIds, propsMap, minWt, maxWt);
     }
     
     private List<Integer> filterForProtInferByMolecularWt(int pinferId,
             List<Integer> allProteinIds,
-            Map<Integer, ProteinProperties> proteinPropertiesMap, double minWt, double maxWt) {
+            Map<Integer, ? extends ProteinProperties> proteinPropertiesMap, double minWt, double maxWt) {
         
         List<Integer> filtered = new ArrayList<Integer>();
         
@@ -67,13 +67,13 @@ public class ProteinPropertiesFilter {
             List<Integer> allProteinIds, double minPi, double maxPi) {
         
         // get a map of the protein ids and protein properties
-        Map<Integer, ProteinProperties> propsMap = ProteinPropertiesStore.getInstance().getPropertiesMapForPi(pinferId);
+        Map<Integer, ? extends ProteinProperties> propsMap = ProteinPropertiesStore.getInstance().getPropertiesMapForPi(pinferId);
         return filterForProtInferByPi(pinferId, allProteinIds, propsMap, minPi, maxPi);
     }
     
     private List<Integer> filterForProtInferByPi(int pinferId,
             List<Integer> allProteinIds,
-            Map<Integer, ProteinProperties> proteinPropertiesMap, double minPi, double maxPi) {
+            Map<Integer, ? extends ProteinProperties> proteinPropertiesMap, double minPi, double maxPi) {
         
         List<Integer> filtered = new ArrayList<Integer>();
         

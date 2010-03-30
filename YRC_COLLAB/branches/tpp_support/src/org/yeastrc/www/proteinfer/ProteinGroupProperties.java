@@ -11,39 +11,44 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 
-class ProteinGroupProperties {
+public class ProteinGroupProperties {
     
     private List<ProteinProperties> proteinPropsList;
     private SORT_ORDER sortOrder;
     
-    ProteinGroupProperties(SORT_ORDER sortOrder) {
+    public ProteinGroupProperties(SORT_ORDER sortOrder) {
         proteinPropsList = new ArrayList<ProteinProperties>();
         this.sortOrder = sortOrder;
     }
     
-    void add(ProteinProperties props) {
+    public void add(ProteinProperties props) {
         this.proteinPropsList.add(props);
     }
     
-    double getGroupMolecularWt() {
+    public double getGroupMolecularWt() {
         return getSortedByMolWt().get(0).getMolecularWt();
     }
     
-    double getGroupPi() {
+    public double getGroupPi() {
         return getSortedByPi().get(0).getPi();
     }
     
-    String getGroupAccession() {
+    public String getGroupAccession() {
     	return getSortedByAccession().get(0).getAccession(sortOrder);
     }
     
-    int getProteinGroupId() {
+    public List<ProteinProperties> getProteinProperties() {
+    	return proteinPropsList;
+    }
+    
+    public int getProteinGroupId() {
         return proteinPropsList.get(0).getProteinGroupId();
     }
     
-    List<ProteinProperties> getSortedByMolWt() {
+    public List<ProteinProperties> getSortedByMolWt() {
     	if(sortOrder == SORT_ORDER.DESC) {
     		Collections.sort(proteinPropsList, new Comparator<ProteinProperties>() {
     			@Override
@@ -95,5 +100,62 @@ class ProteinGroupProperties {
     			}});
     	}
         return proteinPropsList;
+    }
+    
+    public static class ProteinGroupPropertiesComparator implements Comparator<ProteinGroupProperties> {
+
+    	private SORT_BY sortBy;
+    	private SORT_ORDER sortOrder;
+    	
+    	public ProteinGroupPropertiesComparator(SORT_BY sortBy, SORT_ORDER sortOrder) {
+    		this.sortBy = sortBy;
+    		this.sortOrder = sortOrder;
+    	}
+    	
+		@Override
+		public int compare(ProteinGroupProperties o1, ProteinGroupProperties o2) {
+			
+			if(sortBy == SORT_BY.MOL_WT)
+				return compareByMolWt(o1, o2);
+			
+			if(sortBy == SORT_BY.PI)
+				return compareByPi(o1, o2);
+			
+			if(sortBy == SORT_BY.ACCESSION)
+				return compareByAccession(o1, o2);
+			
+			return 0;
+		}
+
+		private int compareByAccession(ProteinGroupProperties o1,
+				ProteinGroupProperties o2) {
+			
+			if(sortOrder == SORT_ORDER.DESC) {
+				return o2.getGroupAccession().compareTo(o1.getGroupAccession());
+	    	}
+	    	else {
+	    		return o1.getGroupAccession().compareTo(o2.getGroupAccession());
+	    	}
+		}
+
+		private int compareByPi(ProteinGroupProperties o1,
+				ProteinGroupProperties o2) {
+			if(sortOrder == SORT_ORDER.DESC) {
+				return Double.valueOf(o2.getGroupPi()).compareTo(o1.getGroupPi());
+	    	}
+	    	else {
+	    		return Double.valueOf(o1.getGroupPi()).compareTo(o2.getGroupPi());
+	    	}
+		}
+
+		private int compareByMolWt(ProteinGroupProperties o1,
+				ProteinGroupProperties o2) {
+			if(sortOrder == SORT_ORDER.DESC) {
+				return Double.valueOf(o2.getGroupMolecularWt()).compareTo(o1.getGroupMolecularWt());
+	    	}
+	    	else {
+	    		return Double.valueOf(o1.getGroupMolecularWt()).compareTo(o2.getGroupMolecularWt());
+	    	}
+		}
     }
 }

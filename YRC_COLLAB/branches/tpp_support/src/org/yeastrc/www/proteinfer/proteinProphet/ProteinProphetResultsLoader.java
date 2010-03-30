@@ -90,7 +90,7 @@ public class ProteinProphetResultsLoader {
     //---------------------------------------------------------------------------------------------------
     public static List<Integer> getProteinIds(int pinferId, ProteinProphetFilterCriteria filterCriteria) {
     	
-        long s = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         List<Integer> proteinIds = ppProtDao.getFilteredSortedProteinIds(pinferId, filterCriteria);
         log.info("Returned "+proteinIds.size()+" protein IDs for protein inference ID: "+pinferId);
         
@@ -98,12 +98,6 @@ public class ProteinProphetResultsLoader {
         if(filterCriteria.getAccessionLike() != null) {
         	log.info("Filtering by accession: "+filterCriteria.getAccessionLike());
             proteinIds = ProteinAccessionFilter.getInstance().filterForProtInferByProteinAccession(pinferId, proteinIds, filterCriteria.getAccessionLike());
-        
-            // apply sorting if needed
-            if(filterCriteria.getSortBy() == SORT_BY.ACCESSION) {
-            	proteinIds = ProteinPropertiesSorter.sortIdsByAccession(proteinIds, pinferId,
-            			filterCriteria.isGroupProteins(), filterCriteria.getSortOrder());
-            }
         }
         
         // filter by description, if required
@@ -124,28 +118,44 @@ public class ProteinProphetResultsLoader {
         	log.info("Filtering by molecular wt.");
             proteinIds = ProteinPropertiesFilter.getInstance().filterForProtInferByMolecularWt(pinferId, proteinIds,
                     filterCriteria.getMinMolecularWt(), filterCriteria.getMaxMolecularWt());
-            
-            // apply sorting if needed
-            if(filterCriteria.getSortBy() == SORT_BY.MOL_WT)
-                proteinIds = ProteinPropertiesSorter.sortIdsByMolecularWt(proteinIds, pinferId, 
-                		filterCriteria.isGroupProteins(), filterCriteria.getSortOrder());
         }
         
         // filter by pI, if required
+        
         if(filterCriteria.hasPiFilter()) {
         	log.info("Filtering by pI");
             proteinIds = ProteinPropertiesFilter.getInstance().filterForProtInferByPi(pinferId, proteinIds,
                     filterCriteria.getMinPi(), filterCriteria.getMaxPi());
-            
-            // apply sorting if needed
-            if(filterCriteria.getSortBy() == SORT_BY.PI)
-                proteinIds = ProteinPropertiesSorter.sortIdsByPi(proteinIds, pinferId, 
-                		filterCriteria.isGroupProteins(), filterCriteria.getSortOrder());
-                    
         }
         
+        // apply sorting if needed
+        long s = System.currentTimeMillis();
+        if(filterCriteria.getSortBy() == SORT_BY.ACCESSION) {
+        	proteinIds = ProphetProteinPropertiesSorter.sortIdsByAccession(proteinIds, pinferId,
+        			filterCriteria.isGroupProteins(), filterCriteria.getSortOrder());
+        	long e = System.currentTimeMillis();
+            log.info("Time for resorting filtered IDs by accession: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        }
+        
+        // apply sorting if needed
+        if(filterCriteria.getSortBy() == SORT_BY.PI) {
+            proteinIds = ProphetProteinPropertiesSorter.sortIdsByPi(proteinIds, pinferId, 
+            		filterCriteria.isGroupProteins(), filterCriteria.getSortOrder());
+            long e = System.currentTimeMillis();
+        	log.info("Time for resorting filtered IDs by pI: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        }
+        
+        // apply sorting if needed
+        if(filterCriteria.getSortBy() == SORT_BY.MOL_WT) {
+            proteinIds = ProphetProteinPropertiesSorter.sortIdsByMolecularWt(proteinIds, pinferId, 
+            		filterCriteria.isGroupProteins(), filterCriteria.getSortOrder());
+        	long e = System.currentTimeMillis();
+        	log.info("Time for resorting filtered IDs by Mol. Wt.: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        }
+        
+        
         long e = System.currentTimeMillis();
-        log.info("Time: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        log.info("Time: "+TimeUtils.timeElapsedSeconds(start, e)+" seconds");
         return proteinIds;
     }
     
@@ -654,19 +664,19 @@ public class ProteinProphetResultsLoader {
         long s = System.currentTimeMillis();
         List<Integer> allIds = null;
         if(sortBy == SORT_BY.ACCESSION) {
-        	List<Integer> sortedIds = ProteinPropertiesSorter.sortIdsByAccession(proteinIds, pinferId, groupProteins, sortOrder);
+        	List<Integer> sortedIds = ProphetProteinPropertiesSorter.sortIdsByAccession(proteinIds, pinferId, groupProteins, sortOrder);
             long e = System.currentTimeMillis();
             log.info("Time for resorting filtered IDs: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
             return sortedIds;
         }
         if(sortBy == SORT_BY.MOL_WT) {
-        	List<Integer> sortedIds = ProteinPropertiesSorter.sortIdsByMolecularWt(proteinIds, pinferId, groupProteins, sortOrder);
+        	List<Integer> sortedIds = ProphetProteinPropertiesSorter.sortIdsByMolecularWt(proteinIds, pinferId, groupProteins, sortOrder);
             long e = System.currentTimeMillis();
             log.info("Time for resorting filtered IDs: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
             return sortedIds;
         }
         if(sortBy == SORT_BY.PI) {
-        	List<Integer> sortedIds = ProteinPropertiesSorter.sortIdsByPi(proteinIds, pinferId, groupProteins, sortOrder);
+        	List<Integer> sortedIds = ProphetProteinPropertiesSorter.sortIdsByPi(proteinIds, pinferId, groupProteins, sortOrder);
             long e = System.currentTimeMillis();
             log.info("Time for resorting filtered IDs: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
             return sortedIds;

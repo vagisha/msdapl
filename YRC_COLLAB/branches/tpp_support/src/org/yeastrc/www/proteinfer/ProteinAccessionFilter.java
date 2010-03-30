@@ -45,14 +45,14 @@ public class ProteinAccessionFilter {
         // get the protein accession map if we have one
         // but don't create a new one if it does not exist for
         // the protein inference we are looking at right now. 
-    	Map<Integer, ProteinProperties> propsMap = ProteinPropertiesStore.getInstance().getPropertiesMapForAccession(pinferId, false);
+    	Map<Integer, ? extends ProteinProperties> propsMap = ProteinPropertiesStore.getInstance().getPropertiesMapForAccession(pinferId, false);
         
         return filterForProtInferByProteinAccession(pinferId, allProteinIds, propsMap, accessionLike);
     }
     
     private List<Integer> filterForProtInferByProteinAccession(int pinferId,
             List<Integer> allProteinIds,
-            Map<Integer, ProteinProperties> propsMap, String accessionLike) {
+            Map<Integer, ? extends ProteinProperties> propsMap, String accessionLike) {
         
         Set<String> reqAcc = new HashSet<String>();
         String[] tokens = accessionLike.split(",");
