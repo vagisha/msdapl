@@ -478,6 +478,11 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     // -----------------------------------------------------------------------------------------------
     // COVERAGE
     // -----------------------------------------------------------------------------------------------
+    /**
+     * groupProteins == true if members of a ProteinProphet groups should be together.
+     * If sorOrder is null proteins will not be sorted and members of ProteinProphet group
+     * may not be together.
+     */
     public List<Integer> sortProteinIdsByCoverage(int pinferId, boolean groupProteins, SORT_ORDER sortOrder) {
         return proteinIdsByCoverage(pinferId, 0.0, 100.0, groupProteins, sortOrder);
     }
@@ -496,8 +501,7 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         	map.put("sort", 1);
         	if(groupProteins) 
         		map.put("sort_pg", 1);
-        	else
-        		map.put("sort_ig", 1);
+        	map.put("sort_ig", 1);
         }
         
         // If we are not sorting on coverage do a simple query and return a list of protien ids that 

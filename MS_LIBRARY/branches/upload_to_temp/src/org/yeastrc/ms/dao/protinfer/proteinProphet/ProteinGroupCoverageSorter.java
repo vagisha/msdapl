@@ -32,7 +32,7 @@ public class ProteinGroupCoverageSorter {
 	/**
 	 * Sorting can be either:
 	 * 1. ProteinProphetGroupID 
-	 * 		-- in this case the input list should already be sorted by proteinProphetGroupId, coverage (DESC)
+	 * 		-- in this case the input list should already be sorted by proteinProphetGroupId, groupId, coverage (DESC)
 	 * 2. IndistinguishableProteinGroupID
 	 *		-- list should already be sorted by groupId, coverage (DESC)
 	 * @param list
@@ -149,16 +149,11 @@ public class ProteinGroupCoverageSorter {
 		if(grpList.size() == 0)
 			return;
 
-		double grpCoverage = sortOrder == SORT_ORDER.DESC ? grpList.get(0).coverage : 
-			grpList.get(grpList.size() - 1).coverage;
-
-		for(ProteinGroupCoverage pgc: grpList)
-			pgc.prophetGrpCoverage = grpCoverage;
-		
-		
 		// set the coverage for indistinguishable protein groups
 		int lastGrp = -1;
 
+		double minCoverage = Double.MAX_VALUE;
+		double maxCoverage = 0;
 		// All members of a single indistinguishable protein group
 		List<ProteinGroupCoverage> iGrpList = new ArrayList<ProteinGroupCoverage>();
 
@@ -170,10 +165,18 @@ public class ProteinGroupCoverageSorter {
 				grpList.clear();
 			}
 			grpList.add(pgc);
+			minCoverage = pgc.coverage < minCoverage ? pgc.coverage : minCoverage;
+			maxCoverage = pgc.coverage > maxCoverage ? pgc.coverage : maxCoverage;
 		}
 
 		// last one
 		setGrpCoverage(grpList, sortOrder);
+		
+		// set the coverage for the Prophet group
+		double grpCoverage = sortOrder == SORT_ORDER.DESC ? maxCoverage : minCoverage;
+
+		for(ProteinGroupCoverage pgc: grpList)
+			pgc.prophetGrpCoverage = grpCoverage;
 	}
 	
 	private void setGrpCoverage(List<ProteinGroupCoverage> grpList, SORT_ORDER sortOrder) {

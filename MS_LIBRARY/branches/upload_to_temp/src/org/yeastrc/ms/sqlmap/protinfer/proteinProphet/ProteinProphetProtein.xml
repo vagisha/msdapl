@@ -269,7 +269,7 @@
     			proteinProphetGroupId, 
     		</isPropertyAvailable>
     		<isPropertyAvailable property="sort_ig">
-    			proteinGroupId
+    			proteinGroupId,
     		</isPropertyAvailable>
     		coverage DESC
     	</isPropertyAvailable>
