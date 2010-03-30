@@ -173,6 +173,17 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         return (Integer)queryForObject(sqlMapNameSpace+".selectGroupCount", map);
     }
     
+    public  int getProteinProphetGroupCount(int pinferId, boolean parsimonious) {
+        
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("pinferId", pinferId);
+        if(parsimonious) {
+            map.put("isSubsumed", 0);
+        }
+        return (Integer)queryForObject(sqlMapNameSpace+".selectProphetGroupCount", map);
+    }
+    
+    
     @Override
     public ProteinProphetProtein loadProtein(int pinferProteinId) {
         return (ProteinProphetProtein) super.queryForObject(sqlMapNameSpace+".select", pinferProteinId);
@@ -799,6 +810,24 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         map.put("groupId", groupId);
         return queryForList(sqlMapNameSpace+".selectProteinIdsForGroup", map);
     }
+    
+    /**
+     * Returns the ids of the subsuming proteins for the given protein
+     * @param pinferProteinId
+     * @return
+     */
+    public List<Integer> getSubsumingProteinIds(int pinferProteinId) {
+        return queryForList(sqlMapNameSpace+".selectSubsumingProteinIdsForProtein", pinferProteinId);
+    }
+    
+    /**
+     * Returns the ids of the subsumed proteins for the given protein
+     * @param pinferProteinId
+     * @return
+     */
+    public List<Integer> getSubsumedProteinIds(int pinferProteinId) {
+        return queryForList(sqlMapNameSpace+".selectSubsumedProteinIdsForProtein", pinferProteinId);
+    }
 
     /**
      * Returns the proteins for an indistinguishable protein group
@@ -853,6 +882,23 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         map.put("pinferId", pinferId);
         if(parsimonious)          map.put("isSubsumed", 0);
         List<ProteinAndGroupId> protGrps = queryForList(sqlMapNameSpace+".selectProteinAndGroupIds", map);
+        
+        Map<Integer, Integer> protGrpmap = new HashMap<Integer, Integer>((int) (protGrps.size() * 1.5));
+        for(ProteinAndGroupId pg: protGrps) {
+            protGrpmap.put(pg.getProteinId(), pg.getGroupId());
+        }
+        return protGrpmap;
+    }
+    
+    /**
+     * Returns a map of proteinIds and proteinProphetGroupIds.
+     * Keys in the map are proteinIds and Values are proteinProphetGroupIds
+     */
+    public Map<Integer, Integer> getProteinProphetGroupIds(int pinferId, boolean parsimonious) {
+        Map<String, Number> map = new HashMap<String, Number>(8);
+        map.put("pinferId", pinferId);
+        if(parsimonious)          map.put("isSubsumed", 0);
+        List<ProteinAndGroupId> protGrps = queryForList(sqlMapNameSpace+".selectProteinAndProphetGroupIds", map);
         
         Map<Integer, Integer> protGrpmap = new HashMap<Integer, Integer>((int) (protGrps.size() * 1.5));
         for(ProteinAndGroupId pg: protGrps) {

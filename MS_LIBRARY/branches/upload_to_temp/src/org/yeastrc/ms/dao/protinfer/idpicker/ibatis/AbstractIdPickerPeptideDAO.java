@@ -55,6 +55,11 @@ public abstract class AbstractIdPickerPeptideDAO <T extends GenericIdPickerPepti
          return peptDao.getUniquePeptideIdsForProteinferProtein(pinferProteinId);
      }
      
+     @Override
+     public int getUniqueIonCountForRun(int proteinferId) {
+         return peptDao.getUniqueIonCountForRun(proteinferId);
+     }
+     
      public List<Integer> getPeptideIdsForProteinferRun(int proteinferId) {
          return peptDao.getPeptideIdsForProteinferRun(proteinferId);
      }

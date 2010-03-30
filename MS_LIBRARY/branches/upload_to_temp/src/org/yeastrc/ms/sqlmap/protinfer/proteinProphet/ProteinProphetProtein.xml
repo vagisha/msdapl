@@ -67,6 +67,16 @@
     	</isPropertyAvailable>
     </select>
     
+    <select id="selectProphetGroupCount" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT count(DISTINCT(ppProt.proteinProphetGroupID)) 
+    	FROM ProteinProphetProtein AS ppProt, msProteinInferProtein as prot
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = ppProt.piProteinID
+    	<isPropertyAvailable property="isSubsumed">
+    		AND ppProt.subsumed = #isSubsumed#
+    	</isPropertyAvailable>
+    </select>
+    
     
     <select id="selectParsimProteinCountForProteinferRun" resultClass="Integer" parameterClass="Integer">
     	SELECT count(*) FROM msProteinInferProtein as prot, ProteinProphetProtein as ppProt 
@@ -92,6 +102,17 @@
     	</isPropertyAvailable>
     </select>
     
+	<select id="selectProteinAndProphetGroupIds" resultMap="protAndGroupResult" 
+    		parameterClass="java.util.Map">
+    	SELECT prot.id, pprot.proteinProphetGroupID
+    	FROM msProteinInferProtein as prot, ProteinProphetProtein as pprot 
+    	WHERE prot.piRunID = #pinferId# 
+    	AND prot.id = pprot.piProteinID
+    	<isPropertyAvailable property="isSubsumed">
+    		AND pprot.isSubsumed = #isSubsumed#
+    	</isPropertyAvailable>
+    </select>
+    
 	
 	<select id="selectProteinIdsForGroup" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT prot.id FROM msProteinInferProtein as prot, ProteinProphetProtein as ppProt
@@ -99,6 +120,15 @@
     	AND ppProt.groupID = #groupId#
     	AND prot.id = ppProt.piProteinID
     </select>
+    
+    <select id="selectSubsumingProteinIdsForProtein" resultClass="Integer" parameterClass="Integer">
+    	SELECT subsumingProteinID FROM ProteinProphetSubsumedProtein WHERE subsumedProteinID=#pinferProteinId#
+    </select>
+    
+    <select id="selectSubsumedProteinIdsForProtein" resultClass="Integer" parameterClass="Integer">
+    	SELECT subsumedProteinID FROM ProteinProphetSubsumedProtein WHERE subsumingProteinID=#pinferProteinId#
+    </select>
+    
     
     <select id="selectProteinIdsForProteinProphetGroup" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT prot.id FROM msProteinInferProtein as prot, ProteinProphetProtein as ppProt

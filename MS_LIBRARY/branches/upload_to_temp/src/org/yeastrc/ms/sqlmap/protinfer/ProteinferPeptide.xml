@@ -61,7 +61,14 @@
     </select>
     
     <select id="selectUniqPeptSeqForRun" resultClass="Integer" parameterClass="Integer">
-    	SELECT COUNT(DISTINCT(sequence)) FROM msProteinInferPeptide WHERE piRunID=#id#
+    	SELECT COUNT(*) FROM msProteinInferPeptide WHERE piRunID=#id#
+    </select>
+    
+    <select id="selectUniqIonsForRun" resultClass="Integer" parameterClass="Integer">
+    	SELECT COUNT(*) 
+    	FROM msProteinInferPeptide AS pept, msProteinInferIon AS ion 
+    	WHERE ion.piPeptideID = pept.id 
+    	AND pept.piRunID=#id#
     </select>
     
     <select id="selectPeptidesForProteinferRun" resultMap="pinferPeptideResult" parameterClass="Integer">

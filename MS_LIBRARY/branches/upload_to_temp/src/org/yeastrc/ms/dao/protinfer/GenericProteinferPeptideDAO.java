@@ -19,6 +19,8 @@ public interface GenericProteinferPeptideDAO<T extends GenericProteinferPeptide<
     
     public abstract int getUniquePeptideSequenceCountForRun(int proteinferId);
     
+    public abstract int getUniqueIonCountForRun(int proteinferId);
+    
     public abstract T load(int pinferPeptideId);
     
     public abstract ProteinferPeptide loadPeptide(int pinferId, String peptideSequence);

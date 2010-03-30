@@ -61,7 +61,12 @@ public class ProteinProphetPeptideDAO extends BaseSqlMapDAO  implements
     public int getUniquePeptideSequenceCountForRun(int proteinferId) {
         return peptDao.getUniquePeptideSequenceCountForRun(proteinferId);
     }
-
+    
+    @Override
+    public int getUniqueIonCountForRun(int proteinferId) {
+        return peptDao.getUniqueIonCountForRun(proteinferId);
+    }
+    
     @Override
     public ProteinProphetProteinPeptide load(int pinferPeptideId) {
         return (ProteinProphetProteinPeptide) super.queryForObject(sqlMapNameSpace+".select", pinferPeptideId);
