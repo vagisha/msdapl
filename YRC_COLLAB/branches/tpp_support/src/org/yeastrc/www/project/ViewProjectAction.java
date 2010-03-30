@@ -264,7 +264,9 @@ public class ViewProjectAction extends Action {
                 analysisIds.addAll(aIds);
             }
             List<SearchAnalysis> analyses = new ArrayList<SearchAnalysis>(analysisIds.size());
-            for(int analysisId: analysisIds) {
+            List<Integer> analysisIdsList = new ArrayList<Integer>(analysisIds);
+            Collections.sort(analysisIdsList);
+            for(int analysisId: analysisIdsList) {
                 analyses.add(getSearchAnalysis(analysisId));
             }
             pExpt.setAnalyses(analyses);

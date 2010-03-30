@@ -190,7 +190,7 @@
 			<tr>
 			<td valign="top"><b><bean:write name="prpRun" property="proteinProphetRun.id"/></b></td>
 			<td valign="top"><bean:write name="prpRun" property="programVersionShort"/></td>
-			<td valign="top"><b><NOBR><bean:write name="prpRun" property="proteinProphetRun.filename"/></NOBR></b></td>
+			<td valign="top"><b><bean:write name="prpRun" property="proteinProphetRun.filename"/></b></td>
 			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="numParsimoniousProteinProphetGroups"/></td>
 			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="numParsimoniousProteinGroups"/></td>
 			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="numParsimoniousProteins"/></td>

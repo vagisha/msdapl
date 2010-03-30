@@ -17,7 +17,7 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
-<yrcwww:contentbox title="Project Details" centered="true" width="850">
+<yrcwww:contentbox title="Project Details" centered="true" width="85" widthRel="true">
 
 <SCRIPT LANGUAGE="JavaScript">
  function confirmDelete(ID) {

@@ -24,6 +24,8 @@ public class ExperimentProteinProphetRun {
     private int numParsimoniousProteinGroups;
     private int numParsimoniousProteinProphetGroups;
     
+    private static final Pattern tppVersionPattern = Pattern.compile("TPP\\s+(v\\d+\\.\\d+)");
+    
     public int getUniqIonCount() {
 		return uniqIonCount;
 	}
@@ -40,8 +42,6 @@ public class ExperimentProteinProphetRun {
 		this.numParsimoniousProteinProphetGroups = numProteinProphetGroups;
 	}
 
-	private static final Pattern tppVersionPattern = Pattern.compile("(TPP\\s+v\\d+\\.\\d+)");
-    
     public ExperimentProteinProphetRun(ProteinProphetRun run) {
         this.run = run;
     }
@@ -79,7 +79,7 @@ public class ExperimentProteinProphetRun {
     	if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {
     		Matcher m = tppVersionPattern.matcher(version);
     		if(m.find()) {
-    			version = m.group();
+    			version = m.group(1);
     		}
     	}
     	return version;
