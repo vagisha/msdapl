@@ -384,7 +384,7 @@ function confirmDeleteExperiment(experimentId) {
 </script>
 
 
-<yrcwww:contentbox title="Experiments" centered="true" width="85" widthRel="true">
+<yrcwww:contentbox title="Experiments" centered="true" width="70" widthRel="true">
 
 	<logic:empty name="experiments">
 		<div align="center" style="margin:20">
