@@ -243,16 +243,21 @@ public class ProteinProphetResultsLoader {
     // Get a list of protein groups
     //---------------------------------------------------------------------------------------------------
     public static List<Integer> getPageSublist(List<Integer> allProteinIds, int[] pageIndices, 
-    		boolean completeGroups, boolean descending) {
+    		boolean completeProphetGroups, boolean descending) {
     	
     	int firstIndex = descending ? pageIndices[1] : pageIndices[0];
     	int lastIndex = descending ? pageIndices[0] : pageIndices[1];
     	
-    	if(completeGroups) {
-    		firstIndex = getStartIndexToCompleteFirstGroup(allProteinIds, firstIndex);
-    		lastIndex = getEndIndexToCompleteFirstGroup(allProteinIds, lastIndex);
-    	}
+//    	if(completeProphetGroups) {
+//    		firstIndex = getStartIndexToCompleteFirstProphetGroup(allProteinIds, firstIndex);
+//    		lastIndex = getEndIndexToCompleteFirstProphetGroup(allProteinIds, lastIndex);
+//    	}
+//    	else {
+    		firstIndex = getStartIndexToCompleteIGroup(allProteinIds, firstIndex);
+    		lastIndex = getEndIndexToCompleteIGroup(allProteinIds, lastIndex);
+//    	}
     	
+        	
     	// sublist
         List<Integer> proteinIds = new ArrayList<Integer>();
         if(descending) {
@@ -266,7 +271,7 @@ public class ProteinProphetResultsLoader {
         return proteinIds;
     }
     
-    private static int getStartIndexToCompleteFirstGroup(List<Integer> allProteinIds, int startIndex) {
+    private static int getStartIndexToCompleteProphetGroup(List<Integer> allProteinIds, int startIndex) {
     	
     	if(startIndex == 0)
     		return startIndex;
@@ -289,10 +294,12 @@ public class ProteinProphetResultsLoader {
     		}
     		idx--;
     	}
+    	if(idx < 0)
+    		idx = 0;
     	return idx;
     }
     
-    private static int getEndIndexToCompleteFirstGroup(List<Integer> allProteinIds, int endIndex) {
+    private static int getEndIndexToCompleteProphetGroup(List<Integer> allProteinIds, int endIndex) {
     	
     	if(endIndex == allProteinIds.size() - 1)
     		return endIndex;
@@ -305,16 +312,74 @@ public class ProteinProphetResultsLoader {
     		throw new IllegalArgumentException("endInded < 0 in getEndIndexToCompleteFirstGroup");
     	}
     	ProteinProphetProtein protein = ppProtDao.loadProtein(allProteinIds.get(endIndex));
-    	int groupId = protein.getProteinProphetGroupId();
+    	int prophetGroupId = protein.getProteinProphetGroupId();
     	int idx = endIndex + 1;
     	while(idx < allProteinIds.size()) {
     		protein = ppProtDao.loadProtein(allProteinIds.get(idx));
-    		if(protein.getProteinProphetGroupId() != groupId) {
+    		if(protein.getProteinProphetGroupId() != prophetGroupId) {
     			idx = idx-1;
     			break;
     		}
     		idx++;
     	}
+    	if (idx >= allProteinIds.size())
+    		idx--;
+    	return idx;
+    }
+    
+    private static int getStartIndexToCompleteIGroup(List<Integer> allProteinIds, int startIndex) {
+    	
+    	if(startIndex == 0)
+    		return startIndex;
+    	if(startIndex < 0) {
+    		log.error("startIndex < 0 in getStartIndexToCompleteIGroup");
+    		throw new IllegalArgumentException("startIndex < 0 in getStartIndexToCompleteIGroup");
+    	}
+    	if(startIndex >= allProteinIds.size()) {
+    		log.error("startIndex >= list size in getStartIndexToCompleteIGroup");
+    		throw new IllegalArgumentException("startIndex >= list size in getStartIndexToCompleteIGroup");
+    	}
+    	ProteinProphetProtein protein = ppProtDao.loadProtein(allProteinIds.get(startIndex));
+    	int groupId = protein.getGroupId();
+    	int idx = startIndex - 1;
+    	while(idx >= 0) {
+    		protein = ppProtDao.loadProtein(allProteinIds.get(idx));
+    		if(protein.getGroupId() != groupId) {
+    			idx = idx+1;
+    			break;
+    		}
+    		idx--;
+    	}
+    	if(idx < 0)
+    		idx = 0;
+    	return idx;
+    }
+    
+    private static int getEndIndexToCompleteIGroup(List<Integer> allProteinIds, int endIndex) {
+    	
+    	if(endIndex == allProteinIds.size() - 1)
+    		return endIndex;
+    	if(endIndex >= allProteinIds.size()) {
+    		log.error("endIndex >= list size in getEndIndexToCompleteIGroup");
+    		throw new IllegalArgumentException("endIndex >= list size in getEndIndexToCompleteIGroup");
+    	}
+    	if(endIndex < 0) {
+    		log.error("endInded < 0 in getEndIndexToCompleteIGroup");
+    		throw new IllegalArgumentException("endInded < 0 in getEndIndexToCompleteIGroup");
+    	}
+    	ProteinProphetProtein protein = ppProtDao.loadProtein(allProteinIds.get(endIndex));
+    	int groupId = protein.getGroupId();
+    	int idx = endIndex + 1;
+    	while(idx < allProteinIds.size()) {
+    		protein = ppProtDao.loadProtein(allProteinIds.get(idx));
+    		if(protein.getGroupId() != groupId) {
+    			idx = idx-1;
+    			break;
+    		}
+    		idx++;
+    	}
+    	if (idx >= allProteinIds.size())
+    		idx--;
     	return idx;
     }
     
@@ -363,12 +428,12 @@ public class ProteinProphetResultsLoader {
     private static List<WProteinProphetIndistProteinGroup> makeIndistinguishableGroups(
             List<WProteinProphetProtein> prophetGrpProteins) {
         
-        // sort by indistinguishable protein group ID
-        Collections.sort(prophetGrpProteins, new Comparator<WProteinProphetProtein>() {
-            @Override
-            public int compare(WProteinProphetProtein o1, WProteinProphetProtein o2) {
-                return Integer.valueOf(o1.getProtein().getGroupId()).compareTo(o2.getProtein().getGroupId());
-            }});
+//        // sort by indistinguishable protein group ID
+//        Collections.sort(prophetGrpProteins, new Comparator<WProteinProphetProtein>() {
+//            @Override
+//            public int compare(WProteinProphetProtein o1, WProteinProphetProtein o2) {
+//                return Integer.valueOf(o1.getProtein().getGroupId()).compareTo(o2.getProtein().getGroupId());
+//            }});
         
         List<WProteinProphetIndistProteinGroup> indistGrps = new ArrayList<WProteinProphetIndistProteinGroup>();
         int currGrpId = -1;
@@ -557,6 +622,9 @@ public class ProteinProphetResultsLoader {
         
         ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
         MsSearchResult origResult = resLoader.getResult(psm.getResultId(), inputGenerator);
+        if(origResult == null) {
+        	log.error("No result found for psm: "+psm.getId());
+        }
         MsScan scan = scanDao.loadScanLite(origResult.getScanId());
         return new WProteinProphetIon(ion, origResult, scan);
     }
@@ -692,13 +760,13 @@ public class ProteinProphetResultsLoader {
             allIds = ppProtDao.sortProteinIdsByValidationStatus(pinferId);
         }
         else if (sortBy == SORT_BY.NUM_PEPT) {
-            allIds = ppProtDao.sortProteinIdsByPeptideCount(pinferId, peptideDef, groupProteins);
+            allIds = ppProtDao.sortProteinIdsByPeptideCount(pinferId, peptideDef, groupProteins, sortOrder);
         }
         else if (sortBy == SORT_BY.NUM_UNIQ_PEPT) {
-            allIds = ppProtDao.sortProteinIdsByUniquePeptideCount(pinferId, peptideDef, groupProteins);
+            allIds = ppProtDao.sortProteinIdsByUniquePeptideCount(pinferId, peptideDef, groupProteins, sortOrder);
         }
         else if (sortBy == SORT_BY.NUM_SPECTRA) {
-            allIds = ppProtDao.sortProteinIdsBySpectrumCount(pinferId, groupProteins);
+            allIds = ppProtDao.sortProteinIdsBySpectrumCount(pinferId, groupProteins, sortOrder);
         }
         else if (sortBy == SORT_BY.PROBABILITY_GRP) {
             allIds = ppProtDao.sortProteinIdsByProbability(pinferId, true);

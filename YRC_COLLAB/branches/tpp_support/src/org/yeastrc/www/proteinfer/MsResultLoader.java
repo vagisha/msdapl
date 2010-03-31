@@ -47,6 +47,8 @@ public class MsResultLoader {
     
     public MsSearchResult getResult(int resultId, Program inputGenerator) {
         
+    	log.debug("Getting result for "+inputGenerator+" resultID: "+resultId);
+    
         MsSearchResult result = null;
         if(inputGenerator == Program.SEQUEST) {
             return seqResDao.load(resultId);

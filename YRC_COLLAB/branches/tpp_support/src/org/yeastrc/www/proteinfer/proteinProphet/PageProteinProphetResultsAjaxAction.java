@@ -20,6 +20,7 @@ import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.SORT_BY;
+import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
@@ -96,12 +97,16 @@ public class PageProteinProphetResultsAjaxAction extends Action {
         		+filterCriteria_session.getSortOrder() );
         
         
-        boolean doReversePage = false; // no reverse paging for ProteinProphet results
-        if(group && SORT_BY.isProteinSpecific(filterCriteria_session.getSortBy()))
+        // We can use the pager to page the results in the reverse order (SORT_ORDER == DESC)
+        // However, if we are grouping ProteinProphet groups 
+        // AND the sorting column is NOT ProteinProphetGroup specific
+        // we must have already sorted the results in descending order
+        boolean doReversePage = filterCriteria_session.getSortOrder() == SORT_ORDER.DESC;
+        if(group && !SORT_BY.isProteinProphetGroupSpecific(filterCriteria_session.getSortBy()))
         	doReversePage = false;
         
         if(doReversePage)
-        	log.info("REVERSE PAGING...");
+    		log.info("REVERSE PAGING...");
         
         // get the index range that is to be displayed in this page
         ResultsPager pager = ResultsPager.instance();
