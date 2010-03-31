@@ -19,6 +19,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.SORT_BY;
+import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetROC;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
@@ -98,16 +100,27 @@ public class ProteinProphetViewAction extends Action {
         // page number is now 1
         int pageNum = 1;
         
+        // We can use the pager to page the results in the reverse order (SORT_ORDER == DESC)
+        // However, if we are grouping ProteinProphet groups 
+        // AND the sorting column is NOT ProteinProphetGroup specific
+        // we must have already sorted the results in descending order
+        boolean group = true; // default is ProteinPropht groups are displayed together.
+        boolean doReversePage = filterCriteria.getSortOrder() == SORT_ORDER.DESC;
+        if(group && !SORT_BY.isProteinProphetGroupSpecific(filterCriteria.getSortBy()))
+        	doReversePage = false;
+        
+        if(doReversePage)
+    		log.info("REVERSE PAGING...");
         
         // limit to the proteins that will be displayed on this page
         List<Integer> proteinIdsPage = null;
         if(proteinIds.size() > 0) {
         	// get the index range that is to be displayed in this page
-        	int[] pageIndices = ResultsPager.instance().getPageIndices(proteinIds, pageNum,false);
+        	int[] pageIndices = ResultsPager.instance().getPageIndices(proteinIds, pageNum,doReversePage);
 
         	// sublist to be displayed
         	proteinIdsPage = ProteinProphetResultsLoader.getPageSublist(proteinIds, pageIndices,
-        			filterCriteria.isGroupProteins(), false);
+        			filterCriteria.isGroupProteins(), doReversePage);
         }
         else {
         	proteinIdsPage = new ArrayList<Integer>(0);

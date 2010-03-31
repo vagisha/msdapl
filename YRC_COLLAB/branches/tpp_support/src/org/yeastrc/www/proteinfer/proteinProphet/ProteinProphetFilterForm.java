@@ -6,6 +6,8 @@ import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.SORT_BY;
+import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
 import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
 
@@ -139,6 +141,8 @@ public class ProteinProphetFilterForm extends ProteinInferFilterForm {
     	if(isExcludeSubsumed())
     		filterCriteria.setParsimoniousOnly();
     	
+    	filterCriteria.setSortBy(SORT_BY.PROBABILITY_GRP);
+    	filterCriteria.setSortOrder(SORT_ORDER.DESC);
         return filterCriteria;
     }
 }
