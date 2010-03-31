@@ -583,7 +583,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             if(ion.getModifiedSequence().equals(modifiedSeq)) {
                 numFound++;
                 ProteinferSpectrumMatch psm = new ProteinferSpectrumMatch();
-                psm.setResultId(result.getId());
+                psm.setResultId(result.getPeptideProphetResultId());
                 psm.setProteinferIonId(ion.getId());
                 psm.setRank(rank); 
                 psmDao.saveSpectrumMatch(psm);
