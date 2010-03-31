@@ -335,10 +335,42 @@
     	GROUP BY prot.id HAVING cnt BETWEEN #minSpectra# AND #maxSpectra#
     	<isPropertyAvailable property="sort">
     		ORDER BY cnt
-			<isPropertyAvailable property="groupProteins">
-				, ppProt.proteinProphetGroupID, ppProt.groupID
+			<isPropertyAvailable property="sort_ig">
+				, ppProt.groupID
 			</isPropertyAvailable>
     		ASC
+    	</isPropertyAvailable>
+    </select>
+    
+    <select id="filterGroupsBySpecCount" 
+    		resultClass="org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinGroupSpectrumCountSorter$ProteinGroupSpectrumCount" 
+    		parameterClass="java.util.Map">
+    	SELECT prot.id AS proteinId,
+    		   ppProt.groupID AS proteinGroupId,
+    		   ppProt.proteinProphetGroupID AS proteinProphetGroupId, 
+    	       count(*) AS spectrumCount 
+    	FROM msProteinInferProtein AS prot, 
+    		 ProteinProphetProtein as ppProt,
+    	     msProteinInferProteinPeptideMatch AS m, 
+    		 msProteinInferPeptide AS pept, 
+    		 msProteinInferIon AS ion,
+    		 msProteinInferSpectrumMatch AS psm
+    	WHERE prot.id = ppProt.piProteinID
+    	AND ppProt.piProteinID = m.piProteinID
+    	AND m.piPeptideID = pept.id 
+    	AND pept.id = ion.piPeptideID 
+    	AND ion.id = psm.piIonID
+    	AND prot.piRunID = #pinferId# 
+    	GROUP BY proteinId HAVING spectrumCount BETWEEN #minSpectra# AND #maxSpectra#
+    	<isPropertyAvailable property="sort">
+    		ORDER BY
+    		<isPropertyAvailable property="sort_pg">
+    			proteinProphetGroupId, 
+    		</isPropertyAvailable>
+    		<isPropertyAvailable property="sort_ig">
+    			proteinGroupId,
+    		</isPropertyAvailable>
+    		spectrumCount DESC
     	</isPropertyAvailable>
     </select>
     
@@ -378,10 +410,43 @@
     	GROUP BY prot.id HAVING cnt BETWEEN #minPeptides# AND #maxPeptides#
     	<isPropertyAvailable property="sort">
     		ORDER BY cnt
-			<isPropertyAvailable property="groupProteins">
-				, ppProt.proteinProphetGroupID, ppProt.groupID
+			<isPropertyAvailable property="sort_ig">
+				, ppProt.groupID
 			</isPropertyAvailable>
     		ASC
+    	</isPropertyAvailable>
+    </select>
+    
+    <select id="filterGroupsByPeptideCount_SMC" 
+    		resultClass="org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinGroupPeptideCountSorter$ProteinGroupPeptideCount" 
+    		parameterClass="java.util.Map">
+    	SELECT prot.id AS proteinId,
+    			ppProt.groupID AS proteinGroupId,
+    			ppProt.proteinProphetGroupID AS proteinProphetGroupId,
+    	     	count(ion.id) AS peptideCount
+    	FROM (msProteinInferProtein AS prot, ProteinProphetProtein as ppProt, msProteinInferProteinPeptideMatch as m)
+    	LEFT JOIN ( msProteinInferPeptide AS pept, msProteinInferIon AS ion )
+    	ON  (m.piPeptideID = pept.id AND pept.id = ion.piPeptideID
+    		<isPropertyAvailable property="uniqueToProtein">
+    			AND pept.uniqueToProtein = #uniqueToProtein#
+    		</isPropertyAvailable>
+    	)
+    	WHERE prot.piRunID = #pinferId# 
+    	AND prot.id = ppProt.piProteinID 
+    	AND prot.id = m.piProteinID 
+    	<isPropertyAvailable property="isSubsumed">
+    		AND ppProt.subsumed = #isSubsumed#
+    	</isPropertyAvailable>
+    	GROUP BY proteinId HAVING peptideCount BETWEEN #minPeptides# AND #maxPeptides#
+    	<isPropertyAvailable property="sort">
+    		ORDER BY
+    		<isPropertyAvailable property="sort_pg">
+    			proteinProphetGroupId, 
+    		</isPropertyAvailable>
+    		<isPropertyAvailable property="sort_ig">
+    			proteinGroupId,
+    		</isPropertyAvailable>
+    		peptideCount DESC
     	</isPropertyAvailable>
     </select>
     

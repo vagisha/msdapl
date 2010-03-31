@@ -19,6 +19,8 @@ import org.yeastrc.ms.dao.protinfer.GenericProteinferProteinDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinAndGroupId;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinGroupCoverageSorter.ProteinGroupCoverage;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinGroupPeptideCountSorter.ProteinGroupPeptideCount;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinGroupSpectrumCountSorter.ProteinGroupSpectrumCount;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinUserValidation;
@@ -213,16 +215,23 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         
         // Get a list of protein ids filtered by spectrum count
         sort = filterCriteria.getSortBy() == SORT_BY.NUM_SPECTRA;
+        sortOrder = filterCriteria.getSortBy() == SORT_BY.NUM_SPECTRA ? 
+ 				filterCriteria.getSortOrder() :
+ 				null;
         List<Integer> ids_spec_count = proteinIdsBySpectrumCount(pinferId, 
                 filterCriteria.getNumSpectra(), filterCriteria.getNumMaxSpectra(),
-                sort, filterCriteria.isGroupProteins());
+                sort, sortOrder, filterCriteria.isGroupProteins());
         
         // Get a list of protein ids filtered by peptide count
         sort = filterCriteria.getSortBy() == SORT_BY.NUM_PEPT;
+        sortOrder = filterCriteria.getSortBy() == SORT_BY.NUM_PEPT ? 
+ 				filterCriteria.getSortOrder() :
+ 				null;
         List<Integer> ids_pept = proteinIdsByAllPeptideCount(pinferId, 
                                             filterCriteria.getNumPeptides(), filterCriteria.getNumMaxPeptides(),
                                             filterCriteria.getPeptideDefinition(),
                                             sort, 
+                                            sortOrder,
                                             filterCriteria.isGroupProteins(), 
                                             filterCriteria.parsimoniousOnly()
                                             );
@@ -236,11 +245,15 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         }
         else {
             sort = filterCriteria.getSortBy() == SORT_BY.NUM_UNIQ_PEPT;
+            sortOrder = filterCriteria.getSortBy() == SORT_BY.NUM_UNIQ_PEPT ? 
+     				filterCriteria.getSortOrder() :
+     				null;
             ids_uniq_pept = proteinIdsByUniquePeptideCount(pinferId, 
                                                filterCriteria.getNumUniquePeptides(),
                                                filterCriteria.getNumMaxUniquePeptides(),
                                                filterCriteria.getPeptideDefinition(),
                                                sort,
+                                               sortOrder,
                                                filterCriteria.isGroupProteins(),
                                                filterCriteria.parsimoniousOnly());
         }
@@ -504,7 +517,7 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         	map.put("sort_ig", 1);
         }
         
-        // If we are not sorting on coverage do a simple query and return a list of protien ids that 
+        // If we are not sorting on coverage do a simple query and return a list of protein ids that 
         // satisfy the coverage criteria.
         if(!sort) {
             return queryForList(sqlMapNameSpace+".filterByCoverage", map);
@@ -552,8 +565,8 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     // -----------------------------------------------------------------------------------------------
     // SPECTRUM COUNT
     // -----------------------------------------------------------------------------------------------
-    public List<Integer> sortProteinIdsBySpectrumCount(int pinferId, boolean groupProteins) {
-        return proteinIdsBySpectrumCount(pinferId, 1, Integer.MAX_VALUE, true, groupProteins);
+    public List<Integer> sortProteinIdsBySpectrumCount(int pinferId, boolean groupProteins, SORT_ORDER sortOrder) {
+        return proteinIdsBySpectrumCount(pinferId, 1, Integer.MAX_VALUE, true, sortOrder, groupProteins);
     }
     
     private List<Integer> nrseqIdsBySpectrumCount(int pinferId, int minSpecCount, int maxSpecCount) {
@@ -572,7 +585,7 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     }
 
     private List<Integer> proteinIdsBySpectrumCount(int pinferId, int minSpecCount, int maxSpecCount,
-            boolean sort, boolean groupProteins) {
+            boolean sort, SORT_ORDER sortOrder, boolean groupProteins) {
         
         // If we are NOT filtering anything AND NOT sorting on spectrum count just return all the protein Ids
         // for this protein inference run
@@ -584,9 +597,34 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         map.put("pinferId", pinferId);
         map.put("minSpectra", minSpecCount);
         map.put("maxSpectra", maxSpecCount);
-        if(sort)                    map.put("sort", 1);
-        if(sort && groupProteins)   map.put("groupProteins", 1);
-        return queryForList(sqlMapNameSpace+".filterBySpecCount", map);
+        if(sort) {   
+        	map.put("sort", 1);
+        	if(groupProteins) 
+        		map.put("sort_pg", 1);
+        	map.put("sort_ig", 1);
+        }
+        
+        List<Integer> peptideIds = null;
+        if(!sort || !groupProteins) {
+        	peptideIds = queryForList(sqlMapNameSpace+".filterBySpecCount", map);
+        }
+        // We are sorting on spectrum count and grouping ProteinProphet groups:
+        else { 
+            // group proteins and sort
+            // List of protein IDs along with their proteinProphetGroupID, groupID and spectrum count (sorted by 
+            // protein prophet group, then spectrum count).
+            List<ProteinGroupSpectrumCount> prGrC = queryForList(sqlMapNameSpace+".filterGroupsBySpecCount", map);
+            
+            ProteinGroupSpectrumCountSorter.getInstance().sort(prGrC, sortOrder);
+            
+            List<Integer> proteinIds = new ArrayList<Integer>(prGrC.size());
+            
+            // return the list of protein IDs in the sorted order obove.
+            for(ProteinGroupSpectrumCount pgc: prGrC)
+                proteinIds.add(pgc.getProteinId());
+            return proteinIds;
+        }
+        return peptideIds;
     }
     
     // -----------------------------------------------------------------------------------
@@ -613,30 +651,32 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     // -----------------------------------------------------------------------------------------------
     // PEPTIDE COUNT
     // -----------------------------------------------------------------------------------------------
-    public List<Integer> sortProteinIdsByPeptideCount(int pinferId, PeptideDefinition peptideDef, boolean groupProteins) {
-        return proteinIdsByPeptideCount(pinferId, 1, Integer.MAX_VALUE, peptideDef, true, groupProteins, false, false);
+    public List<Integer> sortProteinIdsByPeptideCount(int pinferId, PeptideDefinition peptideDef, boolean groupProteins,
+    		SORT_ORDER sortOrder) {
+        return proteinIdsByPeptideCount(pinferId, 1, Integer.MAX_VALUE, peptideDef, true, sortOrder, groupProteins, false, false);
     }
     
-    public List<Integer> sortProteinIdsByUniquePeptideCount(int pinferId, PeptideDefinition peptideDef, boolean groupProteins) {
-        return proteinIdsByPeptideCount(pinferId, 0, Integer.MAX_VALUE, peptideDef, true, groupProteins, false, true);
+    public List<Integer> sortProteinIdsByUniquePeptideCount(int pinferId, PeptideDefinition peptideDef, 
+    		boolean groupProteins, SORT_ORDER sortOrder) {
+        return proteinIdsByPeptideCount(pinferId, 0, Integer.MAX_VALUE, peptideDef, true, sortOrder, groupProteins, false, true);
     }
     
     private List<Integer> proteinIdsByUniquePeptideCount(int pinferId, 
             int minUniqPeptideCount, int maxUniqPeptideCount, 
             PeptideDefinition peptDef,
-            boolean sort, boolean groupProteins, boolean isParsimonious) {
+            boolean sort, SORT_ORDER sortOrder, boolean groupProteins, boolean isParsimonious) {
         return proteinIdsByPeptideCount(pinferId, 
                 minUniqPeptideCount, maxUniqPeptideCount, 
-                peptDef, sort, groupProteins, isParsimonious, true);
+                peptDef, sort, sortOrder, groupProteins, isParsimonious, true);
     }
     
     private List<Integer> proteinIdsByAllPeptideCount(int pinferId, 
             int minUniqPeptideCount, int maxUniqPeptideCount,
             PeptideDefinition peptDef,
-            boolean sort, boolean groupProteins, boolean isParsimonious) {
+            boolean sort, SORT_ORDER sortOrder, boolean groupProteins, boolean isParsimonious) {
         return proteinIdsByPeptideCount(pinferId, 
                 minUniqPeptideCount, maxUniqPeptideCount,
-                peptDef, sort, groupProteins, isParsimonious, false);
+                peptDef, sort, sortOrder, groupProteins, isParsimonious, false);
     }
     
     private List<Integer> nrseqIdsByUniquePeptideCount(int pinferId, 
@@ -657,7 +697,8 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     
     private List<Integer> proteinIdsByPeptideCount(int pinferId, int minPeptideCount, int maxPeptideCount,
             PeptideDefinition peptDef,
-            boolean sort, boolean groupProteins, boolean isParsimonious, boolean uniqueToProtein) {
+            boolean sort, SORT_ORDER sortOrder,
+            boolean groupProteins, boolean isParsimonious, boolean uniqueToProtein) {
         
         // If we are NOT filtering anything AND NOT sorting on peptide count just return all the protein Ids
         // for this protein inference run
@@ -678,14 +719,38 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         map.put("maxPeptides", maxPeptideCount);
         if(uniqueToProtein) map.put("uniqueToProtein", 1);
         if(isParsimonious)          map.put("isSubsumed", 0);
-        if(sort)                    map.put("sort", 1);
-        if(sort && groupProteins)   map.put("groupProteins", 1);
+        if(sort) {   
+        	map.put("sort", 1);
+        	if(groupProteins) 
+        		map.put("sort_pg", 1);
+        	map.put("sort_ig", 1);
+        }
         
         List<Integer> peptideIds = null;
-        // peptide uniquely defined by sequence, mods and charge (this is the only option
-        // used by ProteinProphet)
-        if(peptDef.isUseCharge() && peptDef.isUseMods()) {
-            peptideIds = queryForList(sqlMapNameSpace+".filterByPeptideCount_SMC", map);
+        if(!sort || !groupProteins) {
+        	// peptide uniquely defined by sequence, mods and charge (this is the only option
+        	// used by ProteinProphet)
+        	if(peptDef.isUseCharge() && peptDef.isUseMods()) {
+        		peptideIds = queryForList(sqlMapNameSpace+".filterByPeptideCount_SMC", map);
+        	}
+        }
+        
+        
+        // We are sorting on peptide count and grouping ProteinProphet groups:
+        else { 
+            // group proteins and sort
+            // List of protein IDs along with their proteinProphetGroupID, groupID and peptide count (sorted by 
+            // protein prophet group, then peptide count).
+            List<ProteinGroupPeptideCount> prGrC = queryForList(sqlMapNameSpace+".filterGroupsByPeptideCount_SMC", map);
+            
+            ProteinGroupPeptideCountSorter.getInstance().sort(prGrC, sortOrder);
+            
+            List<Integer> proteinIds = new ArrayList<Integer>(prGrC.size());
+            
+            // return the list of protein IDs in the sorted order obove.
+            for(ProteinGroupPeptideCount pgc: prGrC)
+                proteinIds.add(pgc.getProteinId());
+            return proteinIds;
         }
         
         return peptideIds;

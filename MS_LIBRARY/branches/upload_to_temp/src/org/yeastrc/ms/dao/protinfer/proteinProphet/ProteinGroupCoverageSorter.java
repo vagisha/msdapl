@@ -150,27 +150,27 @@ public class ProteinGroupCoverageSorter {
 			return;
 
 		// set the coverage for indistinguishable protein groups
-		int lastGrp = -1;
+		int lastGroupId = -1;
 
 		double minCoverage = Double.MAX_VALUE;
 		double maxCoverage = 0;
 		// All members of a single indistinguishable protein group
 		List<ProteinGroupCoverage> iGrpList = new ArrayList<ProteinGroupCoverage>();
 
-		for(ProteinGroupCoverage pgc: iGrpList) {
-			if(pgc.proteinGroupId != lastGrp) {
+		for(ProteinGroupCoverage pgc: grpList) {
+			if(pgc.proteinGroupId != lastGroupId) {
 
-				setGrpCoverage(grpList, sortOrder);
-				lastGrp = pgc.proteinGroupId;
-				grpList.clear();
+				setGrpCoverage(iGrpList, sortOrder);
+				lastGroupId = pgc.proteinGroupId;
+				iGrpList.clear();
 			}
-			grpList.add(pgc);
+			iGrpList.add(pgc);
 			minCoverage = pgc.coverage < minCoverage ? pgc.coverage : minCoverage;
 			maxCoverage = pgc.coverage > maxCoverage ? pgc.coverage : maxCoverage;
 		}
 
 		// last one
-		setGrpCoverage(grpList, sortOrder);
+		setGrpCoverage(iGrpList, sortOrder);
 		
 		// set the coverage for the Prophet group
 		double grpCoverage = sortOrder == SORT_ORDER.DESC ? maxCoverage : minCoverage;
@@ -184,9 +184,18 @@ public class ProteinGroupCoverageSorter {
 		if(grpList.size() == 0)
 			return;
 
-		double grpCoverage = sortOrder == SORT_ORDER.DESC ? grpList.get(0).coverage : 
-			grpList.get(grpList.size() - 1).coverage;
+		double minCoverage = Double.MAX_VALUE;
+		double maxCoverage = 0;
+		
+		for(ProteinGroupCoverage pgc: grpList) {
+			minCoverage = pgc.coverage < minCoverage ? pgc.coverage : minCoverage;
+			maxCoverage = pgc.coverage > maxCoverage ? pgc.coverage : maxCoverage;
+		}
+//		double grpCoverage = sortOrder == SORT_ORDER.DESC ? grpList.get(0).coverage : 
+//			grpList.get(grpList.size() - 1).coverage;
 
+		double grpCoverage = sortOrder == SORT_ORDER.DESC ? maxCoverage : minCoverage;
+		
 		for(ProteinGroupCoverage pgc: grpList)
 			pgc.grpCoverage = grpCoverage;
 	}
