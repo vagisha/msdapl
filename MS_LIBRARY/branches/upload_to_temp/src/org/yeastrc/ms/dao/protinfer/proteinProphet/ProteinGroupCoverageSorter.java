@@ -58,7 +58,7 @@ public class ProteinGroupCoverageSorter {
 			if(pgc.proteinProphetGroupId != lastProphetGrp) {
 				
 				setProphetGrpCoverage(grpList, sortOrder);
-				lastProphetGrp = pgc.proteinGroupId;
+				lastProphetGrp = pgc.proteinProphetGroupId;
 				grpList.clear();
 			}
 			grpList.add(pgc);
