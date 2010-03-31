@@ -200,6 +200,7 @@
 		<logic:iterate name="iGroup" property="proteins" id="protein">
 		
 		<%if(begin_pp_grp) { begin_pp_grp = false; %>
+		<tr><td colspan="14" style="background-color: #4E5A71; padding:1;"></td></tr>
 		<tr class="protgrp_row sorting_row">
 		<td rowspan="<bean:write name='prophet_grp_row_span' />" valign="middle" style="border-bottom-color:#CFCFCF;">
 			<bean:write name="proteinGroup" property="proteinProphetGroupNumber" />
