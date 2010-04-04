@@ -381,6 +381,68 @@ function confirmDeleteExperiment(experimentId) {
  	
  }
  
+ 
+ // ---------------------------------------------------------------------------------------
+// SAVE / REMOVE BOOKMARK for a PROTEIN INFERENCE RUN
+// --------------------------------------------------------------------------------------- 
+function editBookmark(imgElement, piRunId) {
+	
+	var action = $(imgElement).attr('id');
+	if($(imgElement).is(".no_bookmark")) {
+		saveBookmark(imgElement, piRunId);
+	}
+	else if($(imgElement).is(".has_bookmark")) {
+		removeBookmark(imgElement, piRunId)
+	}
+}
+
+function saveBookmark(imgElement, piRunId) {
+
+	//alert("Saving bookmark for "+piRunId);
+	$.ajax({
+		url:      "<yrcwww:link path='bookmarkProteinInfer.do'/>",
+		data:     {'pinferId': 			piRunId, 
+		           'projectId': 	    <bean:write name='project' property='ID'/>,
+		           'save':  piRunId},
+		success:  function(data) {
+			        if(data == 'OK') {
+			        	$(imgElement).attr('src', "<yrcwww:link path='images/bookmark.png'/>");
+			        	$(imgElement).removeClass("no_bookmark");
+			        	$(imgElement).addClass("has_bookmark");
+			        }
+			        else {
+			        	alert("Error saving bookmark: "+data);
+			        }
+		          }
+	});
+}
+
+function removeBookmark(imgElement, piRunId) {
+
+	//alert("Removing bookmark for "+piRunId);
+	$.ajax({
+		url:      "<yrcwww:link path='bookmarkProteinInfer.do'/>",
+		data:     {'pinferId': 			piRunId,
+				   'projectId': 	    <bean:write name='project' property='ID'/>},
+		success:  function(data) {
+			        if(data == 'OK') {
+			        	// If this action was triggered from the bookmarked list, remove the bookmark icon 
+						// from the protein inference listed with the experiment as well
+			        	$("#expt_piRun_"+piRunId).attr('src', "<yrcwww:link path='images/no_bookmark.png'/>")
+						$("#expt_piRun_"+piRunId).removeClass("has_bookmark");
+			        	$("#expt_piRun_"+piRunId).addClass("no_bookmark");
+						
+						// If this is currently in the bookmark list, hide it
+						$("#bookmark_"+piRunId).hide();
+						
+			        }
+			        else {
+			        	alert("Error saving bookmark: "+data);
+			        }
+		          }
+	});
+}
+
 </script>
 
 
@@ -392,6 +454,7 @@ function confirmDeleteExperiment(experimentId) {
 		</div>
 	</logic:empty>
 
+	<!--  Experiment summaries -->
 	<logic:notEmpty name="experiments">
 		
 		<bean:size name="experiments" id="exptCount"/>
@@ -432,6 +495,24 @@ function confirmDeleteExperiment(experimentId) {
 		</logic:greaterThan>
 		<br/>
 		
+	</logic:notEmpty>
+	
+	<!-- PROTEIN INFERENCE FAVORITES -->
+	<logic:present name="hasBookmarks">
+		<div id="pinfer_bookmarks">
+		<%@ include file="proteinInferBookmarks.jsp" %>
+		</div>
+	</logic:present>
+	<logic:notPresent name="hasBookmarks">
+		<div id="pinfer_bookmarks" style="display:none;">
+		<%@ include file="proteinInferBookmarks.jsp" %>
+		</div>
+	</logic:notPresent>
+	
+	
+	
+	<!-- EXPERIMENT DETAILS -->
+	<logic:notEmpty name="experiments">
 		<logic:iterate name="experiments" id="experiment" scope="request">
 			<%@ include file="experimentDetails.jsp" %>
 		<br>

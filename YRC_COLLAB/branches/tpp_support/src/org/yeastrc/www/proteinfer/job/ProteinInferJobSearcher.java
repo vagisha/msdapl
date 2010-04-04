@@ -129,9 +129,9 @@ public class ProteinInferJobSearcher {
         for(int analysisId: analysisIds) {
             // load the analysis
             MsSearchAnalysis analysis = analysisDao.load(analysisId);
-            List<Integer> analysisInputIds = runDao.loadProteinferIdsForInputIds(
+            List<Integer> piRunIds = runDao.loadProteinferIdsForInputIds(
                     getRunSearchAnalysisIdsForAnalysis(analysisId), analysis.getAnalysisProgram());
-            pinferIdsSet.addAll(analysisInputIds);
+            pinferIdsSet.addAll(piRunIds);
         }
         
         return new ArrayList<Integer>(pinferIdsSet);

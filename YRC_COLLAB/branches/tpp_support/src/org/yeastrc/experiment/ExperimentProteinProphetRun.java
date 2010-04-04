@@ -23,9 +23,18 @@ public class ExperimentProteinProphetRun {
     private int numParsimoniousProteins;
     private int numParsimoniousProteinGroups;
     private int numParsimoniousProteinProphetGroups;
+    private boolean isBookmarked = false;
     
     private static final Pattern tppVersionPattern = Pattern.compile("TPP\\s+(v\\d+\\.\\d+)");
     
+    public boolean getIsBookmarked() {
+		return isBookmarked;
+	}
+
+	public void setBookmarked(boolean isBookmarked) {
+		this.isBookmarked = isBookmarked;
+	}
+	
     public int getUniqIonCount() {
 		return uniqIonCount;
 	}

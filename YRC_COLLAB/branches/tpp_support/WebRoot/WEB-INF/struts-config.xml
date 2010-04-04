@@ -992,6 +992,11 @@
 	  type="org.yeastrc.www.proteinfer.SaveProtInferCommentsAjaxAction"
 	  >
 	</action>
+	<action
+	  path="/bookmarkProteinInfer"
+	  type="org.yeastrc.www.project.BookmarkProteinInferRunAjaxAction"
+	  >
+	</action>
 	<action 
 		path="/getProteinPeptides"
 		type="org.yeastrc.www.proteinfer.ProteinPeptidesAjaxAction"

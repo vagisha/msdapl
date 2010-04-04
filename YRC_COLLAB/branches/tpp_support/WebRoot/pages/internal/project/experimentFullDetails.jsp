@@ -173,6 +173,7 @@
 		<table width="100%">
 		<thead>
 		<tr align="left">
+			<th></th>
 			<th valign="top">ID</th>
 			<th valign="top">Version</th>
 			<th valign="top">File</th>
@@ -188,6 +189,20 @@
 		<tbody>
 		<logic:iterate name="experiment" property="proteinProphetRuns" id="prpRun" type="org.yeastrc.experiment.ExperimentProteinProphetRun">
 			<tr>
+			<logic:equal name="prpRun" property="isBookmarked" value="true">
+				<td valign="top"><img alt="B" class="clickable has_bookmark"
+						src="<yrcwww:link path="images/bookmark.png"/>"
+						id="expt_piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>"
+						onclick="editBookmark(this, <bean:write name='prpRun' property='proteinProphetRun.id'/>)"/>
+				</td>
+			</logic:equal>
+			<logic:equal name="prpRun" property="isBookmarked" value="false">
+				<td valign="top"><img alt="B" class="clickable no_bookmark"
+						src="<yrcwww:link path="images/no_bookmark.png"/>"
+						id="expt_piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>"
+						onclick="javascript:editBookmark(this, <bean:write name='prpRun' property='proteinProphetRun.id'/>)"/>
+				</td>
+			</logic:equal>
 			<td valign="top"><b><bean:write name="prpRun" property="proteinProphetRun.id"/></b></td>
 			<td valign="top"><bean:write name="prpRun" property="programVersionShort"/></td>
 			<td valign="top"><b><bean:write name="prpRun" property="proteinProphetRun.filename"/></b></td>
@@ -240,30 +255,48 @@
 		<table width="100%">
 		<thead>
 		<tr align="left">
+			<th></th>
 			<th valign="top">ID</th>
 			<th valign="top">Version</th>
 			<th valign="top">Date</th>
-			<th valign="top">User</th>
-			<th valign="top" align="center">#Groups<br>(#Proteins)</th>
-			<th valign="top" align="center">#Peptides</th>
+			<th valign="top" align="center">#Indist.<br>Groups</th>
+			<th valign="top" align="center">#Proteins</th>
+			<th valign="top" align="center">#Pept.<br/>Seq.</th>
+			<th valign="top" align="center">#Ions</th>
 			<th valign="top">Comments</th>
 			<th valign="top">&nbsp;</th>
 			<th valign="top">Compare</th></tr>
 		</thead>
 		<tbody>
-		<logic:iterate name="experiment" property="protInferRuns" id="piJob" type="org.yeastrc.experiment.ExperimentProteinferRun">
+		<logic:iterate name="experiment" property="protInferRuns" id="piRun" type="org.yeastrc.experiment.ExperimentProteinferRun">
 			<tr>
-			<td valign="top"><b><bean:write name="piJob" property="job.pinferId"/></b></td>
-			<td valign="top" align="center"><b><bean:write name="piJob" property="job.version"/></b></td>
-			<td valign="top"><bean:write name="piJob" property="job.submitDate"/></td>
-			<td valign="top"><bean:write name="piJob" property="job.researcher.lastName"/></td>
-			
-			<logic:equal name="piJob" property="job.complete" value="true">
-			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><nobr><bean:write name="piJob" property="numParsimoniousProteinGroups"/>(<bean:write name="piJob" property="numParsimoniousProteins"/>)</nobr></td>
-			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="piJob" property="uniqPeptideSequenceCount"/></td>
+			<logic:equal name="piRun" property="isBookmarked" value="true">
+				<td valign="top"><img alt="B" class="clickable has_bookmark"
+						src="<yrcwww:link path="images/bookmark.png"/>"
+						id="expt_piRun_<bean:write name='piRun' property='job.pinferId'/>"
+						onclick="editBookmark(this, <bean:write name='piRun' property='job.pinferId'/>)"/>
+				</td>
+			</logic:equal>
+			<logic:equal name="piRun" property="isBookmarked" value="false">
+				<td valign="top"><img alt="B" class="clickable no_bookmark"
+						src="<yrcwww:link path="images/no_bookmark.png"/>"
+						id="expt_piRun_<bean:write name='piRun' property='job.pinferId'/>"
+						onclick="javascript:editBookmark(this, <bean:write name='piRun' property='job.pinferId'/>)"/>
+				</td>
 			</logic:equal>
 			
-			<logic:equal name="piJob" property="job.complete" value="false">
+			<td valign="top"><b><bean:write name="piRun" property="job.pinferId"/></b></td>
+			<td valign="top" align="center"><b><bean:write name="piRun" property="job.version"/></b></td>
+			<td valign="top"><bean:write name="piRun" property="job.submitDate"/></td>
+			
+			<logic:equal name="piRun" property="job.complete" value="true">
+			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="piRun" property="numParsimoniousProteinGroups"/></td>
+			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="piRun" property="numParsimoniousProteins"/></td>
+			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="piRun" property="uniqPeptideSequenceCount"/></td>
+			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="piRun" property="uniqIonCount"/></td>
+			</logic:equal>
+			
+			<logic:equal name="piRun" property="job.complete" value="false">
 			<td valign="top">&nbsp;</td>
 			<td valign="top">&nbsp;</td>
 			</logic:equal>
@@ -271,60 +304,64 @@
 			
 			
 			<td valign="top">
-				<span id="piRun_<bean:write name='piJob' property='job.pinferId'/>_text"><bean:write name="piJob" property="job.comments"/></span>
+				<span id="piRun_<bean:write name='piRun' property='job.pinferId'/>_text"><bean:write name="piRun" property="job.comments"/></span>
 				<logic:equal name="writeAccess" value="true">
-				<span class="editableComment clickable" id="piRun_<bean:write name='piJob' property='job.pinferId'/>" style="font-size:8pt; color:red;">[Edit]</span>
+				<span class="editableComment clickable" id="piRun_<bean:write name='piRun' property='job.pinferId'/>" style="font-size:8pt; color:red;">[Edit]</span>
 				</logic:equal>
 			</td>
 			<td valign="top">
 			
 			<!-- Job COMPLETE -->
-			<logic:equal name="piJob" property="job.complete" value="true">
+			<logic:equal name="piRun" property="job.complete" value="true">
 				<nobr>
-				<a href="<yrcwww:link path='viewProteinInferenceResult.do?'/>pinferId=<bean:write name='piJob' property='job.pinferId'/>">
+				<a href="<yrcwww:link path='viewProteinInferenceResult.do?'/>pinferId=<bean:write name='piRun' property='job.pinferId'/>">
 				<b><font color="green">View</font></b></a>
 				&nbsp;
 				<span class="clickable" style="text-decoration: underline; color:red;" 
-				      onclick="javascript:deleteProtInferRun(<bean:write name='piJob' property='job.pinferId'/>);">Delete</span>
+				      onclick="javascript:deleteProtInferRun(<bean:write name='piRun' property='job.pinferId'/>);">Delete</span>
 				</nobr>
 			</logic:equal>
 			<!-- Job FAILED -->
-			<logic:equal name="piJob" property="job.failed" value="true">
-				<a href="<yrcwww:link path='viewProteinInferenceJob.do?'/>pinferId=<bean:write name='piJob' property='job.pinferId'/>&projectId=<bean:write name='experiment' property='projectId'/>">
-				<b><font color="red"><bean:write name="piJob" property="job.statusDescription"/></font></b>
+			<logic:equal name="piRun" property="job.failed" value="true">
+				<a href="<yrcwww:link path='viewProteinInferenceJob.do?'/>pinferId=<bean:write name='piRun' property='job.pinferId'/>&projectId=<bean:write name='experiment' property='projectId'/>">
+				<b><font color="red"><bean:write name="piRun" property="job.statusDescription"/></font></b>
 				</a>
 			</logic:equal>
 			<!-- Job RUNNING -->
-			<logic:equal name="piJob" property="job.running" value="true">
-				<a href="<yrcwww:link path='viewProteinInferenceJob.do?'/>pinferId=<bean:write name='piJob' property='job.pinferId'/>&projectId=<bean:write name='experiment' property='projectId'/>">
-				<b><font color="#000000"><bean:write name="piJob" property="job.statusDescription"/></font></b>
+			<logic:equal name="piRun" property="job.running" value="true">
+				<a href="<yrcwww:link path='viewProteinInferenceJob.do?'/>pinferId=<bean:write name='piRun' property='job.pinferId'/>&projectId=<bean:write name='experiment' property='projectId'/>">
+				<b><font color="#000000"><bean:write name="piRun" property="job.statusDescription"/></font></b>
 				</a>
 			</logic:equal>
 			
- 		 			</td>
+ 		 	</td>
  		 			
- 		 			<logic:equal name="piJob" property="job.complete" value="true">
- 		 			<td valign="top" align="center" >
- 		 				<input type="checkbox" class="compare_cb" value="<bean:write name='piJob' property='job.pinferId'/>"></input>
- 		 				<!-- 
-				<a href="<yrcwww:link path='newProteinSetComparison.do?'/>piRunId=<bean:write name='piJob' property='job.pinferId'/>">Compare</a>
-				-->
+ 		 	<logic:equal name="piRun" property="job.complete" value="true">
+ 		 	<td valign="top" align="center" >
+ 		 		<input type="checkbox" class="compare_cb" value="<bean:write name='piRun' property='job.pinferId'/>"></input>
 			</td>
 			</logic:equal>
  		 			
 			</tr>
 			<tr>
-				<td colspan="5" valign="top">
-				<div id="piRun_<bean:write name='piJob' property='job.pinferId'/>_edit" align="center"
+				<td colspan="10" valign="top">
+				<div id="piRun_<bean:write name='piRun' property='job.pinferId'/>_edit" align="center"
 			     style="display:none;">
 			     <textarea rows="5" cols="60" class="edit_text"></textarea>
 			     <br>
-			     <button class="savePiRunComments" id="<bean:write name='piJob' property='job.pinferId'/>">Save</button>
-			     <button class="cancelPiRunComments" id="<bean:write name='piJob' property='job.pinferId'/>">Cancel</button>
+			     <button class="savePiRunComments" id="<bean:write name='piRun' property='job.pinferId'/>">Save</button>
+			     <button class="cancelPiRunComments" id="<bean:write name='piRun' property='job.pinferId'/>">Cancel</button>
 				</div>
 				</td>
 			</tr>
 		</logic:iterate>
+		
+		<tr><td colspan="10" style="font-size:8pt;" >
+			<ul>
+			<li>Only parsimonious proteins are included in calculating indistinguishable group and protein counts</li>
+			<li>#Ions = number of unique combinations of sequence + modifications + charge</li>
+			</ul>
+		</td></tr>
 		
 		</tbody>
 		</table>

@@ -15,13 +15,31 @@ public class ExperimentProteinferRun {
 
     private final ProteinferJob job;
     private int uniqPeptideSequenceCount;
+    private int uniqIonCount;
     private int numParsimoniousProteins;
     private int numParsimoniousProteinGroups;
+    private boolean isBookmarked = false;
     
     public ExperimentProteinferRun(ProteinferJob job) {
         this.job = job;
     }
+    
+    public boolean getIsBookmarked() {
+		return isBookmarked;
+	}
 
+	public void setBookmarked(boolean isBookmarked) {
+		this.isBookmarked = isBookmarked;
+	}
+
+	public int getUniqIonCount() {
+		return uniqIonCount;
+	}
+
+	public void setUniqIonCount(int uniqueIonCount) {
+		this.uniqIonCount = uniqueIonCount;
+	}
+	
     public int getUniqPeptideSequenceCount() {
         return uniqPeptideSequenceCount;
     }
