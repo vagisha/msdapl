@@ -14,7 +14,7 @@ public class ProteinInferenceProgram {
     private String description;
     private ProgramParam[] params;
     
-    public static final String protInferVersion = "0.1.1";
+    public static final String protInferVersion = "0.1.2";
     
     public static final ProteinInferenceProgram PROTINFER_SEQ = new PISequestProgram();
     public static final ProteinInferenceProgram PROTINFER_PLCID = new PIProlucidProgram();
