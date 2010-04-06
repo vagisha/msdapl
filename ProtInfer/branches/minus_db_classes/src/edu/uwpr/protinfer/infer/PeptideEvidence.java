@@ -22,6 +22,11 @@ public class PeptideEvidence <T extends SpectrumMatch>{
     }
     
     public void addSpectrumMatch(T spectrumMatch) {
+    	int resultId = spectrumMatch.getResultId();
+    	for(T sm: spectrumMatchList) {
+    		if(sm.getResultId() == resultId)
+    			return;
+    	}
         spectrumMatchList.add(spectrumMatch);
     }
     

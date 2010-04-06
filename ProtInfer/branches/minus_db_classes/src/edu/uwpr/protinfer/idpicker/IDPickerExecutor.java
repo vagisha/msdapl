@@ -172,6 +172,7 @@ public class IDPickerExecutor {
             }
             pept.setId(id);
         }
+        log.info("In assignPeptideIds: number of IDs: "+currPeptId);
     }
 
     private static int getNrSeqDatabaseId(int inputId, Program inputGenerator) {
@@ -450,7 +451,8 @@ public class IDPickerExecutor {
 //        filter.setProteinferId(pinferId);
 //        filterDao.saveIdPickerParam(filter);
 
-        int piRunId = Integer.parseInt(args[0]);
+//        int piRunId = Integer.parseInt(args[0]);
+        int piRunId = 36; 
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
         IdPickerRun run = runDao.loadProteinferRun(piRunId);
         System.out.println("Number of files: "+run.getInputList().size());

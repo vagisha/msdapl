@@ -174,6 +174,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
             result = null;
             iter.remove();
         }
+        log.info("Number of ions seen: "+peptideHitMap.size());
         
         // free up unused maps
         allResults.clear();  allResults = null;
@@ -182,7 +183,6 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         
         long e = System.currentTimeMillis();
         log.info("\tTime to rank peptide spectra and create list of spectrum matches: "+TimeUtils.timeElapsedSeconds(s,e)+" seconds.");
-        e = System.currentTimeMillis();
         return psmList;
     }
 

@@ -267,8 +267,8 @@ public class IdPickerResultSaver {
     
     private <T extends SpectrumMatch> void saveInferredProteins(int pinferId, List<InferredProtein<T>> proteins) {
         
-        // map of peptide id and pinferPeptideIDs
-        Map<Integer, Integer> idpPeptideIds = new HashMap<Integer, Integer>();
+        // map of peptide sequence (no mods or charge) and pinferPeptideIDs
+        Map<String, Integer> idpPeptideIds = new HashMap<String, Integer>();
         
         for(InferredProtein<T> protein: proteins) {
             
@@ -286,11 +286,11 @@ public class IdPickerResultSaver {
             // save the peptides, ions and the associated spectrum matches
             for(PeptideEvidence<T> pev: pevList) {
                 Peptide peptide = pev.getPeptide();
-                Integer pinferPeptideId = idpPeptideIds.get(peptide.getId());
+                Integer pinferPeptideId = idpPeptideIds.get(peptide.getPeptideSequence());
                 if(pinferPeptideId == null) {
                     pinferPeptideId = savePeptideEvidence(pev, pinferId);
                     // add to our map
-                    idpPeptideIds.put(peptide.getId(), pinferPeptideId);
+                    idpPeptideIds.put(peptide.getPeptideSequence(), pinferPeptideId);
                 }
                 // link the protein and peptide
                 protDao.saveProteinferProteinPeptideMatch(pinferProteinId, pinferPeptideId);
