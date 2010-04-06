@@ -19,10 +19,14 @@ import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferPeptide;
+import org.yeastrc.ms.domain.protinfer.SORT_BY;
+import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerParam;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.util.TimeUtils;
+import org.yeastrc.nrseq.ProteinReference;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
+import org.yeastrc.www.util.RoundingUtils;
 
 import edu.uwpr.protinfer.idpicker.IDPickerParams;
 import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
@@ -89,6 +93,8 @@ public class ProteinInferDownloadAction extends Action {
         
         // Get the filtering criteria
         ProteinFilterCriteria filterCriteria = filterForm.getFilterCriteria(peptideDef);
+        filterCriteria.setSortBy(SORT_BY.GROUP_ID);
+        filterCriteria.setSortOrder(SORT_ORDER.ASC);
         
         // Get the protein Ids that fulfill the criteria.
         List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
@@ -119,51 +125,51 @@ public class ProteinInferDownloadAction extends Action {
         
         // print input summary
         List<WIdPickerInputSummary> inputSummary = IdPickerResultsLoader.getIDPickerInputSummary(pinferId);
-        writer.write("File\tNumHits\tNumFilteredHits\n");
-        int totalDecoyHits = 0;
+        writer.write("File\tNumHits\tNumFilteredHits\t%Filtered\n");
         int totalTargetHits = 0;
         int filteredTargetHits = 0;
         for(WIdPickerInputSummary input: inputSummary) {
             writer.write(input.getFileName()+"\t");
-//            writer.write(input.getInput().getNumDecoyHits()+"\t");
-            writer.write(input.getInput().getNumTargetHits()+"\t");
-            writer.write(input.getInput().getNumFilteredTargetHits()+"\n");
+            writer.write(input.getNumHits()+"\t");
+            writer.write(input.getNumFilteredHits()+"\t");
+            writer.write(input.getPercentFilteredHits()+"%\n");
             
-//            totalDecoyHits += input.getInput().getNumDecoyHits();
             totalTargetHits += input.getInput().getNumTargetHits();
             filteredTargetHits += input.getInput().getNumFilteredTargetHits();
         }
         writer.write("TOTAL\t");
-//        writer.write(totalDecoyHits+"\t");
         writer.write(totalTargetHits+"\t");
-        writer.write(filteredTargetHits+"\n");
+        writer.write(filteredTargetHits+"\t");
+        writer.write(RoundingUtils.getInstance().roundTwo((filteredTargetHits*100.0)/(double)totalTargetHits)+"%\n");
         writer.write("\n\n");
         
         
         if(!filterForm.isCollapseGroups()) {
             // print each protein
-            printIndividualProteins(writer, pinferId, peptideDef, proteinIds, filterForm.isPrintPeptides());
+            printIndividualProteins(writer, pinferId, peptideDef, proteinIds, filterForm.isPrintPeptides(), filterForm.isPrintDescriptions());
         }
         else {
             // user wants to see only one line for each protein group; all members of the group will be displayed comma-separated
-            printCollapsedProteinGroups(writer, pinferId, peptideDef, proteinIds, filterForm.isPrintPeptides());
+            printCollapsedProteinGroups(writer, pinferId, peptideDef, proteinIds, filterForm.isPrintPeptides(), filterForm.isPrintDescriptions());
         }
     }
 
     private void printIndividualProteins(PrintWriter writer, int pinferId,
-            PeptideDefinition peptideDef, List<Integer> proteinIds, boolean printPeptides) {
+            PeptideDefinition peptideDef, List<Integer> proteinIds, boolean printPeptides, boolean printDescriptions) {
         writer.write("ProteinGroupID\t");
         writer.write("Parsimonious\t");
         writer.write("FastaID\tCommonName\t");
         writer.write("Coverage\tNumSpectra\tNSAF\t");
-        writer.write("NumPeptides\tNumUniquePeptides");
+        writer.write("NumPeptides\tNumUniquePeptides\t");
+        writer.write("Mol.Wt\tpI");
         if(printPeptides)
             writer.write("\tPeptides");
-//            writer.write("Description\n");
+        if(printDescriptions)
+            writer.write("\tDescription");
         writer.write("\n");
 
         List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
-        for(int i = proteinIds.size() - 1; i >=0; i--) {
+        for(int i = 0; i < proteinIds.size(); i++) {
             int proteinId = proteinIds.get(i);
             WIdPickerProtein wProt = IdPickerResultsLoader.getIdPickerProtein(proteinId, peptideDef, fastaDatabaseIds);
             writer.write(wProt.getProtein().getGroupId()+"\t");
@@ -175,24 +181,35 @@ public class ProteinInferDownloadAction extends Action {
 				writer.write(wProt.getAccessionsCommaSeparated()+"\t");
 			} catch (SQLException e) {
 				log.error("Error getting accessions", e);
-				writer.write("ERROR");
+				writer.write("ERROR\t");
 			}
             try {
 				writer.write(wProt.getCommonNamesCommaSeparated()+"\t");
 			} catch (SQLException e) {
 				log.error("Error getting common names", e);
-				writer.write("ERROR");
+				writer.write("ERROR\t");
 			}
             writer.write(wProt.getProtein().getCoverage()+"\t");
             writer.write(wProt.getProtein().getSpectrumCount()+"\t");
             writer.write(wProt.getProtein().getNsafFormatted()+"\t");
             writer.write(wProt.getProtein().getPeptideCount()+"\t");
-            writer.write(wProt.getProtein().getUniquePeptideCount()+"");
+            writer.write(wProt.getProtein().getUniquePeptideCount()+"\t");
+            writer.write(wProt.getMolecularWeight()+"\t");
+            writer.write(wProt.getPi()+"");
             
             if(printPeptides) {
                 writer.write("\t"+getPeptides(proteinId));
             }
-//                writer.write(wProt.getDescription()+"\n");
+            if(printDescriptions) {
+            	try {
+					ProteinReference ref = wProt.getOneDescriptionReference();
+					if(ref != null)
+						writer.write("\t"+wProt.getOneDescriptionReference().getDescription());
+				} catch (SQLException e) {
+					log.error("Error getting description", e);
+					writer.write("\tERROR");
+				}
+            }
             writer.write("\n");
         }
     }
@@ -209,12 +226,13 @@ public class ProteinInferDownloadAction extends Action {
     }
 
     private void printCollapsedProteinGroups(PrintWriter writer, int pinferId,
-            PeptideDefinition peptideDef, List<Integer> proteinIds, boolean printPeptides) {
+            PeptideDefinition peptideDef, List<Integer> proteinIds, boolean printPeptides, boolean printDescriptions) {
         writer.write("ProteinGroupID\t");
         writer.write("Parsimonious\t");
-        writer.write("FastaID(s)\t");
-        writer.write("NumSpectra\t");
-        writer.write("NumPeptides\tNumUniquePeptides");
+        writer.write("FastaID\tCommonName\t");
+        writer.write("Coverage\tNumSpectra\tNSAF\t");
+        writer.write("NumPeptides\tNumUniquePeptides\t");
+        writer.write("Mol.Wt\tpI");
         if(printPeptides)
             writer.write("\tPeptides");
         writer.write("\n");
@@ -222,6 +240,12 @@ public class ProteinInferDownloadAction extends Action {
         int currentGroupId = -1;
         boolean parsimonious = false;
         String fastaIds = "";
+        String commonNames = "";
+        String descStr = "";
+        String coverageStr = "";
+        String NsafStr = "";
+        String molWtStr = "";
+        String piStr = "";
         String peptides = "";
         int spectrumCount = 0;
         int numPept = 0;
@@ -242,15 +266,55 @@ public class ProteinInferDownloadAction extends Action {
                     if(fastaIds.length() > 0)
                         fastaIds = fastaIds.substring(1); // remove first comma
                     writer.write(fastaIds+"\t");
+                    // Common names
+                    if(commonNames.length() > 0)
+                        commonNames = commonNames.substring(1);
+                    writer.write(commonNames+"\t");
+                    
+                    // Coverages
+                    if(coverageStr.length() > 0)
+                        coverageStr = coverageStr.substring(1);
+                    writer.write(coverageStr+"\t");
+                    
                     writer.write(spectrumCount+"\t");
+                    
+                    // NSAFs
+                    if(NsafStr.length() > 0)
+                        NsafStr = NsafStr.substring(1);
+                    writer.write(NsafStr+"\t");
+                    
                     writer.write(numPept+"\t");
-                    writer.write(numUniqPept+"");
+                    writer.write(numUniqPept+"\t");
+                    
+                    // Molecular weights
+                    if(molWtStr.length() > 0)
+                        molWtStr = molWtStr.substring(1);
+                    writer.write(molWtStr+"\t");
+                    
+                    // pIs
+                    if(piStr.length() > 0)
+                        piStr = piStr.substring(1);
+                    writer.write(piStr+"");
+                    
                     if(printPeptides)
                         writer.write("\t"+peptides);
+                    
+                    if(printDescriptions) {
+                        if(descStr.length() > 0)
+                            descStr = descStr.substring(1);
+                        writer.write("\t"+descStr);
+                    }
+                    
                     writer.write("\n");
                 }
                 fastaIds = "";
                 peptides = "";
+                commonNames = "";
+                descStr = "";
+                coverageStr = "";
+                NsafStr = "";
+                molWtStr = "";
+                piStr = "";
                 currentGroupId = wProt.getProtein().getGroupId();
                 parsimonious = wProt.getProtein().getIsParsimonious();
                 spectrumCount = wProt.getProtein().getSpectrumCount();
@@ -261,11 +325,31 @@ public class ProteinInferDownloadAction extends Action {
                 }
             }
             try {
-				fastaIds += ","+wProt.getAccessionsCommaSeparated();
+				fastaIds += ";"+wProt.getAccessionsCommaSeparated();
 			} catch (SQLException e) {
 				log.error("Error getting accessions", e);
 				fastaIds += ",ERROR";
 			}
+			try {
+				String cn = wProt.getCommonNamesCommaSeparated();
+				if(cn.trim().length() > 0)
+					commonNames += ";"+cn;
+			} catch (SQLException e) {
+				log.error("Error getting common names", e);
+				fastaIds += ",ERROR";
+			}
+			try {
+				ProteinReference ref = wProt.getOneDescriptionReference();
+				if(ref != null)
+					descStr += ", "+wProt.getOneDescriptionReference().getDescription();
+			} catch (SQLException e) {
+				log.error("Error getting description", e);
+				descStr += ", ERROR";
+			}
+			coverageStr += ","+wProt.getProtein().getCoverage()+"%";
+            NsafStr += ","+wProt.getProtein().getNsafFormatted();
+            molWtStr += ","+wProt.getMolecularWeight();
+            piStr += ","+wProt.getPi();
         }
         // write the last one
         writer.write(currentGroupId+"\t");
@@ -273,14 +357,47 @@ public class ProteinInferDownloadAction extends Action {
             writer.write("P\t");
         else
             writer.write("\t");
+        // Fasta IDs
         if(fastaIds.length() > 0)
             fastaIds = fastaIds.substring(1); // remove first comma
         writer.write(fastaIds+"\t");
+        
+        // Common names
+        if(commonNames.length() > 0)
+            commonNames = commonNames.substring(1);
+        writer.write(commonNames+"\t");
+        
+        // Coverages
+        if(coverageStr.length() > 0)
+            coverageStr = coverageStr.substring(1);
+        writer.write(coverageStr+"\t");
+        
         writer.write(spectrumCount+"\t");
+        
+        // NSAFs
+        if(NsafStr.length() > 0)
+            NsafStr = NsafStr.substring(1);
+        writer.write(NsafStr+"\t");
+        
         writer.write(numPept+"\t");
-        writer.write(numUniqPept+"");
+        writer.write(numUniqPept+"\t");
+        
+        // Molecular weights
+        if(molWtStr.length() > 0)
+            molWtStr = molWtStr.substring(1);
+        writer.write(molWtStr+"\t");
+        
+        // pIs
+        if(piStr.length() > 0)
+            piStr = piStr.substring(1);
+        writer.write(piStr+"");
+        
         if(printPeptides)
             writer.write("\t"+peptides);
+        
+        if(printDescriptions)
+            writer.write("\t"+descStr);
+        
         writer.write("\n");
     }
 }
