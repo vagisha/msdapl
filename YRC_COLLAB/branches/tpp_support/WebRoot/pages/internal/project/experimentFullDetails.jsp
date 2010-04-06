@@ -270,6 +270,7 @@
 		<tbody>
 		<logic:iterate name="experiment" property="protInferRuns" id="piRun" type="org.yeastrc.experiment.ExperimentProteinferRun">
 			<tr>
+			<logic:equal name="piRun" property="job.complete" value="true">
 			<logic:equal name="piRun" property="isBookmarked" value="true">
 				<td valign="top"><img alt="B" class="clickable has_bookmark"
 						src="<yrcwww:link path="images/bookmark.png"/>"
@@ -284,6 +285,10 @@
 						onclick="javascript:editBookmark(this, <bean:write name='piRun' property='job.pinferId'/>)"/>
 				</td>
 			</logic:equal>
+			</logic:equal>
+			<logic:equal name="piRun" property="job.complete" value="false">
+				<td>&nbsp;</td>
+			</logic:equal>
 			
 			<td valign="top"><b><bean:write name="piRun" property="job.pinferId"/></b></td>
 			<td valign="top" align="center"><b><bean:write name="piRun" property="job.version"/></b></td>
@@ -297,6 +302,8 @@
 			</logic:equal>
 			
 			<logic:equal name="piRun" property="job.complete" value="false">
+			<td valign="top">&nbsp;</td>
+			<td valign="top">&nbsp;</td>
 			<td valign="top">&nbsp;</td>
 			<td valign="top">&nbsp;</td>
 			</logic:equal>
