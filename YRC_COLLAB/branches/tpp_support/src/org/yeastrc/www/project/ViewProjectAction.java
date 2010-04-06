@@ -404,7 +404,6 @@ public class ViewProjectAction extends Action {
         MsSearchAnalysis analysis = daoFactory.getMsSearchAnalysisDAO().load(searchAnalysisId);
         SearchAnalysis sAnalysis = new SearchAnalysis(analysis);
         if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
-            System.out.println(analysis.getId());
            PeptideProphetAnalysis prophetAnalysis = daoFactory.getPeptideProphetAnalysisDAO().load(analysis.getId());
            if(prophetAnalysis != null)
                sAnalysis.setAnalysisName(prophetAnalysis.getFileName());

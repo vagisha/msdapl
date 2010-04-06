@@ -128,7 +128,7 @@ public class EditProjectForm extends ActionForm {
 	// Grants
 	//----------------------------------------------------------------
 	public Grant getGrant(int index) {
-	    System.out.println("Getting grant id at index: "+index);
+	    //System.out.println("Getting grant id at index: "+index);
 		while(index >= grants.size())
 			grants.add(new Grant());
 		return grants.get(index);

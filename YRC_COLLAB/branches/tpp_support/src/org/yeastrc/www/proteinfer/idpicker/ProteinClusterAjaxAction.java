@@ -3,18 +3,20 @@ package org.yeastrc.www.proteinfer.idpicker;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
-import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
 public class ProteinClusterAjaxAction extends Action{
 
+	private static final Logger log = Logger.getLogger(ProteinClusterAjaxAction.class.getName());
+	
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -56,7 +58,7 @@ public class ProteinClusterAjaxAction extends Action{
         if(filterCriteria == null)  filterCriteria = new ProteinFilterCriteria();
         PeptideDefinition peptideDef = filterCriteria.getPeptideDefinition();
         
-        System.out.println("Got request for clusterId: "+clusterId+" of protein inference run: "+pinferId);
+        log.info("Got request for clusterId: "+clusterId+" of protein inference run: "+pinferId);
 
         request.setAttribute("pinferId", pinferId);
         request.setAttribute("clusterId", clusterId);

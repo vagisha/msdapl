@@ -86,7 +86,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         else {
         	
         	log.info("Found information in session for: "+pinferId);
-        	System.out.println("stored protein ids: "+proteinIds.size());
+        	log.info("#stored protein ids: "+proteinIds.size());
         	 
         	// we will use the sorting column and sorting order from the filter criteria in the session.
         	filterCriteria_request.setSortBy(filterCriteria_session.getSortBy());

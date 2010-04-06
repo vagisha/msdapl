@@ -84,7 +84,7 @@ public class ProteinDetailsAjaxAction extends Action {
         }
         if(peptideDef == null) peptideDef = new PeptideDefinition();
         
-        System.out.println("Got request for protien inference protein ID: "+pinferProtId+" of protein inference run: "+pinferId);
+        log.info("Got request for protien inference protein ID: "+pinferProtId+" of protein inference run: "+pinferId);
 
         long s = System.currentTimeMillis();
         
