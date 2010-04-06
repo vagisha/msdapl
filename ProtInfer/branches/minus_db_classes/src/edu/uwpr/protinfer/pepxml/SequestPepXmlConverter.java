@@ -24,7 +24,7 @@ import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.search.MsResidueModification;
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
+import org.yeastrc.ms.domain.search.Param;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
@@ -213,9 +213,9 @@ public class SequestPepXmlConverter extends PepXmlConverter<SequestSearchResult>
     @Override
     void writeProgramSpecificParams(int searchId, XMLStreamWriter writer) throws XMLStreamException {
         SequestSearch search = seqSearchDao.loadSearch(searchId);
-        List<SequestParam> params = search.getSequestParams();
+        List<Param> params = search.getSequestParams();
         // TODO do we really need to write this out
-        for(SequestParam param: params) {
+        for(Param param: params) {
             writer.writeStartElement("parameter");
             writer.writeAttribute("name", param.getParamName());
             writer.writeAttribute("value", param.getParamValue());

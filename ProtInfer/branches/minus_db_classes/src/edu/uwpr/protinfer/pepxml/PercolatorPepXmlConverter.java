@@ -31,7 +31,7 @@ import org.yeastrc.ms.domain.analysis.percolator.PercolatorParam;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.search.MsResidueModification;
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
+import org.yeastrc.ms.domain.search.Param;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
@@ -281,9 +281,9 @@ public class PercolatorPepXmlConverter extends PepXmlConverter<PercolatorResult>
     @Override
     void writeProgramSpecificParams(int searchId, XMLStreamWriter writer) throws XMLStreamException {
         SequestSearch search = seqSearchDao.loadSearch(searchId);
-        List<SequestParam> params = search.getSequestParams();
+        List<Param> params = search.getSequestParams();
         // TODO do we really need to write this out
-        for(SequestParam param: params) {
+        for(Param param: params) {
             writer.writeStartElement("parameter");
             writer.writeAttribute("name", param.getParamName());
             writer.writeAttribute("value", param.getParamValue());
