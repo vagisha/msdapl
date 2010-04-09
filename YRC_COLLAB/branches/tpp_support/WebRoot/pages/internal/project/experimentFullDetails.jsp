@@ -257,6 +257,7 @@
 		<tr align="left">
 			<th></th>
 			<th valign="top">ID</th>
+			<th valign="top">User</th>
 			<th valign="top">Version</th>
 			<th valign="top">Date</th>
 			<th valign="top" align="center">#Indist.<br>Groups</th>
@@ -291,6 +292,7 @@
 			</logic:equal>
 			
 			<td valign="top"><b><bean:write name="piRun" property="job.pinferId"/></b></td>
+			<td valign="top"><bean:write name="piRun" property="job.researcher.lastName"/></td>
 			<td valign="top" align="center"><b><bean:write name="piRun" property="job.version"/></b></td>
 			<td valign="top"><bean:write name="piRun" property="job.submitDate"/></td>
 			
@@ -326,6 +328,12 @@
 				&nbsp;
 				<span class="clickable" style="text-decoration: underline; color:red;" 
 				      onclick="javascript:deleteProtInferRun(<bean:write name='piRun' property='job.pinferId'/>);">Delete</span>
+				</nobr>
+				<yrcwww:member group="administrators">
+				&nbsp;
+				<span class="clickable" style="text-decoration: underline; color:red;" 
+				      onclick="javascript:rerunProtInferRun(<bean:write name='piRun' property='job.pinferId'/>);">R</span>
+				</yrcwww:member>
 				</nobr>
 			</logic:equal>
 			<!-- Job FAILED -->

@@ -42,6 +42,12 @@ public class NewPercolatorProteinInferenceAction extends Action {
             HttpServletResponse response )
     throws Exception {
         
+//    	ActionErrors errors = new ActionErrors();
+//    	errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.general.errorMessage", 
+//    			"Protein inference jobs have been disabled. A bug was found that is currently being fixed."));
+//    	saveErrors( request, errors );
+//    	return mapping.findForward("standardHome");
+    	
         // User making this request
         User user = UserUtils.getUser(request);
         if (user == null) {

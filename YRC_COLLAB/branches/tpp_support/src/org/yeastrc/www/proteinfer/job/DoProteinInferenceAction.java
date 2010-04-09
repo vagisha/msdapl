@@ -48,10 +48,9 @@ public class DoProteinInferenceAction extends Action {
             return mapping.findForward("authenticate");
         }
 
-        // Restrict access to yrc members
+        // Restrict access to MacCoss lab members
         Groups groupMan = Groups.getInstance();
         if (!groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS) &&
-          !groupMan.isMember( user.getResearcher().getID(), Projects.YATES) &&
           !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
             ActionErrors errors = new ActionErrors();
             errors.add("access", new ActionMessage("error.access.invalidgroup"));

@@ -289,6 +289,16 @@ function deleteProtInferRun(pinferId) {
 }
 
 // ---------------------------------------------------------------------------------------
+// RE-RUN PROTEIN INFERENCE
+// --------------------------------------------------------------------------------------- 
+function rerunProtInferRun(pinferId) {
+	if(confirm("Are you sure you want to re-run protein inference ID "+pinferId+"?")) {
+          document.location.href="<yrcwww:link path='rerunProteinInferJob.do?pinferId='/>"+pinferId+"&projectId=<bean:write name='project' property='ID'/>";
+        return 1;
+    }
+}
+
+// ---------------------------------------------------------------------------------------
 // COMPARE SELECTED PROTEIN INFERENCE RUNS
 // --------------------------------------------------------------------------------------- 
 function compareSelectedProtInfer() {

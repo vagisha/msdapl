@@ -221,8 +221,8 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 			 ExperimentProteinferRun piRun = new ExperimentProteinferRun(piJob);
 			 piRun.setNumParsimoniousProteins(protDao.getIdPickerProteinIds(piJob.getPinferId(), true).size());
 			 piRun.setNumParsimoniousProteinGroups(protDao.getIdPickerGroupCount(piJob.getPinferId(), true));
-			 piRun.setUniqPeptideSequenceCount(IdPickerResultsLoader.getUniquePeptideCount(piJob.getPinferId()));
-
+			 piRun.setUniqPeptideSequenceCount(peptDao.getUniquePeptideSequenceCountForRun(piJob.getPinferId()));
+			 piRun.setUniqIonCount(peptDao.getUniqueIonCountForRun(piJob.getPinferId()));
 			 piRuns.add(piRun);
 		 }
 		 pExpt.setProtInferRuns(piRuns);

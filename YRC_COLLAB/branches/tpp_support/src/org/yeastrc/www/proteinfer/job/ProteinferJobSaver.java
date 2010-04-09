@@ -21,7 +21,9 @@ import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerInput;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerParam;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.www.proteinfer.ProteinInferInputSummary;
 import org.yeastrc.www.proteinfer.ProteinInferInputSummary.ProteinInferIputFile;
@@ -112,6 +114,40 @@ public class ProteinferJobSaver {
         
         // finally save info in tblProteinferJobs;
         createEntryInTblProteinferJobs(jobId, pinferId);
+	}
+	
+	public int submitIdPickerJob(int submitterId, IdPickerRun pirun) throws Exception,
+			SQLException {
+        
+        int pinferId = pinferDao.save(pirun);
+        
+        if(pinferId <= 0) {
+            log.error("Error saving a new entry for Protein Inference");
+            throw new Exception("Error saving a new entry for Protein Inference");
+        }
+        
+        List<IdPickerInput> inputFiles = pirun.getInputList();
+        // save the input file information
+        for(IdPickerInput input: inputFiles) {
+        	input.setProteinferId(pinferId);
+            pinferInputDao.saveProteinferInput(input);
+        }
+        
+        // save the parameters
+        if(ProteinInferenceProgram.isIdPicker(pirun.getProgram())) {
+        	for(IdPickerParam param: pirun.getParams()) {
+        		param.setProteinferId(pinferId);
+                pinferParamDao.saveIdPickerParam(param);
+            }
+        }
+        
+        // create and entry in tblJobs
+        int jobId = createEntryInTblJobs(submitterId);
+        
+        // finally save info in tblProteinferJobs;
+        createEntryInTblProteinferJobs(jobId, pinferId);
+        
+        return jobId;
 	}
     
     /**
