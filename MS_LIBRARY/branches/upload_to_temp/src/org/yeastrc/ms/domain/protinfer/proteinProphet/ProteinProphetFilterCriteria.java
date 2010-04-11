@@ -21,6 +21,9 @@ public class ProteinProphetFilterCriteria extends ProteinFilterCriteria {
     private double minProteinProbability = 0.0;
     private double maxProteinProbability = 1.0;
     
+    private double minPeptideProbability = 0.0;
+    private double minUniqPeptideProbability = 0.0;
+    
     public static SORT_BY defaultSortBy() {
         return SORT_BY.PROTEIN_PROPHET_GROUP;
     }
@@ -90,10 +93,28 @@ public class ProteinProphetFilterCriteria extends ProteinFilterCriteria {
         if(this.minProteinProbability != that.minProteinProbability)          return false;
         if(this.maxProteinProbability != that.maxProteinProbability)          return false;
 
+        if(this.minPeptideProbability != that.minPeptideProbability)			return false;
+        if(this.minUniqPeptideProbability != that.minUniqPeptideProbability)	return false;
         return true;
     }
 
-    public double getMinGroupProbability() {
+    public double getMinPeptideProbability() {
+		return minPeptideProbability;
+	}
+
+	public void setMinPeptideProbability(double minPeptideProbability) {
+		this.minPeptideProbability = minPeptideProbability;
+	}
+
+	public double getMinUniqPeptideProbability() {
+		return minUniqPeptideProbability;
+	}
+
+	public void setMinUniqPeptideProbability(double minUniqPeptideProbability) {
+		this.minUniqPeptideProbability = minUniqPeptideProbability;
+	}
+
+	public double getMinGroupProbability() {
         return minGroupProbability;
     }
 

@@ -451,10 +451,43 @@
     </select>
     
     <select id="filterNrseqIdsByPeptideCount_SMC" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT prot.nrseqProteinID, prot.id, count(ion.id) AS cnt 
+    	SELECT prot.nrseqProteinID, prot.id, 
+    	<isNotPropertyAvailable property="peptideProbability">
+    		count(ion.id) AS cnt 
+    	</isNotPropertyAvailable>
+    	<isPropertyAvailable property="peptideProbability">
+    		ion.id AS ionID,
+    		count(pIon.nspAdjProbability) AS cnt
+    	</isPropertyAvailable>
     	FROM (msProteinInferProtein AS prot, ProteinProphetProtein as ppProt, msProteinInferProteinPeptideMatch as m)
     	LEFT JOIN ( msProteinInferPeptide AS pept, msProteinInferIon AS ion )
     	ON  (m.piPeptideID = pept.id AND pept.id = ion.piPeptideID
+    		<isPropertyAvailable property="uniqueToProtein">
+    			AND pept.uniqueToProtein = #uniqueToProtein#
+    		</isPropertyAvailable>
+    	)
+    	<isPropertyAvailable property="peptideProbability">
+    	LEFT JOIN (ProteinProphetProteinIon AS pIon)
+    	ON (pIon.piProteinID = prot.id 
+    		AND pIon.piIonID = ion.id
+    		AND pIon.nspAdjProbability >= #peptideProbability#)
+    	</isPropertyAvailable>
+    	
+    	WHERE prot.piRunID = #pinferId# 
+    	AND prot.id = ppProt.piProteinID 
+    	AND prot.id = m.piProteinID 
+    	<isPropertyAvailable property="isSubsumed">
+    		AND ppProt.subsumed = #isSubsumed#
+    	</isPropertyAvailable>
+    	GROUP BY prot.id HAVING cnt BETWEEN #minPeptides# AND #maxPeptides#
+    	
+    </select>
+    
+    <select id="filterNrseqIdsByPeptideCount_S" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT prot.nrseqProteinID, prot.id, count(pept.id) AS cnt 
+    	FROM (msProteinInferProtein AS prot, ProteinProphetProtein as ppProt, msProteinInferProteinPeptideMatch as m)
+    	LEFT JOIN ( msProteinInferPeptide AS pept )
+    	ON  (m.piPeptideID = pept.id 
     		<isPropertyAvailable property="uniqueToProtein">
     			AND pept.uniqueToProtein = #uniqueToProtein#
     		</isPropertyAvailable>
@@ -465,8 +498,8 @@
     	<isPropertyAvailable property="isSubsumed">
     		AND ppProt.subsumed = #isSubsumed#
     	</isPropertyAvailable>
-    	GROUP BY prot.id HAVING cnt BETWEEN #minPeptides# AND #maxPeptides#
-    	
+    	GROUP BY prot.id
+    	HAVING cnt BETWEEN #minPeptides# AND #maxPeptides#
     </select>
    <!-- =========================================================================== -->
     

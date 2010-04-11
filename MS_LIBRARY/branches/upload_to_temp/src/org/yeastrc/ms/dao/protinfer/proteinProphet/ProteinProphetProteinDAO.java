@@ -376,7 +376,8 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         List<Integer> ids_pept = nrseqIdsByAllPeptideCount(pinferId, 
                                             filterCriteria.getNumPeptides(), filterCriteria.getNumMaxPeptides(),
                                             filterCriteria.getPeptideDefinition(),
-                                            filterCriteria.parsimoniousOnly()
+                                            filterCriteria.parsimoniousOnly(),
+                                            filterCriteria.getMinPeptideProbability()
                                             );
         
         // Get a list of protein ids filtered by UNIQUE peptide count
@@ -386,11 +387,12 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
             ids_uniq_pept = ids_pept;
         }
         else {
-            ids_uniq_pept = nrseqIdsByAllPeptideCount(pinferId, 
+            ids_uniq_pept = nrseqIdsByUniquePeptideCount(pinferId, 
                                                filterCriteria.getNumUniquePeptides(),
                                                filterCriteria.getNumMaxUniquePeptides(),
                                                filterCriteria.getPeptideDefinition(),
-                                               filterCriteria.parsimoniousOnly());
+                                               filterCriteria.parsimoniousOnly(),
+                                               filterCriteria.getMinUniqPeptideProbability());
         }
         
         
@@ -681,18 +683,20 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     
     private List<Integer> nrseqIdsByUniquePeptideCount(int pinferId, 
             int minUniqPeptideCount, int maxUniqPeptideCount, 
-            PeptideDefinition peptDef,boolean isParsimonious) {
+            PeptideDefinition peptDef,boolean isParsimonious,
+            double peptideProbability) {
         return nrseqIdsByPeptideCount(pinferId, 
                 minUniqPeptideCount, maxUniqPeptideCount, 
-                peptDef, isParsimonious, true);
+                peptDef, isParsimonious, true, peptideProbability);
     }
     
     private List<Integer> nrseqIdsByAllPeptideCount(int pinferId, 
             int minUniqPeptideCount, int maxUniqPeptideCount,
-            PeptideDefinition peptDef, boolean isParsimonious) {
+            PeptideDefinition peptDef, boolean isParsimonious,
+            double peptideProbability) {
         return nrseqIdsByPeptideCount(pinferId, 
                 minUniqPeptideCount, maxUniqPeptideCount,
-                peptDef, isParsimonious, false);
+                peptDef, isParsimonious, false, peptideProbability);
     }
     
     private List<Integer> proteinIdsByPeptideCount(int pinferId, int minPeptideCount, int maxPeptideCount,
@@ -757,17 +761,20 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     }
     
     private List<Integer> nrseqIdsByPeptideCount(int pinferId, int minPeptideCount, int maxPeptideCount,
-            PeptideDefinition peptDef, boolean isParsimonious, boolean uniqueToProtein) {
+            PeptideDefinition peptDef, boolean isParsimonious, boolean uniqueToProtein,
+            double peptideProbability) {
         
         // If we are NOT filtering anything just return all the protein Ids
         // for this protein inference run
         if(!uniqueToProtein) {
-            if(minPeptideCount <= 1 && maxPeptideCount == Integer.MAX_VALUE) {
+            if(minPeptideCount <= 1 && maxPeptideCount == Integer.MAX_VALUE &&
+               peptideProbability <= 0.0) {
                 return getNrseqProteinIds(pinferId, isParsimonious);
             }
         }
         else {
-            if(minPeptideCount <= 0 && maxPeptideCount == Integer.MAX_VALUE) {
+            if(minPeptideCount <= 0 && maxPeptideCount == Integer.MAX_VALUE &&
+               peptideProbability <= 0.0) {
                 return getNrseqProteinIds(pinferId, isParsimonious);
             }
         }
@@ -781,10 +788,19 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         
         
         List<Integer> proteinIds = null;
-        // peptide uniquely defined by sequence, mods and charge (this is the only option
-        // used by ProteinProphet)
+        // peptide uniquely defined by sequence, mods and charge 
         if(peptDef.isUseCharge() && peptDef.isUseMods()) {
+        	
+        	// NOTE: peptide probability will be applied only when filtering on unique ions
+            if(peptideProbability > 0.0) {
+            	map.put("peptideProbability", peptideProbability);
+            }
+            
             proteinIds = queryForList(sqlMapNameSpace+".filterNrseqIdsByPeptideCount_SMC", map);
+        }
+        // peptide uniquely defined by sequence
+        else if(!peptDef.isUseCharge() && !peptDef.isUseMods()) {
+        	proteinIds = queryForList(sqlMapNameSpace+".filterNrseqIdsByPeptideCount_S", map);
         }
         
         return proteinIds;

@@ -102,26 +102,64 @@ public class GenericProteinferProtein <T extends GenericProteinferPeptide<?,?>>{
         peptideList.add(peptide);
     }
     
+    public int getSequenceCount() {
+    	return peptideList.size();
+    }
+    
+    public int getUniqueSequenceCount() {
+    	PeptideDefinition def = new PeptideDefinition();
+    	def.setUseCharge(false);
+    	def.setUseMods(false);
+    	return getUniquePeptideCountForDefinition(def);
+    }
+    
+    /**
+     * Returns the number of unique combinations of sequence + mods + charge
+     * @return
+     */
+    public int getIonCount() {
+    	PeptideDefinition def = new PeptideDefinition();
+    	def.setUseCharge(true);
+    	def.setUseMods(true);
+    	return getPeptideCountForDefinition(def);
+    }
+    
+    public int getUniqueIonCount() {
+    	PeptideDefinition def = new PeptideDefinition();
+    	def.setUseCharge(true);
+    	def.setUseMods(true);
+    	return getUniquePeptideCountForDefinition(def);
+    }
+    
     public int getPeptideCount() {
         // peptide is uniquely defined by its sequence
         if(!peptideDefinition.isUseCharge() && !peptideDefinition.isUseMods()) 
-            return peptideList.size();
+            return getSequenceCount();
         
         else {
-            int cnt = 0;
-            for(T peptide: peptideList)
-                cnt += peptide.getNumDistinctPeptides(peptideDefinition);
-            return cnt;
+            return getPeptideCountForDefinition(peptideDefinition);
         }
     }
+
+	private int getPeptideCountForDefinition(PeptideDefinition def) {
+		int cnt = 0;
+		for(T peptide: peptideList)
+		    cnt += peptide.getNumDistinctPeptides(def);
+		return cnt;
+	}
     
     public int getUniquePeptideCount() {
         
-        int uniqCnt = 0;
+        return getUniquePeptideCountForDefinition(peptideDefinition);
+    }
+    
+    private int getUniquePeptideCountForDefinition(PeptideDefinition def) {
+    	
+    	int uniqCnt = 0;
         for(T peptide: peptideList) {
             if(!peptide.isUniqueToProtein())
                 continue;
-            uniqCnt += peptide.getNumDistinctPeptides(peptideDefinition);
+            uniqCnt += peptide.getNumDistinctPeptides(def);
         }
         return uniqCnt;
     }
