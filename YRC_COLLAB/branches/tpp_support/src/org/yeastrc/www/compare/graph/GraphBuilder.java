@@ -32,7 +32,7 @@ public class GraphBuilder {
         buildGraph(List<ComparisonProtein> proteins, List<Integer> pinferIds) {
         
     	long s = System.currentTimeMillis();
-    	log.info("Building graph for comparison");
+    	log.info("Building graph for comparison; # ComparisonProteins: "+proteins.size());
         Map<String, Peptide> peptideIdMap = new HashMap<String, Peptide>();
         int peptideId = 1;
         
@@ -42,7 +42,7 @@ public class GraphBuilder {
         for (ComparisonProtein protein: proteins) {
             
             List<String> peptides = getPeptides(protein.getNrseqId(), pinferIds);
-            protein.setMaxPeptideCount(peptides.size());
+            protein.setMaxPeptideSeqCount(peptides.size());
             
             for(String peptide: peptides) {
                 Peptide pept = peptideIdMap.get(peptide);
@@ -59,7 +59,7 @@ public class GraphBuilder {
                     }
                 }
                 catch (InvalidVertexException e) {
-                    e.printStackTrace();
+                	log.error("EXCEPTION adding edge to graph", e);
                 }
             }
         }

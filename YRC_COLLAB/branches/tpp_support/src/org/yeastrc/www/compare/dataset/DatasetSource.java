@@ -32,4 +32,8 @@ public enum DatasetSource {
         else
             return null;
     }
+    
+    public boolean isIdPicker() {
+    	return this.name().equals("PROTINFER");
+    }
 }

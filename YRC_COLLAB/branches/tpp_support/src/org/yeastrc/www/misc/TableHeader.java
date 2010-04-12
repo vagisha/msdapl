@@ -22,7 +22,10 @@ public class TableHeader {
     private SORT_ORDER defaultSortOrder = SORT_ORDER.ASC;
     private int width;
     private int colspan = 0;
-    private SORT_CLASS sortClass = SORT_CLASS.SORT_ALPHA;
+    private int rowspan = 0;
+    private int rowIndex = 1;
+
+	private SORT_CLASS sortClass = SORT_CLASS.SORT_ALPHA;
     private String styleClass = null;
     
     public SORT_CLASS getSortClass() {
@@ -40,7 +43,23 @@ public class TableHeader {
     public void setColspan(int colspan) {
         this.colspan = colspan;
     }
+    
+    public int getRowspan() {
+        return rowspan;
+    }
 
+    public void setRowspan(int rowspan) {
+        this.rowspan = rowspan;
+    }
+    
+    public int getRowIndex() {
+		return rowIndex;
+	}
+
+	public void setRowIndex(int rowIndex) {
+		this.rowIndex = rowIndex;
+	}
+    
     public int getWidth() {
         return width;
     }

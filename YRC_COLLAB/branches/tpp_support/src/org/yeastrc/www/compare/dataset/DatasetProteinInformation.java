@@ -16,9 +16,15 @@ public class DatasetProteinInformation {
     private boolean present;
     private boolean parsimonious;
     private boolean grouped;
+    private int sequenceCount;
+    // private int uniqSeqCount;
+    private int ionCount;
+    private int uniqIonCount;
     private int spectrumCount;
     private double nsaf = -1.0;
     private final Dataset dataset;
+    
+    private static final DecimalFormat df = new DecimalFormat("0.000000");
     
     public DatasetProteinInformation(Dataset dataset) {
         this.dataset = dataset;
@@ -49,6 +55,22 @@ public class DatasetProteinInformation {
         this.parsimonious = parsimonious;
     }
 
+    public int getSequenceCount() {
+    	return sequenceCount;
+    }
+    
+//    public int getUniqueSequenceCount() {
+//    	return uniqSeqCount;
+//    }
+    
+    public int getIonCount() {
+    	return ionCount;
+    }
+    
+    public int getUniqueIonCount() {
+    	return uniqIonCount;
+    }
+    
     public int getSpectrumCount() {
         return spectrumCount;
     }
@@ -63,6 +85,22 @@ public class DatasetProteinInformation {
     
     public void setSpectrumCount(int spectrumCount) {
         this.spectrumCount = spectrumCount;
+    }
+    
+    public void setSequenceCount(int sequenceCount) {
+        this.sequenceCount = sequenceCount;
+    }
+    
+//    public void setUniqueSequenceCount(int sequenceCount) {
+//        this.uniqSeqCount = sequenceCount;
+//    }
+    
+    public void setIonCount(int ionCount) {
+        this.ionCount = ionCount;
+    }
+    
+    public void setUniqueIonCount(int ionCount) {
+        this.uniqIonCount = ionCount;
     }
 
     public boolean isGrouped() {
@@ -82,8 +120,6 @@ public class DatasetProteinInformation {
     }
     
     public String getNsafFormatted() {
-        String format = "0.000000";
-        DecimalFormat df = new DecimalFormat(format);
         return df.format(nsaf);
     }
 }

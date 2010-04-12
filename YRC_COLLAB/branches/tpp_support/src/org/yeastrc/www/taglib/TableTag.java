@@ -90,7 +90,16 @@ public class TableTag extends TagSupport {
             // print header
             writer.print("<thead>\n");
             writer.print("<tr>\n");
+            int rowIndex = -1;
             for(TableHeader header: tabular.tableHeaders()) {
+            	
+            	// do we need to start a new row
+            	if(header.getRowIndex() != rowIndex) {
+            		if(rowIndex != -1) {
+            			writer.print("</tr>\n<tr>");
+            		}
+            		rowIndex = header.getRowIndex();
+            	}
                 writer.print("<th");
                 if(header.getHeaderId() != null) {
                     writer.print(" id=\""+header.getHeaderId()+"\" ");
@@ -116,6 +125,9 @@ public class TableTag extends TagSupport {
                 }
                 if(header.getColspan() > 0) {
                     writer.print(" colspan=\""+header.getColspan()+"\" ");
+                }
+                if(header.getRowspan() > 0) {
+                    writer.print(" rowspan=\""+header.getRowspan()+"\" ");
                 }
                 if(header.getWidth() > 0) {
                     writer.print(" width=\""+header.getWidth()+"%\" ");

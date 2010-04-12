@@ -38,9 +38,14 @@
 	&nbsp; &nbsp; Page <bean:write name="currentPage" /> of <bean:write name="pageCount" />
 </div>
 
-<div style="margin:top: 3px;">
-<span class="underline clickable" style="font-size:8pt;color:red;" id="full_names" onclick="toggleFullNames()">[Full Names]</span> &nbsp; &nbsp;
-<span class="underline clickable" style="font-size:8pt;color:red;" id="full_descriptions" onclick="toggleFullDescriptions()">[Full Descriptions]</span>
+<div style="margin:top: 3px; margin-left: 10px; margin-right: 10px;">
+<table width="100%">
+<tr>
+<td><span class="underline clickable" style="font-size:8pt;color:red;" id="full_names" onclick="toggleFullNames()">[Full Names]</span>
+&nbsp;&nbsp;<span class="underline clickable" style="font-size:8pt;color:red;" id="full_descriptions" onclick="toggleFullDescriptions()">[Full Descriptions]</span></td>
+<td align="right"><span style="font-size:8pt;font-weight:bold;">* A peptide is a unique combination of sequence + modifications + charge</span></td>
+</tr>
+</table>
 </div>
 
 <%
@@ -51,7 +56,7 @@
  else sortedClass = "sorted-desc";
  %>
 
-<table cellpadding="0" cellspacing="0" align="center" width="99%"  id="protlisttable" class="table_pinfer" style="margin-top:10;">
+<table cellpadding="0" cellspacing="0" align="center" width="99%"  id="protlisttable" class="table_pinfer" style="margin-top:3;">
 
 	<logic:notEmpty name="proteinGroups">
 		<thead>
@@ -150,14 +155,14 @@
 			 if(sortBy == SORT_BY.NUM_PEPT) colSortedClass = sortedClass;
 		%>
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.NUM_PEPT.name()%>">
-			<b><font size="2pt"># Pept.</font></b>
+			<b><font size="2pt"># Pept.*</font></b>
 		</th>
 		
 		<% colSortedClass = "";
 			 if(sortBy == SORT_BY.NUM_UNIQ_PEPT) colSortedClass = sortedClass;
 		%>
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.NUM_UNIQ_PEPT.name()%>">
-			<b><font size="2pt"># Uniq. Pept.</font></b></th>
+			<b><font size="2pt"># Uniq. Pept.*</font></b></th>
 		
 		<% colSortedClass = "";
 			 if(sortBy == SORT_BY.NUM_SPECTRA) colSortedClass = sortedClass;

@@ -43,14 +43,14 @@
   
   <td><table>
   <tr>
-  <td>Peptides: </td>
+  <td>Peptides*: </td>
   <td>
   	Min <html:text name="proteinProphetFilterForm" property="minPeptides" size="3"></html:text>
   	Max <html:text name="proteinProphetFilterForm" property="maxPeptides" size="3"></html:text>
   </td>
   </tr>
   <tr>
-  <td>Unique Peptides: </td>
+  <td>Unique Peptides*: </td>
   <td>
   	Min <html:text name="proteinProphetFilterForm" property="minUniquePeptides" size="3"></html:text>
   	Max <html:text name="proteinProphetFilterForm" property="maxUniquePeptides" size="3"></html:text>

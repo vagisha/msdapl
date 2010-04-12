@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.struts.action.ActionForm;
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
 import org.yeastrc.www.compare.dataset.Dataset;
@@ -36,6 +37,16 @@ public class DatasetFiltersForm extends ActionForm {
     private String minPi;
     private String maxPi;
     
+    private String minPeptides = "1";
+    private String maxPeptides;
+    private String minUniquePeptides = "0";
+    private String maxUniquePeptides;
+    private boolean peptideUniqueSequence = false;
+    
+    private String peptideProbability = "0.0";
+    private boolean applyProbToPept = true;
+    private boolean applyProbToUniqPept = false;
+    
     private String accessionLike = null;
     private String descriptionLike = null;
     private String descriptionNotLike = null;
@@ -46,7 +57,7 @@ public class DatasetFiltersForm extends ActionForm {
     // FOR PROTEIN-PROPHET
     private boolean hasProteinProphetDatasets = false;
     private String errorRate = "0.01";
-    private boolean useProteinGroupProbability = false;
+    private boolean useProteinGroupProbability = true;
     
     
     
@@ -59,9 +70,37 @@ public class DatasetFiltersForm extends ActionForm {
         useProteinGroupProbability = false;
         
         keepProteinGroups = false;
+        peptideUniqueSequence = false;
+        
+        applyProbToPept = false;
+        applyProbToUniqPept = false;
     }
     
-    public boolean isKeepProteinGroups() {
+    public boolean getApplyProbToPept() {
+		return applyProbToPept;
+	}
+
+	public void setApplyProbToPept(boolean applyProbToPept) {
+		this.applyProbToPept = applyProbToPept;
+	}
+
+	public boolean getApplyProbToUniqPept() {
+		return applyProbToUniqPept;
+	}
+
+	public void setApplyProbToUniqPept(boolean applyProbToUniqPept) {
+		this.applyProbToUniqPept = applyProbToUniqPept;
+	}
+
+	public boolean getPeptideUniqueSequence() {
+		return peptideUniqueSequence;
+	}
+
+	public void setPeptideUniqueSequence(boolean peptideUniqueSequence) {
+		this.peptideUniqueSequence = peptideUniqueSequence;
+	}
+
+	public boolean isKeepProteinGroups() {
         return keepProteinGroups;
     }
 
@@ -137,6 +176,60 @@ public class DatasetFiltersForm extends ActionForm {
 	public void setSearchAllDescriptions(boolean searchAllDescriptions) {
 		this.searchAllDescriptions = searchAllDescriptions;
 	}
+    
+	// MIN PEPTIDES
+    public String getMinPeptides() {
+        return minPeptides;
+    }
+    public int getMinPeptidesInteger() {
+        if(minPeptides == null || minPeptides.trim().length() == 0)
+            return 1;
+        return Integer.parseInt(minPeptides);
+    }
+    public void setMinPeptides(String minPeptides) {
+        this.minPeptides = minPeptides;
+    }
+
+    // MAX PEPTIDES
+    public String getMaxPeptides() {
+        return maxPeptides;
+    }
+    public int getMaxPeptidesInteger() {
+        if(maxPeptides == null || maxPeptides.trim().length() == 0)
+            return Integer.MAX_VALUE;
+        return Integer.parseInt(maxPeptides);
+    }
+    public void setMaxPeptides(String maxPeptides) {
+        this.maxPeptides = maxPeptides;
+    }
+    
+    // MIN UNIQUE PEPTIDES
+    public String getMinUniquePeptides() {
+        return minUniquePeptides;
+    }
+    public int getMinUniquePeptidesInteger() {
+        if(minUniquePeptides == null || minUniquePeptides.trim().length() == 0)
+            return 0;
+        else
+            return Integer.parseInt(minUniquePeptides);
+    }
+    public void setMinUniquePeptides(String minUniquePeptides) {
+        this.minUniquePeptides = minUniquePeptides;
+    }
+
+    // MAX UNIQUE PEPTIDES
+    public String getMaxUniquePeptides() {
+        return maxUniquePeptides;
+    }
+    public int getMaxUniquePeptidesInteger() {
+        if(maxUniquePeptides == null || maxUniquePeptides.trim().length() == 0)
+            return Integer.MAX_VALUE;
+        else
+            return Integer.parseInt(maxUniquePeptides);
+    }
+    public void setMaxUniquePeptides(String maxUniquePeptides) {
+        this.maxUniquePeptides = maxUniquePeptides;
+    }
     
     //-----------------------------------------------------------------------------
     // Molecular Weight
@@ -270,7 +363,7 @@ public class DatasetFiltersForm extends ActionForm {
 
     
     //-----------------------------------------------------------------------------
-    // Protein Prophet datasets
+    // ProteinProphet datasets
     //-----------------------------------------------------------------------------
     public boolean getHasProteinProphetDatasets() {
         return hasProteinProphetDatasets ;
@@ -280,6 +373,9 @@ public class DatasetFiltersForm extends ActionForm {
         this.hasProteinProphetDatasets = hasProteinProphetDatasets;
     }
     
+    //-----------------------------------------------------------------------------
+    // ProteinProphet error rate
+    //-----------------------------------------------------------------------------
     public String getErrorRate() {
         return errorRate;
     }
@@ -299,6 +395,22 @@ public class DatasetFiltersForm extends ActionForm {
     
     public void setUseProteinGroupProbability(boolean useProteinGroupProbability) {
         this.useProteinGroupProbability = useProteinGroupProbability;
+    }
+    
+    //-----------------------------------------------------------------------------
+    // ProteinProphet peptide probability
+    //-----------------------------------------------------------------------------
+    public String getMinPeptideProbability() {
+        return peptideProbability;
+    }
+    public double getMinPeptideProbabilityDouble() {
+        if(peptideProbability == null || peptideProbability.trim().length() == 0)
+            return 0.0;
+        else
+            return Double.parseDouble(peptideProbability);
+    }
+    public void setMinPeptideProbability(String peptideProbability) {
+        this.peptideProbability = peptideProbability;
     }
     
     
@@ -373,6 +485,20 @@ public class DatasetFiltersForm extends ActionForm {
         filters.setDescriptionNotLike(this.getDescriptionNotLike());
         filters.setSearchAllDescriptions(this.isSearchAllDescriptions());
         
+        filters.setMinPeptideCount(this.getMinPeptidesInteger());
+        filters.setMaxPeptideCount(this.getMaxPeptidesInteger());
+        filters.setMinUniqPeptideCount(this.getMinUniquePeptidesInteger());
+        filters.setMaxUniqPeptideCount(this.getMaxUniquePeptidesInteger());
+        
+        if (this.hasProteinProphetDatasets) {
+        	filters.setHasProteinProphetFilters(true);
+        	filters.setProteinProphetError(this.getErrorRateDouble());
+        	filters.setUseGroupProbability(this.getUseProteinGroupProbability());
+        	filters.setPeptideProbability(this.getMinPeptideProbabilityDouble());
+        	filters.setApplyToPeptide(this.getApplyProbToPept());
+        	filters.setApplyToUniqPeptide(this.getApplyProbToUniqPept());
+        }
+        
         return filters;
     }
     
@@ -381,6 +507,18 @@ public class DatasetFiltersForm extends ActionForm {
     // -------------------------------------------------------------------------------
     public ProteinFilterCriteria getFilterCriteria() {
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
+        
+        filterCriteria.setNumPeptides(this.getMinPeptidesInteger());
+        filterCriteria.setNumMaxPeptides(this.getMaxPeptidesInteger());
+        filterCriteria.setNumUniquePeptides(this.getMinUniquePeptidesInteger());
+        filterCriteria.setNumMaxUniquePeptides(this.getMaxUniquePeptidesInteger());
+        
+        PeptideDefinition peptDef = new PeptideDefinition();
+        if(!this.peptideUniqueSequence) {
+        	peptDef.setUseCharge(true);
+        	peptDef.setUseMods(true);
+        }
+        filterCriteria.setPeptideDefinition(peptDef);
         
         filterCriteria.setParsimonious(true);
         filterCriteria.setNonParsimonious(false);
@@ -398,6 +536,13 @@ public class DatasetFiltersForm extends ActionForm {
         if(this.getUseProteinGroupProbability())
             filterCriteria.setMinGroupProbability(minProbability);
         else filterCriteria.setMinProteinProbability(minProbability);
+        
+        if(applyProbToPept && getMinPeptideProbabilityDouble() > 0.0) {
+        	filterCriteria.setMinPeptideProbability(getMinPeptideProbabilityDouble());
+        }
+        if(applyProbToUniqPept && getMinPeptideProbabilityDouble() > 0.0) {
+        	filterCriteria.setMinUniqPeptideProbability(getMinPeptideProbabilityDouble());
+        }
         ((ProteinProphetDataset)dataset).setProteinFilterCriteria(filterCriteria);
         
         return filterCriteria;

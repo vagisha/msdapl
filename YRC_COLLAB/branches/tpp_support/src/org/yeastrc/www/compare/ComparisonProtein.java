@@ -26,7 +26,8 @@ public class ComparisonProtein {
     private ProteinListing listing;
     private float molecularWeight = -1.0f;
     private float pi = -1.0f;
-    private int maxPeptideCount;
+    private int maxPeptideSeqCount; 
+    private int maxPeptideIonCount;
     
     private List<DatasetProteinInformation> datasetInfo;
     
@@ -76,12 +77,20 @@ public class ComparisonProtein {
         return false;
     }
 
-    public int getMaxPeptideCount() {
-        return maxPeptideCount;
+    public int getMaxPeptideSeqCount() {
+        return maxPeptideSeqCount;
     }
 
-    public void setMaxPeptideCount(int maxPeptideCount) {
-        this.maxPeptideCount = maxPeptideCount;
+    public void setMaxPeptideSeqCount(int maxPeptideSeqCount) {
+        this.maxPeptideSeqCount = maxPeptideSeqCount;
+    }
+    
+    public int getMaxPeptideIonCount() {
+        return maxPeptideIonCount;
+    }
+
+    public void setMaxPeptideIonCount(int maxPeptideIonCount) {
+        this.maxPeptideIonCount = maxPeptideIonCount;
     }
 
     public boolean isParsimonious() {

@@ -37,7 +37,7 @@ public class ComparisonProteinSorter {
     public void sortByPeptideCount( List<ComparisonProtein> proteins, SORT_ORDER sortOrder) throws SQLException {
         for(ComparisonProtein protein: proteins) {
          // get the (max)number of peptides identified for this protein
-            protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
+            protein.setMaxPeptideSeqCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
         }
         if(sortOrder == SORT_ORDER.DESC)
             Collections.sort(proteins, new PeptideCountCompartorDesc());
@@ -52,7 +52,7 @@ public class ComparisonProteinSorter {
                 @Override
                 public int compare(ComparisonProteinGroup o1,
                         ComparisonProteinGroup o2) {
-                    return Integer.valueOf(o2.getMaxPeptideCount()).compareTo(o1.getMaxPeptideCount());
+                    return Integer.valueOf(o2.getMaxPeptideSeqCount()).compareTo(o1.getMaxPeptideSeqCount());
                 }});
         
         if(sortOrder == SORT_ORDER.ASC)
@@ -60,7 +60,7 @@ public class ComparisonProteinSorter {
                 @Override
                 public int compare(ComparisonProteinGroup o1,
                         ComparisonProteinGroup o2) {
-                    return Integer.valueOf(o1.getMaxPeptideCount()).compareTo(o2.getMaxPeptideCount());
+                    return Integer.valueOf(o1.getMaxPeptideSeqCount()).compareTo(o2.getMaxPeptideSeqCount());
                 }});
     }
     
@@ -129,14 +129,14 @@ public class ComparisonProteinSorter {
     private static class PeptideCountCompartorDesc implements Comparator<ComparisonProtein> {
         @Override
         public int compare(ComparisonProtein o1, ComparisonProtein o2) {
-            return Integer.valueOf(o2.getMaxPeptideCount()).compareTo(o1.getMaxPeptideCount());
+            return Integer.valueOf(o2.getMaxPeptideSeqCount()).compareTo(o1.getMaxPeptideSeqCount());
         }
     }
     
     private static class PeptideCountCompartorAsc implements Comparator<ComparisonProtein> {
         @Override
         public int compare(ComparisonProtein o1, ComparisonProtein o2) {
-            return Integer.valueOf(o1.getMaxPeptideCount()).compareTo(o2.getMaxPeptideCount());
+            return Integer.valueOf(o1.getMaxPeptideSeqCount()).compareTo(o2.getMaxPeptideSeqCount());
         }
     }
     

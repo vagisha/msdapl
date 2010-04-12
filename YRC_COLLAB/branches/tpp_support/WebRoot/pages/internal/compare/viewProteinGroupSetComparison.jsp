@@ -624,6 +624,18 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 	</td>
 </tr>
 <tr>
+	<td><b>S</b></td>
+	<td style="font-size: 8pt;"># of unique peptide sequences</td>
+</tr>
+<tr>
+	<td><b>I</b></td>
+	<td style="font-size: 8pt;"># of ions: unique combination of sequence + modifications + charge</td>
+</tr>
+<tr>
+	<td><b>U.I</b></td>
+	<td style="font-size: 8pt;"># of unique ions</td>
+</tr>
+<tr>
 	<td><b>SC</b></td>
 	<td style="font-size: 8pt;">Spectrum Counts. <br/>
 		Example: 18(24) <br/>

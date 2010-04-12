@@ -55,7 +55,7 @@ public class PeptideComparisonDataset implements Tabular {
 
     @Override
     public int columnCount() {
-        return datasets.size() + 1;
+        return datasets.size() + 1 + datasets.size();
     }
 
     @Override
@@ -64,9 +64,7 @@ public class PeptideComparisonDataset implements Tabular {
         ComparisonPeptide peptide = peptides.get(index);
         TableRow row = new TableRow();
         
-        TableCell peptCell = new TableCell(peptide.getSequence());
-        peptCell.setClassName("left_align");
-        row.addCell(peptCell);
+        
         int dsIndex = 0;
         for(Dataset ds: datasets) {
             TableCell cell = new TableCell();
@@ -89,6 +87,30 @@ public class PeptideComparisonDataset implements Tabular {
             }
             row.addCell(cell);
         }
+        // sequence
+        TableCell peptCell = new TableCell(peptide.getSequence());
+        peptCell.setClassName("left_align");
+        row.addCell(peptCell);
+        
+        // charge
+        TableCell chargeCell = new TableCell(peptide.getCharge()+"");
+        chargeCell.setClassName("left_align");
+        row.addCell(chargeCell);
+        
+        // Spectrum counts
+        for(Dataset ds: datasets) {
+            TableCell cell = new TableCell();
+            
+            DatasetPeptideInformation dpi = peptide.getDatasetPeptideInformation(ds);
+            if(dpi == null || !dpi.isPresent()) { // dataset does not contain this protein
+                cell.setClassName("pept-not-found");
+            }
+            else {
+            	cell.setData(dpi.getSpectrumCount()+"");
+            }
+            row.addCell(cell);
+        }
+        
         return row;
     }
 
@@ -100,13 +122,22 @@ public class PeptideComparisonDataset implements Tabular {
     @Override
     public List<TableHeader> tableHeaders() {
         List<TableHeader> headers = new ArrayList<TableHeader>(columnCount());
-        TableHeader header = new TableHeader("Sequence");
-        header.setSortClass(SORT_CLASS.SORT_ALPHA);
-        headers.add(header);
+        TableHeader header;
         for(Dataset ds: datasets) {
             header = new TableHeader(String.valueOf(ds.getDatasetId()));
             header.setWidth(2);
             header.setSortClass(SORT_CLASS.SORT_ALPHA);
+            headers.add(header);
+        }
+        header = new TableHeader("Sequence");
+        header.setSortClass(SORT_CLASS.SORT_ALPHA);
+        headers.add(header);
+        header = new TableHeader("Charge");
+        header.setSortClass(SORT_CLASS.SORT_INT);
+        headers.add(header);
+        for(Dataset ds: datasets) {
+            header = new TableHeader(String.valueOf(ds.getDatasetId())+"<br>SC");
+            header.setSortClass(SORT_CLASS.SORT_INT);
             headers.add(header);
         }
         return headers;

@@ -331,7 +331,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 
     @Override
     public int columnCount() {
-        return datasets.size() + 4;
+        return datasets.size() + 6 + datasets.size()*4;
     }
 
     @Override
@@ -396,10 +396,6 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         TableCell protCommonName = new TableCell(getCommonNameContents(protein));
         row.addCell(protCommonName);
         
-        // External Links
-//        TableCell extLinks = new TableCell(getExternalLinks(protein));
-//        row.addCell(extLinks);
-        
         // Protein molecular wt.
         TableCell molWt = new TableCell();
         molWt.setData(protein.getMolecularWeight()+"");
@@ -419,33 +415,65 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         
         // These values are identical for all members of a protein group
         if(newRow) {
-        	// Peptide count
-        	TableCell peptCount = new TableCell(String.valueOf(protein.getMaxPeptideCount()));
+        	// Peptide sequence count
+        	TableCell peptCount = new TableCell(String.valueOf(protein.getMaxPeptideSeqCount()));
         	peptCount.setRowSpan(groupMemberCount.get(currentGroupId));
         	peptCount.setClassName("pept_count clickable underline");
         	peptCount.setId(String.valueOf(protein.getNrseqId()));
         	row.addCell(peptCount);
         
-        
-        	// Spectrum counts in each dataset
+        	// Sequence counts, ion counts, Spectrum counts in each dataset
         	for(Dataset dataset: datasets) {
         		DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
-        		TableCell cell = new TableCell();
 
         		if(dpi == null || !dpi.isPresent()) { // dataset does not contain this protein
+        			TableCell cell = new TableCell();
         			cell.setClassName("prot-not-found");
         			cell.setRowSpan(groupMemberCount.get(currentGroupId));
+        			row.addCell(cell);
+        			
+        			cell = new TableCell();
+        			cell.setClassName("prot-not-found");
+        			cell.setRowSpan(groupMemberCount.get(currentGroupId));
+        			row.addCell(cell);
+        			
+        			cell = new TableCell();
+        			cell.setClassName("prot-not-found");
+        			cell.setRowSpan(groupMemberCount.get(currentGroupId));
+        			row.addCell(cell);
+        			
         		}
         		else {
         			String className = "prot-found";
+        			
+        			// Peptide sequence count
+        			String contents = dpi.getSequenceCount()+"";
+                	TableCell seqCount = new TableCell(contents);
+                	seqCount.setRowSpan(groupMemberCount.get(currentGroupId));
+                	row.addCell(seqCount);
+                
+                	// Peptide ion count
+                	contents = dpi.getIonCount()+"";
+                	TableCell ionCount = new TableCell(contents);
+                	ionCount.setRowSpan(groupMemberCount.get(currentGroupId));
+                	row.addCell(ionCount);
+                	
+                	// Unique Peptide ion count
+                	contents = dpi.getUniqueIonCount()+"";
+                	TableCell uIonCount = new TableCell(contents);
+                	uIonCount.setRowSpan(groupMemberCount.get(currentGroupId));
+                	row.addCell(uIonCount);
+                	
+                	TableCell cell = new TableCell();
         			cell.setClassName(className);
         			cell.setData(dpi.getSpectrumCount()+"("+dpi.getNormalizedSpectrumCountRounded()+")");
         			cell.setTextColor("#FFFFFF");
         			float scaledCount = getScaledSpectrumCount(dpi.getNormalizedSpectrumCount());
         			cell.setBackgroundColor(getScaledColor(scaledCount));
         			cell.setRowSpan(groupMemberCount.get(currentGroupId));
+        			row.addCell(cell);
         		}
-        		row.addCell(cell);
+        		
         	}
         }
         return row;
@@ -577,6 +605,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         for(Dataset dataset: datasets) {
             header = new TableHeader(String.valueOf(dataset.getDatasetId()));
             header.setWidth(2);
+            header.setRowspan(2);
             header.setSortable(false);
             headers.add(header);
         }
@@ -587,22 +616,20 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 //        headers.add(header);
         
         header = new TableHeader("Name");
-        header.setWidth(10);
+        //header.setWidth(8);
         header.setSortable(false);
+        header.setRowspan(2);
         headers.add(header);
         
         header = new TableHeader("Common Name");
-        header.setWidth(10);
+        //header.setWidth(8);
         header.setSortable(false);
+        header.setRowspan(2);
         headers.add(header);
         
-//        header = new TableHeader("Links");
-//        header.setWidth(5);
-//        header.setSortable(false);
-//        headers.add(header);
-        
         header = new TableHeader("Mol. Wt.");
-        header.setWidth(8);
+        //header.setWidth(8);
+        header.setRowspan(2);
         header.setSortable(true);
         header.setSortClass(SORT_CLASS.SORT_FLOAT);
         header.setDefaultSortOrder(SORT_ORDER.ASC);
@@ -614,7 +641,8 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         headers.add(header);
         
         header = new TableHeader("pI");
-        header.setWidth(5);
+        //header.setWidth(5);
+        header.setRowspan(2);
         header.setSortClass(SORT_CLASS.SORT_FLOAT);
         header.setDefaultSortOrder(SORT_ORDER.ASC);
         header.setHeaderId(SORT_BY.PI.name());
@@ -625,13 +653,17 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         headers.add(header);
         
         header = new TableHeader("Description");
-        header.setWidth(100 - (15 + datasets.size()*2));
+        int width = Math.max(20, 100 - (15 + datasets.size()*2));
+        header.setWidth(width);
         header.setSortable(false);
+        header.setRowspan(2);
         headers.add(header);
         
-        // Peptide count
-        header = new TableHeader("#Pept");
-        header.setWidth(5);
+        // Peptide sequence count
+        header = new TableHeader("#Seq.");
+        //header.setWidth(5);
+        header.setRowspan(2);
+        header.setStyleClass("small_font");
         header.setSortable(true);
         header.setSortClass(SORT_CLASS.SORT_INT);
         header.setDefaultSortOrder(SORT_ORDER.DESC);
@@ -642,12 +674,43 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         }
         headers.add(header);
         
-        // spectrum counts
+        // sequence counts, ion counts and spectrum counts
         for(Dataset dataset: datasets) {
-            header = new TableHeader("SC("+dataset.getDatasetId()+")");
-            header.setWidth(2);
-            header.setSortable(false);
-            headers.add(header);
+        	header = new TableHeader(""+dataset.getDatasetId());
+        	header.setColspan(4);
+        	header.setSortable(false);
+        	headers.add(header);
+        }
+    	
+        for(Dataset dataset: datasets) {
+        	header = new TableHeader("S");
+        	header.setRowIndex(2);
+        	header.setStyleClass("small_font");
+        	header.setWidth(2);
+        	header.setSortable(false);
+        	headers.add(header);
+        	
+        	header = new TableHeader("I");
+        	header.setRowIndex(2);
+        	header.setWidth(2);
+        	header.setStyleClass("small_font");
+        	header.setSortable(false);
+        	headers.add(header);
+        	
+        	header = new TableHeader("U.I");
+        	header.setRowIndex(2);
+        	header.setWidth(2);
+        	header.setStyleClass("small_font");
+        	header.setSortable(false);
+        	headers.add(header);
+        	
+        	header = new TableHeader("SC");
+        	header.setRowIndex(2);
+        	header.setWidth(2);
+        	header.setStyleClass("small_font");
+        	header.setSortable(false);
+        	headers.add(header);
+        	
         }
         return headers;
     }
@@ -696,6 +759,10 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
                 List<Integer> piProteinIds = protDao.getProteinIdsForNrseqIds(dpi.getDatasetId(), nrseqIds);
                 if(piProteinIds.size() == 1) {
                     ProteinferProtein prot = protDao.loadProtein(piProteinIds.get(0));
+                    dpi.setSequenceCount(prot.getSequenceCount());
+                    //dpi.setUniqueSequenceCount(prot.getUniqueSequenceCount());
+					dpi.setIonCount(prot.getIonCount());
+					dpi.setUniqueIonCount(prot.getUniqueIonCount());
                     dpi.setSpectrumCount(prot.getSpectrumCount());
                 }
                 else {

@@ -56,7 +56,6 @@ import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
 import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
 import org.yeastrc.www.proteinfer.ProteinProperties;
 import org.yeastrc.www.proteinfer.ProteinPropertiesFilter;
-import org.yeastrc.www.proteinfer.ProteinPropertiesSorter;
 import org.yeastrc.www.proteinfer.ProteinPropertiesStore;
 
 /**

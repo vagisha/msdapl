@@ -152,12 +152,74 @@
 		<td></td>
 	</tr>
 	
-	<!-- ################## PARSIMONIOUS ONLY CHECKBOX	  ########################### -->
+	<tr>
+		<td valign="top" style="padding-bottom: 10px;">Include Proteins:</td>
+		<td valign="top" colspan="3" style="padding-bottom: 10px;">
+			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="0"><b>All</b></html:radio>
+			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="1"><b>Parsimonious in >= 1 Dataset</b></html:radio>
+			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="2"><b>Parsimonious in ALL Datasets</b></html:radio>
+			<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
+			<br>
+			<span style="font-size:8pt;">
+				NOTE: For ProteinProphet datasets "parsimonious" = NOT "subsumed"
+			</span>
+			</logic:equal>
+		</td>
+	</tr>
 	
 	
+	<tr><td colspan="4" style="border: 1px solid rgb(170, 170, 170); background-color: white;padding:1"><span></span></td></tr>
+	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
+	
+	<!-- ################## MOLECULAR WT. AND pI FILTERS	  ########################################### -->
+	<tr>
+		<td style="padding: 0 0 5 5;"><b>Mol. Wt:</b> </td>
+		<td style="padding: 0 5 5 0" align="left">
+			Min. <html:text name="proteinSetComparisonForm" property="minMolecularWt" size="8"></html:text> 
+		    Max. <html:text name="proteinSetComparisonForm" property="maxMolecularWt" size="8"></html:text>
+		</td>
+		<td style="padding:0 0 5 5;"><b>pI:</b></td>
+		<td style="padding:0 0 5 0;" align="left">
+			Min. <html:text name="proteinSetComparisonForm" property="minPi" size="8"></html:text> 
+			Max. <html:text name="proteinSetComparisonForm" property="maxPi" size="8"></html:text>
+		</td>
+	</tr>
+	
+	<!-- ################## MIN / MAX PEPTIDES FILTERS	  ########################################### -->
+	<tr>
+		<td style="padding: 0 0 5 5;"><b># Peptides*:</b> </td>
+		<td style="padding: 0 5 5 0" align="left">
+			Min. <html:text name="proteinSetComparisonForm" property="minPeptides" size="8"></html:text> 
+		    Max. <html:text name="proteinSetComparisonForm" property="maxPeptides" size="8"></html:text>
+		</td>
+		<td style="padding:0 0 5 5;"><b># Uniq. Peptides*:</b></td>
+		<td style="padding:0 0 5 0;" align="left">
+			Min. <html:text name="proteinSetComparisonForm" property="minUniquePeptides" size="8"></html:text> 
+			Max. <html:text name="proteinSetComparisonForm" property="maxUniquePeptides" size="8"></html:text>
+			<!--
+			<html:checkbox name="proteinSetComparisonForm"  property="peptideUniqueSequence">Unique Sequence</html:checkbox>
+			-->
+		</td>
+	</tr>
+	<tr><td colspan="4"><span style="font-size:8pt;">* Peptide = sequence + modifications + charge</span></td></tr>
+	
+	<!-- ################## PEPTIDE PROBABILITY FILTERS	  ########################################### -->
 	<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
 	<tr>
-		<td valign="top" style="padding-bottom: 10px;">ProteinProphet Error: </td>
+		<td><b>Min. Peptide Probability: </b></td>
+		<td style="padding-left: 5px;"><html:text name="proteinSetComparisonForm" property="minPeptideProbability" size="8"></html:text></td>
+		<td colspan="2">Apply to: 
+			<html:checkbox name="proteinSetComparisonForm" property="applyProbToPept"># Peptides</html:checkbox>
+			<html:checkbox name="proteinSetComparisonForm" property="applyProbToUniqPept"># Uniq. Peptides</html:checkbox>
+		</td>
+	</tr>
+	</logic:equal>
+	
+	
+	<!-- ################## PROTEIN PROPHET OPTIONS	  ########################### -->
+	<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
+	<tr>
+		<td valign="top" style="padding-bottom: 10px;"><b>ProteinProphet Error: </b></td>
 		<td valign="top" style="padding-bottom: 10px; padding-left: 5px;">
 			<html:text name="proteinSetComparisonForm" property="errorRate"></html:text>
 			<br>
@@ -175,35 +237,10 @@
 		</td>
 	</tr>
 	</logic:equal>
-	<tr>
-		<td valign="top" style="padding-bottom: 10px;">Include Proteins:</td>
-		<td valign="top" colspan="3" style="padding-bottom: 10px;">
-			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="0"><b>All</b></html:radio>
-			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="1"><b>Parsimonious in >= 1 Dataset</b></html:radio>
-			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="2"><b>Parsimonious in ALL Datasets</b></html:radio>
-			<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
-			<br>
-			<span style="font-size:8pt;">
-				NOTE: For ProteinProphet datasets "parsimonious" = NOT "subsumed"
-			</span>
-			</logic:equal>
-		</td>
-	</tr>
 	
 	
-	<!-- ################## MOLECULAR WT. AND pI FILTERS	  ########################################### -->
-	<tr>
-		<td style="padding: 0 0 5 5;"><b>Mol. Wt:</b> </td>
-		<td style="padding: 0 5 5 0" align="left">
-			Min. <html:text name="proteinSetComparisonForm" property="minMolecularWt" size="8"></html:text> 
-		    Max. <html:text name="proteinSetComparisonForm" property="maxMolecularWt" size="8"></html:text>
-		</td>
-		<td style="padding:0 0 5 5;"><b>pI:</b></td>
-		<td style="padding:0 0 5 0;" align="left">
-			Min. <html:text name="proteinSetComparisonForm" property="minPi" size="8"></html:text> 
-			Max. <html:text name="proteinSetComparisonForm" property="maxPi" size="8"></html:text>
-		</td>
-	</tr>
+	<tr><td colspan="4" style="border: 1px solid rgb(170, 170, 170); background-color: white;padding:1"><span></span></td></tr>
+	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
 	
 	<tr>
 		<!-- ################## SEARCH BOX	  ########################################### -->
@@ -239,6 +276,8 @@
  	
  	
  	<logic:notPresent name="goEnrichmentView">
+ 	<tr><td colspan="4" style="border: 1px solid rgb(170, 170, 170); background-color: white;padding:1"><span></span></td></tr>
+	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
 	<tr>
 		<td valign="top" align="left" colspan="4" style="padding-top:5px;">
 			<html:checkbox name="proteinSetComparisonForm" property="keepProteinGroups">Keep Protein Groups</html:checkbox><br>

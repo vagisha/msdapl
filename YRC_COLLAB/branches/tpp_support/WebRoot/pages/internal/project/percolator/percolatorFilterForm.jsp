@@ -68,8 +68,10 @@
 						<html:text name="filterForm" property="fileNameFilter" size="50" /><br>
 						Enter comma-separated file names
 					</td>
-					
+					<!--
 					<td valign="top">Unique peptides</td><td valign="top"> <html:checkbox name="filterForm" property="peptidesView" /> </td>
+					-->
+					<td></td>
 				</tr>
 				
 				<tr>

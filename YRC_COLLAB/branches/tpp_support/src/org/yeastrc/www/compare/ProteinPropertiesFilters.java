@@ -22,7 +22,100 @@ public class ProteinPropertiesFilters {
     private double minPi = 0.0;
     private double maxPi = Double.MAX_VALUE;
     
-    public ProteinPropertiesFilters() {}
+    private int minPeptideCount = 0;
+    private int maxPeptideCount = Integer.MAX_VALUE;
+    private int minUniqPeptideCount = 0;
+    private int maxUniqPeptideCount = Integer.MAX_VALUE;
+    
+    // ProteinProphet related
+    private boolean hasProteinProphetFilters = false;
+	private double peptideProbability = 0.0;
+    private boolean applyToPeptide = true;
+    private boolean applyToUniqPeptide = false;
+    private double proteinProphetError = 0.01;
+    private boolean useGroupProbability = true;
+    
+    public boolean hasProteinProphetFilters() {
+		return hasProteinProphetFilters;
+	}
+
+	public void setHasProteinProphetFilters(boolean hasProteinProphetFilters) {
+		this.hasProteinProphetFilters = hasProteinProphetFilters;
+	}
+
+	public double getPeptideProbability() {
+		return peptideProbability;
+	}
+
+	public void setPeptideProbability(double peptideProbability) {
+		this.peptideProbability = peptideProbability;
+	}
+
+	public boolean isApplyToPeptide() {
+		return applyToPeptide;
+	}
+
+	public void setApplyToPeptide(boolean applyToPeptide) {
+		this.applyToPeptide = applyToPeptide;
+	}
+
+	public boolean isApplyToUniqPeptide() {
+		return applyToUniqPeptide;
+	}
+
+	public void setApplyToUniqPeptide(boolean applyToUniqPeptide) {
+		this.applyToUniqPeptide = applyToUniqPeptide;
+	}
+
+	public double getProteinProphetError() {
+		return proteinProphetError;
+	}
+
+	public void setProteinProphetError(double proteinProphetError) {
+		this.proteinProphetError = proteinProphetError;
+	}
+
+	public boolean isUseGroupProbability() {
+		return useGroupProbability;
+	}
+
+	public void setUseGroupProbability(boolean useGroupProbability) {
+		this.useGroupProbability = useGroupProbability;
+	}
+	
+    public int getMinPeptideCount() {
+		return minPeptideCount;
+	}
+
+	public void setMinPeptideCount(int minPeptideCount) {
+		this.minPeptideCount = minPeptideCount;
+	}
+
+	public int getMaxPeptideCount() {
+		return maxPeptideCount;
+	}
+
+	public void setMaxPeptideCount(int maxPeptideCount) {
+		this.maxPeptideCount = maxPeptideCount;
+	}
+
+	public int getMinUniqPeptideCount() {
+		return minUniqPeptideCount;
+	}
+
+	public void setMinUniqPeptideCount(int minUniqPeptideCount) {
+		this.minUniqPeptideCount = minUniqPeptideCount;
+	}
+
+	public int getMaxUniqPeptideCount() {
+		return maxUniqPeptideCount;
+	}
+
+	public void setMaxUniqPeptideCount(int maxUniqPeptideCount) {
+		this.maxUniqPeptideCount = maxUniqPeptideCount;
+	}
+
+	public ProteinPropertiesFilters() {}
     
     public String getAccessionLike() {
         return accessionLike;
@@ -107,5 +200,13 @@ public class ProteinPropertiesFilters {
     
     public boolean hasPiFilter() {
         return (minPi != 0 || maxPi != Double.MAX_VALUE);
+    }
+    
+    public boolean hasPeptideCountFilter() {
+    	return (minPeptideCount != 0 || maxPeptideCount != Integer.MAX_VALUE);
+    }
+    
+    public boolean hasUniquePeptideCountFilter() {
+    	return (minUniqPeptideCount != 0 || maxUniqPeptideCount != Integer.MAX_VALUE);
     }
 }

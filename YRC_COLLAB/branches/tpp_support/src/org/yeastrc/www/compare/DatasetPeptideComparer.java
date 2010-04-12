@@ -11,14 +11,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferPeptideDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.ProteinferIon;
 import org.yeastrc.ms.domain.protinfer.ProteinferPeptide;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
+import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
+import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetPeptideInformation;
 import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
 import org.yeastrc.www.compare.dataset.DatasetSource;
+import org.yeastrc.www.proteinfer.MsResultLoader;
+
+import edu.uwpr.protinfer.PeptideKeyCalculator;
 
 /**
  * 
@@ -30,6 +41,7 @@ public class DatasetPeptideComparer {
     private static final ProteinferPeptideDAO peptDao = daoFactory.getProteinferPeptideDao();
     private static final ProteinferProteinDAO protDao = daoFactory.getProteinferProteinDao();
     
+    private static final Logger log = Logger.getLogger(DatasetPeptideComparer.class.getName());
     
     private DatasetPeptideComparer() {}
     
@@ -111,8 +123,16 @@ public class DatasetPeptideComparer {
         ArrayList<Integer> nrseqIds = new ArrayList<Integer>(1);
         nrseqIds.add(nrseqProteinId);
         
+        MsResultLoader resLoader = MsResultLoader.getInstance();
+        PeptideDefinition peptDef = new PeptideDefinition();
+        peptDef.setUseCharge(true);
+        peptDef.setUseMods(true);
+        
         for(Dataset dataset: datasets) {
             
+        	ProteinferRun run = daoFactory.getProteinferRunDao().loadProteinferRun(dataset.getDatasetId());
+        	Program inputGenerator = run.getInputGenerator();
+        	
             if(dataset.getSource() != DatasetSource.DTA_SELECT) {
                 List<Integer> piProteinIds = protDao.getProteinIdsForNrseqIds(dataset.getDatasetId(), nrseqIds);
                 
@@ -120,16 +140,37 @@ public class DatasetPeptideComparer {
                     List<ProteinferPeptide> peptides = peptDao.loadPeptidesForProteinferProtein(piProteinId);
                     
                     for(ProteinferPeptide pept: peptides) {
-                        ComparisonPeptide compPept = peptSeqMap.get(pept.getSequence());
-                        if(compPept == null) {
-                           compPept = new ComparisonPeptide(nrseqProteinId, pept.getSequence());
-                           peptSeqMap.put(pept.getSequence(), compPept);
-                        }
-                        DatasetPeptideInformation dpi = new DatasetPeptideInformation(dataset);
-                        dpi.setPresent(true);
-                        dpi.setSpectrumCount(pept.getSpectrumCount());
-                        dpi.setUnique(pept.isUniqueToProtein());
-                        compPept.addDatasetInformation(dpi);
+                    	
+                    	for(ProteinferIon ion: pept.getIonList()) {
+                    		ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
+                    		int resultId = psm.getResultId();
+                    		MsSearchResult result = resLoader.getResult(resultId, inputGenerator);
+                    		
+                    		String modifiedSeq = null;
+                    		String peptideKey = null;
+							try {
+								modifiedSeq = result.getResultPeptide().getModifiedPeptide();
+								peptideKey = modifiedSeq+"_"+ion.getCharge();
+							} catch (ModifiedSequenceBuilderException e) {
+								log.error("Error building modified sequence for ion: "+ion.getId());
+								peptideKey = "ERROR";
+							}
+                    		ComparisonPeptide compPept = peptSeqMap.get(peptideKey);
+                    		
+                    		if(compPept == null) {
+                                compPept = new ComparisonPeptide(nrseqProteinId);
+                                compPept.setSequence(modifiedSeq);
+                                compPept.setCharge(ion.getCharge());
+                                peptSeqMap.put(peptideKey, compPept);
+                             }
+                    		
+                    		DatasetPeptideInformation dpi = new DatasetPeptideInformation(dataset);
+                            dpi.setPresent(true);
+                            dpi.setSpectrumCount(ion.getSpectrumCount());
+                            dpi.setUnique(pept.isUniqueToProtein());
+                            compPept.addDatasetInformation(dpi);
+                    		
+                    	}
                     }
                 }
             }

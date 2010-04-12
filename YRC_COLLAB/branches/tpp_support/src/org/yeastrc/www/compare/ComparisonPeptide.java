@@ -19,12 +19,12 @@ public class ComparisonPeptide {
 
     private int nrseqProteinId;
     private String sequence;
+    private int charge;
     
     List<DatasetPeptideInformation> datasetInfo;
     
-    public ComparisonPeptide(int nrseqId, String sequence) {
+    public ComparisonPeptide(int nrseqId) {
         this.nrseqProteinId = nrseqId;
-        this.sequence = sequence;
         datasetInfo = new ArrayList<DatasetPeptideInformation>();
     }
     
@@ -64,9 +64,16 @@ public class ComparisonPeptide {
     public String getSequence() {
         return sequence;
     }
-
+    
     public void setSequence(String sequence) {
         this.sequence = sequence;
     }
-
+    
+    public int getCharge() {
+    	return charge;
+    }
+    
+    public void setCharge(int charge) {
+    	this.charge = charge;
+    }
 }

@@ -98,6 +98,7 @@ public class ProteinDatasetComparer {
             if(dataset.getSource() != DatasetSource.DTA_SELECT)
                 nrseqProteinIds = getProteinIdsForDataset(dataset);
             
+            log.info("Got "+nrseqProteinIds.size()+" nrseqIds for pinferId: "+dataset.getDatasetId());
             for(int nrseqId: nrseqProteinIds) {
                 ComparisonProtein protein = proteinMap.get(nrseqId);
                 if(protein == null) {
@@ -122,6 +123,7 @@ public class ProteinDatasetComparer {
                 
             	// get only non-parsimonious
                 List<Integer> nrseqProteinIds = getAllNonParsimoniousProteinIdsForDataset(dataset); 
+                log.info("Got "+nrseqProteinIds.size()+" nrseqIds for pinferId: "+dataset.getDatasetId());
                 
                 for(int nrseqId: nrseqProteinIds) {
                     ComparisonProtein protein = proteinMap.get(nrseqId);
@@ -153,6 +155,7 @@ public class ProteinDatasetComparer {
                 
                 if(dataset.getSource() != DatasetSource.DTA_SELECT)
                     nrseqProteinIds = getProteinIdsForDataset(dataset);
+                log.info("Got "+nrseqProteinIds.size()+" nrseqIds for pinferId: "+dataset.getDatasetId());
                 
                 for(int nrseqId: nrseqProteinIds) {
                     ComparisonProtein protein = proteinMap.get(nrseqId);
@@ -184,9 +187,8 @@ public class ProteinDatasetComparer {
         
         if(dataset.getSource() == DatasetSource.PROTINFER) {
         	
-        	ProteinFilterCriteria filterCriteria = dataset.getProteinFilterCrteria();
         	List<Integer> ids = protDao.getFilteredNrseqIds(dataset.getDatasetId(), 
-        			filterCriteria);
+        			dataset.getProteinFilterCrteria());
         	return ids;
         }
         
