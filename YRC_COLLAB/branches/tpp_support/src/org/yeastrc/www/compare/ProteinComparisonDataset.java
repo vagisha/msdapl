@@ -297,15 +297,19 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 
 			if(dpi == null || !dpi.isPresent()) { // dataset does not contain this protein
 				TableCell cell = new TableCell();
-    			cell.setClassName("prot-not-found");
+    			cell.setClassName("prot-not-found"); // # seq
     			row.addCell(cell);
     			
     			cell = new TableCell();
-    			cell.setClassName("prot-not-found");
+    			cell.setClassName("prot-not-found"); // # ions
     			row.addCell(cell);
     			
     			cell = new TableCell();
-    			cell.setClassName("prot-not-found");
+    			cell.setClassName("prot-not-found"); // # unique ions
+    			row.addCell(cell);
+    			
+    			cell = new TableCell();
+    			cell.setClassName("prot-not-found"); // SC
     			row.addCell(cell);
 			}
 			else {

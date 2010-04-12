@@ -428,17 +428,22 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 
         		if(dpi == null || !dpi.isPresent()) { // dataset does not contain this protein
         			TableCell cell = new TableCell();
-        			cell.setClassName("prot-not-found");
+        			cell.setClassName("prot-not-found"); // # seq
         			cell.setRowSpan(groupMemberCount.get(currentGroupId));
         			row.addCell(cell);
         			
         			cell = new TableCell();
-        			cell.setClassName("prot-not-found");
+        			cell.setClassName("prot-not-found"); // # ions
         			cell.setRowSpan(groupMemberCount.get(currentGroupId));
         			row.addCell(cell);
         			
         			cell = new TableCell();
-        			cell.setClassName("prot-not-found");
+        			cell.setClassName("prot-not-found"); // # unique ions
+        			cell.setRowSpan(groupMemberCount.get(currentGroupId));
+        			row.addCell(cell);
+        			
+        			cell = new TableCell();
+        			cell.setClassName("prot-not-found"); // SC
         			cell.setRowSpan(groupMemberCount.get(currentGroupId));
         			row.addCell(cell);
         			
