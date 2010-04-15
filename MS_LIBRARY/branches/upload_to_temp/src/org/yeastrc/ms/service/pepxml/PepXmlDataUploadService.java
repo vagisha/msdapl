@@ -100,7 +100,7 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
     private DynamicModLookupUtil dynaModLookup;
     private int numSearchesUploaded = 0;
 
-    private Map<String, List<PeptideProteinMatch>> proteinMatches;
+    // private Map<String, List<PeptideProteinMatch>> proteinMatches;
     private PeptideProteinMatchingService matchService;
 
     private static final Logger log = Logger.getLogger(PepXmlDataUploadService.class.getName());
@@ -117,7 +117,7 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
         this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
 
-        proteinMatches = new HashMap<String, List<PeptideProteinMatch>>();
+        //proteinMatches = new HashMap<String, List<PeptideProteinMatch>>();
 
         DAOFactory daoFactory = DAOFactory.instance();
 
@@ -391,7 +391,10 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
     	log.info("Loading search results for file: "+filename);
     	
         int runSearchId = uploadRunSearchHeader(searchId, runId, parser);
-
+        log.info("Created entry in msRunSearch table: "+runSearchId);
+        
+        Map<String, List<PeptideProteinMatch>> proteinMatches = new HashMap<String, List<PeptideProteinMatch>>();
+        
         // If the refresh parser has not been run we will initialize the PeptideProteinMatchingService
         if(!parser.isRefreshParserRun()) {
             initializePeptideProteinMatchingService(searchId);
