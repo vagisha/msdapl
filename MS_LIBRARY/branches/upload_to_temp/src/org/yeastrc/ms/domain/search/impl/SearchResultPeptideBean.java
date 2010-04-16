@@ -11,7 +11,7 @@ import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.service.ModifiedSequenceBuilder;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
-import org.yeastrc.ms.util.AminoAcidUtils;
+import org.yeastrc.ms.util.AminoAcidUtilsFactory;
 
 public class SearchResultPeptideBean  implements MsSearchResultPeptide {
 
@@ -116,7 +116,7 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
                 char modSymbol = mod.getModificationSymbol();
                 if(modSymbol == '\u0000') {
                     seq.append("["+Math.round(mod.getModificationMass().doubleValue() +
-                            AminoAcidUtils.monoMass(origseq.charAt(mod.getModifiedPosition())))+"]");
+                            AminoAcidUtilsFactory.getAminoAcidUtils().monoMass(origseq.charAt(mod.getModifiedPosition())))+"]");
                 }
                 else {
                     seq.append(modSymbol);
