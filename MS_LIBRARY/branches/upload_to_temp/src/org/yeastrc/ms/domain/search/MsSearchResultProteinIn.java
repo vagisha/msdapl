@@ -8,6 +8,8 @@ public interface MsSearchResultProteinIn {
      */
     public abstract String getAccession();
     
+    public abstract void setAccession(String accession);
+    
     /**
      * @return the description
      */

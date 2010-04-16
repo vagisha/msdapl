@@ -463,6 +463,11 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         
         for(Modification mod: ion.getModifications()) {
             
+        	// if this is a terminal modification skip over it
+        	if(mod.isTerminalModification())
+        		continue;
+        	
+        		
             // if this is not a dynamic modification ignore it
             // NOTE: ProtXml modifications are 1-based.  
             if(modLookup.isStaticModification(strippedSeq.charAt(mod.getPosition() - 1), mod.getMass(), true))
@@ -506,7 +511,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             if(!mod.isTerminalModification())
                 continue;
             
-            MsTerminalModification dbMod = modLookup.getTerminalModification(mod.getTerminus(), mod.getMass());
+            MsTerminalModification dbMod = modLookup.getTerminalModification(mod.getTerminus(), mod.getMass(), true); // mod mass + terminus mass
             if(dbMod == null) {
                 UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
                 ex.appendErrorMessage("searchId: "+searchId+
@@ -572,6 +577,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             
             try {
                 modifiedSeq = ModifiedSequenceBuilder.build(ion.getUnmodifiedSequence(), resMods, termMods);
+                log.debug("Modified sequence for resultID: "+result.getId()+" "+modifiedSeq);
             }
             catch (ModifiedSequenceBuilderException e) {
                 UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
@@ -595,10 +601,10 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         if(numFound != ion.getSpectrumCount()) {
 //            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
 //            ex.appendErrorMessage("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
-//                        ") does not match the number of results returned: "+numFound);
+//                        ") in protXML does not match the number of results returned: "+numFound);
 //            throw ex;
-            log.warn("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
-                  ")  charge ("+ion.getCharge()+") does not match the number of results returned: "+numFound);
+            log.error("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
+            ") in protXML does not match the number of results returned: "+numFound);
         }
     }
 
@@ -722,11 +728,26 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     }
 
     private int getNrseqProteinId(String accession, int nrseqDatabaseId) {
+    	// We have a limit on size of accession strings in YRC_NRSEQ
+    	if(accession.length() > 500)
+    		accession = accession.substring(0, 500);
         NrDbProtein protein = NrSeqLookupUtil.getDbProtein(nrseqDatabaseId, accession);
         if(protein != null)
             return protein.getProteinId();
-        else
-            return 0;
+        else if(accession.length() == 500) {
+        	// this could be an older protein only 255 chars long
+        	protein = NrSeqLookupUtil.getDbProtein(nrseqDatabaseId, accession.substring(0, 255));
+        	
+        	if(protein != null)
+        		return protein.getProteinId();
+        	
+        }
+        else {
+        	List<NrDbProtein> proteins = NrSeqLookupUtil.getDbProteinsPartialAccession(nrseqDatabaseId, accession);
+        	if(proteins.size() == 1)
+        		return proteins.get(0).getProteinId();
+        }
+        return 0;
     }
 
     private int addProteinInferenceRun(InteractProtXmlParser parser) throws UploadException {

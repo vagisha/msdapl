@@ -133,6 +133,21 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         }
     }
     
+    
+    public static List<NrDbProtein> getDbProteinsPartialAccession (int databaseId, String accession) {
+    	
+    	Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put("dbId", databaseId);
+        map.put("accession", accession+"%");
+        String statementName = "NrSeq.selectDbProteinForDbIdPartialAcc";
+        try {
+            return sqlMap.queryForList(statementName, map);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
     /**
      * 
      * @param databaseId

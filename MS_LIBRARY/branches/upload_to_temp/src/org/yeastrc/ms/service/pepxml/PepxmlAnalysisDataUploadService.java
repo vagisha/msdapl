@@ -444,34 +444,85 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         // load the stored result
         MsSearchResult storedResult = resDao.load(matchingSearchResultId);
         List<MsSearchResultProtein> storedMatches = storedResult.getProteinMatchList();
+        Set<String> storedAccessions = new HashSet<String>(storedMatches.size()*2);
+        for(MsSearchResultProtein prot: storedMatches) {
+            storedAccessions.add(prot.getAccession());
+        }
         
         List<MsSearchResultProteinIn> myMatches = result.getSearchResult().getProteinMatchList();
-        if(storedMatches.size() != myMatches.size()) {
+        // Get the unique accessions from the interact pepxml file
+        // If the accessions are longer than 500 chars truncate them. 
+        // YRC_NRSEQ supports only 500 length accessions
+        Set<String> pepXmlAccessions = new HashSet<String>(storedMatches.size()*2);
+        for(MsSearchResultProteinIn match: myMatches) {
+        	String accession = match.getAccession();
+        	if(accession.length() > 500)
+        		accession = accession.substring(0, 500);
+        	pepXmlAccessions.add(accession);
+        }
+        
+        if(storedMatches.size() != pepXmlAccessions.size()) {
 //            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
 //            ex.setErrorMessage("Number of protein matches stored: "+storedMatches.size()+
 //                    " does not match the number of matches found in interact files: "+myMatches.size()+
 //                    " for searchResultID: "+matchingSearchResultId);
 //            throw ex;
-            log.error("Number of protein matches stored: "+storedMatches.size()+
-                  " does not match the number of matches found in interact files: "+myMatches.size()+
-                  " for searchResultID: "+matchingSearchResultId);
+            
+            if(myMatches.size() > storedMatches.size()) {
+            	log.error("MORE PROTEINS IN interact pepxml");
+            	log.error("Number of protein matches stored: "+storedMatches.size()+
+                        " does not match the number of matches found in interact files: "+myMatches.size()+
+                        " for searchResultID: "+matchingSearchResultId);
+            }
         }
         
-        Set<String> storedAccessions = new HashSet<String>(storedMatches.size());
-        for(MsSearchResultProtein prot: storedMatches) {
-            storedAccessions.add(prot.getAccession());
-        }
         
-        for(MsSearchResultProteinIn prot: myMatches) {
-            if(!storedAccessions.contains(prot.getAccession())) {
-//                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-//                ex.setErrorMessage("Protein in interact file not found in database: "+prot.getAccession()+
-//                        "; searchResultID: "+matchingSearchResultId+
-//                        "; peptide: "+result.getSearchResult().getResultPeptide().getPeptideSequence());
-//                throw ex;
-                log.error("Protein in interact file not found in database: "+prot.getAccession()+
-                      "; searchResultID: "+matchingSearchResultId+
-                      "; peptide: "+result.getSearchResult().getResultPeptide().getPeptideSequence());
+        Set<String> shortStoredAccessionIPI = null;
+        
+        // Make sure we have stored all proteins that are  associated with the result in the interact pepxml file
+        for(String pepxmlAcc: pepXmlAccessions) {
+        	boolean matchFound = true;
+            if(!storedAccessions.contains(pepxmlAcc)) {
+            	matchFound = false;
+            }
+            
+            if(!matchFound) {
+            	// We may have a shorter version of the accession (255 chars before the table was modified)
+            	if(pepxmlAcc.length() > 255) {
+            		if(storedAccessions.contains(pepxmlAcc.substring(0,255))) {
+            			matchFound = true;
+            		}
+            	}
+            }
+            if(!matchFound) {
+            	
+            	// If these are IPI accessions, refresh parser may truncate the accessions
+            	if(pepxmlAcc.startsWith("IPI:IPI")) {
+            		
+            		if(shortStoredAccessionIPI == null) {
+            			shortStoredAccessionIPI = new HashSet<String>(storedMatches.size() * 2);
+            			for(String acc: storedAccessions) {
+            				int idx = acc.indexOf("|");
+            				if(idx == -1) shortStoredAccessionIPI.add(acc);
+            				else		  shortStoredAccessionIPI.add(acc.substring(0, idx));
+            			}
+            		}
+            		
+            		if(shortStoredAccessionIPI.contains(pepxmlAcc))
+            			matchFound = true;
+            	}
+            }
+            // no match found
+            if(!matchFound) {
+            	
+//              UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+//              ex.setErrorMessage("Protein in interact file not found in database: "+prot.getAccession()+
+//                      "; searchResultID: "+matchingSearchResultId+
+//                      "; peptide: "+result.getSearchResult().getResultPeptide().getPeptideSequence());
+//              throw ex;
+              log.error("Protein in interact file not found in database: "+pepxmlAcc+
+                    "; searchResultID: "+matchingSearchResultId+
+                    "; peptide: "+result.getSearchResult().getResultPeptide().getPeptideSequence());
             }
         }
     }

@@ -14,6 +14,8 @@ import java.util.Map;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
+import org.yeastrc.ms.util.AminoAcidUtilsFactory;
+import org.yeastrc.ms.util.BaseAminoAcidUtils;
 
 /**
  * 
@@ -25,6 +27,19 @@ public class ModifiedSequenceBuilder {
     
     public static String build(String sequence, List<MsResultResidueMod> dynamicResidueMods,
             List<MsResultTerminalMod> dynamicTerminalMods) throws ModifiedSequenceBuilderException {
+    	
+    	return build(sequence, dynamicResidueMods, dynamicTerminalMods, false);
+    }
+    
+    public static String buildWithDiffMass(String sequence, List<MsResultResidueMod> dynamicResidueMods,
+            List<MsResultTerminalMod> dynamicTerminalMods) throws ModifiedSequenceBuilderException {
+    	
+    	return build(sequence, dynamicResidueMods, dynamicTerminalMods, true);
+    }
+    
+    
+    private static String build(String sequence, List<MsResultResidueMod> dynamicResidueMods,
+            List<MsResultTerminalMod> dynamicTerminalMods, boolean diffMassOnly) throws ModifiedSequenceBuilderException {
         
         if((dynamicResidueMods == null || dynamicResidueMods.size() == 0) &&
            (dynamicTerminalMods == null || dynamicTerminalMods.size() == 0))
@@ -58,6 +73,19 @@ public class ModifiedSequenceBuilder {
         StringBuilder buf = new StringBuilder();
         for(int i = 0; i < sequence.length(); i++) {
             
+        	
+        	// add any dynamic N-terminal modifications
+            if(i == 0 && ntermMods.size() > 0) {
+            	double ntermmod = 0;
+                for(MsResultTerminalMod mod: ntermMods)
+                	ntermmod += mod.getModificationMass().doubleValue();
+                if(ntermmod > 0) {
+                	ntermmod += BaseAminoAcidUtils.NTERM_MASS;
+                	buf.append("n["+Math.round(ntermmod)+"]");
+                }
+            }
+            
+            // add the amino acid char
             buf.append(sequence.charAt(i));
             
             double mass = 0;
@@ -74,23 +102,32 @@ public class ModifiedSequenceBuilder {
                 }
             }
             
-            // add any dynamic terminal modifications
-            if(i == 0 && ntermMods.size() > 0) {
-                for(MsResultTerminalMod mod: ntermMods)
-                    mass += mod.getModificationMass().doubleValue();
-            }
-            if(i == sequence.length() - 1 && ctermMods.size() > 0) {
-                for(MsResultTerminalMod mod: ctermMods)
-                    mass += mod.getModificationMass().doubleValue();
-            }
             
             // If this position is modified add a string representing the mass of the residue at this position.
             if(mass != 0) {
-                
+            	if(!diffMassOnly) {
+            		double charMass = AminoAcidUtilsFactory.getAminoAcidUtils().monoMass(sequence.charAt(i));
+            		mass += charMass;
+            	}
                 String modStr = ""+Math.round(mass); // (AminoAcidUtils.monoMass(sequence.charAt(i)) + mass);
-                if(mass > 0)
-                    modStr = "+"+modStr;
+                if(diffMassOnly) {
+                	if(mass > 0) 
+                		modStr = "+"+modStr; // positive mass diff
+                	else
+                		modStr = "-"+modStr; // negative mass diff
+                }
                 buf.append("["+modStr+"]");
+            }
+            
+            // add any dynamic C-term modification
+            if(i == sequence.length() - 1 && ctermMods.size() > 0) {
+            	double ctermmod = 0;
+                for(MsResultTerminalMod mod: ctermMods)
+                	ctermmod += mod.getModificationMass().doubleValue();
+                if(ctermmod > 0) {
+                	ctermmod += BaseAminoAcidUtils.CTERM_MASS;
+                	buf.append("c["+Math.round(ctermmod)+"]");
+                }
             }
         }
         

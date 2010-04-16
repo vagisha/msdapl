@@ -26,6 +26,7 @@ import org.yeastrc.ms.domain.search.pepxml.PepXmlBaseSearchScanIn;
 import org.yeastrc.ms.domain.search.pepxml.impl.PepXmlBaseSearchScan;
 import org.yeastrc.ms.domain.search.pepxml.sequest.PepXmlSequestSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
+import org.yeastrc.ms.util.AminoAcidUtilsFactory;
 
 /**
  * 
@@ -141,4 +142,9 @@ public class PepXmlBaseFileReader extends PepXmlGenericFileReader<PepXmlBaseSear
             System.out.println();
         }
     }
+
+	@Override
+	protected double getMonoAAMass(char aa) {
+		return AminoAcidUtilsFactory.getAminoAcidUtils().monoMass(aa);
+	}
 }

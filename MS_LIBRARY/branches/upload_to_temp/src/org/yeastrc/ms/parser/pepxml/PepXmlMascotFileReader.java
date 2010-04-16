@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.analysis.peptideProphet.MascotPeptideProphetResultIn;
-import org.yeastrc.ms.domain.analysis.peptideProphet.SequestPeptideProphetResultIn;
 import org.yeastrc.ms.domain.analysis.peptideProphet.impl.MascotPeptideProphetResult;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
@@ -26,9 +25,9 @@ import org.yeastrc.ms.domain.search.mascot.MascotSearchResultIn;
 import org.yeastrc.ms.domain.search.mascot.impl.MascotResult;
 import org.yeastrc.ms.domain.search.pepxml.mascot.PepXmlMascotSearchScanIn;
 import org.yeastrc.ms.domain.search.pepxml.mascot.impl.PepXmlMascotSearchScan;
-import org.yeastrc.ms.domain.search.pepxml.sequest.PepXmlSequestSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.util.AminoAcidUtils;
+import org.yeastrc.ms.util.AminoAcidUtilsFactory;
 
 /**
  * 
@@ -149,8 +148,9 @@ public class PepXmlMascotFileReader extends PepXmlGenericFileReader<PepXmlMascot
     }
     
     public static void main(String[] args) throws DataProviderException {
-        String file = "/Users/silmaril/WORK/UW/FLINT/mascot_test/090715_EPO-iT_80mM_HCD.pep.xml";
-        PepXmlSequestFileReader reader = new PepXmlSequestFileReader();
+//        String file = "/Users/silmaril/WORK/UW/FLINT/mascot_test/090715_EPO-iT_80mM_HCD.pep.xml";
+        String file = "/Users/silmaril/WORK/UW/HOOPMANN_DATA/F001861.pep.xml";
+        PepXmlMascotFileReader reader = new PepXmlMascotFileReader();
         reader.open(file);
         System.out.println("PeptideProphet version: "+reader.getPeptideProphetVersion());
         System.out.println("PeptideProphetROC should be: "+reader.getPeptideProphetRoc());
@@ -165,8 +165,8 @@ public class PepXmlMascotFileReader extends PepXmlGenericFileReader<PepXmlMascot
             int numResults = 0;
             while(reader.hasNextSearchScan()) {
                 numScans++;
-                PepXmlSequestSearchScanIn scan = reader.getNextSearchScan();
-                for(SequestPeptideProphetResultIn res: scan.getScanResults()) {
+                PepXmlMascotSearchScanIn scan = reader.getNextSearchScan();
+                for(MascotPeptideProphetResultIn res: scan.getScanResults()) {
                     numResults++;
                 }
             }
@@ -176,4 +176,8 @@ public class PepXmlMascotFileReader extends PepXmlGenericFileReader<PepXmlMascot
         }
     }
 
+    @Override
+	protected double getMonoAAMass(char aa) {
+    	return AminoAcidUtilsFactory.getAminoAcidUtils().monoMass(aa);
+	}
 }

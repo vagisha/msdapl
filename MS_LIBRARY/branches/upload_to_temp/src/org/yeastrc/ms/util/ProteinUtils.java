@@ -22,10 +22,10 @@ public class ProteinUtils {
         sequence = sequence.trim().toUpperCase();
         double mass = 0;
         for(int i = 0; i < sequence.length(); i++) {
-            mass += AminoAcidUtils.avgMass(sequence.charAt(i));
+            mass += AminoAcidUtilsFactory.getProteinAminoAcidUtils().avgMass(sequence.charAt(i));
         }
         // add H for n-terminus and OH for c-terminus
-        mass = (mass + 2 * AminoAcidUtils.HYDROGEN + AminoAcidUtils.OXYGEN); //  / 1000.0; // kiloDaltons
+        mass = (mass + BaseAminoAcidUtils.NTERM_MASS + BaseAminoAcidUtils.CTERM_MASS); //  / 1000.0; // kiloDaltons
         return Math.round(mass *100.0) / 100.0;
     }
 

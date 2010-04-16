@@ -25,6 +25,10 @@ public class DbLocus implements MsSearchResultProteinIn {
     public String getAccession() {
         return accession;
     }
+    
+    public void setAccession(String accession) {
+    	this.accession = accession;
+    }
 
     /**
      * @return the description

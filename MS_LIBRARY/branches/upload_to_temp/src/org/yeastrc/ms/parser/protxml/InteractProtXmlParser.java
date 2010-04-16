@@ -27,6 +27,7 @@ import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPepti
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetROC;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetROCPoint;
+import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.parser.DataProviderException;
 
 public class InteractProtXmlParser {
@@ -338,6 +339,13 @@ public class InteractProtXmlParser {
             if(evtType == XMLStreamReader.START_ELEMENT && "modification_info".equalsIgnoreCase(reader.getLocalName())) {
                 String modPeptide = reader.getAttributeValue(null, "modified_peptide");
                 lastIon.setModifiedSequence(modPeptide);
+                
+                String modNtermMass = reader.getAttributeValue(null, "mod_nterm_mass");
+                if(modNtermMass != null)
+                	lastIon.addModification(new Modification(new BigDecimal(modNtermMass), Terminal.NTERM));
+                String modCtermMass = reader.getAttributeValue(null, "mod_ctermMass");
+                if(modCtermMass != null)
+                	lastIon.addModification(new Modification(new BigDecimal(modCtermMass), Terminal.CTERM));
             }
             
             if(evtType == XMLStreamReader.START_ELEMENT && "mod_aminoacid_mass".equalsIgnoreCase(reader.getLocalName())) {

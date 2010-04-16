@@ -12,7 +12,8 @@ import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.util.AminoAcidUtils;
+import org.yeastrc.ms.util.AminoAcidUtilsFactory;
+import org.yeastrc.ms.util.BaseAminoAcidUtils;
 
 public class DynamicModLookupUtil {
 
@@ -29,7 +30,7 @@ public class DynamicModLookupUtil {
     
     private int searchId;
 
-    public DynamicModLookupUtil(int searchId){
+    public DynamicModLookupUtil(int searchId) {
         modDao = DAOFactory.instance().getMsSearchModDAO();
         residueModMap = new HashMap<String, Integer>();
         terminalModMap = new HashMap<String, Integer>();
@@ -86,7 +87,7 @@ public class DynamicModLookupUtil {
         
         double mass = modMass.doubleValue();
         if(isMassPlusCharMass) {
-            mass -= AminoAcidUtils.monoMass(aa);
+            mass -= AminoAcidUtilsFactory.getAminoAcidUtils().monoMass(aa);
         }
         for(MsResidueModification mod: this.staticResMods) {
             if(mod.getModifiedResidue() == aa && (Math.abs(mass - mod.getModificationMass().doubleValue()) < 0.5))
@@ -130,7 +131,7 @@ public class DynamicModLookupUtil {
     public MsResidueModification getDynamicResidueModification(char modChar, BigDecimal modMass, boolean isMassPlusCharMass) {
         double mass = modMass.doubleValue();
         if(isMassPlusCharMass) {
-            mass -= AminoAcidUtils.monoMass(modChar);
+            mass -= AminoAcidUtilsFactory.getAminoAcidUtils().monoMass(modChar);
             
             // if this amino acid has a static modification subtract that mass as well
             for(MsResidueModification staticMod: staticResMods) {
@@ -165,7 +166,7 @@ public class DynamicModLookupUtil {
      * @return 0 if no match is found
      */
     public int getDynamicTerminalModificationId(Terminal modTerminal, BigDecimal modMass) {
-        Integer modId = terminalModMap.get(modTerminal+""+modMass.doubleValue());
+    	Integer modId = terminalModMap.get(modTerminal+""+modMass.doubleValue());
         if (modId != null)  return modId;
         return 0;
     }
@@ -178,6 +179,26 @@ public class DynamicModLookupUtil {
                     return mod;
             }
         }
+        return null;
+    }
+    
+    public MsTerminalModification getTerminalModification(Terminal modTerminal, BigDecimal modMass, boolean isMassPlusTerm) {
+    	
+    	if(!isMassPlusTerm)
+    		return getTerminalModification(modTerminal, modMass);
+    	
+    	double mass = modMass.doubleValue();
+    	if(modTerminal == Terminal.NTERM)
+    		mass -= BaseAminoAcidUtils.NTERM_MASS;
+    	else
+    		mass -= BaseAminoAcidUtils.CTERM_MASS;
+    	
+    	for(MsTerminalModification mod: this.dynaTermMods) {
+            double mm = mod.getModificationMass().doubleValue();
+            if(Math.abs(mm - mass) < 0.05 && modTerminal == mod.getModifiedTerminal())
+                return mod;
+        }
+        
         return null;
     }
 }

@@ -51,6 +51,8 @@ import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.PepxmlDataProvider;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.util.AminoAcidUtils;
+import org.yeastrc.ms.util.AminoAcidUtilsFactory;
+import org.yeastrc.ms.util.BaseAminoAcidUtils;
 
 /**
  * 
@@ -427,6 +429,20 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
         else if("N".equalsIgnoreCase(variable)) {
             String aa = reader.getAttributeValue(null, "aminoacid");
             String massdiff = reader.getAttributeValue(null, "massdiff");
+            String mass = reader.getAttributeValue(null, "mass");
+            
+            if(Double.parseDouble(mass) - Double.parseDouble(massdiff) == 0) {
+            	// If mass == massDiff this is not really a static modification
+                // This case happens in pepXML files generated with the Mascot to pepxml converter
+                // Non-standard amino acid and their masses are stuck in the 
+                // <aminoacid_modification> elements
+                // Example: <aminoacid_modification aminoacid="X" mass="111.000000" massdiff="111.000000" variable="N"/>
+            	// We will log a warning but save this as a static modification
+            	log.warn("mass and massdiff have same value: "+aa+" mass: "+mass+" massdiff: "+massdiff);
+            	if(AminoAcidUtilsFactory.getAminoAcidUtils().isAminoAcid(aa.charAt(0))) {
+            		log.error("!!! mass and modmass same for a STANDARD AMINO ACID!!!");
+            	}
+            }
             ResidueModification mod = new ResidueModification();
             mod.setModificationMass(new BigDecimal(massdiff));
             mod.setModifiedResidue(aa.charAt(0));
@@ -559,6 +575,8 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
     protected abstract void readProgramSpecificResult(R result);
     
     protected abstract void readProgramSpecificScore(R result, String name, String value);
+    
+    protected abstract double getMonoAAMass(char aa);
     
     //-------------------------------------------------------------------------------------------
     //-------------------------------------------------------------------------------------------
@@ -762,23 +780,71 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
         // String modifiedPeptide = reader.getAttributeValue(null, "modified_peptide");
         String modNtermMass = reader.getAttributeValue(null, "mod_nterm_mass");
         String modCtermMass = reader.getAttributeValue(null, "mod_ctermMass");
+        
+        // N-term modification
         if(modNtermMass != null) {
+        	double mass = Double.parseDouble(modNtermMass);
+        	mass -= BaseAminoAcidUtils.NTERM_MASS;
             // add this only if this is a dynamic terminal modification
-            BigDecimal mass = new BigDecimal(modNtermMass);
-            for(MsTerminalModificationIn mMod: this.searchDynamicTerminalMods) {
-                if(mass.doubleValue() == mMod.getModificationMass().doubleValue()) {
-                    dynamicMods.add(new Modification(mass, Terminal.NTERM));
-                }
-            }
+        	boolean isStaticTermMod = false;
+        	for(MsTerminalModificationIn mMod: this.searchStaticTerminalMods) {
+        		if(mMod.getModifiedTerminal() != Terminal.NTERM)
+        			continue;
+        		double diff = mass - mMod.getModificationMass().doubleValue();
+        		if(Math.abs(diff) <= 0.05) {
+        			isStaticTermMod = true;
+        			break;
+        		}
+        	}
+        	
+        	if(!isStaticTermMod) {
+        		boolean foundMatch = false;
+        		for(MsTerminalModificationIn mMod: this.searchDynamicTerminalMods) {
+        			if(mMod.getModifiedTerminal() != Terminal.NTERM)
+            			continue;
+        			double diff = mass - mMod.getModificationMass().doubleValue();
+            		if(Math.abs(diff) <= 0.05) {
+        				dynamicMods.add(new Modification(mMod.getModificationMass(), Terminal.NTERM));
+        				foundMatch = true;
+        			}
+        		}
+        		if(!foundMatch)  {
+        			throw new DataProviderException("No match found for dynamic N-term mod mass: "+modNtermMass);
+        		}
+        		
+        	}
         }
+        
+        // C-term modification
         if(modCtermMass != null) {
-         // add this only if this is a dynamic terminal modification
-            BigDecimal mass = new BigDecimal(modNtermMass);
-            for(MsTerminalModificationIn mMod: this.searchDynamicTerminalMods) {
-                if(mass.doubleValue() == mMod.getModificationMass().doubleValue()) {
-                    dynamicMods.add(new Modification(mass, Terminal.CTERM));
-                }
-            }
+            double mass = Double.parseDouble(modCtermMass);
+            mass -= BaseAminoAcidUtils.CTERM_MASS;
+            // add this only if this is a dynamic terminal modification
+            boolean isStaticTermMod = false;
+        	for(MsTerminalModificationIn mMod: this.searchStaticTerminalMods) {
+        		if(mMod.getModifiedTerminal() != Terminal.CTERM)
+        			continue;
+        		double diff = mass - mMod.getModificationMass().doubleValue();
+        		if(Math.abs(diff) <= 0.05) {
+        			isStaticTermMod = true;
+        			break;
+        		}
+        	}
+        	if(!isStaticTermMod) {
+        		boolean foundMatch = false;
+        		for(MsTerminalModificationIn mMod: this.searchDynamicTerminalMods) {
+        			if(mMod.getModifiedTerminal() != Terminal.CTERM)
+            			continue;
+        			double diff = mass - mMod.getModificationMass().doubleValue();
+            		if(Math.abs(diff) <= 0.05) {
+        				dynamicMods.add(new Modification(mMod.getModificationMass(), Terminal.CTERM));
+        				foundMatch = true;
+        			}
+        		}
+        		if(!foundMatch)  {
+        			throw new DataProviderException("No match found for dynamic C-term mod mass: "+modCtermMass);
+        		}
+        	}
         }
         
         
@@ -811,10 +877,12 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
         // element has mass_of_aminoacid + modification_mass. 
         
         double massDiff = getModMassDiff(modChar, mass, false);
+        
+        
         // If this mass difference and modChar match a static modification return null
         BigDecimal modMass = staticModMap.get(modChar);
         if(modMass != null && Math.abs(massDiff - modMass.doubleValue()) < 0.5) {
-            return null;
+            return null; // this is a static modification
         }
         
         massDiff = getModMassDiff(modChar, mass, true);
@@ -835,7 +903,14 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
     protected final double getModMassDiff(char modChar, BigDecimal mass, boolean subtractStatic) {
         // modification mass in pepXml files are: mass_of_aminoacid + modification_mass
         // we need just the modification_mass
-        double massDiff = mass.doubleValue() - AminoAcidUtils.monoMass(modChar);
+        double massDiff = mass.doubleValue() - getMonoAAMass(modChar); // AminoAcidUtils.monoMass(modChar);
+        
+        if(massDiff == mass.doubleValue()) {
+        	// If massDiff is the same as mass it means we did not find mass for this amino acid
+        	// This can happen for non-standard amino acids
+        	// We will log a warning
+        	log.warn("No mass found for amino acid: "+modChar);
+        }
         // if this is amino acid has a static modification, subtract that 
         // A residue could have both static and dynamic modifications(??)
         if(subtractStatic) {

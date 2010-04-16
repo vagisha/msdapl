@@ -29,6 +29,7 @@ import org.yeastrc.ms.domain.search.xtandem.XtandemSearchResultIn;
 import org.yeastrc.ms.domain.search.xtandem.impl.XtandemResult;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.util.AminoAcidUtils;
+import org.yeastrc.ms.util.AminoAcidUtilsFactory;
 
 /**
  * 
@@ -177,4 +178,8 @@ public class PepXmlXtandemFileReader extends PepXmlGenericFileReader<PepXmlXtand
         }
     }
     
+    @Override
+	protected double getMonoAAMass(char aa) {
+    	return AminoAcidUtilsFactory.getAminoAcidUtils().monoMass(aa);
+	}
 }

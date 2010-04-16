@@ -27,6 +27,7 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.domain.search.sequest.impl.SequestResult;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.util.AminoAcidUtils;
+import org.yeastrc.ms.util.AminoAcidUtilsFactory;
 
 /**
  * 
@@ -182,4 +183,8 @@ public class PepXmlSequestFileReader extends PepXmlGenericFileReader<PepXmlSeque
         }
     }
 
+    @Override
+	protected double getMonoAAMass(char aa) {
+		return AminoAcidUtilsFactory.getSequestAminoAcidUtils().monoMass(aa);
+	}
 }

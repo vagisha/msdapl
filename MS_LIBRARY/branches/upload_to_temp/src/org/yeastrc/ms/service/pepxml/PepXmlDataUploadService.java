@@ -34,7 +34,6 @@ import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchIn;
-import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
@@ -393,7 +392,7 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         int runSearchId = uploadRunSearchHeader(searchId, runId, parser);
         log.info("Created entry in msRunSearch table: "+runSearchId);
         
-        Map<String, List<PeptideProteinMatch>> proteinMatches = new HashMap<String, List<PeptideProteinMatch>>();
+        //Map<String, List<PeptideProteinMatch>> proteinMatches = new HashMap<String, List<PeptideProteinMatch>>();
         
         // If the refresh parser has not been run we will initialize the PeptideProteinMatchingService
         if(!parser.isRefreshParserRun()) {
@@ -414,7 +413,7 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
 
                         R sres = result.getSearchResult();
                         String peptideSeq = sres.getResultPeptide().getPeptideSequence();
-                        List<PeptideProteinMatch> matches = proteinMatches.get(peptideSeq);
+                        List<PeptideProteinMatch> matches = null; // proteinMatches.get(peptideSeq);
                         if(matches == null) {
                             matches = matchService.getMatchingProteins(peptideSeq);
                             if(matches.size() == 0) {
@@ -437,10 +436,22 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                                     throw ex;
                                 }
                             }
-                            proteinMatches.put(peptideSeq, matches);
+                            // proteinMatches.put(peptideSeq, matches);
                         }
 
                         List<MsSearchResultProteinIn> protList = sres.getProteinMatchList();
+                        // truncate accessions if required
+                        // accessions in the pepXML files can be longer than the accessions in YRC_NRSEQ
+                        // Limit was 255 now increased to 500
+                        // If the fasta file has already been uploaded it means that 
+                        // 500 chars are enough to uniquely identify this accession in the fasta file.
+                        for(MsSearchResultProteinIn prot: protList) {
+                        	if(prot.getAccession().length() > 500) {
+                        		log.warn("Truncating LONG Protein name in pepXML; length: "+prot.getAccession().length()+"\n"+
+                        				prot.getAccession());
+                        		prot.setAccession(prot.getAccession().substring(0,500));
+                        	}
+                        }
 
                         for(PeptideProteinMatch match: matches) {
                             boolean haveAlready = false;
@@ -449,7 +460,20 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                                     haveAlready = true;
                                     break;
                                 }
+                                // It is possible that our protein was entered into the database BEFORE column definition
+                                // was changed to 500 chars
+                                // In this case we look for a matching prefix
+                                else if(match.getProtein().getAccessionString().length() == 255 &&
+                                		prot.getAccession().length() == 500) {
+                                	
+                                	if(prot.getAccession().startsWith(match.getProtein().getAccessionString())) {
+                                		haveAlready = true;
+                                		break;
+                                	}
+                                }
+                                // TODO what if the protein names in pepXML are truncated.
                             }
+                            
                             if(haveAlready)
                                 continue;
                             DbLocus locus = new DbLocus(match.getProtein().getAccessionString(), match.getProtein().getDescription());
@@ -457,9 +481,9 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                             locus.setCtermResidue(match.getPostResidue());
                             locus.setNumEnzymaticTermini(match.getNumEnzymaticTermini());
                             sres.addMatchingProteinMatch(locus);
-
                         }
                     }
+                    
                     int resultId = uploadBaseSearchResult(result.getSearchResult(), runSearchId, scanId);
                     uploadProgramSpecificResultData(result.getSearchResult(), resultId); // Program specific scores
                     numResults++;
@@ -541,26 +565,26 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         return resultId;
     }
 
-    private <T extends MsSearchResult> List<Integer> uploadBaseSearchResults(
-            List<T> results) throws UploadException {
-
-        List<Integer> autoIncrIds = resultDao.saveResultsOnly(results);
-        for(int i = 0; i < results.size(); i++) {
-            MsSearchResult result = results.get(i);
-            int resultId = autoIncrIds.get(i);
-
-            // upload the protein matches
-            uploadProteinMatches(result, resultId);
-
-            // upload dynamic mods for this result
-            uploadResultResidueMods(result, resultId, result.getRunSearchId());
-
-            // no dynamic terminal mods for sequest
-            uploadResultTerminalMods(result, resultId, searchId);
-        }
-
-        return autoIncrIds;
-    }
+//    private <T extends MsSearchResult> List<Integer> uploadBaseSearchResults(
+//            List<T> results) throws UploadException {
+//
+//        List<Integer> autoIncrIds = resultDao.saveResultsOnly(results);
+//        for(int i = 0; i < results.size(); i++) {
+//            MsSearchResult result = results.get(i);
+//            int resultId = autoIncrIds.get(i);
+//
+//            // upload the protein matches
+//            uploadProteinMatches(result, resultId);
+//
+//            // upload dynamic mods for this result
+//            uploadResultResidueMods(result, resultId, result.getRunSearchId());
+//
+//            // no dynamic terminal mods for sequest
+//            uploadResultTerminalMods(result, resultId, searchId);
+//        }
+//
+//        return autoIncrIds;
+//    }
 
     private void uploadProteinMatches(MsSearchResultIn result, final int resultId, int databaseId)
     throws UploadException {
@@ -574,27 +598,28 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
             // only UNIQUE accession strings for this result will be added.
             if (accSet.contains(match.getAccession()))
                 continue;
+            log.debug("Adding match: resultID: "+resultId+"; Accession : "+match.getAccession());
             accSet.add(match.getAccession());
             proteinMatchList.add(new SearchResultProteinBean(resultId, match.getAccession()));
         }
     }
 
-    private final void uploadProteinMatches(MsSearchResult result, final int resultId)
-    throws UploadException {
-        // upload the protein matches if the cache has enough entries
-        if (proteinMatchList.size() >= BUF_SIZE) {
-            uploadProteinMatchBuffer();
-        }
-        // add the protein matches for this result to the cache
-        Set<String> accSet = new HashSet<String>(result.getProteinMatchList().size());
-        for (MsSearchResultProtein match: result.getProteinMatchList()) {
-            // only UNIQUE accession strings for this result will be added.
-            if (accSet.contains(match.getAccession()))
-                continue;
-            accSet.add(match.getAccession());
-            proteinMatchList.add(new SearchResultProteinBean(result.getId(), match.getAccession()));
-        }
-    }
+//    private final void uploadProteinMatches(MsSearchResult result, final int resultId)
+//    throws UploadException {
+//        // upload the protein matches if the cache has enough entries
+//        if (proteinMatchList.size() >= BUF_SIZE) {
+//            uploadProteinMatchBuffer();
+//        }
+//        // add the protein matches for this result to the cache
+//        Set<String> accSet = new HashSet<String>(result.getProteinMatchList().size());
+//        for (MsSearchResultProtein match: result.getProteinMatchList()) {
+//            // only UNIQUE accession strings for this result will be added.
+//            if (accSet.contains(match.getAccession()))
+//                continue;
+//            accSet.add(match.getAccession());
+//            proteinMatchList.add(new SearchResultProteinBean(result.getId(), match.getAccession()));
+//        }
+//    }
 
     private void uploadProteinMatchBuffer() {
 
@@ -632,30 +657,30 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         }
     }
 
-    private void uploadResultResidueMods(MsSearchResult result, int resultId,
-            int searchId) throws UploadException {
-        // upload the result dynamic residue modifications if the cache has enough entries
-        if (resultResidueModList.size() >= BUF_SIZE) {
-            uploadResultResidueModBuffer();
-        }
-        // add the dynamic residue modifications for this result to the cache
-        for (MsResultResidueMod mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
-            if (mod == null)
-                continue;
-            int modId = dynaModLookup.getDynamicResidueModificationId( 
-                    mod.getModifiedResidue(), mod.getModificationMass()); 
-            if (modId == 0) {
-                UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
-                ex.setErrorMessage("No matching dynamic residue modification found for: searchId: "+
-                        searchId+
-                        "; modResidue: "+mod.getModifiedResidue()+
-                        "; modMass: "+mod.getModificationMass().doubleValue());
-                throw ex;
-            }
-            ResultResidueModIds resultMod = new ResultResidueModIds(resultId, modId, mod.getModifiedPosition());
-            resultResidueModList.add(resultMod);
-        }
-    }
+//    private void uploadResultResidueMods(MsSearchResult result, int resultId,
+//            int searchId) throws UploadException {
+//        // upload the result dynamic residue modifications if the cache has enough entries
+//        if (resultResidueModList.size() >= BUF_SIZE) {
+//            uploadResultResidueModBuffer();
+//        }
+//        // add the dynamic residue modifications for this result to the cache
+//        for (MsResultResidueMod mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
+//            if (mod == null)
+//                continue;
+//            int modId = dynaModLookup.getDynamicResidueModificationId( 
+//                    mod.getModifiedResidue(), mod.getModificationMass()); 
+//            if (modId == 0) {
+//                UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
+//                ex.setErrorMessage("No matching dynamic residue modification found for: searchId: "+
+//                        searchId+
+//                        "; modResidue: "+mod.getModifiedResidue()+
+//                        "; modMass: "+mod.getModificationMass().doubleValue());
+//                throw ex;
+//            }
+//            ResultResidueModIds resultMod = new ResultResidueModIds(resultId, modId, mod.getModifiedPosition());
+//            resultResidueModList.add(resultMod);
+//        }
+//    }
 
     private void uploadResultResidueModBuffer() {
         modDao.saveAllDynamicResidueModsForResult(resultResidueModList);
@@ -687,30 +712,30 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         }
     }
 
-    private void uploadResultTerminalMods(MsSearchResult result, int resultId,
-            int searchId) throws UploadException {
-        // upload the result dynamic terminal modifications if the cache has enough entries
-        if (resultTerminalModList.size() >= BUF_SIZE) {
-            uploadResultTerminalModBuffer();
-        }
-        // add the dynamic terminal modifications for this result to the cache
-        for (MsTerminalModificationIn mod: result.getResultPeptide().getResultDynamicTerminalModifications()) {
-            if (mod == null)
-                continue;
-            int modId = dynaModLookup.getDynamicTerminalModificationId(
-                    mod.getModifiedTerminal(), mod.getModificationMass()); 
-            if (modId == 0) {
-                UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
-                ex.setErrorMessage("No matching dynamic terminal modification found for: searchId: "+
-                        searchId+
-                        "; modTerminal: "+mod.getModifiedTerminal()+
-                        "; modMass: "+mod.getModificationMass().doubleValue());
-                throw ex;
-            }
-            ResultTerminalModIds resultMod = new ResultTerminalModIds(resultId, modId);
-            resultTerminalModList.add(resultMod);
-        }
-    }
+//    private void uploadResultTerminalMods(MsSearchResult result, int resultId,
+//            int searchId) throws UploadException {
+//        // upload the result dynamic terminal modifications if the cache has enough entries
+//        if (resultTerminalModList.size() >= BUF_SIZE) {
+//            uploadResultTerminalModBuffer();
+//        }
+//        // add the dynamic terminal modifications for this result to the cache
+//        for (MsTerminalModificationIn mod: result.getResultPeptide().getResultDynamicTerminalModifications()) {
+//            if (mod == null)
+//                continue;
+//            int modId = dynaModLookup.getDynamicTerminalModificationId(
+//                    mod.getModifiedTerminal(), mod.getModificationMass()); 
+//            if (modId == 0) {
+//                UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
+//                ex.setErrorMessage("No matching dynamic terminal modification found for: searchId: "+
+//                        searchId+
+//                        "; modTerminal: "+mod.getModifiedTerminal()+
+//                        "; modMass: "+mod.getModificationMass().doubleValue());
+//                throw ex;
+//            }
+//            ResultTerminalModIds resultMod = new ResultTerminalModIds(resultId, modId);
+//            resultTerminalModList.add(resultMod);
+//        }
+//    }
 
     private void uploadResultTerminalModBuffer() {
         modDao.saveAllDynamicTerminalModsForResult(resultTerminalModList);

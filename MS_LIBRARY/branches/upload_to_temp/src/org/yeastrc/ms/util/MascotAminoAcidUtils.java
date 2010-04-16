@@ -1,7 +1,7 @@
 /**
- * AminoAcidUtils.java
+ * MascotAminoAidUtils.java
  * @author Vagisha Sharma
- * Jan 18, 2009
+ * Apr 15, 2010
  * @version 1.0
  */
 package org.yeastrc.ms.util;
@@ -12,14 +12,19 @@ import java.util.Set;
 /**
  * 
  */
-public class AminoAcidUtils {
+public class MascotAminoAcidUtils extends BaseAminoAcidUtils {
 
-    public static final double HYDROGEN = 1.00794;
-    public static final double OXYGEN = 15.9994;
-    public static final double PROTON = 1.00727646688;
-    
-    private static final char[] aminoAcidsChars = new char[24];
+	private static final char[] aminoAcidsChars = new char[24];
     private static final Set<Character> validChars = new HashSet<Character>();
+    
+    /*
+     * 	<aminoacid_modification aminoacid="B" mass="114.534940" massdiff="114.534940" variable="N"/>
+		<aminoacid_modification aminoacid="J" mass="0.000000" massdiff="0.000000" variable="N"/>
+		<aminoacid_modification aminoacid="O" mass="0.000000" massdiff="0.000000" variable="N"/>
+		<aminoacid_modification aminoacid="U" mass="150.953630" massdiff="150.953630" variable="N"/>
+		<aminoacid_modification aminoacid="X" mass="111.000000" massdiff="111.000000" variable="N"/>
+		<aminoacid_modification aminoacid="Z" mass="128.550590" massdiff="128.550590" variable="N"/>
+     */
     
     static {
         validChars.add('G');
@@ -31,14 +36,10 @@ public class AminoAcidUtils {
         validChars.add('C');
         validChars.add('L');
         validChars.add('I');
-        //validChars.add('X');
         validChars.add('N');
-        validChars.add('O');
-        validChars.add('B');
         validChars.add('D');
         validChars.add('Q');
         validChars.add('K');
-        validChars.add('Z');
         validChars.add('E');
         validChars.add('M');
         validChars.add('H');
@@ -46,10 +47,13 @@ public class AminoAcidUtils {
         validChars.add('R');
         validChars.add('Y');
         validChars.add('W');
+        validChars.add('X'); // non-standard
+        validChars.add('B'); // non-standard
+        validChars.add('Z'); // non-standard
+        validChars.add('U'); // non-standard
         
         int i = 0;
         aminoAcidsChars[i++] = 'A'; // Ananine
-        aminoAcidsChars[i++] = 'B'; // Aspartic Acid or Asparagine
         aminoAcidsChars[i++] = 'C'; // Cysteine
         aminoAcidsChars[i++] = 'D'; // Aspartic Acid
         aminoAcidsChars[i++] = 'E'; // Glutamic Acid
@@ -61,7 +65,6 @@ public class AminoAcidUtils {
         aminoAcidsChars[i++] = 'L'; // Leucine
         aminoAcidsChars[i++] = 'M'; // Methionine
         aminoAcidsChars[i++] = 'N'; // Asparagine
-        aminoAcidsChars[i++] = 'O'; // Ornithine
         aminoAcidsChars[i++] = 'P'; // Proline  
         aminoAcidsChars[i++] = 'Q'; // Glutamine
         aminoAcidsChars[i++] = 'R'; // Arginine        
@@ -70,80 +73,14 @@ public class AminoAcidUtils {
         aminoAcidsChars[i++] = 'V'; // Valine
         aminoAcidsChars[i++] = 'W'; // Tryptophan
         aminoAcidsChars[i++] = 'Y'; // Tyrosine
+        aminoAcidsChars[i++] = 'X'; // 
+        aminoAcidsChars[i++] = 'B'; // Aspartic Acid or Asparagine
         aminoAcidsChars[i++] = 'Z'; // Glutamatic Acid or Glutamine
-        //aminoAcidsChars[i++] = 'X'; // Leucine or Isoleucine
+        aminoAcidsChars[i++] = 'U'; // Glutamatic Acid or Glutamine
         
     }
     
-    public AminoAcidUtils() {}
-    
-    public char[] getAminoAcidChars() {
-        return aminoAcidsChars;
-    }
-    
-    public boolean isAminoAcid(char aa) {
-        return validChars.contains(Character.toUpperCase(aa));
-    }
-    
-    public double avgMass(char aminoAcid) {
-        switch(aminoAcid) {
-            case 'G': return avgMass_G();
-            case 'A': return avgMass_A();
-            case 'S': return avgMass_S();
-            case 'P': return avgMass_P();
-            case 'V': return avgMass_V();
-            case 'T': return avgMass_T();
-            case 'C': return avgMass_C();
-            case 'L': return avgMass_L();
-            case 'I': return avgMass_I();
-            //case 'X': return avgMass_X();
-            case 'N': return avgMass_N();
-            case 'O': return avgMass_O();
-            case 'B': return avgMass_B();
-            case 'D': return avgMass_D();
-            case 'Q': return avgMass_Q();
-            case 'K': return avgMass_K();
-            case 'Z': return avgMass_Z();
-            case 'E': return avgMass_E();
-            case 'M': return avgMass_M();
-            case 'H': return avgMass_H();
-            case 'F': return avgMass_F();
-            case 'R': return avgMass_R();
-            case 'Y': return avgMass_Y();
-            case 'W': return avgMass_W();
-            default : return 0;
-        }
-    }
-    
-    public double monoMass(char aminoAcid) {
-        switch(aminoAcid) {
-            case 'G': return monoMass_G();
-            case 'A': return monoMass_A();
-            case 'S': return monoMass_S();
-            case 'P': return monoMass_P();
-            case 'V': return monoMass_V();
-            case 'T': return monoMass_T();
-            case 'C': return monoMass_C();
-            case 'L': return monoMass_L();
-            case 'I': return monoMass_I();
-            //case 'X': return monoMass_X();
-            case 'N': return monoMass_N();
-            case 'O': return monoMass_O();
-            case 'B': return monoMass_B();
-            case 'D': return monoMass_D();
-            case 'Q': return monoMass_Q();
-            case 'K': return monoMass_K();
-            case 'Z': return monoMass_Z();
-            case 'E': return monoMass_E();
-            case 'M': return monoMass_M();
-            case 'H': return monoMass_H();
-            case 'F': return monoMass_F();
-            case 'R': return monoMass_R();
-            case 'Y': return monoMass_Y();
-            case 'W': return monoMass_W();
-            default : return 0;
-        }
-    }
+    public MascotAminoAcidUtils() {}
     
     public double monoMassPeptide(String peptide) {
         if(peptide == null || peptide.length() == 0)
@@ -166,6 +103,75 @@ public class AminoAcidUtils {
         }
         return mass;
     }
+    
+    public char[] getAminoAcidChars() {
+        return aminoAcidsChars;
+    }
+    
+    public boolean isAminoAcid(char aa) {
+        return validChars.contains(Character.toUpperCase(aa));
+    }
+    
+    public double avgMass(char aminoAcid) {
+        switch(aminoAcid) {
+            case 'G': return avgMass_G();
+            case 'A': return avgMass_A();
+            case 'S': return avgMass_S();
+            case 'P': return avgMass_P();
+            case 'V': return avgMass_V();
+            case 'T': return avgMass_T();
+            case 'C': return avgMass_C();
+            case 'L': return avgMass_L();
+            case 'I': return avgMass_I();
+            case 'N': return avgMass_N();
+            case 'D': return avgMass_D();
+            case 'Q': return avgMass_Q();
+            case 'K': return avgMass_K();
+            case 'E': return avgMass_E();
+            case 'M': return avgMass_M();
+            case 'H': return avgMass_H();
+            case 'F': return avgMass_F();
+            case 'R': return avgMass_R();
+            case 'Y': return avgMass_Y();
+            case 'W': return avgMass_W();
+            case 'X': return avgMass_X();
+            case 'B': return avgMass_B();
+            case 'Z': return avgMass_Z();
+            case 'U': return avgMass_U();
+            default : return 0;
+        }
+    }
+    
+    public double monoMass(char aminoAcid) {
+        switch(aminoAcid) {
+            case 'G': return monoMass_G();
+            case 'A': return monoMass_A();
+            case 'S': return monoMass_S();
+            case 'P': return monoMass_P();
+            case 'V': return monoMass_V();
+            case 'T': return monoMass_T();
+            case 'C': return monoMass_C();
+            case 'L': return monoMass_L();
+            case 'I': return monoMass_I();
+            case 'N': return monoMass_N();
+            case 'D': return monoMass_D();
+            case 'Q': return monoMass_Q();
+            case 'K': return monoMass_K();
+            case 'E': return monoMass_E();
+            case 'M': return monoMass_M();
+            case 'H': return monoMass_H();
+            case 'F': return monoMass_F();
+            case 'R': return monoMass_R();
+            case 'Y': return monoMass_Y();
+            case 'W': return monoMass_W();
+            case 'X': return monoMass_X();
+            case 'B': return monoMass_B();
+            case 'Z': return monoMass_Z();
+            case 'U': return monoMass_U();
+            default : return 0;
+        }
+    }
+    
     
 //  add_G_Glycine = 0.0000                 ; added to G - avg.  57.0519, mono.  57.02146
     public  double avgMass_G() {return 57.0519;}
@@ -195,14 +201,11 @@ public class AminoAcidUtils {
     public  double avgMass_I() {return 113.1594;}
     public  double monoMass_I(){return 113.08406;}
 //  add_X_LorI = 0.0000                    ; added to X - avg. 113.1594, mono. 113.08406
-    //public  double avgMass_X() {return 113.1594;}
-    //public  double monoMass_X(){return 113.08406;}
+    public  double avgMass_X() {return 111.0000;}
+    public  double monoMass_X(){return 111.0000;}
 //  add_N_Asparagine = 0.0000              ; added to N - avg. 114.1038, mono. 114.04293
     public  double avgMass_N() {return 114.1038;}
     public  double monoMass_N(){return 114.04293;}
-//  add_O_Ornithine = 0.0000               ; added to O - avg. 114.1472, mono  114.07931
-    public  double avgMass_O() {return 114.1472;}
-    public  double monoMass_O(){return 114.07931;}
 //  add_B_avg_NandD = 0.0000               ; added to B - avg. 114.5962, mono. 114.53494
     public  double avgMass_B() {return 114.5962;}
     public  double monoMass_B(){return 114.53494;}
@@ -239,4 +242,7 @@ public class AminoAcidUtils {
 //  add_W_Tryptophan = 0.0000              ; added to W - avg. 186.2132, mono. 186.07931
     public  double avgMass_W() {return 186.2132;}
     public  double monoMass_W(){return 186.07931;}
+    
+    public  double avgMass_U() {return 150.95363;}
+    public  double monoMass_U(){return 150.95363;}
 }

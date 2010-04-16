@@ -25,7 +25,7 @@ import org.yeastrc.ms.ConnectionFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.nrseq.NrDbProteinFull;
 import org.yeastrc.ms.service.database.DatabaseCopyException;
-import org.yeastrc.ms.util.AminoAcidUtils;
+import org.yeastrc.ms.util.AminoAcidUtilsFactory;
 import org.yeastrc.ms.util.TimeUtils;
 
 /**
@@ -295,7 +295,7 @@ public class FastaDatabaseSuffixCreator {
     
     private void buildSuffixTable() throws SQLException {
         
-        char[] aaChars = AminoAcidUtils.getAminoAcidChars();
+        char[] aaChars = AminoAcidUtilsFactory.getProteinAminoAcidUtils().getAminoAcidChars();
         
         int[] posIndex = new int[SUFFIX_LENGTH];
         for(int i = 0; i < posIndex.length; i++) {

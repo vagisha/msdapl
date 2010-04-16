@@ -102,6 +102,13 @@
         WHERE databaseID = #dbId#
         AND accessionString = #accession#
     </select>
+
+	<select id="selectDbProteinForDbIdPartialAcc" resultMap="nrDbProtResult" parameterClass="java.util.Map"> 
+        SELECT *
+        FROM tblProteinDatabase 
+        WHERE databaseID = #dbId#
+        AND accessionString LIKE #accession#
+    </select>
     
     <select id="selectDbProteinIdForDbIdPartialAcc" resultClass="Integer" parameterClass="java.util.Map"> 
         SELECT id
