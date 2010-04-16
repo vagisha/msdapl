@@ -28,8 +28,8 @@ import org.yeastrc.ms.domain.search.xtandem.XtandemSearchIn;
 import org.yeastrc.ms.domain.search.xtandem.XtandemSearchResultIn;
 import org.yeastrc.ms.domain.search.xtandem.impl.XtandemResult;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.util.AminoAcidUtils;
 import org.yeastrc.ms.util.AminoAcidUtilsFactory;
+import org.yeastrc.ms.util.BaseAminoAcidUtils;
 
 /**
  * 
@@ -127,7 +127,7 @@ public class PepXmlXtandemFileReader extends PepXmlGenericFileReader<PepXmlXtand
                 searchResult.getXtandemResultData().setPredictedIons(Integer.parseInt(val));
             else if (attrib.equalsIgnoreCase("calc_neutral_pep_mass")) {
                 // NOTE: We are storing M+H in the database
-                searchResult.getXtandemResultData().setCalculatedMass(new BigDecimal(val).add(BigDecimal.valueOf(AminoAcidUtils.PROTON))); 
+                searchResult.getXtandemResultData().setCalculatedMass(new BigDecimal(val).add(BigDecimal.valueOf(BaseAminoAcidUtils.PROTON))); 
             }
         }
         

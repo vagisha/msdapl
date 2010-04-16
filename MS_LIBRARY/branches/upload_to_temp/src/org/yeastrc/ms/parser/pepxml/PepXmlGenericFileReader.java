@@ -50,7 +50,6 @@ import org.yeastrc.ms.domain.search.pepxml.PepXmlSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.PepxmlDataProvider;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
-import org.yeastrc.ms.util.AminoAcidUtils;
 import org.yeastrc.ms.util.AminoAcidUtilsFactory;
 import org.yeastrc.ms.util.BaseAminoAcidUtils;
 
@@ -593,7 +592,7 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
                 scan.setScanNumber(Integer.parseInt(val));
             else if (attrib.equalsIgnoreCase("precursor_neutral_mass"))
                 // NOTE: We store M+H in the database
-                scan.setObservedMass(new BigDecimal(val).add(BigDecimal.valueOf(AminoAcidUtils.PROTON)));
+                scan.setObservedMass(new BigDecimal(val).add(BigDecimal.valueOf(BaseAminoAcidUtils.PROTON)));
             else if (attrib.equalsIgnoreCase("assumed_charge"))
                 scan.setCharge(Integer.parseInt(val));
             else if (attrib.equalsIgnoreCase("retention_time_sec"))

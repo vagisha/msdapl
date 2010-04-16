@@ -26,8 +26,8 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.domain.search.sequest.impl.SequestResult;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.util.AminoAcidUtils;
 import org.yeastrc.ms.util.AminoAcidUtilsFactory;
+import org.yeastrc.ms.util.BaseAminoAcidUtils;
 
 /**
  * 
@@ -129,7 +129,7 @@ public class PepXmlSequestFileReader extends PepXmlGenericFileReader<PepXmlSeque
                 searchResult.getSequestResultData().setPredictedIons(Integer.parseInt(val));
             else if (attrib.equalsIgnoreCase("calc_neutral_pep_mass")) {
                 // NOTE: We are storing M+H in the database
-                searchResult.getSequestResultData().setCalculatedMass(new BigDecimal(val).add(BigDecimal.valueOf(AminoAcidUtils.PROTON))); 
+                searchResult.getSequestResultData().setCalculatedMass(new BigDecimal(val).add(BigDecimal.valueOf(BaseAminoAcidUtils.PROTON))); 
             }
         }
     }

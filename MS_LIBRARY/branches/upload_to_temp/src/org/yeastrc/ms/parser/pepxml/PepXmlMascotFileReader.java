@@ -26,8 +26,8 @@ import org.yeastrc.ms.domain.search.mascot.impl.MascotResult;
 import org.yeastrc.ms.domain.search.pepxml.mascot.PepXmlMascotSearchScanIn;
 import org.yeastrc.ms.domain.search.pepxml.mascot.impl.PepXmlMascotSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.util.AminoAcidUtils;
 import org.yeastrc.ms.util.AminoAcidUtilsFactory;
+import org.yeastrc.ms.util.BaseAminoAcidUtils;
 
 /**
  * 
@@ -124,7 +124,7 @@ public class PepXmlMascotFileReader extends PepXmlGenericFileReader<PepXmlMascot
                 searchResult.getMascotResultData().setPredictedIons(Integer.parseInt(val));
             else if (attrib.equalsIgnoreCase("calc_neutral_pep_mass")) {
                 // NOTE: We are storing M+H in the database
-                searchResult.getMascotResultData().setCalculatedMass(new BigDecimal(val).add(BigDecimal.valueOf(AminoAcidUtils.PROTON))); 
+                searchResult.getMascotResultData().setCalculatedMass(new BigDecimal(val).add(BigDecimal.valueOf(BaseAminoAcidUtils.PROTON))); 
             }
         }
         
