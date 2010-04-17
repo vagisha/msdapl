@@ -392,7 +392,7 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         int runSearchId = uploadRunSearchHeader(searchId, runId, parser);
         log.info("Created entry in msRunSearch table: "+runSearchId);
         
-        //Map<String, List<PeptideProteinMatch>> proteinMatches = new HashMap<String, List<PeptideProteinMatch>>();
+        Map<String, List<PeptideProteinMatch>> proteinMatches = new HashMap<String, List<PeptideProteinMatch>>();
         
         // If the refresh parser has not been run we will initialize the PeptideProteinMatchingService
         if(!parser.isRefreshParserRun()) {
@@ -413,7 +413,7 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
 
                         R sres = result.getSearchResult();
                         String peptideSeq = sres.getResultPeptide().getPeptideSequence();
-                        List<PeptideProteinMatch> matches = null; // proteinMatches.get(peptideSeq);
+                        List<PeptideProteinMatch> matches = proteinMatches.get(peptideSeq);
                         if(matches == null) {
                             matches = matchService.getMatchingProteins(peptideSeq);
                             if(matches.size() == 0) {
@@ -436,7 +436,7 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                                     throw ex;
                                 }
                             }
-                            // proteinMatches.put(peptideSeq, matches);
+                            proteinMatches.put(peptideSeq, matches);
                         }
 
                         List<MsSearchResultProteinIn> protList = sres.getProteinMatchList();
@@ -467,11 +467,21 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                                 		prot.getAccession().length() == 500) {
                                 	
                                 	if(prot.getAccession().startsWith(match.getProtein().getAccessionString())) {
+                                		// update the accession so that we don't have trouble matching it with 
+                                		// entries in YRC_NRSEQ later
+                                		prot.setAccession(match.getProtein().getAccessionString());
                                 		haveAlready = true;
                                 		break;
                                 	}
                                 }
-                                // TODO what if the protein names in pepXML are truncated.
+                                // What if the protein names in pepXML are truncated.
+                                else if(match.getProtein().getAccessionString().startsWith(prot.getAccession())) {
+                                	// update the accession so that we don't have trouble matching it with 
+                            		// entries in YRC_NRSEQ later
+                            		prot.setAccession(match.getProtein().getAccessionString());
+                            		haveAlready = true;
+                            		break;
+                                }
                             }
                             
                             if(haveAlready)

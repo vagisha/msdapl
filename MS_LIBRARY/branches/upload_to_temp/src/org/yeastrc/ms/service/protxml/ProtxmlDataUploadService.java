@@ -334,18 +334,18 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         
         int nrseqId = getNrseqProteinId(protein.getProteinName(), nrseqDatabaseId);
         
+        if(nrseqId == 0) {
+            UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND);
+            ex.appendErrorMessage("No NRSEQ id foud for protein: "+protein.getProteinName()+"; databaseId: "+nrseqDatabaseId);
+            throw ex;
+        }
+        
         // if a protein with this nrseqId has already been saved do not save it again
         // ProteinProphet can list identical proteins (same sequence) as indistinguishable
         // proteins.  We will not save them twice. 
         ProteinferProtein oldProtein = ppProtDao.loadProtein(protein.getProteinferId(), nrseqId);
         if(oldProtein != null) {
             return oldProtein.getId();
-        }
-        
-        if(nrseqId == 0) {
-            UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND);
-            ex.appendErrorMessage("No NRSEQ id foud for protein: "+protein.getProteinName()+"; databaseId: "+nrseqDatabaseId);
-            throw ex;
         }
         
         protein.setNrseqProteinId(nrseqId);
@@ -731,13 +731,27 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     	// We have a limit on size of accession strings in YRC_NRSEQ
     	if(accession.length() > 500)
     		accession = accession.substring(0, 500);
-        NrDbProtein protein = NrSeqLookupUtil.getDbProtein(nrseqDatabaseId, accession);
+        NrDbProtein protein = null;
+        try {
+        	protein = NrSeqLookupUtil.getDbProtein(nrseqDatabaseId, accession);
+        }
+        catch(Exception e) { // TODO accessions for a particular database may not be unique
+        					 // the method above will throw an exception if > 1 matches are found
+        	log.error("Exception looking up YRC_NRSEQ match for dbID: "+nrseqDatabaseId+" and accession: "+accession, e);
+        }
         if(protein != null)
             return protein.getProteinId();
         else if(accession.length() == 500) {
         	// this could be an older protein only 255 chars long
-        	protein = NrSeqLookupUtil.getDbProtein(nrseqDatabaseId, accession.substring(0, 255));
-        	
+        	try {
+        		protein = NrSeqLookupUtil.getDbProtein(nrseqDatabaseId, accession.substring(0, 255));
+        	}
+        	catch(Exception e) {
+        		// TODO accessions for a particular database may not be unique
+				 // the method above will throw an exception if > 1 matches are found
+            	log.error("Exception looking up YRC_NRSEQ match for dbID: "+nrseqDatabaseId+
+            			" and accession substring: "+accession.substring(0, 255), e);
+            }
         	if(protein != null)
         		return protein.getProteinId();
         	

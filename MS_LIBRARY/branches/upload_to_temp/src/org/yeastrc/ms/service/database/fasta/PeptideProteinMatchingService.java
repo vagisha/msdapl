@@ -239,12 +239,12 @@ public class PeptideProteinMatchingService {
         Statement stmt = null;
         ResultSet rs = null;
         
-        List<List<String>> suffixLists = getSuffixLists(peptide);
-        
+        List<String> alternatePeptides = getAlternateSequences(peptide);
         
         Set<Integer> dbProteinIds = new HashSet<Integer>();
-        for(List<String> suffixList: suffixLists) {
-        	
+        for(String altPeptide: alternatePeptides) {
+        	List<String> suffixList = getSuffixList(altPeptide);
+        
         	String commaSep = StringUtils.makeQuotedCommaSeparated(suffixList);
         	try {
         		conn = ConnectionFactory.getNrseqConnection();
@@ -264,7 +264,7 @@ public class PeptideProteinMatchingService {
         		//            }
         	}
         	catch (SQLException e) {
-        		throw new RuntimeException("Exception getting matching proteinIds for suffix: "+peptide+" and database: "+this.databaseId, e);
+        		throw new RuntimeException("Exception getting matching proteinIds for suffix: "+altPeptide+" and database: "+this.databaseId, e);
         	}
         	finally {
 
@@ -284,9 +284,11 @@ public class PeptideProteinMatchingService {
         
         Set<Integer> dbProteinIds = new HashSet<Integer>();
         
-        List<List<String>> suffixLists = getSuffixLists(peptide);
+        List<String> alternatePeptides = getAlternateSequences(peptide);
         
-        for(List<String> suffixList: suffixLists) {
+        for(String altPeptide: alternatePeptides) {
+        	List<String> suffixList = getSuffixList(altPeptide);
+        
         	Map<Integer, Integer> proteinIdCount = new HashMap<Integer, Integer>();
 
         	try {
@@ -338,35 +340,28 @@ public class PeptideProteinMatchingService {
         return new ArrayList<Integer>(dbProteinIds);
     }
     
-    private List<List<String>> getSuffixLists(String peptideSeq) {
+    private List<String> getSuffixList(String peptideSeq) {
         
-    	List<String> allPeptides = getAlternateSequences(peptideSeq);
-    	
-    	List<List<String>> suffixSets = new ArrayList<List<String>>();
-    	
-    	for(String peptide: allPeptides) {
-    		Set<String> suffixList = new HashSet<String>();
-    		for(int i = 0; i < peptide.length(); i++) {
-    			int end = Math.min(i+FastaDatabaseSuffixCreator.SUFFIX_LENGTH, peptide.length());
-    			suffixList.add(peptide.substring(i, end));
+    	Set<String> suffixList = new HashSet<String>();
+    	for(int i = 0; i < peptideSeq.length(); i++) {
+    		int end = Math.min(i+FastaDatabaseSuffixCreator.SUFFIX_LENGTH, peptideSeq.length());
+    		suffixList.add(peptideSeq.substring(i, end));
 
-    			if(i+FastaDatabaseSuffixCreator.SUFFIX_LENGTH >= peptide.length())
-    				break;
-    		}
-    		suffixSets.add(new ArrayList<String>(suffixList));
+    		if(i+FastaDatabaseSuffixCreator.SUFFIX_LENGTH >= peptideSeq.length())
+    			break;
     	}
-        return suffixSets;
+    	return new ArrayList<String>(suffixList);
     }
     
-    private List<Integer> getMatchingDbProteinIdsForPeptideFromMemory(String peptideSeq) {
+    private List<Integer> getMatchingDbProteinIdsForPeptideFromMemory(String peptide) {
         
         int SUFFIX_LENGTH = FastaDatabaseSuffixCreator.SUFFIX_LENGTH;
         
-        if(peptideSeq.length() < SUFFIX_LENGTH) {
-            log.info("LOOKING FOR MATCH FOR SMALL PEPTIDE: "+peptideSeq);
+        if(peptide.length() < SUFFIX_LENGTH) {
+            log.info("LOOKING FOR MATCH FOR SMALL PEPTIDE: "+peptide);
             Set<Integer> allMatches = new HashSet<Integer>();
             for(String suffix: suffixMap.keySet()) {
-                if(suffix.startsWith(peptideSeq)) {
+                if(suffix.startsWith(peptide)) {
                     allMatches.addAll(suffixMap.get(suffix));
                 }
             }
@@ -380,8 +375,14 @@ public class PeptideProteinMatchingService {
         
         Set<Integer> allMatches = new HashSet<Integer>();
         
-        List<List<String>> suffixLists = getSuffixLists(peptideSeq);
-        for(List<String> suffixList: suffixLists) {
+        List<String> alternatePeptides = getAlternateSequences(peptide);
+        if(alternatePeptides.size() > 16000) {
+        	log.info("# ALTERNATE SEQUENCES: "+alternatePeptides.size()+" for peptide: "+peptide);
+        }
+        
+        
+        for(String altPeptide: alternatePeptides) {
+        	List<String> suffixList = getSuffixList(altPeptide);
         	
         	int numSuffixesInSeq = suffixList.size();
         	
@@ -393,15 +394,15 @@ public class PeptideProteinMatchingService {
         		
         		if(matchingProteins == null || matchingProteins.isEmpty()) {
         			// This can happen since we are looking for I<->L substitutions also
-        			log.debug("No protein matches found for suffix: "+suffix+" for peptide: "+peptideSeq);
+        			log.debug("No protein matches found for suffix: "+suffix+" for peptide: "+altPeptide);
         			continue;	
         		}
         		if(idx == 0) {
-                    for(int proteinId: matchingProteins)
+                    for(Integer proteinId: matchingProteins)
                         matches.put(proteinId, 1);
                 }
         		
-        		for(int proteinId: matchingProteins) {
+        		for(Integer proteinId: matchingProteins) {
                     Integer num = matches.get(proteinId);
                     if(num != null) {
                         matches.put(proteinId, ++num);
@@ -409,7 +410,6 @@ public class PeptideProteinMatchingService {
                 }
         		idx++;
         	}
-        	
         	// keep only those matches that had all the suffixes in our peptide.
             for(int proteinId: matches.keySet()) {
                 int cnt = matches.get(proteinId);
@@ -418,8 +418,13 @@ public class PeptideProteinMatchingService {
             }
         }
         
+        if(alternatePeptides.size() > 16000) {
+        	log.info("DONE LOOKING FOR SUFFIX TO PROTEIN MATCH for "+alternatePeptides.size()+" alternate peptides");
+        }
+        
+        
         if(allMatches.size() > 10)
-            log.debug("!!!# matches found: "+allMatches.size()+" for peptide: "+peptideSeq);
+            log.debug("!!!# matches found: "+allMatches.size()+" for peptide: "+peptide);
         
         return new ArrayList<Integer>(allMatches);
     }
@@ -463,6 +468,16 @@ public class PeptideProteinMatchingService {
     }
     
     public static void main(String[] args) {
+    	
+    	// 8192 for DLLLIRGGDLRHIGGGGNILLGGLNLLGGGLGQG
+    	// SUFFIX SET SIZE: 247808
+
+    	// 32768 for VILFMIILSGNLSIIILIRISSQLHHPMYFFLSHLAFAD
+    	 // INFO [Thread-1] [16 Apr 2010 22:47:24] - SUFFIX SET SIZE: 1177600
+
+    	//  Number of alternate peptides: 1048576 for MPLIYINIILEFTISLLGILVYRSHLISSLLCLEGIILSL
+
+    	// 512 for LLGMGDIEGLIDKVNELKLDDNEALIE
     	
     	String sequence = "ABCDIFG";
     	List<String> alternames = getAlternateSequences(sequence);

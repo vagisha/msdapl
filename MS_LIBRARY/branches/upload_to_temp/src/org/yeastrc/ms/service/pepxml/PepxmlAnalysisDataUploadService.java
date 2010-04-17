@@ -449,12 +449,12 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
             storedAccessions.add(prot.getAccession());
         }
         
-        List<MsSearchResultProteinIn> myMatches = result.getSearchResult().getProteinMatchList();
+        List<MsSearchResultProteinIn> pepXmlMatches = result.getSearchResult().getProteinMatchList();
         // Get the unique accessions from the interact pepxml file
         // If the accessions are longer than 500 chars truncate them. 
         // YRC_NRSEQ supports only 500 length accessions
         Set<String> pepXmlAccessions = new HashSet<String>(storedMatches.size()*2);
-        for(MsSearchResultProteinIn match: myMatches) {
+        for(MsSearchResultProteinIn match: pepXmlMatches) {
         	String accession = match.getAccession();
         	if(accession.length() > 500)
         		accession = accession.substring(0, 500);
@@ -462,18 +462,18 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         }
         
         if(storedMatches.size() != pepXmlAccessions.size()) {
-//            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-//            ex.setErrorMessage("Number of protein matches stored: "+storedMatches.size()+
-//                    " does not match the number of matches found in interact files: "+myMatches.size()+
-//                    " for searchResultID: "+matchingSearchResultId);
-//            throw ex;
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.setErrorMessage("Number of protein matches stored: "+storedMatches.size()+
+                    " does not match the number of matches found in interact files: "+pepXmlMatches.size()+
+                    " for searchResultID: "+matchingSearchResultId);
+            throw ex;
             
-            if(myMatches.size() > storedMatches.size()) {
-            	log.error("MORE PROTEINS IN interact pepxml");
-            	log.error("Number of protein matches stored: "+storedMatches.size()+
-                        " does not match the number of matches found in interact files: "+myMatches.size()+
-                        " for searchResultID: "+matchingSearchResultId);
-            }
+//            log.error("Number of protein matches stored: "+storedMatches.size()+
+//            		" does not match the number of matches found in interact files: "+myMatches.size()+
+//            		" for searchResultID: "+matchingSearchResultId);
+//            if(myMatches.size() > storedMatches.size()) {
+//            	log.error("MORE PROTEINS IN interact pepxml");
+//            }
         }
         
         
@@ -515,14 +515,14 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
             // no match found
             if(!matchFound) {
             	
-//              UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-//              ex.setErrorMessage("Protein in interact file not found in database: "+prot.getAccession()+
-//                      "; searchResultID: "+matchingSearchResultId+
-//                      "; peptide: "+result.getSearchResult().getResultPeptide().getPeptideSequence());
-//              throw ex;
-              log.error("Protein in interact file not found in database: "+pepxmlAcc+
-                    "; searchResultID: "+matchingSearchResultId+
-                    "; peptide: "+result.getSearchResult().getResultPeptide().getPeptideSequence());
+              UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+              ex.setErrorMessage("Protein in interact file not found in database: "+pepxmlAcc+
+                      "; searchResultID: "+matchingSearchResultId+
+                      "; peptide: "+result.getSearchResult().getResultPeptide().getPeptideSequence());
+              throw ex;
+//              log.error("Protein in interact file not found in database: "+pepxmlAcc+
+//                    "; searchResultID: "+matchingSearchResultId+
+//                    "; peptide: "+result.getSearchResult().getResultPeptide().getPeptideSequence());
             }
         }
     }
