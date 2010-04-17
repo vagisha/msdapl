@@ -75,6 +75,7 @@ public class FastaInMemorySuffixCreator {
         // Remove any '*' characters from the sequence
         sequence = sequence.replaceAll("\\*", "");
         
+        Integer idObj = Integer.valueOf(dbProteinId);
         for(int i = 0; i < sequence.length(); i++) {
             int end = Math.min(i+SUFFIX_LENGTH, sequence.length());
             String subseq = sequence.substring(i, end);
@@ -84,7 +85,7 @@ public class FastaInMemorySuffixCreator {
                 matchingProteins = new ArrayList<Integer>();
                 suffixMap.put(subseq, matchingProteins);
             }
-            matchingProteins.add(dbProteinId);
+            matchingProteins.add(idObj);
             
             if(i+SUFFIX_LENGTH >= sequence.length())
                 break;
