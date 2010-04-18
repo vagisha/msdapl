@@ -114,7 +114,7 @@ public class PeptideProteinMatchingService {
         
         // find the best protein peptide match based on the given enzyme and num enzymatic termini criteria
         List<PeptideProteinMatch> matchingProteins = new ArrayList<PeptideProteinMatch>(dbProtIds.size());
-        log.debug("Number of matching proteins for peptide : "+peptide+" before applying enzyme rules: "+matchingProteins.size());
+        log.debug("Number of matching proteins for peptide : "+peptide+" before applying enzyme rules: "+dbProtIds.size());
         for(int dbProtId: dbProtIds) {
             NrDbProtein dbProt = NrSeqLookupUtil.getDbProtein(dbProtId);
             PeptideProteinMatch match = getPeptideProteinMatch(dbProt, peptide, enzymeRules, numEnzymaticTermini);
@@ -122,6 +122,7 @@ public class PeptideProteinMatchingService {
                 matchingProteins.add(match);
             }
         }
+        log.debug("Number of matches after applying emzyme rules: "+matchingProteins.size());
         return matchingProteins;
     }
     
@@ -355,6 +356,9 @@ public class PeptideProteinMatchingService {
     
     private List<Integer> getMatchingDbProteinIdsForPeptideFromMemory(String peptide) {
         
+    	
+    	peptide = FastaInMemorySuffixCreator.format(peptide);
+    	
         int SUFFIX_LENGTH = FastaDatabaseSuffixCreator.SUFFIX_LENGTH;
         
         if(peptide.length() < SUFFIX_LENGTH) {
@@ -375,53 +379,43 @@ public class PeptideProteinMatchingService {
         
         Set<Integer> allMatches = new HashSet<Integer>();
         
-        List<String> alternatePeptides = getAlternateSequences(peptide);
-        if(alternatePeptides.size() > 16000) {
-        	log.info("# ALTERNATE SEQUENCES: "+alternatePeptides.size()+" for peptide: "+peptide);
-        }
-        
-        
-        for(String altPeptide: alternatePeptides) {
-        	List<String> suffixList = getSuffixList(altPeptide);
-        	
-        	int numSuffixesInSeq = suffixList.size();
-        	
-        	Map<Integer, Integer> matches = new HashMap<Integer, Integer>();
-        	
-        	int idx = 0;
-        	for(String suffix: suffixList) {
-        		List<Integer> matchingProteins = suffixMap.get(suffix);
-        		
-        		if(matchingProteins == null || matchingProteins.isEmpty()) {
-        			// This can happen since we are looking for I<->L substitutions also
-        			log.debug("No protein matches found for suffix: "+suffix+" for peptide: "+altPeptide);
-        			continue;	
-        		}
-        		if(idx == 0) {
-                    for(Integer proteinId: matchingProteins)
-                        matches.put(proteinId, 1);
-                }
-        		
-        		for(Integer proteinId: matchingProteins) {
-                    Integer num = matches.get(proteinId);
-                    if(num != null) {
-                        matches.put(proteinId, ++num);
-                    }
-                }
-        		idx++;
+        List<String> suffixList = getSuffixList(peptide);
+        //log.info("SUFFIX LIST: "+suffixList);
+
+        int numSuffixesInSeq = suffixList.size();
+
+        Map<Integer, Integer> matches = new HashMap<Integer, Integer>();
+
+        int idx = 0;
+        for(String suffix: suffixList) {
+        	List<Integer> matchingProteins = suffixMap.get(suffix);
+//        	if(matchingProteins == null || matchingProteins.isEmpty()) {
+//        		// This can happen since we are looking for I<->L substitutions also
+//        		log.debug("No protein matches found for suffix: "+suffix+" for peptide: "+peptide);
+//        		continue;	
+//        	}
+        	if(idx == 0) {
+        		for(Integer proteinId: matchingProteins)
+        			matches.put(proteinId, 1);
         	}
-        	// keep only those matches that had all the suffixes in our peptide.
-            for(int proteinId: matches.keySet()) {
-                int cnt = matches.get(proteinId);
-                if(cnt >= numSuffixesInSeq)
-                    allMatches.add(proteinId);
-            }
+
+        	for(Integer proteinId: matchingProteins) {
+        		Integer num = matches.get(proteinId);
+        		if(num != null) {
+        			matches.put(proteinId, ++num);
+        		}
+        	}
+        	idx++;
         }
         
-        if(alternatePeptides.size() > 16000) {
-        	log.info("DONE LOOKING FOR SUFFIX TO PROTEIN MATCH for "+alternatePeptides.size()+" alternate peptides");
+        // keep only those matches that had all the suffixes in our peptide.
+        for(int proteinId: matches.keySet()) {
+        	int cnt = matches.get(proteinId);
+        	if(cnt >= numSuffixesInSeq)
+        		allMatches.add(proteinId);
         }
         
+        //log.info(allMatches);
         
         if(allMatches.size() > 10)
             log.debug("!!!# matches found: "+allMatches.size()+" for peptide: "+peptide);

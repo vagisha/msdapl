@@ -72,8 +72,8 @@ public class FastaInMemorySuffixCreator {
         
         int SUFFIX_LENGTH = FastaDatabaseSuffixCreator.SUFFIX_LENGTH;
         
-        // Remove any '*' characters from the sequence
-        sequence = sequence.replaceAll("\\*", "");
+        
+        sequence = format(sequence);
         
         Integer idObj = Integer.valueOf(dbProteinId);
         for(int i = 0; i < sequence.length(); i++) {
@@ -90,5 +90,18 @@ public class FastaInMemorySuffixCreator {
             if(i+SUFFIX_LENGTH >= sequence.length())
                 break;
         }
+    }
+    
+    public static String format(String peptide) {
+    	
+    	// Remove any '*' characters from the sequence
+    	peptide = peptide.replaceAll("\\*", "");
+    	// Replace all 'L' with '1'
+    	peptide = peptide.replaceAll("L", "1");
+        // Replace all "I" with "1"
+    	peptide = peptide.replaceAll("I", "1");
+    	
+    	return peptide;
+   
     }
 }

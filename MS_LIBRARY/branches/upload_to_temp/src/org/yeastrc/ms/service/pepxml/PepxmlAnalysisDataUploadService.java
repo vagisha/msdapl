@@ -462,11 +462,20 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         }
         
         if(storedMatches.size() != pepXmlAccessions.size()) {
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-            ex.setErrorMessage("Number of protein matches stored: "+storedMatches.size()+
-                    " does not match the number of matches found in interact files: "+pepXmlMatches.size()+
-                    " for searchResultID: "+matchingSearchResultId);
-            throw ex;
+        	
+        	if(storedMatches.size() < pepXmlAccessions.size()) {
+        		UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+        		ex.setErrorMessage("Number of protein matches stored: "+storedMatches.size()+
+        				" LESS THAN the number of matches found in interact files: "+pepXmlMatches.size()+
+        				" for searchResultID: "+matchingSearchResultId);
+        		throw ex;
+        	}
+        	else { // otherwise simply log a warning.  TPP converted Mascot pepXML files can have
+        		   // incorrect number of protein matchces.
+        		log.warn("Number of protein matches stored: "+storedMatches.size()+
+        				" MORE THAN the number of matches found in interact files: "+pepXmlMatches.size()+
+        				" for searchResultID: "+matchingSearchResultId);
+        	}
             
 //            log.error("Number of protein matches stored: "+storedMatches.size()+
 //            		" does not match the number of matches found in interact files: "+myMatches.size()+

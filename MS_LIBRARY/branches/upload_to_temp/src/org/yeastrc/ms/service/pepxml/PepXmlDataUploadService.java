@@ -38,6 +38,7 @@ import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModIds;
 import org.yeastrc.ms.domain.search.impl.ResultTerminalModIds;
@@ -463,8 +464,7 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                                 // It is possible that our protein was entered into the database BEFORE column definition
                                 // was changed to 500 chars
                                 // In this case we look for a matching prefix
-                                else if(match.getProtein().getAccessionString().length() == 255 &&
-                                		prot.getAccession().length() == 500) {
+                                else if(match.getProtein().getAccessionString().length() == 255) {
                                 	
                                 	if(prot.getAccession().startsWith(match.getProtein().getAccessionString())) {
                                 		// update the accession so that we don't have trouble matching it with 
@@ -522,7 +522,13 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         List<MsEnzyme> enzymes = search.getEnzymeList();
         List<MsSearchDatabase> databases = search.getSearchDatabases();
 
-        int numEnzymaticTermini = getNumEnzymaticTermini(searchId);
+        
+        int numEnzymaticTermini = 0; 
+        // Sequest pepXML files have all protein matches regardless of NET
+        if(search.getSearchProgram() == Program.SEQUEST)
+        	numEnzymaticTermini = 0;
+        else if(search.getSearchProgram() == Program.MASCOT)
+        	numEnzymaticTermini = getNumEnzymaticTermini(searchId);
 
         if(databases.size() != 1) {
             UploadException ex = new UploadException(ERROR_CODE.GENERAL);
