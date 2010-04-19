@@ -15,9 +15,6 @@ function newPopup(url) {
 </script>
 
 
-<a href="JavaScript:newPopup('http://www.quackit.com/html/html_help.cfm');">Open a popup window</a>
-
-
 <html:form action="updateProteinSetComparison" method="POST">
 
 	<!-- Does the user want to download the results -->
