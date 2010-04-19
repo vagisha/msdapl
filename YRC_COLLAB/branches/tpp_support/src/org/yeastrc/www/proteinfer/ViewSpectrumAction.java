@@ -53,7 +53,7 @@ import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.mascot.MascotSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.xtandem.XtandemSearchResult;
-import org.yeastrc.ms.util.AminoAcidUtils;
+import org.yeastrc.ms.util.BaseAminoAcidUtils;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
@@ -563,7 +563,7 @@ public class ViewSpectrumAction extends Action {
         // If we did not find the mass, calculate it from what we have
         double mass = 0.0;
         if (massFrmScanCharge == null) {
-            mass = (scan.getPrecursorMz().doubleValue() - AminoAcidUtils.HYDROGEN) * charge + AminoAcidUtils.HYDROGEN;
+            mass = (scan.getPrecursorMz().doubleValue() - BaseAminoAcidUtils.HYDROGEN) * charge + BaseAminoAcidUtils.HYDROGEN;
         }
         else
             mass = massFrmScanCharge.doubleValue();

@@ -206,13 +206,13 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
             cell.setClassName("left_align");
             row.addCell(cell);
             
-            String cellContents = result.getOneProtein();
+            String cellContents = result.getOneProteinShort();
             if(result.getProteinCount() > 1) {
                 cellContents += " <span class=\"underline clickable\" "+
                 "onClick=javascript:toggleProteins("+result.getPeptideProphetResultId()+") "+
                 ">("+result.getProteinCount()+")</span>";
                 cellContents += " \n<div style=\"display: none;\" id=\"proteins_for_"
-                			 +result.getPeptideProphetResultId()+"\">"+result.getOtherProteinsHtml()+"</div>";
+                			 +result.getPeptideProphetResultId()+"\">"+result.getOtherProteinsShortHtml()+"</div>";
             }
             cell = new TableCell(cellContents);
             cell.setClassName("left_align");

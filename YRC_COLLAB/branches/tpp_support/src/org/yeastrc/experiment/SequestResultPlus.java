@@ -59,7 +59,7 @@ public class SequestResultPlus implements SequestSearchResult {
         return result.getProteinMatchList();
     }
     
-    public String getOtherProteinsHtml() {
+    public String getOtherProteinsShortHtml() {
         if(result.getProteinMatchList() == null)
             return null;
         else {
@@ -70,7 +70,7 @@ public class SequestResultPlus implements SequestSearchResult {
                     i++;
                     continue;
                 }
-                buf.append("<br>"+protein.getAccession());
+                buf.append("<br>"+makeShort(protein.getAccession()));
             }
             if(buf.length() > 0)
                 buf.delete(0, "<br>".length());
@@ -78,12 +78,19 @@ public class SequestResultPlus implements SequestSearchResult {
         }
     }
     
-    public String getOneProtein() {
+    public String getOneProteinShort() {
         if(result.getProteinMatchList() == null)
             return null;
         else {
-            return result.getProteinMatchList().get(0).getAccession();
+            return makeShort(result.getProteinMatchList().get(0).getAccession());
         }
+    }
+    
+    private String makeShort(String string) {
+    	if(string.length() > 23)
+    		return string.substring(0, 20)+"...";
+    	else
+    		return string;
     }
     
     public int getProteinCount() {
