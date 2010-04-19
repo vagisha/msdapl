@@ -37,6 +37,9 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
     // SORTING
     private SORT_BY sortBy = SORT_BY.NUM_PEPT;
     private SORT_ORDER sortOrder = SORT_ORDER.DESC;
+
+    // CLUSTER
+	private boolean cluster = false;
     
     
     public void reset() {
@@ -136,6 +139,17 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 
     public void setGoEnrichmentGraph(boolean goEnrichmentGraph) {
         this.goEnrichmentGraph = goEnrichmentGraph;
+    }
+    
+    //-----------------------------------------------------------------------------
+    // Cluster
+    //-----------------------------------------------------------------------------
+    public boolean isCluster() {
+        return cluster;
+    }
+
+    public void setCluster(boolean cluster) {
+        this.cluster = cluster;
     }
     
     //-----------------------------------------------------------------------------

@@ -74,7 +74,19 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     private SORT_BY sortBy = SORT_BY.NUM_PEPT;
     private SORT_ORDER sortOrder = SORT_ORDER.DESC;
     
+    private boolean isClustered = false;
+    private boolean isInitialized = false;
+    
     private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
+    
+    
+    public void setIsClustered(boolean isClustered) {
+    	this.isClustered = isClustered;
+    }
+    
+    public void setIsInitialized(boolean isInitialized) {
+    	this.isInitialized = isInitialized;
+    }
     
     private int  getStartIndex() {
         
@@ -112,9 +124,9 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         return endIndex;
     }
 
-    public void setRowCount(int count) {
-        this.rowCount = count;
-    }
+//    public void setRowCount(int count) {
+//        this.rowCount = count;
+//    }
     
     public ProteinGroupComparisonDataset() {
         this.datasets = new ArrayList<Dataset>();
@@ -155,13 +167,13 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         return proteinGroups.size();
     }
     
-    public void setMinNormalizedSpectrumCount(int minNormalizedSpectrumCount) {
-        this.minNormalizedSpectrumCount = minNormalizedSpectrumCount;
-    }
-
-    public void setMaxNormalizedSpectrumCount(int maxNormalizedSpectrumCount) {
-        this.maxNormalizedSpectrumCount = maxNormalizedSpectrumCount;
-    }
+//    public void setMinNormalizedSpectrumCount(int minNormalizedSpectrumCount) {
+//        this.minNormalizedSpectrumCount = minNormalizedSpectrumCount;
+//    }
+//
+//    public void setMaxNormalizedSpectrumCount(int maxNormalizedSpectrumCount) {
+//        this.maxNormalizedSpectrumCount = maxNormalizedSpectrumCount;
+//    }
     
     public void initSummary() {
         initProteinCounts();
@@ -635,25 +647,36 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         header = new TableHeader("Mol. Wt.");
         //header.setWidth(8);
         header.setRowspan(2);
-        header.setSortable(true);
-        header.setSortClass(SORT_CLASS.SORT_FLOAT);
-        header.setDefaultSortOrder(SORT_ORDER.ASC);
-        header.setHeaderId(SORT_BY.MOL_WT.name());
-        if(this.sortBy == SORT_BY.MOL_WT) {
-            header.setSorted(true);
-            header.setSortOrder(this.sortOrder);
+        if(!isClustered) {
+        	header.setSortable(true);
+        	header.setSortClass(SORT_CLASS.SORT_FLOAT);
+        	header.setDefaultSortOrder(SORT_ORDER.ASC);
+        	header.setHeaderId(SORT_BY.MOL_WT.name());
+        	if(this.sortBy == SORT_BY.MOL_WT) {
+        		header.setSorted(true);
+        		header.setSortOrder(this.sortOrder);
+        	}
+        }
+        else {
+        	header.setSortable(false);
         }
         headers.add(header);
         
         header = new TableHeader("pI");
         //header.setWidth(5);
         header.setRowspan(2);
-        header.setSortClass(SORT_CLASS.SORT_FLOAT);
-        header.setDefaultSortOrder(SORT_ORDER.ASC);
-        header.setHeaderId(SORT_BY.PI.name());
-        if(this.sortBy == SORT_BY.PI) {
-            header.setSorted(true);
-            header.setSortOrder(this.sortOrder);
+        if(!isClustered) {
+        	header.setSortable(true);
+        	header.setSortClass(SORT_CLASS.SORT_FLOAT);
+        	header.setDefaultSortOrder(SORT_ORDER.ASC);
+        	header.setHeaderId(SORT_BY.PI.name());
+        	if(this.sortBy == SORT_BY.PI) {
+        		header.setSorted(true);
+        		header.setSortOrder(this.sortOrder);
+        	}
+        }
+        else {
+        	header.setSortable(false);
         }
         headers.add(header);
         
@@ -669,13 +692,18 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         //header.setWidth(5);
         header.setRowspan(2);
         header.setStyleClass("small_font");
-        header.setSortable(true);
-        header.setSortClass(SORT_CLASS.SORT_INT);
-        header.setDefaultSortOrder(SORT_ORDER.DESC);
-        header.setHeaderId(SORT_BY.NUM_PEPT.name());
-        if(this.sortBy == SORT_BY.NUM_PEPT) {
-            header.setSorted(true);
-            header.setSortOrder(this.sortOrder);
+        if(!isClustered) {
+        	header.setSortable(true);
+        	header.setSortClass(SORT_CLASS.SORT_INT);
+        	header.setDefaultSortOrder(SORT_ORDER.DESC);
+        	header.setHeaderId(SORT_BY.NUM_PEPT.name());
+        	if(this.sortBy == SORT_BY.NUM_PEPT) {
+        		header.setSorted(true);
+        		header.setSortOrder(this.sortOrder);
+        	}
+        }
+        else {
+        	header.setSortable(false);
         }
         headers.add(header);
         
@@ -722,10 +750,11 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 
     @Override
     public void tabulate() {
-        initializeInfo(this.getStartIndex(), this.getEndIndex());
+    	if(!this.isInitialized)
+    		initializeInfo(this.getStartIndex(), this.getEndIndex());
     }
     
-    public void initializeInfo(int startIndex, int endIndex) {
+    private void initializeInfo(int startIndex, int endIndex) {
         
         for(int i = startIndex; i < endIndex; i++) {
             ComparisonProtein protein = proteins.get(i);
@@ -808,6 +837,10 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         ResultsPager pager = ResultsPager.instance();
         this.pageCount = pager.getPageCount(this.proteins.size(), rowCount);
         this.displayPageNumbers = pager.getPageList(this.proteins.size(), currentPage, rowCount);
+    }
+    
+    public void setRowCount(int rowCount) {
+    	this.rowCount = rowCount;
     }
     
     @Override

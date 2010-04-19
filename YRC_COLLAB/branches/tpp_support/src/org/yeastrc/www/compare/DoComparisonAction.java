@@ -30,6 +30,7 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
+import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.compare.ProteinDatasetComparer.PARSIM;
 import org.yeastrc.www.compare.dataset.Dataset;
@@ -170,6 +171,14 @@ public class DoComparisonAction extends Action {
                 return mapping.findForward("Download");
             }
             
+            // IS THE USER INTERESTED IN CLUSTERING RESULTS?
+            if(myForm.isCluster()) {
+            	log.info("CLUSTERING......");
+                request.setAttribute("comparisonForm", myForm);
+                request.setAttribute("comparisonDataset", comparison);
+                return mapping.findForward("Cluster");
+            }
+            
         	// sort the results
         	s = System.currentTimeMillis();
         	
@@ -196,7 +205,7 @@ public class DoComparisonAction extends Action {
             }
             
             // create a list of the dataset ids being compared
-            request.setAttribute("datasetIds", makeCommaSeparated(allRunIds));
+            request.setAttribute("datasetIds", StringUtils.makeCommaSeparated(allRunIds));
             
             request.setAttribute("comparison", comparison);
             request.setAttribute("speciesIsYeast", isSpeciesYeast(datasets));
@@ -281,6 +290,14 @@ public class DoComparisonAction extends Action {
                 return mapping.findForward("Download");
             }
             
+            // IS THE USER INTERESTED IN CLUSTERING RESULTS?
+            if(myForm.isCluster()) {
+            	log.info("CLUSTERING......");
+                request.setAttribute("comparisonForm", myForm);
+                request.setAttribute("comparisonGroupDataset", grpComparison);
+                return mapping.findForward("Cluster");
+            }
+            
             // Set the page number
             grpComparison.setCurrentPage(myForm.getPageNum());
             
@@ -299,7 +316,7 @@ public class DoComparisonAction extends Action {
             log.info("DoComparisonAction finished in: "+TimeUtils.timeElapsedSeconds(start, end)+" seconds");
             
             // create a list of the dataset ids being compared
-            request.setAttribute("datasetIds", makeCommaSeparated(allRunIds));
+            request.setAttribute("datasetIds", StringUtils.makeCommaSeparated(allRunIds));
             
             request.setAttribute("comparison", grpComparison);
             request.setAttribute("speciesIsYeast", isSpeciesYeast(datasets));
@@ -307,18 +324,18 @@ public class DoComparisonAction extends Action {
         }
     }
 
-    private String makeCommaSeparated(List<Integer> ... idLists) {
-        StringBuilder buf = new StringBuilder();
-        for(List<Integer> ids: idLists) {
-            if(ids == null)
-                continue;
-            for(int id: ids)
-                buf.append(","+id);
-            if(buf.length() > 0)
-                buf.deleteCharAt(0);
-        }
-        return buf.toString();
-    }
+//    private String makeCommaSeparated(List<Integer> ... idLists) {
+//        StringBuilder buf = new StringBuilder();
+//        for(List<Integer> ids: idLists) {
+//            if(ids == null)
+//                continue;
+//            for(int id: ids)
+//                buf.append(","+id);
+//            if(buf.length() > 0)
+//                buf.deleteCharAt(0);
+//        }
+//        return buf.toString();
+//    }
     
     private boolean isSpeciesYeast(List<? extends Dataset> datasets) throws Exception {
         

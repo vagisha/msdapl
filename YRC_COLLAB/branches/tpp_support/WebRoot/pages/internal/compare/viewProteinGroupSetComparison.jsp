@@ -259,6 +259,7 @@ function pageResults(pageNum) {
   	$("input#pageNum").val(pageNum);
   	$("input#download").val("false");
   	$("input#goEnrichment").val("false");
+  	$("input#cluster").val("false");
   	//alert("setting to "+pageNum+" value set to: "+$("input#pageNum").val());
   	$("form[name='proteinSetComparisonForm']").submit();
 }
@@ -270,6 +271,7 @@ function sortResults(sortBy, sortOrder) {
   	$("input#pageNum").val(1);
   	$("input#download").val("false");
   	$("input#goEnrichment").val("false");
+  	$("input#cluster").val("false");
   	$("input#sortBy").val(sortBy);
   	$("input#sortOrder").val(sortOrder);
   	$("form[name='proteinSetComparisonForm']").attr('target', '');
@@ -283,7 +285,19 @@ function updateResults() {
   	$("input#pageNum").val(1);
   	$("input#download").val("false");
   	$("input#goEnrichment").val("false");
+  	$("input#cluster").val("false");
   	$("form[name='proteinSetComparisonForm']").attr('target', '');
+  	$("form[name='proteinSetComparisonForm']").submit();
+}
+
+// ---------------------------------------------------------------------------------------
+// CLUSTER RESULTS
+// ---------------------------------------------------------------------------------------
+function clusterResults() {
+  	$("input#pageNum").val(1);
+  	$("input#download").val("false");
+  	$("input#goEnrichment").val("false");
+  	$("input#cluster").val("true");
   	$("form[name='proteinSetComparisonForm']").submit();
 }
 
@@ -293,6 +307,7 @@ function updateResults() {
 function downloadResults() {
   	$("input#download").val("true");
   	$("input#goEnrichment").val("false");
+  	$("input#cluster").val("false");
   	$("form[name='proteinSetComparisonForm']").attr('target', '_blank');
   	$("form[name='proteinSetComparisonForm']").submit();
 }
@@ -302,6 +317,7 @@ function downloadResults() {
 // ---------------------------------------------------------------------------------------
 function doGoEnrichmentAnalysis() {
 	$("input#download").val("false");
+	$("input#cluster").val("false");
 	$("input#goEnrichment").val("true");
 	if(!validateGoEnrichmentForm())
     	return false;

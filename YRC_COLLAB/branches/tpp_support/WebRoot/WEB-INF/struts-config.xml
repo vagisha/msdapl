@@ -1145,6 +1145,7 @@
 		<forward name="Failure" path="/selectComparisonDatasets.do" redirect="false" />
 		<forward name="Download" path="/downloadProteinComparisonResults.do" redirect="false" />
 		<forward name="GOAnalysis" path="/compareGoEnrichment.do" redirect="false" />
+		<forward name="Cluster" path="/compareClstered.do" redirect="false" />
 	</action>
 	
 	<action 
@@ -1205,6 +1206,17 @@
 	  validate="false">
 	  <forward name="Success" path="/pages/utils/showImage.jsp" redirect="false"/>
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+	</action>
+	
+	<action 
+		path="/compareClstered"
+		name="proteinSetComparisonForm"
+		scope="request"
+		validate="true"
+		type="org.yeastrc.www.compare.clustering.ClusterSpectrumCountsAction"
+	>
+		<forward name="ProteinGroupList" path="/pages/internal/compare/viewProteinGroupSetComparison.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/compare/viewCompareClustered.jsp" redirect="false" />
 	</action>
 	
 	<!-- ================================================================================== -->

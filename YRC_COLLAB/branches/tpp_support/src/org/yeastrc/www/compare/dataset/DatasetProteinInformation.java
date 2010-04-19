@@ -76,7 +76,10 @@ public class DatasetProteinInformation {
     }
 
     public float getNormalizedSpectrumCount() {
-        return spectrumCount * dataset.getSpectrumCountNormalizationFactor();
+    	if(this.isPresent())
+    		return spectrumCount * dataset.getSpectrumCountNormalizationFactor();
+    	else
+    		return 0;
     }
     
     public int getNormalizedSpectrumCountRounded() {
