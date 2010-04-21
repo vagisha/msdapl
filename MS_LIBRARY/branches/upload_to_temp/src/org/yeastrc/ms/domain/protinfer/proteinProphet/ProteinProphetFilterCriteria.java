@@ -81,7 +81,7 @@ public class ProteinProphetFilterCriteria extends ProteinFilterCriteria {
         super.setSortBy(filterCriteria.getSortBy());
     }
     
-    public boolean equals(ProteinProphetFilterCriteria o) {
+    public boolean equals(Object o) {
         if(!super.equals(o))
             return false;
         if(!(o instanceof ProteinProphetFilterCriteria))

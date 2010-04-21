@@ -6,10 +6,12 @@
  */
 package org.yeastrc.ms.domain.nrseq;
 
+import java.io.Serializable;
+
 /**
  * 
  */
-public class NrProtein {
+public class NrProtein implements Serializable {
 
 	private int id;
 	private int sequenceId;

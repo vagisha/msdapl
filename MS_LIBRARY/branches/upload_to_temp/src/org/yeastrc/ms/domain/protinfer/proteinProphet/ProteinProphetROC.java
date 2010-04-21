@@ -6,13 +6,14 @@
  */
 package org.yeastrc.ms.domain.protinfer.proteinProphet;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 
  */
-public class ProteinProphetROC {
+public class ProteinProphetROC implements Serializable {
 
     private int proteinferId;
     private List<ProteinProphetROCPoint> rocPoints;
@@ -27,8 +28,10 @@ public class ProteinProphetROC {
 
     public void setProteinferId(int proteinferId) {
         this.proteinferId = proteinferId;
-        for(ProteinProphetROCPoint point: rocPoints)
-            point.setProteinferId(proteinferId);
+        if(rocPoints != null) {
+        	for(ProteinProphetROCPoint point: rocPoints)
+        		point.setProteinferId(proteinferId);
+        }
     }
 
     public List<ProteinProphetROCPoint> getRocPoints() {
@@ -37,10 +40,13 @@ public class ProteinProphetROC {
     
     public void addRocPoint(ProteinProphetROCPoint point) {
         this.rocPoints.add(point);
+        point.setProteinferId(this.proteinferId);
     }
     
     public void setRocPoints(List<ProteinProphetROCPoint> rocPoints) {
         this.rocPoints = rocPoints;
+        for(ProteinProphetROCPoint point: this.rocPoints)
+        	point.setProteinferId(this.proteinferId);
     }
 
     public double getMinProbabilityForError(double error) {

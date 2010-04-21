@@ -6,7 +6,9 @@
  */
 package org.yeastrc.ms.domain.protinfer.proteinProphet;
 
-public class ProteinProphetROCPoint {
+import java.io.Serializable;
+
+public class ProteinProphetROCPoint implements Serializable {
     
     private int proteinferId;
     private double sensitivity;

@@ -6,13 +6,14 @@
  */
 package org.yeastrc.ms.domain.protinfer;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 
  */
-public class ProteinFilterCriteria {
+public class ProteinFilterCriteria implements Serializable {
 
     private int numPeptides = 1;
     private int numMaxPeptides = Integer.MAX_VALUE;
@@ -28,7 +29,7 @@ public class ProteinFilterCriteria {
     private boolean excludeIndistinGroups = false;
     
     private String peptide;
-    private boolean exactMatch = true;
+    private boolean exactPeptideMatch = true;
     
     private List<ProteinUserValidation> validationStatus = new ArrayList<ProteinUserValidation>();
     
@@ -326,14 +327,14 @@ public class ProteinFilterCriteria {
         this.peptide = peptide;
     }
     public void setExactPeptideMatch(boolean exact) {
-        this.exactMatch = exact;
+        this.exactPeptideMatch = exact;
     }
     public boolean getExactPeptideMatch() {
-        return this.exactMatch;
+        return this.exactPeptideMatch;
     }
     
     
-    public boolean equals(ProteinFilterCriteria o) {
+    public boolean equals(Object o) {
         if(this == o)
             return true;
         if(!(o instanceof ProteinFilterCriteria))
@@ -408,7 +409,7 @@ public class ProteinFilterCriteria {
         else {
             if(!this.peptide.equalsIgnoreCase(that.peptide))
                 return false;
-            if(this.exactMatch != that.exactMatch)
+            if(this.exactPeptideMatch != that.exactPeptideMatch)
                 return false;
         }
         

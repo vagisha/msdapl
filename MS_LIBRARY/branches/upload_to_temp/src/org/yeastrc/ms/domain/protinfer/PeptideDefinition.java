@@ -1,6 +1,8 @@
 package org.yeastrc.ms.domain.protinfer;
 
-public class PeptideDefinition {
+import java.io.Serializable;
+
+public class PeptideDefinition implements Serializable {
 
     private boolean useMods;
     private boolean useCharge;
