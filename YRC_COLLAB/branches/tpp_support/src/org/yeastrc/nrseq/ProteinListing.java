@@ -6,6 +6,7 @@
  */
 package org.yeastrc.nrseq;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,7 +23,7 @@ import org.yeastrc.ms.domain.nrseq.NrProtein;
 /**
  * 
  */
-public class ProteinListing {
+public class ProteinListing implements Serializable {
 
 	private NrProtein protein;
 	private List<ProteinReference> fastaReferences;

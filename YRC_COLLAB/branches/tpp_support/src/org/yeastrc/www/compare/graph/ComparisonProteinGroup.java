@@ -42,7 +42,12 @@ public class ComparisonProteinGroup extends Vertex<ComparisonProteinGroup> {
         return this.proteins;
     }
     
-    @Override
+    /** Added for de-serialization */
+    public void setProteins(List<ComparisonProtein> proteins) {
+		this.proteins = proteins;
+	}
+
+	@Override
     public ComparisonProteinGroup combineWith(ComparisonProteinGroup v) {
         List<ComparisonProtein> allProteins = new ArrayList<ComparisonProtein>(proteins.size() + v.getProteins().size());
         allProteins.addAll(proteins);

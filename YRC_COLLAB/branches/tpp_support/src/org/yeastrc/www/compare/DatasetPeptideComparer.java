@@ -53,8 +53,8 @@ public class DatasetPeptideComparer {
     
     public int getMaxPeptidesForProtein(ComparisonProtein protein) {
         
-        List<Integer> datasetIds = new ArrayList<Integer>(protein.getDatasetInfo().size());
-        for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
+        List<Integer> datasetIds = new ArrayList<Integer>(protein.getDatasetInformation().size());
+        for(DatasetProteinInformation dpi: protein.getDatasetInformation()) {
             // If this dataset does not contain this protein move on.
             if(!dpi.isPresent()) continue;
             datasetIds.add(dpi.getDatasetId());

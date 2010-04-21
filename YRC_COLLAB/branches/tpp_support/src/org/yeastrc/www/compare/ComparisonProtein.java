@@ -6,6 +6,7 @@
  */
 package org.yeastrc.www.compare;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,50 +20,54 @@ import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
 /**
  * 
  */
-public class ComparisonProtein {
+public class ComparisonProtein implements Serializable {
 
-    private final int nrseqId;
+    private int nrseqId;
     private int groupId;
-    private ProteinListing listing;
-    private float molecularWeight = -1.0f;
+	private ProteinListing proteinListing;
+	private float molecularWeight = -1.0f;
     private float pi = -1.0f;
     private int maxPeptideSeqCount; 
     private int maxPeptideIonCount;
     
-    private List<DatasetProteinInformation> datasetInfo;
+    private List<DatasetProteinInformation> datasetInformation;
     
     public ComparisonProtein(int nrseqId) {
         this.nrseqId = nrseqId;
-        datasetInfo = new ArrayList<DatasetProteinInformation>();
+        datasetInformation = new ArrayList<DatasetProteinInformation>();
     }
     
     public void setProteinListing(ProteinListing listing) {
-    	this.listing = listing;
+    	this.proteinListing = listing;
     }
     
     public ProteinListing getProteinListing() {
-    	return this.listing;
+    	return this.proteinListing;
     }
+    
+    public void setNrseqId(int nrseqId) {
+		this.nrseqId = nrseqId;
+	}
     
     public int getNrseqId() {
         return nrseqId;
     }
 
-    public List<DatasetProteinInformation> getDatasetInfo() {
-        return datasetInfo;
+    public List<DatasetProteinInformation> getDatasetInformation() {
+        return datasetInformation;
     }
     
     public void setDatasetInformation(List<DatasetProteinInformation> infoList) {
-        this.datasetInfo = infoList;
+        this.datasetInformation = infoList;
     }
     
     public void addDatasetInformation(DatasetProteinInformation info) {
-        datasetInfo.add(info);
+        datasetInformation.add(info);
     }
     
     public DatasetProteinInformation getDatasetProteinInformation(Dataset dataset) {
         
-        for(DatasetProteinInformation dsInfo: datasetInfo) {
+        for(DatasetProteinInformation dsInfo: datasetInformation) {
             if(dataset.equals(dsInfo.getDataset())) {
                 return dsInfo;
             }
@@ -94,7 +99,7 @@ public class ComparisonProtein {
     }
 
     public boolean isParsimonious() {
-        for(DatasetProteinInformation dpi: this.datasetInfo) {
+        for(DatasetProteinInformation dpi: this.datasetInformation) {
             if(dpi.isParsimonious())
                 return true;
         }
@@ -130,18 +135,18 @@ public class ComparisonProtein {
     }
     
     public String getAccessionsCommaSeparated() throws SQLException {
-    	List<String> accessions = listing.getFastaAccessions();
+    	List<String> accessions = proteinListing.getFastaAccessions();
     	return StringUtils.makeCommaSeparated(accessions);
     }
     
     public ProteinReference getOneDescriptionReference() throws SQLException {
-    	if(listing.getDescriptionReferences().size() > 0)
-    		return listing.getDescriptionReferences().get(0);
+    	if(proteinListing.getDescriptionReferences().size() > 0)
+    		return proteinListing.getDescriptionReferences().get(0);
     	return null;
     }
     
     public String getCommonNamesCommaSeparated() throws SQLException {
-    	List<String> names = listing.getCommonNames();
+    	List<String> names = proteinListing.getCommonNames();
     	return StringUtils.makeCommaSeparated(names);
     }
     

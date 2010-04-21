@@ -22,6 +22,8 @@ function newPopup(url) {
 	
 	<!-- Does the user want to cluster results -->
 	<html:hidden name="proteinSetComparisonForm" property="cluster" value="false" styleId="cluster" />
+	<html:hidden name="proteinSetComparisonForm" property="clusteringToken" />
+	<html:hidden name="proteinSetComparisonForm" property="newToken" />
 	
 	<!-- Does the user want to do GO Enrichment analysis-->
 	<html:hidden name="proteinSetComparisonForm" property="goEnrichment" value="false" styleId="goEnrichment" />
@@ -301,14 +303,12 @@ function newPopup(url) {
  		<td valign="top" align="center" colspan="4" style="padding-top:5px;">	
  			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button"></html:submit>
  			
- 			<yrcwww:member group="administrators">
  			&nbsp; &nbsp;
  			<html:submit value="Cluster" onclick="javascript:clusterResults();" styleClass="plain_button"></html:submit>
  			
  			<logic:present name="clusteredImgUrl">
  				&nbsp;&nbsp;<a href="JavaScript:newPopup('<bean:write name='clusteredImgUrl'/>');" >Heatmap</a>
  			</logic:present>
- 			</yrcwww:member>
  			
 		</td>
 	</tr>

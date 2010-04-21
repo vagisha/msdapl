@@ -6,11 +6,13 @@
  */
 package org.yeastrc.www.compare.dataset;
 
+import java.io.Serializable;
+
 
 /**
  * 
  */
-public class SelectableDataset {
+public class SelectableDataset implements Serializable {
 
     private boolean selected = false;
     private int datasetId;

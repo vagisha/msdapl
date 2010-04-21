@@ -14,7 +14,7 @@
 </yrcwww:notauthenticated>
 
 <logic:notPresent name="comparison">
-	<logic:forward name="newProteinSetComparison" />
+	<logic:forward name="doProteinSetComparison" />
 </logic:notPresent>
 
 <%@ include file="/includes/header.jsp" %>

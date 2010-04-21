@@ -7,9 +7,7 @@
 package org.yeastrc.www.compare;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,19 +19,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.jobqueue.MSJob;
-import org.yeastrc.jobqueue.MSJobFactory;
-import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
-import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.protinfer.SORT_BY;
-import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.compare.ProteinDatasetComparer.PARSIM;
-import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetBuilder;
 import org.yeastrc.www.compare.dataset.DatasetSource;
 import org.yeastrc.www.compare.dataset.FilterableDataset;
@@ -64,7 +54,7 @@ public class DoComparisonAction extends Action {
     	log.info("Got request to compare protein inferences");
     	
         // Form we will use
-        ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) form; // request.getAttribute("comparisonFrom");
+        ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) form;
         if(myForm == null) {
             ActionErrors errors = new ActionErrors();
             errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "No comparison form in request."));
@@ -208,7 +198,7 @@ public class DoComparisonAction extends Action {
             request.setAttribute("datasetIds", StringUtils.makeCommaSeparated(allRunIds));
             
             request.setAttribute("comparison", comparison);
-            request.setAttribute("speciesIsYeast", isSpeciesYeast(datasets));
+            request.setAttribute("speciesIsYeast", SpeciesChecker.isSpeciesYeast(datasets));
             return mapping.findForward("ProteinList");
         }
         
@@ -319,52 +309,8 @@ public class DoComparisonAction extends Action {
             request.setAttribute("datasetIds", StringUtils.makeCommaSeparated(allRunIds));
             
             request.setAttribute("comparison", grpComparison);
-            request.setAttribute("speciesIsYeast", isSpeciesYeast(datasets));
+            request.setAttribute("speciesIsYeast", SpeciesChecker.isSpeciesYeast(datasets));
             return mapping.findForward("ProteinGroupList");
         }
-    }
-
-//    private String makeCommaSeparated(List<Integer> ... idLists) {
-//        StringBuilder buf = new StringBuilder();
-//        for(List<Integer> ids: idLists) {
-//            if(ids == null)
-//                continue;
-//            for(int id: ids)
-//                buf.append(","+id);
-//            if(buf.length() > 0)
-//                buf.deleteCharAt(0);
-//        }
-//        return buf.toString();
-//    }
-    
-    private boolean isSpeciesYeast(List<? extends Dataset> datasets) throws Exception {
-        
-        
-        Set<Integer> notYeastExpts = new HashSet<Integer>();
-        
-        ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
-        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
-        
-        for(Dataset dataset: datasets) {
-            List<Integer> searchIds = runDao.loadSearchIdsForProteinferRun(dataset.getDatasetId());
-            if(searchIds != null) {
-                for(int searchId: searchIds) {
-
-                    MsSearch search = searchDao.loadSearch(searchId);
-
-                    if(notYeastExpts.contains(search.getExperimentId())) // if we have already seen this and it is not yeast go on looking
-                        continue;
-
-                    MSJob job = MSJobFactory.getInstance().getJobForExperiment(search.getExperimentId());
-
-                    if(job.getTargetSpecies() == 4932) {
-                        return true;
-                    }
-                    else 
-                        notYeastExpts.add(search.getExperimentId());
-                }
-            }
-        }
-        return false;
     }
 }

@@ -40,9 +40,11 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 
     // CLUSTER
 	private boolean cluster = false;
+	private String clusteringToken = null;
+	private boolean newToken = false;
     
     
-    public void reset() {
+	public void reset() {
         super.reset();
     }
     
@@ -151,6 +153,22 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
     public void setCluster(boolean cluster) {
         this.cluster = cluster;
     }
+    
+    public String getClusteringToken() {
+		return clusteringToken;
+	}
+
+	public void setClusteringToken(String clusteringToken) {
+		this.clusteringToken = clusteringToken;
+	}
+	
+	public boolean isNewToken() {
+		return newToken;
+	}
+
+	public void setNewToken(boolean newToken) {
+		this.newToken = newToken;
+	}
     
     //-----------------------------------------------------------------------------
     // Sorting

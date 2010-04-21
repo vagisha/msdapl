@@ -6,11 +6,13 @@
  */
 package org.yeastrc.www.compare.dataset;
 
+import java.io.Serializable;
+
 
 /**
  * 
  */
-public class Dataset {
+public class Dataset implements Serializable {
 
     private int datasetId;
     private String datasetComments;

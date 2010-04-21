@@ -24,7 +24,7 @@ import org.yeastrc.www.user.UserUtils;
  */
 public class UpdateProteinComparisonAction extends Action {
 
-    private static final Logger log = Logger.getLogger(UpdateProteinComparisonAction.class);
+    private static final Logger log = Logger.getLogger(UpdateProteinComparisonAction.class.getName());
 
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
@@ -41,6 +41,18 @@ public class UpdateProteinComparisonAction extends Action {
             return mapping.findForward("authenticate");
         }
         
-        return mapping.findForward("DoComparison");
+        // Form we will use
+        ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) form;
+        if(myForm == null) {
+            ActionErrors errors = new ActionErrors();
+            errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "No comparison form in request."));
+            saveErrors( request, errors );
+            return mapping.findForward("Failure");
+        }
+        
+        if(!myForm.isCluster())
+        	return mapping.findForward("DoComparison");
+        else
+        	return mapping.findForward("ClusterGateway");
     }
 }

@@ -6,6 +6,7 @@
  */
 package org.yeastrc.nrseq;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.yeastrc.ms.domain.nrseq.NrDatabase;
@@ -14,7 +15,7 @@ import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 /**
  * 
  */
-public class ProteinReference {
+public class ProteinReference implements Serializable {
 
 	private int databaseId;
 	private String databaseName;

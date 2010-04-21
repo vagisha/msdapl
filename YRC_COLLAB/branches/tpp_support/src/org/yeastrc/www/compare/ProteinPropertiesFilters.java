@@ -6,6 +6,7 @@
  */
 package org.yeastrc.www.compare;
 
+
 /**
  * 
  */
@@ -35,6 +36,40 @@ public class ProteinPropertiesFilters {
     private double proteinProphetError = 0.01;
     private boolean useGroupProbability = true;
     
+    
+    public boolean equals(Object o) {
+    	
+    	if(this == o)
+            return true;
+        if(!(o instanceof ProteinPropertiesFilters))
+            return false;
+        ProteinPropertiesFilters that = (ProteinPropertiesFilters)o;
+        
+        if(this.accessionLike != that.accessionLike)          			return false;
+        if(this.descriptionLike != that.descriptionLike)      			return false;
+        if(this.descriptionNotLike!= that.descriptionNotLike)          	return false;
+        if(this.searchAllDescriptions != that.searchAllDescriptions)	return false;
+        
+        if(this.minMolWt != that.minMolWt)								return false;
+        if(this.maxMolWt != that.maxMolWt)								return false;
+        if(this.minPi != that.minPi)									return false;
+        if(this.maxPi != that.maxPi)									return false;
+        
+        if(this.minPeptideCount != that .minPeptideCount)				return false;
+        if(this.maxPeptideCount != that.maxPeptideCount)				return false;
+        if(this.minUniqPeptideCount != that.minUniqPeptideCount)		return false;
+        if(this.maxUniqPeptideCount != that.maxUniqPeptideCount)		return false;
+        
+        if(this.hasProteinProphetFilters != that.hasProteinProphetFilters)	return false;
+        if(this.peptideProbability != that.peptideProbability)				return false;
+        if(this.applyToPeptide != that.applyToPeptide)						return false;
+        if(this.applyToUniqPeptide != that.applyToUniqPeptide)				return false;
+        if(this.proteinProphetError != that.proteinProphetError)			return false;
+        if(this.useGroupProbability != that.useGroupProbability)			return false;
+        
+        return true;
+    }
+ 
     public boolean hasProteinProphetFilters() {
 		return hasProteinProphetFilters;
 	}

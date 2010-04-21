@@ -6,12 +6,13 @@
  */
 package org.yeastrc.www.compare.dataset;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
 
 /**
  * 
  */
-public class DatasetProteinInformation {
+public class DatasetProteinInformation implements Serializable {
 
     private boolean present;
     private boolean parsimonious;

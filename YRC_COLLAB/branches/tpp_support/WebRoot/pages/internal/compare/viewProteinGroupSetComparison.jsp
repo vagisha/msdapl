@@ -15,7 +15,7 @@
 </yrcwww:notauthenticated>
 
 <logic:notPresent name="comparison">
-	<logic:forward name="newProteinSetComparison" />
+	<logic:forward name="doProteinSetComparison" />
 </logic:notPresent>
 
 <%@ include file="/includes/header.jsp" %>
@@ -35,7 +35,7 @@
 // INITIALIZE
 // ---------------------------------------------------------------------------------------
 $(document).ready(function() {
-	
+
    var colCount = <%=comparison.tableHeaders().size()%>
    $("#compare_results").each(function() {
    		var $table = $(this);

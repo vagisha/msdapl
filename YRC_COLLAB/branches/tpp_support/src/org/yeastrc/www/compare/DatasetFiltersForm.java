@@ -32,8 +32,8 @@ public class DatasetFiltersForm extends ActionForm {
     
     private boolean groupIndistinguishableProteins = false;
     
-    private String minMolWt;
-    private String maxMolWt;
+    private String minMolecularWt;
+    private String maxMolecularWt;
     private String minPi;
     private String maxPi;
     
@@ -42,10 +42,6 @@ public class DatasetFiltersForm extends ActionForm {
     private String minUniquePeptides = "0";
     private String maxUniquePeptides;
     private boolean peptideUniqueSequence = false;
-    
-    private String peptideProbability = "0.0";
-    private boolean applyProbToPept = true;
-    private boolean applyProbToUniqPept = false;
     
     private String accessionLike = null;
     private String descriptionLike = null;
@@ -58,6 +54,10 @@ public class DatasetFiltersForm extends ActionForm {
     private boolean hasProteinProphetDatasets = false;
     private String errorRate = "0.01";
     private boolean useProteinGroupProbability = true;
+    
+    private String minPeptideProbability = "0.0";
+    private boolean applyProbToPept = true;
+    private boolean applyProbToUniqPept = false;
     
     
     
@@ -235,27 +235,27 @@ public class DatasetFiltersForm extends ActionForm {
     // Molecular Weight
     //-----------------------------------------------------------------------------
     public String getMinMolecularWt() {
-        return minMolWt;
+        return minMolecularWt;
     }
     public Double getMinMolecularWtDouble() {
-        if(minMolWt != null && minMolWt.trim().length() > 0)
-            return Double.parseDouble(minMolWt);
+        if(minMolecularWt != null && minMolecularWt.trim().length() > 0)
+            return Double.parseDouble(minMolecularWt);
         return 0.0;
     }
     public void setMinMolecularWt(String molWt) {
-        this.minMolWt = molWt;
+        this.minMolecularWt = molWt;
     }
     
     public String getMaxMolecularWt() {
-        return maxMolWt;
+        return maxMolecularWt;
     }
     public Double getMaxMolecularWtDouble() {
-        if(maxMolWt != null && maxMolWt.trim().length() > 0)
-            return Double.parseDouble(maxMolWt);
+        if(maxMolecularWt != null && maxMolecularWt.trim().length() > 0)
+            return Double.parseDouble(maxMolecularWt);
         return Double.MAX_VALUE;
     }
     public void setMaxMolecularWt(String molWt) {
-        this.maxMolWt = molWt;
+        this.maxMolecularWt = molWt;
     }
     
     //-----------------------------------------------------------------------------
@@ -401,16 +401,16 @@ public class DatasetFiltersForm extends ActionForm {
     // ProteinProphet peptide probability
     //-----------------------------------------------------------------------------
     public String getMinPeptideProbability() {
-        return peptideProbability;
+        return minPeptideProbability;
     }
     public double getMinPeptideProbabilityDouble() {
-        if(peptideProbability == null || peptideProbability.trim().length() == 0)
+        if(minPeptideProbability == null || minPeptideProbability.trim().length() == 0)
             return 0.0;
         else
-            return Double.parseDouble(peptideProbability);
+            return Double.parseDouble(minPeptideProbability);
     }
     public void setMinPeptideProbability(String peptideProbability) {
-        this.peptideProbability = peptideProbability;
+        this.minPeptideProbability = peptideProbability;
     }
     
     

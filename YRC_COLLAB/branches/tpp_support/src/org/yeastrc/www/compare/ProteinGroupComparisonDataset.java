@@ -6,6 +6,10 @@
  */
 package org.yeastrc.www.compare;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +46,7 @@ import org.yeastrc.www.project.SORT_CLASS;
 /**
  * 
  */
-public class ProteinGroupComparisonDataset implements Tabular, Pageable {
+public class ProteinGroupComparisonDataset implements Tabular, Pageable, Serializable {
 
     private List<? extends Dataset> datasets;
     private List<Integer> fastaDatabaseIds; // for protein name lookup
@@ -56,7 +60,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     private int[][] proteinCounts;
     private int[][] proteinGroupCounts;
     
-    private float minNormalizedSpectrumCount;
+	private float minNormalizedSpectrumCount;
     private float maxNormalizedSpectrumCount;
     
     private int rowCount = 50;
@@ -74,21 +78,29 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     private SORT_BY sortBy = SORT_BY.NUM_PEPT;
     private SORT_ORDER sortOrder = SORT_ORDER.DESC;
     
-    private boolean isClustered = false;
-    private boolean isInitialized = false;
+    private boolean clustered = false;
+    private boolean initialized = false;
     
     private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
     
     
-    public void setIsClustered(boolean isClustered) {
-    	this.isClustered = isClustered;
-    }
-    
-    public void setIsInitialized(boolean isInitialized) {
-    	this.isInitialized = isInitialized;
-    }
-    
-    private int  getStartIndex() {
+    public boolean isClustered() {
+		return clustered;
+	}
+
+	public void setClustered(boolean clustered) {
+		this.clustered = clustered;
+	}
+
+	public boolean isInitialized() {
+		return initialized;
+	}
+
+	public void setInitialized(boolean initialized) {
+		this.initialized = initialized;
+	}
+
+	private int getStartIndex() {
         
         if(startIndex != -1)
             return startIndex;
@@ -142,6 +154,28 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 
     public List<ComparisonProteinGroup> getProteinsGroups() {
         return proteinGroups;
+    }
+    
+    /** Added for serialization */
+    public void setProteinGroups(List<ComparisonProteinGroup> groups) {
+    	if(this.proteinGroups == null)
+    		this.proteinGroups = new ArrayList<ComparisonProteinGroup>();
+    	else
+    		this.proteinGroups.clear();
+    	
+    	if(this.proteins == null) 
+    		this.proteins = new ArrayList<ComparisonProtein>();
+    	else
+    		this.proteins.clear();
+    	
+    	if(groupMemberCount == null)
+    		groupMemberCount = new HashMap<Integer, Integer>();
+    	else
+    		groupMemberCount.clear();
+    	
+    	for(ComparisonProteinGroup grp: groups) {
+    		addProteinGroup(grp);
+    	}
     }
     
     public void setDatasets(List<? extends Dataset> datasets) {
@@ -647,7 +681,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         header = new TableHeader("Mol. Wt.");
         //header.setWidth(8);
         header.setRowspan(2);
-        if(!isClustered) {
+        if(!clustered) {
         	header.setSortable(true);
         	header.setSortClass(SORT_CLASS.SORT_FLOAT);
         	header.setDefaultSortOrder(SORT_ORDER.ASC);
@@ -665,7 +699,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         header = new TableHeader("pI");
         //header.setWidth(5);
         header.setRowspan(2);
-        if(!isClustered) {
+        if(!clustered) {
         	header.setSortable(true);
         	header.setSortClass(SORT_CLASS.SORT_FLOAT);
         	header.setDefaultSortOrder(SORT_ORDER.ASC);
@@ -692,7 +726,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         //header.setWidth(5);
         header.setRowspan(2);
         header.setStyleClass("small_font");
-        if(!isClustered) {
+        if(!clustered) {
         	header.setSortable(true);
         	header.setSortClass(SORT_CLASS.SORT_INT);
         	header.setDefaultSortOrder(SORT_ORDER.DESC);
@@ -750,7 +784,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 
     @Override
     public void tabulate() {
-    	if(!this.isInitialized)
+    	if(!this.initialized)
     		initializeInfo(this.getStartIndex(), this.getEndIndex());
     }
     
@@ -773,7 +807,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         protein.setProteinListing(listing);
 
         // Get the group information for the different datasets
-        for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
+        for(DatasetProteinInformation dpi: protein.getDatasetInformation()) {
             if(dpi.getDatasetSource() == DatasetSource.PROTINFER) {
                 boolean grouped = idpProtDao.isNrseqProteinGrouped(dpi.getDatasetId(), protein.getNrseqId());
                 dpi.setGrouped(grouped);
@@ -788,7 +822,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         // Get the spectrum count information for the protein in the different datasets
         ArrayList<Integer> nrseqIds = new ArrayList<Integer>(1);
         nrseqIds.add(protein.getNrseqId());
-        for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
+        for(DatasetProteinInformation dpi: protein.getDatasetInformation()) {
             if(dpi.getDatasetSource() != DatasetSource.DTA_SELECT) {
                 List<Integer> piProteinIds = protDao.getProteinIdsForNrseqIds(dpi.getDatasetId(), nrseqIds);
                 if(piProteinIds.size() == 1) {
@@ -808,7 +842,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         
         // Get the NSAF information for the protein in the different datasets
         // NSAF is available only for ProteinInference proteins
-        for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
+        for(DatasetProteinInformation dpi: protein.getDatasetInformation()) {
             if(dpi.getDatasetSource() == DatasetSource.PROTINFER) {
                 List<Integer> piProteinIds = idpProtDao.getProteinIdsForNrseqIds(dpi.getDatasetId(), nrseqIds);
                 if(piProteinIds.size() == 1) {
@@ -887,5 +921,37 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 
     public void setSortOrder(SORT_ORDER sortOrder) {
         this.sortOrder = sortOrder;
+    }
+    
+    private void writeObject(ObjectOutputStream out) throws IOException {
+    	
+    	out.defaultWriteObject();
+    }
+    
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    	
+    	 this.datasets = new ArrayList<Dataset>();
+         this.proteinGroups = new ArrayList<ComparisonProteinGroup>();
+         this.proteins = new ArrayList<ComparisonProtein>();
+         this.groupMemberCount = new HashMap<Integer, Integer>();
+         this.displayPageNumbers = new ArrayList<Integer>();
+         
+         this.startIndex = -1;
+         this.endIndex = -1;
+         
+         this.currentGroupId = -1;
+         this.rowCssClass = "tr_even";
+         
+         this.sortBy = SORT_BY.NUM_PEPT;
+         this.sortOrder = SORT_ORDER.DESC;
+    	
+         // deserialize
+         in.defaultReadObject();
+    	
+    	this.setRowCount(rowCount);
+    	this.setCurrentPage(currentPage); // this will re-set the display page numbers
+    									  // based on row count and number of proteins.
+    	
+    	initSummary(); 
     }
 }

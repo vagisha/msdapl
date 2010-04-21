@@ -599,7 +599,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 		protein.setProteinListing(listing);
 
 		// Get the group information for the different datasets
-		for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
+		for(DatasetProteinInformation dpi: protein.getDatasetInformation()) {
 			if(dpi.getDatasetSource() == DatasetSource.PROTINFER) {
 				boolean grouped = idpProtDao.isNrseqProteinGrouped(dpi.getDatasetId(), protein.getNrseqId());
 				dpi.setGrouped(grouped);
@@ -614,7 +614,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 		// Get the spectrum count information for the protein in the different datasets
 		ArrayList<Integer> nrseqIds = new ArrayList<Integer>(1);
 		nrseqIds.add(protein.getNrseqId());
-		for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
+		for(DatasetProteinInformation dpi: protein.getDatasetInformation()) {
 			if(dpi.getDatasetSource() != DatasetSource.DTA_SELECT) {
 				List<Integer> piProteinIds = protDao.getProteinIdsForNrseqIds(dpi.getDatasetId(), nrseqIds);
 				if(piProteinIds.size() == 1) {
@@ -637,7 +637,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 
 		// Get the NSAF information for the protein in the different datasets
 		// NSAF is available only for ProteinInference proteins
-		for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
+		for(DatasetProteinInformation dpi: protein.getDatasetInformation()) {
 			if(dpi.getDatasetSource() == DatasetSource.PROTINFER) {
 				List<Integer> piProteinIds = idpProtDao.getProteinIdsForNrseqIds(dpi.getDatasetId(), nrseqIds);
 				if(piProteinIds.size() == 1) {

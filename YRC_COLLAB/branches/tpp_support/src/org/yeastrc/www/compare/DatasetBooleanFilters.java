@@ -7,6 +7,7 @@
 package org.yeastrc.www.compare;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.yeastrc.www.compare.dataset.Dataset;
@@ -26,6 +27,49 @@ public class DatasetBooleanFilters {
         orFilters = new ArrayList<Dataset>();
         notFilters = new ArrayList<Dataset>();
         xorFilters = new ArrayList<Dataset>();
+    }
+    
+    public boolean equals(Object o) {
+    	if(this == o)
+    		return true;
+    	if(!(o instanceof DatasetBooleanFilters))
+    		return false;
+    	DatasetBooleanFilters that = (DatasetBooleanFilters)o;
+    	
+    	if(!compareFilters(andFilters, that.getAndFilters()))
+    		return false;
+    	if(!compareFilters(orFilters, that.getOrFilters()))
+    		return false;
+    	if(!compareFilters(notFilters, that.getNotFilters()))
+    		return false;
+    	if(!compareFilters(xorFilters, that.getXorFilters()))
+    		return false;
+    	
+    	return true;
+    }
+    
+    private boolean compareFilters(List<Dataset> myFilters, List<Dataset> theirFilters) {
+    	
+    	List<Integer> myIds = new ArrayList<Integer>();
+    	List<Integer> theirIds = new ArrayList<Integer>();
+    	
+    	for(Dataset ds: myFilters)
+    		myIds.add(ds.getDatasetId());
+    	
+    	for(Dataset ds: theirFilters)
+    		theirIds.add(ds.getDatasetId());
+    	
+    	Collections.sort(myIds);
+    	Collections.sort(theirIds);
+    	
+    	if(myIds.size() != theirIds.size())
+    		return false;
+    	
+    	for(int i = 0; i < myIds.size(); i++)
+    		if(myIds.get(i) != theirIds.get(i))
+    			return false;
+    	
+    	return true;
     }
 
     public List<Dataset> getAndFilters() {
@@ -59,5 +103,4 @@ public class DatasetBooleanFilters {
     public void setXorFilters(List<Dataset> xorFilters) {
         this.xorFilters = xorFilters;
     }
-    
 }

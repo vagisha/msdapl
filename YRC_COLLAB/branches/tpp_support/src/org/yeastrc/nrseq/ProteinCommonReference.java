@@ -6,12 +6,13 @@
  */
 package org.yeastrc.nrseq;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 
 /**
  * 
  */
-public class ProteinCommonReference {
+public class ProteinCommonReference implements Serializable {
 
 	private StandardDatabase database;
 	private String name;
