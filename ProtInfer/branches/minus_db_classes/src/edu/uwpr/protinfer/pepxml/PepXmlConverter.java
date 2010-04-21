@@ -46,7 +46,8 @@ import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
-import org.yeastrc.ms.util.AminoAcidUtils;
+import org.yeastrc.ms.util.AminoAcidUtilsFactory;
+import org.yeastrc.ms.util.BaseAminoAcidUtils;
 
 /**
  * 
@@ -237,10 +238,11 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
         writer.writeAttribute("massdiff", massDiffStr);
         
         double aaMass = massDiff;
+        BaseAminoAcidUtils aaUtils = AminoAcidUtilsFactory.getAminoAcidUtils();
         if(fragmentMassType == MassType.AVG)
-            aaMass += AminoAcidUtils.avgMass(mod.getModifiedResidue());
+            aaMass += aaUtils.avgMass(mod.getModifiedResidue());
         else
-            aaMass += AminoAcidUtils.monoMass(mod.getModifiedResidue());
+            aaMass += aaUtils.monoMass(mod.getModifiedResidue());
         writer.writeAttribute("mass", String.valueOf(aaMass));
         
         if(dynamic)
@@ -438,10 +440,10 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
     private double calculatePeptideNeutralMass(MsSearchResultPeptide peptide, List<MsResidueModification> staticMods) {
         double peptNeutralMass = 0;
         if(fragmentMassType == MassType.AVG) {
-            peptNeutralMass = AminoAcidUtils.avgMassPeptide(peptide.getPeptideSequence());
+            peptNeutralMass = 0; // TODO FIX THIS AminoAcidUtilsFactory.getAminoAcidUtils().avgMassPeptide(peptide.getPeptideSequence());
         }
         else {
-            peptNeutralMass = AminoAcidUtils.monoMassPeptide(peptide.getPeptideSequence());
+            peptNeutralMass = 0; // TODO FIX THIS AminoAcidUtilsFactory.getAminoAcidUtils().monoMassPeptide(peptide.getPeptideSequence());
         }
         // get the dynamic mods
         List<MsResultResidueMod> resultDynaMods = peptide.getResultDynamicResidueModifications();
@@ -459,7 +461,7 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
             if(staticModMap.containsKey(seq.charAt(i)))
                 peptNeutralMass += staticModMap.get(seq.charAt(i)).doubleValue();
         }
-        peptNeutralMass += (AminoAcidUtils.HYDROGEN*2 + AminoAcidUtils.OXYGEN);
+        peptNeutralMass += (BaseAminoAcidUtils.HYDROGEN*2 + BaseAminoAcidUtils.OXYGEN);
         return Math.round(peptNeutralMass*1000000)/1000000.0;
     }
 
@@ -515,9 +517,9 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
     private double getModifiedAminoAcidMass(double massDiff, char aa) {
         double mass = massDiff;
         if(fragmentMassType == MassType.AVG)
-            mass += AminoAcidUtils.avgMass(aa);
+            mass += AminoAcidUtilsFactory.getAminoAcidUtils().avgMass(aa);
         else
-            mass += AminoAcidUtils.monoMass(aa);
+            mass += AminoAcidUtilsFactory.getAminoAcidUtils().monoMass(aa);
         return Math.round(mass*1000000)/1000000.0;
     }
     
@@ -562,7 +564,7 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
     
     // TODO Is this correct?
     private double getNeutralMass(double mPlusH) {
-        return mPlusH - AminoAcidUtils.PROTON;
+        return mPlusH - BaseAminoAcidUtils.PROTON;
     }
     
     //-------------------------------------------------------------------------------------------

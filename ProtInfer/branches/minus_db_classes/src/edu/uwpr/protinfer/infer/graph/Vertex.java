@@ -1,7 +1,9 @@
 package edu.uwpr.protinfer.infer.graph;
 
+import java.io.Serializable;
 
-public abstract class Vertex<T extends Vertex<?>> implements IVertex <T>{
+
+public abstract class Vertex<T extends Vertex<?>> implements IVertex <T>, Serializable {
 
     private boolean isVisited;
     private int componentIndex;
