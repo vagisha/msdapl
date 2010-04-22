@@ -20,12 +20,8 @@
 <script>
 
 // submit the form as soon as the document loads
-$(document).ready(function() {
-	
-	// change the target action of the form; the default is the update action
-	// $("form[name='proteinSetComparisonForm']").attr("action",'<yrcwww:link path="compareClustered.do" />'); 
-	// alert($("form[name='proteinSetComparisonForm']").attr("action"));
-	clusterResults();
+$(window).load(function() {
+	clusterResults(); // submit the form
 });
 
 </script>

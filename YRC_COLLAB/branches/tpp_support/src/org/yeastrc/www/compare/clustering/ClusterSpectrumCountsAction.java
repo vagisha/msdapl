@@ -28,6 +28,7 @@ import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
 import org.yeastrc.www.compare.ProteinSetComparisonForm;
 import org.yeastrc.www.compare.SpeciesChecker;
+import org.yeastrc.www.compare.clustering.SpectrumCountClusterer.ROptions;
 import org.yeastrc.www.compare.util.VennDiagramCreator;
 
 /**
@@ -92,8 +93,15 @@ public class ClusterSpectrumCountsAction extends Action {
             String baseDir = request.getSession().getServletContext().getRealPath(ClusteringConstants.BASE_DIR);
             baseDir = baseDir+File.separator+jobToken;
             
+            ROptions ropts = new ROptions();
+            ropts.setDoLog(myForm.isUseLogScale());
+            ropts.setReplaceMissingWithNegMaxLog(myForm.isReplaceMissingWithMinusMaxLog());
+            ropts.setValueForMissing(myForm.getReplaceMissingWithValueDouble());
+            ropts.setNumCols(grpComparison.getDatasetCount());
+            ropts.setNumRows(grpComparison.getTotalProteinGroupCount());
+            
             ProteinGroupComparisonDataset clusteredGrpComparison = 
-            	SpectrumCountClusterer.getInstance().clusterProteinGroupComparisonDataset(grpComparison, errorMessage, baseDir);
+            	SpectrumCountClusterer.getInstance().clusterProteinGroupComparisonDataset(grpComparison, ropts, errorMessage, baseDir);
             if(clusteredGrpComparison == null) {
             	ActionErrors errors = new ActionErrors();
                 errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Clustering error: "+errorMessage.toString()));

@@ -42,13 +42,16 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 	private boolean cluster = false;
 	private String clusteringToken = null;
 	private boolean newToken = false;
+	private boolean useLogScale = false;
+	private boolean replaceMissingWithMinusMaxLog = false;
+	private String replaceMissingWithValue = null;
     
     
 	public void reset() {
         super.reset();
     }
     
-    public int getPageNum() {
+	public int getPageNum() {
         return pageNum;
     }
 
@@ -68,8 +71,9 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 
         // we need atleast two datasets runs to compare
         if (getSelectedRunCount() < 2) {
-                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Please select 2 or more experiments to compare."));
+        	errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Please select 2 or more experiments to compare."));
         }
+        
         return errors;
     }
 
@@ -168,6 +172,38 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 
 	public void setNewToken(boolean newToken) {
 		this.newToken = newToken;
+	}
+	
+	public boolean isUseLogScale() {
+		return useLogScale;
+	}
+
+	public void setUseLogScale(boolean useLogScale) {
+		this.useLogScale = useLogScale;
+	}
+
+	public boolean isReplaceMissingWithMinusMaxLog() {
+		return replaceMissingWithMinusMaxLog;
+	}
+
+	public void setReplaceMissingWithMinusMaxLog(
+			boolean replaceMissingWithMinusMaxLog) {
+		this.replaceMissingWithMinusMaxLog = replaceMissingWithMinusMaxLog;
+	}
+
+	public String getReplaceMissingWithValue() {
+		return replaceMissingWithValue;
+	}
+	
+	public double getReplaceMissingWithValueDouble() {
+		if(replaceMissingWithValue == null || replaceMissingWithValue.trim().length() == 0) {
+			return 0.0;
+		}
+		return Double.parseDouble(replaceMissingWithValue);
+	}
+
+	public void setReplaceMissingWithValue(String replaceMissingWithValue) {
+		this.replaceMissingWithValue = replaceMissingWithValue;
 	}
     
     //-----------------------------------------------------------------------------

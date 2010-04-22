@@ -302,14 +302,6 @@ function newPopup(url) {
  	<tr>
  		<td valign="top" align="center" colspan="4" style="padding-top:5px;">	
  			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button"></html:submit>
- 			
- 			&nbsp; &nbsp;
- 			<html:submit value="Cluster" onclick="javascript:clusterResults();" styleClass="plain_button"></html:submit>
- 			
- 			<logic:present name="clusteredImgUrl">
- 				&nbsp;&nbsp;<a href="JavaScript:newPopup('<bean:write name='clusteredImgUrl'/>');" >Heatmap</a>
- 			</logic:present>
- 			
 		</td>
 	</tr>
  	</logic:notPresent>
@@ -317,6 +309,27 @@ function newPopup(url) {
 	
 </table>
 </div>
+
+<!-- CLUSTER RSULTS -->
+<logic:notPresent name="goEnrichmentView">
+<div align="center" style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%; margin-top:10px;">
+	<b>Clustering Options: </b>
+	
+	<html:checkbox name="proteinSetComparisonForm" property="useLogScale">Log(2) Scale</html:checkbox>
+		&nbsp;
+	Missing Values: 
+	<html:checkbox name="proteinSetComparisonForm" property="replaceMissingWithMinusMaxLog">-log2(Max(SC)</html:checkbox>
+	&nbsp;
+	<html:text name="proteinSetComparisonForm" property="replaceMissingWithValue">Value:</html:text>
+	&nbsp;
+	<html:submit value="Cluster" onclick="javascript:clusterResults();" styleClass="plain_button"></html:submit>
+	
+	<logic:present name="clusteredImgUrl">
+		&nbsp;&nbsp;
+		<span style="background-color:yellow;"></span><a href="JavaScript:newPopup('<bean:write name='clusteredImgUrl'/>');">Heatmap</a></span>
+	</logic:present>
+</div>
+</logic:notPresent>
 
 
 <!-- DOWNLOAD RESULTS -->

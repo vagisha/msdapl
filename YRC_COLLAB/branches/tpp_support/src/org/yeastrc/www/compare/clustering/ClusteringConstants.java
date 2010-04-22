@@ -19,6 +19,7 @@ public class ClusteringConstants {
 	public static final String OUTPUT_FILE = "output.txt";
 	public static final String R_SCRIPT = "r.script.txt";
 	public static final String SH_SCRIPT = "run.sh";
+	public static final String COLORS = "colors.txt";
 	public static final String PROT_GRP_SER = "ProteinGroupComparisonDataset.ser";
 	public static final String FORM_SER = "ProteinSetComparisonForm.ser";
 }

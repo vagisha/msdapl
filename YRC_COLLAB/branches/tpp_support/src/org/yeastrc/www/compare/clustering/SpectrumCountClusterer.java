@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ApplicationProperties;
 import org.yeastrc.ms.util.FileUtils;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nrseq.ProteinListing;
@@ -44,7 +45,7 @@ public class SpectrumCountClusterer {
 	}
 	
 	public ProteinGroupComparisonDataset clusterProteinGroupComparisonDataset(ProteinGroupComparisonDataset grpComparison,
-			StringBuilder errorMesage, String dir) {
+			ROptions rOptions, StringBuilder errorMesage, String dir) {
 		
 		long s = System.currentTimeMillis(); 
 		for(ComparisonProteinGroup grpProtein: grpComparison.getProteinsGroups()) {
@@ -57,6 +58,7 @@ public class SpectrumCountClusterer {
 		
 		// Create the output directory. If it exists already remove it 
 		if(new File(dir).exists()) {
+			log.info("Directory exists: "+dir+". DELETING....");
 			FileUtils.deleteFile(new File(dir)); 
 		}
 		if(!(new File(dir).mkdir()))  {
@@ -74,8 +76,10 @@ public class SpectrumCountClusterer {
 		String rscriptPath = null;
 		log.info("Writing script file");
 		try {
-			rscriptPath = writeRScript(dir);
+			rscriptPath = writeRScript(dir, rOptions);
+			
 		} catch (IOException e1) {
+			log.error("Error writing R script: "+e1.getMessage(), e1);
 			errorMesage.append("Error writing R script: "+e1.getMessage());
 			return null;
 		}
@@ -86,6 +90,7 @@ public class SpectrumCountClusterer {
 		try {
 			runScriptPath = writeShScript(dir, rscriptPath);
 		} catch (IOException e1) {
+			log.error("Error writing runner script: "+e1.getMessage(), e1);
 			errorMesage.append("Error writing runner script: "+e1.getMessage());
 			return null;
 		}
@@ -107,6 +112,7 @@ public class SpectrumCountClusterer {
 		try {
 			datasetOrder = readDatasetOrder(output);
 		} catch (IOException e1) {
+			log.error("Error reading output file: "+output.getAbsolutePath(), e1);
 			errorMesage.append("Error reading output file: "+output.getAbsolutePath());
 			return null;
 		}
@@ -115,9 +121,13 @@ public class SpectrumCountClusterer {
 		try {
 			groupOrder = readGroupOrder(output);
 		} catch (IOException e1) {
+			log.error("Error reading output file: "+output.getAbsolutePath(), e1);
 			errorMesage.append("Error reading output file: "+output.getAbsolutePath());
 			return null;
 		}
+		
+		// reorder the protein groups
+		ProteinGroupComparisonDataset orderedGrpComparison =  reorderComparison(grpComparison, datasetOrder, groupOrder);
 		
 		output = new File(dir+File.separator+ClusteringConstants.IMG_FILE);
 		if(!output.exists()) {
@@ -125,10 +135,48 @@ public class SpectrumCountClusterer {
 			return null;
 		}
 		
-		return reorderComparison(grpComparison, datasetOrder, groupOrder);
+		// read the colors file
+		List<String> colors = null;
+		output =  new File(dir+File.separator+ClusteringConstants.COLORS);
+		if(!output.exists()) {
+			errorMesage.append("Output file "+output.getAbsolutePath()+" does not exist");
+			return null;
+		}
+		try {
+			colors = readColors(output);
+		}
+		catch (IOException ex) {
+			log.error("Error reading output file: "+output.getAbsolutePath(), ex);
+			errorMesage.append("Error reading output file: "+output.getAbsolutePath());
+			return null;
+		}
 		
+		if(colors != null && colors.size() > 0) {
+			String[] colArr = new String[colors.size()];
+			colArr = colors.toArray(colArr);
+			orderedGrpComparison.setSpectrumCountColors(colArr);
+		}
+		
+		return orderedGrpComparison;
 	}
 	
+	private List<String> readColors(File output) throws IOException {
+		
+		List<String> colors = new ArrayList<String>(256);
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(output));
+			String line = null;
+			while((line = reader.readLine()) != null) {
+				colors.add(line.trim());
+			}
+		}
+		finally {
+			if(reader != null) try {reader.close();} catch(IOException e){}
+		}
+		return colors;
+	}
+
 	private boolean runR(StringBuilder errorMesage, String scriptPath) {
 		log.info("Executing script");
 		Runtime rt = Runtime.getRuntime();
@@ -230,7 +278,7 @@ public class SpectrumCountClusterer {
 		// reorder the datasets
 		List<Dataset> orderedDS = new ArrayList<Dataset>(grpComparison.getDatasetCount());
 		List<? extends Dataset> originalDS = grpComparison.getDatasets();
-		for(int i = datasetOrder.size() - 1; i >= 0; i--) {
+		for(int i = 0; i < datasetOrder.size(); i++) {
 			orderedDS.add(originalDS.get(datasetOrder.get(i) - 1)); // R returns 1-based indexes
 		}
 		clustered.setDatasets(orderedDS);
@@ -289,6 +337,8 @@ public class SpectrumCountClusterer {
 	
 	private String writeShScript(String dir, String pathToRScript) throws IOException {
 		
+		//ApplicationProperties.load(); // load properties
+		
 		String file = dir+File.separator+ClusteringConstants.SH_SCRIPT;
 		BufferedWriter writer = null;
 		try {
@@ -296,8 +346,10 @@ public class SpectrumCountClusterer {
 			writer.write("#!/bin/sh\n");
 			// read this: http://www.uni-koeln.de/rrzk/server/documentation/modules.html
 			// writer.write(". /etc/profile.d/modules.sh\n");
-			writer.write("module load modules modules-init modules-gs R\n");
+			//writer.write("module load modules modules-init modules-gs R\n");
+			//writer.write("/net/gs/vol3/software/bin/R --vanilla --slave --file="+pathToRScript+"\n");
 			writer.write("R --vanilla --slave --file="+pathToRScript+"\n");
+			//writer.write(ApplicationProperties.getRPath()+" --vanilla --slave --file="+pathToRScript+"\n");
 		}
 		finally {
 			if(writer != null) try{writer.close();}catch(IOException e){}
@@ -305,23 +357,61 @@ public class SpectrumCountClusterer {
 		return file;
 	}
 
-	private String writeRScript(String dir) throws IOException {
+	private String writeRScript(String dir, ROptions rinfo) throws IOException {
 		
 		String file = dir+File.separator+ClusteringConstants.R_SCRIPT;
 		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(new FileWriter(file));
+			writer.write("library(gplots)\n");
 			writer.write("test=read.table(\""+dir+File.separator+ClusteringConstants.INPUT_FILE+"\", header=T)\n");
 			writer.write("test_sc=test[,-1]\n");
+			if(rinfo.isDoLog()) {
+				writer.write("test_sc=log2(test_sc)\n");
+				if(rinfo.isReplaceMissingWithNegMaxLog()) {
+					writer.write("test_sc[test_sc == -Inf] <- -max(test_sc)\n");
+				}
+				else {
+					writer.write("test_sc[test_sc == -Inf] <- "+rinfo.getValueForMissing()+"\n");
+				}
+			}
+			else if(rinfo.getValueForMissing() != 0) {
+				writer.write("test_sc[test_sc == 0] <- "+rinfo.getValueForMissing()+"\n");
+			}
+			
+			
+			
 			writer.write("rownames(test_sc) <- test[,1]\n");
-			writer.write("source(\"http://faculty.ucr.edu/~tgirke/Documents/R_BioCond/My_R_Scripts/my.colorFct.R\")\n");
+			// writer.write("source(\"http://faculty.ucr.edu/~tgirke/Documents/R_BioCond/My_R_Scripts/my.colorFct.R\")\n");
+			
+			// get my colors
+			writer.write("all_sc = unmatrix(as.matrix(test_sc))\n");
+			writer.write("all_sc = sort(all_sc)\n");
+			writer.write("m = length(which(all_sc <= mean(all_sc)))\n");
+			writer.write("n_red = 255 * (m/length(all_sc))\n");
+			writer.write("n_green = 255 - n_red\n");
+			writer.write("my_cols = c(hsv(0.25, 1, seq(1,0,length=n_green)), hsv(1, 1, seq(0,1,length=n_red)))\n");
+			
 			String devType = ClusteringConstants.IMG_FILE.substring(ClusteringConstants.IMG_FILE.lastIndexOf(".")+1);
 			writer.write(devType+"(\""+dir+File.separator+ClusteringConstants.IMG_FILE+"\")\n");
 			writer.write("options(expressions=10000)\n");
-			writer.write("hm <- heatmap(as.matrix(test_sc), col=my.colorFct(), scale=\"none\")\n");
+			//writer.write("hm <- heatmap.2(as.matrix(test_sc), cexCol=1.0, col=my.colorFct(), scale=\"none\", margins=c(5,10)");
+			writer.write("hm <- heatmap.2(as.matrix(test_sc), cexCol=1.0, col=my_cols, scale=\"none\", margins=c(5,10), trace=\"none\" ");
+			if(rinfo.numCols <= 2) {
+				writer.write(", Colv=NA ");
+			}
+			double cexRow = 1.0/Math.log10((double)rinfo.numRows);
+			cexRow = Math.round(cexRow*10000.0) / 10000.0;
+			cexRow = Math.max(0.05, cexRow);
+			writer.write(", cexRow="+cexRow+" ");
+			writer.write(")\n");
 			writer.write("dev.off()\n");
+			// write the index of protein groups after clustering
 			writer.write("write(hm$rowInd, file=\""+dir+File.separator+ClusteringConstants.OUTPUT_FILE+"\", sep=\",\", append=FALSE, length(ncolumns=hm$rowInd))\n");
+			// write the index of the datasets after clustering
 			writer.write("write(hm$colInd, file=\""+dir+File.separator+ClusteringConstants.OUTPUT_FILE+"\", sep=\",\", append=TRUE, length(ncolumns=hm$colInd))\n");
+			// write the colors used for the heatmap
+			writer.write("write(my_cols, file=\""+dir+File.separator+ClusteringConstants.COLORS+"\", append=FALSE, 1)\n");
 		}
 		finally {
 			if(writer != null) try{writer.close();}catch(IOException e){}
@@ -333,5 +423,44 @@ public class SpectrumCountClusterer {
 			ProteinComparisonDataset comparison) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public static final class ROptions {
+		int numRows;
+		int numCols;
+		boolean doLog = false;
+		double valueForMissing = 0;
+		boolean replaceMissingWithNegMaxLog = false;
+		
+		public boolean isReplaceMissingWithNegMaxLog() {
+			return replaceMissingWithNegMaxLog;
+		}
+		public void setReplaceMissingWithNegMaxLog(boolean replaceMissingWithNegMaxLog) {
+			this.replaceMissingWithNegMaxLog = replaceMissingWithNegMaxLog;
+		}
+		public int getNumRows() {
+			return numRows;
+		}
+		public void setNumRows(int numRows) {
+			this.numRows = numRows;
+		}
+		public int getNumCols() {
+			return numCols;
+		}
+		public void setNumCols(int numCols) {
+			this.numCols = numCols;
+		}
+		public boolean isDoLog() {
+			return doLog;
+		}
+		public void setDoLog(boolean doLog) {
+			this.doLog = doLog;
+		}
+		public double getValueForMissing() {
+			return valueForMissing;
+		}
+		public void setValueForMissing(double valueForMissing) {
+			this.valueForMissing = valueForMissing;
+		}
 	}
 }

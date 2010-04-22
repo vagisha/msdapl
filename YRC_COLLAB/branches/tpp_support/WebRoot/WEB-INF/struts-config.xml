@@ -1220,7 +1220,7 @@
 	>
 		<forward name="WaitForClustering" path="/waitForClustering.do" redirect="false" />
 		<forward name="DoComparison" path="/doComparison.do" redirect="false" />
-		<forward name="ReadOld" path="/readCompareClustered.do" redirect="false" />
+		<forward name="ReadOld" path="/readCompareClustered.do" redirect="true" />
 		<forward name="Failure" path="/pages/internal/compare/comparisonError.jsp" redirect="false" />
 	</action>
 	

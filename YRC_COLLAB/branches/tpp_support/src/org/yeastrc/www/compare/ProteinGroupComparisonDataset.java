@@ -81,7 +81,9 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
     private boolean clustered = false;
     private boolean initialized = false;
     
-    private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
+    private String[] spectrumCountColors = null;
+    
+	private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
     
     
     public boolean isClustered() {
@@ -98,6 +100,14 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
 
 	public void setInitialized(boolean initialized) {
 		this.initialized = initialized;
+	}
+	
+	public String[] getSpectrumCountColors() {
+		return spectrumCountColors;
+	}
+
+	public void setSpectrumCountColors(String[] spectrumCountColors) {
+		this.spectrumCountColors = spectrumCountColors;
 	}
 
 	private int getStartIndex() {
@@ -615,16 +625,31 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
 	}
 	
     private float getScaledSpectrumCount(float count) {
-        return ((count - minNormalizedSpectrumCount + 1)/maxNormalizedSpectrumCount)*100.0f;
+        return ((count - minNormalizedSpectrumCount)/(maxNormalizedSpectrumCount - minNormalizedSpectrumCount))*100.0f;
     }
     
+//    private String getClusteredColor(float normalizedSpectrumCount) {
+//    	int numbins = spectrumCountColors.length;
+//    	float range = maxNormalizedSpectrumCount - minNormalizedSpectrumCount;
+//    	int bin = (int)Math.ceil(((normalizedSpectrumCount - minNormalizedSpectrumCount) / range ) * numbins);
+//    	return spectrumCountColors[bin-1];
+//    }
+    
     private String getScaledColor(float scaledSpectrumCount) {
-        int rounded = (int)Math.ceil(scaledSpectrumCount);
-        int green = 255;
-        green -= 255.0/100.0 * rounded;
-        int red = 0;
-        red  += 255.0/100.0 * rounded;
-        return "#"+hexValue(red, green, 0);
+    	
+    	if(this.spectrumCountColors != null) {
+    		int bin = (int)Math.ceil((((double) spectrumCountColors.length / 100.0) * scaledSpectrumCount));
+    		if(bin == 0) bin = 1;
+    		return spectrumCountColors[bin-1];
+    	}
+    	else {
+    		int rounded = (int)Math.ceil(scaledSpectrumCount);
+    		int green = 255;
+    		green -= 255.0/100.0 * rounded;
+    		int red = 0;
+    		red  += 255.0/100.0 * rounded;
+    		return "#"+hexValue(red, green, 0);
+    	}
     }
     
     private String hexValue(int r, int g, int b) {
