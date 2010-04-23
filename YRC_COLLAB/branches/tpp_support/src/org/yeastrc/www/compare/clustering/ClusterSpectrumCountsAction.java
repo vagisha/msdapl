@@ -50,6 +50,10 @@ public class ClusterSpectrumCountsAction extends Action {
         }
         
         String jobToken = myForm.getClusteringToken();
+        // Look for it in the session
+        if(jobToken == null || jobToken.trim().length() == 0) {
+        	jobToken = (String)request.getSession().getAttribute("clustering_token");
+        }
         if(jobToken == null || jobToken.trim().length() == 0) {
         	ActionErrors errors = new ActionErrors();
             errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Token for clustering not found in request"));
@@ -57,8 +61,19 @@ public class ClusterSpectrumCountsAction extends Action {
             return mapping.findForward("Failure");
         }
         
+        // put the token in the session
+        request.getSession().setAttribute("clustering_token", jobToken);
+        
+        // put it in the form
+        myForm.setClusteringToken(jobToken);
+        
         // now mark the token as old
 		myForm.setNewToken(false);
+        
+		StringBuilder errorMessage = new StringBuilder();
+        String baseDir = request.getSession().getServletContext().getRealPath(ClusteringConstants.BASE_DIR);
+        baseDir = baseDir+File.separator+jobToken;
+        
         
         if(!myForm.getGroupIndistinguishableProteins()) {
             ProteinComparisonDataset comparison = (ProteinComparisonDataset) request.getAttribute("comparisonDataset");
@@ -70,9 +85,32 @@ public class ClusterSpectrumCountsAction extends Action {
             }
             
             long s = System.currentTimeMillis();
-            SpectrumCountClusterer.getInstance().clusterProteinComparisonDataset(comparison);
+            
+            ROptions ropts = new ROptions();
+            ropts.setDoLog(myForm.isUseLogScale());
+            ropts.setValueForMissing(myForm.getReplaceMissingWithValueDouble());
+            ropts.setNumCols(comparison.getDatasetCount());
+            ropts.setNumRows(comparison.getTotalProteinCount());
+            
+            ProteinComparisonDataset clusteredComparison = 
+            SpectrumCountClusterer.getInstance().clusterProteinComparisonDataset(comparison, ropts, errorMessage, baseDir);
+            if(clusteredComparison == null) {
+            	ActionErrors errors = new ActionErrors();
+                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Clustering error: "+errorMessage.toString()));
+                saveErrors( request, errors );
+                return mapping.findForward("Failure");
+            }
             long e = System.currentTimeMillis();
             log.info("Time to culster ProteinComparisonDataset: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+            
+            // Serialize the ProteinComparisonDataset
+            if(!serializeObject(clusteredComparison, ClusteringConstants.PROT_SER,
+            		errorMessage, baseDir)) {
+            	ActionErrors errors = new ActionErrors();
+                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", errorMessage.toString()));
+                saveErrors( request, errors );
+                return mapping.findForward("Failure");
+            }
             
         }
         else {
@@ -85,13 +123,9 @@ public class ClusterSpectrumCountsAction extends Action {
             }
             
             long s = System.currentTimeMillis();
-            StringBuilder errorMessage = new StringBuilder();
-            String baseDir = request.getSession().getServletContext().getRealPath(ClusteringConstants.BASE_DIR);
-            baseDir = baseDir+File.separator+jobToken;
             
             ROptions ropts = new ROptions();
             ropts.setDoLog(myForm.isUseLogScale());
-            ropts.setReplaceMissingWithNegMaxLog(myForm.isReplaceMissingWithMinusMaxLog());
             ropts.setValueForMissing(myForm.getReplaceMissingWithValueDouble());
             ropts.setNumCols(grpComparison.getDatasetCount());
             ropts.setNumRows(grpComparison.getTotalProteinGroupCount());
@@ -117,24 +151,24 @@ public class ClusterSpectrumCountsAction extends Action {
                 return mapping.findForward("Failure");
             }
             
-            // Serialize the ProteinSetComparisonForm
-            if(!serializeObject(myForm, ClusteringConstants.FORM_SER,
-            		errorMessage, baseDir)) {
-            	ActionErrors errors = new ActionErrors();
-                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", errorMessage.toString()));
-                saveErrors( request, errors );
-                return mapping.findForward("Failure");
-            }
-            
-            // redirect to the ReadClusteredSpectrumCountsAction
-            ActionForward fwd = mapping.findForward("ReadSaved");
-			ActionForward newFwd = new ActionForward(fwd.getPath()+
-					"?token="+jobToken+"&page=1"+
-					"&count="+myForm.getNumPerPage(), fwd.getRedirect());
-			return newFwd;
         }
         
-        return mapping.findForward("Failure");
+        // Serialize the ProteinSetComparisonForm
+        if(!serializeObject(myForm, ClusteringConstants.FORM_SER,
+        		errorMessage, baseDir)) {
+        	ActionErrors errors = new ActionErrors();
+            errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", errorMessage.toString()));
+            saveErrors( request, errors );
+            return mapping.findForward("Failure");
+        }
+        
+        // redirect to the ReadClusteredSpectrumCountsAction
+        ActionForward fwd = mapping.findForward("ReadSaved");
+		ActionForward newFwd = new ActionForward(fwd.getPath()+
+				"?token="+jobToken+"&page=1"+
+				"&count="+myForm.getNumPerPage(), fwd.getRedirect());
+		return newFwd;
+        
     }
 
 	private boolean serializeObject(
@@ -149,6 +183,7 @@ public class ClusterSpectrumCountsAction extends Action {
 		}
 		catch (IOException e) {
 			errorMessage.append("Error writing file: "+outFile+" "+e.getMessage());
+			log.error("Error writing file: "+outFile+" "+e.getMessage(), e);
 			return false;
 		}
 		finally {

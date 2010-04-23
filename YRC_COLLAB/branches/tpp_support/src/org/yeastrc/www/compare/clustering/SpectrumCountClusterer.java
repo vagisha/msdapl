@@ -70,32 +70,8 @@ public class SpectrumCountClusterer {
 			return null;
 		}
 		
-		
-		// write the R script
-		String rscriptPath = null;
-		log.info("Writing script file");
-		try {
-			rscriptPath = writeRScript(dir, rOptions);
-			
-		} catch (IOException e1) {
-			log.error("Error writing R script: "+e1.getMessage(), e1);
-			errorMesage.append("Error writing R script: "+e1.getMessage());
-			return null;
-		}
-		
-		// write the runner script
-		String runScriptPath = null;
-		log.info("Writing runner script");
-		try {
-			runScriptPath = writeShScript(dir, rscriptPath);
-		} catch (IOException e1) {
-			log.error("Error writing runner script: "+e1.getMessage(), e1);
-			errorMesage.append("Error writing runner script: "+e1.getMessage());
-			return null;
-		}
-		
-		// run  R
-		if(!runR(errorMesage, runScriptPath)) {
+		// Write scripts and run R
+		if(!writeScriptsAndRunR(rOptions, errorMesage, dir)) {
 			return null;
 		}
 		
@@ -157,6 +133,126 @@ public class SpectrumCountClusterer {
 		}
 		
 		return orderedGrpComparison;
+	}
+
+	private boolean writeScriptsAndRunR(ROptions rOptions,
+			StringBuilder errorMesage, String dir) {
+		// write the R script
+		String rscriptPath = null;
+		log.info("Writing script file");
+		try {
+			rscriptPath = writeRScript(dir, rOptions);
+			
+		} catch (IOException e1) {
+			log.error("Error writing R script: "+e1.getMessage(), e1);
+			errorMesage.append("Error writing R script: "+e1.getMessage());
+			return false;
+		}
+		
+		// write the runner script
+		String runScriptPath = null;
+		log.info("Writing runner script");
+		try {
+			runScriptPath = writeShScript(dir, rscriptPath);
+		} catch (IOException e1) {
+			log.error("Error writing runner script: "+e1.getMessage(), e1);
+			errorMesage.append("Error writing runner script: "+e1.getMessage());
+			return false;
+		}
+		
+		// run  R
+		return runR(errorMesage, runScriptPath);
+	}
+	
+	public ProteinComparisonDataset clusterProteinComparisonDataset(
+			ProteinComparisonDataset comparison, ROptions rOptions, StringBuilder errorMesage, String dir) {
+		
+		long s = System.currentTimeMillis(); 
+		
+		for(ComparisonProtein protein: comparison.getProteins()) {
+			comparison.initializeProteinInfo(protein);
+        }
+		long e = System.currentTimeMillis();
+		log.info("Time to initialize protein info: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+		
+		// Create the output directory. If it exists already remove it 
+		if(new File(dir).exists()) {
+			log.info("Directory exists: "+dir+". DELETING....");
+			FileUtils.deleteFile(new File(dir)); 
+		}
+		if(!(new File(dir).mkdir()))  {
+			errorMesage.append("Error creating directory: "+dir);
+			return null;
+		}
+		
+		// Write the input file
+		if(!writeInputFile(comparison, errorMesage, dir)) {
+			return null;
+		}
+		
+		// Write scripts and run R
+		if(!writeScriptsAndRunR(rOptions, errorMesage, dir)) {
+			return null;
+		}
+		
+		log.info("Checking for output files");
+		// make sure expected output files are present
+		File output = new File(dir+File.separator+ClusteringConstants.OUTPUT_FILE);
+		if(!output.exists()) {
+			errorMesage.append("Output file "+output.getAbsolutePath()+" does not exist");
+			return null;
+		}
+		
+		List<Integer> datasetOrder;
+		try {
+			datasetOrder = readDatasetOrder(output);
+		} catch (IOException e1) {
+			log.error("Error reading output file: "+output.getAbsolutePath(), e1);
+			errorMesage.append("Error reading output file: "+output.getAbsolutePath());
+			return null;
+		}
+		
+		List<Integer> proteinOrder;
+		try {
+			proteinOrder = readGroupOrder(output);
+		} catch (IOException e1) {
+			log.error("Error reading output file: "+output.getAbsolutePath(), e1);
+			errorMesage.append("Error reading output file: "+output.getAbsolutePath());
+			return null;
+		}
+		
+		// reorder the protein groups
+		ProteinComparisonDataset orderedComparison =  reorderComparison(comparison, datasetOrder, proteinOrder);
+		
+		output = new File(dir+File.separator+ClusteringConstants.IMG_FILE);
+		if(!output.exists()) {
+			errorMesage.append("Output file "+output.getAbsolutePath()+" does not exist");
+			return null;
+		}
+		
+		// read the colors file
+		List<String> colors = null;
+		output =  new File(dir+File.separator+ClusteringConstants.COLORS);
+		if(!output.exists()) {
+			errorMesage.append("Output file "+output.getAbsolutePath()+" does not exist");
+			return null;
+		}
+		try {
+			colors = readColors(output);
+		}
+		catch (IOException ex) {
+			log.error("Error reading output file: "+output.getAbsolutePath(), ex);
+			errorMesage.append("Error reading output file: "+output.getAbsolutePath());
+			return null;
+		}
+		
+		if(colors != null && colors.size() > 0) {
+			String[] colArr = new String[colors.size()];
+			colArr = colors.toArray(colArr);
+			orderedComparison.setSpectrumCountColors(colArr);
+		}
+		
+		return orderedComparison;
 	}
 	
 	private List<String> readColors(File output) throws IOException {
@@ -265,6 +361,53 @@ public class SpectrumCountClusterer {
 		return true;
 	}
 	
+	private boolean writeInputFile(ProteinComparisonDataset grpComparison,
+			StringBuilder errorMesage, String dir) {
+		String fileName = dir+File.separator+ClusteringConstants.INPUT_FILE;
+		log.info("Writing input file: "+fileName);
+		BufferedWriter writer = null;
+		try {
+			writer = new BufferedWriter(new FileWriter(fileName));
+			
+			// write the IDs of the protein inferences being compared
+			writer.write("Name");
+			for(Dataset dataset: grpComparison.getDatasets()) {
+				writer.write("\tID_"+dataset.getDatasetId());
+			}
+			writer.write("\n");
+			
+			// write the results so that we can cluster them
+			for(ComparisonProtein prot: grpComparison.getProteins()) {
+				
+				String rowname = "";// grpProtein.getGroupId()+"_";
+				ProteinListing listing = prot.getProteinListing();
+				// Can't use common-names since two or more proteins can have the same common name
+				rowname += listing.getFastaAccessions().get(0);
+				
+				writer.write(rowname);
+				
+				
+				for(Dataset dataset: grpComparison.getDatasets()) {
+					DatasetProteinInformation dpi = prot.getDatasetProteinInformation(dataset);
+					if(dpi != null)
+						writer.write("\t"+dpi.getNormalizedSpectrumCount());
+					else
+						writer.write("\t0");
+				}
+				writer.write("\n");
+			}
+		}
+		catch(IOException ex) {
+			errorMesage.append("Error creating input file: "+fileName+"\n"+ex.getMessage());
+			return false;
+		}
+		finally {
+			if(writer != null) try{writer.close();}catch(IOException ex){}
+		}
+		
+		return true;
+	}
+	
 	private ProteinGroupComparisonDataset reorderComparison(ProteinGroupComparisonDataset grpComparison,
 			List<Integer> datasetOrder, List<Integer> groupOrder) {
 		
@@ -296,6 +439,41 @@ public class SpectrumCountClusterer {
 		
 		long e = System.currentTimeMillis();
 		log.info("Reordered ProteinGroupComparisonDataset in "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+		return clustered;
+		
+	}
+	
+	private ProteinComparisonDataset reorderComparison(ProteinComparisonDataset comparison,
+			List<Integer> datasetOrder, List<Integer> proteinOrder) {
+		
+		
+		log.info("Reordering ProteinComparisonDataset");
+		long s = System.currentTimeMillis();
+		
+		ProteinComparisonDataset clustered = new ProteinComparisonDataset();
+		
+		// reorder the datasets
+		List<Dataset> orderedDS = new ArrayList<Dataset>(comparison.getDatasetCount());
+		List<? extends Dataset> originalDS = comparison.getDatasets();
+		for(int i = 0; i < datasetOrder.size(); i++) {
+			orderedDS.add(originalDS.get(datasetOrder.get(i) - 1)); // R returns 1-based indexes
+		}
+		clustered.setDatasets(orderedDS);
+		
+		// reorder the proteins
+		List<ComparisonProtein> originalProteins = comparison.getProteins();
+		for(int i = proteinOrder.size() - 1; i >= 0; i--) {
+			clustered.addProtein(originalProteins.get(proteinOrder.get(i) - 1)); // R returns 1-based indexes
+		}
+		
+		clustered.initSummary();
+		
+		clustered.setInitialized(true);
+		clustered.setSortBy(null);
+		clustered.setSortOrder(null);
+		
+		long e = System.currentTimeMillis();
+		log.info("Reordered ProteinComparisonDataset in "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
 		return clustered;
 		
 	}
@@ -362,14 +540,14 @@ public class SpectrumCountClusterer {
 			writer.write("test_sc=test[,-1]\n");
 			if(rinfo.isDoLog()) {
 				writer.write("test_sc=log2(test_sc)\n");
-				if(rinfo.isReplaceMissingWithNegMaxLog()) {
-					writer.write("test_sc[test_sc == -Inf] <- -max(test_sc)\n");
-				}
-				else {
+				if(rinfo.getValueForMissing() != Double.MIN_VALUE) {
 					writer.write("test_sc[test_sc == -Inf] <- "+rinfo.getValueForMissing()+"\n");
 				}
+				else {
+					writer.write("test_sc[test_sc == -Inf] <- -1.0\n");
+				}
 			}
-			else if(rinfo.getValueForMissing() != 0) {
+			else if(rinfo.getValueForMissing() != Double.MIN_VALUE) {
 				writer.write("test_sc[test_sc == 0] <- "+rinfo.getValueForMissing()+"\n");
 			}
 			
@@ -413,25 +591,13 @@ public class SpectrumCountClusterer {
 		return file;
 	}
 	
-	public ProteinComparisonDataset clusterProteinComparisonDataset(
-			ProteinComparisonDataset comparison) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	public static final class ROptions {
 		int numRows;
 		int numCols;
 		boolean doLog = false;
-		double valueForMissing = 0;
-		boolean replaceMissingWithNegMaxLog = false;
+		double valueForMissing = Double.MIN_VALUE;
 		
-		public boolean isReplaceMissingWithNegMaxLog() {
-			return replaceMissingWithNegMaxLog;
-		}
-		public void setReplaceMissingWithNegMaxLog(boolean replaceMissingWithNegMaxLog) {
-			this.replaceMissingWithNegMaxLog = replaceMissingWithNegMaxLog;
-		}
 		public int getNumRows() {
 			return numRows;
 		}

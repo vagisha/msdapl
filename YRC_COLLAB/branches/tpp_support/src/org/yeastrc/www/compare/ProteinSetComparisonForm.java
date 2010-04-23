@@ -44,7 +44,6 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 	private String clusteringToken = null;
 	private boolean newToken = false;
 	private boolean useLogScale = false;
-	private boolean replaceMissingWithMinusMaxLog = false;
 	private String replaceMissingWithValue = null;
     
     
@@ -190,22 +189,13 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 		this.useLogScale = useLogScale;
 	}
 
-	public boolean isReplaceMissingWithMinusMaxLog() {
-		return replaceMissingWithMinusMaxLog;
-	}
-
-	public void setReplaceMissingWithMinusMaxLog(
-			boolean replaceMissingWithMinusMaxLog) {
-		this.replaceMissingWithMinusMaxLog = replaceMissingWithMinusMaxLog;
-	}
-
 	public String getReplaceMissingWithValue() {
 		return replaceMissingWithValue;
 	}
 	
 	public double getReplaceMissingWithValueDouble() {
 		if(replaceMissingWithValue == null || replaceMissingWithValue.trim().length() == 0) {
-			return 0.0;
+			return Double.MIN_VALUE;
 		}
 		return Double.parseDouble(replaceMissingWithValue);
 	}

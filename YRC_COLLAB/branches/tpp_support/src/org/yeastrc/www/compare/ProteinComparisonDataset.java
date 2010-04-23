@@ -6,6 +6,7 @@
  */
 package org.yeastrc.www.compare;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ import org.yeastrc.www.project.SORT_CLASS;
 /**
  * 
  */
-public class ProteinComparisonDataset implements Tabular, Pageable {
+public class ProteinComparisonDataset implements Tabular, Pageable, Serializable {
 
 	private List<? extends Dataset> datasets;
 	private List<Integer> fastaDatabaseIds; // for protein name lookup
@@ -62,8 +63,12 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 	private SORT_BY sortBy = SORT_BY.NUM_PEPT;
 	private SORT_ORDER sortOrder = SORT_ORDER.DESC;
 
+	
+	private boolean initialized = false;
+    
+    private String[] spectrumCountColors = null;
+    
 	private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
-
 
 
 	public ProteinComparisonDataset() {
@@ -72,6 +77,22 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 		this.displayPageNumbers = new ArrayList<Integer>();
 	}
 
+	public boolean isInitialized() {
+		return initialized;
+	}
+
+	public void setInitialized(boolean initialized) {
+		this.initialized = initialized;
+	}
+	
+	public String[] getSpectrumCountColors() {
+		return spectrumCountColors;
+	}
+
+	public void setSpectrumCountColors(String[] spectrumCountColors) {
+		this.spectrumCountColors = spectrumCountColors;
+	}
+	
 	private int  getOffset() {
 		return (this.currentPage - 1)*rowCount;
 	}
@@ -429,16 +450,23 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 	}
 
 	private float getScaledSpectrumCount(float count) {
-		return ((count - minNormalizedSpectrumCount + 1)/maxNormalizedSpectrumCount)*100.0f;
-	}
+        return ((count - minNormalizedSpectrumCount)/(maxNormalizedSpectrumCount - minNormalizedSpectrumCount))*100.0f;
+    }
 
 	private String getScaledColor(float scaledSpectrumCount) {
-		int rounded = (int)Math.ceil(scaledSpectrumCount);
-		int green = 255;
-		green -= 255.0/100.0 * rounded;
-		int red = 0;
-		red  += 255.0/100.0 * rounded;
-		return "#"+hexValue(red, green, 0);
+		if(this.spectrumCountColors != null) {
+    		int bin = (int)Math.ceil((((double) spectrumCountColors.length / 100.0) * scaledSpectrumCount));
+    		if(bin == 0) bin = 1;
+    		return spectrumCountColors[bin-1];
+    	}
+    	else {
+    		int rounded = (int)Math.ceil(scaledSpectrumCount);
+    		int green = 255;
+    		green -= 255.0/100.0 * rounded;
+    		int red = 0;
+    		red  += 255.0/100.0 * rounded;
+    		return "#"+hexValue(red, green, 0);
+    	}
 	}
 
 	private String hexValue(int r, int g, int b) {
@@ -575,9 +603,11 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 
 	@Override
 	public void tabulate() {
-
-		int max = Math.min((this.getOffset() + rowCount), this.getFilteredProteinCount());
-		initializeInfo(this.getOffset(), max);
+		
+		if(!this.initialized) {
+			int max = Math.min((this.getOffset() + rowCount), this.getFilteredProteinCount());
+			initializeInfo(this.getOffset(), max);
+		}
 	}
 
 	public void initializeInfo(int startIndex, int endIndex) {

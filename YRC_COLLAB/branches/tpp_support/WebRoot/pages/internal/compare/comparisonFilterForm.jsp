@@ -314,10 +314,8 @@ function newPopup(url) {
 	<b>Clustering Options: </b>
 	<html:checkbox name="proteinSetComparisonForm" property="useLogScale">Log(2) Scale</html:checkbox>
 		&nbsp;
-	Missing Values: 
-	<html:checkbox name="proteinSetComparisonForm" property="replaceMissingWithMinusMaxLog">-log2(Max(SC)</html:checkbox>
-	&nbsp;
-	<html:text name="proteinSetComparisonForm" property="replaceMissingWithValue">Value:</html:text>
+	Replace missing with: 
+	<html:text name="proteinSetComparisonForm" property="replaceMissingWithValue"></html:text>
 	&nbsp;
 	<html:submit value="Cluster" onclick="javascript:clusterResults();" styleClass="plain_button" style="margin-top:0px;"></html:submit>
 	

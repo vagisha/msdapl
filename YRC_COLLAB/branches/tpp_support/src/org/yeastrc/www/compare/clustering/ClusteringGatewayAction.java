@@ -51,6 +51,11 @@ public class ClusteringGatewayAction extends Action {
         // Look for a clustering token in the form
         String token = ((ProteinSetComparisonForm) form).getClusteringToken();
         
+        // Look for it in the session
+        if(token == null || token.trim().length() == 0) {
+        	token = (String)request.getSession().getAttribute("clustering_token");
+        }
+        
         // No token found
         if(token == null || token.trim().length() == 0) {
         	return startNewClustering(mapping, (ProteinSetComparisonForm) form); // NEW CLUSTERING ACTION
@@ -121,6 +126,12 @@ public class ClusteringGatewayAction extends Action {
 	private boolean formsMatch(ProteinSetComparisonForm myForm,
 			ProteinSetComparisonForm savedForm) {
 		
+		if(myForm.getGroupIndistinguishableProteins() != savedForm.getGroupIndistinguishableProteins())
+			return false;
+		
+		if(myForm.isKeepProteinGroups() != savedForm.isKeepProteinGroups())
+			return false;
+		
 		// compare the filtering criteria in the two forms
 		ProteinPropertiesFilters myFilters = myForm.getProteinPropertiesFilters();
 		ProteinPropertiesFilters savedFilters = savedForm.getProteinPropertiesFilters();
@@ -133,6 +144,10 @@ public class ClusteringGatewayAction extends Action {
 		if(!(myBoolFilters.equals(theirBoolFilters)))
 			return false;
 		
+		if(myForm.isUseLogScale() != savedForm.isUseLogScale())
+			return false;
+		if(myForm.getReplaceMissingWithValueDouble() != savedForm.getReplaceMissingWithValueDouble())
+			return false;
 		return true;
 	}
 
