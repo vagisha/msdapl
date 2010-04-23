@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ApplicationProperties;
 import org.yeastrc.ms.util.FileUtils;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nrseq.ProteinListing;
@@ -290,12 +289,7 @@ public class SpectrumCountClusterer {
 		}
 		
 		clustered.initSummary();
-		clustered.setRowCount(clustered.getTotalProteinCount());
-		clustered.setCurrentPage(1);
 		
-		//clustered.setDisplayPageNumbers(pageNums);
-		//clustered.setLastPage(1);
-		clustered.setClustered(true);
 		clustered.setInitialized(true);
 		clustered.setSortBy(null);
 		clustered.setSortOrder(null);

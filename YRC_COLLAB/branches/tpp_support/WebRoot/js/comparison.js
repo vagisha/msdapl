@@ -34,7 +34,7 @@ function pageResults(pageNum) {
   	$("input#pageNum").val(pageNum);
   	$("input#download").val("false");
   	$("input#goEnrichment").val("false");
-  	$("input#cluster").val("false");
+  	//$("input#cluster").val("false");
   	//alert("setting to "+pageNum+" value set to: "+$("input#pageNum").val());
   	$("form[name='proteinSetComparisonForm']").submit();
 }
@@ -61,6 +61,8 @@ function updateResults() {
   	$("input#download").val("false");
   	$("input#goEnrichment").val("false");
   	$("input#cluster").val("false");
+  	$("input#numPerPage").val($("input#pager_result_count").val());
+  	//alert("setting result count to: "+$("input#numPerPage").val());
   	$("form[name='proteinSetComparisonForm']").attr('target', '');
   	$("form[name='proteinSetComparisonForm']").submit();
 }
@@ -73,6 +75,8 @@ function clusterResults() {
   	$("input#download").val("false");
   	$("input#goEnrichment").val("false");
   	$("input#cluster").val("true");
+  	$("input#numPerPage").val($("input#pager_result_count").val());
+  	//alert("setting result count to: "+$("input#numPerPage").val());
   	$("form[name='proteinSetComparisonForm']").submit();
 }
 

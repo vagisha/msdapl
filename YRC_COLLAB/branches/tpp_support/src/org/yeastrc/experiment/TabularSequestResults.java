@@ -34,6 +34,7 @@ public class TabularSequestResults implements Tabular, Pageable {
     private List<SequestResultPlus> results;
     
     private int currentPage;
+    private int numPerPage;
     private int lastPage = currentPage;
     private List<Integer> displayPageNumbers;
     
@@ -208,4 +209,14 @@ public class TabularSequestResults implements Tabular, Pageable {
     public int getPageCount() {
         return lastPage;
     }
+    
+    @Override
+	public int getNumPerPage() {
+		return numPerPage;
+	}
+
+	@Override
+	public void setNumPerPage(int num) {
+		this.numPerPage = num;
+	}
 }

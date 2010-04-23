@@ -33,6 +33,7 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     private boolean hasBullsEyeArea = false;
     
     private int currentPage;
+    private int numPerPage;
     private int lastPage = currentPage;
     private List<Integer> displayPageNumbers;
     
@@ -179,8 +180,6 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     public void tabulate() {
         // nothing to do here?
     }
-
-    
     
     @Override
     public int getCurrentPage() {
@@ -213,5 +212,15 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     public int getPageCount() {
         return lastPage;
     }
+    
+    @Override
+	public int getNumPerPage() {
+		return numPerPage;
+	}
+
+	@Override
+	public void setNumPerPage(int num) {
+		this.numPerPage = num;
+	}
 
 }

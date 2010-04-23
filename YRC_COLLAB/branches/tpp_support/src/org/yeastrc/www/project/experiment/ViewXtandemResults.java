@@ -131,7 +131,7 @@ public class ViewXtandemResults extends Action {
 
 
         // Extract the ones we will display
-        int numResultsPerPage = 50;
+        int numResultsPerPage = myForm.getNumPerPage();
         int pageNum = myForm.getPageNum();
         if(pageNum <= 0) {
             pageNum = 1;
@@ -164,6 +164,7 @@ public class ViewXtandemResults extends Action {
         boolean useEvalue = DAOFactory.instance().getSequestSearchDAO().hasEvalue(searchId);
         TabularXtandemResults tabResults = new TabularXtandemResults(results, useEvalue);
         tabResults.setCurrentPage(pageNum);
+        tabResults.setNumPerPage(numResultsPerPage);
         int pageCount = pager.getPageCount(resultIds.size(), numResultsPerPage);
         tabResults.setLastPage(pageCount);
         List<Integer> pageList = pager.getPageList(resultIds.size(), pageNum, numResultsPerPage);

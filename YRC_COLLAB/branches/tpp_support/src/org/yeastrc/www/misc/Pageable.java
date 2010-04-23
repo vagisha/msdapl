@@ -19,6 +19,8 @@ public interface Pageable {
     
     public abstract int getPageCount();
     
+    public abstract int getNumPerPage();
+    
     public abstract List<Integer> getDisplayPageNumbers();
 
     public abstract void setCurrentPage(int pageNum);
@@ -26,4 +28,6 @@ public interface Pageable {
     public abstract void setLastPage(int pageCount);
 
     public abstract void setDisplayPageNumbers(List<Integer> pageList);
+    
+    public abstract void setNumPerPage(int num);
 }

@@ -689,6 +689,17 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 	public int getPageCount() {
 		return this.pageCount;
 	}
+	
+	@Override
+	public int getNumPerPage() {
+		return rowCount;
+	}
+
+	@Override
+	public void setNumPerPage(int num) {
+		if(num > 0)
+			this.rowCount = num;
+	}
 
 	public SORT_BY getSortBy() {
 		return sortBy;

@@ -15,6 +15,7 @@
 		</logic:present>
 		
 		<html:hidden name="filterForm" property="pageNum" styleId="pageNum"/>
+		<html:hidden name="filterForm" property="numPerPage" styleId="numPerPage"/>
 		<html:hidden name="filterForm" property="sortByString" styleId="sortBy"/>
 		<html:hidden name="filterForm" property="sortOrderString" styleId="sortOrder"/>
 		

@@ -78,7 +78,6 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
     private SORT_BY sortBy = SORT_BY.NUM_PEPT;
     private SORT_ORDER sortOrder = SORT_ORDER.DESC;
     
-    private boolean clustered = false;
     private boolean initialized = false;
     
     private String[] spectrumCountColors = null;
@@ -86,14 +85,6 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
 	private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
     
     
-    public boolean isClustered() {
-		return clustered;
-	}
-
-	public void setClustered(boolean clustered) {
-		this.clustered = clustered;
-	}
-
 	public boolean isInitialized() {
 		return initialized;
 	}
@@ -706,36 +697,26 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         header = new TableHeader("Mol. Wt.");
         //header.setWidth(8);
         header.setRowspan(2);
-        if(!clustered) {
-        	header.setSortable(true);
-        	header.setSortClass(SORT_CLASS.SORT_FLOAT);
-        	header.setDefaultSortOrder(SORT_ORDER.ASC);
-        	header.setHeaderId(SORT_BY.MOL_WT.name());
-        	if(this.sortBy == SORT_BY.MOL_WT) {
-        		header.setSorted(true);
-        		header.setSortOrder(this.sortOrder);
-        	}
-        }
-        else {
-        	header.setSortable(false);
+        header.setSortable(true);
+        header.setSortClass(SORT_CLASS.SORT_FLOAT);
+        header.setDefaultSortOrder(SORT_ORDER.ASC);
+        header.setHeaderId(SORT_BY.MOL_WT.name());
+        if(this.sortBy == SORT_BY.MOL_WT) {
+        	header.setSorted(true);
+        	header.setSortOrder(this.sortOrder);
         }
         headers.add(header);
         
         header = new TableHeader("pI");
         //header.setWidth(5);
         header.setRowspan(2);
-        if(!clustered) {
-        	header.setSortable(true);
-        	header.setSortClass(SORT_CLASS.SORT_FLOAT);
-        	header.setDefaultSortOrder(SORT_ORDER.ASC);
-        	header.setHeaderId(SORT_BY.PI.name());
-        	if(this.sortBy == SORT_BY.PI) {
-        		header.setSorted(true);
-        		header.setSortOrder(this.sortOrder);
-        	}
-        }
-        else {
-        	header.setSortable(false);
+        header.setSortable(true);
+        header.setSortClass(SORT_CLASS.SORT_FLOAT);
+        header.setDefaultSortOrder(SORT_ORDER.ASC);
+        header.setHeaderId(SORT_BY.PI.name());
+        if(this.sortBy == SORT_BY.PI) {
+        	header.setSorted(true);
+        	header.setSortOrder(this.sortOrder);
         }
         headers.add(header);
         
@@ -751,18 +732,13 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         //header.setWidth(5);
         header.setRowspan(2);
         header.setStyleClass("small_font");
-        if(!clustered) {
-        	header.setSortable(true);
-        	header.setSortClass(SORT_CLASS.SORT_INT);
-        	header.setDefaultSortOrder(SORT_ORDER.DESC);
-        	header.setHeaderId(SORT_BY.NUM_PEPT.name());
-        	if(this.sortBy == SORT_BY.NUM_PEPT) {
-        		header.setSorted(true);
-        		header.setSortOrder(this.sortOrder);
-        	}
-        }
-        else {
-        	header.setSortable(false);
+        header.setSortable(true);
+        header.setSortClass(SORT_CLASS.SORT_INT);
+        header.setDefaultSortOrder(SORT_ORDER.DESC);
+        header.setHeaderId(SORT_BY.NUM_PEPT.name());
+        if(this.sortBy == SORT_BY.NUM_PEPT) {
+        	header.setSorted(true);
+        	header.setSortOrder(this.sortOrder);
         }
         headers.add(header);
         
@@ -931,6 +907,17 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
     public void setLastPage(int pageCount) {
         throw new UnsupportedOperationException();
     }
+    
+    @Override
+	public int getNumPerPage() {
+		return rowCount;
+	}
+
+	@Override
+	public void setNumPerPage(int num) {
+		if(num > 0)
+			this.rowCount = num;
+	}
     
     public SORT_BY getSortBy() {
         return sortBy;

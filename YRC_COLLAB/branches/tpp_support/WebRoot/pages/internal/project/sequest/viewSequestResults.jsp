@@ -55,7 +55,7 @@
 	<yrcwww:table name="results" tableId='seq_results' tableClass="table_basic sortable_table" center="true" />
 	</div>
 	
-	<%@include file="/pages/internal/pager.jsp" %>
+	<%@include file="/pages/internal/pager_small.jsp" %>
 	
 </center>	
 </yrcwww:contentbox>

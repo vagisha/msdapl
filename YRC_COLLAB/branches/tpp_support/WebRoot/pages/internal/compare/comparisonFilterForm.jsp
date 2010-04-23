@@ -21,7 +21,7 @@ function newPopup(url) {
 	<html:hidden name="proteinSetComparisonForm" property="download" value="false" styleId="download" />
 	
 	<!-- Does the user want to cluster results -->
-	<html:hidden name="proteinSetComparisonForm" property="cluster" value="false" styleId="cluster" />
+	<html:hidden name="proteinSetComparisonForm" property="cluster" styleId="cluster" />
 	<html:hidden name="proteinSetComparisonForm" property="clusteringToken" />
 	<html:hidden name="proteinSetComparisonForm" property="newToken" />
 	
@@ -36,6 +36,7 @@ function newPopup(url) {
 	<html:hidden name="proteinSetComparisonForm" property="sortOrderString"  styleId="sortOrder" />
 	
 	
+	<html:hidden name="proteinSetComparisonForm" property="numPerPage" styleId="numPerPage" />
 	<html:hidden name="proteinSetComparisonForm" property="pageNum" styleId="pageNum" />
 	
 <center>
@@ -161,9 +162,7 @@ function newPopup(url) {
 		
 		
 		<!-- ################## GROUP PROTEINS CHECKBOX	  ########################### -->
-		<logic:notPresent name="goEnrichmentView">
-			<td valign="top" colspan="2"><html:checkbox name="proteinSetComparisonForm" property="groupIndistinguishableProteins">Group Indistinguishable Proteins</html:checkbox> </td>
-		</logic:notPresent>
+		<td></td>
 		<td></td>
 	</tr>
 	
@@ -294,14 +293,13 @@ function newPopup(url) {
  	<tr><td colspan="4" style="border: 1px solid rgb(170, 170, 170); background-color: white;padding:1"><span></span></td></tr>
 	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
 	<tr>
-		<td valign="top" align="left" colspan="4" style="padding-top:5px;">
+		<td valign="top" colspan="1"><html:checkbox name="proteinSetComparisonForm" property="groupIndistinguishableProteins">Group Indistinguishable Proteins</html:checkbox> </td>
+		<td valign="top" align="left" colspan="2">
 			<html:checkbox name="proteinSetComparisonForm" property="keepProteinGroups">Keep Protein Groups</html:checkbox><br>
 			<span style="font-size:8pt;">Display ALL protein group members even if some of them do not pass the filtering criteria.</span>
  		</td>
- 	</tr>
- 	<tr>
- 		<td valign="top" align="center" colspan="4" style="padding-top:5px;">	
- 			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button"></html:submit>
+ 		<td valign="middle" align="center" colspan="1">	
+ 			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button" style="margin-top:0px;"></html:submit>
 		</td>
 	</tr>
  	</logic:notPresent>
@@ -314,7 +312,6 @@ function newPopup(url) {
 <logic:notPresent name="goEnrichmentView">
 <div align="center" style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%; margin-top:10px;">
 	<b>Clustering Options: </b>
-	
 	<html:checkbox name="proteinSetComparisonForm" property="useLogScale">Log(2) Scale</html:checkbox>
 		&nbsp;
 	Missing Values: 
@@ -322,11 +319,11 @@ function newPopup(url) {
 	&nbsp;
 	<html:text name="proteinSetComparisonForm" property="replaceMissingWithValue">Value:</html:text>
 	&nbsp;
-	<html:submit value="Cluster" onclick="javascript:clusterResults();" styleClass="plain_button"></html:submit>
+	<html:submit value="Cluster" onclick="javascript:clusterResults();" styleClass="plain_button" style="margin-top:0px;"></html:submit>
 	
 	<logic:present name="clusteredImgUrl">
 		&nbsp;&nbsp;
-		<span style="background-color:yellow;"></span><a href="JavaScript:newPopup('<bean:write name='clusteredImgUrl'/>');">Heatmap</a></span>
+		<span style="background-color:yellow;"><a href="JavaScript:newPopup('<bean:write name='clusteredImgUrl'/>');"><b>Heatmap</b></a></span>
 	</logic:present>
 </div>
 </logic:notPresent>

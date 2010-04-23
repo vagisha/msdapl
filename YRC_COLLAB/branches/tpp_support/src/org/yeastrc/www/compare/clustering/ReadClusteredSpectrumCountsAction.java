@@ -67,7 +67,7 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			saveErrors( request, errors );
 			return mapping.findForward("Failure");
 		}
-
+		
 		// Check if we have a results directory matching this token
 		String clustDir = request.getSession().getServletContext().getRealPath(ClusteringConstants.BASE_DIR);
 		clustDir += File.separator+jobToken;
@@ -106,6 +106,7 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			if(ois != null) try {ois.close();} catch(IOException e){}
 		}
 
+		// Read the form
 		String formFile = clustDir+File.separator+ClusteringConstants.FORM_SER;
 		ProteinSetComparisonForm myForm = null;
 		try {
@@ -129,7 +130,48 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 		finally {
 			if(ois != null) try {ois.close();} catch(IOException e){}
 		}
-
+		
+		// Get the requested page number
+		int page = 0;
+		strId = (String)request.getParameter("page");
+		try {
+			if(strId != null) {
+				page = Integer.parseInt(strId);
+			}
+		}
+		catch (NumberFormatException e) {}
+		
+		
+		if(page <= 0) {
+			ActionErrors errors = new ActionErrors();
+			errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
+					"Invalid page number in request: "+strId));
+			saveErrors( request, errors );
+			return mapping.findForward("Failure");
+		}
+		
+		// Get the number of results to display per page
+		int numPerPage = 50;
+		strId = (String)request.getParameter("count");
+		try {
+			if(strId != null) {
+				numPerPage = Integer.parseInt(strId);
+			}
+		}
+		catch (NumberFormatException e) {}
+		
+		if(numPerPage <= 1) {
+			ActionErrors errors = new ActionErrors();
+			errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
+					"Invalid result count / page in request: "+strId));
+			saveErrors( request, errors );
+			return mapping.findForward("Failure");
+		}
+		
+		
+		grpComparison.setRowCount(numPerPage);
+		grpComparison.setCurrentPage(page);
+		
 		// R image output
 		String imgUrl = request.getSession().getServletContext().getContextPath()+"/"+ClusteringConstants.BASE_DIR+"/"+jobToken+"/"+ClusteringConstants.IMG_FILE;
         request.setAttribute("clusteredImgUrl", imgUrl);

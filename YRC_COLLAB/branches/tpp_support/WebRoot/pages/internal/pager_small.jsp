@@ -44,7 +44,4 @@
 	
 	</logic:greaterThan>
 	
-	<input type="text" size="3" value='<bean:write name="pageable" property="numPerPage"/>' 
-			style="margin-left:20px;" id="pager_result_count" />
-		<span style="font-size:8pt;">Results / Page</span>
 </div>

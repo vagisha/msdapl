@@ -185,8 +185,10 @@ public class DoComparisonAction extends Action {
             e = System.currentTimeMillis();
             log.info("Time to sort results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         	
-            // Set the page number
+            // Set the page number and the number of results to be displayed per page
+            comparison.setNumPerPage(myForm.getNumPerPage()); // this method call should come first
             comparison.setCurrentPage(myForm.getPageNum());
+            
             
             // Create Venn Diagram only if 2 or 3 datasets are being compared
             if(comparison.getDatasetCount() == 2 || comparison.getDatasetCount() == 3) {
@@ -288,8 +290,10 @@ public class DoComparisonAction extends Action {
                 return mapping.findForward("Cluster");
             }
             
-            // Set the page number
+            // Set the page number and the number of results to be displayed per page
+            grpComparison.setNumPerPage(myForm.getNumPerPage()); // this method call should come first
             grpComparison.setCurrentPage(myForm.getPageNum());
+            
             
             // sorting order
             grpComparison.setSortBy(myForm.getSortBy());

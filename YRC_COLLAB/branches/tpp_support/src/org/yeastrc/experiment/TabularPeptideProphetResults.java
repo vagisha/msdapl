@@ -33,6 +33,7 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
         private Program searchProgram;
         
         private int currentPage;
+        private int numPerPage;
         private int lastPage = currentPage;
         private List<Integer> displayPageNumbers;
         
@@ -262,5 +263,15 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
         public int getPageCount() {
             return lastPage;
         }
+        
+        @Override
+    	public int getNumPerPage() {
+    		return numPerPage;
+    	}
+
+    	@Override
+    	public void setNumPerPage(int num) {
+    		this.numPerPage = num;
+    	}
 
 }

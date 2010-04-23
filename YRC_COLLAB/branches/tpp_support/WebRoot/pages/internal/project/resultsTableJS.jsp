@@ -58,6 +58,8 @@ function sortResults(sortBy, sortOrder) {
 // ---------------------------------------------------------------------------------------
 function updateResults() {
 	$("input#pageNum").val(1); // reset the page number to 1
+	$("input#numPerPage").val($("input#pager_result_count").val());
+	//alert("setting result count to: "+$("input#numPerPage").val());
 	$("form").submit();
 }
 

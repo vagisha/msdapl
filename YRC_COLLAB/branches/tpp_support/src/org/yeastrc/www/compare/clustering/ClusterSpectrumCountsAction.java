@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,14 +21,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
 import org.yeastrc.www.compare.ProteinSetComparisonForm;
-import org.yeastrc.www.compare.SpeciesChecker;
 import org.yeastrc.www.compare.clustering.SpectrumCountClusterer.ROptions;
-import org.yeastrc.www.compare.util.VennDiagramCreator;
 
 /**
  * 
@@ -130,24 +126,12 @@ public class ClusterSpectrumCountsAction extends Action {
                 return mapping.findForward("Failure");
             }
             
-            // R image output
-            String imgUrl = request.getSession().getServletContext().getContextPath()+"/"+ClusteringConstants.BASE_DIR+"/"+jobToken+"/"+ClusteringConstants.IMG_FILE;
-            request.setAttribute("clusteredImgUrl", imgUrl);
-            
-            // Create Venn Diagram only if 2 or 3 datasets are being compared
-            if(clusteredGrpComparison.getDatasetCount() == 2 || clusteredGrpComparison.getDatasetCount() == 3) {
-                String googleChartUrl = VennDiagramCreator.instance().getChartUrl(clusteredGrpComparison);
-                request.setAttribute("chart", googleChartUrl);
-            }
-            
-            // create a list of the dataset ids being compared
-            // Get the selected protein inference run ids
-            List<Integer> allRunIds = myForm.getAllSelectedRunIds();
-            request.setAttribute("datasetIds", StringUtils.makeCommaSeparated(allRunIds));
-            
-            request.setAttribute("comparison", clusteredGrpComparison);
-            request.setAttribute("speciesIsYeast", SpeciesChecker.isSpeciesYeast(clusteredGrpComparison.getDatasets()));
-            return mapping.findForward("ProteinGroupList");
+            // redirect to the ReadClusteredSpectrumCountsAction
+            ActionForward fwd = mapping.findForward("ReadSaved");
+			ActionForward newFwd = new ActionForward(fwd.getPath()+
+					"?token="+jobToken+"&page=1"+
+					"&count="+myForm.getNumPerPage(), fwd.getRedirect());
+			return newFwd;
         }
         
         return mapping.findForward("Failure");

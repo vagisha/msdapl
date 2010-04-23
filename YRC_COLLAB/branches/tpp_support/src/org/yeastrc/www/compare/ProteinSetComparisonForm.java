@@ -21,6 +21,7 @@ import org.yeastrc.ms.domain.search.SORT_ORDER;
 public class ProteinSetComparisonForm extends DatasetFiltersForm {
 
     private int pageNum = 1;
+    private int numPerPage = 50;
     
     // DOWNLOAD options
     private boolean download = false;
@@ -58,9 +59,16 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
     public void setPageNum(int pageNum) {
         this.pageNum = pageNum;
     }
-
     
-    /**
+    public int getNumPerPage() {
+		return numPerPage;
+	}
+
+	public void setNumPerPage(int numPerPage) {
+		this.numPerPage = numPerPage;
+	}
+
+	/**
      * Validate the properties that have been sent from the HTTP request,
      * and return an ActionErrors object that encapsulates any
      * validation errors that have been found.  If no errors are found, return

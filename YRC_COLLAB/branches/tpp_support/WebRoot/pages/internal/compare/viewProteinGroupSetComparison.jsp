@@ -317,7 +317,7 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 <table id="compare_results_pager2">
 <tr>
 <td>
-<%@include file="/pages/internal/pager.jsp" %>
+<%@include file="/pages/internal/pager_small.jsp" %>
 </td>
 </tr>
 </table>

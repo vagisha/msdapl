@@ -1242,7 +1242,7 @@
 		validate="true"
 		type="org.yeastrc.www.compare.clustering.ClusterSpectrumCountsAction"
 	>
-		<forward name="ProteinGroupList" path="/pages/internal/compare/viewProteinGroupSetComparison.jsp" redirect="false" />
+		<forward name="ReadSaved" path="/readCompareClustered.do" redirect="true" />
 		<forward name="Failure" path="/pages/internal/compare/comparisonError.jsp" redirect="false" />
 	</action>
 	

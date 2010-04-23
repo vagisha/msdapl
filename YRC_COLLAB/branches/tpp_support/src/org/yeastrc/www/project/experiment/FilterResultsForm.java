@@ -48,9 +48,18 @@ public class FilterResultsForm extends ActionForm {
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
     
     private int pageNum = 1;
+    private int numPerPage = 50;
     
     
-    public int getPageNum() {
+    public int getNumPerPage() {
+		return numPerPage;
+	}
+
+	public void setNumPerPage(int numPerPage) {
+		this.numPerPage = numPerPage;
+	}
+
+	public int getPageNum() {
         return pageNum;
     }
 
