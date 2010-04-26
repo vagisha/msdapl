@@ -434,8 +434,8 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
             row.setStyleClass(rowCssClass);
         
         // Protein name
-        TableCell protName = new TableCell(getAccessionContents(protein));
-        protName.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
+        TableCell protName = new TableCell("<A name='"+(index + this.getStartIndex())+"'></A> "+getAccessionContents(protein));
+        //TableCell protName = new TableCell(getAccessionContents(protein));
         protName.setClassName("prot_accession");
         row.addCell(protName);
         
@@ -598,10 +598,10 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
 	private String getAccessionContents(ComparisonProtein protein) {
 		
 		String fullContents = "";
-        fullContents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+"\")";
+        fullContents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+")\"";
     	fullContents += " style=\"display:none;\" class=\"full_name clickable underline\">";
         String shortContents = "";
-        shortContents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+"\")";
+        shortContents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+")\"";
         shortContents += " class=\"short_name clickable underline\">";
         List<ProteinReference> references;
         references = protein.getProteinListing().getFastaReferences();
@@ -615,7 +615,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         return fullContents+"\n"+shortContents;
 	}
 	
-    private float getScaledSpectrumCount(float count) {
+    public float getScaledSpectrumCount(float count) {
         return ((count - minNormalizedSpectrumCount)/(maxNormalizedSpectrumCount - minNormalizedSpectrumCount))*100.0f;
     }
     
@@ -626,7 +626,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
 //    	return spectrumCountColors[bin-1];
 //    }
     
-    private String getScaledColor(float scaledSpectrumCount) {
+    public  String getScaledColor(float scaledSpectrumCount) {
     	
     	if(this.spectrumCountColors != null) {
     		int bin = (int)Math.ceil((((double) spectrumCountColors.length / 100.0) * scaledSpectrumCount));

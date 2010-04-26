@@ -10,7 +10,7 @@
 // Popup window code
 function newPopup(url) {
 	popupWindow = window.open(
-		url,'popUpWindow','height=700,width=800,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')
+		url,'popUpWindow','height=600,width=500,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no,status=yes')
 }
 </script>
 
@@ -38,6 +38,7 @@ function newPopup(url) {
 	
 	<html:hidden name="proteinSetComparisonForm" property="numPerPage" styleId="numPerPage" />
 	<html:hidden name="proteinSetComparisonForm" property="pageNum" styleId="pageNum" />
+	<html:hidden name="proteinSetComparisonForm" property="rowIndex" styleId="rowIndex" />
 	
 <center>
 <br>
@@ -321,7 +322,11 @@ function newPopup(url) {
 	
 	<logic:present name="clusteredImgUrl">
 		&nbsp;&nbsp;
-		<span style="background-color:yellow;"><a href="JavaScript:newPopup('<bean:write name='clusteredImgUrl'/>');"><b>Heatmap</b></a></span>
+		<nobr>
+		<b>Heatmap:</b>
+		<span style="background-color:yellow;"><a href="JavaScript:newPopup('<bean:write name='clusteredImgUrl'/>');"><b>PDF</b></a></span>
+		<span style="background-color:yellow;"><a href="JavaScript:newPopup('<yrcwww:link path='heatmap.do?token='/><bean:write name="proteinSetComparisonForm" property='clusteringToken' />');"><b>HTML</b></a></span>
+		</nobr>
 	</logic:present>
 </div>
 </logic:notPresent>

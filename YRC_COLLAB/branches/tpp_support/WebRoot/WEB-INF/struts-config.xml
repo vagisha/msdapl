@@ -1255,6 +1255,15 @@
 		<forward name="Failure" path="/pages/internal/compare/comparisonError.jsp" redirect="false" />
 	</action>
 	
+	<action 
+		path="/heatmap"
+		type="org.yeastrc.www.compare.clustering.HeatMapAction"
+	>
+		<forward name="Success" path="/pages/internal/compare/heatMap.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/compare/heatMap.jsp" redirect="false" />
+	</action>
+	
+	
 	<!-- ================================================================================== -->
 	<!-- Actions related to downloading PepXML files -->
 	<!-- ================================================================================== -->

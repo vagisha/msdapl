@@ -227,6 +227,18 @@
 </attribute>
 
 <attribute>
+<name>cellspacing</name>
+<required>false</required>
+<rtexprvalue>false</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>cellpadding</name>
+<required>false</required>
+<rtexprvalue>false</rtexprvalue>
+</attribute>
+
+<attribute>
 <name>center</name>
 <required>false</required>
 <rtexprvalue>false</rtexprvalue>

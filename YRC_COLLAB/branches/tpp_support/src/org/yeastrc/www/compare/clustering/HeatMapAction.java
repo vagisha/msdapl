@@ -1,7 +1,7 @@
 /**
- * ReadClusteredSpectrumCountsAction.java
+ * HeatMapAction.java
  * @author Vagisha Sharma
- * Apr 20, 2010
+ * Apr 23, 2010
  * @version 1.0
  */
 package org.yeastrc.www.compare.clustering;
@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,19 +21,16 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
 import org.yeastrc.www.compare.ProteinSetComparisonForm;
-import org.yeastrc.www.compare.SpeciesChecker;
-import org.yeastrc.www.compare.util.VennDiagramCreator;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
 /**
  * 
  */
-public class ReadClusteredSpectrumCountsAction extends Action {
+public class HeatMapAction extends Action {
 
 	private static final Logger log = Logger.getLogger(ReadClusteredSpectrumCountsAction.class.getName());
 
@@ -81,33 +77,6 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			return mapping.findForward("Failure");
 		}
 
-		// Get the requested page number
-		int page = 0;
-		strId = (String)request.getParameter("page");
-		try {
-			if(strId != null) {
-				page = Integer.parseInt(strId);
-			}
-		}
-		catch (NumberFormatException e) {}
-		
-		if(page <= 0) {
-			page = 1;
-		}
-		
-		// Get the number of results to display per page
-		int numPerPage = 0;
-		strId = (String)request.getParameter("count");
-		try {
-			if(strId != null) {
-				numPerPage = Integer.parseInt(strId);
-			}
-		}
-		catch (NumberFormatException e) {}
-		
-		if(numPerPage <= 1) {
-			numPerPage = 50;
-		}
 		
 		ObjectInputStream ois = null;
 		
@@ -117,7 +86,7 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 		try {
 			ois = new ObjectInputStream(new FileInputStream(formFile));
 			myForm = (ProteinSetComparisonForm) ois.readObject();
-			myForm.setNumPerPage(numPerPage);
+			//myForm.setNumPerPage(numPerPage);
 		}
 		catch (IOException e) {
 			ActionErrors errors = new ActionErrors();
@@ -137,19 +106,6 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			if(ois != null) try {ois.close();} catch(IOException e){}
 		}
 		
-		
-		
-		// R image output
-		String imgUrl = request.getSession().getServletContext().getContextPath()+"/"+ClusteringConstants.BASE_DIR+"/"+jobToken+"/"+ClusteringConstants.IMG_FILE;
-        request.setAttribute("clusteredImgUrl", imgUrl);
-        
-        
-		// create a list of the dataset ids being compared
-		// Get the selected protein inference run ids
-		List<Integer> allRunIds = myForm.getAllSelectedRunIds();
-		request.setAttribute("datasetIds", StringUtils.makeCommaSeparated(allRunIds));
-
-		request.setAttribute("proteinSetComparisonForm", myForm);
 		
 		
 		// Read the results
@@ -177,20 +133,7 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			finally {
 				if(ois != null) try {ois.close();} catch(IOException e){}
 			}
-			
-			request.setAttribute("comparison", grpComparison);
-			grpComparison.setRowCount(numPerPage);
-			grpComparison.setCurrentPage(page);
-			
-			request.setAttribute("speciesIsYeast", SpeciesChecker.isSpeciesYeast(grpComparison.getDatasets()));
-			
-			// Create Venn Diagram only if 2 or 3 datasets are being compared
-	        if(grpComparison.getDatasetCount() == 2 || grpComparison.getDatasetCount() == 3) {
-	            String googleChartUrl = VennDiagramCreator.instance().getChartUrl(grpComparison);
-	            request.setAttribute("chart", googleChartUrl);
-	        }
-	        
-	        return mapping.findForward("ProteinGroupList");
+			request.setAttribute("heatmap", new HeatMapData(grpComparison));
 		}
 		
 		else {
@@ -219,20 +162,10 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 				if(ois != null) try {ois.close();} catch(IOException e){}
 			}
 			
-			request.setAttribute("comparison", comparison);
-			comparison.setRowCount(numPerPage);
-			comparison.setCurrentPage(page);
+			request.setAttribute("heatmap", new HeatMapData(comparison));
 			
-			request.setAttribute("speciesIsYeast", SpeciesChecker.isSpeciesYeast(comparison.getDatasets()));
-			
-			// Create Venn Diagram only if 2 or 3 datasets are being compared
-	        if(comparison.getDatasetCount() == 2 || comparison.getDatasetCount() == 3) {
-	            String googleChartUrl = VennDiagramCreator.instance().getChartUrl(comparison);
-	            request.setAttribute("chart", googleChartUrl);
-	        }
-	        
-	        return mapping.findForward("ProteinList");
 		}
 		
+		return mapping.findForward("Success");
 	}
 }

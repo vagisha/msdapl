@@ -197,7 +197,7 @@ DIV.pinfer_header_small {
 }
 
 /* url(../images/sprite.png) repeat-x scroll 0 -100px; */
-.table_basic TH , .table_same_color_row TH, .table_compare_grp TH {
+.table_basic TH , .table_same_color_row TH, .table_compare_grp TH, TH.header {
 	background: #bec1c2 url(../images/sprite.png) repeat-x scroll 0 0; 
 	color: #3D4960;
 	padding: 3 5 3 5;

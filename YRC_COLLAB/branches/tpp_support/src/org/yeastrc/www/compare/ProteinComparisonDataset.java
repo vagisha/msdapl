@@ -280,8 +280,9 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 		}
 
 		// Protein accession
-		TableCell protName = new TableCell(getAccessionContents(protein));
-		protName.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
+		//TableCell protName = new TableCell(getAccessionContents(protein));
+		TableCell protName = new TableCell("<A name='"+(index + this.getOffset())+"'></A> "+getAccessionContents(protein));
+		//protName.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
 		protName.setClassName("prot_accession");
 		row.addCell(protName);
 
@@ -432,10 +433,10 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 	private String getAccessionContents(ComparisonProtein protein) {
 
 		String fullContents = "";
-		fullContents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+"\")";
+		fullContents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+")\"";
 		fullContents += " style=\"display:none;\" class=\"full_name clickable underline\">";
 		String shortContents = "";
-		shortContents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+"\")";
+		shortContents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+")\"";
 		shortContents += " class=\"short_name clickable underline\">";
 		List<ProteinReference> references;
 		references = protein.getProteinListing().getFastaReferences();
@@ -449,11 +450,11 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 		return fullContents+"\n"+shortContents;
 	}
 
-	private float getScaledSpectrumCount(float count) {
+	public float getScaledSpectrumCount(float count) {
         return ((count - minNormalizedSpectrumCount)/(maxNormalizedSpectrumCount - minNormalizedSpectrumCount))*100.0f;
     }
 
-	private String getScaledColor(float scaledSpectrumCount) {
+	public String getScaledColor(float scaledSpectrumCount) {
 		if(this.spectrumCountColors != null) {
     		int bin = (int)Math.ceil((((double) spectrumCountColors.length / 100.0) * scaledSpectrumCount));
     		if(bin == 0) bin = 1;

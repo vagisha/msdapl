@@ -101,9 +101,14 @@ public class ClusteringGatewayAction extends Action {
             			// if form in request matches serialized form
             			if(formsMatch((ProteinSetComparisonForm) form, savedForm)) {
             				ActionForward fwd = mapping.findForward("ReadOld");
+            				String anchor = "";
+            		        if(((ProteinSetComparisonForm) form).getRowIndex() != -1) {
+            		        	anchor = "#"+((ProteinSetComparisonForm) form).getRowIndex();
+            		        }
             				ActionForward newFwd = new ActionForward(fwd.getPath()+
             						"?token="+token+"&page="+((ProteinSetComparisonForm)form).getPageNum()+
-            						"&count="+((ProteinSetComparisonForm)form).getNumPerPage(), 
+            						"&count="+((ProteinSetComparisonForm)form).getNumPerPage()+
+            						anchor, 
             						fwd.getRedirect());
             				return newFwd;
             			}

@@ -22,6 +22,7 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 
     private int pageNum = 1;
     private int numPerPage = 50;
+    private int rowIndex = -1;
     
     // DOWNLOAD options
     private boolean download = false;
@@ -65,6 +66,14 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 
 	public void setNumPerPage(int numPerPage) {
 		this.numPerPage = numPerPage;
+	}
+
+	public int getRowIndex() {
+		return rowIndex;
+	}
+
+	public void setRowIndex(int rowIndex) {
+		this.rowIndex = rowIndex;
 	}
 
 	/**

@@ -27,7 +27,10 @@ public class TableTag extends TagSupport {
     private String name;  // name of the bean that contains the table data
     private String tableId;
     private String tableClass; 
-    private boolean center = false;
+    private int cellpadding = -1;
+    private int cellspacing = -1;
+
+	private boolean center = false;
     
     private static final Logger log = Logger.getLogger(TableTag.class.getName());
     
@@ -60,6 +63,14 @@ public class TableTag extends TagSupport {
         return Boolean.toString(center);
     }
     
+    public void setCellpadding(int cellpadding) {
+		this.cellpadding = cellpadding;
+	}
+
+	public void setCellspacing(int cellspacing) {
+		this.cellspacing = cellspacing;
+	}
+    
     public int doStartTag() throws JspException{
         
         if(this.name == null)   return SKIP_BODY;
@@ -84,6 +95,10 @@ public class TableTag extends TagSupport {
                 tblAttrib = tblAttrib + "class=\""+tableClass+"\" ";
             if(center) 
                 tblAttrib = tblAttrib + "align=\"center\" ";
+            if(cellpadding != -1)
+            	tblAttrib = tblAttrib + "cellpadding = \""+cellpadding+"\" ";
+            if(cellspacing != -1)
+            	tblAttrib = tblAttrib + "cellspacing = \""+cellspacing+"\" ";
             writer.print("<table "+tblAttrib+">\n");
             
             

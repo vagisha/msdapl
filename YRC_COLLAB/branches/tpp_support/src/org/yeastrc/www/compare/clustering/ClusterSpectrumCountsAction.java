@@ -75,6 +75,7 @@ public class ClusterSpectrumCountsAction extends Action {
         baseDir = baseDir+File.separator+jobToken;
         
         
+        // DONT GROUP INDISTINGUISHABLE PROTEINS
         if(!myForm.getGroupIndistinguishableProteins()) {
             ProteinComparisonDataset comparison = (ProteinComparisonDataset) request.getAttribute("comparisonDataset");
             if(comparison == null) {
@@ -113,6 +114,8 @@ public class ClusterSpectrumCountsAction extends Action {
             }
             
         }
+        
+        // GROUP INDISTINGUISHABLE PROTEINS
         else {
             ProteinGroupComparisonDataset grpComparison = (ProteinGroupComparisonDataset) request.getAttribute("comparisonGroupDataset");
             if(grpComparison == null) {
@@ -164,9 +167,14 @@ public class ClusterSpectrumCountsAction extends Action {
         
         // redirect to the ReadClusteredSpectrumCountsAction
         ActionForward fwd = mapping.findForward("ReadSaved");
+        String anchor = "";
+        if(myForm.getRowIndex() != -1) {
+        	anchor = "#"+myForm.getRowIndex();
+        }
 		ActionForward newFwd = new ActionForward(fwd.getPath()+
 				"?token="+jobToken+"&page=1"+
-				"&count="+myForm.getNumPerPage(), fwd.getRedirect());
+				"&count="+myForm.getNumPerPage()+
+				anchor, fwd.getRedirect());
 		return newFwd;
         
     }

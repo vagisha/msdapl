@@ -1,3 +1,11 @@
+
+<%@page import="org.yeastrc.www.compare.dataset.DatasetColor"%>
+<%@page import="org.yeastrc.ms.domain.search.SORT_ORDER"%>
+
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+
+<bean:define name="comparison" id="comparison" type="org.yeastrc.www.compare.ProteinComparisonDataset"></bean:define>
+
 <script src="<yrcwww:link path='js/comparison.js'/>"></script>
 <script>
 

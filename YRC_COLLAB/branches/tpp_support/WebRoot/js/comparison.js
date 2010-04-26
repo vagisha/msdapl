@@ -25,7 +25,15 @@
   $.blockUI.defaults.fadeIn = 0;
   $.blockUI.defaults.fadeOut = 0;
   $().ajaxStop($.unblockUI);
-   
+
+//---------------------------------------------------------------------------------------
+//PROTEIN DETAILS
+//---------------------------------------------------------------------------------------
+function showProteinDetails(nrseqId) {
+	
+	// protName.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
+	window.location.href = "viewProtein.do?id="+nrseqId;
+}
 
 // ---------------------------------------------------------------------------------------
 // PAGE RESULTS
@@ -37,6 +45,16 @@ function pageResults(pageNum) {
   	//$("input#cluster").val("false");
   	//alert("setting to "+pageNum+" value set to: "+$("input#pageNum").val());
   	$("form[name='proteinSetComparisonForm']").submit();
+}
+
+//---------------------------------------------------------------------------------------
+//NAVIGATE TO RELEVANT PAGE
+//---------------------------------------------------------------------------------------
+function goToHeatMapIndex(index) {
+	var numPerPage = $("input#numPerPage").val();
+	var newPage = Math.ceil(index / numPerPage);
+	$("input#rowIndex").val(index);
+	pageResults(newPage);
 }
 
 // ---------------------------------------------------------------------------------------
