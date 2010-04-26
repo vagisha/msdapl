@@ -58,6 +58,7 @@ public class ClusteringGatewayAction extends Action {
         
         // No token found
         if(token == null || token.trim().length() == 0) {
+        	log.info("No token found in request or session; Starting new clustering job");
         	return startNewClustering(mapping, (ProteinSetComparisonForm) form); // NEW CLUSTERING ACTION
         }
         
@@ -66,6 +67,7 @@ public class ClusteringGatewayAction extends Action {
         	
         	// If this is a fresh token
         	if(((ProteinSetComparisonForm) form).isNewToken()) {
+        		log.info("Token found. New token. Forwarding to DoComparison");
         		return mapping.findForward("DoComparison");
         	}
         	
@@ -94,12 +96,14 @@ public class ClusteringGatewayAction extends Action {
             		
             		// If we were not able to read the form start a new clustering process
             		if(savedForm == null) {
+            			log.info("Toke found.  Old token. BUT could not read serialized form. Starting new clustering job");
             			return startNewClustering(mapping, (ProteinSetComparisonForm) form); // NEW CLUSTERING ACTION
             		}
             		
             		else {
             			// if form in request matches serialized form
             			if(formsMatch((ProteinSetComparisonForm) form, savedForm)) {
+            				log.info("Toke found.  Old token. Forms match. Reading saved results");
             				ActionForward fwd = mapping.findForward("ReadOld");
             				String anchor = "";
             		        if(((ProteinSetComparisonForm) form).getRowIndex() != -1) {
@@ -115,6 +119,7 @@ public class ClusteringGatewayAction extends Action {
 
             			// form in request does not match serialized form
             			else {
+            				log.info("Toke found.  Old token. Forms DON'T match. Starting new clustering job");
             				return startNewClustering(mapping, (ProteinSetComparisonForm) form); // NEW CLUSTERING ACTION
             			}
             		}
@@ -122,6 +127,7 @@ public class ClusteringGatewayAction extends Action {
             	
             	// Results directory does not exist anymore. We have to do clustering all over again.
             	else {
+            		log.info("Toke found.  Old token. BUT results directory not found. Starting new clustering job");
             		return startNewClustering(mapping, (ProteinSetComparisonForm) form); // NEW CLUSTERING ACTION
             	}
         	}
@@ -140,14 +146,18 @@ public class ClusteringGatewayAction extends Action {
 		// compare the filtering criteria in the two forms
 		ProteinPropertiesFilters myFilters = myForm.getProteinPropertiesFilters();
 		ProteinPropertiesFilters savedFilters = savedForm.getProteinPropertiesFilters();
-		if(!(myFilters.equals(savedFilters)))
+		if(!(myFilters.equals(savedFilters))) {
+			log.info("ProteinPropertiesFilters don't match");
 			return false;
+		}
 		
 		// Compare the boolean filters
 		DatasetBooleanFilters myBoolFilters = myForm.getSelectedBooleanFilters();
 		DatasetBooleanFilters theirBoolFilters = savedForm.getSelectedBooleanFilters();
-		if(!(myBoolFilters.equals(theirBoolFilters)))
+		if(!(myBoolFilters.equals(theirBoolFilters))) {
+			log.info("DatasetBooleanFilters don't match");
 			return false;
+		}
 		
 		if(myForm.isUseLogScale() != savedForm.isUseLogScale())
 			return false;

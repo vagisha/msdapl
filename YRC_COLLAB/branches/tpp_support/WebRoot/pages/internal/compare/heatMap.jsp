@@ -19,7 +19,7 @@
 
 var fontsize = 2;
 $(document).ready(function() {
-	setFont(fontsize);
+	//setFont(fontsize);
 });
 
 function setFont(size) {
@@ -70,15 +70,15 @@ function updatePage(rowIndex) {
 	<span>Click on the heatmap to navigate to the relevant page in the comparison view.</span><br/><br/>
 	<table width="100%" cellspacing="0" cellpadding="0" align="center" >
 	<tr>
-		<th width="10%" class="header">Protein</th>
+		<th width="2%" class="header">Protein</th>
 		<logic:iterate name="heatmap" property="datasetLabels" id="datasetLabel">
-			<th width="45%" class="header"><bean:write name="datasetLabel"/></th>
+			<th class="header"><bean:write name="datasetLabel"/></th>
 		</logic:iterate>
 	</tr>
 	
 	<logic:iterate name="heatmap" property="rows" id="row">
 	<tr>
-		<td class="rowname"><bean:write name="row" property="rowName" /></td>
+		<td class="rowname" style="font-size:2"><bean:write name="row" property="rowName" /></td>
 		<logic:iterate name="row" property="cells" id="cell">
 			<td style="font-size:0pt; background-color:<bean:write name='cell' property='hexColor' />;" 
 				class="clickable"

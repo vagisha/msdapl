@@ -22,6 +22,8 @@ public class DatasetBooleanFilters {
     private List<Dataset> notFilters;
     private List<Dataset> xorFilters;
     
+    //private static final Logger log = Logger.getLogger(DatasetBooleanFilters.class.getName());
+    
     public DatasetBooleanFilters() {
         andFilters = new ArrayList<Dataset>();
         orFilters = new ArrayList<Dataset>();
@@ -65,9 +67,13 @@ public class DatasetBooleanFilters {
     	if(myIds.size() != theirIds.size())
     		return false;
     	
-    	for(int i = 0; i < myIds.size(); i++)
-    		if(myIds.get(i) != theirIds.get(i))
+    	//log.info("Comparing boolean filters (myIds): "+myIds);
+    	//log.info("Comparing boolean filters (theirIds): "+theirIds);
+    	for(int i = 0; i < myIds.size(); i++) {
+    		if(myIds.get(i).intValue() != theirIds.get(i).intValue()) {
     			return false;
+    		}
+    	}
     	
     	return true;
     }

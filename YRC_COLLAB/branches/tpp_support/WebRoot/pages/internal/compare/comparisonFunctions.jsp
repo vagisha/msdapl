@@ -4,7 +4,6 @@
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<bean:define name="comparison" id="comparison" type="org.yeastrc.www.compare.ProteinComparisonDataset"></bean:define>
 
 <script src="<yrcwww:link path='js/comparison.js'/>"></script>
 <script>
