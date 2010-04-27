@@ -9,7 +9,10 @@ package org.yeastrc.www.compare;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
@@ -61,7 +64,7 @@ public class DatasetFiltersForm extends ActionForm {
     
     
     
-    public void reset() {
+    public void reset(ActionMapping mapping, HttpServletRequest request) {
         accessionLike = null;
         descriptionLike = null;
         errorRate = "0.01";

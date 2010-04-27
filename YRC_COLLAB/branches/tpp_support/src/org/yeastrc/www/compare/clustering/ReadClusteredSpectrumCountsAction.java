@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,6 +24,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.util.StringUtils;
+import org.yeastrc.www.compare.DisplayColumns;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
 import org.yeastrc.www.compare.ProteinSetComparisonForm;
@@ -137,6 +139,16 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			if(ois != null) try {ois.close();} catch(IOException e){}
 		}
 		
+		// We are going to display all columns unless we have the noDispCol parameter in the request
+		myForm.resetDisplayColumns();
+		// If we have display column preferences in the request get them now
+		String noDispCol = request.getParameter("noDispCol");
+		if(noDispCol != null) {
+			DisplayColumns displayColumns = parseNoDispCol(noDispCol);
+			if(displayColumns != null)
+				myForm.setDisplayColumns(displayColumns);
+		}
+		request.setAttribute("proteinSetComparisonForm", myForm);
 		
 		
 		// R image output
@@ -149,8 +161,6 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 		List<Integer> allRunIds = myForm.getAllSelectedRunIds();
 		request.setAttribute("datasetIds", StringUtils.makeCommaSeparated(allRunIds));
 
-		request.setAttribute("proteinSetComparisonForm", myForm);
-		
 		
 		// Read the results
 		if(myForm.getGroupIndistinguishableProteins()) {
@@ -178,6 +188,7 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 				if(ois != null) try {ois.close();} catch(IOException e){}
 			}
 			
+			grpComparison.setDisplayColumns(myForm.getDisplayColumns());
 			request.setAttribute("comparison", grpComparison);
 			grpComparison.setRowCount(numPerPage);
 			grpComparison.setCurrentPage(page);
@@ -235,4 +246,15 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 		}
 		
 	}
+
+	private DisplayColumns parseNoDispCol(String noDispCol) {
+		
+		DisplayColumns displayColumns = new DisplayColumns();
+		String[] tokens = noDispCol.split(",");
+		for(String tok: tokens) {
+			displayColumns.setNoDisplay(tok.charAt(0));
+		}
+		return displayColumns;
+	}
+
 }

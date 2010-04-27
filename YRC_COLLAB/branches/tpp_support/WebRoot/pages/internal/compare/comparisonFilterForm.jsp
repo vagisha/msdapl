@@ -12,6 +12,18 @@ function newPopup(url) {
 	popupWindow = window.open(
 		url,'popUpWindow','height=600,width=500,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no,status=yes')
 }
+function toggleColumnChooser() {
+	var text = $("#columnChooser").text();
+	//alert(text);
+	if(text == "Choose Columns") {
+		$("#columnChooser").text("Hide Column Chooser");
+		$("#columnChooserTgt").show();
+	}
+	else {
+		$("#columnChooser").text("Choose Columns");
+		$("#columnChooserTgt").hide();
+	}
+}
 </script>
 
 
@@ -47,7 +59,7 @@ function newPopup(url) {
 <table align="center">
 	<tr>
 		<td valign="middle" style="padding: 0 0 10 5;">Filter: </td>
-		<td style="padding-bottom:10px;"  align="left">
+		<td style="padding-bottom:10px;"  align="left" colspan="3">
 		<table>
 		<tr>
 		<td valign="top"><b>AND</b></td>
@@ -160,11 +172,6 @@ function newPopup(url) {
 		</tr>
 		</table>
 		</td>
-		
-		
-		<!-- ################## GROUP PROTEINS CHECKBOX	  ########################### -->
-		<td></td>
-		<td></td>
 	</tr>
 	
 	<tr>
@@ -300,8 +307,40 @@ function newPopup(url) {
 			<span style="font-size:8pt;">Display ALL protein group members even if some of them do not pass the filtering criteria.</span>
  		</td>
  		<td valign="middle" align="center" colspan="1">	
+ 			<span class="clickable underline" id="columnChooser" 
+ 			      onclick="toggleColumnChooser();">Choose Columns</span>&nbsp;
  			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button" style="margin-top:0px;"></html:submit>
+			
 		</td>
+	</tr>
+	<tr>
+	<td colspan="4" align="center">
+	<div id="columnChooserTgt" class="small_font" align="left" 
+		 style="padding: 5 0 5 0; border: 1px solid gray; width:50%; display:none">
+	
+		<html:checkbox name="proteinSetComparisonForm" property="showPresent">Present / Not-present</html:checkbox>
+		<br/>
+		<html:checkbox name="proteinSetComparisonForm" property="showFastaId">Fasta ID</html:checkbox>
+		<br/>
+		<html:checkbox name="proteinSetComparisonForm" property="showCommonName">Common Name</html:checkbox>
+		<br/>
+		<html:checkbox name="proteinSetComparisonForm" property="showDescription">Description</html:checkbox>
+		<br/>
+		<html:checkbox name="proteinSetComparisonForm" property="showMolWt">Molecular Wt.</html:checkbox>
+		<br/>
+		<html:checkbox name="proteinSetComparisonForm" property="showPi">pI</html:checkbox>
+		<br/>
+		<html:checkbox name="proteinSetComparisonForm" property="showTotalSeq">Total # Sequences</html:checkbox>
+		<br/>
+		<html:checkbox name="proteinSetComparisonForm" property="showNumSeq"># Sequences (S) for a dataset</html:checkbox>
+		<br/>
+		<html:checkbox name="proteinSetComparisonForm" property="showNumIons"># Ions (I) for a dataset</html:checkbox>
+		<br/>
+		<html:checkbox name="proteinSetComparisonForm" property="showNumUniqIons"># Unique Ions (U.I) for a dataset</html:checkbox>
+		<br/>
+		<html:checkbox name="proteinSetComparisonForm" property="showSpectrumCount">Spectrum Count (SC) for a dataset</html:checkbox>
+		</div>
+	</td>
 	</tr>
  	</logic:notPresent>
  	

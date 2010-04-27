@@ -9,6 +9,8 @@ package org.yeastrc.www.compare.clustering;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -104,6 +106,9 @@ public class ClusteringGatewayAction extends Action {
             			// if form in request matches serialized form
             			if(formsMatch((ProteinSetComparisonForm) form, savedForm)) {
             				log.info("Toke found.  Old token. Forms match. Reading saved results");
+            				String noDispCols = ((ProteinSetComparisonForm) form).getDisplayColumns().getNoDisplayColCommaSeparated();
+            				if(noDispCols.length() > 0)
+            					noDispCols = "&noDispCol="+noDispCols;
             				ActionForward fwd = mapping.findForward("ReadOld");
             				String anchor = "";
             		        if(((ProteinSetComparisonForm) form).getRowIndex() != -1) {
@@ -112,6 +117,7 @@ public class ClusteringGatewayAction extends Action {
             				ActionForward newFwd = new ActionForward(fwd.getPath()+
             						"?token="+token+"&page="+((ProteinSetComparisonForm)form).getPageNum()+
             						"&count="+((ProteinSetComparisonForm)form).getNumPerPage()+
+            						noDispCols+
             						anchor, 
             						fwd.getRedirect());
             				return newFwd;
@@ -136,6 +142,21 @@ public class ClusteringGatewayAction extends Action {
 
 	private boolean formsMatch(ProteinSetComparisonForm myForm,
 			ProteinSetComparisonForm savedForm) {
+		
+		List<Integer> myRunIds = myForm.getAllSelectedRunIds();
+		List<Integer> savedRunIds = savedForm.getAllSelectedRunIds();
+		if(myRunIds.size() != savedRunIds.size()) {
+			log.info("selected runIds do not match");
+			return false;
+		}
+		Collections.sort(myRunIds);
+		Collections.sort(savedRunIds);
+		for(int i = 0; i < myRunIds.size(); i++) {
+			if(myRunIds.get(i).intValue() != savedRunIds.get(i).intValue()) {
+				log.info("selected runIds do not match");
+				return false;
+			}
+		}
 		
 		if(myForm.getGroupIndistinguishableProteins() != savedForm.getGroupIndistinguishableProteins())
 			return false;

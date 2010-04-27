@@ -109,6 +109,18 @@ public class CompareProteinSetsAction extends Action {
 //            }
 //        }
         
+        myForm.setShowPresent(true);
+        myForm.setShowFastaId(true);
+        myForm.setShowCommonName(true);
+        myForm.setShowDescription(true);
+        myForm.setShowMolWt(true);
+        myForm.setShowPi(true);
+        myForm.setShowTotalSeq(true);
+        myForm.setShowNumSeq(true);
+        myForm.setShowNumIons(true);
+        myForm.setShowNumUniqIons(true);
+        myForm.setShowSpectrumCount(true);
+        
         return mapping.findForward("DoComparison");
     }
     

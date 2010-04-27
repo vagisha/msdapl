@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.util.FileUtils;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nrseq.ProteinListing;
+import org.yeastrc.www.compare.DisplayColumns;
 import org.yeastrc.www.compare.ComparisonProtein;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
@@ -47,6 +48,9 @@ public class SpectrumCountClusterer {
 			ROptions rOptions, StringBuilder errorMesage, String dir) {
 		
 		long s = System.currentTimeMillis(); 
+		
+		// reset the display columns so that all fields get initialized.
+		grpComparison.setDisplayColumns(new DisplayColumns());
 		for(ComparisonProteinGroup grpProtein: grpComparison.getProteinsGroups()) {
             for(ComparisonProtein protein: grpProtein.getProteins()) {
             	grpComparison.initializeProteinInfo(protein);
@@ -519,8 +523,8 @@ public class SpectrumCountClusterer {
 			// read this: http://www.uni-koeln.de/rrzk/server/documentation/modules.html
 			// writer.write(". /etc/profile.d/modules.sh\n");
 			//writer.write("module load modules modules-init modules-gs R\n");
-			writer.write("/net/gs/vol3/software/bin/R --vanilla --slave --file="+pathToRScript+"\n");
-			//writer.write("R --vanilla --slave --file="+pathToRScript+"\n");
+			//writer.write("/net/gs/vol3/software/bin/R --vanilla --slave --file="+pathToRScript+"\n");
+			writer.write("R --vanilla --slave --file="+pathToRScript+"\n");
 			//writer.write(ApplicationProperties.getRPath()+" --vanilla --slave --file="+pathToRScript+"\n");
 		}
 		finally {

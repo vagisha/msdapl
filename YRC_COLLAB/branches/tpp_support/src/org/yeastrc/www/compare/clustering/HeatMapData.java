@@ -46,7 +46,7 @@ public class HeatMapData {
 			
 			List<HeatMapCell> cells = new ArrayList<HeatMapCell>();
 			
-			row.setRowName(protein.getProteinListing().getBestReferences().get(0).getShortAccession());
+			row.setRowName(protein.getProteinListing().getFastaReferences().get(0).getShortAccession());
 			
 			for(Dataset ds: grpComparison.getDatasets()) {
 				
@@ -87,7 +87,7 @@ public class HeatMapData {
 			
 			List<HeatMapCell> cells = new ArrayList<HeatMapCell>();
 			
-			row.setRowName(protein.getProteinListing().getBestReferences().get(0).getShortAccession());
+			row.setRowName(protein.getProteinListing().getFastaReferences().get(0).getShortAccession());
 			
 			for(Dataset ds: comparison.getDatasets()) {
 				

@@ -260,6 +260,8 @@ public class DoComparisonAction extends Action {
             
             // Create the group comparison dataset
             ProteinGroupComparisonDataset grpComparison = new ProteinGroupComparisonDataset();
+            grpComparison.setDisplayColumns(myForm.getDisplayColumns());
+            
             for(ComparisonProteinGroup grp: proteinGroups)
                 grpComparison.addProteinGroup(grp);
             

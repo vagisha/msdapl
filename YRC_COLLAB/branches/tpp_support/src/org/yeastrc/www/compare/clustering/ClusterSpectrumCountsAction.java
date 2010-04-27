@@ -141,6 +141,8 @@ public class ClusterSpectrumCountsAction extends Action {
                 saveErrors( request, errors );
                 return mapping.findForward("Failure");
             }
+            clusteredGrpComparison.setDisplayColumns(myForm.getDisplayColumns());
+            
             long e = System.currentTimeMillis();
             log.info("Time to culster ProteinGroupComparisonDataset: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
             
@@ -171,9 +173,13 @@ public class ClusterSpectrumCountsAction extends Action {
         if(myForm.getRowIndex() != -1) {
         	anchor = "#"+myForm.getRowIndex();
         }
+        String noDispCols = ((ProteinSetComparisonForm) form).getDisplayColumns().getNoDisplayColCommaSeparated();
+		if(noDispCols.length() > 0)
+			noDispCols = "&noDispCol="+noDispCols;
 		ActionForward newFwd = new ActionForward(fwd.getPath()+
 				"?token="+jobToken+"&page=1"+
 				"&count="+myForm.getNumPerPage()+
+				noDispCols+
 				anchor, fwd.getRedirect());
 		return newFwd;
         

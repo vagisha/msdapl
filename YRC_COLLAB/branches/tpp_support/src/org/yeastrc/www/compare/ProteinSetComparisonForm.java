@@ -46,10 +46,38 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 	private boolean newToken = false;
 	private boolean useLogScale = false;
 	private String replaceMissingWithValue = null;
+	
+	// WHICH COLUMNS TO DISPLAY
+	private boolean showPresent = true;
+	private boolean showFastaId = true;
+	private boolean showCommonName = true;
+	private boolean showDescription = true;
+	private boolean showMolWt = true;
+	private boolean showPi = true;
+	private boolean showTotalSeq = true;
+	private boolean showNumSeq = true;
+	private boolean showNumIons = true;
+	private boolean showNumUniqIons = true;
+	private boolean showSpectrumCount = true;
     
     
-	public void reset() {
-        super.reset();
+	public void reset(ActionMapping mapping, HttpServletRequest request) {
+        
+		if(request.getAttribute("comparisonFormReset") == null) {
+			super.reset(mapping, request);
+			showPresent = false;
+			showFastaId = false;
+			showCommonName = false;
+			showDescription = false;
+			showMolWt = false;
+			showPi = false;
+			showTotalSeq = false;
+			showNumSeq = false;
+			showNumIons = false;
+			showNumUniqIons = false;
+			showSpectrumCount = false;
+		}
+		request.setAttribute("comparisonFormReset", true);
     }
     
 	public int getPageNum() {
@@ -85,11 +113,12 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
         ActionErrors errors = new ActionErrors();
 
-        // we need atleast two datasets runs to compare
-        if (getSelectedRunCount() < 2) {
-        	errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Please select 2 or more experiments to compare."));
+        if(request.getAttribute("comparisonFormReset") == null) {
+        	// we need atleast two datasets runs to compare
+        	if (getSelectedRunCount() < 2) {
+        		errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Please select 2 or more experiments to compare."));
+        	}
         }
-        
         return errors;
     }
 
@@ -245,4 +274,118 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
     public void setSortOrderString(String sortOrder) {
         this.sortOrder = SORT_ORDER.getSortByForName(sortOrder);
     }
+    
+    //-----------------------------------------------------------------------------
+    // Columns we will display
+    //-----------------------------------------------------------------------------
+    public boolean isShowPresent() {
+		return showPresent;
+	}
+	public void setShowPresent(boolean showPresent) {
+		this.showPresent = showPresent;
+	}
+	public boolean isShowFastaId() {
+		return showFastaId;
+	}
+	public void setShowFastaId(boolean showFastaId) {
+		this.showFastaId = showFastaId;
+	}
+	public boolean isShowCommonName() {
+		return showCommonName;
+	}
+	public void setShowCommonName(boolean showCommonName) {
+		this.showCommonName = showCommonName;
+	}
+	public boolean isShowDescription() {
+		return showDescription;
+	}
+	public void setShowDescription(boolean showDescription) {
+		this.showDescription = showDescription;
+	}
+	public boolean isShowMolWt() {
+		return showMolWt;
+	}
+	public void setShowMolWt(boolean showMolWt) {
+		this.showMolWt = showMolWt;
+	}
+	public boolean isShowPi() {
+		return showPi;
+	}
+	public void setShowPi(boolean showPi) {
+		this.showPi = showPi;
+	}
+	public boolean isShowTotalSeq() {
+		return showTotalSeq;
+	}
+	public void setShowTotalSeq(boolean showTotalSeq) {
+		this.showTotalSeq = showTotalSeq;
+	}
+	public boolean isShowNumSeq() {
+		return showNumSeq;
+	}
+	public void setShowNumSeq(boolean showNumSeq) {
+		this.showNumSeq = showNumSeq;
+	}
+	public boolean isShowNumIons() {
+		return showNumIons;
+	}
+	public void setShowNumIons(boolean showNumIons) {
+		this.showNumIons = showNumIons;
+	}
+	public boolean isShowNumUniqIons() {
+		return showNumUniqIons;
+	}
+	public void setShowNumUniqIons(boolean showNumUniqIons) {
+		this.showNumUniqIons = showNumUniqIons;
+	}
+	public boolean isShowSpectrumCount() {
+		return showSpectrumCount;
+	}
+	public void setShowSpectrumCount(boolean showSpectrumCount) {
+		this.showSpectrumCount = showSpectrumCount;
+	}
+	
+	public void resetDisplayColumns() {
+		this.setShowPresent(true);
+		this.setShowFastaId(true);
+		this.setShowCommonName(true);
+		this.setShowDescription(true);
+		this.setShowMolWt(true);
+		this.setShowPi(true);
+		this.setShowTotalSeq(true);
+		this.setShowNumSeq(true);
+		this.setShowNumIons(true);
+		this.setShowNumUniqIons(true);
+		this.setShowSpectrumCount(true);
+	}
+	
+	public void setDisplayColumns(DisplayColumns displayColumns) {
+		this.setShowPresent(displayColumns.isShowPresent());
+		this.setShowFastaId(displayColumns.isShowFastaId());
+		this.setShowCommonName(displayColumns.isShowCommonName());
+		this.setShowDescription(displayColumns.isShowDescription());
+		this.setShowMolWt(displayColumns.isShowMolWt());
+		this.setShowPi(displayColumns.isShowPi());
+		this.setShowTotalSeq(displayColumns.isShowTotalSeq());
+		this.setShowNumSeq(displayColumns.isShowNumSeq());
+		this.setShowNumIons(displayColumns.isShowNumIons());
+		this.setShowNumUniqIons(displayColumns.isShowNumUniqIons());
+		this.setShowSpectrumCount(displayColumns.isShowSpectrumCount());
+	}
+	
+	public DisplayColumns getDisplayColumns () {
+		DisplayColumns colFilters = new DisplayColumns();
+		colFilters.setShowPresent(this.isShowPresent());
+		colFilters.setShowFastaId(this.isShowFastaId());
+		colFilters.setShowCommonName(this.isShowCommonName());
+		colFilters.setShowDescription(this.isShowDescription());
+		colFilters.setShowMolWt(this.isShowMolWt());
+		colFilters.setShowPi(this.isShowPi());
+		colFilters.setShowTotalSeq(this.isShowTotalSeq());
+		colFilters.setShowNumSeq(this.isShowNumSeq());
+		colFilters.setShowNumIons(this.isShowNumIons());
+		colFilters.setShowNumUniqIons(this.isShowNumUniqIons());
+		colFilters.setShowSpectrumCount(this.isShowSpectrumCount());
+		return colFilters;
+	}
 }
