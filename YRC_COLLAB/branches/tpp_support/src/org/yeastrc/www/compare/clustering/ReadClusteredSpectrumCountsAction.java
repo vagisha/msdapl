@@ -237,6 +237,7 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 				if(ois != null) try {ois.close();} catch(IOException e){}
 			}
 			
+			comparison.setDisplayColumns(myForm.getDisplayColumns());
 			request.setAttribute("comparison", comparison);
 			comparison.setRowCount(numPerPage);
 			comparison.setCurrentPage(page);

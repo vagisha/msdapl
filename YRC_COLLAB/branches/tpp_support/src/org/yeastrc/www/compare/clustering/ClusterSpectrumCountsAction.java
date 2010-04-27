@@ -101,6 +101,9 @@ public class ClusterSpectrumCountsAction extends Action {
                 saveErrors( request, errors );
                 return mapping.findForward("Failure");
             }
+            
+            clusteredComparison.setDisplayColumns(myForm.getDisplayColumns());
+            
             long e = System.currentTimeMillis();
             log.info("Time to culster ProteinComparisonDataset: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
             

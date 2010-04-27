@@ -141,6 +141,7 @@ public class DoComparisonAction extends Action {
             comparison.setSortBy(myForm.getSortBy());
             comparison.setSortOrder(myForm.getSortOrder());
             
+            comparison.setDisplayColumns(myForm.getDisplayColumns());
         	comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
         	
         	// If User requested GO enrichment analysis forward to another action class

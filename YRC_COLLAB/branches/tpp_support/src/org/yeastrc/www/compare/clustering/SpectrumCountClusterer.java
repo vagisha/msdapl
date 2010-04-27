@@ -49,8 +49,13 @@ public class SpectrumCountClusterer {
 		
 		long s = System.currentTimeMillis(); 
 		
+		// remove any sorting parameters
+		grpComparison.setSortBy(null);
+		grpComparison.setSortOrder(null);
+		
 		// reset the display columns so that all fields get initialized.
 		grpComparison.setDisplayColumns(new DisplayColumns());
+		
 		for(ComparisonProteinGroup grpProtein: grpComparison.getProteinsGroups()) {
             for(ComparisonProtein protein: grpProtein.getProteins()) {
             	grpComparison.initializeProteinInfo(protein);
@@ -172,6 +177,13 @@ public class SpectrumCountClusterer {
 			ProteinComparisonDataset comparison, ROptions rOptions, StringBuilder errorMesage, String dir) {
 		
 		long s = System.currentTimeMillis(); 
+		
+		// remove any sorting parameters
+		comparison.setSortBy(null);
+		comparison.setSortOrder(null);
+		
+		// reset the display columns so that all fields get initialized.
+		comparison.setDisplayColumns(new DisplayColumns());
 		
 		for(ComparisonProtein protein: comparison.getProteins()) {
 			comparison.initializeProteinInfo(protein);
