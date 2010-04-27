@@ -7,6 +7,8 @@
 package org.yeastrc.www.compare;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -307,6 +309,7 @@ public class DatasetFiltersForm extends ActionForm {
     }
     
     public List<SelectableDataset> getAndList() {
+        Collections.sort(andList, new SelectableDatasetComparator());
         return andList;
     }
     
@@ -325,6 +328,7 @@ public class DatasetFiltersForm extends ActionForm {
     }
     
     public List<SelectableDataset> getOrList() {
+    	Collections.sort(orList, new SelectableDatasetComparator());
         return orList;
     }
     
@@ -343,6 +347,7 @@ public class DatasetFiltersForm extends ActionForm {
     }
     
     public List<SelectableDataset> getNotList() {
+    	Collections.sort(notList, new SelectableDatasetComparator());
         return notList;
     }
     
@@ -361,9 +366,61 @@ public class DatasetFiltersForm extends ActionForm {
     }
     
     public List<SelectableDataset> getXorList() {
+    	Collections.sort(xorList, new SelectableDatasetComparator());
         return xorList;
     }
 
+    public boolean setDatasetOrder(List<Integer> piRunIds) {
+    	
+    	if(piRunIds.size() > andList.size())
+    		return false;
+    	
+    	
+    	int dsIndex = 0;
+    	for(Integer piRunId: piRunIds) {
+    		for(SelectableDataset ds: andList) {
+    			if(ds.getDatasetId() == piRunId.intValue())
+    				ds.setDatasetIndex(dsIndex);
+    		}
+    		dsIndex++;
+    	}
+    	dsIndex = 0;
+    	for(Integer piRunId: piRunIds) {
+    		for(SelectableDataset ds: orList) {
+    			if(ds.getDatasetId() == piRunId.intValue())
+    				ds.setDatasetIndex(dsIndex);
+    		}
+    		dsIndex++;
+    	}
+    	dsIndex = 0;
+    	for(Integer piRunId: piRunIds) {
+    		for(SelectableDataset ds: notList) {
+    			if(ds.getDatasetId() == piRunId.intValue())
+    				ds.setDatasetIndex(dsIndex);
+    		}
+    		dsIndex++;
+    	}
+    	dsIndex = 0;
+    	for(Integer piRunId: piRunIds) {
+    		for(SelectableDataset ds: xorList) {
+    			if(ds.getDatasetId() == piRunId.intValue())
+    				ds.setDatasetIndex(dsIndex);
+    		}
+    		dsIndex++;
+    	}
+    	
+    	List<Integer> myIds = new ArrayList<Integer>(andList.size());
+    	for(SelectableDataset ds: andList)
+    		myIds.add(ds.getDatasetId());
+    	
+    	Collections.sort(piRunIds);
+    	Collections.sort(myIds);
+    	for(int i = 0; i < myIds.size(); i++)
+    		if(myIds.get(i).intValue() != piRunIds.get(i).intValue())
+    			return false;
+    	
+    	return true;
+    }
     
     //-----------------------------------------------------------------------------
     // ProteinProphet datasets
@@ -424,10 +481,16 @@ public class DatasetFiltersForm extends ActionForm {
         return andList.size();
     }
     
-    public List<Integer> getAllSelectedRunIds() {
+    public List<Integer> getAllSelectedRunIdsOrdered() {
         
+    	List<SelectableDataset> orderedDatasets = new ArrayList<SelectableDataset>(andList.size());
+    	for(SelectableDataset dataset: andList)
+    		orderedDatasets.add(dataset);
+    	// order by dataset Index
+    	Collections.sort(orderedDatasets, new SelectableDatasetComparator());
+    	
         List<Integer> all = new ArrayList<Integer>();
-        for (SelectableDataset dataset: andList) {
+        for (SelectableDataset dataset: orderedDatasets) {
             all.add(dataset.getDatasetId());
         }
         return all;
@@ -551,5 +614,11 @@ public class DatasetFiltersForm extends ActionForm {
         return filterCriteria;
     }
     
-    
+    private static final class SelectableDatasetComparator implements Comparator<SelectableDataset> {
+
+		@Override
+		public int compare(SelectableDataset o1, SelectableDataset o2) {
+			return Integer.valueOf(o1.getDatasetIndex()).compareTo(o2.getDatasetIndex());
+		}
+    }
 }

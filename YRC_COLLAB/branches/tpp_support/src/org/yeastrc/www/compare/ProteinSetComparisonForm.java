@@ -46,6 +46,7 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 	private boolean newToken = false;
 	private boolean useLogScale = false;
 	private String replaceMissingWithValue = null;
+	private boolean clusterColumns = false;
 	
 	// WHICH COLUMNS TO DISPLAY
 	private boolean showPresent = true;
@@ -80,6 +81,7 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 		request.setAttribute("comparisonFormReset", true);
     }
     
+
 	public int getPageNum() {
         return pageNum;
     }
@@ -240,6 +242,14 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 
 	public void setReplaceMissingWithValue(String replaceMissingWithValue) {
 		this.replaceMissingWithValue = replaceMissingWithValue;
+	}
+	
+	public boolean isClusterColumns() {
+		return clusterColumns;
+	}
+
+	public void setClusterColumns(boolean clusterColumns) {
+		this.clusterColumns = clusterColumns;
 	}
     
     //-----------------------------------------------------------------------------

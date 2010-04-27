@@ -63,7 +63,8 @@ public class DoComparisonAction extends Action {
         }
         
         // Get the selected protein inference run ids
-        List<Integer> allRunIds = myForm.getAllSelectedRunIds();
+        // these should be ordered by any user specified order
+        List<Integer> allRunIds = myForm.getAllSelectedRunIdsOrdered();
         
         // Need atleast two datasets to compare.
         if(allRunIds.size() < 2) {

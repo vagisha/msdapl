@@ -585,7 +585,7 @@ public class SpectrumCountClusterer {
 			writer.write("options(expressions=10000)\n");
 			//writer.write("hm <- heatmap.2(as.matrix(test_sc), cexCol=1.0, col=my.colorFct(), scale=\"none\", margins=c(5,10)");
 			writer.write("hm <- heatmap.2(as.matrix(test_sc), cexCol=1.0, col=my_cols, scale=\"none\", margins=c(5,10), trace=\"none\" ");
-			if(rinfo.numCols <= 2) {
+			if(rinfo.numCols <= 2 || !rinfo.isClusterColumns()) {
 				writer.write(", Colv=NA ");
 			}
 			double cexRow = 1.0/Math.log10((double)rinfo.numRows);
@@ -613,6 +613,7 @@ public class SpectrumCountClusterer {
 		int numCols;
 		boolean doLog = false;
 		double valueForMissing = Double.MIN_VALUE;
+		boolean clusterColumns = false;
 		
 		public int getNumRows() {
 			return numRows;
@@ -637,6 +638,12 @@ public class SpectrumCountClusterer {
 		}
 		public void setValueForMissing(double valueForMissing) {
 			this.valueForMissing = valueForMissing;
+		}
+		public boolean isClusterColumns() {
+			return clusterColumns;
+		}
+		public void setClusterColumns(boolean clusterColumns) {
+			this.clusterColumns = clusterColumns;
 		}
 	}
 }

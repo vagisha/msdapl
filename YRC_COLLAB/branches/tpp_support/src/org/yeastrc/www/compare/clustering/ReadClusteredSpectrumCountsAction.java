@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
@@ -139,6 +140,34 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			if(ois != null) try {ois.close();} catch(IOException e){}
 		}
 		
+		// Are we given an order in which to display the datasets
+		String dsOrder = request.getParameter("dsOrder");
+		if(dsOrder != null) {
+			
+			// Set this in the request so that the link to the HTML can use this order
+			request.setAttribute("dsOrder", dsOrder);
+			
+			String[] tokens = dsOrder.split("_");
+			List<Integer> piRunIds = new ArrayList<Integer>(tokens.length);
+			for(String tok: tokens) {
+				try {piRunIds.add(Integer.parseInt(tok));}
+				catch(NumberFormatException e) {
+					ActionErrors errors = new ActionErrors();
+					errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
+					"Error parsing dataset order: "+dsOrder));
+					saveErrors( request, errors );
+					return mapping.findForward("Failure");
+				}
+			}
+			if(!myForm.setDatasetOrder(piRunIds)) {
+				ActionErrors errors = new ActionErrors();
+				errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
+				"Error setting dataset order: "+dsOrder));
+				saveErrors( request, errors );
+				return mapping.findForward("Failure");
+			}
+		}
+		
 		// We are going to display all columns unless we have the noDispCol parameter in the request
 		myForm.resetDisplayColumns();
 		
@@ -165,7 +194,7 @@ public class ReadClusteredSpectrumCountsAction extends Action {
         
 		// create a list of the dataset ids being compared
 		// Get the selected protein inference run ids
-		List<Integer> allRunIds = myForm.getAllSelectedRunIds();
+		List<Integer> allRunIds = myForm.getAllSelectedRunIdsOrdered();
 		request.setAttribute("datasetIds", StringUtils.makeCommaSeparated(allRunIds));
 
 		
@@ -196,6 +225,8 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			}
 			
 			grpComparison.setDisplayColumns(myForm.getDisplayColumns());
+			grpComparison.setDatasetOrder(myForm.getAllSelectedRunIdsOrdered());
+			grpComparison.initSummary(); // this needs to be done in case the dataset order has changed
 			request.setAttribute("comparison", grpComparison);
 			grpComparison.setRowCount(numPerPage);
 			grpComparison.setCurrentPage(page);
@@ -238,6 +269,8 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			}
 			
 			comparison.setDisplayColumns(myForm.getDisplayColumns());
+			comparison.setDatasetOrder(myForm.getAllSelectedRunIdsOrdered());
+			comparison.initSummary(); // this needs to be done in case the dataset order has changed
 			request.setAttribute("comparison", comparison);
 			comparison.setRowCount(numPerPage);
 			comparison.setCurrentPage(page);

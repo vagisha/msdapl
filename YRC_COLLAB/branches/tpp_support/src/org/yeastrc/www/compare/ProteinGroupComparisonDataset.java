@@ -195,6 +195,18 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         this.datasets = datasets;
     }
     
+    public void setDatasetOrder(List<Integer> piRunIds) {
+    	
+    	List<Dataset> newOrder = new ArrayList<Dataset>();
+    	for(Integer piRunId: piRunIds) {
+    		for(Dataset ds: datasets) {
+    			if(ds.getDatasetId() == piRunId.intValue())
+    				newOrder.add(ds);
+    		}
+    	}
+    	this.datasets = newOrder;
+    }
+    
     public void addProteinGroup(ComparisonProteinGroup proteinGroup) {
         this.proteinGroups.add(proteinGroup);
         for(ComparisonProtein protein: proteinGroup.getProteins())

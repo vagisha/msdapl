@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -106,7 +108,24 @@ public class HeatMapAction extends Action {
 			if(ois != null) try {ois.close();} catch(IOException e){}
 		}
 		
-		
+		// Are we given an order in which to display the datasets.
+		String dsOrder = request.getParameter("dsOrder");
+		List<Integer> piRunIds = null;
+		if(dsOrder != null) {
+			
+			String[] tokens = dsOrder.split("_");
+			piRunIds = new ArrayList<Integer>(tokens.length);
+			for(String tok: tokens) {
+				try {piRunIds.add(Integer.parseInt(tok));}
+				catch(NumberFormatException e) {
+					ActionErrors errors = new ActionErrors();
+					errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
+					"Error parsing dataset order: "+dsOrder));
+					saveErrors( request, errors );
+					return mapping.findForward("Failure");
+				}
+			}
+		}
 		
 		// Read the results
 		if(myForm.getGroupIndistinguishableProteins()) {
@@ -115,6 +134,8 @@ public class HeatMapAction extends Action {
 			try {
 				ois = new ObjectInputStream(new FileInputStream(grpComparisonFile));
 				grpComparison = (ProteinGroupComparisonDataset) ois.readObject();
+				if(piRunIds != null)
+					grpComparison.setDatasetOrder(piRunIds);
 			}
 			catch (IOException e) {
 				ActionErrors errors = new ActionErrors();
@@ -143,6 +164,8 @@ public class HeatMapAction extends Action {
 			try {
 				ois = new ObjectInputStream(new FileInputStream(comparisonFile));
 				comparison = (ProteinComparisonDataset) ois.readObject();
+				if(piRunIds != null)
+					comparison.setDatasetOrder(piRunIds);
 			}
 			catch (IOException e) {
 				ActionErrors errors = new ActionErrors();

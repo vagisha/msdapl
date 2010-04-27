@@ -92,6 +92,7 @@ public class ClusterSpectrumCountsAction extends Action {
             ropts.setValueForMissing(myForm.getReplaceMissingWithValueDouble());
             ropts.setNumCols(comparison.getDatasetCount());
             ropts.setNumRows(comparison.getTotalProteinCount());
+            ropts.setClusterColumns(myForm.isClusterColumns());
             
             ProteinComparisonDataset clusteredComparison = 
             SpectrumCountClusterer.getInstance().clusterProteinComparisonDataset(comparison, ropts, errorMessage, baseDir);
@@ -135,6 +136,7 @@ public class ClusterSpectrumCountsAction extends Action {
             ropts.setValueForMissing(myForm.getReplaceMissingWithValueDouble());
             ropts.setNumCols(grpComparison.getDatasetCount());
             ropts.setNumRows(grpComparison.getTotalProteinGroupCount());
+            ropts.setClusterColumns(myForm.isClusterColumns());
             
             ProteinGroupComparisonDataset clusteredGrpComparison = 
             	SpectrumCountClusterer.getInstance().clusterProteinGroupComparisonDataset(grpComparison, ropts, errorMessage, baseDir);

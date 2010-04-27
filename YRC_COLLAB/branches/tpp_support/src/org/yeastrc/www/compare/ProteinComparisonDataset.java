@@ -123,6 +123,17 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 	public void setDatasets(List<? extends Dataset> datasets) {
 		this.datasets = datasets;
 	}
+	public void setDatasetOrder(List<Integer> piRunIds) {
+    	
+    	List<Dataset> newOrder = new ArrayList<Dataset>();
+    	for(Integer piRunId: piRunIds) {
+    		for(Dataset ds: datasets) {
+    			if(ds.getDatasetId() == piRunId.intValue())
+    				newOrder.add(ds);
+    		}
+    	}
+    	this.datasets = newOrder;
+    }
 
 	public void addProtein(ComparisonProtein protein) {
 		this.proteins.add(protein);

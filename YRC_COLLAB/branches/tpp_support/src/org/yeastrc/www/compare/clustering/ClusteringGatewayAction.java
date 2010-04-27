@@ -106,18 +106,33 @@ public class ClusteringGatewayAction extends Action {
             			// if form in request matches serialized form
             			if(formsMatch((ProteinSetComparisonForm) form, savedForm)) {
             				log.info("Toke found.  Old token. Forms match. Reading saved results");
+            				
+            				// Columns we don't want to display
             				String noDispCols = ((ProteinSetComparisonForm) form).getDisplayColumns().getNoDisplayColCommaSeparated();
             				if(noDispCols.length() > 0)
             					noDispCols = "&noDispCol="+noDispCols;
-            				ActionForward fwd = mapping.findForward("ReadOld");
+            				
+            				// Dataset order
+            				List<Integer> datasetOrder = ((ProteinSetComparisonForm) form).getAllSelectedRunIdsOrdered();
+            				String order = "";
+            				for(Integer id: datasetOrder)
+            					order += "_"+id;
+            				if(order.length() > 0)
+            					order = order.substring(1);
+            				order = "&dsOrder="+order;
+            				
+            				// Anchor
             				String anchor = "";
             		        if(((ProteinSetComparisonForm) form).getRowIndex() != -1) {
             		        	anchor = "#"+((ProteinSetComparisonForm) form).getRowIndex();
             		        }
+            		        
+            		        ActionForward fwd = mapping.findForward("ReadOld");
             				ActionForward newFwd = new ActionForward(fwd.getPath()+
             						"?token="+token+"&page="+((ProteinSetComparisonForm)form).getPageNum()+
             						"&count="+((ProteinSetComparisonForm)form).getNumPerPage()+
             						noDispCols+
+            						order+
             						anchor, 
             						fwd.getRedirect());
             				return newFwd;
@@ -143,8 +158,8 @@ public class ClusteringGatewayAction extends Action {
 	private boolean formsMatch(ProteinSetComparisonForm myForm,
 			ProteinSetComparisonForm savedForm) {
 		
-		List<Integer> myRunIds = myForm.getAllSelectedRunIds();
-		List<Integer> savedRunIds = savedForm.getAllSelectedRunIds();
+		List<Integer> myRunIds = myForm.getAllSelectedRunIdsOrdered();
+		List<Integer> savedRunIds = savedForm.getAllSelectedRunIdsOrdered();
 		if(myRunIds.size() != savedRunIds.size()) {
 			log.info("selected runIds do not match");
 			return false;
@@ -183,6 +198,8 @@ public class ClusteringGatewayAction extends Action {
 		if(myForm.isUseLogScale() != savedForm.isUseLogScale())
 			return false;
 		if(myForm.getReplaceMissingWithValueDouble() != savedForm.getReplaceMissingWithValueDouble())
+			return false;
+		if(myForm.isClusterColumns() != savedForm.isClusterColumns())
 			return false;
 		return true;
 	}

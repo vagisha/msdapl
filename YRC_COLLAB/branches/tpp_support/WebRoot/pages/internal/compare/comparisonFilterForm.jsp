@@ -1,12 +1,15 @@
 
 <%@page import="org.yeastrc.bio.go.GOUtils"%>
 <%@page import="org.yeastrc.www.compare.DisplayColumns"%>
+<%@page import="org.yeastrc.www.compare.dataset.DatasetColor"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
 <script type="text/javascript" src="<yrcwww:link path='/js/jquery.cookie.js'/>"></script>
+<script type="text/javascript" src="<yrcwww:link path='/js/jquery.listreorder.js'/>"></script>
+<script type="text/javascript" src="<yrcwww:link path='/js/jquery.disable.text.select.pack.js'/>"></script>
 <script type="text/javascript">
 // Popup window code
 function newPopup(url) {
@@ -26,6 +29,20 @@ function toggleColumnChooser() {
 	}
 }
 
+function toggleOrderChanger() {
+
+	var text = $("#orderChanger").text();
+	//alert(text);
+	if(text == "Order Datasets") {
+		$("#orderChanger").text("Hide Dataset Order");
+		$("#orderChangerTgt").show();
+	}
+	else {
+		$("#orderChanger").text("Order Datasets");
+		$("#orderChangerTgt").hide();
+	}
+}
+
 function saveDisplayColumnsCookie() {
 	//alert("saving cookie");
 	var cookieVal = "";
@@ -36,7 +53,7 @@ function saveDisplayColumnsCookie() {
 	
 	if(cookieVal.length > 0) {
 		cookieVal = cookieVal.substring(1);
-		alert(cookieVal);
+		//alert(cookieVal);
 		var COOKIE_NAME = 'noDispCols_compare';
 		var options = { path: '/', expires: 100 };
     	$.cookie(COOKIE_NAME, cookieVal, options);
@@ -49,6 +66,24 @@ $(document).ready(function() {
 	// reset the form.  When clicking the reload button the form is 
 	// not resest, so we reset it manually. 
  	$("form")[0].reset();
+ 	
+	var datasetList = $('ol#datasetList').ListReorder();
+	datasetList.bind('listorderchanged', function(evt, jqList, listOrder) {
+		var str = "";
+		for (var i = 0; i < listOrder.length; i++) {
+			// i is current datasetIndex; listOrder[i] is the original datasetIndex
+			//var origIndex = $("#AND_index_"+listOrder[i]).val();
+			$("#AND_index_"+listOrder[i]).val(i);
+			$("#OR_index_"+listOrder[i]).val(i);
+			$("#NOT_index_"+listOrder[i]).val(i);
+			$("#XOR_index_"+listOrder[i]).val(i);
+			var newIndex = $("#AND_index_"+listOrder[i]).val();
+			//str += "orig: "+origIndex+"; new: "+newIndex+"\n";
+		}
+		//alert(str);
+	});
+	
+ 	
 });
 
 </script>
@@ -106,7 +141,8 @@ $(document).ready(function() {
 					</logic:notEqual>
 					<span style="cursor:pointer;" onclick="javascript:toggleAndSelect(<bean:write name='datasetIndex'/>, <bean:write name='andDataset' property='red'/>,<bean:write name='andDataset' property='green'/>,<bean:write name='andDataset' property='blue'/>);">&nbsp;&nbsp;</span>
 					<html:hidden name="andDataset" property="datasetId" indexed="true" />
-					<html:hidden name="andDataset" property="datasetIndex" indexed="true" />
+					<html:hidden name="andDataset" property="datasetIndex" indexed="true" 
+								styleId='<%= "AND_index_"+datasetIndex%>'/>
 					<html:hidden name="andDataset" property="sourceString" indexed="true" />
 					<html:hidden name="andDataset" property="selected" indexed="true" 
 				             styleId='<%= "AND_"+datasetIndex+"_select"%>' />
@@ -132,7 +168,8 @@ $(document).ready(function() {
 					</logic:notEqual>
 					<span style="cursor:pointer;" onclick="javascript:toggleOrSelect(<bean:write name='datasetIndex'/>,<bean:write name='orDataset' property='red'/>,<bean:write name='orDataset' property='green'/>,<bean:write name='orDataset' property='blue'/>);">&nbsp;&nbsp;</span>
 					<html:hidden name="orDataset" property="datasetId" indexed="true" />
-					<html:hidden name="orDataset" property="datasetIndex" indexed="true" />
+					<html:hidden name="orDataset" property="datasetIndex" indexed="true"
+								 styleId='<%= "OR_index_"+datasetIndex%>'/>
 					<html:hidden name="orDataset" property="sourceString" indexed="true" />
 					<html:hidden name="orDataset" property="selected" indexed="true" 
 								styleId='<%= "OR_"+datasetIndex+"_select"%>' />
@@ -159,7 +196,8 @@ $(document).ready(function() {
 					</logic:notEqual>
 					<span style="cursor:pointer;" onclick="javascript:toggleNotSelect(<bean:write name='datasetIndex'/>,<bean:write name='notDataset' property='red'/>,<bean:write name='notDataset' property='green'/>,<bean:write name='notDataset' property='blue'/>);">&nbsp;&nbsp;</span>
 					<html:hidden name="notDataset" property="datasetId" indexed="true" />
-					<html:hidden name="notDataset" property="datasetIndex" indexed="true" />
+					<html:hidden name="notDataset" property="datasetIndex" indexed="true" 
+								 styleId='<%= "NOT_index_"+datasetIndex%>'/>
 					<html:hidden name="notDataset" property="sourceString" indexed="true" />
 					<html:hidden name="notDataset" property="selected" indexed="true" 
 								styleId='<%= "NOT_"+datasetIndex+"_select"%>' />
@@ -186,7 +224,8 @@ $(document).ready(function() {
 					</logic:notEqual>
 					<span style="cursor:pointer;" onclick="javascript:toggleXorSelect(<bean:write name='datasetIndex'/>,<bean:write name='xorDataset' property='red'/>,<bean:write name='xorDataset' property='green'/>,<bean:write name='xorDataset' property='blue'/>);">&nbsp;&nbsp;</span>
 					<html:hidden name="xorDataset" property="datasetId" indexed="true" />
-					<html:hidden name="xorDataset" property="datasetIndex" indexed="true" />
+					<html:hidden name="xorDataset" property="datasetIndex" indexed="true" 
+								 styleId='<%= "XOR_index_"+datasetIndex%>'/>
 					<html:hidden name="xorDataset" property="sourceString" indexed="true" />
 					<html:hidden name="xorDataset" property="selected" indexed="true" 
 								styleId='<%= "XOR_"+datasetIndex+"_select"%>' />
@@ -328,20 +367,49 @@ $(document).ready(function() {
  	<tr><td colspan="4" style="border: 1px solid rgb(170, 170, 170); background-color: white;padding:1"><span></span></td></tr>
 	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
 	<tr>
-		<td valign="top" colspan="1"><html:checkbox name="proteinSetComparisonForm" property="groupIndistinguishableProteins">Group Indistinguishable Proteins</html:checkbox> </td>
+		<td valign="top"></td>
+		<td valign="top" colspan="1">
+			<html:checkbox name="proteinSetComparisonForm" property="groupIndistinguishableProteins">Group Indistinguishable Proteins</html:checkbox>
+		</td>
 		<td valign="top" align="left" colspan="2">
 			<html:checkbox name="proteinSetComparisonForm" property="keepProteinGroups">Keep Protein Groups</html:checkbox><br>
 			<span style="font-size:8pt;">Display ALL protein group members even if some of them do not pass the filtering criteria.</span>
  		</td>
- 		<td valign="middle" align="center" colspan="1">	
- 			<span class="clickable underline" id="columnChooser" 
- 			      onclick="toggleColumnChooser();">Choose Columns</span>&nbsp;
+ 	</tr>
+ 	<tr>
+ 		<td></td>
+ 		<td valign="top" align="left">
+			<span class="clickable underline" id="columnChooser" 
+ 			      onclick="toggleColumnChooser();">Choose Columns</span>
+ 			&nbsp;
+ 			<span class="clickable underline" id="orderChanger" 
+ 			      onclick="toggleOrderChanger();">Order Datasets</span> 
+ 		</td>
+ 		<td valign="middle" align="left" colspan="2">	
  			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button" style="margin-top:0px;"></html:submit>
-			
 		</td>
 	</tr>
 	<tr>
 	<td colspan="4" align="center">
+	
+	<!-- DATASET ORDER CHANGER -->
+	<div id="orderChangerTgt" class="small_font" align="left" 
+		 style="padding: 5 0 5 0; border: 1px solid gray; width:50%; display:none">
+		<ol id="datasetList">
+			<logic:iterate name="proteinSetComparisonForm" property="andList" id="andDataset" indexId="row">
+				<li style="margin: 0 5 5 5">
+				<span style="display:block; float:left; width:10px; height:10px; background: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> );;"></span>&nbsp;
+				<span id="<bean:write name='andDataset' property='datasetIndex' />"><b>ID <bean:write name="andDataset" property="datasetId" /></b>
+				<bean:write name="andDataset" property="datasetComments" />
+				</span>
+				</li>
+			</logic:iterate>
+		</ol>
+		<span class="small_font">Drag the blue-bordered white boxes to reorder the datasets. Click "Update" to display results with the new order</span>
+	</div>
+	
+	
+	<!-- DISPLAY COLUMN CHOOSER -->
 	<div id="columnChooserTgt" class="small_font" align="left" 
 		 style="padding: 5 0 5 0; border: 1px solid gray; width:50%; display:none">
 	
@@ -395,7 +463,9 @@ $(document).ready(function() {
 	<html:checkbox name="proteinSetComparisonForm" property="useLogScale">Log(2) Scale</html:checkbox>
 		&nbsp;
 	Replace missing with: 
-	<html:text name="proteinSetComparisonForm" property="replaceMissingWithValue"></html:text>
+	<html:text name="proteinSetComparisonForm" property="replaceMissingWithValue" size="3"></html:text>
+	&nbsp;
+	<html:checkbox name="proteinSetComparisonForm" property="clusterColumns">Cluster Columns</html:checkbox>
 	&nbsp;
 	<html:submit value="Cluster" onclick="javascript:clusterResults();" styleClass="plain_button" style="margin-top:0px;"></html:submit>
 	
@@ -404,7 +474,12 @@ $(document).ready(function() {
 		<nobr>
 		<b>Heatmap:</b>
 		<span style="background-color:yellow;"><a href="JavaScript:newPopup('<bean:write name='clusteredImgUrl'/>');"><b>PDF</b></a></span>
-		<span style="background-color:yellow;"><a href="JavaScript:newPopup('<yrcwww:link path='heatmap.do?token='/><bean:write name="proteinSetComparisonForm" property='clusteringToken' />');"><b>HTML</b></a></span>
+		<logic:present name="dsOrder">
+			<span style="background-color:yellow;"><a href="JavaScript:newPopup('<yrcwww:link path='heatmap.do?token='/><bean:write name="proteinSetComparisonForm" property='clusteringToken' />&dsOrder=<bean:write name="dsOrder" />');"><b>HTML</b></a></span>
+		</logic:present>
+		<logic:notPresent name="dsOrder">
+			<span style="background-color:yellow;"><a href="JavaScript:newPopup('<yrcwww:link path='heatmap.do?token='/><bean:write name="proteinSetComparisonForm" property='clusteringToken' />');"><b>HTML</b></a></span>
+		</logic:notPresent>
 		</nobr>
 	</logic:present>
 </div>
