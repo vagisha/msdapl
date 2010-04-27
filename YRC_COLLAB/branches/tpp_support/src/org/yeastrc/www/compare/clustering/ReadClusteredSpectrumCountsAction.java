@@ -141,12 +141,19 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 		
 		// We are going to display all columns unless we have the noDispCol parameter in the request
 		myForm.resetDisplayColumns();
+		
 		// If we have display column preferences in the request get them now
 		String noDispCol = request.getParameter("noDispCol");
 		if(noDispCol != null) {
 			DisplayColumns displayColumns = parseNoDispCol(noDispCol);
 			if(displayColumns != null)
 				myForm.setDisplayColumns(displayColumns);
+		}
+		// If we did not find a parameter in the request look for a cookie
+		else { 
+			 Cookie[] cookies = request.getCookies();
+			 DisplayColumns displayColumns = getDisplayColumns(cookies);
+			 myForm.setDisplayColumns(displayColumns);
 		}
 		request.setAttribute("proteinSetComparisonForm", myForm);
 		
@@ -253,6 +260,23 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 		String[] tokens = noDispCol.split(",");
 		for(String tok: tokens) {
 			displayColumns.setNoDisplay(tok.charAt(0));
+		}
+		return displayColumns;
+	}
+	
+	private DisplayColumns getDisplayColumns(Cookie[] cookies) {
+		
+		DisplayColumns displayColumns = new DisplayColumns();
+		for(Cookie cookie: cookies) {
+			if(cookie.getName().equals("noDispCols_compare")) {
+				String val = cookie.getValue();
+				if(val != null) {
+					String[] tokens = val.split("_");
+					for(String tok: tokens) {
+						displayColumns.setNoDisplay(tok.charAt(0));
+					}
+				}
+			}
 		}
 		return displayColumns;
 	}

@@ -1,11 +1,12 @@
 
 <%@page import="org.yeastrc.bio.go.GOUtils"%>
+<%@page import="org.yeastrc.www.compare.DisplayColumns"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-
+<script type="text/javascript" src="<yrcwww:link path='/js/jquery.cookie.js'/>"></script>
 <script type="text/javascript">
 // Popup window code
 function newPopup(url) {
@@ -24,6 +25,32 @@ function toggleColumnChooser() {
 		$("#columnChooserTgt").hide();
 	}
 }
+
+function saveDisplayColumnsCookie() {
+	//alert("saving cookie");
+	var cookieVal = "";
+	$(".colChooser").each(function() {
+		if($(this).is(":checked")) {}
+		else {cookieVal += "_"+$(this).attr('title')};
+	});
+	
+	if(cookieVal.length > 0) {
+		cookieVal = cookieVal.substring(1);
+		alert(cookieVal);
+		var COOKIE_NAME = 'noDispCols_compare';
+		var options = { path: '/', expires: 100 };
+    	$.cookie(COOKIE_NAME, cookieVal, options);
+    }
+	
+	return false;
+}
+$(document).ready(function() {
+	
+	// reset the form.  When clicking the reload button the form is 
+	// not resest, so we reset it manually. 
+ 	$("form")[0].reset();
+});
+
 </script>
 
 
@@ -318,27 +345,40 @@ function toggleColumnChooser() {
 	<div id="columnChooserTgt" class="small_font" align="left" 
 		 style="padding: 5 0 5 0; border: 1px solid gray; width:50%; display:none">
 	
-		<html:checkbox name="proteinSetComparisonForm" property="showPresent">Present / Not-present</html:checkbox>
+		<html:checkbox name="proteinSetComparisonForm" property="showPresent" styleClass="colChooser"
+					   styleId="showPresent"  title="<%=String.valueOf(DisplayColumns.present) %>">Present / Not-present</html:checkbox>
 		<br/>
-		<html:checkbox name="proteinSetComparisonForm" property="showFastaId">Fasta ID</html:checkbox>
+		<html:checkbox name="proteinSetComparisonForm" property="showFastaId" styleClass="colChooser"
+		   			   styleId="showFastaId" title="<%=String.valueOf(DisplayColumns.fasta) %>">Fasta ID</html:checkbox>
 		<br/>
-		<html:checkbox name="proteinSetComparisonForm" property="showCommonName">Common Name</html:checkbox>
+		<html:checkbox name="proteinSetComparisonForm" property="showCommonName" styleClass="colChooser"
+					   styleId="showCommonName" title="<%=String.valueOf(DisplayColumns.commonName) %>">Common Name</html:checkbox>
 		<br/>
-		<html:checkbox name="proteinSetComparisonForm" property="showDescription">Description</html:checkbox>
+		<html:checkbox name="proteinSetComparisonForm" property="showDescription" styleClass="colChooser"
+					   styleId="showDescription" title="<%=String.valueOf(DisplayColumns.description) %>">Description</html:checkbox>
 		<br/>
-		<html:checkbox name="proteinSetComparisonForm" property="showMolWt">Molecular Wt.</html:checkbox>
+		<html:checkbox name="proteinSetComparisonForm" property="showMolWt" styleClass="colChooser"
+					   styleId="showMolWt" title="<%=String.valueOf(DisplayColumns.molWt) %>">Molecular Wt.</html:checkbox>
 		<br/>
-		<html:checkbox name="proteinSetComparisonForm" property="showPi">pI</html:checkbox>
+		<html:checkbox name="proteinSetComparisonForm" property="showPi" styleClass="colChooser"
+		 			   styleId="showPi" title="<%=String.valueOf(DisplayColumns.pi) %>">pI</html:checkbox>
 		<br/>
-		<html:checkbox name="proteinSetComparisonForm" property="showTotalSeq">Total # Sequences</html:checkbox>
+		<html:checkbox name="proteinSetComparisonForm" property="showTotalSeq" styleClass="colChooser"
+					   styleId="showTotalSeq" title="<%=String.valueOf(DisplayColumns.totalSeq) %>">Total # Sequences</html:checkbox>
 		<br/>
-		<html:checkbox name="proteinSetComparisonForm" property="showNumSeq"># Sequences (S) for a dataset</html:checkbox>
+		<html:checkbox name="proteinSetComparisonForm" property="showNumSeq" styleClass="colChooser"
+					   styleId="showNumSeq" title="<%=String.valueOf(DisplayColumns.numSeq) %>"># Sequences (S) for a dataset</html:checkbox>
 		<br/>
-		<html:checkbox name="proteinSetComparisonForm" property="showNumIons"># Ions (I) for a dataset</html:checkbox>
+		<html:checkbox name="proteinSetComparisonForm" property="showNumIons" styleClass="colChooser"
+					   styleId="showNumIons" title="<%=String.valueOf(DisplayColumns.numIons) %>"># Ions (I) for a dataset</html:checkbox>
 		<br/>
-		<html:checkbox name="proteinSetComparisonForm" property="showNumUniqIons"># Unique Ions (U.I) for a dataset</html:checkbox>
+		<html:checkbox name="proteinSetComparisonForm" property="showNumUniqIons" styleClass="colChooser"
+					   styleId="showNumUniqIons" title="<%=String.valueOf(DisplayColumns.numUniqueIons) %>"># Unique Ions (U.I) for a dataset</html:checkbox>
 		<br/>
-		<html:checkbox name="proteinSetComparisonForm" property="showSpectrumCount">Spectrum Count (SC) for a dataset</html:checkbox>
+		<html:checkbox name="proteinSetComparisonForm" property="showSpectrumCount" styleClass="colChooser"
+					   styleId="showSpectrumCount" title="<%=String.valueOf(DisplayColumns.numSpectrumCount) %>">Spectrum Count (SC) for a dataset</html:checkbox>
+		<br/>
+		<input type="button" value="Save Settings"  onclick="saveDisplayColumnsCookie();"/>
 		</div>
 	</td>
 	</tr>

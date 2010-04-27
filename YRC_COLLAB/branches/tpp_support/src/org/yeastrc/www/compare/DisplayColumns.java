@@ -8,8 +8,6 @@ package org.yeastrc.www.compare;
 
 import java.io.Serializable;
 
-import com.sun.org.apache.xerces.internal.impl.dv.dtd.NMTOKENDatatypeValidator;
-
 /**
  * 
  */
@@ -27,17 +25,17 @@ public class DisplayColumns implements Serializable {
 	private boolean showNumUniqIons = true;
 	private boolean showSpectrumCount = true;
 	
-	private static final char present = 'P';
-	private static final char fasta = 'F';
-	private static final char commonName = 'N';
-	private static final char description = 'D';
-	private static final char molWt = 'M';
-	private static final char pi = 'I';
-	private static final char totalSeq = 'T';
-	private static final char numSeq = 'Q';
-	private static final char numIons = 'O';
-	private static final char numUniqueIons = 'U';
-	private static final char numSpectrumCount = 'S';
+	public static final char present = 'P';
+	public static final char fasta = 'F';
+	public static final char commonName = 'N';
+	public static final char description = 'D';
+	public static final char molWt = 'M';
+	public static final char pi = 'I';
+	public static final char totalSeq = 'T';
+	public static final char numSeq = 'Q';
+	public static final char numIons = 'O';
+	public static final char numUniqueIons = 'U';
+	public static final char numSpectrumCount = 'S';
 	
 	
 	public boolean isShowPresent() {

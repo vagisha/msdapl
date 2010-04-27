@@ -9,6 +9,7 @@ package org.yeastrc.www.compare;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -109,19 +110,29 @@ public class CompareProteinSetsAction extends Action {
 //            }
 //        }
         
-        myForm.setShowPresent(true);
-        myForm.setShowFastaId(true);
-        myForm.setShowCommonName(true);
-        myForm.setShowDescription(true);
-        myForm.setShowMolWt(true);
-        myForm.setShowPi(true);
-        myForm.setShowTotalSeq(true);
-        myForm.setShowNumSeq(true);
-        myForm.setShowNumIons(true);
-        myForm.setShowNumUniqIons(true);
-        myForm.setShowSpectrumCount(true);
+        // Check if there is a cookie in the request for column display
+        Cookie[] cookies = request.getCookies();
+        DisplayColumns displayColumns = getDisplayColumns(cookies);
+        myForm.setDisplayColumns(displayColumns);
         
         return mapping.findForward("DoComparison");
     }
+
+	private DisplayColumns getDisplayColumns(Cookie[] cookies) {
+		
+		DisplayColumns displayColumns = new DisplayColumns();
+		for(Cookie cookie: cookies) {
+			if(cookie.getName().equals("noDispCols_compare")) {
+				String val = cookie.getValue();
+				if(val != null) {
+					String[] tokens = val.split("_");
+					for(String tok: tokens) {
+						displayColumns.setNoDisplay(tok.charAt(0));
+					}
+				}
+			}
+		}
+		return displayColumns;
+	}
     
 }
