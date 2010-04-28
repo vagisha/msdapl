@@ -151,7 +151,7 @@ public class DownloadComparisonResults extends Action {
         for(ComparisonProtein protein: comparison.getProteins()) {
             
             comparison.initializeProteinInfo(protein);
-            writeComparisonProtein(writer, comparison.getDatasets(), form.isIncludeDescriptions(), protein);
+            writeComparisonProtein(writer, comparison.getDatasets(), form.isIncludeDescriptions(), protein, false);
         }
         
         writer.write("\n\n");
@@ -342,7 +342,7 @@ public class DownloadComparisonResults extends Action {
                 comparison.initializeProteinInfo(protein);
 
                 writeComparisonProtein(writer, comparison.getDatasets(), printDescription,
-						protein);
+						protein, true);
             }
         }
     }
@@ -350,9 +350,11 @@ public class DownloadComparisonResults extends Action {
 
 	private void writeComparisonProtein(PrintWriter writer,
 			List<? extends Dataset> datasets, boolean printDescription,
-			ComparisonProtein protein) {
+			ComparisonProtein protein, boolean printGroupId) {
 		
 		writer.write(protein.getNrseqId()+"\t");
+		if(printGroupId)
+			writer.write(protein.getGroupId()+"\t");
         try {
 			writer.write(protein.getAccessionsCommaSeparated()+"\t");
 		} catch (SQLException e) {
@@ -446,7 +448,9 @@ public class DownloadComparisonResults extends Action {
 					nameString += ",ERROR";
 				}
                 try {
-					commonNameString += ","+protein.getCommonNamesCommaSeparated();
+                	String cn = protein.getCommonNamesCommaSeparated();
+                	if(cn != null && cn.trim().length() > 0)
+                		commonNameString += ","+cn;
 				} catch (SQLException e1) {
 					log.error("Error getting common name", e1);
 					commonNameString += ",ERROR";
@@ -481,7 +485,10 @@ public class DownloadComparisonResults extends Action {
             writer.write(nrseqIdString.substring(1)+"\t");
             writer.write(grpProtein.getGroupId()+"\t");
             writer.write(nameString.substring(1)+"\t");
-            writer.write(commonNameString.substring(1)+"\t");
+            if(commonNameString.length() > 0)
+            	writer.write(commonNameString.substring(1)+"\t");
+            else
+            	writer.write("\t");
             writer.write(molWtString.substring(1)+"\t");
             writer.write(piString.substring(1)+"\t");
             writer.write(grpProtein.getMaxPeptideCount()+"\t");
