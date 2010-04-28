@@ -93,7 +93,7 @@ public class ComparisonProteinGroup extends Vertex<ComparisonProteinGroup> {
             protein.setGroupId(groupId);
     }
     
-    public int getMaxPeptideSeqCount() {
-        return proteins.get(0).getMaxPeptideSeqCount();
+    public int getTotalPeptideSeqCount() {
+        return proteins.get(0).getTotalPeptideSeqCount();
     }
 }

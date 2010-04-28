@@ -432,20 +432,25 @@ $(document).ready(function() {
 		 			   styleId="showPi" title="<%=String.valueOf(DisplayColumns.pi) %>">pI</html:checkbox>
 		<br/>
 		<html:checkbox name="proteinSetComparisonForm" property="showTotalSeq" styleClass="colChooser"
-					   styleId="showTotalSeq" title="<%=String.valueOf(DisplayColumns.totalSeq) %>">Total # Sequences</html:checkbox>
+					   styleId="showTotalSeq" title="<%=String.valueOf(DisplayColumns.totalSeq) %>">Total # Sequences for a protein</html:checkbox>
 		<br/>
 		<html:checkbox name="proteinSetComparisonForm" property="showNumSeq" styleClass="colChooser"
-					   styleId="showNumSeq" title="<%=String.valueOf(DisplayColumns.numSeq) %>"># Sequences (S) for a dataset</html:checkbox>
+					   styleId="showNumSeq" title="<%=String.valueOf(DisplayColumns.numSeq) %>"># Sequences (S) for a protein in a dataset</html:checkbox>
 		<br/>
 		<html:checkbox name="proteinSetComparisonForm" property="showNumIons" styleClass="colChooser"
-					   styleId="showNumIons" title="<%=String.valueOf(DisplayColumns.numIons) %>"># Ions (I) for a dataset</html:checkbox>
+					   styleId="showNumIons" title="<%=String.valueOf(DisplayColumns.numIons) %>"># Ions (I) for a protein in a dataset</html:checkbox>
 		<br/>
 		<html:checkbox name="proteinSetComparisonForm" property="showNumUniqIons" styleClass="colChooser"
-					   styleId="showNumUniqIons" title="<%=String.valueOf(DisplayColumns.numUniqueIons) %>"># Unique Ions (U.I) for a dataset</html:checkbox>
+					   styleId="showNumUniqIons" title="<%=String.valueOf(DisplayColumns.numUniqueIons) %>"># Unique Ions (U.I) for a protein in a dataset</html:checkbox>
 		<br/>
 		<html:checkbox name="proteinSetComparisonForm" property="showSpectrumCount" styleClass="colChooser"
-					   styleId="showSpectrumCount" title="<%=String.valueOf(DisplayColumns.numSpectrumCount) %>">Spectrum Count (SC) for a dataset</html:checkbox>
+					   styleId="showSpectrumCount" title="<%=String.valueOf(DisplayColumns.numSpectrumCount) %>">Spectrum Count (SC) for a protein in a dataset</html:checkbox>
 		<br/>
+		<html:checkbox name="proteinSetComparisonForm" property="showNsaf" styleClass="colChooser"
+					   styleId="showSpectrumCount" title="<%=String.valueOf(DisplayColumns.nsaf) %>">NSAF* (N) for a protein in a dataset</html:checkbox>
+		<br/>
+		<span class="small_font">*NSAF is available only for proteins inferred via MSDaPl.</span>
+		<br/><br/>
 		<input type="button" value="Save Settings"  onclick="saveDisplayColumnsCookie();"/>
 		</div>
 	</td>

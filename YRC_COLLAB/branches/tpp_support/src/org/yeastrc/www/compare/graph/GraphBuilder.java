@@ -42,7 +42,7 @@ public class GraphBuilder {
         for (ComparisonProtein protein: proteins) {
             
             List<String> peptides = getPeptides(protein.getNrseqId(), pinferIds);
-            protein.setMaxPeptideSeqCount(peptides.size());
+            protein.setTotalPeptideSeqCount(peptides.size());
             
             for(String peptide: peptides) {
                 Peptide pept = peptideIdMap.get(peptide);

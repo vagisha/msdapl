@@ -16,22 +16,35 @@
 	</td>
 </tr>
 <tr>
+	<td><b>#Seq</b></td>
+	<td style="font-size: 8pt;"># of unique peptide sequences for a protein from ALL datasets being compared</td>
+</tr>
+<tr>
 	<td><b>S</b></td>
-	<td style="font-size: 8pt;"># of unique peptide sequences</td>
+	<td style="font-size: 8pt;"># of unique peptide sequences for a protein in a dataset</td>
 </tr>
 <tr>
 	<td><b>I</b></td>
-	<td style="font-size: 8pt;"># of ions: unique combination of sequence + modifications + charge</td>
+	<td style="font-size: 8pt;"># of ions: unique combination of sequence + modifications + charge for a protein
+	                            in a dataset</td>
 </tr>
 <tr>
 	<td><b>U.I</b></td>
-	<td style="font-size: 8pt;"># of unique ions</td>
+	<td style="font-size: 8pt;"># of unique ions for a protein in a dataset</td>
 </tr>
 <tr>
 	<td><b>SC</b></td>
-	<td style="font-size: 8pt;">Spectrum Counts. <br/>
+	<td style="font-size: 8pt;">Spectrum Counts for a protein in a dataset <br/>
 		Example: 18(24) <br/>
 	    18 is the # of spectra that were contributing evidence for the protein. <br/>
 	    24 is the spectrum count after normalization (based on total spectra).</td>
+</tr>
+<tr>
+	<td><b>N</b></td>
+	<td style="font-size: 8pt;">NSAF (Normalized Spectrum Abundance Factor). <br/>
+		This is available only for the protein inference program implemented in MSDaPl.<br/>
+		NSAF is not calculated for non-parsimonious proteins.<br/>
+		A value of -1 will appear in this column for these proteins.
+	</td>
 </tr>
 </table>

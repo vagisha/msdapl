@@ -51,7 +51,7 @@ public class DatasetPeptideComparer {
         return instance;
     }
     
-    public int getMaxPeptidesForProtein(ComparisonProtein protein) {
+    public int getTotalPeptSeqForProtein(ComparisonProtein protein) {
         
         List<Integer> datasetIds = new ArrayList<Integer>(protein.getDatasetInformation().size());
         for(DatasetProteinInformation dpi: protein.getDatasetInformation()) {

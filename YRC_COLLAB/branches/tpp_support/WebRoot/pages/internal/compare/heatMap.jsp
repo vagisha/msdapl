@@ -55,7 +55,7 @@ function updatePage(rowIndex) {
 
 <logic:present name="heatmap">
 
-	<table width="70%" cellspacing="0" cellpadding="10" align="center">
+	<table width="90%" cellspacing="0" cellpadding="10" align="center">
 	<tr><td align="right" style="color: #3D4960;">
 	<b>Font: &nbsp;<span class="clickable" 
 				style="background: white; border: 1px solid #CBCBCB; padding:3 3 3 3;" onclick="increaseFont();">+</span> 
@@ -66,7 +66,7 @@ function updatePage(rowIndex) {
 	</table>
 	
 	<center>
-	<div style="border: 1px solid; width:70%; padding: 3 3 3 3; color: #3D4960;">
+	<div style="border: 1px solid; width:90%; padding: 3 3 3 3; color: #3D4960;">
 	<span>Click on the heatmap to navigate to the relevant page in the comparison view.</span><br/><br/>
 	<table width="100%" cellspacing="0" cellpadding="0" align="center" >
 	<tr>

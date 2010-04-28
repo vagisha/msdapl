@@ -24,6 +24,7 @@ public class DisplayColumns implements Serializable {
 	private boolean showNumIons = true;
 	private boolean showNumUniqIons = true;
 	private boolean showSpectrumCount = true;
+	private boolean showNsaf = false;
 	
 	public static final char present = 'P';
 	public static final char fasta = 'F';
@@ -36,6 +37,7 @@ public class DisplayColumns implements Serializable {
 	public static final char numIons = 'O';
 	public static final char numUniqueIons = 'U';
 	public static final char numSpectrumCount = 'S';
+	public static final char nsaf = 'A';
 	
 	
 	public boolean isShowPresent() {
@@ -105,6 +107,13 @@ public class DisplayColumns implements Serializable {
 		this.showSpectrumCount = showSpectrumCount;
 	}
 	
+	public boolean isShowNsaf() {
+		return showNsaf;
+	}
+	public void setShowNsaf(boolean showNsaf) {
+		this.showNsaf = showNsaf;
+	}
+	
 	public void setNoDisplay(char columnCode) {
 		
 		switch (columnCode) {
@@ -119,6 +128,7 @@ public class DisplayColumns implements Serializable {
 		case numIons:			this.showNumIons = false; break;
 		case numUniqueIons:		this.showNumUniqIons = false; break;
 		case numSpectrumCount:	this.showSpectrumCount = false; break;
+		case nsaf:				this.showNsaf = false; break;
 		default:
 			break;
 		}
@@ -131,12 +141,13 @@ public class DisplayColumns implements Serializable {
 		if(!this.isShowCommonName()) 	str += ","+commonName;
 		if(!this.isShowDescription())	str += ","+description;
 		if(!this.isShowMolWt())			str += ","+molWt;
-		if(!this.isShowPi())				str += ","+pi;
+		if(!this.isShowPi())			str += ","+pi;
 		if(!this.isShowTotalSeq())		str += ","+totalSeq;
-		if(!this.isShowNumSeq())			str += ","+numSeq;
+		if(!this.isShowNumSeq())		str += ","+numSeq;
 		if(!this.isShowNumIons())		str += ","+numIons;
 		if(!this.isShowNumUniqIons())	str += ","+numUniqueIons;
 		if(!this.isShowSpectrumCount())	str += ","+numSpectrumCount;
+		if(!this.isShowNsaf())			str += ","+nsaf;
 		
 		if(str.length() > 0)
 			str = str.substring(1);

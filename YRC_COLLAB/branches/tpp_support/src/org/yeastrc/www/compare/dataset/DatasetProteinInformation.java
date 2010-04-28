@@ -22,10 +22,8 @@ public class DatasetProteinInformation implements Serializable {
     private int ionCount;
     private int uniqIonCount;
     private int spectrumCount;
-    private double nsaf = -1.0;
+    private String nsaf;
     private final Dataset dataset;
-    
-    private static final DecimalFormat df = new DecimalFormat("0.000000");
     
     public DatasetProteinInformation(Dataset dataset) {
         this.dataset = dataset;
@@ -115,15 +113,11 @@ public class DatasetProteinInformation implements Serializable {
         this.grouped = grouped;
     }
 
-    public double getNsaf() {
-        return nsaf;
-    }
-
-    public void setNsaf(double nsaf) {
-        this.nsaf = nsaf;
+    public void setNsafFormatted(String nsafFormatted) {
+        this.nsaf = nsafFormatted;
     }
     
     public String getNsafFormatted() {
-        return df.format(nsaf);
+        return nsaf;
     }
 }

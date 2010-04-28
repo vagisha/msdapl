@@ -60,6 +60,7 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 	private boolean showNumIons = true;
 	private boolean showNumUniqIons = true;
 	private boolean showSpectrumCount = true;
+	private boolean showNsaf = false;
     
     
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
@@ -77,6 +78,7 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 			showNumIons = false;
 			showNumUniqIons = false;
 			showSpectrumCount = false;
+			showNsaf = false;
 		}
 		request.setAttribute("comparisonFormReset", true);
     }
@@ -355,6 +357,13 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 		this.showSpectrumCount = showSpectrumCount;
 	}
 	
+	public boolean isShowNsaf() {
+		return showNsaf;
+	}
+	public void setShowNsaf(boolean showNsaf) {
+		this.showNsaf = showNsaf;
+	}
+	
 	public void resetDisplayColumns() {
 		this.setShowPresent(true);
 		this.setShowFastaId(true);
@@ -367,6 +376,7 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 		this.setShowNumIons(true);
 		this.setShowNumUniqIons(true);
 		this.setShowSpectrumCount(true);
+		this.setShowNsaf(false);
 	}
 	
 	public void setDisplayColumns(DisplayColumns displayColumns) {
@@ -381,6 +391,7 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 		this.setShowNumIons(displayColumns.isShowNumIons());
 		this.setShowNumUniqIons(displayColumns.isShowNumUniqIons());
 		this.setShowSpectrumCount(displayColumns.isShowSpectrumCount());
+		this.setShowNsaf(displayColumns.isShowNsaf());
 	}
 	
 	public DisplayColumns getDisplayColumns () {
@@ -396,6 +407,7 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 		colFilters.setShowNumIons(this.isShowNumIons());
 		colFilters.setShowNumUniqIons(this.isShowNumUniqIons());
 		colFilters.setShowSpectrumCount(this.isShowSpectrumCount());
+		colFilters.setShowNsaf(this.isShowNsaf());
 		return colFilters;
 	}
 }

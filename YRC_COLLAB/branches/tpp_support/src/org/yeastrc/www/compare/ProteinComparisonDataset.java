@@ -341,7 +341,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 
 		// Peptide count
 		if(displayColumns.isShowTotalSeq()) {
-			TableCell peptCount = new TableCell(String.valueOf(protein.getMaxPeptideSeqCount()));
+			TableCell peptCount = new TableCell(String.valueOf(protein.getTotalPeptideSeqCount()));
 			peptCount.setClassName("pept_count clickable underline");
 			peptCount.setId(String.valueOf(protein.getNrseqId()));
 			row.addCell(peptCount);
@@ -376,6 +376,12 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 					cell.setClassName("prot-not-found"); // SC
 					row.addCell(cell);
 				}
+				// Are we printing NSAF?
+        		if(displayColumns.isShowNsaf()) {
+        			cell = new TableCell();
+        			cell.setClassName("prot-not-found"); // NSAF
+        			row.addCell(cell);
+        		}
 			}
 			else {
 				String className = "prot-found";
@@ -410,6 +416,12 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 					cell.setBackgroundColor(getScaledColor(scaledCount));
 					row.addCell(cell);
 				}
+				
+				// Are we printing NSAF?
+        		if(displayColumns.isShowNsaf()) {
+        			TableCell cell = new TableCell(dpi.getNsafFormatted());
+        			row.addCell(cell);
+        		}
 			}
 		}
 
@@ -680,6 +692,15 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
         			header.setSortable(false);
         			headers.add(header);
         		}
+        		
+        		if(displayColumns.isShowNsaf()) {
+        			header = new TableHeader("N");
+        			header.setRowIndex(2);
+        			header.setWidth(2);
+        			header.setStyleClass("small_font");
+        			header.setSortable(false);
+        			headers.add(header);
+        		}
 
         	}
         }
@@ -752,7 +773,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 
 		// get the (max)number of peptides identified for this protein
 		if(this.sortBy != SORT_BY.NUM_PEPT)
-			protein.setMaxPeptideSeqCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
+			protein.setTotalPeptideSeqCount(DatasetPeptideComparer.instance().getTotalPeptSeqForProtein(protein));
 
 		// Get the NSAF information for the protein in the different datasets
 		// NSAF is available only for ProteinInference proteins
@@ -761,7 +782,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 				List<Integer> piProteinIds = idpProtDao.getProteinIdsForNrseqIds(dpi.getDatasetId(), nrseqIds);
 				if(piProteinIds.size() == 1) {
 					IdPickerProteinBase prot = idpProtDao.loadProtein(piProteinIds.get(0));
-					dpi.setNsaf(prot.getNsaf());
+					dpi.setNsafFormatted(prot.getNsafFormatted());
 				}
 			}
 		}
