@@ -10,7 +10,7 @@ public class GenericIdPickerProtein <T extends GenericIdPickerPeptide<?,?>> exte
     private int groupId = -1;
     private boolean isParsimonious;
     private double nsaf = -1.0; // normalized spectrum abundance factor
-    
+    private static final DecimalFormat df = new DecimalFormat("0.000000");
     
     public double getNsaf() {
         return nsaf;
@@ -19,9 +19,10 @@ public class GenericIdPickerProtein <T extends GenericIdPickerPeptide<?,?>> exte
         this.nsaf = nsaf;
     }
     public String getNsafFormatted() {
-        String format = "0.000000";
-        DecimalFormat df = new DecimalFormat(format);
-        return df.format(nsaf);
+    	if(isParsimonious)
+    		return df.format(nsaf);
+    	else
+    		return "-1";
     }
     
     public int getClusterId() {
