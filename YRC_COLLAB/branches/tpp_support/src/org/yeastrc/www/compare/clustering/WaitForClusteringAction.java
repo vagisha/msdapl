@@ -17,6 +17,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.www.compare.ProteinSetComparisonForm;
+import org.yeastrc.www.taglib.HistoryTag;
 
 /**
  * 
@@ -46,7 +47,7 @@ public class WaitForClusteringAction extends Action {
 		myForm.setClusteringToken(token);
 		myForm.setNewToken(true); // this is new token
 		
-        request.setAttribute("doNotSaveToHistory", true); // We don't want this added to history.
+        request.setAttribute(HistoryTag.NO_HISTORY_ATTRIB, true); // We don't want this added to history.
         return mapping.findForward("Success");
     }
     

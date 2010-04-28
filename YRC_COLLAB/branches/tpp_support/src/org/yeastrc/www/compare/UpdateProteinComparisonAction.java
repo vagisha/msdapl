@@ -16,6 +16,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.www.taglib.HistoryTag;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -50,8 +51,11 @@ public class UpdateProteinComparisonAction extends Action {
             return mapping.findForward("Failure");
         }
         
-        if(!myForm.isCluster())
+        request.setAttribute(HistoryTag.NO_HISTORY_ATTRIB, true); // Don't want this to be saved to history.
+        
+        if(!myForm.isCluster()) {
         	return mapping.findForward("DoComparison");
+        }
         else
         	return mapping.findForward("ClusterGateway");
     }

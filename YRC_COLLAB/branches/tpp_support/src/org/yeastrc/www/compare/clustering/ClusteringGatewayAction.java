@@ -98,7 +98,7 @@ public class ClusteringGatewayAction extends Action {
             		
             		// If we were not able to read the form start a new clustering process
             		if(savedForm == null) {
-            			log.info("Toke found.  Old token. BUT could not read serialized form. Starting new clustering job");
+            			log.info("Token found.  Old token. BUT could not read serialized form. Starting new clustering job");
             			return startNewClustering(mapping, (ProteinSetComparisonForm) form); // NEW CLUSTERING ACTION
             		}
             		

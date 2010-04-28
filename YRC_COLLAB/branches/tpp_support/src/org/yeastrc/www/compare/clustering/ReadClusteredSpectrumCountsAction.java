@@ -31,6 +31,7 @@ import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
 import org.yeastrc.www.compare.ProteinSetComparisonForm;
 import org.yeastrc.www.compare.SpeciesChecker;
 import org.yeastrc.www.compare.util.VennDiagramCreator;
+import org.yeastrc.www.taglib.HistoryTag;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -239,6 +240,7 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 	            request.setAttribute("chart", googleChartUrl);
 	        }
 	        
+	        request.setAttribute(HistoryTag.NO_HISTORY_ATTRIB, true); // Don't want this to be saved to history.
 	        return mapping.findForward("ProteinGroupList");
 		}
 		
@@ -283,6 +285,7 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 	            request.setAttribute("chart", googleChartUrl);
 	        }
 	        
+	        request.setAttribute(HistoryTag.NO_HISTORY_ATTRIB, true); // Don't want this to be saved to history.
 	        return mapping.findForward("ProteinList");
 		}
 		

@@ -20,6 +20,8 @@ public final class HistoryTag extends TagSupport {
 	// The number of links to show, including the current page, defaults to 5
 	private int numLinks = 5;
 	
+	public static final String NO_HISTORY_ATTRIB = "HistoryTag_noHistory";
+	
 	/**
 	 * Whether or not to save this page to the History
 	 * Defaults to true
@@ -57,6 +59,8 @@ public final class HistoryTag extends TagSupport {
 			
 			if (this.save) {
 				String title = (String)(request.getAttribute("title"));
+				if(request.getAttribute(NO_HISTORY_ATTRIB) != null)
+					title = null;
 				if (title != null) {
 					String url = "";
 					String uri = request.getRequestURI();
