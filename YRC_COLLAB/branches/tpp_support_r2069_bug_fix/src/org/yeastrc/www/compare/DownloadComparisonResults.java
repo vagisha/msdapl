@@ -143,6 +143,10 @@ public class DownloadComparisonResults extends Action {
         // write the header
         writeHeader(writer, comparison.getDatasets(), form.isIncludeDescriptions(), false);
         
+        // Remove any sorting criteria so that all fields get initialized properly.
+        comparison.setSortBy(null);
+        comparison.setSortOrder(null);
+        
         // write information for each protein
         for(ComparisonProtein protein: comparison.getProteins()) {
             
@@ -316,6 +320,9 @@ public class DownloadComparisonResults extends Action {
       // print the proteins in each protein group
       writeHeader(writer, comparison.getDatasets(), form.isIncludeDescriptions(), true);
       
+      // Remove any sorting criteria so that all fields get initialized properly.
+      comparison.setSortBy(null);
+      comparison.setSortOrder(null);
       
       if(!form.isCollapseProteinGroups())
           writeSplitProteinGroup(writer, comparison, form.isIncludeDescriptions());
