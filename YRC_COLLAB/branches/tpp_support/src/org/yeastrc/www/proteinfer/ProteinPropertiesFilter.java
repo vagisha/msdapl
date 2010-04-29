@@ -109,10 +109,10 @@ public class ProteinPropertiesFilter {
         	double molWt = ProteinUtils.calculateMolWt(sequence);
         	double pi = ProteinUtils.calculatePi(sequence);
         	
-        	if(molWt >= minWt && molWt <= maxWt)
+        	if((molWt >= minWt && molWt <= maxWt) &&  // pass mol filter  AND
+        	   (pi >= minPi && pi <= maxPi)) {		  // pass pI filter
         		filtered.add(nrseqId);
-        	if(pi >= minPi && pi <= maxPi)
-        		filtered.add(nrseqId);
+        	}
         }
         return filtered;
     }
