@@ -160,6 +160,7 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 					return mapping.findForward("Failure");
 				}
 			}
+			// set the order in the form
 			if(!myForm.setDatasetOrder(piRunIds)) {
 				ActionErrors errors = new ActionErrors();
 				errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
@@ -226,7 +227,14 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			}
 			
 			grpComparison.setDisplayColumns(myForm.getDisplayColumns());
-			grpComparison.setDatasetOrder(myForm.getAllSelectedRunIdsOrdered());
+			// If we are clustering columns AND we are not given a dataset order in the request parameters we will display the clustered order
+			// Otherwise we will display the order given to us in the request parameters.
+			if(!myForm.isClusterColumns() || dsOrder != null)
+				grpComparison.setDatasetOrder(myForm.getAllSelectedRunIdsOrdered());
+			else {
+				// Change the order in the form if we are using the clustered order
+				myForm.setDatasetOrder(grpComparison.getDatasetOrder());
+			}
 			grpComparison.initSummary(); // this needs to be done in case the dataset order has changed
 			request.setAttribute("comparison", grpComparison);
 			grpComparison.setRowCount(numPerPage);
@@ -271,7 +279,14 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			}
 			
 			comparison.setDisplayColumns(myForm.getDisplayColumns());
-			comparison.setDatasetOrder(myForm.getAllSelectedRunIdsOrdered());
+			// If we are clustering columns AND we are not given a dataset order in the request parameters we will display the clustered order
+			// Otherwise we will display the order given to us in the request parameters.
+			if(!myForm.isClusterColumns() || dsOrder != null)
+				comparison.setDatasetOrder(myForm.getAllSelectedRunIdsOrdered());
+			else {
+				// Change the order in the form if we are using the clustered order
+				myForm.setDatasetOrder(comparison.getDatasetOrder()); 
+			}
 			comparison.initSummary(); // this needs to be done in case the dataset order has changed
 			request.setAttribute("comparison", comparison);
 			comparison.setRowCount(numPerPage);

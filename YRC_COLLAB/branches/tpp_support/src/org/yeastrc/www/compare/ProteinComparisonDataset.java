@@ -134,6 +134,13 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
     	}
     	this.datasets = newOrder;
     }
+	
+	public List<Integer> getDatasetOrder() {
+    	List<Integer> piRunIds = new ArrayList<Integer>();
+    	for(Dataset ds: datasets)
+    		piRunIds.add(ds.getDatasetId());
+    	return piRunIds;
+    }
 
 	public void addProtein(ComparisonProtein protein) {
 		this.proteins.add(protein);
