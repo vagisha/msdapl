@@ -173,6 +173,12 @@ public class DownloadComparisonResults extends Action {
         if(writeProteinGroupsHeader)
         	writer.write("ProteinGroupID\t");
         
+        if(displayColumns.isShowPresent()) {
+        	for(Dataset dataset: datasets) {
+        		writer.write(dataset.getSourceString()+"("+dataset.getDatasetId()+")\t");
+        	}
+        }
+        
         if(displayColumns.isShowFastaId())
         	writer.write("Fasta ID\t");
         if(displayColumns.isShowCommonName())
@@ -184,11 +190,6 @@ public class DownloadComparisonResults extends Action {
         if(displayColumns.isShowTotalSeq())
         	writer.write("NumSeq\t");
         
-        if(displayColumns.isShowPresent()) {
-        	for(Dataset dataset: datasets) {
-        		writer.write(dataset.getSourceString()+"("+dataset.getDatasetId()+")\t");
-        	}
-        }
         // sequence, ion, unique ion, spectrum count column headers.
         for(Dataset dataset: datasets) {
         	if(displayColumns.isShowNumSeq())
@@ -418,6 +419,26 @@ public class DownloadComparisonResults extends Action {
 		if(printGroupId)
 			writer.write(protein.getGroupId()+"\t");
 		
+		if(displayColumns.isShowPresent()) {
+			for(Dataset dataset: datasets) {
+				DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+				if(dpi == null || !dpi.isPresent()) {
+					writer.write("-");
+				}
+				else {
+					if(dpi.isParsimonious()) {
+						writer.write("*");
+					}
+					else {
+						writer.write("=");
+					}
+					if(dpi.isGrouped())
+						writer.write("g");
+				}
+				writer.write("\t");
+			}
+		}
+		
 		if(displayColumns.isShowFastaId()) {
 			try {
 				writer.write(protein.getAccessionsCommaSeparated()+"\t");
@@ -444,25 +465,6 @@ public class DownloadComparisonResults extends Action {
 			writer.write(protein.getTotalPeptideSeqCount()+"\t");
         // writer.write(protein.getMaxPeptideIonCount()+"\t");
        
-		if(displayColumns.isShowPresent()) {
-			for(Dataset dataset: datasets) {
-				DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
-				if(dpi == null || !dpi.isPresent()) {
-					writer.write("-");
-				}
-				else {
-					if(dpi.isParsimonious()) {
-						writer.write("*");
-					}
-					else {
-						writer.write("=");
-					}
-					if(dpi.isGrouped())
-						writer.write("g");
-				}
-				writer.write("\t");
-			}
-		}
 		
         // spectrum count information
         for(Dataset dataset: datasets) {
@@ -590,23 +592,6 @@ public class DownloadComparisonResults extends Action {
             writer.write(nrseqIdString.substring(1)+"\t");
             writer.write(grpProtein.getGroupId()+"\t");
             
-            if(displayColumns.isShowFastaId())
-            	writer.write(nameString.substring(1)+"\t");
-            
-            if(displayColumns.isShowCommonName()) {
-            	if(commonNameString.length() > 0)
-            		writer.write(commonNameString.substring(1)+"\t");
-            	else
-            		writer.write("\t");
-            }
-            
-            if(displayColumns.isShowMolWt())
-            	writer.write(molWtString.substring(1)+"\t");
-            if(displayColumns.isShowPi())
-            	writer.write(piString.substring(1)+"\t");
-            if(displayColumns.isShowTotalSeq())
-            	writer.write(grpProtein.getTotalPeptideSeqCount()+"\t");
-            
             ComparisonProtein oneProtein = grpProtein.getProteins().get(0);
             // The value of isParsimonious will be the same for all proteins in a group
             if(displayColumns.isShowPresent()) {
@@ -629,6 +614,25 @@ public class DownloadComparisonResults extends Action {
             		writer.write("\t");
             	}
             }
+            
+            if(displayColumns.isShowFastaId())
+            	writer.write(nameString.substring(1)+"\t");
+            
+            if(displayColumns.isShowCommonName()) {
+            	if(commonNameString.length() > 0)
+            		writer.write(commonNameString.substring(1)+"\t");
+            	else
+            		writer.write("\t");
+            }
+            
+            if(displayColumns.isShowMolWt())
+            	writer.write(molWtString.substring(1)+"\t");
+            if(displayColumns.isShowPi())
+            	writer.write(piString.substring(1)+"\t");
+            if(displayColumns.isShowTotalSeq())
+            	writer.write(grpProtein.getTotalPeptideSeqCount()+"\t");
+            
+            
             // The spectrum count information will be the same for all proteins in a group
             int dsIndex = 0;
             for(Dataset dataset: comparison.getDatasets()) {
