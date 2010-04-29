@@ -21,7 +21,7 @@
 
 // submit the form as soon as the document loads
 $(window).load(function() {
-	clusterResults(); // submit the form
+	updateResults(); // submit the form
 });
 
 </script>

@@ -95,7 +95,6 @@ $(document).ready(function() {
 	<html:hidden name="proteinSetComparisonForm" property="download" value="false" styleId="download" />
 	
 	<!-- Does the user want to cluster results -->
-	<html:hidden name="proteinSetComparisonForm" property="cluster" styleId="cluster" />
 	<html:hidden name="proteinSetComparisonForm" property="clusteringToken" />
 	<html:hidden name="proteinSetComparisonForm" property="newToken" />
 	
@@ -275,13 +274,13 @@ $(document).ready(function() {
 	
 	<!-- ################## MIN / MAX PEPTIDES FILTERS	  ########################################### -->
 	<tr>
-		<td style="padding: 0 0 5 5;"><b># Peptides*:</b> </td>
-		<td style="padding: 0 5 5 0" align="left">
+		<td style="padding: 0 0 0 5;"><b># Peptides*:</b> </td>
+		<td style="padding: 0 5 0 0" align="left">
 			Min. <html:text name="proteinSetComparisonForm" property="minPeptides" size="8"></html:text> 
 		    Max. <html:text name="proteinSetComparisonForm" property="maxPeptides" size="8"></html:text>
 		</td>
-		<td style="padding:0 0 5 5;"><b># Uniq. Peptides*:</b></td>
-		<td style="padding:0 0 5 0;" align="left">
+		<td style="padding:0 0 0 5;"><b># Uniq. Peptides*:</b></td>
+		<td style="padding:0 0 0 0;" align="left">
 			Min. <html:text name="proteinSetComparisonForm" property="minUniquePeptides" size="8"></html:text> 
 			Max. <html:text name="proteinSetComparisonForm" property="maxUniquePeptides" size="8"></html:text>
 			<!--
@@ -289,7 +288,7 @@ $(document).ready(function() {
 			-->
 		</td>
 	</tr>
-	<tr><td colspan="4"><span style="font-size:8pt;">* Peptide = sequence + modifications + charge</span></td></tr>
+	<tr><td colspan="4" style="padding-bottom:10px;"><span style="font-size:8pt;">* Peptide = sequence + modifications + charge</span></td></tr>
 	
 	<!-- ################## PEPTIDE PROBABILITY FILTERS	  ########################################### -->
 	<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
@@ -327,8 +326,6 @@ $(document).ready(function() {
 	</logic:equal>
 	
 	
-	<tr><td colspan="4" style="border: 1px solid rgb(170, 170, 170); background-color: white;padding:1"><span></span></td></tr>
-	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
 	
 	<tr>
 		<!-- ################## SEARCH BOX	  ########################################### -->
@@ -362,33 +359,54 @@ $(document).ready(function() {
   		</td>
   		</tr>
  	
- 	
- 	<logic:notPresent name="goEnrichmentView">
  	<tr><td colspan="4" style="border: 1px solid rgb(170, 170, 170); background-color: white;padding:1"><span></span></td></tr>
 	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
+	
+ 	<!-- CLUSTERING OPTIONS -->
+ 	<logic:notPresent name="goEnrichmentView">
 	<tr>
-		<td valign="top"></td>
-		<td valign="top" colspan="1">
+	<td><b>Clustering Options: </b></td>
+	<td colspan="1">
+		<html:checkbox name="proteinSetComparisonForm" property="useLogScale">Log(2) Scale</html:checkbox>
+			&nbsp;
+		Replace missing with: 
+		<html:text name="proteinSetComparisonForm" property="replaceMissingWithValue" size="3"></html:text>
+	</td>
+	<td colspan="2">
+		<html:checkbox name="proteinSetComparisonForm" property="clusterColumns">Cluster Columns</html:checkbox>
+	</td>
+	</tr>
+	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
+	<tr><td colspan="4" style="border: 1px solid rgb(170, 170, 170); background-color: white;padding:1"><span></span></td></tr>
+	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
+	</logic:notPresent>
+	
+	
+	<logic:notPresent name="goEnrichmentView">
+	<tr>
+		<td valign="top" align="left">
+		<span class="clickable underline" id="columnChooser" 
+			      onclick="toggleColumnChooser();">Choose Columns</span>
+		</td>
+		<td valign="top"><html:checkbox name="proteinSetComparisonForm" property="cluster" styleId="cluster">Cluster Spectrum Counts</html:checkbox></td>
+		<td valign="top" colspan="2">
 			<html:checkbox name="proteinSetComparisonForm" property="groupIndistinguishableProteins">Group Indistinguishable Proteins</html:checkbox>
 		</td>
+	</tr>
+	<tr>
+		<td>
+			<span class="clickable underline" id="orderChanger" 
+ 			      onclick="toggleOrderChanger();">Order Datasets</span> 
+		</td>
+		<td></td>
 		<td valign="top" align="left" colspan="2">
 			<html:checkbox name="proteinSetComparisonForm" property="keepProteinGroups">Keep Protein Groups</html:checkbox><br>
 			<span style="font-size:8pt;">Display ALL protein group members even if some of them do not pass the filtering criteria.</span>
  		</td>
  	</tr>
- 	<tr>
- 		<td></td>
- 		<td valign="top" align="left">
-			<span class="clickable underline" id="columnChooser" 
- 			      onclick="toggleColumnChooser();">Choose Columns</span>
- 			&nbsp;
- 			<span class="clickable underline" id="orderChanger" 
- 			      onclick="toggleOrderChanger();">Order Datasets</span> 
- 		</td>
- 		<td valign="middle" align="left" colspan="2">	
- 			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button" style="margin-top:0px;"></html:submit>
-		</td>
-	</tr>
+ 	
+	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
+	
 	<tr>
 	<td colspan="4" align="center">
 	
@@ -455,40 +473,18 @@ $(document).ready(function() {
 		</div>
 	</td>
 	</tr>
+	
+ 	<tr>
+ 		<td valign="middle" align="center" colspan="4">	
+ 			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button" style="margin-top:0px;"></html:submit>
+		</td>
+	</tr>
+	
  	</logic:notPresent>
  	
 	
 </table>
 </div>
-
-<!-- CLUSTER RSULTS -->
-<logic:notPresent name="goEnrichmentView">
-<div align="center" style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%; margin-top:10px;">
-	<b>Clustering Options: </b>
-	<html:checkbox name="proteinSetComparisonForm" property="useLogScale">Log(2) Scale</html:checkbox>
-		&nbsp;
-	Replace missing with: 
-	<html:text name="proteinSetComparisonForm" property="replaceMissingWithValue" size="3"></html:text>
-	&nbsp;
-	<html:checkbox name="proteinSetComparisonForm" property="clusterColumns">Cluster Columns</html:checkbox>
-	&nbsp;
-	<html:submit value="Cluster" onclick="javascript:clusterResults();" styleClass="plain_button" style="margin-top:0px;"></html:submit>
-	
-	<logic:present name="clusteredImgUrl">
-		&nbsp;&nbsp;
-		<nobr>
-		<b>Heatmap:</b>
-		<span style="background-color:yellow;"><a href="JavaScript:newPopup('<bean:write name='clusteredImgUrl'/>');"><b>PDF</b></a></span>
-		<logic:present name="dsOrder">
-			<span style="background-color:yellow;"><a href="JavaScript:newPopup('<yrcwww:link path='heatmap.do?token='/><bean:write name="proteinSetComparisonForm" property='clusteringToken' />&dsOrder=<bean:write name="dsOrder" />');"><b>HTML</b></a></span>
-		</logic:present>
-		<logic:notPresent name="dsOrder">
-			<span style="background-color:yellow;"><a href="JavaScript:newPopup('<yrcwww:link path='heatmap.do?token='/><bean:write name="proteinSetComparisonForm" property='clusteringToken' />');"><b>HTML</b></a></span>
-		</logic:notPresent>
-		</nobr>
-	</logic:present>
-</div>
-</logic:notPresent>
 
 
 <!-- DOWNLOAD RESULTS -->

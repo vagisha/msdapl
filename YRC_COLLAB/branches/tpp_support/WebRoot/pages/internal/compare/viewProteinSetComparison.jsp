@@ -298,6 +298,21 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 	<td align="left" valign="bottom">
 		<span class="underline clickable" style="font-size:8pt;color:red;" id="full_names" onclick="toggleFullNames()">[Full Names]</span> &nbsp; &nbsp;
 		<span class="underline clickable" style="font-size:8pt;color:red;" id="full_descriptions" onclick="toggleFullDescriptions()">[Full Descriptions]</span>
+	
+		<logic:present name="clusteredImgUrl">
+				&nbsp;&nbsp;
+				<nobr>
+				<b>Heatmap:</b>
+				<span style="background-color:yellow;"><a href="JavaScript:newPopup('<bean:write name='clusteredImgUrl'/>');"><b>PDF</b></a></span>
+				<logic:present name="dsOrder">
+					<span style="background-color:yellow;"><a href="JavaScript:newPopup('<yrcwww:link path='heatmap.do?token='/><bean:write name="proteinSetComparisonForm" property='clusteringToken' />&dsOrder=<bean:write name="dsOrder" />');"><b>HTML</b></a></span>
+				</logic:present>
+				<logic:notPresent name="dsOrder">
+					<span style="background-color:yellow;"><a href="JavaScript:newPopup('<yrcwww:link path='heatmap.do?token='/><bean:write name="proteinSetComparisonForm" property='clusteringToken' />');"><b>HTML</b></a></span>
+				</logic:notPresent>
+				</nobr>
+		</logic:present>
+		
 	</td>
 	<td align="right" valign="bottom">
 		<a href="" onclick="openInformationPopup('<yrcwww:link path='pages/internal/docs/comparison.jsp'/>'); return false;">
