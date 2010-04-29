@@ -57,6 +57,10 @@ public class DownloadComparisonResults extends Action {
         PrintWriter writer = response.getWriter();
         writer.write("\n\n");
         writer.write("Date: "+new Date()+"\n\n");
+        // Is the data clustered
+        if(myForm.isCluster()) {
+        	writer.write("Clustered Spectrum Counts = TRUE\n\n");
+        }
         
         
         if(!myForm.getGroupIndistinguishableProteins()) {
@@ -195,13 +199,10 @@ public class DownloadComparisonResults extends Action {
         		writer.write("#U.Ion("+dataset.getDatasetId()+")\t");
         	if(displayColumns.isShowSpectrumCount())
         		writer.write("SC("+dataset.getDatasetId()+")\t");
-        }
-        // NSAF column headers.
-        for(Dataset dataset: datasets) {
-        	if(displayColumns.isShowNsaf()) {
+        	if(displayColumns.isShowNsaf()) // NSAF column headers.
         		writer.write("NSAF("+dataset.getDatasetId()+")\t");
-        	}
         }
+        
         if(printDescription)
             writer.write("Description\n");
         else
@@ -225,6 +226,7 @@ public class DownloadComparisonResults extends Action {
 	}
 
 	private void writeProteinFilters(PrintWriter writer, ProteinPropertiesFilters filters) {
+		
 		// Accession string filter
 		if(filters.hasAccessionFilter()) {
             writer.write("Filtering for FASTA ID(s): "+filters.getAccessionLike()+"\n\n");
@@ -486,25 +488,23 @@ public class DownloadComparisonResults extends Action {
             	if(displayColumns.isShowSpectrumCount())
             		writer.write(dpi.getSpectrumCount()+"("+dpi.getNormalizedSpectrumCountRounded()+")\t");
             }
-        }
-        // NSAF information
-        if(displayColumns.isShowNsaf()) {
-        	for(Dataset dataset: datasets) {
+            
+            // NSAF information
+            if(displayColumns.isShowNsaf()) {
 
-        		if(!dataset.getSource().isIdPicker()) {
-        			writer.write("-1\t");
-        			continue;  // NSAF information is available only for IDPicker results.
-        		}
-        		else {
-        			DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
-        			if(dpi == null || !dpi.isPresent()) {
-        				writer.write("0\t");
-        			}
-        			else {
-        				writer.write(dpi.getNsafFormatted()+"\t");
-        			}
-        		}
-        	}
+            	if(!dataset.getSource().isIdPicker()) {
+            		writer.write("-1\t");
+            		continue;  // NSAF information is available only for IDPicker results.
+            	}
+            	else {
+            		if(dpi == null || !dpi.isPresent()) {
+            			writer.write("0\t");
+            		}
+            		else {
+            			writer.write(dpi.getNsafFormatted()+"\t");
+            		}
+            	}
+            }
         }
         
         if(printDescription) {
@@ -630,6 +630,7 @@ public class DownloadComparisonResults extends Action {
             	}
             }
             // The spectrum count information will be the same for all proteins in a group
+            int dsIndex = 0;
             for(Dataset dataset: comparison.getDatasets()) {
 
                 DatasetProteinInformation dpi = oneProtein.getDatasetProteinInformation(dataset);
@@ -653,14 +654,13 @@ public class DownloadComparisonResults extends Action {
                 	if(displayColumns.isShowSpectrumCount())
                 		writer.write(dpi.getSpectrumCount()+"("+dpi.getNormalizedSpectrumCountRounded()+")\t");
                 }
+                
+                if(displayColumns.isShowNsaf()) {
+                	String nsafStr = nsafStrings[dsIndex++];
+                	writer.write(nsafStr.substring(1)+"\t");
+                }
             }
             
-            
-            if(displayColumns.isShowNsaf()) {
-            	for(String nsafStr: nsafStrings) {
-            		writer.write(nsafStr.substring(1)+"\t");
-            	}
-            }
             
             // print description, if required
             if(includeDescription)

@@ -1182,9 +1182,6 @@
 	
 	<action 
 		path="/downloadProteinComparisonResults"
-		name="proteinSetComparisonForm"
-		scope="request"
-		validate="true"
 		type="org.yeastrc.www.compare.DownloadComparisonResults"
 	>
 		<forward name="Success" path="/pages/internal/compare/viewProteinSetComparison.jsp" redirect="false" />
@@ -1252,6 +1249,7 @@
 	>
 		<forward name="ProteinGroupList" path="/pages/internal/compare/viewProteinGroupSetComparison.jsp" redirect="false" />
 		<forward name="ProteinList" path="/pages/internal/compare/viewProteinSetComparison.jsp" redirect="false" />
+		<forward name="Download" path="/downloadProteinComparisonResults.do" redirect="false" />
 		<forward name="Failure" path="/pages/internal/compare/comparisonError.jsp" redirect="false" />
 	</action>
 	

@@ -237,6 +237,17 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			}
 			grpComparison.initSummary(); // this needs to be done in case the dataset order has changed
 			request.setAttribute("comparison", grpComparison);
+			
+			// If the user is downloading redirect to the download page
+			if(request.getParameter("download") != null) {
+				if(request.getParameter("dgrp") != null) // collpase protein groups
+					myForm.setCollapseProteinGroups(true);
+				if(request.getParameter("descr") != null) // get descriptions
+					myForm.setIncludeDescriptions(true);
+				request.setAttribute("comparisonForm", myForm);
+				request.setAttribute("comparisonGroupDataset", grpComparison);
+				return mapping.findForward("Download");
+			}
 			grpComparison.setRowCount(numPerPage);
 			grpComparison.setCurrentPage(page);
 			
@@ -289,6 +300,18 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			}
 			comparison.initSummary(); // this needs to be done in case the dataset order has changed
 			request.setAttribute("comparison", comparison);
+			
+			// If the user is downloading redirect to the download page
+			if(request.getParameter("download") != null) {
+				request.setAttribute("comparisonForm", myForm);
+				if(request.getParameter("dgrp") != null) // collpase protein groups
+					myForm.setCollapseProteinGroups(true);
+				if(request.getParameter("descr") != null) // get descriptions
+					myForm.setIncludeDescriptions(true);
+				request.setAttribute("comparisonDataset", comparison);
+				return mapping.findForward("Download");
+			}
+			
 			comparison.setRowCount(numPerPage);
 			comparison.setCurrentPage(page);
 			

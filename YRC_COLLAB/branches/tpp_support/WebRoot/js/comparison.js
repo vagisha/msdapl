@@ -91,7 +91,7 @@ function updateResults() {
 function downloadResults() {
   	$("input#download").val("true");
   	$("input#goEnrichment").val("false");
-  	$("input#cluster").val("false");
+  	//$("input#cluster").val("false");
   	$("form[name='proteinSetComparisonForm']").attr('target', '_blank');
   	$("form[name='proteinSetComparisonForm']").submit();
 }

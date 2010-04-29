@@ -127,12 +127,22 @@ public class ClusteringGatewayAction extends Action {
             		        	anchor = "#"+((ProteinSetComparisonForm) form).getRowIndex();
             		        }
             		        
+            		        // Downloading options
+            		        String downloadOpts = "";
+            		        if(((ProteinSetComparisonForm) form).isDownload()) {
+            		        	downloadOpts = "&download=T";
+            		        	if(((ProteinSetComparisonForm) form).isCollapseProteinGroups())
+            		        		downloadOpts += "&dgrp=T";
+            		        	if(((ProteinSetComparisonForm) form).isIncludeDescriptions())
+            		        		downloadOpts += "&descr=T";
+            		        }
             		        ActionForward fwd = mapping.findForward("ReadOld");
             				ActionForward newFwd = new ActionForward(fwd.getPath()+
             						"?token="+token+"&page="+((ProteinSetComparisonForm)form).getPageNum()+
             						"&count="+((ProteinSetComparisonForm)form).getNumPerPage()+
             						noDispCols+
             						order+
+            						downloadOpts+
             						anchor, 
             						fwd.getRedirect());
             				return newFwd;
