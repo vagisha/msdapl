@@ -90,9 +90,9 @@ public class CompareProteinSetsAction extends Action {
         }
         
         // Form we will use
-        ProteinSetComparisonForm myForm = (ProteinSetComparisonForm)form; // new ProteinSetComparisonForm();
+        ProteinSetComparisonForm myForm = (ProteinSetComparisonForm)form;
         myForm.setGroupIndistinguishableProteins(groupProteins);
-        //myForm.setKeepProteinGroups(true);
+        myForm.setKeepProteinGroups(true);
        
         
         // ANY AND, OR, NOT, XOR filters

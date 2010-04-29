@@ -53,7 +53,7 @@ public class DatasetFiltersForm extends ActionForm {
     private String descriptionNotLike = null;
     private boolean searchAllDescriptions = false;
     
-    private boolean keepProteinGroups = false;
+    private boolean keepProteinGroups = true;
 
     // FOR PROTEIN-PROPHET
     private boolean hasProteinProphetDatasets = false;
