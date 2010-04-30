@@ -365,7 +365,7 @@ public class DatasetFiltersForm extends ActionForm {
         
         filters.setMinMolecularWt(this.getMinMolecularWtDouble());
         filters.setMaxMolecularWt(this.getMaxMolecularWtDouble());
-        filters.setMinPi(this.getMinMolecularWtDouble());
+        filters.setMinPi(this.getMinPiDouble());
         filters.setMaxPi(this.getMaxPiDouble());
         
         filters.setAccessionLike(this.getAccessionLike());
