@@ -77,14 +77,19 @@ $(document).ready(function() {
 			$("#OR_index_"+listOrder[i]).val(i);
 			$("#NOT_index_"+listOrder[i]).val(i);
 			$("#XOR_index_"+listOrder[i]).val(i);
-			var newIndex = $("#AND_index_"+listOrder[i]).val();
+			//var newIndex = $("#AND_index_"+listOrder[i]).val();
 			//str += "orig: "+origIndex+"; new: "+newIndex+"\n";
 		}
 		//alert(str);
 	});
 	
- 	
+	$('#resetDatasetOrder').click(function(){
+		datasetList.get(0).restoreOrder();
+		return false;
+	});
+	
 });
+ 	
 
 </script>
 
@@ -424,6 +429,9 @@ $(document).ready(function() {
 			</logic:iterate>
 		</ol>
 		<span class="small_font">Drag the blue-bordered white boxes to reorder the datasets. Click "Update" to display results with the new order</span>
+		
+		<div align="center" style="padding:3px;"><input type="button" value="Reset"  id="resetDatasetOrder"/></div>
+		
 	</div>
 	
 	
