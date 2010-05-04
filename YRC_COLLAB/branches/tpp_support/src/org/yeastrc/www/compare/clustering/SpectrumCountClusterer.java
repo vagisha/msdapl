@@ -19,8 +19,8 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.util.FileUtils;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nrseq.ProteinListing;
-import org.yeastrc.www.compare.DisplayColumns;
 import org.yeastrc.www.compare.ComparisonProtein;
+import org.yeastrc.www.compare.DisplayColumns;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
 import org.yeastrc.www.compare.dataset.Dataset;
@@ -121,7 +121,8 @@ public class SpectrumCountClusterer {
 		
 		// read the colors file
 		List<String> colors = null;
-		output =  new File(dir+File.separator+ClusteringConstants.COLORS);
+		String colorsFile = rOptions.getGradientFile();
+		output =  new File(dir+File.separator+colorsFile);
 		if(!output.exists()) {
 			errorMesage.append("Output file "+output.getAbsolutePath()+" does not exist");
 			return null;
@@ -143,7 +144,7 @@ public class SpectrumCountClusterer {
 		
 		return orderedGrpComparison;
 	}
-
+	
 	private boolean writeScriptsAndRunR(ROptions rOptions,
 			StringBuilder errorMesage, String dir) {
 		// write the R script
@@ -248,7 +249,8 @@ public class SpectrumCountClusterer {
 		
 		// read the colors file
 		List<String> colors = null;
-		output =  new File(dir+File.separator+ClusteringConstants.COLORS);
+		String colorsFile = rOptions.getGradientFile();
+		output =  new File(dir+File.separator+colorsFile);
 		if(!output.exists()) {
 			errorMesage.append("Output file "+output.getAbsolutePath()+" does not exist");
 			return null;
@@ -271,7 +273,7 @@ public class SpectrumCountClusterer {
 		return orderedComparison;
 	}
 	
-	private List<String> readColors(File output) throws IOException {
+	public static List<String> readColors(File output) throws IOException {
 		
 		List<String> colors = new ArrayList<String>(256);
 		BufferedReader reader = null;
@@ -553,7 +555,7 @@ public class SpectrumCountClusterer {
 			writer.write("test=read.table(\""+dir+File.separator+ClusteringConstants.INPUT_FILE+"\", header=T)\n");
 			writer.write("test_sc=test[,-1]\n");
 			if(rinfo.isDoLog()) {
-				writer.write("test_sc=log2(test_sc)\n");
+				writer.write("test_sc=log"+rinfo.getLogBase()+"(test_sc)\n");
 				if(rinfo.getValueForMissing() != Double.MIN_VALUE) {
 					writer.write("test_sc[test_sc == -Inf] <- "+rinfo.getValueForMissing()+"\n");
 				}
@@ -574,9 +576,24 @@ public class SpectrumCountClusterer {
 			writer.write("all_sc = unmatrix(as.matrix(test_sc))\n");
 			writer.write("all_sc = sort(all_sc)\n");
 			writer.write("m = length(which(all_sc <= mean(all_sc)))\n");
-			writer.write("n_red = 255 * (m/length(all_sc))\n");
-			writer.write("n_green = 255 - n_red\n");
-			writer.write("my_cols = c(hsv(0.25, 1, seq(1,0,length=n_green)), hsv(1, 1, seq(0,1,length=n_red)))\n");
+			writer.write("n_high = 255 * (m/length(all_sc))\n");
+			writer.write("n_low = 255 - n_high\n");
+			
+			// write the colors used for the heatmap
+			// red-green gradient
+			writer.write("grad_rg = c(hsv(0.25 , 1, seq(1,0,length=n_low)), hsv(1 , 1, seq(0,1,length=n_high)))\n");
+			writer.write("write(grad_rg, file=\""+dir+File.separator+ClusteringConstants.COLORS_RG+"\", append=FALSE, 1)\n");
+			
+			
+			// blue-yellow gradient
+			writer.write("grad_by = c(hsv(0.67 , 1, seq(1,0,length=n_low)), hsv(0.17 , 1, seq(0,1,length=n_high)))\n");
+			writer.write("write(grad_by, file=\""+dir+File.separator+ClusteringConstants.COLORS_BY+"\", append=FALSE, 1)\n");
+			
+			if(rinfo.getGradient().equalsIgnoreCase(ClusteringConstants.GRADIENT_BY)) 
+				writer.write("my_cols = grad_by\n");
+			else
+				writer.write("my_cols = grad_rg\n");
+			
 			
 			String devType = ClusteringConstants.IMG_FILE.substring(ClusteringConstants.IMG_FILE.lastIndexOf(".")+1);
 			writer.write(devType+"(\""+dir+File.separator+ClusteringConstants.IMG_FILE+"\")\n");
@@ -596,8 +613,6 @@ public class SpectrumCountClusterer {
 			writer.write("write(hm$rowInd, file=\""+dir+File.separator+ClusteringConstants.OUTPUT_FILE+"\", sep=\",\", append=FALSE, length(ncolumns=hm$rowInd))\n");
 			// write the index of the datasets after clustering
 			writer.write("write(hm$colInd, file=\""+dir+File.separator+ClusteringConstants.OUTPUT_FILE+"\", sep=\",\", append=TRUE, length(ncolumns=hm$colInd))\n");
-			// write the colors used for the heatmap
-			writer.write("write(my_cols, file=\""+dir+File.separator+ClusteringConstants.COLORS+"\", append=FALSE, 1)\n");
 		}
 		finally {
 			if(writer != null) try{writer.close();}catch(IOException e){}
@@ -610,8 +625,10 @@ public class SpectrumCountClusterer {
 		int numRows;
 		int numCols;
 		boolean doLog = false;
+		int logBase = 10;
 		double valueForMissing = Double.MIN_VALUE;
 		boolean clusterColumns = false;
+		String gradient = ClusteringConstants.GRADIENT_BY;
 		
 		public int getNumRows() {
 			return numRows;
@@ -631,6 +648,12 @@ public class SpectrumCountClusterer {
 		public void setDoLog(boolean doLog) {
 			this.doLog = doLog;
 		}
+		public int getLogBase() {
+			return logBase;
+		}
+		public void setLogBase(int logBase) {
+			this.logBase = logBase;
+		}
 		public double getValueForMissing() {
 			return valueForMissing;
 		}
@@ -642,6 +665,16 @@ public class SpectrumCountClusterer {
 		}
 		public void setClusterColumns(boolean clusterColumns) {
 			this.clusterColumns = clusterColumns;
+		}
+		public String getGradient() {
+			return gradient;
+		}
+		public void setGradient(String gradient) {
+			this.gradient = gradient;
+		}
+		public String getGradientFile() {
+			return this.gradient.equalsIgnoreCase(ClusteringConstants.GRADIENT_BY) ? 
+					ClusteringConstants.COLORS_BY : ClusteringConstants.COLORS_RG;
 		}
 	}
 }

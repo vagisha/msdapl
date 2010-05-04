@@ -205,7 +205,10 @@ public class ClusteringGatewayAction extends Action {
 			return false;
 		}
 		
+		// Compare clustering options
 		if(myForm.isUseLogScale() != savedForm.isUseLogScale())
+			return false;
+		if(myForm.getLogBase() != savedForm.getLogBase())
 			return false;
 		if(myForm.getReplaceMissingWithValueDouble() != savedForm.getReplaceMissingWithValueDouble())
 			return false;

@@ -74,6 +74,12 @@ public class ClusterSpectrumCountsAction extends Action {
         String baseDir = request.getSession().getServletContext().getRealPath(ClusteringConstants.BASE_DIR);
         baseDir = baseDir+File.separator+jobToken;
         
+        ROptions ropts = new ROptions();
+        ropts.setDoLog(myForm.isUseLogScale());
+        ropts.setLogBase(myForm.getLogBase());
+        ropts.setValueForMissing(myForm.getReplaceMissingWithValueDouble());
+        ropts.setGradient(myForm.getHeatMapGradient());
+        ropts.setClusterColumns(myForm.isClusterColumns());
         
         // DONT GROUP INDISTINGUISHABLE PROTEINS
         if(!myForm.getGroupIndistinguishableProteins()) {
@@ -87,12 +93,8 @@ public class ClusterSpectrumCountsAction extends Action {
             
             long s = System.currentTimeMillis();
             
-            ROptions ropts = new ROptions();
-            ropts.setDoLog(myForm.isUseLogScale());
-            ropts.setValueForMissing(myForm.getReplaceMissingWithValueDouble());
             ropts.setNumCols(comparison.getDatasetCount());
             ropts.setNumRows(comparison.getTotalProteinCount());
-            ropts.setClusterColumns(myForm.isClusterColumns());
             
             ProteinComparisonDataset clusteredComparison = 
             SpectrumCountClusterer.getInstance().clusterProteinComparisonDataset(comparison, ropts, errorMessage, baseDir);
@@ -131,12 +133,8 @@ public class ClusterSpectrumCountsAction extends Action {
             
             long s = System.currentTimeMillis();
             
-            ROptions ropts = new ROptions();
-            ropts.setDoLog(myForm.isUseLogScale());
-            ropts.setValueForMissing(myForm.getReplaceMissingWithValueDouble());
             ropts.setNumCols(grpComparison.getDatasetCount());
             ropts.setNumRows(grpComparison.getTotalProteinGroupCount());
-            ropts.setClusterColumns(myForm.isClusterColumns());
             
             ProteinGroupComparisonDataset clusteredGrpComparison = 
             	SpectrumCountClusterer.getInstance().clusterProteinGroupComparisonDataset(grpComparison, ropts, errorMessage, baseDir);

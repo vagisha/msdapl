@@ -14,6 +14,7 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
+import org.yeastrc.www.compare.clustering.ClusteringConstants;
 
 /**
  * 
@@ -45,7 +46,9 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 	private String clusteringToken = null;
 	private boolean newToken = false;
 	private boolean useLogScale = false;
+	private int logBase = 10;
 	private String replaceMissingWithValue = null;
+	private String heatMapGradient = ClusteringConstants.GRADIENT_BY;
 	private boolean clusterColumns = false;
 	
 	// WHICH COLUMNS TO DISPLAY
@@ -82,7 +85,6 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 		}
 		request.setAttribute("comparisonFormReset", true);
     }
-    
 
 	public int getPageNum() {
         return pageNum;
@@ -231,6 +233,14 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 		this.useLogScale = useLogScale;
 	}
 
+	public int getLogBase() {
+		return logBase;
+	}
+
+	public void setLogBase(int logBase) {
+		this.logBase = logBase;
+	}
+	
 	public String getReplaceMissingWithValue() {
 		return replaceMissingWithValue;
 	}
@@ -253,6 +263,15 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 	public void setClusterColumns(boolean clusterColumns) {
 		this.clusterColumns = clusterColumns;
 	}
+	
+	public String getHeatMapGradient() {
+		return heatMapGradient;
+	}
+
+	public void setHeatMapGradient(String gradient) {
+		this.heatMapGradient = gradient;
+	}
+
     
     //-----------------------------------------------------------------------------
     // Sorting

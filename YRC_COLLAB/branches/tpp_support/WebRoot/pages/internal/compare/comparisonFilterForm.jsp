@@ -2,6 +2,7 @@
 <%@page import="org.yeastrc.bio.go.GOUtils"%>
 <%@page import="org.yeastrc.www.compare.DisplayColumns"%>
 <%@page import="org.yeastrc.www.compare.dataset.DatasetColor"%>
+<%@page import="org.yeastrc.www.compare.clustering.ClusteringConstants"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -371,14 +372,29 @@ $(document).ready(function() {
  	<logic:notPresent name="goEnrichmentView">
 	<tr>
 	<td><b>Clustering Options: </b></td>
-	<td colspan="1">
-		<html:checkbox name="proteinSetComparisonForm" property="useLogScale">Log(2) Scale</html:checkbox>
-			&nbsp;
+	<td colspan="3">
+		<html:checkbox name="proteinSetComparisonForm" property="useLogScale">Log Scale</html:checkbox>
+		&nbsp;
+		
+		Base:
+		<html:select name="proteinSetComparisonForm" property="logBase">
+			<html:option value="10"></html:option>
+			<html:option value="2"></html:option>
+		</html:select>
+		&nbsp;
+		
 		Replace missing with: 
 		<html:text name="proteinSetComparisonForm" property="replaceMissingWithValue" size="3"></html:text>
-	</td>
-	<td colspan="2">
-		<html:checkbox name="proteinSetComparisonForm" property="clusterColumns">Cluster Columns</html:checkbox>
+		&nbsp; 
+		
+		Gradient:
+		<html:select name="proteinSetComparisonForm" property="heatMapGradient">
+			<html:option value="<%=ClusteringConstants.GRADIENT_BY %>"></html:option>
+			<html:option value="<%=ClusteringConstants.GRADIENT_RG %>"></html:option>
+		</html:select>
+		&nbsp;
+		
+		<html:checkbox name="proteinSetComparisonForm" property="clusterColumns"><nobr>Cluster Columns</nobr></html:checkbox>
 	</td>
 	</tr>
 	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
@@ -393,7 +409,10 @@ $(document).ready(function() {
 		<span class="clickable underline" id="columnChooser" 
 			      onclick="toggleColumnChooser();">Choose Columns</span>
 		</td>
-		<td valign="top"><html:checkbox name="proteinSetComparisonForm" property="cluster" styleId="cluster">Cluster Spectrum Counts</html:checkbox></td>
+		<td valign="top">
+			<html:checkbox name="proteinSetComparisonForm" property="cluster" styleId="cluster">Cluster Spectrum Counts</html:checkbox>
+			<br/><span class="small_font">Normalized spectrum counts are used</span>
+		</td>
 		<td valign="top" colspan="2">
 			<html:checkbox name="proteinSetComparisonForm" property="groupIndistinguishableProteins">Group Indistinguishable Proteins</html:checkbox>
 		</td>

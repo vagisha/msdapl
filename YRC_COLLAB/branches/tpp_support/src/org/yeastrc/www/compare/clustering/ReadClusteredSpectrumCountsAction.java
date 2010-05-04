@@ -188,6 +188,28 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 		}
 		request.setAttribute("proteinSetComparisonForm", myForm);
 		
+		// Are we given a gradient preference in the request
+		String gradient = request.getParameter("gradient");
+		String[] gradientColors = null;
+		if(gradient != null) {
+			List<String> colors = null;
+			
+			if(gradient.equalsIgnoreCase("BY")) {
+				String colorFile = clustDir+File.separator+ClusteringConstants.COLORS_BY;
+				try {colors = SpectrumCountClusterer.readColors(new File(colorFile));}
+				catch(IOException e) {log.error("Error reading colors file: "+colorFile, e);}
+			}
+			if(gradient.equalsIgnoreCase("RG")) {
+				String colorFile = clustDir+File.separator+ClusteringConstants.COLORS_RG;
+				try {colors = SpectrumCountClusterer.readColors(new File(colorFile));}
+				catch(IOException e) {log.error("Error reading colors file: "+colorFile, e);}
+			}
+			
+			if(colors != null && colors.size() > 0) {
+				gradientColors = new String[colors.size()];
+				gradientColors = colors.toArray(gradientColors);
+			}
+		}
 		
 		// R image output
 		String imgUrl = request.getSession().getServletContext().getContextPath()+"/"+ClusteringConstants.BASE_DIR+"/"+jobToken+"/"+ClusteringConstants.IMG_FILE;
@@ -247,6 +269,10 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 				request.setAttribute("comparisonForm", myForm);
 				request.setAttribute("comparisonGroupDataset", grpComparison);
 				return mapping.findForward("Download");
+			}
+			
+			if(gradientColors != null) {
+				grpComparison.setSpectrumCountColors(gradientColors);
 			}
 			grpComparison.setRowCount(numPerPage);
 			grpComparison.setCurrentPage(page);
@@ -312,6 +338,9 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 				return mapping.findForward("Download");
 			}
 			
+			if(gradientColors != null) {
+				comparison.setSpectrumCountColors(gradientColors);
+			}
 			comparison.setRowCount(numPerPage);
 			comparison.setCurrentPage(page);
 			
