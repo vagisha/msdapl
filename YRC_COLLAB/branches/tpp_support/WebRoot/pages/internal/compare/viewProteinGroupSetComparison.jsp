@@ -57,7 +57,7 @@ $(document).ready(function() {
    					$(row).addClass('prot_open');
    					
    					if($(row).is('.has_proteins')) {
-   						$(row).children(".prot_descr").children(".prot_groups").show();
+   						$(row).children(".prot_accession").children(".prot_groups").show();
    					}
    					else {
    						// append a div to the description cell for the protein groups to go into

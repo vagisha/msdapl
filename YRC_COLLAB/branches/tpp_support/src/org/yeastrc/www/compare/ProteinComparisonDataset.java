@@ -64,7 +64,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 	private SORT_ORDER sortOrder = SORT_ORDER.DESC;
 
 	
-	private boolean initialized = false;
+	private boolean proteinsInitialized = false;
     
     private String[] spectrumCountColors = null;
     
@@ -88,12 +88,8 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 		this.displayColumns = displayColumns;
 	}
 	
-	public boolean isInitialized() {
-		return initialized;
-	}
-
-	public void setInitialized(boolean initialized) {
-		this.initialized = initialized;
+	public void setProteinsInitialized(boolean initialized) {
+		this.proteinsInitialized = initialized;
 	}
 	
 	public String[] getSpectrumCountColors() {
@@ -174,14 +170,31 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 	}
 
 	private void getMinMaxSpectrumCounts() {
+		
 		float minCount = Float.MAX_VALUE;
 		float maxCount = 1.0f;
-		for(Dataset dataset: datasets) {
-			minCount = Math.min(minCount, dataset.getNormMinProteinSpectrumCount());
-			maxCount = Math.max(maxCount, dataset.getNormMaxProteinSpectrumCount());
-		}
-		this.minNormalizedSpectrumCount = minCount;
+		
+    	if(proteinsInitialized) {  // this means spectrum counts for all proteins have been initialized
+    		for(ComparisonProtein protein: this.proteins) {
+    			for(Dataset dataset: datasets) {
+    				DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+    				if(dpi != null && dpi.isPresent()) {
+    					minCount = Math.min(minCount, dpi.getNormalizedSpectrumCount());
+    					maxCount = Math.max(maxCount, dpi.getNormalizedSpectrumCount());
+    				}
+    			}
+    		}
+    	}
+    	else {
+    		
+    		for(Dataset dataset: datasets) {
+    			minCount = Math.min(minCount, dataset.getNormMinProteinSpectrumCount());
+    			maxCount = Math.max(maxCount, dataset.getNormMaxProteinSpectrumCount());
+    		}
+    	}
+    	this.minNormalizedSpectrumCount = minCount;
 		this.maxNormalizedSpectrumCount = maxCount;
+		
 	}
 
 	private void calculateSpectrumCountNormalization() {
@@ -724,7 +737,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 	@Override
 	public void tabulate() {
 		
-		if(!this.initialized) {
+		if(!this.proteinsInitialized) {
 			int max = Math.min((this.getOffset() + rowCount), this.getFilteredProteinCount());
 			initializeInfo(this.getOffset(), max);
 		}
@@ -750,7 +763,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 
 		// This query takes a long time so if these columns are not being displayed, don't 
         // get this information.
-        if(!displayColumns.isShowPresent()) {
+        if(displayColumns.isShowPresent()) {
         	// Get the group information for the different datasets
         	for(DatasetProteinInformation dpi: protein.getDatasetInformation()) {
         		if(dpi.getDatasetSource() == DatasetSource.PROTINFER) {
