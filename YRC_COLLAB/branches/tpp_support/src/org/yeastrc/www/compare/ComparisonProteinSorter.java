@@ -14,6 +14,9 @@ import java.util.List;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.ms.util.ProteinUtils;
+import org.yeastrc.nrseq.ProteinListing;
+import org.yeastrc.nrseq.ProteinListingBuilder;
+import org.yeastrc.nrseq.ProteinReference;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 
 /**
@@ -124,6 +127,58 @@ public class ComparisonProteinSorter {
             Collections.sort(proteinGroups, new PiCompartorGroupAsc());
     }
     
+    //-------------------------------------------------------------------------------------------------
+    // SORT BY Fasta Accession
+    //-------------------------------------------------------------------------------------------------
+    public void sortByAccession(List<ComparisonProtein> proteins, SORT_ORDER sortOrder, List<Integer> fastaDatabaseIds) {
+    	
+    	ProteinListingBuilder listingBuilder = ProteinListingBuilder.getInstance();
+    	
+        for(ComparisonProtein protein: proteins) {
+            if(protein.getProteinListing() != null)
+                continue;
+            // build a dummy protein listing just for sorting
+            ProteinListing listing = new ProteinListing(null);
+            listingBuilder.getFastaReferences(fastaDatabaseIds, protein.getNrseqId(), listing);
+            // If there are multiple references sort them 
+            List<ProteinReference> fastaRefs = listing.getFastaReferences();
+            
+            if(sortOrder == SORT_ORDER.ASC) {
+            	Collections.sort(fastaRefs, new Comparator<ProteinReference>() {
+            		@Override
+            		public int compare(ProteinReference o1, ProteinReference o2) {
+            			return o1.getAccession().compareTo(o2.getAccession());
+            		}
+            	});
+            }
+            else {
+            	Collections.sort(fastaRefs, new Comparator<ProteinReference>() {
+            		@Override
+            		public int compare(ProteinReference o1, ProteinReference o2) {
+            			return o2.getAccession().compareTo(o1.getAccession());
+            		}
+            	});
+            }
+            protein.setProteinListing(listing);
+        }
+        if(sortOrder == SORT_ORDER.DESC)
+            Collections.sort(proteins, new AccessionCompartorDesc());
+        if(sortOrder == SORT_ORDER.ASC)
+            Collections.sort(proteins, new AccessionCompartorAsc());
+    }
+    
+    public void sortGroupsByAccession(List<ComparisonProteinGroup> proteinGroups, SORT_ORDER sortOrder, 
+    			List<Integer> fastaDatabaseIds) {
+        
+        for(ComparisonProteinGroup proteinGroup: proteinGroups) {
+            // get the protein properties
+            sortByAccession(proteinGroup.getProteins(), sortOrder, fastaDatabaseIds);
+        }
+        if(sortOrder == SORT_ORDER.DESC)
+            Collections.sort(proteinGroups, new AccessionCompartorGroupDesc());
+        if(sortOrder == SORT_ORDER.ASC)
+            Collections.sort(proteinGroups, new AccessionCompartorGroupAsc());
+    }
     
     
     private static class PeptideCountCompartorDesc implements Comparator<ComparisonProtein> {
@@ -193,6 +248,38 @@ public class ComparisonProteinSorter {
         @Override
         public int compare(ComparisonProteinGroup o1, ComparisonProteinGroup o2) {
             return Float.valueOf(o1.getProteins().get(0).getPi()).compareTo(o2.getProteins().get(0).getPi());
+        }
+    }
+    
+    private static class AccessionCompartorDesc implements Comparator<ComparisonProtein> {
+        @Override
+        public int compare(ComparisonProtein o1, ComparisonProtein o2) {
+            return o1.getProteinListing().getFastaAccessions().get(0)
+            .compareTo(o2.getProteinListing().getFastaAccessions().get(0));
+        }
+    }
+    
+    private static class AccessionCompartorAsc implements Comparator<ComparisonProtein> {
+    	@Override
+        public int compare(ComparisonProtein o1, ComparisonProtein o2) {
+            return o2.getProteinListing().getFastaAccessions().get(0)
+            .compareTo(o1.getProteinListing().getFastaAccessions().get(0));
+        }
+    }
+    
+    private static class AccessionCompartorGroupDesc implements Comparator<ComparisonProteinGroup> {
+        @Override
+        public int compare(ComparisonProteinGroup o1, ComparisonProteinGroup o2) {
+            return o2.getProteins().get(0).getProteinListing().getFastaAccessions().get(0)
+            	.compareTo(o1.getProteins().get(0).getProteinListing().getFastaAccessions().get(0));
+        }
+    }
+    
+    private static class AccessionCompartorGroupAsc implements Comparator<ComparisonProteinGroup> {
+        @Override
+        public int compare(ComparisonProteinGroup o1, ComparisonProteinGroup o2) {
+        	return o1.getProteins().get(0).getProteinListing().getFastaAccessions().get(0)
+        	.compareTo(o2.getProteins().get(0).getProteinListing().getFastaAccessions().get(0));
         }
     }
 }

@@ -577,7 +577,14 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
         if(displayColumns.isShowFastaId()) {
         	header = new TableHeader("Fasta ID");
         	//header.setWidth(8);
-        	header.setSortable(false);
+        	header.setSortable(true);
+        	header.setSortClass(SORT_CLASS.SORT_ALPHA);
+        	header.setDefaultSortOrder(SORT_ORDER.ASC);
+        	header.setHeaderId(SORT_BY.ACCESSION.name());
+        	if(this.sortBy == SORT_BY.ACCESSION) {
+        		header.setSorted(true);
+        		header.setSortOrder(this.sortOrder);
+        	}
         	header.setRowspan(2);
         	headers.add(header);
         }

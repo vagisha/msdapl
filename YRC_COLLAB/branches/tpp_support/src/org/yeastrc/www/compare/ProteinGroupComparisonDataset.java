@@ -700,12 +700,12 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         return ((count - minNormalizedSpectrumCount)/(maxNormalizedSpectrumCount - minNormalizedSpectrumCount))*100.0f;
     }
     
-//    private String getClusteredColor(float normalizedSpectrumCount) {
-//    	int numbins = spectrumCountColors.length;
-//    	float range = maxNormalizedSpectrumCount - minNormalizedSpectrumCount;
-//    	int bin = (int)Math.ceil(((normalizedSpectrumCount - minNormalizedSpectrumCount) / range ) * numbins);
-//    	return spectrumCountColors[bin-1];
-//    }
+    public String getHeatMapColor(float normalizedSpectrumCount) {
+    	int numbins = spectrumCountColors.length;
+    	float range = maxNormalizedSpectrumCount - minNormalizedSpectrumCount;
+    	int bin = (int)Math.ceil(((normalizedSpectrumCount - minNormalizedSpectrumCount) / range ) * numbins);
+    	return spectrumCountColors[bin-1];
+    }
     
     public  String getScaledColor(float scaledSpectrumCount) {
     	
@@ -769,8 +769,15 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         if(displayColumns.isShowFastaId()) {
         	header = new TableHeader("Fasta ID");
         	//header.setWidth(8);
-        	header.setSortable(false);
         	header.setRowspan(2);
+        	header.setSortable(true);
+        	header.setSortClass(SORT_CLASS.SORT_ALPHA);
+        	header.setDefaultSortOrder(SORT_ORDER.ASC);
+        	header.setHeaderId(SORT_BY.ACCESSION.name());
+        	if(this.sortBy == SORT_BY.ACCESSION) {
+        		header.setSorted(true);
+        		header.setSortOrder(this.sortOrder);
+        	}
         	headers.add(header);
         }
         

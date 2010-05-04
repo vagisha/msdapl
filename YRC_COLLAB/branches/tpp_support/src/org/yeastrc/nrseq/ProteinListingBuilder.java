@@ -70,11 +70,7 @@ public class ProteinListingBuilder {
 		ProteinListing listing = new ProteinListing(protein);
 
 		// first get the references for the given fasta databaseIDs
-		List<NrDbProtein> matchingProteins = NrSeqLookupUtil.getDbProteins(nrseqId, fastaDatabaseIds);
-		for(NrDbProtein prot: matchingProteins) {
-			if(prot.isCurrent()) // add only current references
-				listing.addFastaReference(new ProteinReference(prot));
-		}
+		getFastaReferences(fastaDatabaseIds, nrseqId, listing);
 		
 		// get references to species specific database
 		// This will also get any available common names from the tier-one databases
@@ -137,6 +133,15 @@ public class ProteinListingBuilder {
 		}
 		
 		return listing;
+	}
+
+	public void getFastaReferences(List<Integer> fastaDatabaseIds,
+			int nrseqId, ProteinListing listing) {
+		List<NrDbProtein> matchingProteins = NrSeqLookupUtil.getDbProteins(nrseqId, fastaDatabaseIds);
+		for(NrDbProtein prot: matchingProteins) {
+			if(prot.isCurrent()) // add only current references
+				listing.addFastaReference(new ProteinReference(prot));
+		}
 	}
 		
 	

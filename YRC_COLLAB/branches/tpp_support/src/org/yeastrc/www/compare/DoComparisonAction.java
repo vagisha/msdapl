@@ -181,6 +181,8 @@ public class DoComparisonAction extends Action {
                 sorter.sortByMolecularWeight(comparison.getProteins(), sortOrder);
             else if (sortBy == SORT_BY.PI)
                 sorter.sortByPi(comparison.getProteins(), sortOrder);
+            else if (sortBy == SORT_BY.ACCESSION)
+            	sorter.sortByAccession(comparison.getProteins(), sortOrder, comparison.getFastaDatabaseIds());
             else
                 sorter.sortByPeptideCount(comparison.getProteins(), sortOrder);
             
@@ -254,6 +256,8 @@ public class DoComparisonAction extends Action {
                 sorter.sortGroupsByMolecularWeight(proteinGroups, sortOrder);
             else if (sortBy == SORT_BY.PI)
                 sorter.sortGroupsByPi(proteinGroups, sortOrder);
+            else if (sortBy == SORT_BY.ACCESSION)
+            	sorter.sortGroupsByAccession(proteinGroups, sortOrder, comparison.getFastaDatabaseIds());
             else
                 sorter.sortGroupsByPeptideCount(proteinGroups, sortOrder);
             
