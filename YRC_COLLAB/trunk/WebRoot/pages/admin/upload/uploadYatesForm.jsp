@@ -97,7 +97,7 @@ function projectSearcherPopUp(field) {
       <html:option value="2007">2007</html:option>
       <html:option value="2008">2008</html:option>
       <html:option value="2009">2009</html:option>
-      <html:option value="20010">2010</html:option>
+      <html:option value="2010">2010</html:option>
      </html:select>
      
      <b> - </b>
@@ -225,7 +225,7 @@ function projectSearcherPopUp(field) {
       <html:option value="2007">2007</html:option>
       <html:option value="2008">2008</html:option>
       <html:option value="2009">2009</html:option>
-      <html:option value="20010">2010</html:option>
+      <html:option value="2010">2010</html:option>
      </html:select>
      
      <b> - </b>
@@ -353,7 +353,7 @@ function projectSearcherPopUp(field) {
       <html:option value="2007">2007</html:option>
       <html:option value="2008">2008</html:option>
       <html:option value="2009">2009</html:option>
-      <html:option value="20010">2010</html:option>
+      <html:option value="2010">2010</html:option>
      </html:select>
      
      <b> - </b>
@@ -480,7 +480,7 @@ function projectSearcherPopUp(field) {
       <html:option value="2007">2007</html:option>
       <html:option value="2008">2008</html:option>
       <html:option value="2009">2009</html:option>
-      <html:option value="20010">2010</html:option>
+      <html:option value="2010">2010</html:option>
      </html:select>
      
      <b> - </b>
@@ -608,7 +608,7 @@ function projectSearcherPopUp(field) {
       <html:option value="2007">2007</html:option>
       <html:option value="2008">2008</html:option>
       <html:option value="2009">2009</html:option>
-      <html:option value="20010">2010</html:option>
+      <html:option value="2010">2010</html:option>
      </html:select>
      
      <b> - </b>
@@ -735,7 +735,7 @@ function projectSearcherPopUp(field) {
       <html:option value="2007">2007</html:option>
       <html:option value="2008">2008</html:option>
       <html:option value="2009">2009</html:option>
-      <html:option value="20010">2010</html:option>
+      <html:option value="2010">2010</html:option>
      </html:select>
      
      <b> - </b>
@@ -862,7 +862,7 @@ function projectSearcherPopUp(field) {
       <html:option value="2007">2007</html:option>
       <html:option value="2008">2008</html:option>
       <html:option value="2009">2009</html:option>
-      <html:option value="20010">2010</html:option>
+      <html:option value="2010">2010</html:option>
      </html:select>
      
      <b> - </b>
@@ -989,7 +989,7 @@ function projectSearcherPopUp(field) {
       <html:option value="2007">2007</html:option>
       <html:option value="2008">2008</html:option>
       <html:option value="2009">2009</html:option>
-      <html:option value="20010">2010</html:option>
+      <html:option value="2010">2010</html:option>
      </html:select>
      
      <b> - </b>
@@ -1116,7 +1116,7 @@ function projectSearcherPopUp(field) {
       <html:option value="2007">2007</html:option>
       <html:option value="2008">2008</html:option>
       <html:option value="2009">2009</html:option>
-      <html:option value="20010">2010</html:option>
+      <html:option value="2010">2010</html:option>
      </html:select>
      
      <b> - </b>
@@ -1243,7 +1243,7 @@ function projectSearcherPopUp(field) {
       <html:option value="2007">2007</html:option>
       <html:option value="2008">2008</html:option>
       <html:option value="2009">2009</html:option>
-      <html:option value="20010">2010</html:option>
+      <html:option value="2010">2010</html:option>
      </html:select>
      
      <b> - </b>
