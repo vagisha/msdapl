@@ -25,6 +25,7 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.www.compare.DatasetBooleanFilters;
 import org.yeastrc.www.compare.ProteinPropertiesFilters;
 import org.yeastrc.www.compare.ProteinSetComparisonForm;
+import org.yeastrc.www.compare.clustering.ClusteringConstants.GRADIENT;
 
 /**
  * 
@@ -121,6 +122,13 @@ public class ClusteringGatewayAction extends Action {
             					order = order.substring(1);
             				order = "&dsOrder="+order;
             				
+            				// gradient
+            				String gradient = "";
+            				if(((ProteinSetComparisonForm) form).getHeatMapGradient() == GRADIENT.BY)
+            					gradient="&gradient="+GRADIENT.BY.name();
+            				else
+            					gradient="&gradient="+GRADIENT.GR.name();
+            				
             				// Anchor
             				String anchor = "";
             		        if(((ProteinSetComparisonForm) form).getRowIndex() != -1) {
@@ -142,6 +150,7 @@ public class ClusteringGatewayAction extends Action {
             						"&count="+((ProteinSetComparisonForm)form).getNumPerPage()+
             						noDispCols+
             						order+
+            						gradient+
             						downloadOpts+
             						anchor, 
             						fwd.getRedirect());

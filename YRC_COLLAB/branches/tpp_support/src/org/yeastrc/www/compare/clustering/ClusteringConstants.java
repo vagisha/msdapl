@@ -25,6 +25,26 @@ public class ClusteringConstants {
 	public static final String PROT_SER = "ProteinComparisonDataset.ser";
 	public static final String FORM_SER = "ProteinSetComparisonForm.ser";
 	
-	public static final String GRADIENT_RG = "Red-Green";
-	public static final String GRADIENT_BY = "Blue-Yellow";
+	public static enum GRADIENT {
+		BY("Blue-Yellow"),
+		GR("Green-Red");
+		
+		private String displayName;
+		
+		private GRADIENT(String displayName) {
+			this.displayName = displayName;
+		}
+		
+		public String getDisplayName() {
+			return displayName;
+		}
+		
+		public static GRADIENT getGradient(String displayName) {
+			for(GRADIENT grad: GRADIENT.values()) {
+				if(grad.getDisplayName().equalsIgnoreCase(displayName))
+					return grad;
+			}
+			return null;
+		}
+	}
 }

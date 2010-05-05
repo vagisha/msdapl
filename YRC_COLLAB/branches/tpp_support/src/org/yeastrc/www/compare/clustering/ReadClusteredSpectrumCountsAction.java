@@ -30,6 +30,7 @@ import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
 import org.yeastrc.www.compare.ProteinSetComparisonForm;
 import org.yeastrc.www.compare.SpeciesChecker;
+import org.yeastrc.www.compare.clustering.ClusteringConstants.GRADIENT;
 import org.yeastrc.www.compare.util.VennDiagramCreator;
 import org.yeastrc.www.taglib.HistoryTag;
 import org.yeastrc.www.user.User;
@@ -192,17 +193,25 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 		String gradient = request.getParameter("gradient");
 		String[] gradientColors = null;
 		if(gradient != null) {
+			
+			// Set this in the request so that the link to the HTML can use this order
+			request.setAttribute("gradient", gradient);
+			
 			List<String> colors = null;
 			
-			if(gradient.equalsIgnoreCase("BY")) {
+			GRADIENT grad = GRADIENT.valueOf(GRADIENT.class, gradient);
+			
+			if(grad == GRADIENT.BY) {
 				String colorFile = clustDir+File.separator+ClusteringConstants.COLORS_BY;
 				try {colors = SpectrumCountClusterer.readColors(new File(colorFile));}
 				catch(IOException e) {log.error("Error reading colors file: "+colorFile, e);}
+				myForm.setHeatMapGradient(GRADIENT.BY);
 			}
-			if(gradient.equalsIgnoreCase("RG")) {
+			if(grad == GRADIENT.GR) {
 				String colorFile = clustDir+File.separator+ClusteringConstants.COLORS_RG;
 				try {colors = SpectrumCountClusterer.readColors(new File(colorFile));}
 				catch(IOException e) {log.error("Error reading colors file: "+colorFile, e);}
+				myForm.setHeatMapGradient(GRADIENT.GR);
 			}
 			
 			if(colors != null && colors.size() > 0) {

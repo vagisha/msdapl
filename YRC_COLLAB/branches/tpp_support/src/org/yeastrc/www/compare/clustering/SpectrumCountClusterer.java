@@ -23,6 +23,7 @@ import org.yeastrc.www.compare.ComparisonProtein;
 import org.yeastrc.www.compare.DisplayColumns;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
+import org.yeastrc.www.compare.clustering.ClusteringConstants.GRADIENT;
 import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
@@ -589,7 +590,7 @@ public class SpectrumCountClusterer {
 			writer.write("grad_by = c(hsv(0.67 , 1, seq(1,0,length=n_low)), hsv(0.17 , 1, seq(0,1,length=n_high)))\n");
 			writer.write("write(grad_by, file=\""+dir+File.separator+ClusteringConstants.COLORS_BY+"\", append=FALSE, 1)\n");
 			
-			if(rinfo.getGradient().equalsIgnoreCase(ClusteringConstants.GRADIENT_BY)) 
+			if(rinfo.getGradient() == GRADIENT.BY) 
 				writer.write("my_cols = grad_by\n");
 			else
 				writer.write("my_cols = grad_rg\n");
@@ -628,7 +629,7 @@ public class SpectrumCountClusterer {
 		int logBase = 10;
 		double valueForMissing = Double.MIN_VALUE;
 		boolean clusterColumns = false;
-		String gradient = ClusteringConstants.GRADIENT_BY;
+		GRADIENT gradient = GRADIENT.BY;
 		
 		public int getNumRows() {
 			return numRows;
@@ -666,14 +667,14 @@ public class SpectrumCountClusterer {
 		public void setClusterColumns(boolean clusterColumns) {
 			this.clusterColumns = clusterColumns;
 		}
-		public String getGradient() {
+		public GRADIENT getGradient() {
 			return gradient;
 		}
-		public void setGradient(String gradient) {
+		public void setGradient(GRADIENT gradient) {
 			this.gradient = gradient;
 		}
 		public String getGradientFile() {
-			return this.gradient.equalsIgnoreCase(ClusteringConstants.GRADIENT_BY) ? 
+			return this.gradient == GRADIENT.BY ? 
 					ClusteringConstants.COLORS_BY : ClusteringConstants.COLORS_RG;
 		}
 	}

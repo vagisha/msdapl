@@ -299,10 +299,10 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 				<b>Heatmap:</b>
 				<span style="background-color:yellow;"><a href="JavaScript:newPopup('<bean:write name='clusteredImgUrl'/>');"><b>PDF</b></a></span>
 				<logic:present name="dsOrder">
-					<span style="background-color:yellow;"><a href="JavaScript:newPopup('<yrcwww:link path='heatmap.do?token='/><bean:write name="proteinSetComparisonForm" property='clusteringToken' />&dsOrder=<bean:write name="dsOrder" />');"><b>HTML</b></a></span>
+					<span style="background-color:yellow;"><a href="JavaScript:newPopup('<yrcwww:link path='heatmap.do?token='/><bean:write name="proteinSetComparisonForm" property='clusteringToken' />&dsOrder=<bean:write name="dsOrder" />&gradient=<bean:write name="gradient"/>');"><b>HTML</b></a></span>
 				</logic:present>
 				<logic:notPresent name="dsOrder">
-					<span style="background-color:yellow;"><a href="JavaScript:newPopup('<yrcwww:link path='heatmap.do?token='/><bean:write name="proteinSetComparisonForm" property='clusteringToken' />');"><b>HTML</b></a></span>
+					<span style="background-color:yellow;"><a href="JavaScript:newPopup('<yrcwww:link path='heatmap.do?token='/><bean:write name="proteinSetComparisonForm" property='clusteringToken' />&gradient=<bean:write name="gradient"/>');"><b>HTML</b></a></span>
 				</logic:notPresent>
 				</nobr>
 		</logic:present>

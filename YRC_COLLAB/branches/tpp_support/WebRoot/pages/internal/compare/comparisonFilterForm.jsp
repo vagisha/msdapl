@@ -388,9 +388,9 @@ $(document).ready(function() {
 		&nbsp; 
 		
 		Gradient:
-		<html:select name="proteinSetComparisonForm" property="heatMapGradient">
-			<html:option value="<%=ClusteringConstants.GRADIENT_BY %>"></html:option>
-			<html:option value="<%=ClusteringConstants.GRADIENT_RG %>"></html:option>
+		<html:select name="proteinSetComparisonForm" property="heatMapGradientString">
+			<html:option value="<%=ClusteringConstants.GRADIENT.BY.getDisplayName() %>"></html:option>
+			<html:option value="<%=ClusteringConstants.GRADIENT.GR.getDisplayName() %>"></html:option>
 		</html:select>
 		&nbsp;
 		

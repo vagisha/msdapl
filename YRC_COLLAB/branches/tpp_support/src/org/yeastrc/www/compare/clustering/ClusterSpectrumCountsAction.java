@@ -25,6 +25,7 @@ import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
 import org.yeastrc.www.compare.ProteinSetComparisonForm;
+import org.yeastrc.www.compare.clustering.ClusteringConstants.GRADIENT;
 import org.yeastrc.www.compare.clustering.SpectrumCountClusterer.ROptions;
 
 /**
@@ -179,11 +180,21 @@ public class ClusterSpectrumCountsAction extends Action {
         String noDispCols = ((ProteinSetComparisonForm) form).getDisplayColumns().getNoDisplayColCommaSeparated();
 		if(noDispCols.length() > 0)
 			noDispCols = "&noDispCol="+noDispCols;
+		
+		String gradient = "";
+		if(((ProteinSetComparisonForm) form).getHeatMapGradient() == GRADIENT.BY)
+			gradient="&gradient="+GRADIENT.BY.name();
+		else
+			gradient = "&gradient="+GRADIENT.GR.name();
+			
+		
 		ActionForward newFwd = new ActionForward(fwd.getPath()+
 				"?token="+jobToken+"&page=1"+
 				"&count="+myForm.getNumPerPage()+
 				noDispCols+
-				anchor, fwd.getRedirect());
+				anchor+
+				gradient, 
+				fwd.getRedirect());
 		return newFwd;
         
     }

@@ -15,6 +15,7 @@ import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.www.compare.clustering.ClusteringConstants;
+import org.yeastrc.www.compare.clustering.ClusteringConstants.GRADIENT;
 
 /**
  * 
@@ -48,7 +49,7 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 	private boolean useLogScale = false;
 	private int logBase = 10;
 	private String replaceMissingWithValue = null;
-	private String heatMapGradient = ClusteringConstants.GRADIENT_BY;
+	private GRADIENT heatMapGradient = ClusteringConstants.GRADIENT.BY;
 	private boolean clusterColumns = false;
 	
 	// WHICH COLUMNS TO DISPLAY
@@ -264,11 +265,19 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 		this.clusterColumns = clusterColumns;
 	}
 	
-	public String getHeatMapGradient() {
-		return heatMapGradient;
+	public String getHeatMapGradientString() {
+		return heatMapGradient.getDisplayName();
+	}
+	
+	public void setHeatMapGradientString(String gradientString) {
+		this.heatMapGradient = GRADIENT.getGradient(gradientString);
+	}
+	
+	public GRADIENT getHeatMapGradient() {
+		return this.heatMapGradient;
 	}
 
-	public void setHeatMapGradient(String gradient) {
+	public void setHeatMapGradient(GRADIENT gradient) {
 		this.heatMapGradient = gradient;
 	}
 

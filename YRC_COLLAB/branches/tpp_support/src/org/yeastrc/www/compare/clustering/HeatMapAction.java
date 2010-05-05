@@ -26,6 +26,7 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
 import org.yeastrc.www.compare.ProteinSetComparisonForm;
+import org.yeastrc.www.compare.clustering.ClusteringConstants.GRADIENT;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -127,6 +128,32 @@ public class HeatMapAction extends Action {
 			}
 		}
 		
+		// Are we given a gradient preference in the request
+		String gradient = request.getParameter("gradient");
+		String[] gradientColors = null;
+		if(gradient != null) {
+			List<String> colors = null;
+			
+			GRADIENT grad = GRADIENT.valueOf(GRADIENT.class, gradient);
+			if(grad == GRADIENT.BY) {
+				String colorFile = clustDir+File.separator+ClusteringConstants.COLORS_BY;
+				try {colors = SpectrumCountClusterer.readColors(new File(colorFile));}
+				catch(IOException e) {log.error("Error reading colors file: "+colorFile, e);}
+				myForm.setHeatMapGradient(GRADIENT.BY);
+			}
+			if(grad == GRADIENT.GR) {
+				String colorFile = clustDir+File.separator+ClusteringConstants.COLORS_RG;
+				try {colors = SpectrumCountClusterer.readColors(new File(colorFile));}
+				catch(IOException e) {log.error("Error reading colors file: "+colorFile, e);}
+				myForm.setHeatMapGradient(GRADIENT.GR);
+			}
+			
+			if(colors != null && colors.size() > 0) {
+				gradientColors = new String[colors.size()];
+				gradientColors = colors.toArray(gradientColors);
+			}
+		}
+		
 		// Read the results
 		if(myForm.getGroupIndistinguishableProteins()) {
 			String grpComparisonFile = clustDir+File.separator+ClusteringConstants.PROT_GRP_SER;
@@ -136,6 +163,8 @@ public class HeatMapAction extends Action {
 				grpComparison = (ProteinGroupComparisonDataset) ois.readObject();
 				if(piRunIds != null)
 					grpComparison.setDatasetOrder(piRunIds);
+				if(gradientColors != null)
+					grpComparison.setSpectrumCountColors(gradientColors);
 			}
 			catch (IOException e) {
 				ActionErrors errors = new ActionErrors();
@@ -166,6 +195,8 @@ public class HeatMapAction extends Action {
 				comparison = (ProteinComparisonDataset) ois.readObject();
 				if(piRunIds != null)
 					comparison.setDatasetOrder(piRunIds);
+				if(gradientColors != null)
+					comparison.setSpectrumCountColors(gradientColors);
 			}
 			catch (IOException e) {
 				ActionErrors errors = new ActionErrors();
