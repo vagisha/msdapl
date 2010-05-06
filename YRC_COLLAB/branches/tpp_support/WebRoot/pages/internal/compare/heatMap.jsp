@@ -15,11 +15,30 @@
 <%@ include file="/includes/errors.jsp" %>
 
 <script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
+<script src="<yrcwww:link path='js/jquery.blockUI.js'/>"></script>
 <script>
 
 var fontsize = 2;
 $(document).ready(function() {
-	//setFont(fontsize);
+	$('.plotLink').click(function() { 
+	
+		var url = $(this).attr('href');
+		$("#img").html('<img src="'+url+'"/>');
+		
+		var proteinName = $(this).attr('id');
+		$("#proteinName").html('<b>'+proteinName+'</b>');
+		
+        $.blockUI({ 
+            message: $("#imgdiv"),
+            css: {cursor:'default'}
+        }); 
+ 		return false;
+    });
+     
+    $('#close').click(function() { 
+            $.unblockUI(); 
+            return false; 
+    });
 });
 
 function setFont(size) {
@@ -49,6 +68,12 @@ function updatePage(rowIndex) {
 
 </script>
 
+<!-- Div to modal dialog with plot -->
+<div id="imgdiv" style="display:none">
+<div style="width:100%;" align="right"><img src="<yrcwww:link path='images/proteinfer/dialog-titlebar-close.png'/>"  id="close"/></div>
+<div id="proteinName"></div>
+<div id="img"></div>
+</div>
 
 <!-- RESULTS TABLE -->
 <div style="margin:10 5 10 5;"> 
@@ -71,6 +96,7 @@ function updatePage(rowIndex) {
 	<table width="100%" cellspacing="0" cellpadding="0" align="center" >
 	<tr>
 		<th width="2%" class="header">Protein</th>
+		<th width="1%" class="header"></th>
 		<logic:iterate name="heatmap" property="datasetLabels" id="datasetLabel">
 			<th class="header"><bean:write name="datasetLabel"/></th>
 		</logic:iterate>
@@ -79,6 +105,10 @@ function updatePage(rowIndex) {
 	<logic:iterate name="heatmap" property="rows" id="row">
 	<tr>
 		<td class="rowname" style="font-size:2"><bean:write name="row" property="rowName" /></td>
+		<td class="rowname" style="font-size:2">
+			<a href='<bean:write name='row' property='rowGraph'/>' class="plotLink" 
+			   id='<bean:write name="row" property="rowName" />'>Plot</a>
+		</td>
 		<logic:iterate name="row" property="cells" id="cell">
 			<td style="font-size:0pt; background-color:<bean:write name='cell' property='hexColor' />;" 
 				class="clickable"

@@ -13,6 +13,7 @@ import org.yeastrc.www.compare.ComparisonProtein;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
 import org.yeastrc.www.compare.dataset.Dataset;
+import org.yeastrc.www.compare.dataset.DatasetColor;
 import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 
@@ -62,8 +63,77 @@ public class HeatMapData {
 					cell.setHexColor(grpComparison.getScaledColor(scaledSc));
 				}
 			}
+			
+			// http://chart.apis.google.com/chart?chs=320x200&cht=bvs&chd=t:1,19,27,53,61&chds=0,61&chco=FFCC33&chxt=x,y&chxr=1,0,61,10&chxl=0:|Jan|Feb|Mar|Apr|May
+			String plotUrl = getPlotUrl(protein, grpComparison.getDatasets());
+				
+			row.setRowGraph(plotUrl);
+			
 			row.setCells(cells);
 		}
+	}
+
+
+	private String getPlotUrl(ComparisonProtein protein, List<? extends Dataset> datasets) {
+		
+		String plotUrl = "http://chart.apis.google.com/chart?cht=bvs&chxt=x,y";
+		String data = "";
+		//String colors = "";
+		String xrange = "";
+		String scale = "";
+		String xlabel = "";
+		String chartSize = "chs=";
+		
+		// chart title
+		//String title = "&chtt="+protein.getProteinListing().getFastaReferences().get(0).getShortAccession();
+		//plotUrl += title;
+		
+		int idx = 0;
+		int maxSc = 0;
+		int maxLabel = 0;
+		for(Dataset ds: datasets) {
+			
+			DatasetProteinInformation dpi = protein.getDatasetProteinInformation(ds);
+			
+			xlabel += "|ID_"+ds.getDatasetId();
+			//colors += "|"+DatasetColor.get(idx).hexValue();
+			idx++;
+			
+			maxLabel = (int)Math.max(maxLabel, ("ID_"+ds.getDatasetId()).length());
+			
+			if(dpi == null || !dpi.isPresent()) {
+				data+=",0";
+			}
+			else {
+				data += ","+dpi.getNormalizedSpectrumCountRounded();
+				maxSc = (int) Math.max(0, dpi.getNormalizedSpectrumCount());
+			}
+			
+		}
+		int barWidth = maxLabel*6;
+		String barSpacing = barWidth+",10,10";
+		int chartWidth = ((barWidth + 10)*datasets.size())+50;
+		chartSize += chartWidth+"x200";
+		plotUrl += "&"+chartSize;
+		plotUrl += "&chbh="+barSpacing;
+		
+		//colors = colors.substring(1);
+		plotUrl += "&chco="+DatasetColor.ORANGE.hexValue();
+		
+		data = data.substring(1);
+		data = "t:"+data;
+		plotUrl += "&chd="+data;
+		
+		
+		int div = (int)Math.ceil((double)maxSc / 10.0);
+		xrange = "1,0,"+maxSc+","+div;
+		plotUrl += "&chxr="+xrange;
+		
+		scale = "0,"+maxSc;
+		plotUrl += "&chds="+scale;
+		
+		plotUrl += "&chxl=0:"+xlabel;
+		return plotUrl;
 	}
 	
 	
@@ -102,6 +172,11 @@ public class HeatMapData {
 					float scaledSc = comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount());
 					cell.setHexColor(comparison.getScaledColor(scaledSc));
 				}
+				
+				// http://chart.apis.google.com/chart?chs=320x200&cht=bvs&chd=t:1,19,27,53,61&chds=0,61&chco=FFCC33&chxt=x,y&chxr=1,0,61,10&chxl=0:|Jan|Feb|Mar|Apr|May
+				String plotUrl = getPlotUrl(protein, comparison.getDatasets());
+					
+				row.setRowGraph(plotUrl);
 			}
 			row.setCells(cells);
 		}
@@ -120,6 +195,7 @@ public class HeatMapData {
 		private String rowName;
 		private List<HeatMapCell> cells;
 		private int indexInList;
+		private String rowGraph = "NULL";
 		
 		public String getRowName() {
 			return rowName;
@@ -138,6 +214,12 @@ public class HeatMapData {
 		}
 		public void setIndexInList(int indexInList) {
 			this.indexInList = indexInList;
+		}
+		public String getRowGraph() {
+			return rowGraph;
+		}
+		public void setRowGraph(String rowGraph) {
+			this.rowGraph = rowGraph;
 		}
 	}
 	
