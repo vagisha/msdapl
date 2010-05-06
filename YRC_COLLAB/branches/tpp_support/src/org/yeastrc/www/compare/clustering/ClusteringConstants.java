@@ -16,6 +16,8 @@ public class ClusteringConstants {
 	public static final String BASE_DIR = "clustering";
 	public static final String IMG_FILE = "clustered.pdf";
 	public static final String INPUT_FILE = "input.txt";
+	public static final String INPUT_FILE_MOD = "input_mod.txt"; // modified spectrum counts; scaled, normalized etc.
+																 // This is the input that will be give to to heatmap.2
 	public static final String OUTPUT_FILE = "output.txt";
 	public static final String R_SCRIPT = "r.script.txt";
 	public static final String SH_SCRIPT = "run.sh";

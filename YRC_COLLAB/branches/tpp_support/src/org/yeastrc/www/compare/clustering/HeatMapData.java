@@ -59,8 +59,8 @@ public class HeatMapData {
 					cell.setHexColor("#FFFFFF");
 				}
 				else {
-					float scaledSc = grpComparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount());
-					cell.setHexColor(grpComparison.getScaledColor(scaledSc));
+					float heatMapSpectrumCount = dpi.getHeatMapSpectrumCount();
+					cell.setHexColor(grpComparison.getHeatMapColor(heatMapSpectrumCount));
 				}
 			}
 			
@@ -169,8 +169,8 @@ public class HeatMapData {
 					cell.setHexColor("#FFFFFF");
 				}
 				else {
-					float scaledSc = comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount());
-					cell.setHexColor(comparison.getScaledColor(scaledSc));
+					float heatMapSpectrumCount = dpi.getHeatMapSpectrumCount();
+					cell.setHexColor(comparison.getHeatMapColor(heatMapSpectrumCount));
 				}
 				
 				// http://chart.apis.google.com/chart?chs=320x200&cht=bvs&chd=t:1,19,27,53,61&chds=0,61&chco=FFCC33&chxt=x,y&chxr=1,0,61,10&chxl=0:|Jan|Feb|Mar|Apr|May

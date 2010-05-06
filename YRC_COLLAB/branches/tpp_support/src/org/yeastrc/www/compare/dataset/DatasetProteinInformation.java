@@ -7,7 +7,6 @@
 package org.yeastrc.www.compare.dataset;
 
 import java.io.Serializable;
-import java.text.DecimalFormat;
 
 /**
  * 
@@ -22,6 +21,7 @@ public class DatasetProteinInformation implements Serializable {
     private int ionCount;
     private int uniqIonCount;
     private int spectrumCount;
+    private float heatMapSpectrumCount; // used for clustering and displaying heatmap
     private String nsaf;
     private final Dataset dataset;
     
@@ -97,7 +97,15 @@ public class DatasetProteinInformation implements Serializable {
 //        this.uniqSeqCount = sequenceCount;
 //    }
     
-    public void setIonCount(int ionCount) {
+    public float getHeatMapSpectrumCount() {
+		return heatMapSpectrumCount;
+	}
+
+	public void setHeatMapSpectrumCount(float count) {
+		this.heatMapSpectrumCount = count;
+	}
+
+	public void setIonCount(int ionCount) {
         this.ionCount = ionCount;
     }
     

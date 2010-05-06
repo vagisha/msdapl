@@ -48,7 +48,7 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 	private boolean newToken = false;
 	private boolean useLogScale = false;
 	private int logBase = 10;
-	private String replaceMissingWithValue = null;
+	private String replaceMissingWithValue = "-1";
 	private GRADIENT heatMapGradient = ClusteringConstants.GRADIENT.BY;
 	private boolean clusterColumns = false;
 	
@@ -248,7 +248,7 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 	
 	public double getReplaceMissingWithValueDouble() {
 		if(replaceMissingWithValue == null || replaceMissingWithValue.trim().length() == 0) {
-			return Double.MIN_VALUE;
+			return -1.0;
 		}
 		return Double.parseDouble(replaceMissingWithValue);
 	}

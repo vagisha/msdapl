@@ -87,7 +87,22 @@ public class SpectrumCountClusterer {
 		
 		log.info("Checking for output files");
 		// make sure expected output files are present
-		File output = new File(dir+File.separator+ClusteringConstants.OUTPUT_FILE);
+		File output = new File(dir+File.separator+ClusteringConstants.INPUT_FILE_MOD); 
+		if(!output.exists()) {
+			errorMesage.append("Modified input file "+output.getAbsolutePath()+" does not exist");
+			return null;
+		}
+		try {
+			readModifiedSpectrumCounts(grpComparison, output);
+		}
+		catch(IOException e1) {
+			log.error("Error reading modified input file: "+output.getAbsolutePath(), e1);
+			errorMesage.append("Error reading modified input file: "+output.getAbsolutePath());
+			return null;
+		}
+		
+		// This file contains the order of rows and columns after clustering
+		output = new File(dir+File.separator+ClusteringConstants.OUTPUT_FILE);
 		if(!output.exists()) {
 			errorMesage.append("Output file "+output.getAbsolutePath()+" does not exist");
 			return null;
@@ -113,6 +128,11 @@ public class SpectrumCountClusterer {
 		
 		// reorder the protein groups
 		ProteinGroupComparisonDataset orderedGrpComparison =  reorderComparison(grpComparison, datasetOrder, groupOrder);
+		
+		if(rOptions.isDoLog())
+			orderedGrpComparison.setMinHeatMapSpectrumCount((float)rOptions.getValueForMissing());
+		else
+			orderedGrpComparison.setMinHeatMapSpectrumCount(0);
 		
 		output = new File(dir+File.separator+ClusteringConstants.IMG_FILE);
 		if(!output.exists()) {
@@ -146,6 +166,82 @@ public class SpectrumCountClusterer {
 		return orderedGrpComparison;
 	}
 	
+	private void readModifiedSpectrumCounts(
+			ProteinGroupComparisonDataset grpComparison, File output) throws IOException {
+		
+		List<ComparisonProteinGroup> proteinGrps = grpComparison.getProteinsGroups();
+		int index = 0;
+		
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(output));
+			String line = null;
+			while((line = reader.readLine()) != null) {
+				String[] tokens = line.split("\\s+");
+				float[] modCounts = new float[tokens.length];
+				
+				for(int i = 0; i < tokens.length; i++)
+					modCounts[i] = Float.parseFloat(tokens[i]);
+				
+				ComparisonProteinGroup grp = proteinGrps.get(index);
+				index++;
+				for(ComparisonProtein protein: grp.getProteins()) {
+					
+					int dsIndex = 0;
+					for(Dataset ds: grpComparison.getDatasets()) {
+						
+						DatasetProteinInformation dpi = protein.getDatasetProteinInformation(ds);
+						if(dpi != null) {
+							float modCount = modCounts[dsIndex];
+							dpi.setHeatMapSpectrumCount(modCount);
+						}
+						dsIndex++;
+					}
+				}
+			}
+		} 
+		finally {
+			if(reader != null) try {reader.close();} catch(IOException e){}
+		}
+	}
+	
+	private void readModifiedSpectrumCounts(
+			ProteinComparisonDataset comparison, File output) throws IOException {
+		
+		int index = 0;
+		
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(output));
+			String line = null;
+			while((line = reader.readLine()) != null) {
+				String[] tokens = line.split("\\s+");
+				float[] modCounts = new float[tokens.length];
+				
+				for(int i = 0; i < tokens.length; i++)
+					modCounts[i] = Float.parseFloat(tokens[i]);
+				
+				ComparisonProtein protein = comparison.getProteins().get(index);
+				index++;
+				
+				int dsIndex = 0;
+				for(Dataset ds: comparison.getDatasets()) {
+
+					DatasetProteinInformation dpi = protein.getDatasetProteinInformation(ds);
+					if(dpi != null) {
+						float modCount = modCounts[dsIndex];
+						dpi.setHeatMapSpectrumCount(modCount);
+					}
+					dsIndex++;
+				}
+			}
+		} 
+		finally {
+			if(reader != null) try {reader.close();} catch(IOException e){}
+		}
+	}
+
+
 	private boolean writeScriptsAndRunR(ROptions rOptions,
 			StringBuilder errorMesage, String dir) {
 		// write the R script
@@ -215,7 +311,22 @@ public class SpectrumCountClusterer {
 		
 		log.info("Checking for output files");
 		// make sure expected output files are present
-		File output = new File(dir+File.separator+ClusteringConstants.OUTPUT_FILE);
+		File output = new File(dir+File.separator+ClusteringConstants.INPUT_FILE_MOD); 
+		if(!output.exists()) {
+			errorMesage.append("Modified input file "+output.getAbsolutePath()+" does not exist");
+			return null;
+		}
+		try {
+			readModifiedSpectrumCounts(comparison, output);
+		}
+		catch(IOException e1) {
+			log.error("Error reading modified input file: "+output.getAbsolutePath(), e1);
+			errorMesage.append("Error reading modified input file: "+output.getAbsolutePath());
+			return null;
+		}
+		
+		// This file contains the order of rows and columns after clustering
+		output = new File(dir+File.separator+ClusteringConstants.OUTPUT_FILE);
 		if(!output.exists()) {
 			errorMesage.append("Output file "+output.getAbsolutePath()+" does not exist");
 			return null;
@@ -241,6 +352,11 @@ public class SpectrumCountClusterer {
 		
 		// reorder the protein groups
 		ProteinComparisonDataset orderedComparison =  reorderComparison(comparison, datasetOrder, proteinOrder);
+		
+		if(rOptions.isDoLog())
+			orderedComparison.setMinHeatMapSpectrumCount((float)rOptions.getValueForMissing());
+		else
+			orderedComparison.setMinHeatMapSpectrumCount(0);
 		
 		output = new File(dir+File.separator+ClusteringConstants.IMG_FILE);
 		if(!output.exists()) {
@@ -573,6 +689,7 @@ public class SpectrumCountClusterer {
 			writer.write("rownames(test_sc) <- test[,1]\n");
 			// writer.write("source(\"http://faculty.ucr.edu/~tgirke/Documents/R_BioCond/My_R_Scripts/my.colorFct.R\")\n");
 			
+			writer.write("write(t(as.matrix(test_sc)), file=\""+dir+File.separator+ClusteringConstants.INPUT_FILE_MOD+"\", sep=\" \", length(colnames(test_sc)))\n");
 			// get my colors
 			writer.write("all_sc = unmatrix(as.matrix(test_sc))\n");
 			writer.write("all_sc = sort(all_sc)\n");
@@ -627,7 +744,7 @@ public class SpectrumCountClusterer {
 		int numCols;
 		boolean doLog = false;
 		int logBase = 10;
-		double valueForMissing = Double.MIN_VALUE;
+		double valueForMissing = -1.0;
 		boolean clusterColumns = false;
 		GRADIENT gradient = GRADIENT.BY;
 		

@@ -67,6 +67,8 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 	private boolean proteinsInitialized = false;
     
     private String[] spectrumCountColors = null;
+    private float minHeatMapSpectrumCount;
+    private float maxHeatMapSpectrumCount;
     
     private DisplayColumns displayColumns; 
     
@@ -98,6 +100,10 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 
 	public void setSpectrumCountColors(String[] spectrumCountColors) {
 		this.spectrumCountColors = spectrumCountColors;
+	}
+	
+	public void setMinHeatMapSpectrumCount(float count) {
+		this.minHeatMapSpectrumCount = count;
 	}
 	
 	private int  getOffset() {
@@ -174,6 +180,8 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 		float minCount = Float.MAX_VALUE;
 		float maxCount = 1.0f;
 		
+		float maxHeatMapCount = -1.0f;
+		
     	if(proteinsInitialized) {  // this means spectrum counts for all proteins have been initialized
     		for(ComparisonProtein protein: this.proteins) {
     			for(Dataset dataset: datasets) {
@@ -181,6 +189,9 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
     				if(dpi != null && dpi.isPresent()) {
     					minCount = Math.min(minCount, dpi.getNormalizedSpectrumCount());
     					maxCount = Math.max(maxCount, dpi.getNormalizedSpectrumCount());
+    					
+    					// TODO This is ugly
+    					maxHeatMapCount = Math.max(maxHeatMapCount, dpi.getHeatMapSpectrumCount());
     				}
     			}
     		}
@@ -194,6 +205,8 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
     	}
     	this.minNormalizedSpectrumCount = minCount;
 		this.maxNormalizedSpectrumCount = maxCount;
+		
+		this.maxHeatMapSpectrumCount = maxHeatMapCount;
 		
 	}
 
@@ -433,7 +446,10 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 					cell.setData(dpi.getSpectrumCount()+"("+dpi.getNormalizedSpectrumCountRounded()+")");
 					cell.setTextColor("#FFFFFF");
 					float scaledCount = getScaledSpectrumCount(dpi.getNormalizedSpectrumCount());
-					cell.setBackgroundColor(getScaledColor(scaledCount));
+					if(this.spectrumCountColors == null)
+    					cell.setBackgroundColor(getScaledColor(scaledCount));
+    				else
+    					cell.setBackgroundColor(getHeatMapColor(dpi.getHeatMapSpectrumCount()));
 					row.addCell(cell);
 				}
 				
@@ -537,6 +553,15 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
         return ((count - minNormalizedSpectrumCount)/(maxNormalizedSpectrumCount - minNormalizedSpectrumCount))*100.0f;
     }
 
+	public String getHeatMapColor(float heatMapSpectrumCount) {
+    	int numbins = spectrumCountColors.length;
+    	float range = maxHeatMapSpectrumCount - minHeatMapSpectrumCount;
+    	float scaledCount = ((heatMapSpectrumCount - minHeatMapSpectrumCount)/range)*100.0f;
+    	int bin = (int)Math.ceil((((double) numbins / 100.0) * scaledCount));
+		if(bin == 0) bin = 1;
+    	return spectrumCountColors[bin-1];
+    }
+	
 	public String getScaledColor(float scaledSpectrumCount) {
 		if(this.spectrumCountColors != null) {
     		int bin = (int)Math.ceil((((double) spectrumCountColors.length / 100.0) * scaledSpectrumCount));
