@@ -31,7 +31,7 @@ $(document).ready(function() {
         $.blockUI({ 
             message: $("#imgdiv"),
             css: {cursor:'default',
-            	  top:  ($(window).height() - 300) /2 + 'px', 
+            	  top:  ($(window).height() - 350) /2 + 'px', 
                   left: ($(window).width() - 500) /2 + 'px',
                   width: '500px',
                   }
@@ -76,7 +76,8 @@ function updatePage(rowIndex) {
 <div id="imgdiv" style="display:none">
 <div style="width:100%;" align="right"><img src="<yrcwww:link path='images/proteinfer/dialog-titlebar-close.png'/>"  id="close"/></div>
 <div id="proteinName"></div>
-<div id="img"></div>
+<div id="img" style="margin:10px;"></div>
+<div>Note: Normalized spectrum counts are used for clustering</div>
 </div>
 
 <!-- RESULTS TABLE -->

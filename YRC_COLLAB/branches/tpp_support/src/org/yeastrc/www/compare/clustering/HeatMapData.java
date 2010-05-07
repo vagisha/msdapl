@@ -83,8 +83,9 @@ public class HeatMapData {
 
 	private String getPlotUrl(ComparisonProtein protein, List<? extends Dataset> datasets) {
 		
-		String plotUrl = "http://chart.apis.google.com/chart?cht=bvs&chxt=x,y";
-		String data = "";
+		String plotUrl = "http://chart.apis.google.com/chart?cht=bvg&chxt=x,y,x";
+		String data1 = "";
+		String data2 = "";
 		//String colors = "";
 		String xrange = "";
 		String scale = "";
@@ -109,27 +110,32 @@ public class HeatMapData {
 			maxLabel = (int)Math.max(maxLabel, (""+ds.getDatasetId()).length());
 			
 			if(dpi == null || !dpi.isPresent()) {
-				data+=",0";
+				data1+=",0";
+				data2 += ",0";
 			}
 			else {
-				data += ","+dpi.getNormalizedSpectrumCountRounded();
+				data1 += ","+dpi.getNormalizedSpectrumCountRounded();
+				data2 += ","+dpi.getSpectrumCount();
 				maxSc = (int) Math.max(maxSc, dpi.getNormalizedSpectrumCount());
 			}
 			
 		}
-		int barWidth = maxLabel*6;
-		String barSpacing = barWidth+",10,10";
-		int chartWidth = ((barWidth + 10)*datasets.size())+50;
-		chartSize += chartWidth+"x200";
+		int barWidth = (maxLabel*6)/2;
+		if(barWidth < 12)	barWidth = 12;
+		String barSpacing = barWidth+",1,10";
+		int chartWidth = ((barWidth*2 + 1 + 10)*datasets.size())+50;
+		chartSize += chartWidth+"x250";
 		plotUrl += "&"+chartSize;
 		plotUrl += "&chbh="+barSpacing;
 		
 		//colors = colors.substring(1);
-		plotUrl += "&chco="+DatasetColor.ORANGE.hexValue();
+		plotUrl += "&chco=C6D9FD,4D89F9";
 		
-		data = data.substring(1);
-		data = "t:"+data;
-		plotUrl += "&chd="+data;
+		data1 = data1.substring(1);
+		data1 = "t:"+data1;
+		data2 = data2.substring(1);
+		data2 = "|"+data2;
+		plotUrl += "&chd="+data1+data2;
 		
 		
 		int div = (int)Math.ceil((double)maxSc / 10.0);
@@ -143,6 +149,15 @@ public class HeatMapData {
 		plotUrl += "&chds="+scale;
 		
 		plotUrl += "&chxl=0:"+xlabel;
+		
+		// x-axis label
+		plotUrl += "&chxl=2:|Dataset+ID&chxp=2,50";
+		
+		// bar labels
+		plotUrl += "&chm=N,000000,0,,10|N,000000,1,,10";
+		
+		// legend
+		plotUrl += "&chdl=Spectrum+Count|Norm.+Spectrum+Count&chdlp=b";
 		return plotUrl;
 	}
 	
