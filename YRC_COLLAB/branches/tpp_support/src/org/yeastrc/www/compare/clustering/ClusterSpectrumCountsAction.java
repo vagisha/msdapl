@@ -81,6 +81,7 @@ public class ClusterSpectrumCountsAction extends Action {
         ropts.setValueForMissing(myForm.getReplaceMissingWithValueDouble());
         ropts.setGradient(myForm.getHeatMapGradient());
         ropts.setClusterColumns(myForm.isClusterColumns());
+        ropts.setScaleRows(myForm.isScaleRows());
         
         // DONT GROUP INDISTINGUISHABLE PROTEINS
         if(!myForm.getGroupIndistinguishableProteins()) {

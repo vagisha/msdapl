@@ -106,6 +106,10 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 		this.minHeatMapSpectrumCount = count;
 	}
 	
+	public float getMinHeatMapSpectrumCount() {
+		return this.minHeatMapSpectrumCount;
+	}
+	
 	private int  getOffset() {
 		return (this.currentPage - 1)*rowCount;
 	}
@@ -181,6 +185,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 		float maxCount = 1.0f;
 		
 		float maxHeatMapCount = -1.0f;
+		float minHeatMapCount = this.minHeatMapSpectrumCount;
 		
     	if(proteinsInitialized) {  // this means spectrum counts for all proteins have been initialized
     		for(ComparisonProtein protein: this.proteins) {
@@ -192,6 +197,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
     					
     					// TODO This is ugly
     					maxHeatMapCount = Math.max(maxHeatMapCount, dpi.getHeatMapSpectrumCount());
+    					minHeatMapCount = Math.min(minHeatMapCount, dpi.getHeatMapSpectrumCount());
     				}
     			}
     		}
@@ -207,6 +213,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 		this.maxNormalizedSpectrumCount = maxCount;
 		
 		this.maxHeatMapSpectrumCount = maxHeatMapCount;
+		this.minHeatMapSpectrumCount = minHeatMapCount;
 		
 	}
 

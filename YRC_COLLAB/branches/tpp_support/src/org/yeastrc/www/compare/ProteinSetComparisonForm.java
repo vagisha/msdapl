@@ -51,6 +51,7 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 	private String replaceMissingWithValue = "-1";
 	private GRADIENT heatMapGradient = ClusteringConstants.GRADIENT.BY;
 	private boolean clusterColumns = false;
+	private boolean scaleRows = true;
 	
 	// WHICH COLUMNS TO DISPLAY
 	private boolean showPresent = true;
@@ -265,6 +266,14 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 		this.clusterColumns = clusterColumns;
 	}
 	
+	public boolean isScaleRows() {
+		return scaleRows;
+	}
+
+	public void setScaleRows(boolean scaleRows) {
+		this.scaleRows = scaleRows;
+	}
+
 	public String getHeatMapGradientString() {
 		return heatMapGradient.getDisplayName();
 	}

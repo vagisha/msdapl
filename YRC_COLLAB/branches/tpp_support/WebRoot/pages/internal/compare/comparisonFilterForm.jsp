@@ -373,6 +373,20 @@ $(document).ready(function() {
 	<tr>
 	<td><b>Clustering Options: </b></td>
 	<td colspan="3">
+	
+		Gradient:
+		<html:select name="proteinSetComparisonForm" property="heatMapGradientString">
+			<html:option value="<%=ClusteringConstants.GRADIENT.BY.getDisplayName() %>"></html:option>
+			<html:option value="<%=ClusteringConstants.GRADIENT.GR.getDisplayName() %>"></html:option>
+		</html:select>
+		&nbsp;
+		
+		<html:checkbox name="proteinSetComparisonForm" property="scaleRows"><nobr>Scale Rows</nobr></html:checkbox>
+		&nbsp;
+		
+		<html:checkbox name="proteinSetComparisonForm" property="clusterColumns"><nobr>Cluster Columns</nobr></html:checkbox>
+		&nbsp;
+		
 		<html:checkbox name="proteinSetComparisonForm" property="useLogScale">Log Scale</html:checkbox>
 		&nbsp;
 		
@@ -387,14 +401,7 @@ $(document).ready(function() {
 		<html:text name="proteinSetComparisonForm" property="replaceMissingWithValue" size="3"></html:text>
 		&nbsp; 
 		
-		Gradient:
-		<html:select name="proteinSetComparisonForm" property="heatMapGradientString">
-			<html:option value="<%=ClusteringConstants.GRADIENT.BY.getDisplayName() %>"></html:option>
-			<html:option value="<%=ClusteringConstants.GRADIENT.GR.getDisplayName() %>"></html:option>
-		</html:select>
-		&nbsp;
 		
-		<html:checkbox name="proteinSetComparisonForm" property="clusterColumns"><nobr>Cluster Columns</nobr></html:checkbox>
 	</td>
 	</tr>
 	<tr><td colspan="4" style="padding:4"><span></span></td></tr>

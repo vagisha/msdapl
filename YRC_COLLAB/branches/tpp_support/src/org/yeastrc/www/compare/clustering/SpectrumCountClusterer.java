@@ -94,6 +94,10 @@ public class SpectrumCountClusterer {
 		}
 		try {
 			readModifiedSpectrumCounts(grpComparison, output);
+			if(rOptions.isDoLog())
+				grpComparison.setMinHeatMapSpectrumCount((float)rOptions.getValueForMissing());
+			else
+				grpComparison.setMinHeatMapSpectrumCount(0);
 		}
 		catch(IOException e1) {
 			log.error("Error reading modified input file: "+output.getAbsolutePath(), e1);
@@ -129,10 +133,6 @@ public class SpectrumCountClusterer {
 		// reorder the protein groups
 		ProteinGroupComparisonDataset orderedGrpComparison =  reorderComparison(grpComparison, datasetOrder, groupOrder);
 		
-		if(rOptions.isDoLog())
-			orderedGrpComparison.setMinHeatMapSpectrumCount((float)rOptions.getValueForMissing());
-		else
-			orderedGrpComparison.setMinHeatMapSpectrumCount(0);
 		
 		output = new File(dir+File.separator+ClusteringConstants.IMG_FILE);
 		if(!output.exists()) {
@@ -318,6 +318,10 @@ public class SpectrumCountClusterer {
 		}
 		try {
 			readModifiedSpectrumCounts(comparison, output);
+			if(rOptions.isDoLog())
+				comparison.setMinHeatMapSpectrumCount((float)rOptions.getValueForMissing());
+			else
+				comparison.setMinHeatMapSpectrumCount(0);
 		}
 		catch(IOException e1) {
 			log.error("Error reading modified input file: "+output.getAbsolutePath(), e1);
@@ -353,10 +357,6 @@ public class SpectrumCountClusterer {
 		// reorder the protein groups
 		ProteinComparisonDataset orderedComparison =  reorderComparison(comparison, datasetOrder, proteinOrder);
 		
-		if(rOptions.isDoLog())
-			orderedComparison.setMinHeatMapSpectrumCount((float)rOptions.getValueForMissing());
-		else
-			orderedComparison.setMinHeatMapSpectrumCount(0);
 		
 		output = new File(dir+File.separator+ClusteringConstants.IMG_FILE);
 		if(!output.exists()) {
@@ -567,6 +567,7 @@ public class SpectrumCountClusterer {
 		}
 		
 		clustered.setProteinsInitialized(true);
+		clustered.setMinHeatMapSpectrumCount(grpComparison.getMinHeatMapSpectrumCount()); // This should be before initSummary
 		clustered.initSummary();
 		clustered.setSortBy(null);
 		clustered.setSortOrder(null);
@@ -601,6 +602,7 @@ public class SpectrumCountClusterer {
 		}
 		
 		clustered.setProteinsInitialized(true);
+		clustered.setMinHeatMapSpectrumCount(comparison.getMinHeatMapSpectrumCount());
 		clustered.initSummary();
 		clustered.setSortBy(null);
 		clustered.setSortOrder(null);
@@ -680,14 +682,16 @@ public class SpectrumCountClusterer {
 					writer.write("test_sc[test_sc == -Inf] <- -1.0\n");
 				}
 			}
-			else if(rinfo.getValueForMissing() != Double.MIN_VALUE) {
-				writer.write("test_sc[test_sc == 0] <- "+rinfo.getValueForMissing()+"\n");
-			}
-			
-			
+//			else if(rinfo.getValueForMissing() != Double.MIN_VALUE) {
+//				writer.write("test_sc[test_sc == 0] <- "+rinfo.getValueForMissing()+"\n");
+//			}
 			
 			writer.write("rownames(test_sc) <- test[,1]\n");
 			// writer.write("source(\"http://faculty.ucr.edu/~tgirke/Documents/R_BioCond/My_R_Scripts/my.colorFct.R\")\n");
+			
+			if(rinfo.isScaleRows()) {
+				writer.write("test_sc <- t(scale(t(test_sc)))\n");
+			}
 			
 			writer.write("write(t(as.matrix(test_sc)), file=\""+dir+File.separator+ClusteringConstants.INPUT_FILE_MOD+"\", sep=\" \", length(colnames(test_sc)))\n");
 			// get my colors
@@ -744,7 +748,8 @@ public class SpectrumCountClusterer {
 		int numCols;
 		boolean doLog = false;
 		int logBase = 10;
-		double valueForMissing = -1.0;
+		double valueForMissing = -1.0; // only used for log scale
+		boolean scaleRows = true;
 		boolean clusterColumns = false;
 		GRADIENT gradient = GRADIENT.BY;
 		
@@ -777,6 +782,12 @@ public class SpectrumCountClusterer {
 		}
 		public void setValueForMissing(double valueForMissing) {
 			this.valueForMissing = valueForMissing;
+		}
+		public boolean isScaleRows() {
+			return scaleRows;
+		}
+		public void setScaleRows(boolean scaleRows) {
+			this.scaleRows = scaleRows;
 		}
 		public boolean isClusterColumns() {
 			return clusterColumns;
