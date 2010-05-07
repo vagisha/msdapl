@@ -525,35 +525,34 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 
 	private String getCommonNameContents(ComparisonProtein protein) {
 
-		String contents = "";
-		contents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+")\"";
-		contents += " class=\"clickable underline\">";
-		List<ProteinReference> commonRefs = protein.getProteinListing().getCommonReferences();
-		for(ProteinReference ref: commonRefs) {
-			contents += ref.getCommonReference().getName()+"<br>";
-		}
-		contents += "</span>";
+		String contents = "<a href=\"viewProtein.do?id="+protein.getNrseqId()+"\">";
+        contents += "<span>";
+        List<ProteinReference> commonRefs = protein.getProteinListing().getCommonReferences();
+        for(ProteinReference ref: commonRefs) {
+        	contents += ref.getCommonReference().getName()+"<br>";
+        }
+        contents += "</span></a>";
 		return contents;
 	}
 
 	private String getAccessionContents(ComparisonProtein protein) {
 
-		String fullContents = "";
-		fullContents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+")\"";
-		fullContents += " style=\"display:none;\" class=\"full_name clickable underline\">";
-		String shortContents = "";
-		shortContents += "<span onclick=\"showProteinDetails("+protein.getNrseqId()+")\"";
-		shortContents += " class=\"short_name clickable underline\">";
-		List<ProteinReference> references;
-		references = protein.getProteinListing().getFastaReferences();
-		
-		for(ProteinReference ref: references) {
-			fullContents += ref.getAccession()+"<br>";
-			shortContents += ref.getShortAccession()+"<br>";
-		}
-		fullContents += "</span>";
-		shortContents += "</span>";
-		return fullContents+"\n"+shortContents;
+		String fullContents = "<a href=\"viewProtein.do?id="+protein.getNrseqId()+"\">";
+        fullContents += "<span";
+    	fullContents += " style=\"display:none;\" class=\"full_name\">";
+        String shortContents = "<a href=\"viewProtein.do?id="+protein.getNrseqId()+"\">";
+        shortContents += "<span";
+        shortContents += " class=\"short_name\">";
+        List<ProteinReference> references;
+        references = protein.getProteinListing().getFastaReferences();
+        
+        for(ProteinReference ref: references) {
+        	fullContents += ref.getAccession()+"<br>";
+        	shortContents += ref.getShortAccession()+"<br>";
+        }
+        fullContents += "</span></a>";
+        shortContents += "</span></a>";
+        return fullContents+"\n"+shortContents;
 	}
 
 	public float getScaledSpectrumCount(float count) {

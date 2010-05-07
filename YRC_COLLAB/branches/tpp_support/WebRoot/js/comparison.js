@@ -26,14 +26,6 @@
   $.blockUI.defaults.fadeOut = 0;
   $().ajaxStop($.unblockUI);
 
-//---------------------------------------------------------------------------------------
-//PROTEIN DETAILS
-//---------------------------------------------------------------------------------------
-function showProteinDetails(nrseqId) {
-	
-	// protName.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
-	window.location.href = "viewProtein.do?id="+nrseqId;
-}
 
 // ---------------------------------------------------------------------------------------
 // PAGE RESULTS
