@@ -15,7 +15,7 @@
 // Popup window code
 function newPopup(url) {
 	popupWindow = window.open(
-		url,'popUpWindow','height=600,width=500,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=yes,directories=no,status=yes')
+		url,'popUpWindow','height=600,width=600,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=yes,directories=no,status=yes')
 }
 function toggleColumnChooser() {
 	var text = $("#columnChooser").text();

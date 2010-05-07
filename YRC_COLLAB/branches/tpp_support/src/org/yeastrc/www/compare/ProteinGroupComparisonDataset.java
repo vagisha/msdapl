@@ -761,7 +761,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
     	}
     }
     
-    private String hexValue(int r, int g, int b) {
+    public static String hexValue(int r, int g, int b) {
         String red = Integer.toHexString(r);
         if(red.length() == 1)
             red = "0"+red;

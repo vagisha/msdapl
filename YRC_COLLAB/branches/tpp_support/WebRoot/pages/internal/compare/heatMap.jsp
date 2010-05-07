@@ -30,7 +30,11 @@ $(document).ready(function() {
 		
         $.blockUI({ 
             message: $("#imgdiv"),
-            css: {cursor:'default'}
+            css: {cursor:'default',
+            	  top:  ($(window).height() - 300) /2 + 'px', 
+                  left: ($(window).width() - 500) /2 + 'px',
+                  width: '500px',
+                  }
         }); 
  		return false;
     });
@@ -97,6 +101,7 @@ function updatePage(rowIndex) {
 	<tr>
 		<th width="2%" class="header">Protein</th>
 		<th width="1%" class="header"></th>
+		<th width="2%" class="header"></th>
 		<logic:iterate name="heatmap" property="datasetLabels" id="datasetLabel">
 			<th class="header"><bean:write name="datasetLabel"/></th>
 		</logic:iterate>
@@ -106,7 +111,7 @@ function updatePage(rowIndex) {
 	<tr>
 		<td class="rowname" style="font-size:2"><bean:write name="row" property="rowName" /></td>
 		<td class="rowname" style="font-size:2">
-			<a href='<bean:write name='row' property='rowGraph'/>' class="plotLink" 
+			<a href='<bean:write name='row' property='plotUrl'/>' class="plotLink" 
 			   id='<bean:write name="row" property="rowName" />'>Plot</a>
 		</td>
 		<logic:iterate name="row" property="cells" id="cell">

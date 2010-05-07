@@ -47,6 +47,13 @@ public class HeatMapData {
 			
 			List<HeatMapCell> cells = new ArrayList<HeatMapCell>();
 			
+			// add cell for molecular wt.
+			String molWtCellColor = getColorForMolWt(protein.getMolecularWeight());
+			HeatMapCell cell1 = new HeatMapCell();
+			cell1.setLabel("");
+			cell1.setHexColor(molWtCellColor);
+			cells.add(cell1);
+			
 			row.setRowName(protein.getProteinListing().getFastaReferences().get(0).getShortAccession());
 			
 			for(Dataset ds: grpComparison.getDatasets()) {
@@ -67,7 +74,7 @@ public class HeatMapData {
 			// http://chart.apis.google.com/chart?chs=320x200&cht=bvs&chd=t:1,19,27,53,61&chds=0,61&chco=FFCC33&chxt=x,y&chxr=1,0,61,10&chxl=0:|Jan|Feb|Mar|Apr|May
 			String plotUrl = getPlotUrl(protein, grpComparison.getDatasets());
 				
-			row.setRowGraph(plotUrl);
+			row.setPlotUrl(plotUrl);
 			
 			row.setCells(cells);
 		}
@@ -95,18 +102,18 @@ public class HeatMapData {
 			
 			DatasetProteinInformation dpi = protein.getDatasetProteinInformation(ds);
 			
-			xlabel += "|ID_"+ds.getDatasetId();
+			xlabel += "|"+ds.getDatasetId();
 			//colors += "|"+DatasetColor.get(idx).hexValue();
 			idx++;
 			
-			maxLabel = (int)Math.max(maxLabel, ("ID_"+ds.getDatasetId()).length());
+			maxLabel = (int)Math.max(maxLabel, (""+ds.getDatasetId()).length());
 			
 			if(dpi == null || !dpi.isPresent()) {
 				data+=",0";
 			}
 			else {
 				data += ","+dpi.getNormalizedSpectrumCountRounded();
-				maxSc = (int) Math.max(0, dpi.getNormalizedSpectrumCount());
+				maxSc = (int) Math.max(maxSc, dpi.getNormalizedSpectrumCount());
 			}
 			
 		}
@@ -126,6 +133,9 @@ public class HeatMapData {
 		
 		
 		int div = (int)Math.ceil((double)maxSc / 10.0);
+		if(div > 5) {
+			div = Math.round((float)div / 5.0f) * 5;
+		}
 		xrange = "1,0,"+maxSc+","+div;
 		plotUrl += "&chxr="+xrange;
 		
@@ -159,6 +169,13 @@ public class HeatMapData {
 			
 			row.setRowName(protein.getProteinListing().getFastaReferences().get(0).getShortAccession());
 			
+			// add cell for molecular wt.
+			String molWtCellColor = getColorForMolWt(protein.getMolecularWeight());
+			HeatMapCell cell1 = new HeatMapCell();
+			cell1.setLabel("");
+			cell1.setHexColor(molWtCellColor);
+			cells.add(cell1);
+			
 			for(Dataset ds: comparison.getDatasets()) {
 				
 				HeatMapCell cell = new HeatMapCell();
@@ -176,11 +193,28 @@ public class HeatMapData {
 				// http://chart.apis.google.com/chart?chs=320x200&cht=bvs&chd=t:1,19,27,53,61&chds=0,61&chco=FFCC33&chxt=x,y&chxr=1,0,61,10&chxl=0:|Jan|Feb|Mar|Apr|May
 				String plotUrl = getPlotUrl(protein, comparison.getDatasets());
 					
-				row.setRowGraph(plotUrl);
+				row.setPlotUrl(plotUrl);
 			}
 			row.setCells(cells);
 		}
 	}
+
+	private String getColorForMolWt(float molecularWeight) {
+		
+		int r = 255;
+		int g = 255;
+		int b = 0;
+		
+		int bin = (int) (molecularWeight / 10000);
+		//r += 25 * bin;
+		g -= 25 * bin;
+		//b -= 25 * bin;
+		r = Math.min(255, r);
+		g = Math.max(0, g);
+		//b = Math.max(0, bin);
+		return ProteinGroupComparisonDataset.hexValue(r, g, b);
+	}
+
 
 	public List<String> getDatasetLabels() {
 		return datasetLabels;
@@ -195,7 +229,7 @@ public class HeatMapData {
 		private String rowName;
 		private List<HeatMapCell> cells;
 		private int indexInList;
-		private String rowGraph = "NULL";
+		private String plotUrl = "NULL";
 		
 		public String getRowName() {
 			return rowName;
@@ -215,11 +249,11 @@ public class HeatMapData {
 		public void setIndexInList(int indexInList) {
 			this.indexInList = indexInList;
 		}
-		public String getRowGraph() {
-			return rowGraph;
+		public String getPlotUrl() {
+			return plotUrl;
 		}
-		public void setRowGraph(String rowGraph) {
-			this.rowGraph = rowGraph;
+		public void setPlotUrl(String url) {
+			this.plotUrl = url;
 		}
 	}
 	

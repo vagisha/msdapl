@@ -698,7 +698,10 @@ public class SpectrumCountClusterer {
 			writer.write("all_sc = unmatrix(as.matrix(test_sc))\n");
 			writer.write("all_sc = sort(all_sc)\n");
 			writer.write("m = length(which(all_sc <= mean(all_sc)))\n");
-			writer.write("n_high = 255 * (m/length(all_sc))\n");
+			if(rinfo.isScaleRows())
+				writer.write("n_high = 255 * 0.5\n");
+			else
+				writer.write("n_high = 255 * (m/length(all_sc))\n");
 			writer.write("n_low = 255 - n_high\n");
 			
 			// write the colors used for the heatmap
