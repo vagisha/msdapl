@@ -605,6 +605,14 @@
 	  <forward name="Success" path="/pages/internal/data/protein/viewProtein.jsp" redirect="false"/>
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	</action>
+	
+	<action
+	  path="/viewProteinDetails"
+	  type="org.yeastrc.www.protein.ProteinDetailsAction"
+	  validate="false">
+	  <forward name="Success" path="/pages/internal/data/protein/proteinDetails.jsp" redirect="false"/>
+	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+	</action>
 
 	<!-- ================================================================================== -->
 	<!-- Actions related to PHILIUS WebService -->

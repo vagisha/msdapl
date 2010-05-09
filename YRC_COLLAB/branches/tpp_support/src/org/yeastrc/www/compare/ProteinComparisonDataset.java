@@ -22,6 +22,7 @@ import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.ms.util.ProteinUtils;
+import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.nrseq.ProteinListingBuilder;
 import org.yeastrc.nrseq.ProteinReference;
@@ -343,9 +344,15 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 			}
 		}
 
+		List<Integer> pinferIds = new ArrayList<Integer>(this.getDatasetCount());
+        for(Dataset ds: this.getDatasets()) 
+        	pinferIds.add(ds.getDatasetId());
+        String pinferIdsCommaSeparated = StringUtils.makeCommaSeparated(pinferIds);
+        
 		// Protein accession
 		if(displayColumns.isShowFastaId()) {
-			TableCell protName = new TableCell("<A name='"+(index + this.getOffset())+"'></A> "+getAccessionContents(protein));
+			TableCell protName = new TableCell("<A name='"+(index + this.getOffset())+"'></A> "
+					+getAccessionContents(protein, pinferIdsCommaSeparated));
 			//protName.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
 			protName.setClassName("prot_accession");
 			row.addCell(protName);
@@ -353,7 +360,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 
 		// Protein common name
 		if(displayColumns.isShowCommonName()) {
-			TableCell protCommonName = new TableCell(getCommonNameContents(protein));
+			TableCell protCommonName = new TableCell(getCommonNameContents(protein, pinferIdsCommaSeparated));
 			row.addCell(protCommonName);
 		}
 
@@ -523,9 +530,9 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 	}
 
 
-	private String getCommonNameContents(ComparisonProtein protein) {
+	private String getCommonNameContents(ComparisonProtein protein, String pinferIdsCommaSeparated) {
 
-		String contents = "<a href=\"viewProtein.do?id="+protein.getNrseqId()+"\">";
+		String contents = "<a href=\"viewProteinDetails.do?id="+protein.getNrseqId()+"&pinferIds="+pinferIdsCommaSeparated+"\">";
         contents += "<span>";
         List<ProteinReference> commonRefs = protein.getProteinListing().getCommonReferences();
         for(ProteinReference ref: commonRefs) {
@@ -535,9 +542,9 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 		return contents;
 	}
 
-	private String getAccessionContents(ComparisonProtein protein) {
+	private String getAccessionContents(ComparisonProtein protein, String pinferIdsCommaSeparated) {
 
-		String fullContents = "<a href=\"viewProtein.do?id="+protein.getNrseqId()+"\">";
+		String fullContents = "<a href=\"viewProteinDetails.do?id="+protein.getNrseqId()+"&pinferIds="+pinferIdsCommaSeparated+"\">";
         fullContents += "<span";
     	fullContents += " style=\"display:none;\" class=\"full_name\">";
         String shortContents = "<a href=\"viewProtein.do?id="+protein.getNrseqId()+"\">";

@@ -27,6 +27,7 @@ import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.ms.util.ProteinUtils;
+import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.nrseq.ProteinListingBuilder;
 import org.yeastrc.nrseq.ProteinReference;
@@ -499,9 +500,15 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         else
             row.setStyleClass(rowCssClass);
         
+        List<Integer> pinferIds = new ArrayList<Integer>(this.getDatasetCount());
+        for(Dataset ds: this.getDatasets()) 
+        	pinferIds.add(ds.getDatasetId());
+        String pinferIdsCommaSeparated = StringUtils.makeCommaSeparated(pinferIds);
+        
         // Protein name
         if(displayColumns.isShowFastaId()) {
-        	TableCell protName = new TableCell("<A name='"+(index + this.getStartIndex())+"'></A> "+getAccessionContents(protein));
+        	TableCell protName = new TableCell("<A name='"+(index + this.getStartIndex())+"'></A> "
+        			+getAccessionContents(protein, pinferIdsCommaSeparated));
         	//TableCell protName = new TableCell(getAccessionContents(protein));
         	protName.setClassName("prot_accession");
         	row.addCell(protName);
@@ -509,7 +516,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         
         if(displayColumns.isShowCommonName()) {
         	// Protein common name
-        	TableCell protCommonName = new TableCell(getCommonNameContents(protein));
+        	TableCell protCommonName = new TableCell(getCommonNameContents(protein, pinferIdsCommaSeparated));
         	row.addCell(protCommonName);
         }
         
@@ -698,9 +705,9 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         return fullContents+"\n"+shortContents;
 	}
 
-	private String getCommonNameContents(ComparisonProtein protein) {
+	private String getCommonNameContents(ComparisonProtein protein, String pinferIdsCommaSeparated) {
 		
-		String contents = "<a href=\"viewProtein.do?id="+protein.getNrseqId()+"\">";
+		String contents = "<a href=\"viewProteinDetails.do?id="+protein.getNrseqId()+"&pinferIds="+pinferIdsCommaSeparated+"\">";
         contents += "<span>";
         List<ProteinReference> commonRefs = protein.getProteinListing().getCommonReferences();
         for(ProteinReference ref: commonRefs) {
@@ -710,12 +717,13 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
 		return contents;
 	}
 
-	private String getAccessionContents(ComparisonProtein protein) {
+	private String getAccessionContents(ComparisonProtein protein, String pinferIdsCommaSeparated) {
 		
-		String fullContents = "<a href=\"viewProtein.do?id="+protein.getNrseqId()+"\">";
+		String fullContents = "<a href=\"viewProteinDetails.do?id="+protein.getNrseqId()+"&pinferIds="+pinferIdsCommaSeparated+"\">";
         fullContents += "<span";
     	fullContents += " style=\"display:none;\" class=\"full_name\">";
-        String shortContents = "<a href=\"viewProtein.do?id="+protein.getNrseqId()+"\">";
+    	
+        String shortContents = "<a href=\"proteinDetails.do?id="+protein.getNrseqId()+"&pinferIds="+pinferIdsCommaSeparated+"\">";
         shortContents += "<span";
         shortContents += " class=\"short_name\">";
         List<ProteinReference> references;
