@@ -397,10 +397,11 @@ $(document).ready(function() {
 		</html:select>
 		&nbsp;
 		
+		<yrcwww:member group="administrators">
 		Replace missing with: 
 		<html:text name="proteinSetComparisonForm" property="replaceMissingWithValue" size="3"></html:text>
 		&nbsp; 
-		
+		</yrcwww:member>
 		
 	</td>
 	</tr>
