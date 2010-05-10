@@ -654,8 +654,8 @@ public class SpectrumCountClusterer {
 			// read this: http://www.uni-koeln.de/rrzk/server/documentation/modules.html
 			// writer.write(". /etc/profile.d/modules.sh\n");
 			//writer.write("module load modules modules-init modules-gs R\n");
-			//writer.write("/net/gs/vol3/software/bin/R --vanilla --slave --file="+pathToRScript+"\n");
-			writer.write("R --vanilla --slave --file="+pathToRScript+"\n");
+			writer.write("/net/gs/vol3/software/bin/R --vanilla --slave --file="+pathToRScript+"\n");
+			//writer.write("R --vanilla --slave --file="+pathToRScript+"\n");
 			//writer.write(ApplicationProperties.getRPath()+" --vanilla --slave --file="+pathToRScript+"\n");
 		}
 		finally {
