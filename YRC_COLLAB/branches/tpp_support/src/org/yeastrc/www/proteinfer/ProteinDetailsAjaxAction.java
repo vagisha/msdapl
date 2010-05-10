@@ -15,6 +15,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.bio.taxonomy.TaxonomyUtils;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
@@ -25,6 +26,7 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerPeptideBase;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptide;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nrseq.GOSearcher;
+import org.yeastrc.www.protein.ProteinAbundanceDao;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerIonForProtein;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
@@ -100,10 +102,26 @@ public class ProteinDetailsAjaxAction extends Action {
         Set<String> peptideSequences = null;
         int nrseqProteinId = 0;
         
+        
         if(ProteinInferenceProgram.isIdPicker(run.getProgram())) {
             // get the protein 
             WIdPickerProtein iProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, pinferProtId, peptideDef);
             request.setAttribute("protein", iProt);
+            
+            // Abundance information. Only for yeaset
+            // Ghaemmaghami, et al., Nature 425, 737-741 (2003)
+            if(iProt.getProteinListing().getSpeciesId() == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
+            	double abundance = ProteinAbundanceDao.getInstance().getAbundance(iProt.getProteinListing().getNrseqProteinId());
+            	if(abundance == -1)
+            		request.setAttribute("proteinAbundance", "UNKNOWN");
+            	else {
+            		if(abundance == Math.round(abundance)) {
+            			request.setAttribute("proteinAbundance", String.valueOf((int)abundance));
+            		}
+            		else
+            			request.setAttribute("proteinAbundance", String.valueOf(abundance));
+            	}
+            }
             
             // Gene Ontology information
             Map goterms = GOSearcher.getGONodes(iProt.getProteinListing());
@@ -153,6 +171,21 @@ public class ProteinDetailsAjaxAction extends Action {
             // get the protein 
             WProteinProphetProtein pProt = ProteinProphetResultsLoader.getWProteinProphetProtein(pinferId, pinferProtId, peptideDef);
             request.setAttribute("protein", pProt);
+            
+            // Abundance information. Only for yeast
+            // Ghaemmaghami, et al., Nature 425, 737-741 (2003)
+            if(pProt.getProteinListing().getSpeciesId() == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
+            	double abundance = ProteinAbundanceDao.getInstance().getAbundance(pProt.getProteinListing().getNrseqProteinId());
+            	if(abundance == -1)
+            		request.setAttribute("proteinAbundance", "UNKNOWN");
+            	else {
+            		if(abundance == Math.round(abundance)) {
+            			request.setAttribute("proteinAbundance", String.valueOf((int)abundance));
+            		}
+            		else
+            			request.setAttribute("proteinAbundance", String.valueOf(abundance));
+            	}
+            }
             
             // Gene Ontology information
             Map goterms = GOSearcher.getGONodes(pProt.getProteinListing());

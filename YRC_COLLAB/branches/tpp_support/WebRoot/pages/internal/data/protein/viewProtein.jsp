@@ -90,6 +90,20 @@
    <TD valign="top" width="75%"><bean:write name="protein" property="peptide.length" filter="false"/> amino acids</TD>
   </yrcwww:colorrow>
 
+ <logic:present name="proteinAbundance">
+  <yrcwww:colorrow scheme="search">
+	<TD valign="top" width="25%"><b>Abundance:</b>
+	<br/>
+    <span class="small_font">Ghaemmaghami, <em>et al., </em></span><br>
+    <span class="small_font"><em>Nature</em> <strong>425</strong>, 737-741 (2003)</span>
+	</td>
+	<TD valign="top" width="75%">
+    	<bean:write name="proteinAbundance" /> copies / cell 
+	</td>
+  </yrcwww:colorrow>
+</logic:present>
+
+
   <yrcwww:colorrow scheme="search">
    <TD valign="top" width="100%" colspan="2" align="center"><br><font style="font-size:12pt;"><b>Gene Ontology:</b></font><br><br></TD>
   </yrcwww:colorrow>

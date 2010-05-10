@@ -21,6 +21,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.bio.taxonomy.TaxonomyUtils;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.nrseq.NrProtein;
 import org.yeastrc.ms.util.TimeUtils;
@@ -122,6 +123,22 @@ private static final Logger log = Logger.getLogger(ProteinDetailsAjaxAction.clas
         protein.setSequence(sequence);
         
         request.setAttribute("protein", protein);
+        
+        // Abundance information. Only for yeast
+        // Ghaemmaghami, et al., Nature 425, 737-741 (2003)
+        if(nrProtein.getSpeciesId() == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
+        	double abundance = ProteinAbundanceDao.getInstance().getAbundance(nrProtein.getId());
+        	if(abundance == -1)
+        		request.setAttribute("proteinAbundance", "UNKNOWN");
+        	else {
+        		if(abundance == Math.round(abundance)) {
+        			request.setAttribute("proteinAbundance", String.valueOf((int)abundance));
+        		}
+        		else
+        			request.setAttribute("proteinAbundance", String.valueOf(abundance));
+        	}
+        }
+        
         
         // Gene Ontology information
         Map goterms = GOSearcher.getGONodes(protein.getProteinListing());

@@ -21,6 +21,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.bio.taxonomy.TaxonomyUtils;
 import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
@@ -80,6 +81,21 @@ public class ViewProteinAction extends Action {
 			// Load our protein
 			NRProteinFactory nrpf = NRProteinFactory.getInstance();
 			protein = (NRProtein)(nrpf.getProtein(proteinID));
+			
+			// Abundance information. Only for yeast
+	        // Ghaemmaghami, et al., Nature 425, 737-741 (2003)
+	        if(protein.getSpecies().getId() == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
+	        	double abundance = ProteinAbundanceDao.getInstance().getAbundance(protein.getId());
+	        	if(abundance == -1)
+	        		request.setAttribute("proteinAbundance", "UNKNOWN");
+	        	else {
+	        		if(abundance == Math.round(abundance)) {
+	        			request.setAttribute("proteinAbundance", String.valueOf((int)abundance));
+	        		}
+	        		else
+	        			request.setAttribute("proteinAbundance", String.valueOf(abundance));
+	        	}
+	        }
 		
 		} catch (NumberFormatException nfe) {
 			ActionErrors errors = new ActionErrors();

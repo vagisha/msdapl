@@ -70,6 +70,20 @@
     	<bean:write name="protein" property="pi" />
 	</td>
 </tr>
+
+<logic:present name="proteinAbundance">
+<tr>
+	<td valign="top" align="left"><b>Abundance:</b>
+	<br/>
+    <span class="small_font">Ghaemmaghami, <em>et al., </em></span><br>
+    <span class="small_font"><em>Nature</em> <strong>425</strong>, 737-741 (2003)</span>
+	</td>
+	<td valign="top" align="left">
+    	<bean:write name="proteinAbundance" /> copies / cell 
+	</td>
+</tr>
+</logic:present>
+
 <tr>
 	<td valign="top" align="left"><b>Description(s):</b></td>
 	<td valign="top" align="left" style="color: #888888; font-size: 9pt;">

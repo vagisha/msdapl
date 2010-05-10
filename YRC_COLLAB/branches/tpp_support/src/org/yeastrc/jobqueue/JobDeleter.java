@@ -47,9 +47,6 @@ public class JobDeleter {
 			stmt.setInt( 1, job.getId() );
 			stmt.executeUpdate();
 			
-			stmt.close(); stmt = null;
-			conn.close(); conn = null;
-			
 			return true;
 			
 		} finally {
