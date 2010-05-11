@@ -83,6 +83,31 @@ function updatePage(rowIndex) {
 <!-- RESULTS TABLE -->
 <div style="margin:10 5 10 5;"> 
 
+<div align="center">Molecular Weight</div>
+<table width="60%" align="center" style="border: 1px dashed gray;">
+<tr>
+<td width="2%" class="small_font" style="background-color:rgb(255,255,0);">&nbsp;&nbsp;</td><td class="small_font">0 to 12000</td>
+<td width="2%" style="background-color:rgb(255,180,0);">&nbsp;&nbsp;</td><td class="small_font">12000 to 18000</td>
+<td width="2%" style="background-color:rgb(255,0,0);">&nbsp;&nbsp;</td><td class="small_font">18000 to 22000</td>
+</tr>
+<tr>
+<td width="2%" style="background-color:rgb(255,0,180);">&nbsp;&nbsp;</td><td class="small_font">22000 to 25000</td>
+<td width="2%" style="background-color:rgb(255,0,255);">&nbsp;&nbsp;</td><td class="small_font">25000 to 35000</td>
+<td width="2%" style="background-color:rgb(180,0,255);">&nbsp;&nbsp;</td><td class="small_font">35000 to 40000</td>
+</tr>
+<tr>
+<td width="2%" style="background-color:rgb(0,0,255);">&nbsp;&nbsp;</td><td class="small_font">40000 to 50000</td>
+<td width="2%" style="background-color:rgb(0,180,255);">&nbsp;&nbsp;</td><td class="small_font">50000 to 60000</td>
+<td width="2%" style="background-color:rgb(0,255,255);">&nbsp;&nbsp;</td><td class="small_font">60000 to 70000</td>
+</tr>
+<tr>
+<td width="2%" style="background-color:rgb(0,255,180);">&nbsp;&nbsp;</td><td class="small_font">70000 to 80000</td>
+<td width="2%" style="background-color:rgb(0,255,0);">&nbsp;&nbsp;</td><td class="small_font">80000 to 90000</td>
+<td width="2%" style="background-color:rgb(0,0,0);">&nbsp;&nbsp;</td><td class="small_font">90000 to 100000</td>
+</tr>
+</table>
+
+
 <logic:present name="heatmap">
 
 	<table width="90%" cellspacing="0" cellpadding="10" align="center">

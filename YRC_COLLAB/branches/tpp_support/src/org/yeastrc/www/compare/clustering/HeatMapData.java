@@ -13,7 +13,6 @@ import org.yeastrc.www.compare.ComparisonProtein;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
 import org.yeastrc.www.compare.dataset.Dataset;
-import org.yeastrc.www.compare.dataset.DatasetColor;
 import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 
@@ -148,10 +147,9 @@ public class HeatMapData {
 		scale = "0,"+maxSc;
 		plotUrl += "&chds="+scale;
 		
+		// x-axis labels
 		plotUrl += "&chxl=0:"+xlabel;
-		
-		// x-axis label
-		plotUrl += "&chxl=2:|Dataset+ID&chxp=2,50";
+		plotUrl += "|2:|Dataset+ID&chxp=2,50";
 		
 		// bar labels
 		plotUrl += "&chm=N,000000,0,,10|N,000000,1,,10";
@@ -216,18 +214,42 @@ public class HeatMapData {
 
 	private String getColorForMolWt(float molecularWeight) {
 		
-		int r = 255;
-		int g = 255;
-		int b = 0;
-		
-		int bin = (int) (molecularWeight / 10000);
-		//r += 25 * bin;
-		g -= 25 * bin;
-		//b -= 25 * bin;
-		r = Math.min(255, r);
-		g = Math.max(0, g);
-		//b = Math.max(0, bin);
-		return ProteinGroupComparisonDataset.hexValue(r, g, b);
+//		int r = 255;
+//		int g = 255;
+//		int b = 0;
+//		
+//		int bin = (int) (molecularWeight / 10000);
+//		//r += 25 * bin;
+//		g -= 25 * bin;
+//		//b -= 25 * bin;
+//		r = Math.min(255, r);
+//		g = Math.max(0, g);
+//		//b = Math.max(0, bin);
+		if(molecularWeight > 0 && molecularWeight <= 12000)
+			return ProteinGroupComparisonDataset.hexValue(255, 255,0);  //  0 to 12000; yellow
+		else if(molecularWeight > 12000 && molecularWeight <= 18000)
+			return ProteinGroupComparisonDataset.hexValue(255, 180,0);  // 12000 to 18000;  orange
+		else if(molecularWeight > 18000 && molecularWeight <= 22000)
+			return ProteinGroupComparisonDataset.hexValue(255, 0,0);	// 18000 to 22000; red
+		else if(molecularWeight > 22000 && molecularWeight <= 25000)
+			return ProteinGroupComparisonDataset.hexValue(255,0,180);	// 22000 to 25000; 
+		else if(molecularWeight > 25000 && molecularWeight <= 35000)
+			return ProteinGroupComparisonDataset.hexValue(255,0,255);	// 25000 to 35000; magenta
+		else if(molecularWeight > 35000 && molecularWeight <= 40000)
+			return ProteinGroupComparisonDataset.hexValue(180,0,255);	// 35000 to 40000
+		else if(molecularWeight > 40000 && molecularWeight <= 50000)
+			return ProteinGroupComparisonDataset.hexValue(0,0,255);		// 40000 to 50000; blue
+		else if(molecularWeight > 50000 && molecularWeight <= 60000)
+			return ProteinGroupComparisonDataset.hexValue(0,180,255);	// 50000 to 60000; 
+		else if(molecularWeight > 60000 && molecularWeight <= 70000)
+			return ProteinGroupComparisonDataset.hexValue(0,255,255);	// 60000 to 70000; cyan
+		else if(molecularWeight > 70000 && molecularWeight <= 80000)
+			return ProteinGroupComparisonDataset.hexValue(0,255,180);	// 70000 to 80000; 
+		else if(molecularWeight > 80000 && molecularWeight <= 90000)
+			return ProteinGroupComparisonDataset.hexValue(0,255,0);		// 80000 to 90000; green
+		else
+			return ProteinGroupComparisonDataset.hexValue(0,0,0);		// 90000 to 100000; black
+		//return ProteinGroupComparisonDataset.hexValue(r, g, b);
 	}
 
 
