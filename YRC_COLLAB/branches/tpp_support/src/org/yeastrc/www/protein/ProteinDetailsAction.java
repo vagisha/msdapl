@@ -29,6 +29,7 @@ import org.yeastrc.nrseq.GOSearcher;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.nrseq.ProteinListingBuilder;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
+import org.yeastrc.www.protein.ProteinAbundanceDao.YeastOrfAbundance;
 import org.yeastrc.www.proteinfer.ProteinDetailsAjaxAction;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -127,15 +128,21 @@ private static final Logger log = Logger.getLogger(ProteinDetailsAjaxAction.clas
         // Abundance information. Only for yeast
         // Ghaemmaghami, et al., Nature 425, 737-741 (2003)
         if(nrProtein.getSpeciesId() == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
-        	double abundance = ProteinAbundanceDao.getInstance().getAbundance(nrProtein.getId());
-        	if(abundance == -1)
+        	List<YeastOrfAbundance> abundances = ProteinAbundanceDao.getInstance().getAbundance(nrProtein.getId());
+        	if(abundances == null || abundances.size() == 0)
         		request.setAttribute("proteinAbundance", "UNKNOWN");
         	else {
-        		if(abundance == Math.round(abundance)) {
-        			request.setAttribute("proteinAbundance", String.valueOf((int)abundance));
+        		if(abundances.size() == 1) {
+        			request.setAttribute("proteinAbundance", abundances.get(0).getAbundanceToPrint());
         		}
-        		else
-        			request.setAttribute("proteinAbundance", String.valueOf(abundance));
+        		else {
+        			String aString = "";
+        			for(YeastOrfAbundance a: abundances) {
+        				aString +=  ", "+a.getAbundanceAndOrfNameToPrint();
+        			}
+        			aString = aString.substring(1);
+        			request.setAttribute("proteinAbundance", aString);
+        		}
         	}
         }
         

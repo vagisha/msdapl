@@ -3,6 +3,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.yeastrc.db.DBConnectionManager;
 
@@ -28,7 +30,7 @@ public class ProteinAbundanceDao {
 		return instance;
 	}
 	
-	public double getAbundance(int nrseqProteinId) throws SQLException {
+	public List<YeastOrfAbundance> getAbundance(int nrseqProteinId) throws SQLException {
 		
 		Connection conn = null;
 		Statement stmt = null;
@@ -36,15 +38,19 @@ public class ProteinAbundanceDao {
 		
 		try {
 			
-			String sql = "SELECT abundance from yeastProteinAbundance WHERE proteinID = "+nrseqProteinId;
+			String sql = "SELECT orfName, abundance from yeastProteinAbundance WHERE proteinID = "+nrseqProteinId;
 			conn = DBConnectionManager.getConnection(DBConnectionManager.NRSEQ);
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sql);
 			
-			if(rs.next()) {
-				return rs.getDouble("abundance");
+			List<YeastOrfAbundance> orfs = new ArrayList<YeastOrfAbundance>();
+			while(rs.next()) {
+				YeastOrfAbundance oa = new YeastOrfAbundance();
+				oa.setAbundance(rs.getDouble("abundance"));
+				oa.setOrfName(rs.getString("orfName"));
+				orfs.add(oa);
 			}
-			return -1.0;
+			return orfs;
 			
 		} finally {
 
@@ -59,6 +65,34 @@ public class ProteinAbundanceDao {
 			if (conn != null) {
 				try { conn.close(); conn = null; } catch (Exception e) { ; }
 			}			
+		}
+	}
+	
+	public static final class YeastOrfAbundance {
+		
+		private String orfName;
+		private double abundance;
+		public String getOrfName() {
+			return orfName;
+		}
+		public void setOrfName(String orfName) {
+			this.orfName = orfName;
+		}
+		public double getAbundance() {
+			return abundance;
+		}
+		public String getAbundanceToPrint() {
+			if(abundance == Math.round(abundance)) {
+				return String.valueOf((int)abundance);
+			}
+			else
+				return String.valueOf(abundance);
+		}
+		public String getAbundanceAndOrfNameToPrint() {
+			return orfName+":"+getAbundanceToPrint();
+		}
+		public void setAbundance(double abundance) {
+			this.abundance = abundance;
 		}
 	}
 }

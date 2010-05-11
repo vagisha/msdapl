@@ -49,6 +49,11 @@
  else sortedClass = "sorted-desc";
  %>
 
+<bean:define id="myColspan" value="11"/>
+<logic:present name="yeastAbundances">
+	<bean:define id="myColspan" value="12"/>
+</logic:present>
+
 <table cellpadding="0" cellspacing="0" align="center" width="99%"  id="protlisttable" class="table_pinfer" style="margin-top:10;">
 
 	<logic:notEmpty name="proteinGroups">
@@ -118,6 +123,12 @@
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.NSAF.name()%>">
 			<b><font size="2pt">NSAF**</font></b>
 		</th>
+		
+		<logic:present name="yeastAbundances">
+			<th width="5%">
+				<b><font size="2pt">Copies<br/>/cell</font></b>
+			</th>
+		</logic:present>
 			
 		<% colSortedClass = "";
 			 if(sortBy == SORT_BY.NUM_PEPT) colSortedClass = sortedClass;
@@ -273,6 +284,9 @@
 			<td><bean:write name="protein" property="protein.coverage"/></td>
 			<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
 		
+			<logic:present name="yeastAbundances">
+				<td><bean:write name="protein" property="yeastProteinAbundanceString"/></td>
+			</logic:present>
 		
 		
 			<td rowspan="<bean:write name="rowspan" />" valign="middle">
@@ -300,7 +314,7 @@
 				  id="<bean:write name="protein" property="protein.id" />"
 				  title="<bean:write name="proteinGroup" property="groupId" />"
 				  >Show Peptides</span></nobr></td>
-		<td colspan="11" class="pinfer_filler">
+		<td colspan='<bean:write name="myColspan"/>' class="pinfer_filler">
 			<!--  peptides table will go here: proteinPeptides.jsp -->
 			<div id="peptforprot_<bean:write name="protein" property="protein.id" />_<bean:write name="proteinGroup" property="groupId" />"></div>
 		</td>
@@ -440,6 +454,11 @@
 		<td><bean:write name="protein" property="protein.coverage"/></td>
 		<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
 		
+		<logic:present name="yeastAbundances">
+			<td><bean:write name="protein" property="yeastProteinAbundanceString"/></td>
+		</logic:present>
+			
+		
 		<%if(first) { first = false;%>
 		<td rowspan="<bean:write name="rowspan" />" valign="middle">
 			<bean:write name="proteinGroup" property="matchingPeptideCount"/>
@@ -469,7 +488,7 @@
 					  style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #000000;" 
 					  id="<bean:write name="proteinGroup" property="groupId" />"
 					  >Show Peptides</span></nobr></td>
-			<td colspan="11" class="pinfer_filler">
+			<td colspan="<bean:write name="myColspan"/>" class="pinfer_filler">
 				<!--  peptides table will go here: proteinPeptides.jsp -->
 				<div id="peptforprot_<bean:write name="proteinGroup" property="groupId" />"></div>
 			</td>

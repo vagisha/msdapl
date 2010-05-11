@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.bio.taxonomy.TaxonomyUtils;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
 
@@ -38,5 +39,14 @@ public class ProteinInferToSpeciesMapper {
         }
 		
 		return new ArrayList<Integer>(speciesIds);
+	}
+	
+	public static boolean isSpeciesYeast(int pinferId) {
+		List<Integer> speciesIds = map(pinferId);
+		for(int speciesId: speciesIds) {
+			if(speciesId == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE)
+				return true;
+		}
+		return false;
 	}
 }

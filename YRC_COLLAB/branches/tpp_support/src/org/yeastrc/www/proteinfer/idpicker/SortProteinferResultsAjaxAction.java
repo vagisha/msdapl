@@ -23,6 +23,7 @@ import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
+import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -175,6 +176,9 @@ public class SortProteinferResultsAjaxAction extends Action{
         List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, peptideDef);
         request.setAttribute("proteinGroups", proteinGroups);
 
+        if(ProteinInferToSpeciesMapper.isSpeciesYeast(pinferId)) {
+        	request.setAttribute("yeastAbundances", true);
+        }
 
         // get the list of page numbers to display
         int pageCount = ResultsPager.instance().getPageCount(storedProteinIds.size());

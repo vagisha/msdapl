@@ -27,6 +27,7 @@ import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPepti
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nrseq.GOSearcher;
 import org.yeastrc.www.protein.ProteinAbundanceDao;
+import org.yeastrc.www.protein.ProteinAbundanceDao.YeastOrfAbundance;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerIonForProtein;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
@@ -111,15 +112,29 @@ public class ProteinDetailsAjaxAction extends Action {
             // Abundance information. Only for yeaset
             // Ghaemmaghami, et al., Nature 425, 737-741 (2003)
             if(iProt.getProteinListing().getSpeciesId() == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
-            	double abundance = ProteinAbundanceDao.getInstance().getAbundance(iProt.getProteinListing().getNrseqProteinId());
-            	if(abundance == -1)
+            	List<YeastOrfAbundance> abundances = ProteinAbundanceDao.getInstance().getAbundance(iProt.getProteinListing().getNrseqProteinId());
+            	if(abundances == null || abundances.size() == 0)
             		request.setAttribute("proteinAbundance", "UNKNOWN");
             	else {
-            		if(abundance == Math.round(abundance)) {
-            			request.setAttribute("proteinAbundance", String.valueOf((int)abundance));
+            		if(abundances.size() == 1) {
+            			double abundance = abundances.get(0).getAbundance();
+            			if(abundance == Math.round(abundance)) {
+            				request.setAttribute("proteinAbundance", String.valueOf((int)abundance));
+            			}
+            			else
+            				request.setAttribute("proteinAbundance", String.valueOf(abundance));
             		}
-            		else
-            			request.setAttribute("proteinAbundance", String.valueOf(abundance));
+            		else {
+            			String aString = "";
+            			for(YeastOrfAbundance a: abundances) {
+            				double abundance = a.getAbundance();
+            				aString += ", "+a.getOrfName()+": ";
+            				if(abundance == Math.round(abundance)) aString += String.valueOf((int)abundance);
+            				else aString +=  String.valueOf(abundance);
+            			}
+            			aString = aString.substring(1);
+            			request.setAttribute("proteinAbundance", aString);
+            		}
             	}
             }
             
@@ -175,15 +190,21 @@ public class ProteinDetailsAjaxAction extends Action {
             // Abundance information. Only for yeast
             // Ghaemmaghami, et al., Nature 425, 737-741 (2003)
             if(pProt.getProteinListing().getSpeciesId() == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
-            	double abundance = ProteinAbundanceDao.getInstance().getAbundance(pProt.getProteinListing().getNrseqProteinId());
-            	if(abundance == -1)
+            	List<YeastOrfAbundance> abundances = ProteinAbundanceDao.getInstance().getAbundance(pProt.getProteinListing().getNrseqProteinId());
+            	if(abundances == null || abundances.size() == 0)
             		request.setAttribute("proteinAbundance", "UNKNOWN");
             	else {
-            		if(abundance == Math.round(abundance)) {
-            			request.setAttribute("proteinAbundance", String.valueOf((int)abundance));
+            		if(abundances.size() == 1) {
+            			request.setAttribute("proteinAbundance", abundances.get(0).getAbundanceToPrint());
             		}
-            		else
-            			request.setAttribute("proteinAbundance", String.valueOf(abundance));
+            		else {
+            			String aString = "";
+            			for(YeastOrfAbundance a: abundances) {
+            				aString +=  ", "+a.getAbundanceAndOrfNameToPrint();
+            			}
+            			aString = aString.substring(1);
+            			request.setAttribute("proteinAbundance", aString);
+            		}
             	}
             }
             

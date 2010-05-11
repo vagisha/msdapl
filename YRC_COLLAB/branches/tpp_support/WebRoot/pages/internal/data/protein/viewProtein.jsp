@@ -92,13 +92,13 @@
 
  <logic:present name="proteinAbundance">
   <yrcwww:colorrow scheme="search">
-	<TD valign="top" width="25%"><b>Abundance:</b>
+	<TD valign="top" width="25%"><b>Abundance:</b><br/>(copies / cell)
 	<br/>
     <span class="small_font">Ghaemmaghami, <em>et al., </em></span><br>
     <span class="small_font"><em>Nature</em> <strong>425</strong>, 737-741 (2003)</span>
 	</td>
 	<TD valign="top" width="75%">
-    	<bean:write name="proteinAbundance" /> copies / cell 
+    	<bean:write name="proteinAbundance" />
 	</td>
   </yrcwww:colorrow>
 </logic:present>

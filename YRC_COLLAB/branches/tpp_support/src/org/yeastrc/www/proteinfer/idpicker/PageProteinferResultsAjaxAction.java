@@ -24,6 +24,7 @@ import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
+import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -85,6 +86,9 @@ public class PageProteinferResultsAjaxAction extends Action {
         boolean group = filterCriteria_session.isGroupProteins();
         request.setAttribute("groupProteins", group);
         
+        if(ProteinInferToSpeciesMapper.isSpeciesYeast(pinferId)) {
+        	request.setAttribute("yeastAbundances", true);
+        }
         
         // get the page number from the request
         int pageNum = 1;

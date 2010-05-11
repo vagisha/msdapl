@@ -52,9 +52,11 @@ import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.nrseq.ProteinListingBuilder;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
+import org.yeastrc.www.protein.ProteinAbundanceDao;
 import org.yeastrc.www.proteinfer.MsResultLoader;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
 import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
+import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
 import org.yeastrc.www.proteinfer.ProteinProperties;
 import org.yeastrc.www.proteinfer.ProteinPropertiesFilter;
 import org.yeastrc.www.proteinfer.ProteinPropertiesSorter;
@@ -270,6 +272,7 @@ public class IdPickerResultsLoader {
         
         // get the molecular weight for the protein
         assignProteinProperties(wProt);
+        
         return wProt;
     }
     
@@ -408,6 +411,21 @@ public class IdPickerResultsLoader {
             groups.add(grp);
         }
         
+        // If this protein inference ID is associated with yeast species
+        // get the yeast protein abundances.
+        if(ProteinInferToSpeciesMapper.isSpeciesYeast(pinferId)) {
+        	ProteinAbundanceDao aDao = ProteinAbundanceDao.getInstance();
+        	for(WIdPickerProteinGroup grp: groups) {
+        		for(WIdPickerProtein protein: grp.getProteins()) {
+        			int nrseqId = protein.getProtein().getNrseqProteinId();
+        			try {
+						protein.setYeastProteinAbundance(aDao.getAbundance(nrseqId));
+					} catch (SQLException e1) {
+						log.error("Exception getting yeast protein abundance", e1);
+					}
+        		}
+        	}
+        }
         long e = System.currentTimeMillis();
         log.info("Time to get WIdPickerProteinsGroups: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         

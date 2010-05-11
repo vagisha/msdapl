@@ -26,6 +26,7 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
+import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
 
 import edu.uwpr.protinfer.idpicker.IDPickerParams;
 import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
@@ -167,6 +168,10 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, pageProteinIds, peptideDef);
         
         request.setAttribute("proteinGroups", proteinGroups);
+        
+        if(ProteinInferToSpeciesMapper.isSpeciesYeast(pinferId)) {
+        	request.setAttribute("yeastAbundances", true);
+        }
         
         // get the list of page numbers to display
         int pageCount = ResultsPager.instance().getPageCount(proteinIds.size());

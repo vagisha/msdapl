@@ -28,6 +28,7 @@ import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.GOSupportChecker;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 import org.yeastrc.www.proteinfer.ProteinInferToProjectMapper;
+import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.www.util.RoundingUtils;
@@ -118,6 +119,11 @@ public class ProteinInferViewAction extends Action {
         proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIdsPage, peptideDef);
         
         request.setAttribute("proteinGroups", proteinGroups);
+        
+        if(ProteinInferToSpeciesMapper.isSpeciesYeast(pinferId)) {
+        	request.setAttribute("yeastAbundances", true);
+        }
+        
         
         // get the list of page numbers to display
         int pageCount = ResultsPager.instance().getPageCount(proteinIds.size());

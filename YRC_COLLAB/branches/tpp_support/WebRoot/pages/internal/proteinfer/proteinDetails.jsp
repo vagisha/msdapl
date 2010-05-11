@@ -65,13 +65,13 @@
 
 <logic:present name="proteinAbundance">
 <tr>
-	<td valign="top" align="left"><b>Abundance:</b>
+	<td valign="top" align="left"><b>Abundance:</b><br/>(copies / cell)
 	<br/>
     <span class="small_font">Ghaemmaghami, <em>et al., </em></span><br>
     <span class="small_font"><em>Nature</em> <strong>425</strong>, 737-741 (2003)</span>
 	</td>
 	<td valign="top" align="left">
-    	<bean:write name="proteinAbundance" /> copies / cell 
+    	<bean:write name="proteinAbundance" />
 	</td>
 </tr>
 </logic:present>

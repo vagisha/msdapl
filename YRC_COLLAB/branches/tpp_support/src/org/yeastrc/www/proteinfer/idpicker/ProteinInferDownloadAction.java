@@ -2,6 +2,7 @@ package org.yeastrc.www.proteinfer.idpicker;
 
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,9 +24,13 @@ import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerParam;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
+import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nrseq.ProteinReference;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
+import org.yeastrc.www.protein.ProteinAbundanceDao;
+import org.yeastrc.www.protein.ProteinAbundanceDao.YeastOrfAbundance;
+import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
 import org.yeastrc.www.util.RoundingUtils;
 
 import edu.uwpr.protinfer.idpicker.IDPickerParams;
@@ -156,10 +161,16 @@ public class ProteinInferDownloadAction extends Action {
 
     private void printIndividualProteins(PrintWriter writer, int pinferId,
             PeptideDefinition peptideDef, List<Integer> proteinIds, boolean printPeptides, boolean printDescriptions) {
+    	
+    	boolean isYeast = ProteinInferToSpeciesMapper.isSpeciesYeast(pinferId);
+    	
         writer.write("ProteinGroupID\t");
         writer.write("Parsimonious\t");
         writer.write("FastaID\tCommonName\t");
         writer.write("Coverage\tNumSpectra\tNSAF\t");
+        if(isYeast) {
+        	writer.write("#Copies/Cell\t");
+        }
         writer.write("NumPeptides\tNumUniquePeptides\t");
         writer.write("Mol.Wt\tpI");
         if(printPeptides)
@@ -168,6 +179,9 @@ public class ProteinInferDownloadAction extends Action {
             writer.write("\tDescription");
         writer.write("\n");
 
+        // Only for yeast
+        ProteinAbundanceDao adundanceDao = ProteinAbundanceDao.getInstance();
+        
         List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
         for(int i = 0; i < proteinIds.size(); i++) {
             int proteinId = proteinIds.get(i);
@@ -192,6 +206,28 @@ public class ProteinInferDownloadAction extends Action {
             writer.write(wProt.getProtein().getCoverage()+"\t");
             writer.write(wProt.getProtein().getSpectrumCount()+"\t");
             writer.write(wProt.getProtein().getNsafFormatted()+"\t");
+            
+            if(isYeast) {
+            	try {
+					List<YeastOrfAbundance> abundances = adundanceDao.getAbundance(wProt.getProtein().getNrseqProteinId());
+					if(abundances == null || abundances.size() == 0) {
+						writer.write("UNKNOWN\t");
+					}
+					else if(abundances.size() == 1) {
+						writer.write(abundances.get(0).getAbundanceToPrint()+"\t");
+					}
+					else {
+						List<String> toPrint = new ArrayList<String>(abundances.size());
+						for(YeastOrfAbundance abundance: abundances) {
+							toPrint.add(abundance.getOrfName()+":"+abundance.getAbundanceToPrint());
+						}
+						writer.write(StringUtils.makeCommaSeparated(toPrint)+"\t");
+					}
+				} catch (SQLException e) {
+					log.error("Exception getting protein copies / cell for protein: "+wProt.getProtein().getNrseqProteinId(), e);
+					writer.write("ERROR\t");
+				}
+            }
             writer.write(wProt.getProtein().getPeptideCount()+"\t");
             writer.write(wProt.getProtein().getUniquePeptideCount()+"\t");
             writer.write(wProt.getMolecularWeight()+"\t");

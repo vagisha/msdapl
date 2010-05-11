@@ -94,7 +94,7 @@
   
   <td valign="top"><table>
   
-  <logic:notPresent name="showGoForm">
+  <logic:notPresent name="goView">
   <tr>
   	<td colspan="2">Group Indistinguishable Proteins: </td>
   	<td>

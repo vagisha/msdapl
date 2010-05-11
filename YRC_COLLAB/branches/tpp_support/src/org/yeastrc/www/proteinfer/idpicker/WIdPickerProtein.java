@@ -13,6 +13,7 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
 import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.nrseq.ProteinReference;
+import org.yeastrc.www.protein.ProteinAbundanceDao.YeastOrfAbundance;
 
 public class WIdPickerProtein {
     
@@ -20,8 +21,9 @@ public class WIdPickerProtein {
     private ProteinListing listing;
     private float molecularWeight = -1.0f;
     private float pi = -1.0f;
+    private List<YeastOrfAbundance> yeastOrfAbundances;
     
-    public WIdPickerProtein(IdPickerProteinBase prot) {
+	public WIdPickerProtein(IdPickerProteinBase prot) {
         this.idpProtein = prot;
     }
     
@@ -68,4 +70,29 @@ public class WIdPickerProtein {
     public void setPi(float pi) {
         this.pi = pi;
     }
+    
+    public String getYeastProteinAbundanceString() {
+    	if(yeastOrfAbundances == null || yeastOrfAbundances.size() == 0)
+    		return "UNKNOWN";
+    	
+    	if(yeastOrfAbundances.size() == 1) {
+    		return yeastOrfAbundances.get(0).getAbundanceToPrint();
+		}
+		else {
+			String aString = "";
+			int idx = 0;
+			for(YeastOrfAbundance a: yeastOrfAbundances) {
+				aString += a.getAbundanceAndOrfNameToPrint();
+				if(idx == 0)
+					aString += "<BR>";
+				idx++;
+			}
+			aString = aString.substring(1);
+			return aString;
+		}
+	}
+
+	public void setYeastProteinAbundance(List<YeastOrfAbundance> abundances) {
+		this.yeastOrfAbundances = abundances;
+	}
 }
