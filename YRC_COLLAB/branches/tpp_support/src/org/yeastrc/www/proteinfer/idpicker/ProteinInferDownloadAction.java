@@ -217,11 +217,24 @@ public class ProteinInferDownloadAction extends Action {
 						writer.write(abundances.get(0).getAbundanceToPrint()+"\t");
 					}
 					else {
-						List<String> toPrint = new ArrayList<String>(abundances.size());
-						for(YeastOrfAbundance abundance: abundances) {
-							toPrint.add(abundance.getOrfName()+":"+abundance.getAbundanceToPrint());
-						}
-						writer.write(StringUtils.makeCommaSeparated(toPrint)+"\t");
+						
+						boolean allUnknown = true;
+				    	for(YeastOrfAbundance oa: abundances) {
+				    		if(!oa.isAbundanceNull()) {
+				    			allUnknown = false;
+				    			break;
+				    		}
+				    	}
+				    	if(allUnknown) {
+				    		writer.write("UNKNOWN\t");
+				    	}
+				    	else {
+				    		List<String> toPrint = new ArrayList<String>(abundances.size());
+				    		for(YeastOrfAbundance abundance: abundances) {
+				    			toPrint.add(abundance.getOrfName()+":"+abundance.getAbundanceToPrint());
+				    		}
+				    		writer.write(StringUtils.makeCommaSeparated(toPrint)+"\t");
+				    	}
 					}
 				} catch (SQLException e) {
 					log.error("Exception getting protein copies / cell for protein: "+wProt.getProtein().getNrseqProteinId(), e);

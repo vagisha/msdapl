@@ -75,6 +75,17 @@ public class WIdPickerProtein {
     	if(yeastOrfAbundances == null || yeastOrfAbundances.size() == 0)
     		return "UNKNOWN";
     	
+    	boolean allUnknown = true;
+    	for(YeastOrfAbundance oa: yeastOrfAbundances) {
+    		if(!oa.isAbundanceNull()) {
+    			allUnknown = false;
+    			break;
+    		}
+    	}
+    	if(allUnknown) {
+    		return "UNKNOWN";
+    	}
+    	
     	if(yeastOrfAbundances.size() == 1) {
     		return yeastOrfAbundances.get(0).getAbundanceToPrint();
 		}

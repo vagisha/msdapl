@@ -71,19 +71,24 @@ public class ProteinAbundanceDao {
 	public static final class YeastOrfAbundance {
 		
 		private String orfName;
-		private double abundance;
+		private Double abundance;
 		public String getOrfName() {
 			return orfName;
 		}
 		public void setOrfName(String orfName) {
 			this.orfName = orfName;
 		}
-		public double getAbundance() {
+		public Double getAbundance() {
 			return abundance;
 		}
+		public boolean isAbundanceNull() {
+			return abundance == null;
+		}
 		public String getAbundanceToPrint() {
-			if(abundance == Math.round(abundance)) {
-				return String.valueOf((int)abundance);
+			if(abundance == null)
+				return "UNKNOWN";
+			if(abundance == Math.round(abundance.doubleValue())) {
+				return String.valueOf((int)abundance.doubleValue());
 			}
 			else
 				return String.valueOf(abundance);
@@ -91,7 +96,7 @@ public class ProteinAbundanceDao {
 		public String getAbundanceAndOrfNameToPrint() {
 			return orfName+":"+getAbundanceToPrint();
 		}
-		public void setAbundance(double abundance) {
+		public void setAbundance(Double abundance) {
 			this.abundance = abundance;
 		}
 	}
