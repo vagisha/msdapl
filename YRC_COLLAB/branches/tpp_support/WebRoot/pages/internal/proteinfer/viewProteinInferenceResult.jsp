@@ -1256,6 +1256,13 @@ function hideAllDescriptionsForProtein(proteinId) {
     &nbsp; &nbsp;
     <br>Paoletti <i>et. al.</i> <i>Proc. Natl. Acad. Sci. USA </i>2006;103:18928-33
 </div>
+<br/>
+<div style="font-size: 8pt;margin-top: 3px;" align="left">
+	***Yeast protein copies / cell<br>
+	<i>Global analysis of protein expression in yeast</i>
+    &nbsp; &nbsp;
+    <br>Ghaemmaghami <i>et. al.</i> <i>Nature </i><b>425 </b>2003; 737-741 (16 October 2003)
+</div>
 
  	
 </yrcwww:contentbox>

@@ -126,7 +126,7 @@
 		
 		<logic:present name="yeastAbundances">
 			<th width="5%">
-				<b><font size="2pt">Copies<br/>/cell</font></b>
+				<b><font size="2pt">Copies /<br>cell***</font></b>
 			</th>
 		</logic:present>
 			
@@ -285,7 +285,7 @@
 			<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
 		
 			<logic:present name="yeastAbundances">
-				<td><bean:write name="protein" property="yeastProteinAbundanceString"/></td>
+				<td><bean:write name="protein" property="yeastProteinAbundanceString" filter="false"/></td>
 			</logic:present>
 		
 		
@@ -455,7 +455,7 @@
 		<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
 		
 		<logic:present name="yeastAbundances">
-			<td><bean:write name="protein" property="yeastProteinAbundanceString"/></td>
+			<td><bean:write name="protein" property="yeastProteinAbundanceString" filter="false" /></td>
 		</logic:present>
 			
 		
