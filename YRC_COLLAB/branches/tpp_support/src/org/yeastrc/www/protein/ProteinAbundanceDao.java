@@ -46,7 +46,8 @@ public class ProteinAbundanceDao {
 			List<YeastOrfAbundance> orfs = new ArrayList<YeastOrfAbundance>();
 			while(rs.next()) {
 				YeastOrfAbundance oa = new YeastOrfAbundance();
-				oa.setAbundance(rs.getDouble("abundance"));
+				if(rs.getObject("abundance") != null) 
+					oa.setAbundance(rs.getDouble("abundance"));
 				oa.setOrfName(rs.getString("orfName"));
 				orfs.add(oa);
 			}
