@@ -87,7 +87,6 @@ public class WIdPickerProtein {
 					aString += "<BR>";
 				idx++;
 			}
-			aString = aString.substring(1);
 			return aString;
 		}
 	}
