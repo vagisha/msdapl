@@ -99,7 +99,7 @@ public class ViewAnalysisStats extends Action {
         myForm.setExperimentId(experimentId);
         myForm.setAnalysisId(analysisId);
         myForm.setQvalue(0.01);
-        request.setAttribute("qcPlotsFilterForm", myForm);
+        request.setAttribute("filterForm", myForm);
         
         
         DistributionPlotter plotter = new DistributionPlotter();

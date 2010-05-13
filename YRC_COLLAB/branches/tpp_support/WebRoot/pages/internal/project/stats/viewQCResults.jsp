@@ -7,6 +7,9 @@
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>
 
+<logic:empty name="filterForm">
+	<logic:forward name="viewQCPlots"/>
+</logic:empty>
 
 <%@ include file="/includes/header.jsp" %>
 

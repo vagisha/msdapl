@@ -10,7 +10,7 @@
 </yrcwww:notauthenticated>
 
 <logic:empty name="filterForm">
-  <logic:forward name="viewProject" />
+  <logic:forward name="viewMascotResults" />
 </logic:empty>
 
 

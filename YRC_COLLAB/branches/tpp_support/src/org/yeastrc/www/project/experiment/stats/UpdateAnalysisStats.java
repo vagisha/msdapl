@@ -22,6 +22,7 @@ import org.yeastrc.experiment.stats.DistributionPlotter;
 import org.yeastrc.experiment.stats.FileStats;
 import org.yeastrc.experiment.stats.RetTimePSMDistributionCalculator;
 import org.yeastrc.experiment.stats.RetTimeSpectraDistributionCalculator;
+import org.yeastrc.www.taglib.HistoryTag;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -49,6 +50,7 @@ public class UpdateAnalysisStats extends Action {
         }
 
         QcPlotsFilterForm myForm = (QcPlotsFilterForm) form;
+        request.setAttribute("filterForm", myForm);
         
         int analysisId = myForm.getAnalysisId();
         // If we don't have a valid id, return an error
@@ -121,6 +123,8 @@ public class UpdateAnalysisStats extends Action {
         request.setAttribute("goodSpectraPerc", goodSpectraPerc);
         
         
+        // don't add this to history
+        request.setAttribute(HistoryTag.NO_HISTORY_ATTRIB, true);
         return mapping.findForward("Success");
     }
 }
