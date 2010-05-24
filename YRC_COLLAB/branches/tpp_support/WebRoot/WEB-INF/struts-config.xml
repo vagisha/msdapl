@@ -637,6 +637,13 @@
 	</action>
 	
 	<action
+	  path="/pinferPhiliusResults"
+	  type="org.yeastrc.www.philiusws.PhiliusResultForPinferProteinAction"
+	  validate="false">
+	  <forward name="MakeResult" path="/getPhiliusResults.do" redirect="false" />
+	</action>
+	
+	<action
 	  path="/viewPhiliusGraphic"
 	  type="org.yeastrc.www.philiusws.ViewPhiliusGraphicAction"
 	  validate="false">

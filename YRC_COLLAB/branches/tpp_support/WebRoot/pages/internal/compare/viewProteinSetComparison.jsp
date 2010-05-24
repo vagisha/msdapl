@@ -35,6 +35,15 @@
 // ---------------------------------------------------------------------------------------
 $(document).ready(function() {
 	
+	// ---------------------------------------------------------------
+    // UPDATE PROTEIN DETAIL LINKS. This is done so that protein links work
+    // when the comparison view is accessed via the history bar
+   $("a[href^='viewProteinDetails.do']").each(function() {
+   	  var newHref = this.href.substring(this.href.indexOf("viewProteinDetails.do"));
+      this.href = "<yrcwww:link path=''/>"+newHref;
+   });
+   
+   
    var colCount = <%=comparison.tableHeaders().size()%>
    $("#compare_results").each(function() {
    		var $table = $(this);

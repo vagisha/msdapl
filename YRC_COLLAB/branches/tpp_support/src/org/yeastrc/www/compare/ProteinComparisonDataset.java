@@ -547,7 +547,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 		String fullContents = "<a href=\"viewProteinDetails.do?id="+protein.getNrseqId()+"&pinferIds="+pinferIdsCommaSeparated+"\">";
         fullContents += "<span";
     	fullContents += " style=\"display:none;\" class=\"full_name\">";
-        String shortContents = "<a href=\"viewProtein.do?id="+protein.getNrseqId()+"\">";
+        String shortContents = "<a href=\"viewProteinDetails.do?id="+protein.getNrseqId()+"&pinferIds="+pinferIdsCommaSeparated+"\">";
         shortContents += "<span";
         shortContents += " class=\"short_name\">";
         List<ProteinReference> references;

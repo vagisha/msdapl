@@ -283,7 +283,7 @@ function philiusAnnotations(pinferProteinId, nrseqProteinId) {
 		$("#philius_status_"+pinferProteinId).hide();
 		// request the results 
 		var token = button.attr('name');
-		$.post("<yrcwww:link path='getPhiliusResults.do'/>",
+		$.post("<yrcwww:link path='pinferPhiliusResults.do'/>",
    					{'pinferProteinId': pinferProteinId,
    					 'philiusToken': token},
    					function(data) {

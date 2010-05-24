@@ -17,9 +17,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.domain.protinfer.ProteinferPeptide;
-import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.www.proteinfer.ProteinSequenceHtmlBuilder;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -45,14 +42,14 @@ public class PhiliusResultsAjaxAction extends Action {
         }
 
         // get the protein inference protein ID
-        int pinferProteinId = 0;
-        try {pinferProteinId = Integer.parseInt(request.getParameter("pinferProteinId"));}
+        int nrseqProteinId = 0;
+        try {nrseqProteinId = Integer.parseInt((String)request.getParameter("nrseqProteinId"));}
         catch(NumberFormatException e){};
-        // if we  do not have a valid protein inference run id
+        // if we  do not have a valid nrseq protein ID
         // return an error.
-        if(pinferProteinId <= 0) {
+        if(nrseqProteinId <= 0) {
         	response.setContentType("text/html");
-            response.getWriter().write("FAILED: Invalid protein inference protein ID: "+pinferProteinId);
+            response.getWriter().write("FAILED: Invalid protein ID: "+nrseqProteinId);
             return null;
         }
         
@@ -74,18 +71,12 @@ public class PhiliusResultsAjaxAction extends Action {
         }
         else {
         	
-        	ProteinferProtein protein = ProteinferDAOFactory.instance().getProteinferProteinDao().loadProtein(pinferProteinId);
-        	if(protein == null) {
-        		response.setContentType("text/html");
-                response.getWriter().write("FAILED: No database entry found for protein inference protein ID: "+pinferProteinId);
-                return null;
-        	}
-        	
-        	// Get the unique peptide sequences for this protein (for building the protein sequence HTML)
-            Set<String>peptideSequences = new HashSet<String>(protein.getPeptideCount());
-            for(ProteinferPeptide peptide: protein.getPeptides()) {
-                peptideSequences.add(peptide.getSequence());
+        	// Get the covered peptide sequences for this protein, if available
+            Set<String>peptideSequences = (Set<String>) request.getAttribute("peptides");
+            if(peptideSequences == null) {
+            	peptideSequences = new HashSet<String>(0);
             }
+            
             
             PhiliusSequenceAnnotationWS result = getResult(philiusToken);
 

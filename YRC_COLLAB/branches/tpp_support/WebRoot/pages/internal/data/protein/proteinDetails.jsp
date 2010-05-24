@@ -13,6 +13,109 @@
 
 <%@ include file="/includes/header.jsp" %>
 
+<script>
+// ---------------------------------------------------------------------------------------
+// SUBMIT/SHOW/HIDE PHILIUS RESULTS
+// --------------------------------------------------------------------------------------- 
+// Submit Philius job OR show / hide results
+function philiusAnnotations(nrseqProteinId) {
+
+	var button = $("#philiusbutton_"+nrseqProteinId);
+	
+	if(button.text() == "[Get Predictions]") {
+		// submit a Philius job, get a job token and display a status message.
+		//alert("Submitting Philius job...");
+		button.text("[Processing...]");
+		
+		
+		var token = 0;
+		var statusText = "Your request has been submitted to the Philius Server.  ";
+		statusText += "Processing typically takes about <b>10 seconds</b>.  ";
+		statusText += "To get your results click ";
+		statusText += "<span id=\"philius_refresher\" style=\"text-decoration: underline; cursor: pointer;\" ";
+		
+		$.post("<yrcwww:link path='submitPhiliusJob.do'/>",
+   					{'nrseqId': nrseqProteinId},
+   					function(data) {
+   						token = data;
+   						if(token.substr(0,6) == "FAILED") {
+   							statusText = "Philius Job Submission failed!<br>"+token;
+   							button.text("[Failed...]");
+   						}
+   						else {
+   							//alert("Returned token is: "+token);
+   							statusText += " onclick=philiusAnnotations("+nrseqProteinId+") >";
+   							statusText += "<b>REFRESH</b></span>.";
+   							button.attr('name', token);
+						}
+						// show the status text with a link for fetching the results with the returned token.
+						// OR the failure message.
+						$("#philius_status_"+nrseqProteinId).html(statusText);
+						$("#philius_status_"+nrseqProteinId).show();
+   					}
+    		);
+	}
+	else if (button.text() == "[Processing...]") {
+		// hide the philius status text
+		$("#philius_status_"+nrseqProteinId).hide();
+		// request the results 
+		var token = button.attr('name');
+		$.post("<yrcwww:link path='getPhiliusResults.do'/>",
+   					{'nrseqProteinId': nrseqProteinId,
+   					 'philiusToken': token},
+   					function(data) {
+   						// if results are still not available
+   						if(data == "WAIT") {
+   							// show philius status again
+   							$("#philius_status_"+nrseqProteinId).show();
+   						}
+   						// if the request failed
+   						else if (data.substr(0,6) == "FAILED") {
+   							var statusText = "Philius Job Submission failed!<br>"+data;
+   							$("#philius_status_"+nrseqProteinId).html(statusText);
+   							$("#philius_status_"+nrseqProteinId).show();
+   							button.text("[Failed...]");
+   						}
+   						// Philius did not find any segments
+   						else if (data == "NONE") {
+   							var statusText = "Philius did not predict any segments";
+   							$("#philius_status_"+nrseqProteinId).html(statusText);
+   							$("#philius_status_"+nrseqProteinId).show();
+   							button.text("[Hide Annotations]");
+   						}
+   						// request succeeded; display the results
+   						else {
+   							// show the Philius annotations and hide the protein sequence.
+							$("#protsequence_"+nrseqProteinId).hide();
+							$("#philiusannot_"+nrseqProteinId).html(data);
+							$("#philiusannot_"+nrseqProteinId).show();
+							button.text("[Hide Annotations]");
+   						}
+   					}
+   				);
+	}
+	else if (button.text() == "[Hide Annotations]") {
+		// If the Philius status is visible hide it too
+		$("#philius_status_"+nrseqProteinId).hide();
+		$("#philiusannot_"+nrseqProteinId).hide();
+		$("#protsequence_"+nrseqProteinId).show();
+		button.text("[Show Annotations]");
+	}
+	else if (button.text() == "[Show Annotations]") {
+		$("#philiusannot_"+nrseqProteinId).show();
+		$("#protsequence_"+nrseqProteinId).hide();
+		button.text("[Hide Annotations]");
+	}
+	else if (button.text() == "[Failed...]") {
+		button.text("[Get Predictions]");
+		$("#philius_status_"+nrseqProteinId).hide();
+	}
+}
+
+
+</script>
+
+
 <yrcwww:contentbox title="View Protein Information" centered="true" width="80" widthRel="true">
 
 <center>
@@ -90,9 +193,7 @@
 		<logic:iterate name="protein" property="proteinListing.descriptionReferences" id="reference">
 			<li>
 				<logic:equal name="reference" property="hasExternalLink" value="true">
-					<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;" target="External Link">
-						<b>[<bean:write name="reference" property="databaseName"/>]</b>
-					</a>
+					<a href="<bean:write name="reference" property="url"/>" style="font-size: 8pt;" target="External Link"><b>[<bean:write name="reference" property="databaseName"/>]</b></a>
 				</logic:equal>
 				<logic:equal name="reference" property="hasExternalLink" value="false">
 					<span style="color:#000080;"><b>[<bean:write name="reference" property="databaseName"/>]</b></span>
@@ -181,7 +282,7 @@
 	<span><a href="http://www.ncbi.nlm.nih.gov/sites/entrez?cmd=Search&db=pubmed&term=18989393">Reynolds <I>et al.</I></a></span>
 	<br/>
 	<span style="text-decoration: underline; cursor: pointer;"
-      onclick="philiusAnnotations(<bean:write name="protein" property="protein.id" />,<bean:write name="protein" property="id" />)"
+      onclick="philiusAnnotations(<bean:write name="protein" property="id" />)"
       id="philiusbutton_<bean:write name="protein" property="protein.id"/>">[Get Predictions]</span>
     </font>
 	</td>
