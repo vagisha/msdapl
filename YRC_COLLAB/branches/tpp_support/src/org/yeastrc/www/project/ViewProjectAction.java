@@ -248,8 +248,7 @@ public class ViewProjectAction extends Action {
             try {
                 job = MSJobFactory.getInstance().getJobForProjectExperiment(projectId, experimentId);
                 status = job.getStatus();
-                if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK
-                   || status == JobUtils.STATUS_PENDING_UPLOAD)
+                if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK)
                     continue;
             }
             catch(Exception e) {

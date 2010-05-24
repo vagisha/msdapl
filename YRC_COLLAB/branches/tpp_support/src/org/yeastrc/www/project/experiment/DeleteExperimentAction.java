@@ -96,8 +96,7 @@ public class DeleteExperimentAction extends Action {
         try {
             job = MSJobFactory.getInstance().getJobForProjectExperiment(projectId, experimentId);
             int status = job.getStatus();
-            if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK
-               || status == JobUtils.STATUS_PENDING_UPLOAD) {
+            if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK) {
               
                 ActionErrors errors = new ActionErrors();
                 errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
@@ -113,8 +112,7 @@ public class DeleteExperimentAction extends Action {
         List<ProteinferJob> piJobs = ProteinInferJobSearcher.instance().getProteinferJobsForMsExperiment(experimentId);
         for(ProteinferJob piJob: piJobs) {
             int status = piJob.getStatus();
-            if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK
-                    || status == JobUtils.STATUS_PENDING_UPLOAD) {
+            if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK) {
                    
                      ActionErrors errors = new ActionErrors();
                      errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 

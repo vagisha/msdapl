@@ -152,8 +152,7 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 		 try {
 			 job = MSJobFactory.getInstance().getJobForProjectExperiment(projectId, experimentId);
 			 status = job.getStatus();
-			 if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK
-					 || status == JobUtils.STATUS_PENDING_UPLOAD)
+			 if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK)
 				 return null;
 		 }
 		 catch(Exception e) {return null;} // because job with experimentID does not exist. Should not really happen.

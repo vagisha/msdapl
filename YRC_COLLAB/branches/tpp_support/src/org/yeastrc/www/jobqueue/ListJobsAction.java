@@ -67,7 +67,6 @@ public class ListJobsAction extends Action {
 			js.addStatus( JobUtils.STATUS_OUT_FOR_WORK );
 			js.addStatus( JobUtils.STATUS_QUEUED );
 			js.addStatus( JobUtils.STATUS_SOFT_ERROR );
-			js.addStatus( JobUtils.STATUS_PENDING_UPLOAD );
 		} else {
 			js.addStatus( JobUtils.STATUS_COMPLETE );
 		}
