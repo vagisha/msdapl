@@ -37,6 +37,14 @@ $(document).ready(function() {
    });
 });
   
+// ---------------------------------------------------------------------------------------
+// MAKE A TABLE STRIPED
+// ---------------------------------------------------------------------------------------
+function makeStripedTable(table) {
+	var $table = $(table);
+	$('tbody > tr:odd', $table).addClass("tr_odd");
+   	$('tbody > tr:even', $table).addClass("tr_even");
+}
 
 // ---------------------------------------------------------------------------------------
 // MAKE A TABLE SORTABLE

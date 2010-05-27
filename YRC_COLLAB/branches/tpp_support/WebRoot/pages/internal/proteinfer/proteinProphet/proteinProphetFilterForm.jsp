@@ -34,7 +34,9 @@
   <html:form action="/proteinProphetGateway" method="post" styleId="filterForm" >
   
   <html:hidden name="proteinProphetFilterForm" property="pinferId" />
-  <html:hidden name="proteinProphetFilterForm" property="doGoEnrichment" />
+  <html:hidden name="proteinProphetFilterForm" property="doGoAnalysis" />
+  <html:hidden name="proteinProphetFilterForm" property="goAspect" />
+  <html:hidden name="proteinProphetFilterForm" property="goSlimTermId" />
   
   <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;">
   
@@ -213,14 +215,6 @@
  <div align="center"
 		style="padding: 5; border: 1px dashed gray; background-color: #F0F8FF; margin:5 0 5 0">
 		<b>GO Enrichment:</b>
-		<html:select name="proteinProphetFilterForm" property="goAspect">
-			<html:option
-				value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
-			<html:option
-				value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">Cellular Component</html:option>
-			<html:option
-				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
-		</html:select>
 		&nbsp; &nbsp; 
 		Species:
 		<html:select name="proteinProphetFilterForm" property="speciesId">
@@ -230,7 +224,7 @@
 		P-Value: <html:text name="proteinProphetFilterForm" property="goEnrichmentPVal"></html:text>
 		&nbsp; &nbsp;
 		<a href=""
-			onclick="javascript:doGoEnrichmentAnalysis();return false;">Calculate</a>
+			onclick="javascript:goAnalysisResults();return false;">Calculate</a>
 	</div>
 </logic:equal>
 

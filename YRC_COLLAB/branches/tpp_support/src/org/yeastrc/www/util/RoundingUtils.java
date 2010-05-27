@@ -25,6 +25,13 @@ public class RoundingUtils {
 		return instance;
 	}
 	
+	public double roundOne(BigDecimal number) {
+        return roundOne(number.doubleValue());
+    }
+    public double roundOne(double num) {
+        return Math.round(num*10.0)/10.0;
+    }
+    
 	public double roundTwo(BigDecimal number) {
         return roundTwo(number.doubleValue());
     }

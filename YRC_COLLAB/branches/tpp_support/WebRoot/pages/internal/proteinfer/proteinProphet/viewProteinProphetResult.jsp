@@ -90,9 +90,9 @@ function callback(hash)
 			$tabs.tabs('select', 0);
 		else if (hash == 'protdetails')
 			$tabs.tabs('select', 1);
-		else if (hash == 'protclusters')
+		else if (hash == 'roc')
 			$tabs.tabs('select', 2);
-		else if (hash == 'input')
+		else if (hash == 'gene_ontology')
 			$tabs.tabs('select', 3);
 	} else {
 		$tabs.tabs('select', 0);
@@ -784,7 +784,7 @@ function updateResults() {
 	if(!validateForm())
     	return false;
     
-    $("form#filterForm input[name='doGoEnrichment']").val("false");
+    $("form#filterForm input[name='doGoAnalysis']").val("false");
     	
     $.blockUI();
     $.post( "<yrcwww:link path='proteinProphetGateway.do'/>", 	//url, 
@@ -805,6 +805,37 @@ function refreshProteinList(responseText) {
 		alert("Got stale Protein Prophet ID. Please refresh the page.");
 	}
 	//setupProteinListTable();
+}
+
+// ---------------------------------------------------------------------------------------
+// GENE ONTOLOGY ANALYSIS RESULTS
+// ---------------------------------------------------------------------------------------
+function goAnalysisResults() {
+
+	if(!validateForm())
+    	return false;
+    	
+    var goAspect = $("#goAspectField").val();
+    var goSlim = $("#goSlimTermIdField").val();
+	//alert("GO aspect "+goAspect+"; GO SLIM: "+goSlim);
+	$("form#filterForm input[name='doGoAnalysis']").val("true");
+	$("form#filterForm input[name='goAspect']").val(goAspect);
+	$("form#filterForm input[name='goSlimTermId']").val(goSlim);
+	
+	
+	$.blockUI();
+	$.post( "<yrcwww:link path='proteinProphetGateway.do'/>", 	//url, 
+    		 $("form#filterForm").serialize(), // data to submit
+    		 function(result, status) {
+    		 	// load the result
+    		 	$('#goslim_result').html(result);
+    		 	$.unblockUI();
+    		 	// stripe the table
+    		 	makeStripedTable($("#go_analysis_table")[0]);
+    		 	makeSortableTable($("#go_analysis_table")[0]);
+				// $("#golink").click(); // so that history works
+    		 });
+    		 
 }
 
 // ---------------------------------------------------------------------------------------
@@ -1017,6 +1048,7 @@ function hideAllDescriptionsForProtein(proteinId) {
           <li><a href="#protlist" rel="history" id="protlistlink"><span>Protein List</span></a></li>
           <li><a href="#protdetails" rel="history" id="protdetailslink"><span>Protein Details</span></a></li>
           <li><a href="#roc" rel="history" id="roclink"><span>Sensitivity / Error</span></a></li>
+          <li><a href="#gene_ontology" rel="history" id="golink"><span>Gene Ontology</span></a></li>
       </ul>
    </div>
       
@@ -1090,7 +1122,6 @@ function hideAllDescriptionsForProtein(proteinId) {
 		<div id="protlist_table">
     	<%@ include file="proteinlist.jsp" %>
     	</div>
-    	
     </div>
     
     
@@ -1105,6 +1136,34 @@ function hideAllDescriptionsForProtein(proteinId) {
  	<!-- SENSITIVITY / ERROR INFORMATION -->
  	<div id="roc">
     	<%@ include file="rocSummary.jsp" %>
+    </div>
+    
+    <!-- GENE ONTOLOGY -->
+    <div id="gene_ontology" align="center">
+    	<b>GO Domain:</b> 
+    	<html:select name="proteinProphetFilterForm" property="goAspect" styleId="goAspectField">
+			<html:option
+				value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">Cellular Component</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
+		</html:select>
+		
+		&nbsp; &nbsp;
+		<b>GO Slim: </b>
+		<html:select name="proteinProphetFilterForm" property="goSlimTermId" styleId="goSlimTermIdField">
+			<html:options collection="goslims" property="id" labelProperty="name"/>
+		</html:select>
+		
+		&nbsp; &nbsp;
+    	<a href="" onclick="javascript:goAnalysisResults();return false;"><b>Update</b></a>
+    	
+    	<div style="margin-top:10px;" id="goslim_result"></div>
+    	
+    	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+
+	<div id="pieChart"></div>
     </div>
     	
     	

@@ -43,13 +43,14 @@ public class ProteinInferFilterForm extends ActionForm {
     private boolean exactMatch = true;
     
     private int goAspect = GOUtils.BIOLOGICAL_PROCESS;  // Used for GO enrichment only
+    private int goSlimTermId;
     private int speciesId;
     private String goEnrichmentPVal = "0.01";           // Used for GO enrichment only
     
     private boolean doDownload = false;
-    private boolean doGoEnrichment = false;
+    private boolean doGoAnalysis = false;
     
-    public ProteinInferFilterForm () {}
+	public ProteinInferFilterForm () {}
     
     public void reset() {
         // These need to be set to false because if a checkbox is not checked the browser does not
@@ -99,12 +100,20 @@ public class ProteinInferFilterForm extends ActionForm {
 		this.doDownload = doDownload;
 	}
 
-	public boolean isDoGoEnrichment() {
-		return doGoEnrichment;
+	public int getGoSlimTermId() {
+		return goSlimTermId;
 	}
 
-	public void setDoGoEnrichment(boolean doGoEnrichment) {
-		this.doGoEnrichment = doGoEnrichment;
+	public void setGoSlimTermId(int goSlimTermId) {
+		this.goSlimTermId = goSlimTermId;
+	}
+	
+	public boolean isDoGoAnalysis() {
+		return doGoAnalysis;
+	}
+
+	public void setDoGoAnalysis(boolean doGoAnalysis) {
+		this.doGoAnalysis = doGoAnalysis;
 	}
 	
     // MIN COVERAGE

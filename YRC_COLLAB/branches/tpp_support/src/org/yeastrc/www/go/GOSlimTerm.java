@@ -35,11 +35,22 @@ public class GOSlimTerm {
 		return proteinIdsForTerm.size();
 	}
 	
-	public double getProteinsForTermPerc() {
-		return RoundingUtils.getInstance().roundTwo((double)getProteinCountForTerm() / (double)totalProteins);
+	public double getProteinCountForTermPerc() {
+		return (RoundingUtils.getInstance().roundOne(((double)getProteinCountForTerm()*100.0) / (double)totalProteins));
 	}
 	
 	public GONode getGoNode() {
         return goNode;
     }
+	
+	public String getName() {
+		return goNode.getName();
+	}
+	public String getShortName() {
+		return goNode.getNameMax40();
+	}
+	
+	public String getAccession() {
+		return goNode.getAccession();
+	}
 }

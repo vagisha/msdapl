@@ -960,7 +960,7 @@
 	>
 		<forward name="ViewResults" path="/viewNewPProphetResult.do" redirect="false" />
 		<forward name="Update" path="/updateProteinProphetResult.do" redirect="false" />
-		<forward name="GOEnrichment" path="/proteinProphetGoEnrichment.do" redirect="false" />
+		<forward name="GOAnalysis" path="/proteinProphetGoAnalysis.do" redirect="false" />
 		<forward name="Failure" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
 	</action>
 	
@@ -973,6 +973,16 @@
 	>
 		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
 		<forward name="Failure" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/proteinProphetGoAnalysis"
+		name="proteinProphetFilterForm"
+		scope="request"
+		validate="true"
+		type="org.yeastrc.www.proteinfer.proteinProphet.GOSummaryAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/goAnalysis.jsp" redirect="false" />
 	</action>
 	
 	<action 

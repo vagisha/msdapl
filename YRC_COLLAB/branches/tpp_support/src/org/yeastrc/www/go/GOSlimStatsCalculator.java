@@ -8,6 +8,8 @@ package org.yeastrc.www.go;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +23,7 @@ import org.yeastrc.bio.go.GOUtils;
 public class GOSlimStatsCalculator {
 
 	private List<Integer> nrseqProteinIds;
-	private GONode goSlimNode;
+	private int goSlimTermId = -1;
 	private int goAspect;
 	
 	private List<GOSlimTerm> termNodes;
@@ -34,11 +36,8 @@ public class GOSlimStatsCalculator {
 	public void setNrseqProteinIds(List<Integer> nrseqProteinIds) {
 		this.nrseqProteinIds = nrseqProteinIds;
 	}
-	public GONode getGoSlimNode() {
-		return goSlimNode;
-	}
-	public void setGoSlimNode(GONode goSlimNode) {
-		this.goSlimNode = goSlimNode;
+	public void setGoSlimTermId(int goSlimTermId) {
+		this.goSlimTermId = goSlimTermId;
 	}
 	public int getGoAspect() {
 		return goAspect;
@@ -53,8 +52,8 @@ public class GOSlimStatsCalculator {
 			throw new GOException("No nrseq protein IDs found");
 		}
 		
-		if(goSlimNode == null)
-			throw new GOException("No GO Slim name found");
+		if(goSlimTermId == -1)
+			throw new GOException("No GO Slim term ID found");
 		
 		if(goAspect != GOUtils.BIOLOGICAL_PROCESS && 
 		   goAspect != GOUtils.MOLECULAR_FUNCTION &&
@@ -67,7 +66,6 @@ public class GOSlimStatsCalculator {
 		}
 		
 		// Get the GO terms for the given GO Slim
-		int goSlimTermId = goSlimNode.getId();
 		List<GONode> nodes = null;
 		try {
 			nodes = GOSlimUtils.getGOSlimTerms(goSlimTermId, goAspect);
@@ -105,6 +103,26 @@ public class GOSlimStatsCalculator {
 		}
 		
 		this.termNodes = new ArrayList<GOSlimTerm>(slimTermMap.values());
+	}
+	
+	public GOSlimAnalysis getAnalysis() {
+		GOSlimAnalysis analysis = new GOSlimAnalysis();
+		analysis.setNrseqProteinIds(this.nrseqProteinIds);
+		analysis.setNumProteinsNotAnnotated(this.numProteinsNotAnnotated);
+		Collections.sort(termNodes, new Comparator<GOSlimTerm>() {
+			@Override
+			public int compare(GOSlimTerm o1, GOSlimTerm o2) {
+				return Integer.valueOf(o2.getProteinCountForTerm()).compareTo(o1.getProteinCountForTerm());
+			}
+		});
+		analysis.setTermNodes(this.termNodes);
+		if(goAspect == GOUtils.BIOLOGICAL_PROCESS)
+			analysis.setGoAspect("Biological Process");
+		else if(goAspect == GOUtils.MOLECULAR_FUNCTION)
+			analysis.setGoAspect("Molecular Function");
+		else if(goAspect == GOUtils.CELLULAR_COMPONENT)
+			analysis.setGoAspect("Cellular Component");
+		return analysis;
 	}
 	
 	
