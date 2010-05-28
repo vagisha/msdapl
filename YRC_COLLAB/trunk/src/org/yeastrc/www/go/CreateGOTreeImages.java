@@ -113,9 +113,15 @@ public class CreateGOTreeImages extends Action {
 		    
 		    System.out.println("Writing JPEG to " + file.getCanonicalPath());
 		    FileOutputStream fos = new FileOutputStream ( file );
-		    jpg.write(graph, fos );
-		    fos.close();
-		    fos = null;
+		    try {
+		    	jpg.write(graph, fos );
+		    } catch ( Exception e ) {
+		    	System.out.println( "Error writing JPEG..." );
+		    	continue;
+		    } finally {
+		    	fos.close();
+		    	fos = null;
+		    }
 
 		    String mapDirectory = node.getAccession().substring(node.getAccession().length() - 1, node.getAccession().length());
 		    mapDirectory = node.getAccession().substring( node.getAccession().length() - 2, node.getAccession().length() - 1 ) + "\\" + mapDirectory;
