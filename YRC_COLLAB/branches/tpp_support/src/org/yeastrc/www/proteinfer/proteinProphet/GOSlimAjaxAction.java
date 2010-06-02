@@ -14,9 +14,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.bio.go.GOCache;
-import org.yeastrc.bio.go.GONodeFactory;
-import org.yeastrc.bio.go.GOSearcher;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
@@ -26,18 +23,17 @@ import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.go.GOSlimAnalysis;
 import org.yeastrc.www.go.GOSlimChartUrlCreator;
 import org.yeastrc.www.go.GOSlimStatsCalculator;
-import org.yeastrc.www.go.GOSlimUtils;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 
 /**
- * GOSummaryAjaxAction.java
+ * GOSlimAjaxAction.java
  * @author Vagisha Sharma
  * May 21, 2010
  * 
  */
-public class GOSummaryAjaxAction extends Action {
+public class GOSlimAjaxAction extends Action {
 
-	private static final Logger log = Logger.getLogger(GOSummaryAjaxAction.class.getName());
+	private static final Logger log = Logger.getLogger(GOSlimAjaxAction.class.getName());
 
 	public ActionForward execute( ActionMapping mapping,
 			ActionForm form,
@@ -45,11 +41,10 @@ public class GOSummaryAjaxAction extends Action {
 			HttpServletResponse response )
 	throws Exception {
 
-		log.info("Got request for GO analysis for protein inference");
+		log.info("Got request for GO Slim analysis for protein inference");
 		
 		// form for filtering and display options
         ProteinProphetFilterForm filterForm = (ProteinProphetFilterForm)form;
-        request.setAttribute("proteinProphetFilterForm", filterForm);
 
 		// get the protein inference id
 		int pinferId = filterForm.getPinferId();
@@ -136,7 +131,7 @@ public class GOSummaryAjaxAction extends Action {
         request.setAttribute("barChartUrl", barChartUrl);
         
 		long e = System.currentTimeMillis();
-		log.info("GOSummaryAjaxAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
+		log.info("GOSlimAjaxAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
 		return mapping.findForward("Success");
 	}
 	

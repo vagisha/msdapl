@@ -31,6 +31,7 @@ import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.GOSupportChecker;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 import org.yeastrc.www.proteinfer.ProteinInferToProjectMapper;
+import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
 import org.yeastrc.www.proteinfer.idpicker.ViewProteinInferenceResultAction;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -168,10 +169,11 @@ public class ProteinProphetViewAction extends Action {
         ProteinProphetROC rocSummary = proteinProphetRun.getRoc();
         request.setAttribute("rocSummary", rocSummary);
         
+        // Species for GO analyses
+        List<Integer> speciesIds = ProteinInferToSpeciesMapper.map(pinferId);
+        if(speciesIds.size() == 1) 
+        	filterForm.setSpeciesId(speciesIds.get(0));
         
-        if(GOSupportChecker.isSupported(pinferId)) {
-        	request.setAttribute("showGoForm", true);
-        }
         
         long e = System.currentTimeMillis();
         log.info("Total time (ProteinProphetViewAction): "+TimeUtils.timeElapsedSeconds(s, e));

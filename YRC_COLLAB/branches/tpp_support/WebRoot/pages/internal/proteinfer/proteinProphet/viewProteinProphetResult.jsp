@@ -666,6 +666,22 @@ function makeProteinListSortable() {
 // ---------------------------------------------------------------------------------------
 // FORM VALIDATION
 // ---------------------------------------------------------------------------------------
+function validateGOForm() {
+	if(!validateForm())
+		return false;
+		
+	// P value
+	var value = $('form#filterForm input[name=goEnrichmentPVal]').fieldValue();
+    var valid = validateFloat(value, "P-Value", 0.0, 1.0);
+    if(!valid)	return false;
+    
+    var value = $('form#filterForm input[name=speciesId]').fieldValue();
+    var valid = validateInt(value, "Species");
+    if(!valid)	return false;
+    
+    return true;
+}
+
 function validateForm() {
 
 	// fieldValue is a Form Plugin method that can be invoked to find the 
@@ -758,8 +774,9 @@ function validateInt(value, fieldName, min, max) {
 	if(max && (valid && intVal > max))		valid = false;
 	
 	if(!valid) {
-		if(max) alert("Value for "+fieldName+" should be between "+min+" and "+max);
-		else	alert("Value for "+fieldName+" should be >= "+min);
+		if(max && min) alert("Value for "+fieldName+" should be between "+min+" and "+max);
+		else if (min) alert("Value for "+fieldName+" should be >= "+min);
+		else alert("Invalid value for "+fieldName);
 	}
 	return valid;
 }
@@ -784,7 +801,8 @@ function updateResults() {
 	if(!validateForm())
     	return false;
     
-    $("form#filterForm input[name='doGoAnalysis']").val("false");
+    $("form#filterForm input[name='doGoSlimAnalysis']").val("false");
+	$("form#filterForm input[name='doGoEnrichAnalysis']").val("false");
     	
     $.blockUI();
     $.post( "<yrcwww:link path='proteinProphetGateway.do'/>", 	//url, 
@@ -815,10 +833,13 @@ function goAnalysisResults() {
 	if(!validateForm())
     	return false;
     	
-    var goAspect = $("#goAspectField").val();
+    var goAspect = $("#goAspectField1").val();
     var goSlim = $("#goSlimTermIdField").val();
+    
 	//alert("GO aspect "+goAspect+"; GO SLIM: "+goSlim);
-	$("form#filterForm input[name='doGoAnalysis']").val("true");
+	$("form#filterForm input[name='doGoSlimAnalysis']").val("true");
+	$("form#filterForm input[name='doGoEnrichAnalysis']").val("false");
+	
 	$("form#filterForm input[name='goAspect']").val(goAspect);
 	$("form#filterForm input[name='goSlimTermId']").val(goSlim);
 	
@@ -831,30 +852,68 @@ function goAnalysisResults() {
     		 	$('#goslim_result').html(result);
     		 	$.unblockUI();
     		 	// stripe the table
-    		 	makeStripedTable($("#go_analysis_table")[0]);
-    		 	makeSortableTable($("#go_analysis_table")[0]);
-				// $("#golink").click(); // so that history works
+    		 	makeStripedTable($("#go_slim_table")[0]);
+    		 	makeSortableTable($("#go_slim_table")[0]);
+    		 	hideGoEnrichmentDetails();
     		 });
     		 
+}
+function toggleGoSlimDetails() {
+	fold($("#goslim_fold"));
+}
+function hideGoSlimDetails() {
+	foldClose($("#goslim_fold"));
+}
+function toggleGoSlimTable() {
+	if($("#go_slim_table").is(':visible')) {
+		$("#go_slim_table").hide();
+		$("#go_slim_table_link").text("Show Table");
+	}
+	else {
+		$("#go_slim_table").show();
+		$("#go_slim_table_link").text("Hide Table");
+	}
 }
 
 // ---------------------------------------------------------------------------------------
 // GENE ONTOLOGY ENRICHMENT
 // ---------------------------------------------------------------------------------------
-function doGoEnrichmentAnalysis() {
+function goEnrichmentResults() {
 
-	// validate form
-	if(!validateForm())
+	if(!validateGOForm())
     	return false;
-	// validate pvalue cutoff for enrichment calculation
-	var value = $('form#filterForm input[name=goEnrichmentPVal]').fieldValue();
-    var valid = validateFloat(value, "P-Value", 0.0, 1.0);
-    if(!valid)	return false;
-	
-    $("form#filterForm input[name='doGoEnrichment']").val("true");
+    	
+    var goAspect = $("#goAspectField2").val();
+    var goPVal = $("#goEnrichmentPValField").val();
+    var species = $("#speciesField").val();
     
-	$("form#filterForm").submit();
+	$("form#filterForm input[name='doGoEnrichAnalysis']").val("true");
+	$("form#filterForm input[name='doGoSlimAnalysis']").val("false");
 	
+	$("form#filterForm input[name='goAspect']").val(goAspect);
+	$("form#filterForm input[name='goEnrichmentPVal']").val(goPVal);
+	$("form#filterForm input[name='speciesId']").val(species);
+	
+	
+	$.blockUI();
+	$.post( "<yrcwww:link path='proteinProphetGateway.do'/>", 	//url, 
+    		 $("form#filterForm").serialize(), // data to submit
+    		 function(result, status) {
+    		 	// load the result
+    		 	$('#goenrichment_result').html(result);
+    		 	$.unblockUI();
+    		 	// stripe the table
+    		 	makeStripedTable($("#go_enrichment_table")[0]);
+    		 	makeSortableTable($("#go_enrichment_table")[0]);
+    		 	hideGoSlimDetails();
+    		 });
+	
+}
+function toggleGoEnrichmentDetails() {
+	fold($("#goenrich_fold"));
+}
+function hideGoEnrichmentDetails() {
+	foldClose($("#goenrich_fold"));
 }
 
 // ---------------------------------------------------------------------------------------
@@ -1140,8 +1199,40 @@ function hideAllDescriptionsForProtein(proteinId) {
     
     <!-- GENE ONTOLOGY -->
     <div id="gene_ontology" align="center">
-    	<b>GO Domain:</b> 
-    	<html:select name="proteinProphetFilterForm" property="goAspect" styleId="goAspectField">
+    
+    	<div align="center" style="padding: 5; border: 1px dashed gray; background-color: #F0F8FF; margin:5 0 5 0">
+    	<table cellpadding="5">
+    	<tr>
+    	<td valign="top" style="padding:5x;"><b>GO Slim Analysis: </b></td>
+    	<td style="padding:5x;">
+    		GO Domain: 
+    		<html:select name="proteinProphetFilterForm" property="goAspect" styleId="goAspectField1">
+			<html:option
+				value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">Cellular Component</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
+			</html:select>
+    	</td>
+    	
+    	<td style="padding:5x;">
+    		GO Slim:
+			<html:select name="proteinProphetFilterForm" property="goSlimTermId" styleId="goSlimTermIdField">
+			<html:options collection="goslims" property="id" labelProperty="name"/>
+			</html:select>
+    	</td>
+    	
+    	<td style="padding:5x;">
+    		<a href="" onclick="javascript:goAnalysisResults();return false;"><b>Update</b></a>
+    	</td>
+    	</tr>
+    	
+    	<tr>
+    	<td valign="top" style="padding:5x;"><b>GO Enrichment: </b></td>
+    	<td style="padding:5x;">
+    		GO Domain:
+    		<html:select name="proteinProphetFilterForm" property="goAspect" styleId="goAspectField2">
 			<html:option
 				value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
 			<html:option
@@ -1149,21 +1240,40 @@ function hideAllDescriptionsForProtein(proteinId) {
 			<html:option
 				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
 		</html:select>
-		
-		&nbsp; &nbsp;
-		<b>GO Slim: </b>
-		<html:select name="proteinProphetFilterForm" property="goSlimTermId" styleId="goSlimTermIdField">
-			<html:options collection="goslims" property="id" labelProperty="name"/>
-		</html:select>
-		
-		&nbsp; &nbsp;
-    	<a href="" onclick="javascript:goAnalysisResults();return false;"><b>Update</b></a>
+    	</td>
     	
+    	<td style="padding:5x;">
+    		P-Value: <html:text name="proteinProphetFilterForm" property="goEnrichmentPVal" styleId="goEnrichmentPValField"></html:text>
+    	</td>
+		
+		<td style="padding:5x;">
+    		Species: <html:select name="proteinProphetFilterForm" property="speciesId" styleId="speciesField">
+	    	<html:option value="9913">B. taurus (cow)</html:option>
+	      	<html:option value="6239">C. elegans</html:option>
+	      	<html:option value="7227">D. melanogaster (fruit fly)</html:option>
+		    <html:option value="9031">G. gallus (chicken)</html:option>
+		    <html:option value="9606">H. sapiens</html:option>
+		    <html:option value="10090">M. musculus (mouse)</html:option>
+		    <html:option value="10116">R. norvegicus (rat)</html:option>
+		    <html:option value="4932">S. cerevisiae (budding yeast)</html:option>
+		    <html:option value="4896">S. pombe (fission yeast)</html:option>
+		    <html:option value="287">Pseudomonas aeruginosa</html:option>
+		    <html:option value="0">None</html:option>
+    		</html:select>
+    	</td>
+    	
+		<td style="padding:5x;">
+			<a href="" onclick="javascript:goEnrichmentResults();return false;"><b>Update</b></a>
+		</td> 
+		   	
+    	</tr>
+    	</table>
+    	</div>
+    	
+    	<!-- Placeholder divs for the results to go in -->
     	<div style="margin-top:10px;" id="goslim_result"></div>
+    	<div style="margin-top:10px;" id="goenrichment_result"></div>
     	
-    	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-
-	<div id="pieChart"></div>
     </div>
     	
     	

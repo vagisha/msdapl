@@ -21,14 +21,15 @@ import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.bio.taxonomy.Species;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
-import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.go.GOEnrichmentCalculator;
 import org.yeastrc.www.go.GOEnrichmentInput;
 import org.yeastrc.www.go.GOEnrichmentOutput;
 import org.yeastrc.www.go.GOEnrichmentTabular;
+import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 
 
 /**
@@ -36,7 +37,7 @@ import org.yeastrc.www.go.GOEnrichmentTabular;
  */
 public class ProteinProphetGOEnrichmentAction extends Action {
 
- private static final Logger log = Logger.getLogger(ProteinProphetGOEnrichmentAction.class.getName());
+	private static final Logger log = Logger.getLogger(ProteinProphetGOEnrichmentAction.class.getName());
     
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
@@ -44,6 +45,7 @@ public class ProteinProphetGOEnrichmentAction extends Action {
             HttpServletResponse response )
     throws Exception {
         
+    	log.info("Got request for GO enrichment analysis for protein inference");
         
         ProteinProphetFilterForm filterForm = (ProteinProphetFilterForm) form;
         // get the protein inference id
@@ -51,8 +53,72 @@ public class ProteinProphetGOEnrichmentAction extends Action {
         
         long s = System.currentTimeMillis();
         
+        // Get the peptide definition; We don't get peptide definition from ProteinProphet params so just
+        // use a dummy one.
+        PeptideDefinition peptideDef = new PeptideDefinition();
+        peptideDef.setUseCharge(true);
+        peptideDef.setUseMods(true);
+        
+        // filtering criteria from the request
+        ProteinProphetFilterCriteria filterCriteria_request = filterForm.getFilterCriteria(peptideDef);
+        
+        // protein Ids
+        List<Integer> proteinIds = null;
+        
+        ProteinInferSessionManager sessionManager = ProteinInferSessionManager.getInstance();
+        
+        // Check if we already have information in the session
+        ProteinProphetFilterCriteria filterCriteria_session = sessionManager.getFilterCriteriaForProteinProphet(request, pinferId);
+        proteinIds = sessionManager.getStoredProteinIds(request, pinferId);
+        
+        
+        // If we don't have a filtering criteria in the session return an error
+        if(filterCriteria_session == null || proteinIds == null) {
+        	
+        	log.info("NO information in session for: "+pinferId);
+        	// redirect to the /viewProteinInferenceResult action if this different from the
+            // protein inference ID stored in the session
+            log.error("Stale ProteinProphet ID: "+pinferId);
+            response.setContentType("text/html");
+            response.getWriter().write("STALE_ID");
+            return null;
+        }
+        else {
+        	
+        	log.info("Found information in session for: "+pinferId);
+        	System.out.println("stored protein ids: "+proteinIds.size());
+        	 
+        	// we will use the sorting column and sorting order from the filter criteria in the session.
+        	filterCriteria_request.setSortBy(filterCriteria_session.getSortBy());
+        	filterCriteria_request.setSortOrder(filterCriteria_session.getSortOrder());
+        	
+        	boolean match = matchFilterCriteria(filterCriteria_session, filterCriteria_request);
+        	
+            
+            // if the filtering criteria has changed we need to filter the results again
+            if(!match)  {
+                
+            	log.info("Filtering criteria has changed");
+            	
+                proteinIds = ProteinProphetResultsLoader.getProteinIds(pinferId, filterCriteria_request);
+            }
+        }
+        
+        
+        int goAspect = filterForm.getGoAspect();
         int speciesId = filterForm.getSpeciesId();
-        GOEnrichmentOutput enrichment = doGoEnrichmentAnalysis(pinferId, speciesId, filterForm);
+        // We have the protein inference protein IDs; Get the corresponding nrseq protein IDs
+        List<Integer> nrseqIds = new ArrayList<Integer>(proteinIds.size());
+        ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
+        ProteinferProteinDAO protDao = factory.getProteinferProteinDao();
+        for(int proteinId: proteinIds) {
+            ProteinferProtein protein = protDao.loadProtein(proteinId);
+            nrseqIds.add(protein.getNrseqProteinId());
+        }
+        
+        
+        GOEnrichmentOutput enrichment = doGoEnrichmentAnalysis(nrseqIds, speciesId, goAspect, filterForm.getGoEnrichmentPValDouble());
+        
         // Biological Process
         if(filterForm.getGoAspect() == GOUtils.BIOLOGICAL_PROCESS) {
             GOEnrichmentTabular bpTabular = new GOEnrichmentTabular();
@@ -86,9 +152,6 @@ public class ProteinProphetGOEnrichmentAction extends Action {
         request.setAttribute("enrichment", enrichment);
         request.setAttribute("pinferId", pinferId);
         request.setAttribute("species", Species.getInstance(speciesId));
-        request.setAttribute("proteinProphetFilterForm", filterForm);
-        request.setAttribute("showGoForm", true);
-        request.setAttribute("goView", true);
         
         
         long e = System.currentTimeMillis();
@@ -96,62 +159,26 @@ public class ProteinProphetGOEnrichmentAction extends Action {
         return mapping.findForward("Success");
     }
     
-    private GOEnrichmentOutput doGoEnrichmentAnalysis(int pinferId, int speciesId, ProteinProphetFilterForm filterForm) throws Exception {
+    private GOEnrichmentOutput doGoEnrichmentAnalysis(List<Integer> nrseqIds, int speciesId, int goAspect, double pVal) throws Exception {
         
-        ProteinProphetRun idpRun = ProteinferDAOFactory.instance().getProteinProphetRunDao().loadProteinferRun(pinferId);
-        
-        // Get the filtering criteria
-        ProteinProphetFilterCriteria filterCriteria = new ProteinProphetFilterCriteria();
-        filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
-        filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
-        filterCriteria.setMinMolecularWt(filterForm.getMinMolecularWtDouble());
-        filterCriteria.setMaxMolecularWt(filterForm.getMaxMolecularWtDouble());
-        filterCriteria.setMinPi(filterForm.getMinPiDouble());
-        filterCriteria.setMaxPi(filterForm.getMaxPiDouble());
-        filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
-        filterCriteria.setNumMaxPeptides(filterForm.getMaxPeptidesInteger());
-        filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptidesInteger());
-        filterCriteria.setNumMaxUniquePeptides(filterForm.getMaxUniquePeptidesInteger());
-        filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatchesInteger());
-        filterCriteria.setNumMaxSpectra(filterForm.getMaxSpectrumMatchesInteger());
-        filterCriteria.setMinGroupProbability(filterForm.getMinGroupProbabilityDouble());
-        filterCriteria.setMaxGroupProbability(filterForm.getMaxGroupProbabilityDouble());
-        filterCriteria.setMinProteinProbability(filterForm.getMinProteinProbabilityDouble());
-        filterCriteria.setMaxProteinProbability(filterForm.getMaxProteinProbabilityDouble());
-        filterCriteria.setExcludeIndistinGroups(filterForm.isExcludeIndistinProteinGroups());
-        filterCriteria.setGroupProteins(filterForm.isJoinProphetGroupProteins());
-        if(filterForm.isExcludeSubsumed())
-            filterCriteria.setParsimoniousOnly();
-        filterCriteria.setValidationStatus(filterForm.getValidationStatus());
-        filterCriteria.setAccessionLike(filterForm.getAccessionLike());
-        filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
-        filterCriteria.setDescriptionNotLike(filterForm.getDescriptionNotLike());
-        filterCriteria.setPeptide(filterForm.getPeptide());
-        filterCriteria.setExactPeptideMatch(filterForm.getExactPeptideMatch());
-        
-        // Get the protein Ids that fulfill the criteria.
-        List<Integer> proteinIds = ProteinProphetResultsLoader.getProteinIds(pinferId, filterCriteria);
-        log.info(proteinIds.size()+" proteins for GO enrichment analysis");
-        List<Integer> nrseqIds = new ArrayList<Integer>(proteinIds.size());
-        ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
-        ProteinferProteinDAO protDao = factory.getProteinferProteinDao();
-        for(int proteinId: proteinIds) {
-            ProteinferProtein protein = protDao.loadProtein(proteinId);
-            nrseqIds.add(protein.getNrseqProteinId());
-        }
+        log.info(nrseqIds.size()+" proteins for GO enrichment analysis");
         
         GOEnrichmentInput input = new GOEnrichmentInput(speciesId);
         input.setProteinIds(nrseqIds);
-        if(filterForm.getGoAspect() == GOUtils.BIOLOGICAL_PROCESS)
+        if(goAspect == GOUtils.BIOLOGICAL_PROCESS)
             input.setUseBiologicalProcess(true);
-        if(filterForm.getGoAspect() == GOUtils.CELLULAR_COMPONENT)
+        if(goAspect == GOUtils.CELLULAR_COMPONENT)
             input.setUseCellularComponent(true);
-        if(filterForm.getGoAspect() == GOUtils.MOLECULAR_FUNCTION)
+        if(goAspect == GOUtils.MOLECULAR_FUNCTION)
             input.setUseMolecularFunction(true);
-        input.setPValCutoff(Double.parseDouble(filterForm.getGoEnrichmentPVal()));
+        input.setPValCutoff(pVal);
         
         GOEnrichmentOutput enrichment = GOEnrichmentCalculator.calculate(input);
         return enrichment;
         
+    }
+    
+    private boolean matchFilterCriteria(ProteinProphetFilterCriteria filterCritSession,  ProteinProphetFilterCriteria filterCriteria) {
+        return filterCritSession.equals(filterCriteria);
     }
 }

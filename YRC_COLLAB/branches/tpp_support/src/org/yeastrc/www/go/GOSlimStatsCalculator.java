@@ -14,8 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.yeastrc.bio.go.GONode;
 import org.yeastrc.bio.go.GOUtils;
+import org.yeastrc.bio.taxonomy.TaxonomySearcher;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.domain.nrseq.NrProtein;
+import org.yeastrc.www.go.GOSlimAnalysis.ProteinSpecies;
 
 /**
  * 
@@ -29,6 +34,7 @@ public class GOSlimStatsCalculator {
 	private List<GOSlimTerm> termNodes;
 	private int numProteinsNotAnnotated = 0;
 	
+	private static final Logger log = Logger.getLogger(GOSlimStatsCalculator.class.getName());
 	
 	public List<Integer> getNrseqProteinIds() {
 		return nrseqProteinIds;
@@ -107,7 +113,7 @@ public class GOSlimStatsCalculator {
 	
 	public GOSlimAnalysis getAnalysis() {
 		GOSlimAnalysis analysis = new GOSlimAnalysis();
-		analysis.setNrseqProteinIds(this.nrseqProteinIds);
+		analysis.setTotalProteinCount(nrseqProteinIds.size());
 		analysis.setNumProteinsNotAnnotated(this.numProteinsNotAnnotated);
 		Collections.sort(termNodes, new Comparator<GOSlimTerm>() {
 			@Override
@@ -122,6 +128,37 @@ public class GOSlimStatsCalculator {
 			analysis.setGoAspect("Molecular Function");
 		else if(goAspect == GOUtils.CELLULAR_COMPONENT)
 			analysis.setGoAspect("Cellular Component");
+		
+		try {
+			List<GONode> slimNodes = GOSlimUtils.getGOSlims();
+			for(GONode node: slimNodes) {
+				if(node.getId() == this.goSlimTermId)
+					analysis.setGoSlimName(node.getName());
+			}
+		} catch (SQLException e) {
+			analysis.setGoSlimName("ERROR getting GOSlim name");
+		}
+		
+		// species information
+		Map<Integer, ProteinSpecies> map = new HashMap<Integer, ProteinSpecies>();
+		for(int nrseqId: nrseqProteinIds) {
+			NrProtein prot = NrSeqLookupUtil.getNrProtein(nrseqId);
+			ProteinSpecies ps = map.get(prot.getSpeciesId());
+			if(ps == null) {
+				ps = new ProteinSpecies();
+				ps.setSpeciesId(prot.getSpeciesId());
+				try {
+					ps.setSpeciesName(TaxonomySearcher.getInstance().getName(prot.getSpeciesId()));
+				} catch (SQLException e) {
+					log.error("Error getting species name for: "+prot.getSpeciesId());
+					ps.setSpeciesName("UNKNOWN");
+				}
+				map.put(prot.getSpeciesId(), ps);
+			}
+			ps.incrCount();
+		}
+		analysis.setProteinSpecies(new ArrayList<ProteinSpecies>(map.values()));
+		
 		return analysis;
 	}
 	

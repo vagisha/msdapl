@@ -97,7 +97,9 @@ public class GOSlimChartUrlCreator {
 		buf.append(labels);
 		
 		buf.append("&chxr=1:0,100,10");
-		buf.append("&chbh=12");
+		buf.append("&chbh=12"); // width of bars
+		buf.append("&chm=N**%,000000,0,-1,11"); // labels for each bar
+		
 		return buf.toString();
 	}
 }

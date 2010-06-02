@@ -48,7 +48,8 @@ public class ProteinInferFilterForm extends ActionForm {
     private String goEnrichmentPVal = "0.01";           // Used for GO enrichment only
     
     private boolean doDownload = false;
-    private boolean doGoAnalysis = false;
+    private boolean doGoSlimAnalysis = false;
+    private boolean doGoEnrichAnalysis = false;
     
 	public ProteinInferFilterForm () {}
     
@@ -108,15 +109,24 @@ public class ProteinInferFilterForm extends ActionForm {
 		this.goSlimTermId = goSlimTermId;
 	}
 	
-	public boolean isDoGoAnalysis() {
-		return doGoAnalysis;
+    public boolean isDoGoSlimAnalysis() {
+		return doGoSlimAnalysis;
 	}
 
-	public void setDoGoAnalysis(boolean doGoAnalysis) {
-		this.doGoAnalysis = doGoAnalysis;
+	public void setDoGoSlimAnalysis(boolean doGoSlimAnalysis) {
+		this.doGoSlimAnalysis = doGoSlimAnalysis;
 	}
+
+	public boolean isDoGoEnrichAnalysis() {
+		return doGoEnrichAnalysis;
+	}
+
+	public void setDoGoEnrichAnalysis(boolean doGoEnrichAnalysis) {
+		this.doGoEnrichAnalysis = doGoEnrichAnalysis;
+	}
+
 	
-    // MIN COVERAGE
+	// MIN COVERAGE
     public String getMinCoverage() {
         return minCoverage;
     }
@@ -449,6 +459,12 @@ public class ProteinInferFilterForm extends ActionForm {
 
     public void setGoEnrichmentPVal(String goEnrichmentPVal) {
         this.goEnrichmentPVal = goEnrichmentPVal;
+    }
+    
+    public double getGoEnrichmentPValDouble() {
+    	if(goEnrichmentPVal == null || goEnrichmentPVal.trim().length() == 0)
+    		return 0.0;
+    	return Double.parseDouble(goEnrichmentPVal);
     }
 
     public int getSpeciesId() {

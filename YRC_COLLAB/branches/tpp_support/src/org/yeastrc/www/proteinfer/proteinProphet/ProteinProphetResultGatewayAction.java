@@ -47,8 +47,11 @@ public class ProteinProphetResultGatewayAction extends Action {
 //        if(filterForm.isDoDownload()) {
 //        	return mapping.findForward("Download");
 //        }
-        if (filterForm.isDoGoAnalysis()) {
-        	return mapping.findForward("GOAnalysis");
+        if (filterForm.isDoGoSlimAnalysis()) {
+        	return mapping.findForward("GOSlimAnalysis");
+        }
+        else if (filterForm.isDoGoEnrichAnalysis()) {
+        	return mapping.findForward("GOEnrichAnalysis");
         }
         else {
         	if(request.getAttribute("newRequest") == null) {

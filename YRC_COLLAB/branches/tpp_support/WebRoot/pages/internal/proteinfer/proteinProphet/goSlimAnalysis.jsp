@@ -1,15 +1,27 @@
 
-<%@page import="org.yeastrc.www.go.GOSlimChartUrlCreator"%>
-<%@page import="org.yeastrc.www.go.GOSlimAnalysis"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<div align="center" style="margin-top:20px;">
-	<%GOSlimAnalysis goAnalysis = (GOSlimAnalysis)request.getAttribute("goAnalysis"); %>
+<div style="background-color:#ED9A2E;width:100%; margin:40 0 0 0; padding:3 0 3 0; color:white;" align="left">
+<span style="margin-left:10;" 
+	  class="foldable fold-open" id="goslim_fold" onclick="toggleGoSlimDetails();">&nbsp;&nbsp;&nbsp;&nbsp; </span>
+<b>GO Slim Analysis</b>
+</div>
+	  
+<div align="center" style="border:1px dotted gray;" id="goslim_fold_target">
+	
+	<div style="color:red; font-weight:bold;" align="center">
+		# Proteins: <bean:write name="goAnalysis" property="totalProteinCount"/> &nbsp; &nbsp; 
+		# Not annotated: <bean:write name="goAnalysis" property="numProteinsNotAnnotated"/>
+	</div>
+		
+	<div align="center">
+		<b><bean:write name="goAnalysis" property="goSlimName" /> has <bean:write name="goAnalysis" property="slimTermCount"/> terms. Top 15 terms are displayed</b>
+	</div>
+		
 	<table>
 	<tr>
 	<td>
-		<div align="center">Top 15 terms are displayed</div>
 		<div style="margin-bottom: 10px; padding: 3px; border:1px dashed #BBBBBB; width:100%;" align="center">
 		<img src="<bean:write name='pieChartUrl'/>" alt="Can't see the Google Pie Chart??"/></img>
 		</div>
@@ -23,12 +35,10 @@
 	</td>
 	</tr>
 	</table>
-	<span style="color:red; font-weight:bold;">
-	# Proteins: <bean:write name="goAnalysis" property="totalProteinCount"/> &nbsp; &nbsp; 
-	# Not annotated: <bean:write name="goAnalysis" property="numProteinsNotAnnotated"/>
-	</span>
+	
 	<br/>
-	<table class="table_basic" id="go_analysis_table" width="75%">
+	<div align="center" style="width:75%; font-weight:bold; margin-bottom:3px;color:#D74D2D"><span class="clickable underline" onclick="toggleGoSlimTable();" id="go_slim_table_link">Hide Table</span></div>
+	<table class="table_basic" id="go_slim_table" width="75%">
 	<thead>
 	<th class="sort-alpha">GO ID</th>
 	<th class="sort-alpha"><bean:write name="goAnalysis" property="goAspect"/></th>

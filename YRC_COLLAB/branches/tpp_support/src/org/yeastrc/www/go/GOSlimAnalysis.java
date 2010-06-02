@@ -3,6 +3,7 @@
  */
 package org.yeastrc.www.go;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,18 +15,20 @@ import java.util.List;
 public class GOSlimAnalysis {
 
 	private String goAspect;
-	private List<Integer> nrseqProteinIds;
+	private String goSlimName = "UNKNOWN";
+	private int totalProteinCount;
 	private List<GOSlimTerm> termNodes;
 	private int numProteinsNotAnnotated = 0;
+	private List<ProteinSpecies> proteinSpecies;
 	
-	public List<Integer> getNrseqProteinIds() {
-		return nrseqProteinIds;
-	}
 	public int getTotalProteinCount() {
-		return nrseqProteinIds.size();
+		return totalProteinCount;
 	}
-	public void setNrseqProteinIds(List<Integer> nrseqProteinIds) {
-		this.nrseqProteinIds = nrseqProteinIds;
+	public void setTotalProteinCount(int totalProteinCount) {
+		this.totalProteinCount = totalProteinCount;
+	}
+	public int getSlimTermCount() {
+		return termNodes.size();
 	}
 	public List<GOSlimTerm> getTermNodes() {
 		return termNodes;
@@ -44,5 +47,51 @@ public class GOSlimAnalysis {
 	}
 	public void setGoAspect(String goAspect) {
 		this.goAspect = goAspect;
+	}
+	public String getGoSlimName() {
+		return goSlimName;
+	}
+	public void setGoSlimName(String goSlimName) {
+		this.goSlimName = goSlimName;
+	}
+	
+	public int getSpeciesCount() {
+		if(proteinSpecies != null)
+			return proteinSpecies.size();
+		else
+			return 0;
+	}
+	
+	public List<ProteinSpecies> getProteinSpecies() {
+		return this.proteinSpecies;
+	}
+	
+	public void setProteinSpecies(List<ProteinSpecies> psList) {
+		this.proteinSpecies = psList;
+	}
+	
+	
+	public static final class ProteinSpecies {
+		private int speciesId;
+		private String speciesName;
+		private int count;
+		public int getSpeciesId() {
+			return speciesId;
+		}
+		public void setSpeciesId(int speciesId) {
+			this.speciesId = speciesId;
+		}
+		public String getSpeciesName() {
+			return speciesName;
+		}
+		public void setSpeciesName(String speciesName) {
+			this.speciesName = speciesName;
+		}
+		public int getCount() {
+			return count;
+		}
+		public void incrCount() {
+			this.count++;
+		}
 	}
 }

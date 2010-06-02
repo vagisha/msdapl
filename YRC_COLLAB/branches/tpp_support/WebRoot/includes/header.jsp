@@ -132,18 +132,33 @@ function makeSortableTable(table) {
 // ---------------------------------------------------------------------------------------
 function fold(foldable) {
 	//alert("foldable clicked");
+	if(!foldClose(foldable))
+	foldOpen(foldable);
+}
+function foldClose(foldable) {
 	var target_id = foldable.attr('id')+"_target";
    	//alert("target is: "+target_id);
+	
 	if(foldable.is('.fold-open')) {
 		foldable.removeClass('fold-open');
 		foldable.addClass('fold-close');
 		$("#"+target_id).hide();
+		
+		return true;
  	}
-	else if(foldable.is('.fold-close')) {
+ 	return false;
+}
+function foldOpen(foldable) {
+	var target_id = foldable.attr('id')+"_target";
+   	//alert("target is: "+target_id);
+	
+	if(foldable.is('.fold-close')) {
 		foldable.removeClass('fold-close');
 		foldable.addClass('fold-open');
 		$("#"+target_id).show();
+		return true;
 	}
+	return false;
 }
 
 function openInformationPopup(url) {

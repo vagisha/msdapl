@@ -34,9 +34,12 @@
   <html:form action="/proteinProphetGateway" method="post" styleId="filterForm" >
   
   <html:hidden name="proteinProphetFilterForm" property="pinferId" />
-  <html:hidden name="proteinProphetFilterForm" property="doGoAnalysis" />
+  <html:hidden name="proteinProphetFilterForm" property="doGoSlimAnalysis" />
+  <html:hidden name="proteinProphetFilterForm" property="doGoEnrichAnalysis" />
   <html:hidden name="proteinProphetFilterForm" property="goAspect" />
   <html:hidden name="proteinProphetFilterForm" property="goSlimTermId" />
+  <html:hidden name="proteinProphetFilterForm" property="goEnrichmentPVal" />
+  <html:hidden name="proteinProphetFilterForm" property="speciesId" />
   
   <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;">
   
@@ -210,22 +213,5 @@
   
   
  </TABLE>
- 
- <logic:equal name="showGoForm" value="true">
- <div align="center"
-		style="padding: 5; border: 1px dashed gray; background-color: #F0F8FF; margin:5 0 5 0">
-		<b>GO Enrichment:</b>
-		&nbsp; &nbsp; 
-		Species:
-		<html:select name="proteinProphetFilterForm" property="speciesId">
-			<html:option value="4932">Saccharomyces cerevisiae </html:option>
-		</html:select>
-		&nbsp; &nbsp;
-		P-Value: <html:text name="proteinProphetFilterForm" property="goEnrichmentPVal"></html:text>
-		&nbsp; &nbsp;
-		<a href=""
-			onclick="javascript:goAnalysisResults();return false;">Calculate</a>
-	</div>
-</logic:equal>
 
 </html:form>
