@@ -129,7 +129,7 @@ public class GOEnrichmentTabular implements Tabular {
         cell.setClassName("left_align");
         row.addCell(cell);
         
-        cell = new TableCell(term.getPValueString());
+        cell = new TableCell(term.getPvalueString());
         row.addCell(cell);
         
         cell = new TableCell(""+term.getProteins().size());
@@ -138,7 +138,7 @@ public class GOEnrichmentTabular implements Tabular {
         cell = new TableCell(""+numProteinsInSet);
         row.addCell(cell);
         
-        cell = new TableCell(""+term.totalAnnotatedProteins());
+        cell = new TableCell(""+term.getTotalAnnotatedProteins());
         row.addCell(cell);
         
         cell = new TableCell(""+numProteinsInUniverse);

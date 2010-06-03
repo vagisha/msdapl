@@ -23,7 +23,7 @@ public class GOSlimChartUrlCreator {
 		String data = "";
 		String labels = "";
 		String legend= "";
-		List<GOSlimTerm> slimTerms = analysis.getTermNodes();
+		List<GOSlimTerm> slimTerms = analysis.getTermNodesMinusRootNodes();
 		
 		double totalPerc = 0.0;
 		for(int i = 0; i < maxSlices; i++) {
@@ -68,11 +68,11 @@ public class GOSlimChartUrlCreator {
 	public static String getBarChartUrl(GOSlimAnalysis analysis, int maxBars) {
 		
 		StringBuilder buf = new StringBuilder();
-		buf.append("http://chart.apis.google.com/chart?cht=bhs&chxt=x,y&chs=450x260&chco=BBBB00");
+		buf.append("http://chart.apis.google.com/chart?cht=bhs&chxt=x,y&chs=450x260&chco=80C65A");
 		
 		String data = "";
 		String labels = "";
-		List<GOSlimTerm> slimTerms = analysis.getTermNodes();
+		List<GOSlimTerm> slimTerms = analysis.getTermNodesMinusRootNodes();
 		
 		
 		for(int i = 0; i < maxBars; i++) {

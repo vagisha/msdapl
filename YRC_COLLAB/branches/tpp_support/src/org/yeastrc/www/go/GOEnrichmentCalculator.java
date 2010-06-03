@@ -136,7 +136,7 @@ public class GOEnrichmentCalculator {
     private static void calculateEnrichment(List<EnrichedGOTerm> enrichedTerms, int numProteinsInSet, int totalAnnotatedProteins) throws Exception {
         
         for(EnrichedGOTerm term: enrichedTerms) {
-            term.setPValue(StatUtils.PScore(term.numAnnotatedProteins(), term.totalAnnotatedProteins(), numProteinsInSet, totalAnnotatedProteins));
+            term.setPValue(StatUtils.PScore(term.getNumAnnotatedProteins(), term.getTotalAnnotatedProteins(), numProteinsInSet, totalAnnotatedProteins));
         }
     }
     

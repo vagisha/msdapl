@@ -864,16 +864,6 @@ function toggleGoSlimDetails() {
 function hideGoSlimDetails() {
 	foldClose($("#goslim_fold"));
 }
-function toggleGoSlimTable() {
-	if($("#go_slim_table").is(':visible')) {
-		$("#go_slim_table").hide();
-		$("#go_slim_table_link").text("Show Table");
-	}
-	else {
-		$("#go_slim_table").show();
-		$("#go_slim_table_link").text("Hide Table");
-	}
-}
 
 // ---------------------------------------------------------------------------------------
 // GENE ONTOLOGY ENRICHMENT
@@ -1248,17 +1238,8 @@ function hideAllDescriptionsForProtein(proteinId) {
 		
 		<td style="padding:5x;">
     		Species: <html:select name="proteinProphetFilterForm" property="speciesId" styleId="speciesField">
-	    	<html:option value="9913">B. taurus (cow)</html:option>
-	      	<html:option value="6239">C. elegans</html:option>
-	      	<html:option value="7227">D. melanogaster (fruit fly)</html:option>
-		    <html:option value="9031">G. gallus (chicken)</html:option>
-		    <html:option value="9606">H. sapiens</html:option>
-		    <html:option value="10090">M. musculus (mouse)</html:option>
-		    <html:option value="10116">R. norvegicus (rat)</html:option>
-		    <html:option value="4932">S. cerevisiae (budding yeast)</html:option>
-		    <html:option value="4896">S. pombe (fission yeast)</html:option>
-		    <html:option value="287">Pseudomonas aeruginosa</html:option>
-		    <html:option value="0">None</html:option>
+    		<html:option value="0">None</html:option>
+    		<html:options collection="speciesList" property="id" labelProperty="name"/>
     		</html:select>
     	</td>
     	

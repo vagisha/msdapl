@@ -126,7 +126,8 @@ public class ProteinProphetGOEnrichmentAction extends Action {
             bpTabular.setTitle("Biological Process");
             bpTabular.setNumProteinsInUniverse(enrichment.getTotalAnnotatedBiologicalProcess());
             bpTabular.setNumProteinsInSet(enrichment.getNumSpeciesProteins());
-            request.setAttribute("bioProcessTerms", bpTabular);
+            bpTabular.setNumInputProteins(enrichment.getNumInputProteins());
+            request.setAttribute("goEnrichment", bpTabular);
         }
         
         // Cellular Component
@@ -136,7 +137,8 @@ public class ProteinProphetGOEnrichmentAction extends Action {
             ccTabular.setTitle("Cellular Component");
             ccTabular.setNumProteinsInUniverse(enrichment.getTotalAnnotatedCellularComponent());
             ccTabular.setNumProteinsInSet(enrichment.getNumSpeciesProteins());
-            request.setAttribute("cellComponentTerms", ccTabular);
+            ccTabular.setNumInputProteins(enrichment.getNumInputProteins());
+            request.setAttribute("goEnrichment", ccTabular);
         }
         
         // Molecular Function
@@ -146,16 +148,17 @@ public class ProteinProphetGOEnrichmentAction extends Action {
             mfTabular.setTitle("Molecular Function");
             mfTabular.setNumProteinsInUniverse(enrichment.getTotalAnnotatedMolecularFunction());
             mfTabular.setNumProteinsInSet(enrichment.getNumSpeciesProteins());
-            request.setAttribute("molFunctionTerms", mfTabular);
+            mfTabular.setNumInputProteins(enrichment.getNumInputProteins());
+            request.setAttribute("goEnrichment", mfTabular);
         }
         
-        request.setAttribute("enrichment", enrichment);
+        // request.setAttribute("enrichment", enrichment);
         request.setAttribute("pinferId", pinferId);
         request.setAttribute("species", Species.getInstance(speciesId));
         
         
         long e = System.currentTimeMillis();
-        log.info("ProteinInferGOEnrichmentAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
+        log.info("ProteinProphetGOEnrichmentAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
         return mapping.findForward("Success");
     }
     

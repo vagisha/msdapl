@@ -6,6 +6,7 @@
  */
 package org.yeastrc.www.proteinfer.proteinProphet;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,9 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.bio.go.GONode;
+import org.yeastrc.bio.taxonomy.Species;
+import org.yeastrc.bio.taxonomy.TaxonomyUtils;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.SORT_BY;
@@ -27,6 +31,7 @@ import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
+import org.yeastrc.www.go.GOSlimUtils;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.GOSupportChecker;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
@@ -173,13 +178,70 @@ public class ProteinProphetViewAction extends Action {
         List<Integer> speciesIds = ProteinInferToSpeciesMapper.map(pinferId);
         if(speciesIds.size() == 1) 
         	filterForm.setSpeciesId(speciesIds.get(0));
+        List<Species> speciesList = getSpeciesList(speciesIds);
+        request.setAttribute("speciesList", speciesList);
         
+        // GO Slim terms
+        List<GONode> goslims = GOSlimUtils.getGOSlims();
+        request.setAttribute("goslims", goslims);
+        if(goslims.size() > 0) {
+        	for(GONode slim: goslims) {
+        		if(slim.getName().contains("Generic")) {
+        			filterForm.setGoSlimTermId(slim.getId());
+        			break;
+        		}
+        	}
+        }
         
         long e = System.currentTimeMillis();
         log.info("Total time (ProteinProphetViewAction): "+TimeUtils.timeElapsedSeconds(s, e));
         
         // Go!
         return mapping.findForward("Success");
+	}
+
+	private List<Species> getSpeciesList(List<Integer> mySpeciesIds)
+			throws SQLException {
+		List<Species> speciesList = new ArrayList<Species>();
+        // C. elgans
+        Species species = new Species();
+        species.setId(TaxonomyUtils.CAENORHABDITIS_ELEGANS);
+        speciesList.add(species);
+        // Drosophila
+        species = new Species();
+        species.setId(TaxonomyUtils.DROSOPHILA_MELANOGASTER);
+        speciesList.add(species);
+        // Mouse
+        species = new Species();
+        species.setId(10090);
+        speciesList.add(species);
+        // Rat
+        species = new Species();
+        species.setId(10116);
+        speciesList.add(species);
+        // Budding Yeast
+        species = new Species();
+        species.setId(TaxonomyUtils.SACCHAROMYCES_CEREVISIAE);
+        speciesList.add(species);
+        // Fission Yeast
+        species = new Species();
+        species.setId(TaxonomyUtils.SCHIZOSACCHAROMYCES_POMBE);
+        speciesList.add(species);
+        if(mySpeciesIds.size() == 1) {
+        	int sid = mySpeciesIds.get(0);
+        	boolean found = false;
+        	for(Species sp: speciesList) {
+        		if(sp.getId() == sid) {
+        			found = true; break;
+        		}
+        	}
+        	if(!found) {
+        		species = new Species();
+                species.setId(sid);
+                speciesList.add(species);
+        	}
+        }
+		return speciesList;
 	}
 	
 }

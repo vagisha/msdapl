@@ -20,7 +20,7 @@ import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.bio.taxonomy.TaxonomySearcher;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.nrseq.NrProtein;
-import org.yeastrc.www.go.GOSlimAnalysis.ProteinSpecies;
+import org.yeastrc.www.go.GOSlimAnalysis.SpeciesProteinCount;
 
 /**
  * 
@@ -30,6 +30,8 @@ public class GOSlimStatsCalculator {
 	private List<Integer> nrseqProteinIds;
 	private int goSlimTermId = -1;
 	private int goAspect;
+	
+	private Map<Integer, SpeciesProteinCount> speciesCountMap;
 	
 	private List<GOSlimTerm> termNodes;
 	private int numProteinsNotAnnotated = 0;
@@ -84,6 +86,7 @@ public class GOSlimStatsCalculator {
 			slimTermMap.put(node.getId(), new GOSlimTerm(node, nrseqProteinIds.size()));
 		}
 		
+		speciesCountMap = new HashMap<Integer, SpeciesProteinCount>();
 		
 		for(int nrseqProteinId: nrseqProteinIds) {
 			
@@ -94,6 +97,16 @@ public class GOSlimStatsCalculator {
 				throw new GOException("Error getting terms for GO annotations for protein: "+nrseqProteinId, e);
 			}
 			
+			NrProtein prot = NrSeqLookupUtil.getNrProtein(nrseqProteinId);
+			SpeciesProteinCount spCount = speciesCountMap.get(prot.getSpeciesId());
+			if(spCount == null) {
+				spCount = initProteinSpeciesCount(prot);
+				speciesCountMap.put(prot.getSpeciesId(), spCount);
+			}
+			spCount.incrTotal();
+			if(annotNodes.size() > 0)
+				spCount.incrAnnotated();
+		
 			if(annotNodes.size() == 0)
 				this.numProteinsNotAnnotated++;
 			
@@ -111,6 +124,19 @@ public class GOSlimStatsCalculator {
 		this.termNodes = new ArrayList<GOSlimTerm>(slimTermMap.values());
 	}
 	
+	private SpeciesProteinCount initProteinSpeciesCount(NrProtein prot) {
+		SpeciesProteinCount spCount;
+		spCount = new SpeciesProteinCount();
+		spCount.setSpeciesId(prot.getSpeciesId());
+		try {
+			spCount.setSpeciesName(TaxonomySearcher.getInstance().getName(prot.getSpeciesId()));
+		} catch (SQLException e) {
+			log.error("Error getting species name for: "+prot.getSpeciesId());
+			spCount.setSpeciesName("UNKNOWN");
+		}
+		return spCount;
+	}
+	
 	public GOSlimAnalysis getAnalysis() {
 		GOSlimAnalysis analysis = new GOSlimAnalysis();
 		analysis.setTotalProteinCount(nrseqProteinIds.size());
@@ -122,12 +148,7 @@ public class GOSlimStatsCalculator {
 			}
 		});
 		analysis.setTermNodes(this.termNodes);
-		if(goAspect == GOUtils.BIOLOGICAL_PROCESS)
-			analysis.setGoAspect("Biological Process");
-		else if(goAspect == GOUtils.MOLECULAR_FUNCTION)
-			analysis.setGoAspect("Molecular Function");
-		else if(goAspect == GOUtils.CELLULAR_COMPONENT)
-			analysis.setGoAspect("Cellular Component");
+		analysis.setGoAspect(goAspect);
 		
 		try {
 			List<GONode> slimNodes = GOSlimUtils.getGOSlims();
@@ -138,26 +159,14 @@ public class GOSlimStatsCalculator {
 		} catch (SQLException e) {
 			analysis.setGoSlimName("ERROR getting GOSlim name");
 		}
-		
-		// species information
-		Map<Integer, ProteinSpecies> map = new HashMap<Integer, ProteinSpecies>();
-		for(int nrseqId: nrseqProteinIds) {
-			NrProtein prot = NrSeqLookupUtil.getNrProtein(nrseqId);
-			ProteinSpecies ps = map.get(prot.getSpeciesId());
-			if(ps == null) {
-				ps = new ProteinSpecies();
-				ps.setSpeciesId(prot.getSpeciesId());
-				try {
-					ps.setSpeciesName(TaxonomySearcher.getInstance().getName(prot.getSpeciesId()));
-				} catch (SQLException e) {
-					log.error("Error getting species name for: "+prot.getSpeciesId());
-					ps.setSpeciesName("UNKNOWN");
-				}
-				map.put(prot.getSpeciesId(), ps);
+		List<SpeciesProteinCount> speciesCount = new ArrayList<SpeciesProteinCount>(this.speciesCountMap.values());
+		Collections.sort(speciesCount, new Comparator<SpeciesProteinCount>() {
+			@Override
+			public int compare(SpeciesProteinCount o1, SpeciesProteinCount o2) {
+				return Integer.valueOf(o2.getCount()).compareTo(o1.getCount());
 			}
-			ps.incrCount();
-		}
-		analysis.setProteinSpecies(new ArrayList<ProteinSpecies>(map.values()));
+		});
+		analysis.setSpeciesProteinCount(speciesCount);
 		
 		return analysis;
 	}

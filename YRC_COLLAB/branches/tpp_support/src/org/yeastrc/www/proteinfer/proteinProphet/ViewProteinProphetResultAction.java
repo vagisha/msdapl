@@ -67,13 +67,6 @@ private static final Logger log = Logger.getLogger(ViewProteinProphetResultActio
         filterForm.setPinferId(pinferId);
         
         
-        // GO Slim terms
-        List<GONode> goslims = GOSlimUtils.getGOSlims();
-        request.setAttribute("goslims", goslims);
-        if(goslims.size() > 0) {
-        	filterForm.setGoSlimTermId(goslims.get(0).getId());
-        }
-        
         request.setAttribute("newRequest", true);
         
         // Go!

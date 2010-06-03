@@ -33,7 +33,7 @@ public class EnrichedGOTerm implements Comparable<EnrichedGOTerm> {
         return pValue;
     }
 
-    public String getPValueString() {      
+    public String getPvalueString() {      
         DecimalFormat df = new DecimalFormat("0.####E0");
         return df.format(this.getPValue());       
     }
@@ -58,11 +58,11 @@ public class EnrichedGOTerm implements Comparable<EnrichedGOTerm> {
         return nrseqProteinIds;
     }
     
-    public int numAnnotatedProteins() {
+    public int getNumAnnotatedProteins() {
         return nrseqProteinIds.size();
     }
     
-    public int totalAnnotatedProteins() {
+    public int getTotalAnnotatedProteins() {
         return totalProteins;
     }
     
@@ -86,9 +86,9 @@ public class EnrichedGOTerm implements Comparable<EnrichedGOTerm> {
         buf.append("\t");
         buf.append(goNode.getName());
         buf.append("\t");
-        buf.append("Num proteins: "+this.numAnnotatedProteins());
+        buf.append("Num proteins: "+this.getNumAnnotatedProteins());
         buf.append("\t");
-        buf.append("Num total proteins: "+this.totalAnnotatedProteins());
+        buf.append("Num total proteins: "+this.getTotalAnnotatedProteins());
         return buf.toString();
     }
 }

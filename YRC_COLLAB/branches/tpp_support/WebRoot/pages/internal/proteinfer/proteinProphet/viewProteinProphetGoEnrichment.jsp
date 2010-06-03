@@ -16,42 +16,56 @@
 
 	<table align="center">
 		<tr>
-			<td><b># Proteins (input): </b></td><td><bean:write name="enrichment" property="numInputProteins" /></td>
+			<td><b># Proteins (input): </b></td><td><bean:write name="goEnrichment" property="numInputProteins" /></td>
 		</tr>
 		<tr>
 			<td><b># Proteins (
 			<a target="ncbi_window" href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=<bean:write name="species" property="id"/>">
 				<bean:write name="species" property="name" /></a>): 
-			</b></td><td><bean:write name="enrichment" property="numSpeciesProteins" /></td>
+			</b></td><td><bean:write name="goEnrichment" property="numProteinsInSet" /></td>
 		</tr>
 	</table>
 
-<!-- BIOLOGICAL PROCESS -->
-<logic:present name="bioProcessTerms">
+<logic:present name="goEnrichment">
 	<div align="center">
-	<b># Enriched Terms (Biological Process):<bean:write name="bioProcessTerms" property="enrichedTermCount" /></b>
+		<span style="font-weight:bold; color:red;"># Enriched Terms (<bean:write name="goEnrichment" property="title"/>):<bean:write name="goEnrichment" property="enrichedTermCount" /></span>
+		<table class="table_basic" align="center">
+			<thead>
+				<tr>
+				<th class="sort-alpha">GO ID</th>
+				<th class="sort-alpha">Name</th>
+				<th class="sort-float">P-Value</th>
+				<th class="sort-int">#Annotated (in set)</th>
+				<th class="sort-int">Total (in set)</th>
+				<th class="sort-int">#Annotated (All)</th>
+				<th class="sort-int">Total (All)</th>
+				</tr>
+			</thead>
+			<tbody>
+				<logic:iterate name="goEnrichment" property="enrichedTerms" id="term">
+					<tr>
+						<td><bean:write name="term" property="goNode.accession"/>
+						&nbsp;&nbsp;
+						<span style="font-size:8pt;">
+						<a target="go_window"
+	    				href="http://www.godatabase.org/cgi-bin/amigo/go.cgi?action=query&view=query&search_constraint=terms&query=<bean:write name="term" property="goNode.accession"/>">
+        				AmiGO</a>
+        				&nbsp;
+        				<a target="go_window" href="http://www.yeastrc.org/pdr/viewGONode.do?acc=<bean:write name="term" property="goNode.accession"/>">PDR</a>
+        				</span>
+						</td>
+						
+						<td><bean:write name="term" property="goNode.name"/></td>
+						<td><bean:write name="term" property="pvalueString"/></td>
+						<td><bean:write name="term" property="numAnnotatedProteins"/></td>
+						<td><bean:write name="goEnrichment" property="numProteinsInSet"/></td>
+						<td><bean:write name="term" property="totalAnnotatedProteins"/></td>
+						<td><bean:write name="goEnrichment" property="numProteinsInUniverse"/></td>
+					</tr>
+				</logic:iterate>
+			</tbody>
+		</table>
 	</div>
-	<yrcwww:table name="bioProcessTerms" tableId='go_enrichment_table' tableClass="table_basic" center="true" />
-<br>
 </logic:present>
-
-<!-- CELLULAR COMPONENT -->
-<logic:present name="cellComponentTerms">
-	<div align="center">
-	<b># Enriched Terms (Cellular Component):<bean:write name="cellComponentTerms" property="enrichedTermCount" /></b>
-	</div>
-	<yrcwww:table name="cellComponentTerms" tableId='go_enrichment_table' tableClass="table_basic" center="true" />
-<br>
-</logic:present>
-
-<!-- MOLECULAR FUNCTION -->
-<logic:present name="molFunctionTerms" >
-	<div align="center">
-	<b># Enriched Terms (Molecular Function):<bean:write name="molFunctionTerms" property="enrichedTermCount" /></b>
-	</div>
-	<yrcwww:table name="molFunctionTerms" tableId='go_enrichment_table' tableClass="table_basic" center="true" />
-<br>
-</logic:present>
-
 </div>
 
