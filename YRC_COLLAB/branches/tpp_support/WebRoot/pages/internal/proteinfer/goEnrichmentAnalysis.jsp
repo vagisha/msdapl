@@ -66,6 +66,23 @@
 			</tbody>
 		</table>
 	</div>
+	<div style="margin: 10 0 10 0;">
+		<table style="border:1px dotted gray;">
+			<tr>
+				<td style="font-size:8pt;"><b>#Annotated (in set):</b></td><td style="font-size:8pt;">Number of proteins in the input list annotated with the GO term</td>
+			</tr>
+			<tr>
+				<td style="font-size:8pt;"><b>Total (in set):</b></td><td style="font-size:8pt;">Total number of proteins in the input list with one or more GO annotations</td>
+			</tr>
+			<tr>
+				<td style="font-size:8pt;"><b>#Annotated (All):</b></td><td style="font-size:8pt;">Number of proteins for the species annotated with the GO term</td>
+			</tr>
+			<tr>
+				<td style="font-size:8pt;"><b>Total (All):</b></td><td style="font-size:8pt;">Total number of proteins for the species with one or more GO annotations</td>
+			</tr>
+		</table>
+		
+	</div>
 </logic:present>
 </div>
 

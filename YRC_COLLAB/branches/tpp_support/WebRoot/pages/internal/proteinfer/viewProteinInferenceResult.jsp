@@ -825,31 +825,73 @@ function makeProteinListSortable() {
 // ---------------------------------------------------------------------------------------
 // FORM VALIDATION
 // ---------------------------------------------------------------------------------------
+function validateGOForm() {
+	if(!validateForm())
+		return false;
+		
+	// P value
+	var value = $('form#filterForm input[name=goEnrichmentPVal]').fieldValue();
+    var valid = validateFloat(value, "P-Value", 0.0, 1.0);
+    if(!valid)	return false;
+    
+    var value = $('form#filterForm input[name=speciesId]').fieldValue();
+    var valid = validateInt(value, "Species");
+    if(!valid)	return false;
+    
+    return true;
+}
 function validateForm() {
 
 	// fieldValue is a Form Plugin method that can be invoked to find the 
     // current value of a field 
     
+     // peptides
     var value = $("form#filterForm input[name='minPeptides']").fieldValue();
     var valid = validateInt(value, "Min. Peptides", 1);
     if(!valid)	return false;
     var minPept = parseInt(value);
-    $('form#filterForm input[name=minPeptides]').val(minPept);
     
-    value = $('form#filterForm input[@name=minUniquePeptides]').fieldValue();
+    var value = $("form#filterForm input[name='maxPeptides']").fieldValue();
+    if(!isNaN(parseInt(value))) {
+    	var valid = validateInt(value, "Max. Peptides", minPept);
+    	if(!valid)	return false;
+    }
+    
+    // unique peptides
+    value = $("form#filterForm input[@name='minUniquePeptides']").fieldValue();
     valid = validateInt(value, "Min. Unique Peptides", 0, minPept);
     if(!valid)	return false;
-    $('form#filterForm input[@name=minUniquePeptides]').val(parseInt(value));
+    var minUniqPept = parseInt(value);
     
-    value = $('form#filterForm input[@name=minCoverage]').fieldValue();
+    value = $("form#filterForm input[@name='maxUniquePeptides']").fieldValue();
+    if(!isNaN(parseInt(value))) {
+    	valid = validateInt(value, "Max. Unique Peptides", minUniqPept);
+    	if(!valid)	return false;
+    }
+    
+     // coverage
+    value = $("form#filterForm input[@name='minCoverage']").fieldValue();
     valid = validateFloat(value, "Min. Coverage", 0.0, 100.0);
     if(!valid)	return false;
+    var minCoverage = parseFloat(value);
     
-    value = $('form#filterForm input[@name=minSpectrumMatches]').fieldValue();
+    value = $("form#filterForm input[@name='maxCoverage']").fieldValue();
+    valid = validateFloat(value, "Max. Coverage", minCoverage, 100.0);
+    if(!valid)	return false;
+    
+    // spectrum matches
+    value = $("form#filterForm input[@name='minSpectrumMatches']").fieldValue();
     valid = validateInt(value, "Min. Spectrum Matches", 1);
     if(!valid)	return false;
-    $('form#filterForm input[@name=minSpectrumMatches]').val(parseInt(value));
+    var minSpecMatch = parseInt(value);
     
+    value = $("form#filterForm input[@name='maxSpectrumMatches']").fieldValue();
+    if(!isNaN(parseFloat(value))) {
+    	valid = validateInt(value, "Max. Spectrum Matches", minSpecMatch);
+    	if(!valid)	return false;
+    }
+    
+    // Molecular Wt.
     value = $('form#filterForm input[@name=minMolecularWt]').fieldValue();
     valid = validateFloat(value, "Min. Molecular Wt.", 0);
     if(!valid)	return false;
@@ -866,8 +908,9 @@ function validateInt(value, fieldName, min, max) {
 	if(max && (valid && intVal > max))		valid = false;
 	
 	if(!valid) {
-		if(max) alert("Value for "+fieldName+" should be between "+min+" and "+max);
-		else	alert("Value for "+fieldName+" should be >= "+min);
+		if(max && min) alert("Value for "+fieldName+" should be between "+min+" and "+max);
+		else if (min) alert("Value for "+fieldName+" should be >= "+min);
+		else alert("Invalid value for "+fieldName);
 	}
 	return valid;
 }
@@ -878,8 +921,9 @@ function validateFloat(value, fieldName, min, max) {
 	if(valid && floatVal < min)			valid = false;
 	if(max && (valid && floatVal > max))	valid = false;
 	if(!valid) {
-		if(max) alert("Value for "+fieldName+" should be between "+min+" and "+max);
-		else	alert("Value for "+fieldName+" should be >= "+min);
+		if(max && min) alert("Value for "+fieldName+" should be between "+min+" and "+max);
+		else if (min) alert("Value for "+fieldName+" should be >= "+min);
+		else alert("Invalid value for "+fieldName);
 	}
 	return valid;
 }
@@ -893,7 +937,8 @@ function updateResults() {
     	return false;
     
     $("form#filterForm input[name='doDownload']").val("false");
-    $("form#filterForm input[name='doGoEnrichment']").val("false");
+    $("form#filterForm input[name='doGoSlimAnalysis']").val("false");
+	$("form#filterForm input[name='doGoEnrichAnalysis']").val("false");
     	
     $.blockUI();
     $.post( "<yrcwww:link path='proteinInferGateway.do'/>", 	//url, 
@@ -925,29 +970,90 @@ function downloadResults() {
 	if(!validateForm())
     	return false;
 	$("form#filterForm input[name='doDownload']").val("true");
-    $("form#filterForm input[name='doGoEnrichment']").val("false");
+    $("form#filterForm input[name='doGoSlimAnalysis']").val("false");
+	$("form#filterForm input[name='doGoEnrichAnalysis']").val("false");
     
 	$("form#filterForm").submit();
 }
 
 // ---------------------------------------------------------------------------------------
+// GENE ONTOLOGY ANALYSIS RESULTS
+// ---------------------------------------------------------------------------------------
+function goAnalysisResults() {
+
+	var goAspect = $("#goAspectField1").val();
+    var goSlim = $("#goSlimTermIdField").val();
+    
+	//alert("GO aspect "+goAspect+"; GO SLIM: "+goSlim);
+	$("form#filterForm input[name='doDownload']").val("false");
+	$("form#filterForm input[name='doGoSlimAnalysis']").val("true");
+	$("form#filterForm input[name='doGoEnrichAnalysis']").val("false");
+	
+	$("form#filterForm input[name='goAspect']").val(goAspect);
+	$("form#filterForm input[name='goSlimTermId']").val(goSlim);
+	
+	
+	$.blockUI();
+	$.post( "<yrcwww:link path='proteinInferGateway.do'/>", 	//url, 
+    		 $("form#filterForm").serialize(), // data to submit
+    		 function(result, status) {
+    		 	// load the result
+    		 	$('#goslim_result').html(result);
+    		 	$.unblockUI();
+    		 	// stripe the table
+    		 	makeStripedTable($("#go_slim_table")[0]);
+    		 	makeSortableTable($("#go_slim_table")[0]);
+    		 	hideGoEnrichmentDetails();
+    });
+}
+
+function toggleGoSlimDetails() {
+	fold($("#goslim_fold"));
+}
+function hideGoSlimDetails() {
+	foldClose($("#goslim_fold"));
+}
+
+// ---------------------------------------------------------------------------------------
 // GENE ONTOLOGY ENRICHMENT
 // ---------------------------------------------------------------------------------------
-function doGoEnrichmentAnalysis() {
+function goEnrichmentResults() {
 
-	// validate form
-	if(!validateForm())
+	if(!validateGOForm())
     	return false;
-	// validate pvalue cutoff for enrichment calculation
-	var value = $('form#filterForm input[name=goEnrichmentPVal]').fieldValue();
-    var valid = validateFloat(value, "P-Value", 0.0, 1.0);
-    if(!valid)	return false;
-	
-	$("form#filterForm input[name='doDownload']").val("false");
-    $("form#filterForm input[name='doGoEnrichment']").val("true");
+    	
+    var goAspect = $("#goAspectField2").val();
+    var goPVal = $("#goEnrichmentPValField").val();
+    var species = $("#speciesField").val();
     
-	$("form#filterForm").submit();
+    $("form#filterForm input[name='doDownload']").val("false");
+	$("form#filterForm input[name='doGoEnrichAnalysis']").val("true");
+	$("form#filterForm input[name='doGoSlimAnalysis']").val("false");
 	
+	$("form#filterForm input[name='goAspect']").val(goAspect);
+	$("form#filterForm input[name='goEnrichmentPVal']").val(goPVal);
+	$("form#filterForm input[name='speciesId']").val(species);
+	
+	
+	$.blockUI();
+	$.post( "<yrcwww:link path='proteinInferGateway.do'/>", 	//url, 
+    		 $("form#filterForm").serialize(), // data to submit
+    		 function(result, status) {
+    		 	// load the result
+    		 	$('#goenrichment_result').html(result);
+    		 	$.unblockUI();
+    		 	// stripe the table
+    		 	makeStripedTable($("#go_enrichment_table")[0]);
+    		 	makeSortableTable($("#go_enrichment_table")[0]);
+    		 	hideGoSlimDetails();
+    		 });
+	
+}
+function toggleGoEnrichmentDetails() {
+	fold($("#goenrich_fold"));
+}
+function hideGoEnrichmentDetails() {
+	foldClose($("#goenrich_fold"));
 }
 
 // ---------------------------------------------------------------------------------------
@@ -1145,6 +1251,7 @@ function hideAllDescriptionsForProtein(proteinId) {
           <li><a href="#protdetails" rel="history" id="protdetailslink"><span>Protein Details</span></a></li>
           <li><a href="#protclusters" rel="history" id="protclusterslink"><span>Protein Clusters</span></a></li>
           <li><a href="#input" rel="history" id="inputlink"><span>Summary</span></a></li>
+          <li><a href="#gene_ontology" rel="history" id="golink"><span>Gene Ontology</span></a></li>
       </ul>
    </div>
       
@@ -1242,6 +1349,85 @@ function hideAllDescriptionsForProtein(proteinId) {
       <div id="input">
       	<%@ include file="inputSummary.jsp" %>
 	  </div>
+	  
+	  <!-- GENE ONTOLOGY -->
+    <div id="gene_ontology" align="center">
+    
+    	<div align="center" style="padding: 5; border: 1px dashed gray; background-color: #F0F8FF; margin:5 0 5 0">
+    	<table cellpadding="5">
+    	<tr>
+    	<td valign="top" style="padding:5x;"><b>GO Slim Analysis: </b></td>
+    	<td style="padding:5x;">
+    		GO Domain: 
+    		<html:select name="proteinInferFilterForm" property="goAspect" styleId="goAspectField1">
+			<html:option
+				value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">Cellular Component</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
+			</html:select>
+    	</td>
+    	
+    	<td style="padding:5x;">
+    		GO Slim:
+			<html:select name="proteinInferFilterForm" property="goSlimTermId" styleId="goSlimTermIdField">
+			<html:options collection="goslims" property="id" labelProperty="name"/>
+			</html:select>
+    	</td>
+    	
+    	<td style="padding:5x;">
+    		<a href="" onclick="javascript:goAnalysisResults();return false;"><b>Update</b></a>
+    	</td>
+    	</tr>
+    	
+    	<tr>
+    	<td valign="top" style="padding:5x;"><b>GO Enrichment: </b></td>
+    	<td style="padding:5x;">
+    		GO Domain:
+    		<html:select name="proteinInferFilterForm" property="goAspect" styleId="goAspectField2">
+			<html:option
+				value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">Cellular Component</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
+		</html:select>
+    	</td>
+    	
+    	<td style="padding:5x;">
+    		P-Value: <html:text name="proteinInferFilterForm" property="goEnrichmentPVal" styleId="goEnrichmentPValField"></html:text>
+    	</td>
+		
+		<td style="padding:5x;">
+    		Species: <html:select name="proteinInferFilterForm" property="speciesId" styleId="speciesField">
+    		<html:option value="0">None</html:option>
+    		<html:options collection="speciesList" property="id" labelProperty="name"/>
+    		</html:select>
+    	</td>
+    	
+		<td style="padding:5x;">
+			<a href="" onclick="javascript:goEnrichmentResults();return false;"><b>Update</b></a>
+		</td> 
+		   	
+    	</tr>
+    	<tr>
+    		<td colspan="5">
+    		<span style="font-size:8pt; color:red;"><b>NOTE:</b> If the filtering criteria under the "Protein List" tab has been changed 
+    		please click "Update" to analyze the current list of filtered proteins.</span>
+    		</td>
+    	</tr>
+    	</table>
+    	</div>
+    	
+    	<!-- Placeholder divs for the results to go in -->
+    	<div style="margin-top:10px;" id="goslim_result"></div>
+    	<div style="margin-top:10px;" id="goenrichment_result"></div>
+    	
+    </div>
+    
+    
+    
 
 <div style="font-size: 8pt;margin-top: 3px;" align="left">
 	*This protein inference program is based on the IDPicker algorithm published in:<br>

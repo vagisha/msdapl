@@ -33,7 +33,7 @@ import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.www.go.GOSlimUtils;
 import org.yeastrc.www.misc.ResultsPager;
-import org.yeastrc.www.proteinfer.GOSupportChecker;
+import org.yeastrc.www.proteinfer.GOSupportUtils;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 import org.yeastrc.www.proteinfer.ProteinInferToProjectMapper;
 import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
@@ -202,31 +202,8 @@ public class ProteinProphetViewAction extends Action {
 
 	private List<Species> getSpeciesList(List<Integer> mySpeciesIds)
 			throws SQLException {
-		List<Species> speciesList = new ArrayList<Species>();
-        // C. elgans
-        Species species = new Species();
-        species.setId(TaxonomyUtils.CAENORHABDITIS_ELEGANS);
-        speciesList.add(species);
-        // Drosophila
-        species = new Species();
-        species.setId(TaxonomyUtils.DROSOPHILA_MELANOGASTER);
-        speciesList.add(species);
-        // Mouse
-        species = new Species();
-        species.setId(10090);
-        speciesList.add(species);
-        // Rat
-        species = new Species();
-        species.setId(10116);
-        speciesList.add(species);
-        // Budding Yeast
-        species = new Species();
-        species.setId(TaxonomyUtils.SACCHAROMYCES_CEREVISIAE);
-        speciesList.add(species);
-        // Fission Yeast
-        species = new Species();
-        species.setId(TaxonomyUtils.SCHIZOSACCHAROMYCES_POMBE);
-        speciesList.add(species);
+		List<Species> speciesList = GOSupportUtils.getSpeciesList();
+        
         if(mySpeciesIds.size() == 1) {
         	int sid = mySpeciesIds.get(0);
         	boolean found = false;
@@ -236,7 +213,7 @@ public class ProteinProphetViewAction extends Action {
         		}
         	}
         	if(!found) {
-        		species = new Species();
+        		Species species = new Species();
                 species.setId(sid);
                 speciesList.add(species);
         	}

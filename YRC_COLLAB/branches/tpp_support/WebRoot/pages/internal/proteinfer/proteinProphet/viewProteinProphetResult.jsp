@@ -787,8 +787,9 @@ function validateFloat(value, fieldName, min, max) {
 	if(valid && floatVal < min)			valid = false;
 	if(max && (valid && floatVal > max))	valid = false;
 	if(!valid) {
-		if(max) alert("Value for "+fieldName+" should be between "+min+" and "+max);
-		else	alert("Value for "+fieldName+" should be >= "+min);
+		if(max && min) alert("Value for "+fieldName+" should be between "+min+" and "+max);
+		else if (min) alert("Value for "+fieldName+" should be >= "+min);
+		else alert("Invalid value for "+fieldName);
 	}
 	return valid;
 }
@@ -1248,6 +1249,14 @@ function hideAllDescriptionsForProtein(proteinId) {
 		</td> 
 		   	
     	</tr>
+    	
+    	<tr>
+    		<td colspan="5">
+    		<span style="font-size:8pt; color:red;"><b>NOTE:</b> If the filtering criteria under the "Protein List" tab has been changed 
+    		please click "Update" to analyze the current list of filtered proteins.</span>
+    		</td>
+    	</tr>
+    	
     	</table>
     	</div>
     	

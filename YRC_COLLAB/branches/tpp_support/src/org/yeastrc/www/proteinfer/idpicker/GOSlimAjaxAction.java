@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.yeastrc.www.proteinfer.proteinProphet;
+package org.yeastrc.www.proteinfer.idpicker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +17,18 @@ import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
-import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.go.GOSlimAnalysis;
 import org.yeastrc.www.go.GOSlimChartUrlCreator;
 import org.yeastrc.www.go.GOSlimStatsCalculator;
+import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
+
+import edu.uwpr.protinfer.idpicker.IDPickerParams;
+import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
 
 /**
  * GOSlimAjaxAction.java
@@ -44,21 +49,20 @@ public class GOSlimAjaxAction extends Action {
 		log.info("Got request for GO Slim analysis for protein inference");
 		
 		// form for filtering and display options
-        ProteinProphetFilterForm filterForm = (ProteinProphetFilterForm)form;
+		ProteinInferFilterForm filterForm = (ProteinInferFilterForm)form;
 
 		// get the protein inference id
 		int pinferId = filterForm.getPinferId();
 
 		long s = System.currentTimeMillis();
-		
-		// Get the peptide definition; We don't get peptide definition from ProteinProphet params so just
-        // use a dummy one.
-        PeptideDefinition peptideDef = new PeptideDefinition();
-        peptideDef.setUseCharge(true);
-        peptideDef.setUseMods(true);
+
+		// Get the peptide definition; 
+		IdPickerRun idpRun = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
+        IDPickerParams idpParams = IdPickerParamsMaker.makeIdPickerParams(idpRun.getParams());
+        PeptideDefinition peptideDef = idpParams.getPeptideDefinition();
         
         // filtering criteria from the request
-        ProteinProphetFilterCriteria filterCriteria_request = filterForm.getFilterCriteria(peptideDef);
+        ProteinFilterCriteria filterCriteria_request = filterForm.getFilterCriteria(peptideDef);
         
         // protein Ids
         List<Integer> proteinIds = null;
@@ -66,7 +70,7 @@ public class GOSlimAjaxAction extends Action {
         ProteinInferSessionManager sessionManager = ProteinInferSessionManager.getInstance();
         
         // Check if we already have information in the session
-        ProteinProphetFilterCriteria filterCriteria_session = sessionManager.getFilterCriteriaForProteinProphet(request, pinferId);
+        ProteinFilterCriteria filterCriteria_session = sessionManager.getFilterCriteriaForIdPicker(request, pinferId);
         proteinIds = sessionManager.getStoredProteinIds(request, pinferId);
         
         
@@ -76,7 +80,7 @@ public class GOSlimAjaxAction extends Action {
         	log.info("NO information in session for: "+pinferId);
         	// redirect to the /viewProteinInferenceResult action if this different from the
             // protein inference ID stored in the session
-            log.error("Stale ProteinProphet ID: "+pinferId);
+            log.error("Stale protein inference ID: "+pinferId);
             response.setContentType("text/html");
             response.getWriter().write("STALE_ID");
             return null;
@@ -98,7 +102,7 @@ public class GOSlimAjaxAction extends Action {
                 
             	log.info("Filtering criteria has changed");
             	
-                proteinIds = ProteinProphetResultsLoader.getProteinIds(pinferId, filterCriteria_request);
+            	proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria_request);
             }
         }
 		
@@ -134,7 +138,7 @@ public class GOSlimAjaxAction extends Action {
 		return mapping.findForward("Success");
 	}
 	
-	private boolean matchFilterCriteria(ProteinProphetFilterCriteria filterCritSession,  ProteinProphetFilterCriteria filterCriteria) {
+	private boolean matchFilterCriteria(ProteinFilterCriteria filterCritSession,  ProteinFilterCriteria filterCriteria) {
         return filterCritSession.equals(filterCriteria);
     }
 

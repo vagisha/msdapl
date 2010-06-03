@@ -870,7 +870,8 @@
 		<forward name="ViewResults" path="/viewNewPinferResult.do" redirect="false" />
 		<forward name="Update" path="/updateProteinInferenceResult.do" redirect="false" />
 		<forward name="Download" path="/downloadProtInferResults.do" redirect="false" />
-		<forward name="GOEnrichment" path="/protInferGoEnrichment.do" redirect="false" />
+		<forward name="GOSlimAnalysis" path="/protInferGoSlimAnalysis.do" redirect="false" />
+		<forward name="GOEnrichAnalysis" path="/protInferGoEnrichment.do" redirect="false" />
 		<forward name="Failure" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
 	</action>
 	
@@ -907,6 +908,15 @@
 		<forward name="Failure" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
 	</action>
 	
+	<action 
+		path="/protInferGoSlimAnalysis"
+		name="idPickerFilterForm"
+		scope="request"
+		validate="true"
+		type="org.yeastrc.www.proteinfer.idpicker.GOSlimAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/goSlimAnalysis.jsp" redirect="false" />
+	</action>
 	
 	<action 
 		path="/protInferGoEnrichment"
@@ -915,8 +925,8 @@
 		validate="true"
 		type="org.yeastrc.www.proteinfer.idpicker.ProteinInferGOEnrichmentAction"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/viewProtInferGoEnrichment.jsp" redirect="false" />
-		<forward name="Failure" path="/pages/internal/proteinfer/viewProtInferGoEnrichment.jsp" redirect="false" />
+		<forward name="Success" path="/pages/internal/proteinfer/goEnrichmentAnalysis.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/goEnrichmentAnalysis.jsp" redirect="false" />
 	</action>
 	
 	<action 
@@ -983,7 +993,7 @@
 		validate="true"
 		type="org.yeastrc.www.proteinfer.proteinProphet.GOSlimAjaxAction"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/goSlimAnalysis.jsp" redirect="false" />
+		<forward name="Success" path="/pages/internal/proteinfer/goSlimAnalysis.jsp" redirect="false" />
 	</action>
 	
 	<action 
@@ -993,8 +1003,8 @@
 		validate="true"
 		type="org.yeastrc.www.proteinfer.proteinProphet.ProteinProphetGOEnrichmentAction"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetGoEnrichment.jsp" redirect="false" />
-		<forward name="Failure" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetGoEnrichment.jsp" redirect="false" />
+		<forward name="Success" path="/pages/internal/proteinfer/goEnrichmentAnalysis.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/goEnrichmentAnalysis.jsp" redirect="false" />
 	</action>
 	
 	<action 

@@ -36,7 +36,12 @@
   
   <html:hidden name="proteinInferFilterForm" property="pinferId" />
   <html:hidden name="proteinInferFilterForm" property="doDownload" />
-  <html:hidden name="proteinInferFilterForm" property="doGoEnrichment" />
+  <html:hidden name="proteinInferFilterForm" property="doGoSlimAnalysis" />
+  <html:hidden name="proteinInferFilterForm" property="doGoEnrichAnalysis" />
+  <html:hidden name="proteinInferFilterForm" property="goAspect" />
+  <html:hidden name="proteinInferFilterForm" property="goSlimTermId" />
+  <html:hidden name="proteinInferFilterForm" property="goEnrichmentPVal" />
+  <html:hidden name="proteinInferFilterForm" property="speciesId" />
   
   
   <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;">
@@ -202,38 +207,12 @@
  </TABLE>
  
 
-<logic:notPresent name="goView">
- <div align="center" style="margin:10 0 5 0;">
-   	<a href="" onclick="javascript:downloadResults();return false;" ><b>Download Results</b></a> &nbsp; 
-   	<html:checkbox name="proteinInferFilterForm"property="printPeptides" >Include Peptides</html:checkbox>
-   	<html:checkbox name="proteinInferFilterForm"property="printDescriptions" >Include Descriptions</html:checkbox>
-   	<html:checkbox name="proteinInferFilterForm"property="collapseGroups" >Collapse Protein Groups</html:checkbox>
-  </div>
-</logic:notPresent>
+<div align="center" style="margin:10 0 5 0;">
+  	<a href="" onclick="javascript:downloadResults();return false;" ><b>Download Results</b></a> &nbsp; 
+  	<html:checkbox name="proteinInferFilterForm"property="printPeptides" >Include Peptides</html:checkbox>
+  	<html:checkbox name="proteinInferFilterForm"property="printDescriptions" >Include Descriptions</html:checkbox>
+  	<html:checkbox name="proteinInferFilterForm"property="collapseGroups" >Collapse Protein Groups</html:checkbox>
+ </div>
 
 
-<logic:equal name="showGoForm" value="true">
- <div align="center"
-		style="padding: 5; border: 1px dashed gray; background-color: #F0F8FF; margin:5 0 5 0">
-		<b>GO Enrichment:</b>
-		<html:select name="proteinInferFilterForm" property="goAspect">
-			<html:option
-				value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
-			<html:option
-				value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">Cellular Component</html:option>
-			<html:option
-				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
-		</html:select>
-		&nbsp; &nbsp; 
-		Species:
-		<html:select name="proteinInferFilterForm" property="speciesId">
-			<html:option value="4932">Saccharomyces cerevisiae </html:option>
-		</html:select>
-		&nbsp; &nbsp;
-		P-Value: <html:text name="proteinInferFilterForm" property="goEnrichmentPVal"></html:text>
-		&nbsp; &nbsp;
-		<a href=""
-			onclick="javascript:doGoEnrichmentAnalysis();return false;">Calculate</a>
-	</div>
-</logic:equal>
 </html:form>

@@ -6,6 +6,7 @@
  */
 package org.yeastrc.www.proteinfer.idpicker;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,8 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.bio.go.GONode;
+import org.yeastrc.bio.taxonomy.Species;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
@@ -24,8 +27,9 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
+import org.yeastrc.www.go.GOSlimUtils;
 import org.yeastrc.www.misc.ResultsPager;
-import org.yeastrc.www.proteinfer.GOSupportChecker;
+import org.yeastrc.www.proteinfer.GOSupportUtils;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 import org.yeastrc.www.proteinfer.ProteinInferToProjectMapper;
 import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
@@ -171,8 +175,23 @@ public class ProteinInferViewAction extends Action {
         request.setAttribute("sortBy", filterCriteria.getSortBy());
         request.setAttribute("sortOrder", filterCriteria.getSortOrder());
         
-        if(GOSupportChecker.isSupported(pinferId)) {
-        	request.setAttribute("showGoForm", true);
+        // Species for GO analyses
+        List<Integer> speciesIds = ProteinInferToSpeciesMapper.map(pinferId);
+        if(speciesIds.size() == 1) 
+        	filterForm.setSpeciesId(speciesIds.get(0));
+        List<Species> speciesList = getSpeciesList(speciesIds);
+        request.setAttribute("speciesList", speciesList);
+        
+        // GO Slim terms
+        List<GONode> goslims = GOSlimUtils.getGOSlims();
+        request.setAttribute("goslims", goslims);
+        if(goslims.size() > 0) {
+        	for(GONode slim: goslims) {
+        		if(slim.getName().contains("Generic")) {
+        			filterForm.setGoSlimTermId(slim.getId());
+        			break;
+        		}
+        	}
         }
         
         long e = System.currentTimeMillis();
@@ -180,5 +199,25 @@ public class ProteinInferViewAction extends Action {
         
         // Go!
         return mapping.findForward("Success");
+	}
+	
+	private List<Species> getSpeciesList(List<Integer> mySpeciesIds) throws SQLException {
+		List<Species> speciesList = GOSupportUtils.getSpeciesList();
+
+		if(mySpeciesIds.size() == 1) {
+			int sid = mySpeciesIds.get(0);
+			boolean found = false;
+			for(Species sp: speciesList) {
+				if(sp.getId() == sid) {
+					found = true; break;
+				}
+			}
+			if(!found) {
+				Species species = new Species();
+				species.setId(sid);
+				speciesList.add(species);
+			}
+		}
+		return speciesList;
 	}
 }

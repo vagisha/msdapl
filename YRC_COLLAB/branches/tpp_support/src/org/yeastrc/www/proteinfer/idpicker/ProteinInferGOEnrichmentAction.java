@@ -23,6 +23,7 @@ import org.yeastrc.www.go.GOEnrichmentCalculator;
 import org.yeastrc.www.go.GOEnrichmentInput;
 import org.yeastrc.www.go.GOEnrichmentOutput;
 import org.yeastrc.www.go.GOEnrichmentTabular;
+import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 
 import edu.uwpr.protinfer.idpicker.IDPickerParams;
 import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
@@ -47,16 +48,80 @@ public class ProteinInferGOEnrichmentAction extends Action {
             HttpServletResponse response )
     throws Exception {
         
+    	log.info("Got request for GO enrichment analysis for protein inference");
+    	
     	IdPickerFilterForm filterForm = (IdPickerFilterForm)form;
     	
         // get the protein inference id
         int pinferId = filterForm.getPinferId();
        
-        
         long s = System.currentTimeMillis();
         
+        
+        // Get the peptide definition; 
+		IdPickerRun idpRun = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
+        IDPickerParams idpParams = IdPickerParamsMaker.makeIdPickerParams(idpRun.getParams());
+        PeptideDefinition peptideDef = idpParams.getPeptideDefinition();
+        
+        // filtering criteria from the request
+        ProteinFilterCriteria filterCriteria_request = filterForm.getFilterCriteria(peptideDef);
+        
+        // protein Ids
+        List<Integer> proteinIds = null;
+        
+        ProteinInferSessionManager sessionManager = ProteinInferSessionManager.getInstance();
+        
+        // Check if we already have information in the session
+        ProteinFilterCriteria filterCriteria_session = sessionManager.getFilterCriteriaForIdPicker(request, pinferId);
+        proteinIds = sessionManager.getStoredProteinIds(request, pinferId);
+        
+        
+        // If we don't have a filtering criteria in the session return an error
+        if(filterCriteria_session == null || proteinIds == null) {
+        	
+        	log.info("NO information in session for: "+pinferId);
+        	// redirect to the /viewProteinInferenceResult action if this different from the
+            // protein inference ID stored in the session
+            log.error("Stale protein inference ID: "+pinferId);
+            response.setContentType("text/html");
+            response.getWriter().write("STALE_ID");
+            return null;
+        }
+        else {
+        	
+        	log.info("Found information in session for: "+pinferId);
+        	System.out.println("stored protein ids: "+proteinIds.size());
+        	 
+        	// we will use the sorting column and sorting order from the filter criteria in the session.
+        	filterCriteria_request.setSortBy(filterCriteria_session.getSortBy());
+        	filterCriteria_request.setSortOrder(filterCriteria_session.getSortOrder());
+        	
+        	boolean match = matchFilterCriteria(filterCriteria_session, filterCriteria_request);
+        	
+            
+            // if the filtering criteria has changed we need to filter the results again
+            if(!match)  {
+                
+            	log.info("Filtering criteria has changed");
+            	
+            	proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria_request);
+            }
+        }
+        
+        
+        int goAspect = filterForm.getGoAspect();
         int speciesId = filterForm.getSpeciesId();
-        GOEnrichmentOutput enrichment = doGoEnrichmentAnalysis(pinferId, speciesId, filterForm);
+        // We have the protein inference protein IDs; Get the corresponding nrseq protein IDs
+        List<Integer> nrseqIds = new ArrayList<Integer>(proteinIds.size());
+        ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
+        ProteinferProteinDAO protDao = factory.getProteinferProteinDao();
+        for(int proteinId: proteinIds) {
+            ProteinferProtein protein = protDao.loadProtein(proteinId);
+            nrseqIds.add(protein.getNrseqProteinId());
+        }
+        
+        GOEnrichmentOutput enrichment = doGoEnrichmentAnalysis(nrseqIds, speciesId, goAspect, filterForm.getGoEnrichmentPValDouble());
+        
         // Biological Process
         if(filterForm.getGoAspect() == GOUtils.BIOLOGICAL_PROCESS) {
             GOEnrichmentTabular bpTabular = new GOEnrichmentTabular();
@@ -64,7 +129,8 @@ public class ProteinInferGOEnrichmentAction extends Action {
             bpTabular.setTitle("Biological Process");
             bpTabular.setNumProteinsInUniverse(enrichment.getTotalAnnotatedBiologicalProcess());
             bpTabular.setNumProteinsInSet(enrichment.getNumSpeciesProteins());
-            request.setAttribute("bioProcessTerms", bpTabular);
+            bpTabular.setNumInputProteins(enrichment.getNumInputProteins());
+            request.setAttribute("goEnrichment", bpTabular);
         }
         
         // Cellular Component
@@ -74,7 +140,8 @@ public class ProteinInferGOEnrichmentAction extends Action {
             ccTabular.setTitle("Cellular Component");
             ccTabular.setNumProteinsInUniverse(enrichment.getTotalAnnotatedCellularComponent());
             ccTabular.setNumProteinsInSet(enrichment.getNumSpeciesProteins());
-            request.setAttribute("cellComponentTerms", ccTabular);
+            ccTabular.setNumInputProteins(enrichment.getNumInputProteins());
+            request.setAttribute("goEnrichment", ccTabular);
         }
         
         // Molecular Function
@@ -84,15 +151,12 @@ public class ProteinInferGOEnrichmentAction extends Action {
             mfTabular.setTitle("Molecular Function");
             mfTabular.setNumProteinsInUniverse(enrichment.getTotalAnnotatedMolecularFunction());
             mfTabular.setNumProteinsInSet(enrichment.getNumSpeciesProteins());
-            request.setAttribute("molFunctionTerms", mfTabular);
+            mfTabular.setNumInputProteins(enrichment.getNumInputProteins());
+            request.setAttribute("goEnrichment", mfTabular);
         }
         
-        request.setAttribute("enrichment", enrichment);
         request.setAttribute("pinferId", pinferId);
         request.setAttribute("species", Species.getInstance(speciesId));
-        request.setAttribute("proteinInferFilterForm", filterForm);
-        request.setAttribute("showGoForm", true);
-        request.setAttribute("goView", true);
         
         
         long e = System.currentTimeMillis();
@@ -100,38 +164,26 @@ public class ProteinInferGOEnrichmentAction extends Action {
         return mapping.findForward("Success");
     }
     
-    private GOEnrichmentOutput doGoEnrichmentAnalysis(int pinferId, int speciesId, IdPickerFilterForm filterForm) throws Exception {
+    private GOEnrichmentOutput doGoEnrichmentAnalysis(List<Integer> nrseqIds, int speciesId, int goAspect, double pVal) throws Exception {
         
-        IdPickerRun idpRun = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
-        IDPickerParams idpParams = IdPickerParamsMaker.makeIdPickerParams(idpRun.getParams());
-        PeptideDefinition peptideDef = idpParams.getPeptideDefinition();
-        
-        // Get the filtering criteria
-        ProteinFilterCriteria filterCriteria = filterForm.getFilterCriteria(peptideDef);
-        
-        // Get the protein Ids that fulfill the criteria.
-        List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
-        log.info(proteinIds.size()+" proteins for GO enrichment analysis");
-        List<Integer> nrseqIds = new ArrayList<Integer>(proteinIds.size());
-        ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
-        ProteinferProteinDAO protDao = factory.getProteinferProteinDao();
-        for(int proteinId: proteinIds) {
-            ProteinferProtein protein = protDao.loadProtein(proteinId);
-            nrseqIds.add(protein.getNrseqProteinId());
-        }
+        log.info(nrseqIds.size()+" proteins for GO enrichment analysis");
         
         GOEnrichmentInput input = new GOEnrichmentInput(speciesId);
         input.setProteinIds(nrseqIds);
-        if(filterForm.getGoAspect() == GOUtils.BIOLOGICAL_PROCESS)
+        if(goAspect == GOUtils.BIOLOGICAL_PROCESS)
             input.setUseBiologicalProcess(true);
-        if(filterForm.getGoAspect() == GOUtils.CELLULAR_COMPONENT)
+        if(goAspect == GOUtils.CELLULAR_COMPONENT)
             input.setUseCellularComponent(true);
-        if(filterForm.getGoAspect() == GOUtils.MOLECULAR_FUNCTION)
+        if(goAspect == GOUtils.MOLECULAR_FUNCTION)
             input.setUseMolecularFunction(true);
-        input.setPValCutoff(Double.parseDouble(filterForm.getGoEnrichmentPVal()));
+        input.setPValCutoff(pVal);
         
         GOEnrichmentOutput enrichment = GOEnrichmentCalculator.calculate(input);
         return enrichment;
         
+    }
+    
+    private boolean matchFilterCriteria(ProteinFilterCriteria filterCritSession,  ProteinFilterCriteria filterCriteria) {
+        return filterCritSession.equals(filterCriteria);
     }
 }
