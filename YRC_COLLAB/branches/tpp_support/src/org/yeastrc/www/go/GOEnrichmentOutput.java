@@ -6,9 +6,11 @@
  */
 package org.yeastrc.www.go;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.yeastrc.bio.go.GOUtils;
+import org.yeastrc.bio.taxonomy.Species;
 
 /**
  * 
@@ -16,6 +18,7 @@ import org.yeastrc.bio.go.GOUtils;
 public class GOEnrichmentOutput {
 
     private final int speciesId; // NRSEQ species id
+    private String speciesName;
     private String goDomainName;
     
     private int numInputProteins; 			// number of proteins given for analysis
@@ -32,6 +35,13 @@ public class GOEnrichmentOutput {
     
     public GOEnrichmentOutput(GOEnrichmentInput input) {
         this.speciesId = input.getSpeciesId();
+        Species species = new Species();
+        try {
+			species.setId(speciesId);
+			this.speciesName = species.getName();
+		} catch (SQLException e) {
+			this.speciesName = "ERROR";
+		}
         if(input.getGoAspect() == GOUtils.BIOLOGICAL_PROCESS)
         	goDomainName = "Biological Process";
         else if(input.getGoAspect() == GOUtils.CELLULAR_COMPONENT)
@@ -45,7 +55,9 @@ public class GOEnrichmentOutput {
     public int getSpeciesId() {
         return speciesId;
     }
-    
+    public String getSpeciesName() {
+    	return this.speciesName;
+    }
     public String getGoDomainName() {
     	return goDomainName;
     }

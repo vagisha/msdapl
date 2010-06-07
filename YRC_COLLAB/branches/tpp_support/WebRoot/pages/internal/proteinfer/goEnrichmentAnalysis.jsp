@@ -20,8 +20,8 @@
 		</tr>
 		<tr>
 			<td><b># Proteins (
-			<a target="ncbi_window" href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=<bean:write name="species" property="id"/>">
-				<bean:write name="species" property="name" /></a>): 
+			<a target="ncbi_window" href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=<bean:write name="goEnrichment" property="speciesId"/>">
+				<bean:write name="goEnrichment" property="speciesName" /></a>): 
 			</b></td><td><bean:write name="goEnrichment" property="numInputSpeciesProteins" /></td>
 		</tr>
 	</table>

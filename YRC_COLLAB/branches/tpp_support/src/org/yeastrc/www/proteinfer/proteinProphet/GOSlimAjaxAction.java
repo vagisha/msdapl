@@ -123,11 +123,13 @@ public class GOSlimAjaxAction extends Action {
         GOSlimAnalysis goAnalysis = calculator.getAnalysis();
         request.setAttribute("goAnalysis",goAnalysis);
         
-        String pieChartUrl = GOSlimChartUrlCreator.getPieChartUrl(goAnalysis, 15);
-        request.setAttribute("pieChartUrl", pieChartUrl);
-        
-        String barChartUrl = GOSlimChartUrlCreator.getBarChartUrl(goAnalysis, 15);
-        request.setAttribute("barChartUrl", barChartUrl);
+        if(goAnalysis.getNumAnnotated() > 0) {
+        	String pieChartUrl = GOSlimChartUrlCreator.getPieChartUrl(goAnalysis, 15);
+        	request.setAttribute("pieChartUrl", pieChartUrl);
+
+        	String barChartUrl = GOSlimChartUrlCreator.getBarChartUrl(goAnalysis, 15);
+        	request.setAttribute("barChartUrl", barChartUrl);
+        }
         
 		long e = System.currentTimeMillis();
 		log.info("GOSlimAjaxAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");

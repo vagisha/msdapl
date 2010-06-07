@@ -76,9 +76,6 @@ public class CompareGOEnrichmentAjaxAction extends Action {
 //            return mapping.findForward("CreateGraph");
 //        }
 //        else {
-        	Species species = new Species();
-        	species.setId(speciesId);
-        	request.setAttribute("species", species);
         	request.setAttribute("goEnrichment", enrichment);
         	return mapping.findForward("Success");
 //        }

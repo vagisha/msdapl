@@ -118,9 +118,6 @@ public class ProteinProphetGOEnrichmentAction extends Action {
         GOEnrichmentOutput enrichment = doGoEnrichmentAnalysis(nrseqIds, speciesId, goAspect, filterForm.getGoEnrichmentPValDouble());
         request.setAttribute("goEnrichment", enrichment);
         
-        request.setAttribute("pinferId", pinferId);
-        request.setAttribute("species", Species.getInstance(speciesId));
-        
         
         long e = System.currentTimeMillis();
         log.info("ProteinProphetGOEnrichmentAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
