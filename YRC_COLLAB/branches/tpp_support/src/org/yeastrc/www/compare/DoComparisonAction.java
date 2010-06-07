@@ -6,8 +6,11 @@
  */
 package org.yeastrc.www.compare;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +22,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.bio.taxonomy.Species;
+import org.yeastrc.jobqueue.MSJob;
+import org.yeastrc.jobqueue.MSJobFactory;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.protinfer.SORT_BY;
+import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.ms.util.TimeUtils;
@@ -32,6 +43,7 @@ import org.yeastrc.www.compare.dataset.ProteinferDataset;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.compare.graph.GraphBuilder;
 import org.yeastrc.www.compare.util.VennDiagramCreator;
+import org.yeastrc.www.proteinfer.GOSupportUtils;
 
 import edu.uwpr.protinfer.infer.graph.BipartiteGraph;
 import edu.uwpr.protinfer.infer.graph.GraphCollapser;
@@ -62,6 +74,7 @@ public class DoComparisonAction extends Action {
             return mapping.findForward("Failure");
         }
         
+        
         // Get the selected protein inference run ids
         // these should be ordered by any user specified order
         List<Integer> allRunIds = myForm.getAllSelectedRunIdsOrdered();
@@ -73,6 +86,15 @@ public class DoComparisonAction extends Action {
             saveErrors( request, errors );
             return mapping.findForward("Failure");
         }
+        
+        
+        // Species for GO analyses
+        List<Integer> speciesIds = getMySpeciesIds(allRunIds);
+        if(myForm.getSpeciesId() == 0 && speciesIds.size() == 1) 
+        	myForm.setSpeciesId(speciesIds.get(0));
+        List<Species> speciesList = getSpeciesList(speciesIds);
+        request.setAttribute("speciesList", speciesList);
+        
         
         // Get the datasets we will be comparing
         List<FilterableDataset> datasets = new ArrayList<FilterableDataset>(allRunIds.size());
@@ -125,9 +147,9 @@ public class DoComparisonAction extends Action {
         e = System.currentTimeMillis();
         log.info("Time to apply boolean filters: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
-        // If the user requested GO enrichment we will not group indistinguishable proteins even if that
-        // option was checked in the form. For GO enrichment we only care about a list of proteins
-        if(myForm.isGoEnrichment()) {
+        // If the user requested GO analysis we will not group indistinguishable proteins even if that
+        // option was checked in the form. For GO analysis we only care about a list of proteins
+        if(myForm.isDoGoAnalysis()) {
         	myForm.setGroupIndistinguishableProteins(false);
         }
         
@@ -145,14 +167,21 @@ public class DoComparisonAction extends Action {
             comparison.setDisplayColumns(myForm.getDisplayColumns());
         	comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
         	
-        	// If User requested GO enrichment analysis forward to another action class
-        	// GO ENRICHMENT ANALYSIS?
-            if(myForm.isGoEnrichment()) {
-                log.info("DOING GENE ONTOLOGY ENRICHMENT ANALYSIS...");
+        	// If User requested GO analysis forward to another action class
+        	// GO ANALYSIS?
+            if(myForm.isDoGoAnalysis()) {
+            	
                 comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
                 request.setAttribute("comparisonForm", myForm);
                 request.setAttribute("comparisonDataset", comparison);
-                return mapping.findForward("GOAnalysis");
+                if(myForm.isDoGoSlimAnalysis()) {
+                	log.info("DOING GO Slim ANALYSIS...");
+                	return mapping.findForward("GOSlim");
+                }
+                else if(myForm.isDoGoEnrichAnalysis()) {
+                	log.info("DOING GENE ONTOLOGY ENRICHMENT ANALYSIS...");
+                	return mapping.findForward("GOEnrichment");
+                }
             }
             
             // IS THE USER DOWNLOADING?
@@ -325,4 +354,45 @@ public class DoComparisonAction extends Action {
             return mapping.findForward("ProteinGroupList");
         }
     }
+    
+    private List<Integer> getMySpeciesIds(List<Integer> piRunIds) throws Exception {
+
+		Set<Integer> species = new HashSet<Integer>();
+
+		ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
+		MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+
+		for(Integer piRunId: piRunIds) {
+			List<Integer> searchIds = runDao.loadSearchIdsForProteinferRun(piRunId);
+			if(searchIds != null) {
+				for(int searchId: searchIds) {
+
+					MsSearch search = searchDao.loadSearch(searchId);
+					MSJob job = MSJobFactory.getInstance().getJobForExperiment(search.getExperimentId());
+					species.add(job.getTargetSpecies());
+				}
+			}
+		}
+		return new ArrayList<Integer>(species);
+	}
+	
+	private List<Species> getSpeciesList(List<Integer> mySpeciesIds) throws SQLException {
+		List<Species> speciesList = GOSupportUtils.getSpeciesList();
+
+		if(mySpeciesIds.size() == 1) {
+			int sid = mySpeciesIds.get(0);
+			boolean found = false;
+			for(Species sp: speciesList) {
+				if(sp.getId() == sid) {
+					found = true; break;
+				}
+			}
+			if(!found) {
+				Species species = new Species();
+				species.setId(sid);
+				speciesList.add(species);
+			}
+		}
+		return speciesList;
+	}
 }

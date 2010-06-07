@@ -101,30 +101,6 @@ public class ProteinInferFilterForm extends ActionForm {
 		this.doDownload = doDownload;
 	}
 
-	public int getGoSlimTermId() {
-		return goSlimTermId;
-	}
-
-	public void setGoSlimTermId(int goSlimTermId) {
-		this.goSlimTermId = goSlimTermId;
-	}
-	
-    public boolean isDoGoSlimAnalysis() {
-		return doGoSlimAnalysis;
-	}
-
-	public void setDoGoSlimAnalysis(boolean doGoSlimAnalysis) {
-		this.doGoSlimAnalysis = doGoSlimAnalysis;
-	}
-
-	public boolean isDoGoEnrichAnalysis() {
-		return doGoEnrichAnalysis;
-	}
-
-	public void setDoGoEnrichAnalysis(boolean doGoEnrichAnalysis) {
-		this.doGoEnrichAnalysis = doGoEnrichAnalysis;
-	}
-
 	
 	// MIN COVERAGE
     public String getMinCoverage() {
@@ -475,6 +451,30 @@ public class ProteinInferFilterForm extends ActionForm {
         this.speciesId = speciesId;
     }
     
+    public int getGoSlimTermId() {
+		return goSlimTermId;
+	}
+
+	public void setGoSlimTermId(int goSlimTermId) {
+		this.goSlimTermId = goSlimTermId;
+	}
+	
+    public boolean isDoGoSlimAnalysis() {
+		return doGoSlimAnalysis;
+	}
+
+	public void setDoGoSlimAnalysis(boolean doGoSlimAnalysis) {
+		this.doGoSlimAnalysis = doGoSlimAnalysis;
+	}
+
+	public boolean isDoGoEnrichAnalysis() {
+		return doGoEnrichAnalysis;
+	}
+
+	public void setDoGoEnrichAnalysis(boolean doGoEnrichAnalysis) {
+		this.doGoEnrichAnalysis = doGoEnrichAnalysis;
+	}
+
     public ProteinFilterCriteria getFilterCriteria(PeptideDefinition peptideDef) {
     	
     	ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();

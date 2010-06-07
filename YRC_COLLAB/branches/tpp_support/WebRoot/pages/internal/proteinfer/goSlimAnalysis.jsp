@@ -74,7 +74,8 @@ function toggleBarChart() {
 			</logic:iterate>
 		</table>
 	</div>
-		
+	
+	<logic:present name="pieChartUrl">
 	<div align="center">
 		<b><bean:write name="goAnalysis" property="goSlimName" /> has <bean:write name="goAnalysis" property="slimTermCount"/> 
 		terms for <font color="red"><bean:write name="goAnalysis" property="goAspectString"/></font>. 
@@ -107,6 +108,8 @@ function toggleBarChart() {
 	</td>
 	</tr>
 	</table>
+	</logic:present>
+	
 	
 	<br/>
 	<div align="center" style="width:75%; font-weight:bold; font-size:8pt; margin-bottom:3px;color:#D74D2D">

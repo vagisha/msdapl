@@ -295,6 +295,7 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 <%@include file="comparisonFilterForm.jsp" %>
 
 
+<div id="result_table">
 <!-- PAGE RESULTS -->
 <bean:define name="comparison" id="pageable" />
 <table id="compare_results_pager1">
@@ -360,6 +361,11 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 <!-- LEGEND -->
 <a name="LEGEND"></a>
 <%@include file="legend.jsp" %>
+</div>
+
+<!-- Placeholder divs for the GO Analysis results to go in -->
+<div style="margin-top:10px;" id="goslim_result"></div>
+<div style="margin-top:10px;" id="goenrichment_result"></div>
 
 </yrcwww:contentbox>
 

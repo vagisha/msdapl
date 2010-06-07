@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.yeastrc.bio.go.GOUtils;
 
 public class GOEnrichmentCalculatorTest extends TestCase {
 
@@ -54,7 +55,7 @@ public class GOEnrichmentCalculatorTest extends TestCase {
             
             // Construct GO DataSource
             ds = new BasicDataSource();
-            ds.setUrl("jdbc:mysql://localhost/mygo_200709");
+            ds.setUrl("jdbc:mysql://localhost/mygo_201005");
             ds.setUsername("root");
             ds.setPassword("");
             ic.bind("java:comp/env/jdbc/go", ds);
@@ -68,7 +69,7 @@ public class GOEnrichmentCalculatorTest extends TestCase {
             
             // Construct sgd DataSource
             ds = new BasicDataSource();
-            ds.setUrl("jdbc:mysql://localhost/sgd_static_200709");
+            ds.setUrl("jdbc:mysql://localhost/sgd_static_201005");
             ds.setUsername("root");
             ds.setPassword("");
             ic.bind("java:comp/env/jdbc/sgd", ds);
@@ -129,9 +130,7 @@ public class GOEnrichmentCalculatorTest extends TestCase {
         GOEnrichmentInput input = new GOEnrichmentInput(speciesId);
         input.setProteinIds(proteinIds);
         input.setPValCutoff(0.01);
-        input.setUseBiologicalProcess(true);
-        input.setUseCellularComponent(true);
-        input.setUseMolecularFunction(true);
+        input.setGoAspect(GOUtils.BIOLOGICAL_PROCESS);
         
         GOEnrichmentOutput output = null;
         try {
@@ -143,7 +142,7 @@ public class GOEnrichmentCalculatorTest extends TestCase {
         }
         assertNotNull(output);
         
-        List<EnrichedGOTerm> bpEnriched = output.getBiologicalProcessEnriched();
+        List<EnrichedGOTerm> bpEnriched = output.getEnrichedTerms();
         for(EnrichedGOTerm term: bpEnriched) {
             System.out.println(term);
         }

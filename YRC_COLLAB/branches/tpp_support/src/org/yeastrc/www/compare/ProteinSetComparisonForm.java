@@ -26,24 +26,24 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
     private int numPerPage = 50;
     private int rowIndex = -1;
     
+    private ComparisonCommand action;
+    
     // DOWNLOAD options
     private boolean download = false;
     private boolean collapseProteinGroups = false; // used only for downloading results
     private boolean includeDescription = false; // used only when downloading results
     
     // GO ENRICHMENT
-    private boolean goEnrichment = false;
-    private boolean goEnrichmentGraph = false;
     private int goAspect = GOUtils.BIOLOGICAL_PROCESS;
     private int speciesId;
     private String goEnrichmentPVal = "0.01";
+    private int goSlimTermId;
     
-    // SORTING
+    
     private SORT_BY sortBy = SORT_BY.NUM_PEPT;
     private SORT_ORDER sortOrder = SORT_ORDER.DESC;
 
     // CLUSTER
-	private boolean cluster = false;
 	private String clusteringToken = null;
 	private boolean newToken = false;
 	private boolean useLogScale = false;
@@ -112,6 +112,20 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 		this.rowIndex = rowIndex;
 	}
 
+	public ComparisonCommand getComparisonAction() {
+		return this.action;
+	}
+	
+	public void setComparisonActionId(int id) {
+		this.action = ComparisonCommand.forId(id);
+	}
+	
+	public int getComparisonActionId() {
+		if(this.action == null)
+			return 0;
+		return action.getId();
+	}
+	
 	/**
      * Validate the properties that have been sent from the HTTP request,
      * and return an ActionErrors object that encapsulates any
@@ -171,19 +185,17 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
     public String getGoEnrichmentPVal() {
         return goEnrichmentPVal;
     }
+    
+    public double getGoEnrichmentPValDouble() {
+    	if(goEnrichmentPVal == null || goEnrichmentPVal.trim().length() == 0)
+    		return 0.0;
+    	return Double.parseDouble(goEnrichmentPVal);
+    }
 
     public void setGoEnrichmentPVal(String goEnrichmentPVal) {
         this.goEnrichmentPVal = goEnrichmentPVal;
     }
 
-    public boolean isGoEnrichment() {
-        return goEnrichment;
-    }
-
-    public void setGoEnrichment(boolean goEnrichment) {
-        this.goEnrichment = goEnrichment;
-    }
-    
     public int getSpeciesId() {
         return speciesId;
     }
@@ -192,25 +204,33 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
         this.speciesId = speciesId;
     }
 
-    public boolean isGoEnrichmentGraph() {
-        return goEnrichmentGraph;
-    }
+    public int getGoSlimTermId() {
+		return goSlimTermId;
+	}
 
-    public void setGoEnrichmentGraph(boolean goEnrichmentGraph) {
-        this.goEnrichmentGraph = goEnrichmentGraph;
-    }
-    
+	public void setGoSlimTermId(int goSlimTermId) {
+		this.goSlimTermId = goSlimTermId;
+	}
+	
+    public boolean isDoGoSlimAnalysis() {
+		return (action == ComparisonCommand.GO_SLIM);
+	}
+
+	public boolean isDoGoEnrichAnalysis() {
+		return (action == ComparisonCommand.GO_ENRICH);
+	}
+	
+	public boolean isDoGoAnalysis() {
+		return isDoGoSlimAnalysis() || isDoGoEnrichAnalysis();
+	}
+
     //-----------------------------------------------------------------------------
     // Cluster
     //-----------------------------------------------------------------------------
     public boolean isCluster() {
-        return cluster;
+        return (action == ComparisonCommand.CLUSTER);
     }
 
-    public void setCluster(boolean cluster) {
-        this.cluster = cluster;
-    }
-    
     public String getClusteringToken() {
 		return clusteringToken;
 	}

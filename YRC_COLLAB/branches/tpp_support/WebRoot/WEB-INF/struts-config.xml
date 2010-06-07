@@ -1188,7 +1188,8 @@
 		<forward name="ProteinGroupList" path="/pages/internal/compare/viewProteinGroupSetComparison.jsp" redirect="false" />
 		<forward name="Failure" path="/pages/internal/compare/comparisonError.jsp" redirect="false" />
 		<forward name="Download" path="/downloadProteinComparisonResults.do" redirect="false" />
-		<forward name="GOAnalysis" path="/compareGoEnrichment.do" redirect="false" />
+		<forward name="GOEnrichment" path="/compareGoEnrichment.do" redirect="false" />
+		<forward name="GOSlim" path="/compareGoSlim.do" redirect="false" />
 		<forward name="Cluster" path="/compareClustered.do" redirect="false" />
 	</action>
 	
@@ -1231,23 +1232,25 @@
 	</action>
 	
 	<action 
+		path="/compareGoSlim"
+		name="proteinSetComparisonForm"
+		scope="request"
+		validate="true"
+		type="org.yeastrc.www.compare.go.CompareGOSlimAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/goSlimAnalysis.jsp" redirect="false" />
+		<forward name="FailureMessage" path="/pages/internal/compare/goFailure.jsp" redirect="false" />
+	</action>
+	
+	<action 
 		path="/compareGoEnrichment"
 		name="proteinSetComparisonForm"
 		scope="request"
 		validate="true"
-		type="org.yeastrc.www.compare.CompareGOEnrichmentAction"
+		type="org.yeastrc.www.compare.go.CompareGOEnrichmentAjaxAction"
 	>
-		<forward name="Success" path="/pages/internal/compare/viewCompareGoEnrichment.jsp" redirect="false" />
-		<forward name="CreateGraph" path="/viewCompareGoEnrichmentGraph.do" redirect="false" />
-		<forward name="Failure" path="/pages/internal/compare/viewCompareGoEnrichment.jsp" redirect="false" />
-	</action>
-	
-	<action
-	  path="/viewCompareGoEnrichmentGraph"
-	  type="org.yeastrc.www.compare.CompareGOEnrichmentGraphAction"
-	  validate="false">
-	  <forward name="Success" path="/pages/utils/showImage.jsp" redirect="false"/>
-	  <forward name="Failure" path="/pages/internal/compare/comparisonError.jsp" redirect="false"/>
+		<forward name="Success" path="/pages/internal/proteinfer/goEnrichmentAnalysis.jsp" redirect="false" />
+		<forward name="FailureMessage" path="/pages/internal/compare/goFailure.jsp" redirect="false" />
 	</action>
 	
 	<action 

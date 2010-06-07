@@ -20,8 +20,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.bio.go.GONode;
 import org.yeastrc.www.compare.dataset.DatasetBuilder;
 import org.yeastrc.www.compare.dataset.SelectableDataset;
+import org.yeastrc.www.go.GOSlimUtils;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -100,6 +102,22 @@ public class CompareProteinSetsAction extends Action {
         myForm.setOrList(datasets);
         myForm.setNotList(datasets);
         myForm.setXorList(datasets);
+        
+        
+        // GO Slim terms
+        List<GONode> goslims = GOSlimUtils.getGOSlims();
+        request.getSession().setAttribute("goslims", goslims); // set this in the session
+        if(goslims.size() > 0) {
+        	for(GONode slim: goslims) {
+        		if(slim.getName().contains("Generic")) {
+        			myForm.setGoSlimTermId(slim.getId());
+        			break;
+        		}
+        	}
+        }
+        
+        request.getSession().setAttribute("comparisonCommands", ComparisonCommand.values());
+        myForm.setComparisonActionId(ComparisonCommand.FILTER.getId());
         
 //        // Do we have ProteinProphet datasets
 //        for(SelectableDataset dataset: datasets) {

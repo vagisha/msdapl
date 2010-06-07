@@ -22,13 +22,13 @@
 			<td><b># Proteins (
 			<a target="ncbi_window" href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=<bean:write name="species" property="id"/>">
 				<bean:write name="species" property="name" /></a>): 
-			</b></td><td><bean:write name="goEnrichment" property="numProteinsInSet" /></td>
+			</b></td><td><bean:write name="goEnrichment" property="numInputSpeciesProteins" /></td>
 		</tr>
 	</table>
 
 <logic:present name="goEnrichment">
 	<div align="center">
-		<span style="font-weight:bold; color:red;"># Enriched Terms (<bean:write name="goEnrichment" property="title"/>):<bean:write name="goEnrichment" property="enrichedTermCount" /></span>
+		<span style="font-weight:bold; color:red;"># Enriched Terms (<bean:write name="goEnrichment" property="goDomainName"/>):<bean:write name="goEnrichment" property="enrichedTermCount" /></span>
 		<table class="table_basic" align="center">
 			<thead>
 				<tr>
@@ -58,9 +58,9 @@
 						<td><bean:write name="term" property="goNode.name"/></td>
 						<td><bean:write name="term" property="pvalueString"/></td>
 						<td><bean:write name="term" property="numAnnotatedProteins"/></td>
-						<td><bean:write name="goEnrichment" property="numProteinsInSet"/></td>
+						<td><bean:write name="goEnrichment" property="numInputAnnotatedSpeciesProteins"/></td>
 						<td><bean:write name="term" property="totalAnnotatedProteins"/></td>
-						<td><bean:write name="goEnrichment" property="numProteinsInUniverse"/></td>
+						<td><bean:write name="goEnrichment" property="numAllAnnotatedSpeciesProteins"/></td>
 					</tr>
 				</logic:iterate>
 			</tbody>

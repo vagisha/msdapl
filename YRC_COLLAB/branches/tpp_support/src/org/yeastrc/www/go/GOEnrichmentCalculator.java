@@ -9,6 +9,7 @@ package org.yeastrc.www.go;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,53 +50,43 @@ public class GOEnrichmentCalculator {
         log.info("Number of input proteins: "+input.getProteinIds().size()+"; Number of proteins with speciesID "+input.getSpeciesId()+": "+speciesProteins.size());
         
         GOEnrichmentOutput output = new GOEnrichmentOutput(input);
-        output.setNumSpeciesProteins(speciesProteins.size());
+        output.setNumInputProteins(input.getProteinIds().size());
+        output.setNumInputSpeciesProteins(speciesProteins.size());
+        if(input.getGoAspect() == GOUtils.BIOLOGICAL_PROCESS)
+        	output.setGoDomainName("Biological Process");
+        else if(input.getGoAspect() == GOUtils.CELLULAR_COMPONENT)
+        	output.setGoDomainName("Cellular Component");
+        else if(input.getGoAspect() == GOUtils.MOLECULAR_FUNCTION)
+        	output.setGoDomainName("Molecular Function");
         
-        if(input.useBiologicalProcess()) {
-            getEnrichedTerms(output, speciesProteins, GOUtils.BIOLOGICAL_PROCESS);
-        }
-        if(input.useCellularComponent()) {
-            getEnrichedTerms(output, speciesProteins, GOUtils.CELLULAR_COMPONENT);
-        }
-        if(input.useMolecularFunction()) {
-            getEnrichedTerms(output, speciesProteins, GOUtils.MOLECULAR_FUNCTION);
-        }
+        getEnrichedTerms(output, speciesProteins, input.getGoAspect());
         return output;
     }
     
     private static void getEnrichedTerms(GOEnrichmentOutput output, List<Integer> proteinIds, int goAspect) throws Exception {
         
-        int totalAnnotatedProteins = totalAnnotatedProteinCount(output.getSpeciesId(), goAspect);
-        log.info("Total number of proteins annotated with "+goAspect+": "+totalAnnotatedProteins);
+        int numSpeciesAnnotatedProteins = totalAnnotatedProteinCount(output.getSpeciesId(), goAspect);
+        log.info("Total number of proteins annotated with "+goAspect+": "+numSpeciesAnnotatedProteins);
         
-        if(goAspect == GOUtils.BIOLOGICAL_PROCESS)
-            output.setTotalAnnotatedBiologicalProcess(totalAnnotatedProteins);
-        else if(goAspect == GOUtils.CELLULAR_COMPONENT)
-            output.setTotalAnnotatedCellularComponent(totalAnnotatedProteins);
-        else if (goAspect == GOUtils.MOLECULAR_FUNCTION)
-            output.setTotalAnnotatedMolecularFunction(totalAnnotatedProteins);
-        
+        output.setNumAllAnnotatedSpeciesProteins(numSpeciesAnnotatedProteins);
         
         double pValCutoff = output.getpValCutoff();
         int speciesId = output.getSpeciesId();
-        
-        if(goAspect == GOUtils.BIOLOGICAL_PROCESS)
-            output.setBiologicalProcessEnriched(getEnrichedTerms(proteinIds, pValCutoff, speciesId, goAspect, totalAnnotatedProteins));
-        else if(goAspect == GOUtils.CELLULAR_COMPONENT)
-            output.setCellularComponentEnriched(getEnrichedTerms(proteinIds, pValCutoff, speciesId, goAspect, totalAnnotatedProteins));
-        else if (goAspect == GOUtils.MOLECULAR_FUNCTION)
-            output.setMolecularFunctionEnriched(getEnrichedTerms(proteinIds, pValCutoff, speciesId, goAspect, totalAnnotatedProteins));
-        
-    }
-
-    private static List<EnrichedGOTerm> getEnrichedTerms(List<Integer> proteinIds, double pValCutoff, int speciesId, int goAspect, int totalAnnotatedProteins) throws Exception {
         
         // Get all the GO terms for our protein set
         Map<String, EnrichedGOTerm> goTerms = getAllGOTerms(speciesId, goAspect, proteinIds);
         
         List<EnrichedGOTerm> enrichedTerms = new ArrayList<EnrichedGOTerm>(goTerms.values());
-        Iterator<EnrichedGOTerm> iter = enrichedTerms.iterator();
         
+        // get the number of proteins what had at least one GO annotation.
+        Set<Integer> numInputAnnotatedSpeciesProteins = new HashSet<Integer>(proteinIds.size()*2);
+        for(EnrichedGOTerm term: enrichedTerms) {
+        	numInputAnnotatedSpeciesProteins.addAll(term.getProteins());
+        }
+        output.setNumInputAnnotatedSpeciesProteins(numInputAnnotatedSpeciesProteins.size());
+        
+        
+        Iterator<EnrichedGOTerm> iter = enrichedTerms.iterator();
         // get the root nodes
         GONode aspectRoot = GOUtils.getAspectRootNode(goAspect);
         GONode rootNode = GOUtils.getRootNode();
@@ -112,8 +103,7 @@ public class GOEnrichmentCalculator {
                 iter.remove();
         }
 
-        
-        calculateEnrichment(enrichedTerms, proteinIds.size(), totalAnnotatedProteins);
+        calculateEnrichment(enrichedTerms, numInputAnnotatedSpeciesProteins.size(), numSpeciesAnnotatedProteins);
         
         // returns a list of GO terms enriched above the given cutoff
         iter = enrichedTerms.iterator();
@@ -129,9 +119,8 @@ public class GOEnrichmentCalculator {
         // sort by p-value
         Collections.sort(enrichedTerms);
         
-        return enrichedTerms;
+        output.setEnrichedTerms(enrichedTerms);
     }
-
     
     private static void calculateEnrichment(List<EnrichedGOTerm> enrichedTerms, int numProteinsInSet, int totalAnnotatedProteins) throws Exception {
         

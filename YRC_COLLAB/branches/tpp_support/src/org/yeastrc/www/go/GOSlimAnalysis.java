@@ -55,6 +55,9 @@ public class GOSlimAnalysis {
 		}
 		return terms;
 	}
+	public int getNumAnnotated() {
+		return totalProteinCount - numProteinsNotAnnotated;
+	}
 	public int getNumProteinsNotAnnotated() {
 		return numProteinsNotAnnotated;
 	}

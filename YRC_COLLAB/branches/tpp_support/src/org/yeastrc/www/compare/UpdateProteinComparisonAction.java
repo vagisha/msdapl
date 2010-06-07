@@ -53,10 +53,10 @@ public class UpdateProteinComparisonAction extends Action {
         
         request.setAttribute(HistoryTag.NO_HISTORY_ATTRIB, true); // Don't want this to be saved to history.
         
-        if(!myForm.isCluster()) {
+        if(myForm.isCluster())
+        	return mapping.findForward("ClusterGateway");
+        else {
         	return mapping.findForward("DoComparison");
         }
-        else
-        	return mapping.findForward("ClusterGateway");
     }
 }

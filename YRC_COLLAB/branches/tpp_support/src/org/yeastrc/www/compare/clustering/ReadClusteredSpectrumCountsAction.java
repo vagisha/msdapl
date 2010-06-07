@@ -10,8 +10,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -24,14 +27,22 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.bio.taxonomy.Species;
+import org.yeastrc.jobqueue.MSJob;
+import org.yeastrc.jobqueue.MSJobFactory;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.www.compare.DisplayColumns;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
 import org.yeastrc.www.compare.ProteinSetComparisonForm;
-import org.yeastrc.www.compare.SpeciesChecker;
 import org.yeastrc.www.compare.clustering.ClusteringConstants.GRADIENT;
 import org.yeastrc.www.compare.util.VennDiagramCreator;
+import org.yeastrc.www.proteinfer.GOSupportUtils;
 import org.yeastrc.www.taglib.HistoryTag;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -230,6 +241,13 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 		List<Integer> allRunIds = myForm.getAllSelectedRunIdsOrdered();
 		request.setAttribute("datasetIds", StringUtils.makeCommaSeparated(allRunIds));
 
+		// Species for GO analyses (required for rendering the form)
+        List<Integer> speciesIds = getMySpeciesIds(myForm.getAllSelectedRunIdsOrdered());
+        if(myForm.getSpeciesId() == 0 && speciesIds.size() == 1) 
+        	myForm.setSpeciesId(speciesIds.get(0));
+        List<Species> speciesList = getSpeciesList(speciesIds);
+        request.setAttribute("speciesList", speciesList);
+        
 		
 		// Read the results
 		if(myForm.getGroupIndistinguishableProteins()) {
@@ -285,8 +303,6 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			}
 			grpComparison.setRowCount(numPerPage);
 			grpComparison.setCurrentPage(page);
-			
-			request.setAttribute("speciesIsYeast", SpeciesChecker.isSpeciesYeast(grpComparison.getDatasets()));
 			
 			// Create Venn Diagram only if 2 or 3 datasets are being compared
 	        if(grpComparison.getDatasetCount() == 2 || grpComparison.getDatasetCount() == 3) {
@@ -353,8 +369,7 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			comparison.setRowCount(numPerPage);
 			comparison.setCurrentPage(page);
 			
-			request.setAttribute("speciesIsYeast", SpeciesChecker.isSpeciesYeast(comparison.getDatasets()));
-			
+	        
 			// Create Venn Diagram only if 2 or 3 datasets are being compared
 	        if(comparison.getDatasetCount() == 2 || comparison.getDatasetCount() == 3) {
 	            String googleChartUrl = VennDiagramCreator.instance().getChartUrl(comparison);
@@ -392,6 +407,47 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 			}
 		}
 		return displayColumns;
+	}
+	
+	private List<Integer> getMySpeciesIds(List<Integer> piRunIds) throws Exception {
+
+		Set<Integer> species = new HashSet<Integer>();
+
+		ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
+		MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+
+		for(Integer piRunId: piRunIds) {
+			List<Integer> searchIds = runDao.loadSearchIdsForProteinferRun(piRunId);
+			if(searchIds != null) {
+				for(int searchId: searchIds) {
+
+					MsSearch search = searchDao.loadSearch(searchId);
+					MSJob job = MSJobFactory.getInstance().getJobForExperiment(search.getExperimentId());
+					species.add(job.getTargetSpecies());
+				}
+			}
+		}
+		return new ArrayList<Integer>(species);
+	}
+	
+	private List<Species> getSpeciesList(List<Integer> mySpeciesIds) throws SQLException {
+		List<Species> speciesList = GOSupportUtils.getSpeciesList();
+
+		if(mySpeciesIds.size() == 1) {
+			int sid = mySpeciesIds.get(0);
+			boolean found = false;
+			for(Species sp: speciesList) {
+				if(sp.getId() == sid) {
+					found = true; break;
+				}
+			}
+			if(!found) {
+				Species species = new Species();
+				species.setId(sid);
+				speciesList.add(species);
+			}
+		}
+		return speciesList;
 	}
 
 }

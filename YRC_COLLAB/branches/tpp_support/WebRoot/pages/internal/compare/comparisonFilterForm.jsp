@@ -3,6 +3,7 @@
 <%@page import="org.yeastrc.www.compare.DisplayColumns"%>
 <%@page import="org.yeastrc.www.compare.dataset.DatasetColor"%>
 <%@page import="org.yeastrc.www.compare.clustering.ClusteringConstants"%>
+<%@page import="org.yeastrc.www.compare.ComparisonCommand"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -92,6 +93,24 @@ $(document).ready(function() {
 });
  	
 
+function showActionOptions() {
+	var action = $("#actionOptions").val();
+	if(action == <%=ComparisonCommand.CLUSTER.getId()%>) {
+		foldOpen($("#comparison_culster_opts_fold"));
+	}
+	if(action != <%=ComparisonCommand.CLUSTER.getId()%>) {
+		foldClose($("#comparison_culster_opts_fold"));
+	}
+	
+	if(action == <%=ComparisonCommand.GO_SLIM.getId()%> ||
+	   action == <%=ComparisonCommand.GO_ENRICH.getId()%>) {
+		foldOpen($("#comparison_go_opts_fold"));
+	}
+	if(action != <%=ComparisonCommand.GO_SLIM.getId()%> &&
+	   action != <%=ComparisonCommand.GO_ENRICH.getId()%>) {
+		foldClose($("#comparison_go_opts_fold"));
+	}
+}
 </script>
 
 
@@ -104,12 +123,6 @@ $(document).ready(function() {
 	<html:hidden name="proteinSetComparisonForm" property="clusteringToken" />
 	<html:hidden name="proteinSetComparisonForm" property="newToken" />
 	
-	<!-- Does the user want to do GO Enrichment analysis-->
-	<html:hidden name="proteinSetComparisonForm" property="goEnrichment" value="false" styleId="goEnrichment" />
-	
-	<!-- Does the user want to do GO Enrichment analysis-->
-	<html:hidden name="proteinSetComparisonForm" property="goEnrichmentGraph" value="false" styleId="goEnrichmentGraph" />
-
 	<!-- Sorting criteria for the results -->
 	<html:hidden name="proteinSetComparisonForm" property="sortByString"  styleId="sortBy" />
 	<html:hidden name="proteinSetComparisonForm" property="sortOrderString"  styleId="sortOrder" />
@@ -122,7 +135,15 @@ $(document).ready(function() {
 <center>
 <br>
 
-<div style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%">
+<!--  ====================================================================================== -->
+<!-- FILTERING OPTIONS -->
+<!--  ====================================================================================== -->
+<div style="background-color:#F2F2F2;width:80%; margin:0 0 0 0; padding:1 0 1 0; color:black; border: 1px solid gray; font-size:8pt;" align="left">
+<span style="margin-left:5;" 
+	  class="foldable fold-close" id="comparison_filters_fold">&nbsp;&nbsp;&nbsp;&nbsp; </span>
+<b>Filtering Options</b>
+</div>
+<div style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; border-top:0;width:80%; display:none;" id="comparison_filters_fold_target">
 <table align="center">
 	<tr>
 		<td valign="middle" style="padding: 0 0 10 5;">Filter: </td>
@@ -260,7 +281,6 @@ $(document).ready(function() {
 		</td>
 	</tr>
 	
-	
 	<tr><td colspan="4" style="border: 1px solid rgb(170, 170, 170); background-color: white;padding:1"><span></span></td></tr>
 	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
 	
@@ -368,83 +388,153 @@ $(document).ready(function() {
  	<tr><td colspan="4" style="border: 1px solid rgb(170, 170, 170); background-color: white;padding:1"><span></span></td></tr>
 	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
 	
- 	<!-- CLUSTERING OPTIONS -->
- 	<logic:notPresent name="goEnrichmentView">
 	<tr>
-	<td><b>Clustering Options: </b></td>
-	<td colspan="3">
+	<td valign="top" colspan="2">
+			<html:checkbox name="proteinSetComparisonForm" property="groupIndistinguishableProteins">Group Indistinguishable Proteins</html:checkbox>
+		</td>
+	<td valign="top" align="left" colspan="2">
+			<html:checkbox name="proteinSetComparisonForm" property="keepProteinGroups">Keep Protein Groups</html:checkbox><br>
+			<span style="font-size:8pt;">Display ALL protein group members even if some of them do not pass the filtering criteria.</span>
+ 	</td>
+ 	</tr>	
+ 		
+	</table>
+	</div> <!-- END OF FILTERING OPTIONS -->
 	
-		Gradient:
-		<html:select name="proteinSetComparisonForm" property="heatMapGradientString">
-			<html:option value="<%=ClusteringConstants.GRADIENT.BY.getDisplayName() %>"></html:option>
-			<html:option value="<%=ClusteringConstants.GRADIENT.GR.getDisplayName() %>"></html:option>
+	
+	<!--  ====================================================================================== -->
+	<!-- CLUSTRING OPTIONS -->
+	<!--  ====================================================================================== -->
+	<div style="background-color:#F2F2F2;width:80%; margin:5 0 0 0; padding:1 0 1 0; color:black; border: 1px solid gray; font-size:8pt;" align="left">
+	<span style="margin-left:5;" 
+	  class="foldable fold-close" id="comparison_culster_opts_fold">&nbsp;&nbsp;&nbsp;&nbsp; </span>
+	<b>Clustering Options</b>
+	</div>
+	<div style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; border-top:0;width:80%; display:none;" id="comparison_culster_opts_fold_target">
+	Gradient:
+	<html:select name="proteinSetComparisonForm" property="heatMapGradientString">
+		<html:option value="<%=ClusteringConstants.GRADIENT.BY.getDisplayName() %>"></html:option>
+		<html:option value="<%=ClusteringConstants.GRADIENT.GR.getDisplayName() %>"></html:option>
+	</html:select>
+	&nbsp;
+	
+	<html:checkbox name="proteinSetComparisonForm" property="scaleRows"><nobr>Scale Rows</nobr></html:checkbox>
+	&nbsp;
+	
+	<html:checkbox name="proteinSetComparisonForm" property="clusterColumns"><nobr>Cluster Columns</nobr></html:checkbox>
+	&nbsp;
+	
+	<html:checkbox name="proteinSetComparisonForm" property="useLogScale">Log Scale</html:checkbox>
+	&nbsp;
+	
+	Base:
+	<html:select name="proteinSetComparisonForm" property="logBase">
+		<html:option value="10"></html:option>
+		<html:option value="2"></html:option>
+	</html:select>
+	&nbsp;
+	
+	<yrcwww:member group="administrators">
+	Replace missing with: 
+	<html:text name="proteinSetComparisonForm" property="replaceMissingWithValue" size="3"></html:text>
+	&nbsp; 
+	</yrcwww:member>
+	<br/>
+	<span class="small_font"><b>Note: </b>Normalized spectrum counts are used</span>
+	</div> <!-- END OF CLUSTERING OPTIONS -->	
+	
+	<!--  ====================================================================================== -->
+	<!-- GENE ONTOLOGY OPTIONS -->
+	<!--  ====================================================================================== -->
+	<div style="background-color:#F2F2F2;width:80%; margin:5 0 0 0; padding:1 0 1 0; color:black; border: 1px solid gray; font-size:8pt;" align="left">
+	<span style="margin-left:5;" 
+	  class="foldable fold-close" id="comparison_go_opts_fold">&nbsp;&nbsp;&nbsp;&nbsp; </span>
+	<b>Gene Ontology Analysis Options</b>
+	</div>
+	<div style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; border-top:0;width:80%; display:none;" id="comparison_go_opts_fold_target">
+	
+	<table cellpadding="5">
+    	<tr>
+    	<td valign="top" style="padding:5x;"><b>GO Slim Analysis: </b></td>
+    	<td style="padding:5x;">
+    		GO Domain: 
+    		<html:select name="proteinSetComparisonForm" property="goAspect" styleId="goAspectField1">
+			<html:option
+				value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">Cellular Component</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
+			</html:select>
+    	</td>
+    	
+    	<td style="padding:5x;">
+    		GO Slim:
+			<html:select name="proteinSetComparisonForm" property="goSlimTermId">
+			<html:options collection="goslims" property="id" labelProperty="name"/>
+			</html:select>
+    	</td>
+    	</tr>
+    	
+    	<tr>
+    	<td valign="top" style="padding:5x;"><b>GO Enrichment: </b></td>
+    	<td style="padding:5x;">
+    		GO Domain:
+    		<html:select name="proteinSetComparisonForm" property="goAspect" styleId="goAspectField2">
+			<html:option
+				value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">Cellular Component</html:option>
+			<html:option
+				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
 		</html:select>
-		&nbsp;
+    	</td>
+    	
+    	<td style="padding:5x;">
+    		P-Value: <html:text name="proteinSetComparisonForm" property="goEnrichmentPVal"></html:text>
+    	</td>
 		
-		<html:checkbox name="proteinSetComparisonForm" property="scaleRows"><nobr>Scale Rows</nobr></html:checkbox>
-		&nbsp;
-		
-		<html:checkbox name="proteinSetComparisonForm" property="clusterColumns"><nobr>Cluster Columns</nobr></html:checkbox>
-		&nbsp;
-		
-		<html:checkbox name="proteinSetComparisonForm" property="useLogScale">Log Scale</html:checkbox>
-		&nbsp;
-		
-		Base:
-		<html:select name="proteinSetComparisonForm" property="logBase">
-			<html:option value="10"></html:option>
-			<html:option value="2"></html:option>
-		</html:select>
-		&nbsp;
-		
-		<yrcwww:member group="administrators">
-		Replace missing with: 
-		<html:text name="proteinSetComparisonForm" property="replaceMissingWithValue" size="3"></html:text>
-		&nbsp; 
-		</yrcwww:member>
-		
-	</td>
-	</tr>
-	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
-	<tr><td colspan="4" style="border: 1px solid rgb(170, 170, 170); background-color: white;padding:1"><span></span></td></tr>
-	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
-	</logic:notPresent>
+		<td style="padding:5x;">
+			<logic:present name="speciesList">
+				Species: <html:select name="proteinSetComparisonForm" property="speciesId">
+    			<html:option value="0">None</html:option>
+    			<html:options collection="speciesList" property="id" labelProperty="name"/>
+    			</html:select>
+			</logic:present>
+    	</td>
+    	</tr>
+    	</table>
+	</div> <!-- END OF GENE ONTOLOGY OPTIONS -->	
 	
 	
-	<logic:notPresent name="goEnrichmentView">
+	<!--  ====================================================================================== -->
+	<!-- DISPLAY OPTIONS -->
+	<!--  ====================================================================================== -->
+	<div style="background-color:#F2F2F2;width:80%; margin:5 0 0 0; padding:1 0 1 0; color:black; border: 1px solid gray; font-size:8pt;" align="left">
+	<span style="margin-left:5;" 
+	  class="foldable fold-close" id="comparison_display_opts_fold">&nbsp;&nbsp;&nbsp;&nbsp; </span>
+	<b>Display Options</b>
+	</div>
+	<div style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; border-top:0;width:80%; display:none;" id="comparison_display_opts_fold_target">
+	
+	<table align="center" width="80%">
 	<tr>
-		<td valign="top" align="left">
+		<td valign="top" align="center">
 		<span class="clickable underline" id="columnChooser" 
 			      onclick="toggleColumnChooser();">Choose Columns</span>
 		</td>
-		<td valign="top">
-			<html:checkbox name="proteinSetComparisonForm" property="cluster" styleId="cluster">Cluster Spectrum Counts</html:checkbox>
-			<br/><span class="small_font">Normalized spectrum counts are used</span>
-		</td>
-		<td valign="top" colspan="2">
-			<html:checkbox name="proteinSetComparisonForm" property="groupIndistinguishableProteins">Group Indistinguishable Proteins</html:checkbox>
-		</td>
-	</tr>
-	<tr>
-		<td>
+		<td valign="top" align="center">
 			<span class="clickable underline" id="orderChanger" 
  			      onclick="toggleOrderChanger();">Order Datasets</span> 
 		</td>
-		<td></td>
-		<td valign="top" align="left" colspan="2">
-			<html:checkbox name="proteinSetComparisonForm" property="keepProteinGroups">Keep Protein Groups</html:checkbox><br>
-			<span style="font-size:8pt;">Display ALL protein group members even if some of them do not pass the filtering criteria.</span>
- 		</td>
  	</tr>
- 	
-	<tr><td colspan="4" style="padding:4"><span></span></td></tr>
 	
 	<tr>
-	<td colspan="4" align="center">
+	<td colspan="2" align="center">
 	
 	<!-- DATASET ORDER CHANGER -->
 	<div id="orderChangerTgt" class="small_font" align="left" 
-		 style="padding: 5 0 5 0; border: 1px solid gray; width:50%; display:none">
+		 style="padding: 5 0 5 0; border: 1px solid gray; width:50%; display:none; margin-bottom:5px;">
 		<ol id="datasetList">
 			<logic:iterate name="proteinSetComparisonForm" property="andList" id="andDataset" indexId="row">
 				<li style="margin: 0 5 5 5">
@@ -508,58 +598,36 @@ $(document).ready(function() {
 		</div>
 	</td>
 	</tr>
+	</table>
+	</div> <!-- END OF DISPLAY OPTIONS -->
 	
- 	<tr>
- 		<td valign="middle" align="center" colspan="4">	
- 			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button" style="margin-top:0px;"></html:submit>
+	
+	<div style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; margin-top:10px; width:80%" align="center">
+		<table align="center" width="95%">
+		<tr>
+		<!-- UPDATE RESULTS -->
+		<td align="left">
+			<b>Action:</b>
+			<html:select name="proteinSetComparisonForm" property="comparisonActionId" styleId="actionOptions" onchange="javascript:showActionOptions();">
+				<html:options collection="comparisonCommands" property="id" labelProperty="displayName"/>
+			</html:select>
+			&nbsp; &nbsp;
+ 			<html:submit value="Update" onclick="javascript:updateResults();return false;" styleClass="plain_button" style="margin-top:0px;"></html:submit>
+ 		</td>
+ 		
+ 		<td style="border: 1px solid rgb(170, 170, 170); background-color: white;padding:1"><span></span></td>
+	
+ 		<!-- DOWNLOAD RESULTS -->
+ 		<td align="right">
+ 			<html:checkbox name="proteinSetComparisonForm" property="collapseProteinGroups">Collapse Protein Groups</html:checkbox>
+ 			&nbsp;
+			<html:checkbox name="proteinSetComparisonForm" property="includeDescriptions">Include Description</html:checkbox>
+			&nbsp; &nbsp;
+			<html:submit value="Download" onclick="javascript:downloadResults(); return false;" styleClass="plain_button" style="margin-top:0px;"></html:submit>
 		</td>
-	</tr>
-	
- 	</logic:notPresent>
- 	
-	
-</table>
-</div>
+		</tr>
+		</table>
+	</div>
 
-
-<!-- DOWNLOAD RESULTS -->
-<logic:notPresent name="goEnrichmentView">
-<div align="center" style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%; margin-top:10px;">
-		<b>Download:</b>
-		<html:checkbox name="proteinSetComparisonForm" property="collapseProteinGroups">Collapse Protein Groups</html:checkbox>
-		&nbsp;
-		<html:checkbox name="proteinSetComparisonForm" property="includeDescriptions">Include Description</html:checkbox>
-		<html:submit value="Download" onclick="javascript:downloadResults(); return false;" styleClass="plain_button" style="margin-top:0px;"></html:submit>
-		&nbsp;
-</div>
-</logic:notPresent>
-
-<!-- GO ENRICHMENT -->
-<logic:equal name="speciesIsYeast" value="true">
-<br>
-<div align="center"
-	style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%">
-	<b>GO Enrichment:</b>
-	<html:select name="proteinSetComparisonForm" property="goAspect">
-		<html:option
-			value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
-		<html:option
-			value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">Cellular Component</html:option>
-		<html:option
-			value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
-	</html:select>
-	&nbsp; &nbsp; Species:
-	<html:select name="proteinSetComparisonForm" property="speciesId">
-		<html:option value="4932">Saccharomyces cerevisiae </html:option>
-	</html:select>
-	&nbsp; &nbsp; P-Value:
-	<html:text name="proteinSetComparisonForm" property="goEnrichmentPVal"></html:text>
-	&nbsp; &nbsp;
-	<html:submit value="Calculate" onclick="javascript:doGoEnrichmentAnalysis();"></html:submit>
-	<logic:present name="goEnrichmentView">
-		<html:submit value="Create Graph" onclick="javascript:doGoEnrichmentAnalysisGraph();"></html:submit>
-	</logic:present>
-</div>
-</logic:equal>
 </center>
 </html:form>

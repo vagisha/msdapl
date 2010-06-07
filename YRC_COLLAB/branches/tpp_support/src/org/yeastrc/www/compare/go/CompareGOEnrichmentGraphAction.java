@@ -4,7 +4,7 @@
  * Jun 15, 2009
  * @version 1.0
  */
-package org.yeastrc.www.compare;
+package org.yeastrc.www.compare.go;
 
 import java.awt.image.BufferedImage;
 import java.util.List;

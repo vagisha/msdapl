@@ -96,4 +96,52 @@ function  setupPeptidesTable(table){
    		
 }
 
+// ---------------------------------------------------------------------------------------
+// SUBMIT FORM FOR GO SLIM ANALYSIS
+// ---------------------------------------------------------------------------------------
+function submitFormForGoSlimAnalysis() {
+
+	// hide the main table
+	$("#result_table").hide();
+	
+	$.blockUI();
+	$.post( "<yrcwww:link path='updateProteinSetComparison.do'/>", 	//url, 
+			$("form[name='proteinSetComparisonForm']").serialize(), // data to submit
+    		 function(result, status) {
+    		 	// load the result
+    		 	$('#goslim_result').html(result);
+    		 	$.unblockUI();
+    		 	// stripe the table
+    		 	if($("#go_slim_table").length > 0) {
+	    		 	makeStripedTable($("#go_slim_table")[0]);
+	    		 	makeSortableTable($("#go_slim_table")[0]);
+    		 	}
+    		 	hideGoEnrichmentDetails();
+    });
+}
+// ---------------------------------------------------------------------------------------
+// SUBMIT FORM FOR GO SLIM ANALYSIS
+// ---------------------------------------------------------------------------------------
+function submitFormForGoEnrichmentAnalysis() {
+	
+	// hide the main table
+	$("#result_table").hide();
+	
+	$.blockUI();
+	$.post( "<yrcwww:link path='updateProteinSetComparison.do'/>", 	//url, 
+			$("form[name='proteinSetComparisonForm']").serialize(), // data to submit
+    		 function(result, status) {
+    		 	// load the result
+    		 	$('#goenrichment_result').html(result);
+    		 	$.unblockUI();
+    		 	// stripe the table
+    		 	if($("#go_enrichment_table").length > 0) {
+    		 		makeStripedTable($("#go_enrichment_table")[0]);
+    		 		makeSortableTable($("#go_enrichment_table")[0]);
+    		 	}
+    		 	hideGoSlimDetails();
+    });
+
+}
+
 </script>

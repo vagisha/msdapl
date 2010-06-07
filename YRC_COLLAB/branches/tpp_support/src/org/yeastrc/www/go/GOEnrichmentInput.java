@@ -17,9 +17,7 @@ public class GOEnrichmentInput {
     private List<Integer> proteinIds; // NRSEQ protein ids
     private double pValCutoff = 0.01;
     
-    private boolean useCellularComponent = false;
-    private boolean useMolecularFunction = false;
-    private boolean useBiologicalProcess = false;
+    private int goAspect;
     
     public GOEnrichmentInput(int speciesId) {
         this.speciesId = speciesId;
@@ -43,26 +41,11 @@ public class GOEnrichmentInput {
         pValCutoff = valCutoff;
     }
 
-    public boolean useCellularComponent() {
-        return useCellularComponent;
-    }
-    public void setUseCellularComponent(boolean useCellularComponent) {
-        this.useCellularComponent = useCellularComponent;
-    }
-
-    public boolean useMolecularFunction() {
-        return useMolecularFunction;
-    }
-    public void setUseMolecularFunction(boolean useMolecularFunction) {
-        this.useMolecularFunction = useMolecularFunction;
-    }
-
-    public boolean useBiologicalProcess() {
-        return useBiologicalProcess;
-    }
-
-    public void setUseBiologicalProcess(boolean useBiologicalProcess) {
-        this.useBiologicalProcess = useBiologicalProcess;
+    public void setGoAspect(int goAspect) {
+    	this.goAspect = goAspect;
     }
     
+    public int getGoAspect() {
+    	return goAspect;
+    }
 }

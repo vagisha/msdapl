@@ -31,10 +31,14 @@
 // PAGE RESULTS
 // ---------------------------------------------------------------------------------------
 function pageResults(pageNum) {
+	
+	var actionId = $("#actionOptions").val();
+	if(actionId == 3 || actionId == 4) {
+		alert("Cannot page results if the selected action is GO Analysis");
+		return false;
+	}
   	$("input#pageNum").val(pageNum);
   	$("input#download").val("false");
-  	$("input#goEnrichment").val("false");
-  	//$("input#cluster").val("false");
   	//alert("setting to "+pageNum+" value set to: "+$("input#pageNum").val());
   	$("form[name='proteinSetComparisonForm']").submit();
 }
@@ -53,10 +57,18 @@ function goToHeatMapIndex(index) {
 // SORT RESULTS
 // ---------------------------------------------------------------------------------------
 function sortResults(sortBy, sortOrder) {
+	
+	var actionId = $("#actionOptions").val();
+	if(actionId == 3 || actionId == 4) {
+		alert("Cannot sort results if the selected action is GO Analysis");
+		return false;
+	}
+	if(actionId == 2) {
+		alert("Cannot sort results if the selected action is \"Cluster Spectrum Counts\"");
+		return false;
+	}
   	$("input#pageNum").val(1);
   	$("input#download").val("false");
-  	$("input#goEnrichment").val("false");
-  	$("input#cluster").val("false");
   	$("input#sortBy").val(sortBy);
   	$("input#sortOrder").val(sortOrder);
   	$("form[name='proteinSetComparisonForm']").attr('target', '');
@@ -67,61 +79,58 @@ function sortResults(sortBy, sortOrder) {
 // UPDATE RESULTS
 // ---------------------------------------------------------------------------------------
 function updateResults() {
-  	$("input#pageNum").val(1);
-  	$("input#download").val("false");
-  	$("input#goEnrichment").val("false");
-  	//$("input#cluster").val("false");
-  	$("input#numPerPage").val($("input#pager_result_count").val());
-  	//alert("setting result count to: "+$("input#numPerPage").val());
-  	$("form[name='proteinSetComparisonForm']").attr('target', '');
-  	$("form[name='proteinSetComparisonForm']").submit();
+	
+	$("input#download").val("false");
+	
+	var actionId = $("#actionOptions").val();
+	if(actionId == 3) { // GO Analysis
+		submitFormForGoSlimAnalysis();
+		return false;
+	}
+	else if(actionId == 4) { // GO Enrichment
+		submitFormForGoEnrichmentAnalysis();
+		return false;
+	}
+	else {
+		//alert("Updating");
+		$("input#pageNum").val(1);
+		$("input#numPerPage").val($("input#pager_result_count").val());
+		//alert("setting result count to: "+$("input#numPerPage").val());
+		$("form[name='proteinSetComparisonForm']").attr('target', '');
+		$("form[name='proteinSetComparisonForm']").submit();
+	}
+}
+
+function toggleGoSlimDetails() {
+	fold($("#goslim_fold"));
+}
+function hideGoSlimDetails() {
+	foldClose($("#goslim_fold"));
+}
+
+function toggleGoEnrichmentDetails() {
+	fold($("#goenrich_fold"));
+}
+function hideGoEnrichmentDetails() {
+	foldClose($("#goenrich_fold"));
 }
 
 // ---------------------------------------------------------------------------------------
 // DOWNLOAD RESULTS
 // ---------------------------------------------------------------------------------------
 function downloadResults() {
+	
+	var actionId = $("#actionOptions").val();
+	if(actionId == 3 || actionId == 4) { 
+		alert("GO Analysis results cannot be downloaded");
+		return false;
+	}
   	$("input#download").val("true");
-  	$("input#goEnrichment").val("false");
-  	//$("input#cluster").val("false");
   	$("form[name='proteinSetComparisonForm']").attr('target', '_blank');
   	$("form[name='proteinSetComparisonForm']").submit();
 }
 
-// ---------------------------------------------------------------------------------------
-// GENE ONTOLOGY ENRICHMENT
-// ---------------------------------------------------------------------------------------
-function doGoEnrichmentAnalysis() {
-	$("input#download").val("false");
-	$("input#cluster").val("false");
-	$("input#goEnrichment").val("true");
-	if(!validateGoEnrichmentForm())
-    	return false;
-	$("form[name='proteinSetComparisonForm']").submit();
-}
 
-function validateGoEnrichmentForm() {
-	// fieldValue is a Form Plugin method that can be invoked to find the 
-    // current value of a field 
-    value = $('form input[@name=goEnrichmentPVal]').fieldValue();
-    valid = validateFloat(value, "P-Value", 0.0, 1.0);
-    if(!valid)	return false;
-    
-    return true;
-}
-
-function validateFloat(value, fieldName, min, max) {
-	var floatVal = parseFloat(value);
-	var valid = true;
-	if(isNaN(floatVal))						valid = false;
-	if(valid && floatVal < min)			valid = false;
-	if(max && (valid && floatVal > max))	valid = false;
-	if(!valid) {
-		if(max) alert("Value for "+fieldName+" should be between "+min+" and "+max);
-		else	alert("Value for "+fieldName+" should be >= "+min);
-	}
-	return valid;
-}
 // ---------------------------------------------------------------------------------------
 // TOGGLE AND, OR, NOT FILTERS
 // ---------------------------------------------------------------------------------------
