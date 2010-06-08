@@ -111,7 +111,7 @@ public class ExperimentDeleter {
             ProteinferRun run = runDao.loadProteinferRun(piRunId);
             if(ProteinInferenceProgram.isIdPicker(run.getProgram())) {
                 // If this is a ProteinInference run delete the corresponding job
-                ProteinferJob job = ProteinInferJobSearcher.instance().getJob(piRunId);
+                ProteinferJob job = ProteinInferJobSearcher.getInstance().getJobForPiRunId(piRunId);
                 if(job != null) {
                     try {
                         JobDeleter.getInstance().deleteJob(job);

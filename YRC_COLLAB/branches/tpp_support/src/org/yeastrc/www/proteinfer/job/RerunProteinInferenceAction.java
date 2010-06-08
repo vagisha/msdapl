@@ -17,7 +17,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.yeastrc.project.Projects;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -44,16 +43,6 @@ public class RerunProteinInferenceAction extends Action {
             return mapping.findForward("authenticate");
         }
 
-        // Restrict access to members
-        Groups groupMan = Groups.getInstance();
-        if (!groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS) &&
-          !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
-            ActionErrors errors = new ActionErrors();
-            errors.add("access", new ActionMessage("error.access.invalidgroup"));
-            saveErrors( request, errors );
-            return mapping.findForward( "Failure" );
-        }
-        
         // get the protein inference ID
         int piRunId = -1;
         if (request.getParameter("pinferId") != null) {
@@ -84,7 +73,7 @@ public class RerunProteinInferenceAction extends Action {
         
         log.info("Got request to re-run protein inference piRunID: "+piRunId);
         
-        ProteinferJob job = ProteinInferJobSearcher.instance().getJob(piRunId);
+        ProteinferJob job = ProteinInferJobSearcher.getInstance().getJobForPiRunId(piRunId);
         if(job == null) {
         	ActionErrors errors = new ActionErrors();
             errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.general.errorMessage", "No job found for piRunID: "+piRunId));
@@ -93,6 +82,7 @@ public class RerunProteinInferenceAction extends Action {
         }
         
         // Only an administrator or the user who initially ran this protein inference can re-run it.
+        Groups groupMan = Groups.getInstance();
         if(job.getSubmitter() != user.getResearcher().getID() && 
            !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
         	ActionErrors errors = new ActionErrors();

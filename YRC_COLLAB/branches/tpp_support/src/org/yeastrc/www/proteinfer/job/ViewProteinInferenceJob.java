@@ -23,6 +23,7 @@ import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.project.Projects;
+import org.yeastrc.www.proteinfer.ProteinInferToProjectMapper;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
 import org.yeastrc.www.user.Groups;
@@ -63,19 +64,6 @@ public class ViewProteinInferenceJob extends Action {
             return mapping.findForward( "Failure" );
         }
         
-        // get the project id
-        int projectId = 0;
-        try {projectId = Integer.parseInt(request.getParameter("projectId"));}
-        catch(NumberFormatException e){};
-        if(projectId == 0) {
-            log.error("Invalid project id: "+projectId);
-            ActionErrors errors = new ActionErrors();
-            errors.add("proteinfer", new ActionMessage("error.project.noprojectid"));
-            saveErrors( request, errors );
-            return mapping.findForward("standardHome");
-        }
-        request.setAttribute("projectId", projectId);
-        
         // get the protein inference id
         int pinferId = 0;
         try {pinferId = Integer.parseInt(request.getParameter("pinferId"));}
@@ -90,7 +78,31 @@ public class ViewProteinInferenceJob extends Action {
             return mapping.findForward("Failure");
         }
         
-        ProteinferJob job = ProteinInferJobSearcher.instance().getJob(pinferId);
+        // get the project id
+        int projectId = 0;
+        try {projectId = Integer.parseInt(request.getParameter("projectId"));}
+        catch(NumberFormatException e){};
+        
+        // If there is not project ID in the request parameters get it from the database
+        if(projectId == 0) {
+        	List<Integer> projectIds = ProteinInferToProjectMapper.map(pinferId);
+        	if(projectIds != null && projectIds.size() > 0)
+        		projectId = projectIds.get(0); // get the first one
+        }
+        
+        // Error if we still don't have a project ID
+        if(projectId == 0) {
+            log.error("Invalid project id: "+projectId);
+            ActionErrors errors = new ActionErrors();
+            errors.add("proteinfer", new ActionMessage("error.project.noprojectid"));
+            saveErrors( request, errors );
+            return mapping.findForward("standardHome");
+        }
+        request.setAttribute("projectId", projectId);
+        
+        
+        // load the job
+        ProteinferJob job = ProteinInferJobSearcher.getInstance().getJobForPiRunId(pinferId);
         if(job == null) {
             log.error("No Protein Inference Job found with protein inference ID: "+pinferId);
             ActionErrors errors = new ActionErrors();

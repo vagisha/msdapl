@@ -71,6 +71,9 @@
 	<form-bean name="peptideComparisonForm" type="org.yeastrc.www.compare.ComparePeptidesForm"></form-bean>
 	<form-bean name="sequestPepxmlDownloadForm" type="org.yeastrc.www.project.experiment.SequestPepxmlDownloadForm"></form-bean>
 	
+	<form-bean name="rerunProtInferencesForm" type="org.yeastrc.www.proteinfer.job.RerunProteinInferenceForm"></form-bean>
+	<form-bean name="deleteProtInferencesForm" type="org.yeastrc.www.proteinfer.job.DeleteProteinInferenceForm"></form-bean>
+	
     </form-beans>
 
 
@@ -108,6 +111,7 @@
 	<forward name="viewResearcher" path="/viewResearcher.do" />
 	<forward name="listUploadJobs" path="/listUploadJobs.do" />
 	<forward name="viewUploadJob" path="/viewUploadJob.do" />
+	<forward name="listProtInferJobs" path="/listProtInferJobs.do" />
 	<forward name="editResearcher" path="/editResearcher.do" />
 	<forward name="viewSequestResults" path="/viewSequestResults.do"/>
 	<forward name="viewPercolatorResults" path="/viewPercolatorResults.do"/>
@@ -509,6 +513,45 @@
 	  <forward name="Failure" path="/manageGroups.do" redirect="false"/>
 	</action>
 
+	<!-- ================================================================================== -->
+	<!-- Actions related to protein inferences (admin access only) -->
+	<!-- ================================================================================== -->
+	<action
+	  path="/manageProteinInferences"
+	  type="org.yeastrc.www.proteinfer.job.ViewProtInferAdminOptions"
+	 >
+	  <forward name="Success" path="/pages/admin/manageProtInfer.jsp" redirect="false"/>
+	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+	</action>
+	
+	<action
+	  path="/rerunProteinInferences"
+	  type="org.yeastrc.www.proteinfer.job.RerunProteinInferencesAction"
+	  name="rerunProtInferencesForm"
+	  validate="false"
+	 >
+	  <forward name="Success" path="/pages/admin/manageProtInferSuccess.jsp" redirect="false"/>
+	  <forward name="Failure" path="/pages/admin/manageProtInfer.jsp" redirect="false"/>
+	</action>
+	
+	<action
+	  path="/deleteProteinInferences"
+	  type="org.yeastrc.www.proteinfer.job.DeleteProteinInferencesAction"
+	  name="deleteProtInferencesForm"
+	  validate="false"
+	 >
+	  <forward name="Success" path="/pages/admin/manageProtInferSuccess.jsp" redirect="false"/>
+	  <forward name="Failure" path="/pages/admin/manageProtInfer.jsp" redirect="false"/>
+	</action>
+	
+	<action path="/listProtInferJobs"
+		type="org.yeastrc.www.proteinfer.job.ListProteinInferenceJobsAction" validate="false">
+		<forward name="Success" path="/pages/admin/listProtInferJobs.jsp"
+			redirect="false" />
+		<forward name="Failure" path="/pages/internal/front.jsp"
+			redirect="true" />
+	</action>
+	
 	<!-- ================================================================================== -->
 	<!-- Actions related to instruments -->
 	<!-- ================================================================================== -->

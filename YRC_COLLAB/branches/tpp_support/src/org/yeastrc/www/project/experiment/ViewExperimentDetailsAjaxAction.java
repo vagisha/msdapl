@@ -189,7 +189,7 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 	            
 	            
 		 // load protein prophet results, if any
-		 List<Integer> piRunIds = ProteinInferJobSearcher.instance().getProteinferIdsForMsExperiment(experimentId);
+		 List<Integer> piRunIds = ProteinInferJobSearcher.getInstance().getProteinferIdsForMsExperiment(experimentId);
 		 // loop over and see if any are ProteinProphet runs
 		 ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
 		 ProteinProphetRunDAO pRunDao = ProteinferDAOFactory.instance().getProteinProphetRunDao();
@@ -213,7 +213,7 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 	            
 	            
 		 // load the protein inference jobs, if any
-		 List<ProteinferJob> piJobs = ProteinInferJobSearcher.instance().getProteinferJobsForMsExperiment(experimentId);
+		 List<ProteinferJob> piJobs = ProteinInferJobSearcher.getInstance().getProteinferJobsForMsExperiment(experimentId);
 		 List<ExperimentProteinferRun> piRuns = new ArrayList<ExperimentProteinferRun>(piJobs.size());
 		 IdPickerProteinDAO protDao = ProteinferDAOFactory.instance().getIdPickerProteinDao();
 		 for(ProteinferJob piJob: piJobs) {

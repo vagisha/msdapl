@@ -160,7 +160,7 @@ public class ViewProteinAction extends Action {
 		    List<Integer> experimentIds = ProjectExperimentDAO.instance().getExperimentIdsForProject(project.getID());
 		    
 	        for(int experimentId: experimentIds) {
-	            List<ProteinferJob> piJobs = ProteinInferJobSearcher.instance().getProteinferJobsForMsExperiment(experimentId);
+	            List<ProteinferJob> piJobs = ProteinInferJobSearcher.getInstance().getProteinferJobsForMsExperiment(experimentId);
 	            for(ProteinferJob job: piJobs) {
 	                pinferIds.add(job.getPinferId());
 	            }

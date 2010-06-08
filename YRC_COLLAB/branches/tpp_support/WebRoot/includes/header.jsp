@@ -300,6 +300,9 @@ function openInformationPopup(url) {
       <yrcwww:member group="administrators">
         <li><html:link action="manageInstruments.do"><span>Instruments</span></html:link></li>
       </yrcwww:member>
+      <yrcwww:member group="administrators">
+        <li><html:link action="manageProteinInferences.do"><span>Manage Protein Inferences</span></html:link></li>
+      </yrcwww:member>
    <%} %>
    <%if(docs_menus) { %>
    		<li><a href="<yrcwww:link path='pages/internal/docs/documentation.jsp'/>" title="Help Topics" class="<%=docs_class %>"><span>Help Topics</span></a></li>

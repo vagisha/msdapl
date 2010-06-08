@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.db.DBConnectionManager;
+import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
@@ -37,7 +38,7 @@ public class ProteinInferJobSearcher {
     
     private ProteinInferJobSearcher() {}
     
-    public static ProteinInferJobSearcher instance() {
+    public static ProteinInferJobSearcher getInstance() {
         if(instance == null)
             instance = new ProteinInferJobSearcher();
         return instance;
@@ -52,7 +53,7 @@ public class ProteinInferJobSearcher {
         
         List<ProteinferJob> jobs = new ArrayList<ProteinferJob>(pinferRunIds.size());
         for(int pid: pinferRunIds) {
-            ProteinferJob job = getJob(pid);
+            ProteinferJob job = getJobForPiRunId(pid);
             if(job != null)
                 jobs.add(job);
         }
@@ -93,7 +94,7 @@ public class ProteinInferJobSearcher {
             ProteinferRun run = runDao.loadProteinferRun(pid);
             if(run != null) {
                 
-                ProteinferJob job = getJob(run.getId());
+                ProteinferJob job = getJobForPiRunId(run.getId());
                 if(job != null)
                     jobs.add(job);
             }
@@ -139,16 +140,18 @@ public class ProteinInferJobSearcher {
     
     
     /**
-     * Returns a ProteinferJob object if the protein inference run with the given id
+     * Returns a ProteinferJob object if the protein inference run with the given id exists in the database
      * @param pinferRunId
      * @return
      */
-    public ProteinferJob getJob(int pinferRunId) {
+    public ProteinferJob getJobForPiRunId(int pinferRunId) {
         
         ProteinferRun run = runDao.loadProteinferRun(pinferRunId);
         
-        if(run == null || !ProteinInferenceProgram.isIdPicker(run.getProgram()))
+        if(run == null || !ProteinInferenceProgram.isIdPicker(run.getProgram())) {
+        	log.error("No entry found for protein inference ID: "+pinferRunId+" OR this is not a IDPicker protein inference");
             return null;
+        }
         
 //      // make sure the input generator for this protein inference program was
 //      // a search program or an analysis program
@@ -156,7 +159,7 @@ public class ProteinInferJobSearcher {
 //      continue;
         ProteinferJob job = null;
         try {
-            job = getPiJob(run.getId());
+            job = getPiJobForPiRunId(run.getId());
         }
         catch (SQLException e) {
             log.error("Exception getting ProteinferJob", e);
@@ -174,7 +177,7 @@ public class ProteinInferJobSearcher {
     }
     
     
-    private ProteinferJob getPiJob(int pinferRunId) throws SQLException {
+    private ProteinferJob getPiJobForPiRunId(int pinferRunId) throws SQLException {
         
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -219,6 +222,93 @@ public class ProteinInferJobSearcher {
         }
         return null;
     }
+    
+    /**
+     * Returns a ProteinferJob object if a protein inference job (IDPicker) with the given id exists in the database
+     * @param jobId
+     * @return
+     */
+    public ProteinferJob getJob(int jobId) {
+        
+        ProteinferJob job = null;
+        try {
+            job = getPiJob(jobId);
+        }
+        catch (SQLException e) {
+            log.error("Exception getting ProteinferJob", e);
+            return null;
+        }
+        if(job == null) {
+            log.error("No job found with protein inference run id: "+jobId);
+            return null;
+        }
+        if(job == null) {
+        	log.error("No protein inference job found for jobID: "+jobId);
+        	return null;
+        }
+        
+        // Load the protein inference run
+        ProteinferRun run = runDao.loadProteinferRun(job.getPinferId());
+        
+        // This should be a IDPicker run. We don't support other 
+        if(run == null || !ProteinInferenceProgram.isIdPicker(run.getProgram())) {
+        	log.error("No entry found for protein inference ID: "+job.getPinferId()+" OR this is not a IDPicker protein inference");
+            return null;
+        }
+        
+        job.setProgram(run.getProgramString());
+        job.setVersion(run.getProgramVersion());
+        job.setComments(run.getComments());
+        job.setDateRun(run.getDate());
+        return job;
+    }
+    
+    
+    private ProteinferJob getPiJob(int jobId) throws SQLException {
+        
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            
+            String sql = "SELECT * FROM tblJobs AS j, tblProteinInferJobs AS pj "+
+                        "WHERE j.id = pj.jobID AND j.id="+jobId;
+            
+            conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
+            stmt = conn.prepareStatement( sql );
+            rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                ProteinferJob job = new ProteinferJob();
+                job.setId(jobId);
+                job.setSubmitter( rs.getInt( "submitter" ) );
+                job.setType( rs.getInt( "type" ) );
+                job.setSubmitDate( rs.getDate( "submitDate" ) );
+                job.setLastUpdate( rs.getDate( "lastUpdate" ) );
+                job.setStatus( rs.getInt( "status" ) );
+                job.setAttempts( rs.getInt( "attempts" ) );
+                job.setLog( rs.getString( "log" ) );
+                job.setPinferRunId(rs.getInt("piRunID"));
+                return job;
+            }
+            
+        } finally {
+            
+            if (rs != null) {
+                try { rs.close(); rs = null; } catch (Exception e) { ; }
+            }
+
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }           
+        }
+        return null;
+    }
 
     private List<Integer> getRunSearchIdsForMsSearch(int msSearchId) {
         org.yeastrc.ms.dao.DAOFactory factory = org.yeastrc.ms.dao.DAOFactory.instance();
@@ -233,5 +323,107 @@ public class ProteinInferJobSearcher {
     private List<Integer> getRunSearchAnalysisIdsForAnalysis(int analysisId) {
         org.yeastrc.ms.dao.DAOFactory factory = org.yeastrc.ms.dao.DAOFactory.instance();
         return factory.getMsRunSearchAnalysisDAO().getRunSearchAnalysisIdsForAnalysis(analysisId);
+    }
+    
+    public int getJobCount(List<Integer> statusCodes) throws SQLException {
+    	
+    	int count = 0;
+		
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try {
+			
+			String sql = "SELECT COUNT(*) FROM tblJobs";
+			sql += " WHERE type="+JobUtils.TYPE_PROTEINFER_RUN;
+			if (statusCodes != null && statusCodes.size() > 0) {
+				sql += " AND status IN (";
+				int cnt = 0;
+				for (int st : statusCodes) {
+					if (cnt != 0) sql += ",";
+					else cnt++;
+					
+					sql += st;
+				}
+				sql += ")";
+			}
+			
+			conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
+			stmt = conn.prepareStatement( sql );
+			rs = stmt.executeQuery();
+			
+			while (rs.next()) {
+				try {
+					count = rs.getInt( 1 );
+				} catch (Exception e) { ; }
+			}
+			
+		} finally {
+			
+			if (rs != null) {
+				try { rs.close(); rs = null; } catch (Exception e) { ; }
+			}
+
+			if (stmt != null) {
+				try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+			}
+			
+			if (conn != null) {
+				try { conn.close(); conn = null; } catch (Exception e) { ; }
+			}			
+		}
+		return count;
+    }
+    
+    public List<ProteinferJob> getJobs(List<Integer> statusCodes, int offset) throws SQLException {
+    	
+    	List<ProteinferJob> jobs = new ArrayList<ProteinferJob>();
+		
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try {
+			
+			String sql = "SELECT id FROM tblJobs WHERE type="+JobUtils.TYPE_PROTEINFER_RUN;
+			if (statusCodes != null && statusCodes.size() > 0) {
+				sql += " AND status IN (";
+				int cnt = 0;
+				for (int st : statusCodes) {
+					if (cnt != 0) sql += ",";
+					else cnt++;
+					
+					sql += st;
+				}
+				sql += ") ORDER BY id DESC LIMIT " +offset + ", 50";
+			}
+			
+			conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
+			stmt = conn.prepareStatement( sql );
+			rs = stmt.executeQuery();
+			
+			while (rs.next()) {
+				try {
+					jobs.add(this.getJob( rs.getInt( "id" ) ) );
+				} catch (Exception e) { ; }
+			}
+			
+		} finally {
+			
+			if (rs != null) {
+				try { rs.close(); rs = null; } catch (Exception e) { ; }
+			}
+
+			if (stmt != null) {
+				try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+			}
+			
+			if (conn != null) {
+				try { conn.close(); conn = null; } catch (Exception e) { ; }
+			}			
+		}
+		
+		return jobs;
     }
 }

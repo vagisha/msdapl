@@ -297,7 +297,7 @@ public class ViewProjectAction extends Action {
             
             
             // load protein prophet results, if any
-            List<Integer> piRunIds = ProteinInferJobSearcher.instance().getProteinferIdsForMsExperiment(experimentId);
+            List<Integer> piRunIds = ProteinInferJobSearcher.getInstance().getProteinferIdsForMsExperiment(experimentId);
             Collections.sort(piRunIds);
             
             // loop over and see if any are ProteinProphet runs
@@ -355,7 +355,7 @@ public class ViewProjectAction extends Action {
 		for(int piRunId: piRunIds) {
 		    ProteinferRun run = runDao.loadProteinferRun(piRunId);
 		    if(ProteinInferenceProgram.isIdPicker(run.getProgram())) { // is this a IdPicker run?
-		        ProteinferJob job = ProteinInferJobSearcher.instance().getJob(piRunId);
+		        ProteinferJob job = ProteinInferJobSearcher.getInstance().getJobForPiRunId(piRunId);
 		        ExperimentProteinferRun eppRun = new ExperimentProteinferRun(job);
 		        
 		        eppRun.setNumParsimoniousProteins(proteinDao.getIdPickerProteinIds(piRunId, true).size());

@@ -88,7 +88,7 @@ public class DatasetSelectionFormAction extends Action {
             
             for(int experimentId: experimentIds) {
                 
-                List<Integer> exptPiRunIds = ProteinInferJobSearcher.instance().getProteinferIdsForMsExperiment(experimentId);
+                List<Integer> exptPiRunIds = ProteinInferJobSearcher.getInstance().getProteinferIdsForMsExperiment(experimentId);
                 Collections.sort(exptPiRunIds);
                 for(int piRunId: exptPiRunIds) {
                     
@@ -96,7 +96,7 @@ public class DatasetSelectionFormAction extends Action {
                     ProteinferRunFormBean bean = new ProteinferRunFormBean(run, project.getID());
                     
                     if(ProteinInferenceProgram.isIdPicker(run.getProgram())) {
-                        ProteinferJob job = ProteinInferJobSearcher.instance().getJob(piRunId);
+                        ProteinferJob job = ProteinInferJobSearcher.getInstance().getJobForPiRunId(piRunId);
                         if(job.getStatus() != JobUtils.STATUS_COMPLETE)
                             continue;
                     }

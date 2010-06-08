@@ -979,7 +979,7 @@ function downloadResults() {
 // ---------------------------------------------------------------------------------------
 // GENE ONTOLOGY ANALYSIS RESULTS
 // ---------------------------------------------------------------------------------------
-function goAnalysisResults() {
+function goSlimAnalysisResults() {
 
 	var goAspect = $("#goAspectField1").val();
     var goSlim = $("#goSlimTermIdField").val();
@@ -1377,7 +1377,7 @@ function hideAllDescriptionsForProtein(proteinId) {
     	</td>
     	
     	<td style="padding:5x;">
-    		<a href="" onclick="javascript:goAnalysisResults();return false;"><b>Update</b></a>
+    		<a href="" onclick="javascript:goSlimAnalysisResults();return false;"><b>Update</b></a>
     	</td>
     	</tr>
     	

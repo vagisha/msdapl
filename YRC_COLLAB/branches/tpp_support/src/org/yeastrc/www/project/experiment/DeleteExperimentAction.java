@@ -109,7 +109,7 @@ public class DeleteExperimentAction extends Action {
         catch(Exception e) {;} // because job with experimentID does not exist. Should not really happen.
         
         // Make sure there are no running protein inference jobs for this experiment
-        List<ProteinferJob> piJobs = ProteinInferJobSearcher.instance().getProteinferJobsForMsExperiment(experimentId);
+        List<ProteinferJob> piJobs = ProteinInferJobSearcher.getInstance().getProteinferJobsForMsExperiment(experimentId);
         for(ProteinferJob piJob: piJobs) {
             int status = piJob.getStatus();
             if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK) {

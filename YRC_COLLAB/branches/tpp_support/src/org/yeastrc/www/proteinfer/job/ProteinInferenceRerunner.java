@@ -30,7 +30,7 @@ public class ProteinInferenceRerunner {
 	 */
 	public static int reRun(int pinferId, boolean deleteOriginal) throws Exception {
 		
-		ProteinferJob job = ProteinInferJobSearcher.instance().getJob(pinferId);
+		ProteinferJob job = ProteinInferJobSearcher.getInstance().getJobForPiRunId(pinferId);
 		if(job == null) {
 			log.error("Could not find protein inference job for piRunID: "+pinferId);
 			return -1;
@@ -43,9 +43,13 @@ public class ProteinInferenceRerunner {
 		}
 		
 		run.setId(0);
+		log.info("Re-running piRunID: "+pinferId+"; Delete original: "+deleteOriginal);
 		int jobId = ProteinferJobSaver.instance().submitIdPickerJob(job.getSubmitter(), run);
+		log.info("QUEUED JOB: "+jobId);
 		
 		if(deleteOriginal) {
+			
+			log.info("DELETE OLD JOB: "+job.getId());
 			
 	        boolean deleted = JobDeleter.getInstance().deleteJob(job);
 	        
@@ -55,6 +59,7 @@ public class ProteinInferenceRerunner {
 	        	// now delete the protein inference run from the mass spec database.
 		        ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
 		        try {
+		        	log.info("DELETE OLD PI RUN: "+pinferId);
 		            fact.getProteinferRunDao().delete(pinferId);
 		        }
 		        catch(Exception e) {
