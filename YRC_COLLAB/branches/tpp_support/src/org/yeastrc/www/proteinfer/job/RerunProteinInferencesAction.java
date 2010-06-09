@@ -111,22 +111,26 @@ public class RerunProteinInferencesAction extends Action {
         List<RerunEntry> rerunEntries = new ArrayList<RerunEntry>(piRunIds.size());
         for(Integer piRunId: piRunIds) {
         	
-        	// copy parameters for the old run and queue a new job
-        	int jobId = ProteinInferenceRerunner.reRun(piRunId, deleteOld);
-        	
         	RerunEntry entry = new RerunEntry();
         	entry.setOldPiRunId(piRunId);
+        	rerunEntries.add(entry);
+        	
+        	// get the project ID
+        	List<Integer> projectIds = ProteinInferToProjectMapper.map(piRunId);
+        	// Is this still associated with a project? 
+        	if(projectIds == null || projectIds.size() == 0) {
+        		continue; // no need to re-run this one.
+        	}
+        	
+        	entry.setProjectId(projectIds.get(0)); // just set the first one
+        	
+        	// copy parameters for the old run and queue a new job
+        	int jobId = ProteinInferenceRerunner.reRun(piRunId, deleteOld);
         	
         	// load the new job and get the new protein inference ID
         	ProteinferJob job = ProteinInferJobSearcher.getInstance().getJob(jobId);
         	entry.setNewPiRunId(job.getPinferId());
         	
-        	// get the project ID
-        	List<Integer> projectIds = ProteinInferToProjectMapper.map(piRunId);
-        	if(projectIds.size() > 0)
-        		entry.setProjectId(projectIds.get(0)); // just set the first one
-        	
-        	rerunEntries.add(entry);
         }
         
         request.setAttribute("rerunEntries", rerunEntries);
