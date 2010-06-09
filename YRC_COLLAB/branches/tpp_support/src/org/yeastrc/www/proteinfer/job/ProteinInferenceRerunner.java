@@ -9,6 +9,7 @@ package org.yeastrc.www.proteinfer.job;
 import org.apache.log4j.Logger;
 import org.yeastrc.jobqueue.JobDeleter;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 
 
@@ -43,6 +44,8 @@ public class ProteinInferenceRerunner {
 		}
 		
 		run.setId(0);
+		run.setProgramVersion(ProteinInferenceProgram.protInferVersion); // update to current version
+		
 		log.info("Re-running piRunID: "+pinferId+"; Delete original: "+deleteOriginal);
 		int jobId = ProteinferJobSaver.instance().submitIdPickerJob(job.getSubmitter(), run);
 		log.info("QUEUED JOB: "+jobId);
