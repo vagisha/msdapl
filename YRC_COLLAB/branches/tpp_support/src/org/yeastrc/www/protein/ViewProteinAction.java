@@ -88,15 +88,15 @@ public class ViewProteinAction extends Action {
 	        if(protein.getSpecies().getId() == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
 	        	List<YeastOrfAbundance> abundances = ProteinAbundanceDao.getInstance().getAbundance(protein.getId());
 	        	if(abundances == null || abundances.size() == 0)
-	        		request.setAttribute("proteinAbundance", "UNKNOWN");
+	        		request.setAttribute("proteinAbundance", "NOT AVAILABLE");
 	        	else {
 	        		if(abundances.size() == 1) {
-	        			request.setAttribute("proteinAbundance", abundances.get(0).getAbundanceToPrint());
+	        			request.setAttribute("proteinAbundance", abundances.get(0).getAbundanceString());
 	        		}
 	        		else {
 	        			String aString = "";
 	        			for(YeastOrfAbundance a: abundances) {
-	        				aString +=  ", "+a.getAbundanceAndOrfNameToPrint();
+	        				aString +=  ", "+a.getAbundanceAndOrfNameString();
 	        			}
 	        			aString = aString.substring(1);
 	        			request.setAttribute("proteinAbundance", aString);

@@ -85,17 +85,40 @@ public class ProteinAbundanceDao {
 		public boolean isAbundanceNull() {
 			return abundance == null;
 		}
-		public String getAbundanceToPrint() {
+		public String getAbundanceString() {
 			if(abundance == null)
-				return "UNKNOWN";
+				return "NOT DETECTED";
+			
+			double ab = Math.round(abundance.doubleValue());
+			if(ab == 0.0) // band detected but unquantifiable due to experimental problems
+				return "EXPT. ERROR";
+			else if(ab == -1.0) // band detected but extremely low signal (< 50 copies / cell)
+				return "< 50"; 
+				
 			if(abundance == Math.round(abundance.doubleValue())) {
 				return String.valueOf((int)abundance.doubleValue());
 			}
 			else
 				return String.valueOf(abundance);
 		}
-		public String getAbundanceAndOrfNameToPrint() {
-			return orfName+":"+getAbundanceToPrint();
+		public String getAbundanceAndOrfNameString() {
+			return orfName+":"+getAbundanceString();
+		}
+		public String getAbundanceToPrint() {
+			if(abundance == null)
+				return "NOT_DETECTED";
+			
+			double ab = Math.round(abundance.doubleValue());
+			if(ab == 0.0) // band detected but unquantifiable due to experimental problems
+				return "EXPT_ERROR";
+			else if(ab == -1.0) // band detected but extremely low signal (< 50 copies / cell)
+				return "LOW"; 
+				
+			if(abundance == Math.round(abundance.doubleValue())) {
+				return String.valueOf((int)abundance.doubleValue());
+			}
+			else
+				return String.valueOf(abundance);
 		}
 		public void setAbundance(Double abundance) {
 			this.abundance = abundance;

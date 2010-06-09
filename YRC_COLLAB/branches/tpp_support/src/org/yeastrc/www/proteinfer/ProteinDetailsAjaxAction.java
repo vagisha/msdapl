@@ -114,7 +114,7 @@ public class ProteinDetailsAjaxAction extends Action {
             if(iProt.getProteinListing().getSpeciesId() == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
             	List<YeastOrfAbundance> abundances = ProteinAbundanceDao.getInstance().getAbundance(iProt.getProteinListing().getNrseqProteinId());
             	if(abundances == null || abundances.size() == 0)
-            		request.setAttribute("proteinAbundance", "UNKNOWN");
+            		request.setAttribute("proteinAbundance", "NOT AVAILABLE");
             	else {
             		if(abundances.size() == 1) {
             			double abundance = abundances.get(0).getAbundance();
@@ -192,15 +192,15 @@ public class ProteinDetailsAjaxAction extends Action {
             if(pProt.getProteinListing().getSpeciesId() == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
             	List<YeastOrfAbundance> abundances = ProteinAbundanceDao.getInstance().getAbundance(pProt.getProteinListing().getNrseqProteinId());
             	if(abundances == null || abundances.size() == 0)
-            		request.setAttribute("proteinAbundance", "UNKNOWN");
+            		request.setAttribute("proteinAbundance", "NOT AVAILABLE");
             	else {
             		if(abundances.size() == 1) {
-            			request.setAttribute("proteinAbundance", abundances.get(0).getAbundanceToPrint());
+            			request.setAttribute("proteinAbundance", abundances.get(0).getAbundanceString());
             		}
             		else {
             			String aString = "";
             			for(YeastOrfAbundance a: abundances) {
-            				aString +=  ", "+a.getAbundanceAndOrfNameToPrint();
+            				aString +=  ", "+a.getAbundanceAndOrfNameString();
             			}
             			aString = aString.substring(1);
             			request.setAttribute("proteinAbundance", aString);

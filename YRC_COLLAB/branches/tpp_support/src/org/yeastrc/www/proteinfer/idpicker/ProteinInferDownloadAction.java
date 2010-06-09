@@ -211,7 +211,7 @@ public class ProteinInferDownloadAction extends Action {
             	try {
 					List<YeastOrfAbundance> abundances = adundanceDao.getAbundance(wProt.getProtein().getNrseqProteinId());
 					if(abundances == null || abundances.size() == 0) {
-						writer.write("UNKNOWN\t");
+						writer.write("NOT_AVAILABLE\t");
 					}
 					else if(abundances.size() == 1) {
 						writer.write(abundances.get(0).getAbundanceToPrint()+"\t");
@@ -226,7 +226,7 @@ public class ProteinInferDownloadAction extends Action {
 				    		}
 				    	}
 				    	if(allUnknown) {
-				    		writer.write("UNKNOWN\t");
+				    		writer.write("NOT_DETECTED\t");
 				    	}
 				    	else {
 				    		List<String> toPrint = new ArrayList<String>(abundances.size());

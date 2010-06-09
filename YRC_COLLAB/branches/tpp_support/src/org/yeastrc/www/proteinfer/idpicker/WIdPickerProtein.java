@@ -73,7 +73,7 @@ public class WIdPickerProtein {
     
     public String getYeastProteinAbundanceString() {
     	if(yeastOrfAbundances == null || yeastOrfAbundances.size() == 0)
-    		return "UNKNOWN";
+    		return "NOT AVAILABLE";
     	
     	boolean allUnknown = true;
     	for(YeastOrfAbundance oa: yeastOrfAbundances) {
@@ -83,17 +83,17 @@ public class WIdPickerProtein {
     		}
     	}
     	if(allUnknown) {
-    		return "UNKNOWN";
+    		return "NOT DETECTED";
     	}
     	
     	if(yeastOrfAbundances.size() == 1) {
-    		return yeastOrfAbundances.get(0).getAbundanceToPrint();
+    		return yeastOrfAbundances.get(0).getAbundanceString();
 		}
 		else {
 			String aString = "";
 			int idx = 0;
 			for(YeastOrfAbundance a: yeastOrfAbundances) {
-				aString += a.getAbundanceAndOrfNameToPrint();
+				aString += a.getAbundanceAndOrfNameString();
 				if(idx == 0)
 					aString += "<BR>";
 				idx++;
