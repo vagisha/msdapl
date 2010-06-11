@@ -50,8 +50,18 @@ public class FilterResultsForm extends ActionForm {
     private int pageNum = 1;
     private int numPerPage = 50;
     
+    private boolean doDownload = false;
     
-    public int getNumPerPage() {
+
+	public boolean isDoDownload() {
+		return doDownload;
+	}
+
+	public void setDoDownload(boolean doDownload) {
+		this.doDownload = doDownload;
+	}
+
+	public int getNumPerPage() {
 		return numPerPage;
 	}
 
@@ -330,4 +340,12 @@ public class FilterResultsForm extends ActionForm {
         }
         return filenames;
     }
+    
+    public boolean isExactMatch() {
+		return exactMatch;
+	}
+
+	public void setExactMatch(boolean exactMatch) {
+		this.exactMatch = exactMatch;
+	}
 }

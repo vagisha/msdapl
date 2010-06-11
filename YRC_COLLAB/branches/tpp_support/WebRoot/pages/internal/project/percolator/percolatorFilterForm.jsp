@@ -80,6 +80,11 @@
 					<html:submit value="Update" 
 									styleClass="plain_button" 
 									onclick="javascript:updateResults();return false;"/>
+					&nbsp; &nbsp;
+					<html:hidden name="filterForm" property="doDownload" />
+					<html:submit value="Download" 
+									styleClass="plain_button" 
+									onclick="javascript:downloadResults();return false;"/>
 					</td>
 				</tr>
 				<tr>

@@ -180,6 +180,14 @@ public class ViewAnalysisResults extends Action {
         // Get ALL the filtered and sorted resultIds
         numResults = getUnfilteredResultCount(analysis.getAnalysisProgram(), searchAnalysisId);
         List<Integer> resultIds = getFilteredResultIds(analysis.getAnalysisProgram(), searchAnalysisId, myForm);
+        if(myForm.isDoDownload()) {
+        	// Forward to the Download action
+        	request.setAttribute("analysisId", analysis.getId());
+        	request.setAttribute("analysisResultIds", resultIds);
+        	request.setAttribute("analysisProgram", analysis.getAnalysisProgram());
+        	request.setAttribute("filterForm", myForm);
+        	return mapping.findForward("Download");
+        }
         numResultsFiltered = resultIds.size();
 
 

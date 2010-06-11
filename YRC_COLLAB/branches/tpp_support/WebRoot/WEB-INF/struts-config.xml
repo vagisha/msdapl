@@ -422,6 +422,7 @@
 	  input="/pages/internal/project/percolator/viewPercolatorResults.jsp">
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	  <forward name="Success" path="/pages/internal/project/percolator/viewPercolatorResults.jsp" redirect="false"/>
+	  <forward name="Download" path="/downloadAnalysisResults.do" redirect="false"/>
 	</action>
 	
 	<action
@@ -433,6 +434,14 @@
 	  input="/pages/internal/project/peptideProphet/viewPeptideProphetResults.jsp">
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	  <forward name="Success" path="/pages/internal/project/peptideProphet/viewPeptideProphetResults.jsp" redirect="false"/>
+	</action>
+	
+	<action
+	  path="/downloadAnalysisResults"
+	  type="org.yeastrc.www.project.experiment.DownloadAnalysisResults"
+	  >
+	  <forward name="Failure" path="/pages/internal/project/percolator/viewPercolatorResults.jsp" redirect="false"/>
+	  <forward name="Success" path="/pages/internal/project/percolator/viewPercolatorResults.jsp" redirect="false"/>
 	</action>
 	
 	<action

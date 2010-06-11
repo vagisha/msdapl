@@ -120,7 +120,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         // it should have been displayed in the previous page already. Skip over it....
         if(startIndex > 0) {
             int myGrp = proteins.get(startIndex - 1).getGroupId();
-            while(myGrp == proteins.get(startIndex).getGroupId() && startIndex < this.proteins.size()) {
+            while(startIndex < this.getTotalProteinCount() && (myGrp == proteins.get(startIndex).getGroupId())) {
                 startIndex++;
             }
         }
@@ -137,7 +137,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         // all the members of the group
         if(endIndex < getTotalProteinCount()) {
             int myGrp = proteins.get(endIndex-1).getGroupId();
-            while(proteins.get(endIndex).getGroupId() == myGrp && endIndex < this.getTotalProteinCount()) {
+            while(endIndex < this.getTotalProteinCount() && (proteins.get(endIndex).getGroupId() == myGrp)) {
                 endIndex++;
                 if(endIndex >= this.getTotalProteinCount())
                     break;
