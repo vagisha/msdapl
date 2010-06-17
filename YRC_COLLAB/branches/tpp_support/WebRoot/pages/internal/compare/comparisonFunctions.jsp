@@ -104,6 +104,9 @@ function submitFormForGoSlimAnalysis() {
 	// hide the main table
 	$("#result_table").hide();
 	
+	var goAspect = $("#goAspectField1").val();
+	$("form[name='proteinSetComparisonForm'] input[name='goAspect']").val(goAspect);
+	
 	$.blockUI();
 	$.post( "<yrcwww:link path='updateProteinSetComparison.do'/>", 	//url, 
 			$("form[name='proteinSetComparisonForm']").serialize(), // data to submit
@@ -126,6 +129,9 @@ function submitFormForGoEnrichmentAnalysis() {
 	
 	// hide the main table
 	$("#result_table").hide();
+	
+	var goAspect = $("#goAspectField2").val();
+	$("form[name='proteinSetComparisonForm'] input[name='goAspect']").val(goAspect);
 	
 	$.blockUI();
 	$.post( "<yrcwww:link path='updateProteinSetComparison.do'/>", 	//url, 

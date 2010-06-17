@@ -45,10 +45,11 @@ function toggleEnrichBarChart() {
 	  
 <div align="center" style="border:1px dotted gray;" id="goenrich_fold_target">
 
+<logic:present name="goEnrichment">
 
 	<logic:present name="pieChartUrl">
 	<div align="center">
-		<b>Top 15 enriched terms are displayed</b> 
+		<b>Top 15 enriched <font color="red"><bean:write name="goEnrichment" property="goDomainName" /> </font> terms are displayed</b> 
 	</div>
 		
 	<table width="75%">
@@ -78,7 +79,6 @@ function toggleEnrichBarChart() {
 	
 	<br/>
 	
-<logic:present name="goEnrichment">
 
 	<table align="center">
 		<tr>

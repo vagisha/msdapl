@@ -454,6 +454,8 @@ function showActionOptions() {
 	</div>
 	<div style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; border-top:0;width:80%; display:none;" id="comparison_go_opts_fold_target">
 	
+	<html:hidden name="proteinSetComparisonForm" property="goAspect" />
+	
 	<table cellpadding="5">
     	<tr>
     	<td valign="top" style="padding:5x;"><b>GO Slim Analysis: </b></td>

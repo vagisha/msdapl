@@ -93,7 +93,7 @@ public class GOAnnotationChecker {
 					annotated.add(proteinId);
 				}
 				else {
-					System.out.println("No annotations found for "+proteinId);
+					//System.out.println("No annotations found for "+proteinId);
 				}
 			}
 			
