@@ -3,6 +3,9 @@
  */
 package org.yeastrc.www.compare;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * ComparisonAction.java
  * @author Vagisha Sharma
@@ -36,5 +39,12 @@ public enum ComparisonCommand {
 				return action;
 		}
 		return null;
+	}
+	
+	public static List<ComparisonCommand> getCommandsMinusGO() {
+		List<ComparisonCommand> commands = new ArrayList<ComparisonCommand>();
+		commands.add(FILTER);
+		commands.add(CLUSTER);
+		return commands;
 	}
 }

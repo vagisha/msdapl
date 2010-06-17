@@ -18,6 +18,7 @@ import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.go.GOEnrichmentCalculator;
+import org.yeastrc.www.go.GOEnrichmentChartUrlCreator;
 import org.yeastrc.www.go.GOEnrichmentInput;
 import org.yeastrc.www.go.GOEnrichmentOutput;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
@@ -120,6 +121,13 @@ public class ProteinInferGOEnrichmentAction extends Action {
         GOEnrichmentOutput enrichment = doGoEnrichmentAnalysis(nrseqIds, speciesId, goAspect, filterForm.getGoEnrichmentPValDouble());
         request.setAttribute("goEnrichment", enrichment);
         
+        if(enrichment.getEnrichedTermCount() > 0) {
+        	String pieChartUrl = GOEnrichmentChartUrlCreator.getPieChartUrl(enrichment, 15);
+        	request.setAttribute("pieChartUrl", pieChartUrl);
+
+        	String barChartUrl = GOEnrichmentChartUrlCreator.getBarChartUrl(enrichment, 15);
+        	request.setAttribute("barChartUrl", barChartUrl);
+        }
         
         long e = System.currentTimeMillis();
         log.info("ProteinInferGOEnrichmentAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");

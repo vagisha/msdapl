@@ -4,7 +4,38 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-
+<script>
+function toggleGoEnrichmentTable() {
+	if($("#go_enrichment_table").is(':visible')) {
+		$("#go_enrichment_table").hide();
+		$("#go_enrichment_table_link").text("Show All Enriched Terms");
+	}
+	else {
+		$("#go_enrichment_table").show();
+		$("#go_enrichment_table_link").text("Hide Table");
+	}
+}
+function toggleEnrichPieChart() {
+	if($("#enrich_pie_chart_div").is(':visible')) {
+		$("#enrich_pie_chart_div").hide();
+		$("#enrich_pie_chart_link").text("Show Pie Chart");
+	}
+	else {
+		$("#enrich_pie_chart_div").show();
+		$("#enrich_pie_chart_link").text("Hide");
+	}
+}
+function toggleEnrichBarChart() {
+	if($("#enrich_bar_chart_div").is(':visible')) {
+		$("#enrich_bar_chart_div").hide();
+		$("#enrich_bar_chart_link").text("Show Bar Chart");
+	}
+	else {
+		$("#enrich_bar_chart_div").show();
+		$("#enrich_bar_chart_link").text("Hide");
+	}
+}
+</script>
 
 <div style="background-color:#ED9A2E;width:100%; margin:40 0 0 0; padding:3 0 3 0; color:white;" align="left">
 <span style="margin-left:10;" 
@@ -14,31 +45,94 @@
 	  
 <div align="center" style="border:1px dotted gray;" id="goenrich_fold_target">
 
+
+	<logic:present name="pieChartUrl">
+	<div align="center">
+		<b>Top 15 enriched terms are displayed</b> 
+	</div>
+		
+	<table width="75%">
+	<tr>
+	<td>
+		<div style="font-weight:bold; font-size:8pt; padding: 1 3 1 3; color:#D74D2D; width:100%; margin-bottom:3px; background: #CBCBCB;">
+			<span class="clickable underline" onclick="toggleEnrichPieChart();" id="enrich_pie_chart_link">Hide</span>
+		</div>
+		<div style="margin-bottom: 10px; padding: 3px; border:1px dashed #BBBBBB; width:100%;" align="center" id="enrich_pie_chart_div">
+		<img src="<bean:write name='pieChartUrl'/>" alt="Can't see the Google Pie Chart??"/></img>
+		</div>
+	</td>
+	</tr>
+	<tr>
+	<td>
+		<div style="font-weight:bold; font-size:8pt; padding: 1 3 1 3; color:#D74D2D; width:100%; margin-bottom:3px; background: #CBCBCB;">
+			<span class="clickable underline" onclick="toggleEnrichBarChart();" id="enrich_bar_chart_link">Hide</span>
+		</div>
+		<div style="margin-bottom: 10px; padding: 3px; border:1px dashed #BBBBBB; width:100%;" align="center" id="enrich_bar_chart_div">
+		<img src="<bean:write name='barChartUrl'/>" alt="Can't see the Google Bar Chart??"/></img>
+		</div>
+	</td>
+	</tr>
+	</table>
+	</logic:present>
+	
+	
+	<br/>
+	
+<logic:present name="goEnrichment">
+
 	<table align="center">
 		<tr>
-			<td><b># Proteins (input): </b></td><td><bean:write name="goEnrichment" property="numInputProteins" /></td>
+			<td><b># Input Proteins: </b></td><td><bean:write name="goEnrichment" property="numInputProteins" /></td>
 		</tr>
 		<tr>
-			<td><b># Proteins (
+			<td><b># Annotated Input Proteins: </b></td><td><bean:write name="goEnrichment" property="numInputAnnotatedProteins" /></td>
+		</tr>
+		<tr>
+			<td><b># Annotated Reference Proteins (
 			<a target="ncbi_window" href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=<bean:write name="goEnrichment" property="speciesId"/>">
-				<bean:write name="goEnrichment" property="speciesName" /></a>): 
-			</b></td><td><bean:write name="goEnrichment" property="numInputSpeciesProteins" /></td>
+				<bean:write name="goEnrichment" property="speciesName" /></a>)
+		   </b></td><td><bean:write name="goEnrichment" property="numAllAnnotatedSpeciesProteins" /></td>
 		</tr>
 	</table>
-
-<logic:present name="goEnrichment">
+	
+	<br/>
+	<div style="margin: 10 0 10 0; width: 65%">
+		<table style="border:1px dotted gray;">
+			<tr>
+				<td style="font-size:8pt;" valign="top"><b>#Annotated (input):</b></td>
+				<td style="font-size:8pt;" valign="top">Number of proteins in the input list annotated with the GO term</td>
+			</tr>
+			<tr>
+				<td style="font-size:8pt;" valign="top"><b>#Annotated (reference):</b></td>
+				<td style="font-size:8pt;" valign="top">Number of proteins in the reference set (all proteins of the species) annotated with the GO term</td>
+			</tr>
+			<tr>
+				<td style="font-size:8pt;" valign="top"><b>P-Value:</b></td>
+				<td style="font-size:8pt;" valign="top">
+				Given the total number of annotated input proteins, 
+				the total number of annotated proteins in the reference set, 
+				and the number of proteins in the reference set annotated with a given GO term (#Annotated (reference)), 
+				the p-value represents the chances of randomly having the number of input proteins annotated with that GO term (#Annotated (input)).
+				</td>
+			</tr>
+		</table>
+		
+	</div>
+	
 	<div align="center">
 		<span style="font-weight:bold; color:red;"># Enriched Terms (<bean:write name="goEnrichment" property="goDomainName"/>):<bean:write name="goEnrichment" property="enrichedTermCount" /></span>
-		<table class="table_basic" align="center">
+		
+		<div align="center" style="width:75%; font-weight:bold; font-size:8pt; margin-bottom:3px;color:#D74D2D">
+		<span class="clickable underline" onclick="toggleGoEnrichmentTable();" id="go_enrichment_table_link">Hide Table</span>
+		</div>
+		<table class="table_basic" align="center" id="go_enrichment_table">
 			<thead>
 				<tr>
 				<th class="sort-alpha">GO ID</th>
 				<th class="sort-alpha">Name</th>
 				<th class="sort-float">P-Value</th>
-				<th class="sort-int">#Annotated (in set)</th>
-				<th class="sort-int">Total (in set)</th>
-				<th class="sort-int">#Annotated (All)</th>
-				<th class="sort-int">Total (All)</th>
+				<th class="sort-int">#Annotated (input)</th>
+				<th class="sort-int">#Annotated (reference)</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -58,31 +152,13 @@
 						<td><bean:write name="term" property="goNode.name"/></td>
 						<td><bean:write name="term" property="pvalueString"/></td>
 						<td><bean:write name="term" property="numAnnotatedProteins"/></td>
-						<td><bean:write name="goEnrichment" property="numInputAnnotatedSpeciesProteins"/></td>
 						<td><bean:write name="term" property="totalAnnotatedProteins"/></td>
-						<td><bean:write name="goEnrichment" property="numAllAnnotatedSpeciesProteins"/></td>
 					</tr>
 				</logic:iterate>
 			</tbody>
 		</table>
 	</div>
-	<div style="margin: 10 0 10 0;">
-		<table style="border:1px dotted gray;">
-			<tr>
-				<td style="font-size:8pt;"><b>#Annotated (in set):</b></td><td style="font-size:8pt;">Number of proteins in the input list annotated with the GO term</td>
-			</tr>
-			<tr>
-				<td style="font-size:8pt;"><b>Total (in set):</b></td><td style="font-size:8pt;">Total number of proteins in the input list with one or more GO annotations</td>
-			</tr>
-			<tr>
-				<td style="font-size:8pt;"><b>#Annotated (All):</b></td><td style="font-size:8pt;">Number of proteins for the species annotated with the GO term</td>
-			</tr>
-			<tr>
-				<td style="font-size:8pt;"><b>Total (All):</b></td><td style="font-size:8pt;">Total number of proteins for the species with one or more GO annotations</td>
-			</tr>
-		</table>
-		
-	</div>
+	
 </logic:present>
 </div>
 

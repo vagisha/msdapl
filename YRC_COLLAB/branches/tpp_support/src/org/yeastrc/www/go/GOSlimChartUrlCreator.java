@@ -18,7 +18,7 @@ public class GOSlimChartUrlCreator {
 	public static String getPieChartUrl(GOSlimAnalysis analysis, int maxSlices) {
 		
 		StringBuilder buf = new StringBuilder();
-		buf.append("http://chart.apis.google.com/chart?cht=p&chs=800x300&chco=0000BB,BBBB00");
+		buf.append("http://chart.apis.google.com/chart?cht=p&chs=800x300&chco=003388,BBBB00");
 		
 		String data = "";
 		String labels = "";
@@ -68,7 +68,7 @@ public class GOSlimChartUrlCreator {
 	public static String getBarChartUrl(GOSlimAnalysis analysis, int maxBars) {
 		
 		StringBuilder buf = new StringBuilder();
-		buf.append("http://chart.apis.google.com/chart?cht=bhs&chxt=x,y&chs=450x260&chco=80C65A");
+		buf.append("http://chart.apis.google.com/chart?cht=bhs&chxt=x,y&chs=450x260&chco=008888");
 		
 		String data = "";
 		String labels = "";

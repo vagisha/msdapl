@@ -14,17 +14,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.yeastrc.bio.taxonomy.Species;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.compare.ComparisonProtein;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinSetComparisonForm;
 import org.yeastrc.www.go.GOEnrichmentCalculator;
+import org.yeastrc.www.go.GOEnrichmentChartUrlCreator;
 import org.yeastrc.www.go.GOEnrichmentInput;
 import org.yeastrc.www.go.GOEnrichmentOutput;
 
@@ -77,6 +75,15 @@ public class CompareGOEnrichmentAjaxAction extends Action {
 //        }
 //        else {
         	request.setAttribute("goEnrichment", enrichment);
+        	
+        	if(enrichment.getEnrichedTermCount() > 0) {
+            	String pieChartUrl = GOEnrichmentChartUrlCreator.getPieChartUrl(enrichment, 15);
+            	request.setAttribute("pieChartUrl", pieChartUrl);
+
+            	String barChartUrl = GOEnrichmentChartUrlCreator.getBarChartUrl(enrichment, 15);
+            	request.setAttribute("barChartUrl", barChartUrl);
+            }
+        	
         	return mapping.findForward("Success");
 //        }
     }

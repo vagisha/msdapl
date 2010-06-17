@@ -175,21 +175,32 @@ public class ProteinInferViewAction extends Action {
         request.setAttribute("sortBy", filterCriteria.getSortBy());
         request.setAttribute("sortOrder", filterCriteria.getSortOrder());
         
+        // Determine if we support GO analysis for this species
         // Species for GO analyses
         List<Integer> speciesIds = ProteinInferToSpeciesMapper.map(pinferId);
-        if(speciesIds.size() == 1) 
-        	filterForm.setSpeciesId(speciesIds.get(0));
-        List<Species> speciesList = getSpeciesList(speciesIds);
-        request.setAttribute("speciesList", speciesList);
-        
-        // GO Slim terms
-        List<GONode> goslims = GOSlimUtils.getGOSlims();
-        request.setAttribute("goslims", goslims);
-        if(goslims.size() > 0) {
-        	for(GONode slim: goslims) {
-        		if(slim.getName().contains("Generic")) {
-        			filterForm.setGoSlimTermId(slim.getId());
-        			break;
+        boolean supported = false;
+        for(Integer speciesId: speciesIds) {
+        	if(GOSupportUtils.isSpeciesSupported(speciesId)) {
+        		supported = true;
+        		break;
+        	}
+        }
+        if(supported) {
+        	request.setAttribute("goSupported", true);
+        	if(speciesIds.size() == 1) 
+        		filterForm.setSpeciesId(speciesIds.get(0));
+        	List<Species> speciesList = getSpeciesList(speciesIds);
+        	request.setAttribute("speciesList", speciesList);
+
+        	// GO Slim terms
+        	List<GONode> goslims = GOSlimUtils.getGOSlims();
+        	request.setAttribute("goslims", goslims);
+        	if(goslims.size() > 0) {
+        		for(GONode slim: goslims) {
+        			if(slim.getName().contains("Generic")) {
+        				filterForm.setGoSlimTermId(slim.getId());
+        				break;
+        			}
         		}
         	}
         }

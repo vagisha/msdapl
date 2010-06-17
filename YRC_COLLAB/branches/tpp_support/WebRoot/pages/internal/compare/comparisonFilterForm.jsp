@@ -446,6 +446,7 @@ function showActionOptions() {
 	<!--  ====================================================================================== -->
 	<!-- GENE ONTOLOGY OPTIONS -->
 	<!--  ====================================================================================== -->
+	<logic:present name="goSupported">
 	<div style="background-color:#F2F2F2;width:80%; margin:5 0 0 0; padding:1 0 1 0; color:black; border: 1px solid gray; font-size:8pt;" align="left">
 	<span style="margin-left:5;" 
 	  class="foldable fold-close" id="comparison_go_opts_fold">&nbsp;&nbsp;&nbsp;&nbsp; </span>
@@ -505,6 +506,7 @@ function showActionOptions() {
     	</tr>
     	</table>
 	</div> <!-- END OF GENE ONTOLOGY OPTIONS -->	
+	</logic:present>
 	
 	
 	<!--  ====================================================================================== -->

@@ -88,12 +88,31 @@ public class DoComparisonAction extends Action {
         }
         
         
-        // Species for GO analyses
+        // GO analysis supported only for some species. 
         List<Integer> speciesIds = getMySpeciesIds(allRunIds);
+        boolean supported = false;
+        for(Integer speciesId: speciesIds) {
+        	if(GOSupportUtils.isSpeciesSupported(speciesId)) {
+        		supported = true;
+        		break;
+        	}
+        }
+        if(supported) {
+        	request.setAttribute("goSupported", true);
+        	
+        	List<Species> speciesList = getSpeciesList(speciesIds);
+            request.setAttribute("speciesList", speciesList);
+            
+            request.setAttribute("comparisonCommands", ComparisonCommand.values());
+        }
+        else {
+        	request.setAttribute("comparisonCommands", ComparisonCommand.getCommandsMinusGO());
+        }
+        
+        // Species for GO analyses
         if(myForm.getSpeciesId() == 0 && speciesIds.size() == 1) 
         	myForm.setSpeciesId(speciesIds.get(0));
-        List<Species> speciesList = getSpeciesList(speciesIds);
-        request.setAttribute("speciesList", speciesList);
+        
         
         
         // Get the datasets we will be comparing
@@ -146,6 +165,7 @@ public class DoComparisonAction extends Action {
         ProteinDatasetBooleanFilterer.getInstance().applyBooleanFilters(comparison, filters);
         e = System.currentTimeMillis();
         log.info("Time to apply boolean filters: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        
         
         // If the user requested GO analysis we will not group indistinguishable proteins even if that
         // option was checked in the form. For GO analysis we only care about a list of proteins

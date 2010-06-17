@@ -1251,7 +1251,10 @@ function hideAllDescriptionsForProtein(proteinId) {
           <li><a href="#protdetails" rel="history" id="protdetailslink"><span>Protein Details</span></a></li>
           <li><a href="#protclusters" rel="history" id="protclusterslink"><span>Protein Clusters</span></a></li>
           <li><a href="#input" rel="history" id="inputlink"><span>Summary</span></a></li>
-          <li><a href="#gene_ontology" rel="history" id="golink"><span>Gene Ontology</span></a></li>
+          
+          <logic:present name="goSupported">
+          	<li><a href="#gene_ontology" rel="history" id="golink"><span>Gene Ontology</span></a></li>
+          </logic:present>
       </ul>
    </div>
       
@@ -1351,6 +1354,7 @@ function hideAllDescriptionsForProtein(proteinId) {
 	  </div>
 	  
 	  <!-- GENE ONTOLOGY -->
+	  <logic:present name="goSupported">
     <div id="gene_ontology" align="center">
     
     	<div align="center" style="padding: 5; border: 1px dashed gray; background-color: #F0F8FF; margin:5 0 5 0">
@@ -1425,7 +1429,7 @@ function hideAllDescriptionsForProtein(proteinId) {
     	<div style="margin-top:10px;" id="goenrichment_result"></div>
     	
     </div>
-    
+    </logic:present>
     
     
 

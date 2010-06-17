@@ -22,12 +22,10 @@ public class GOEnrichmentOutput {
     private String goDomainName;
     
     private int numInputProteins; 			// number of proteins given for analysis
-    private int numInputSpeciesProteins; 	// number of proteins in the input that come from the given species
-    private int numInputAnnotatedSpeciesProteins; // number of proteins in the input that come from the given species AND
-    										 	  // have at least one GO annotation
+    private int numInputAnnotatedProteins; 	// number of proteins in the input that have at least one GO annotation
     
     private int numAllAnnotatedSpeciesProteins; // number of ALL proteins in our database that come from the given species AND
-    									        // have at leaset one GO annotation (of the given GO aspect).
+    									        // have at least one GO annotation.
     
     private final double pValCutoff;
     
@@ -90,21 +88,12 @@ public class GOEnrichmentOutput {
 		this.numInputProteins = numInputProteins;
 	}
 
-	public int getNumInputSpeciesProteins() {
-		return numInputSpeciesProteins;
+	public int getNumInputAnnotatedProteins() {
+		return numInputAnnotatedProteins;
 	}
 
-	public void setNumInputSpeciesProteins(int numInputSpeciesProteins) {
-		this.numInputSpeciesProteins = numInputSpeciesProteins;
-	}
-
-	public int getNumInputAnnotatedSpeciesProteins() {
-		return numInputAnnotatedSpeciesProteins;
-	}
-
-	public void setNumInputAnnotatedSpeciesProteins(
-			int numInputAnnotatedSpeciesProteins) {
-		this.numInputAnnotatedSpeciesProteins = numInputAnnotatedSpeciesProteins;
+	public void setNumInputAnnotatedProteins(int numInputAnnotatedProteins) {
+		this.numInputAnnotatedProteins = numInputAnnotatedProteins;
 	}
 
 	public int getNumAllAnnotatedSpeciesProteins() {

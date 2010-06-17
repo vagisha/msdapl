@@ -1098,7 +1098,9 @@ function hideAllDescriptionsForProtein(proteinId) {
           <li><a href="#protlist" rel="history" id="protlistlink"><span>Protein List</span></a></li>
           <li><a href="#protdetails" rel="history" id="protdetailslink"><span>Protein Details</span></a></li>
           <li><a href="#roc" rel="history" id="roclink"><span>Sensitivity / Error</span></a></li>
-          <li><a href="#gene_ontology" rel="history" id="golink"><span>Gene Ontology</span></a></li>
+          <logic:present name="goSupported">
+          	<li><a href="#gene_ontology" rel="history" id="golink"><span>Gene Ontology</span></a></li>
+          </logic:present>
       </ul>
    </div>
       

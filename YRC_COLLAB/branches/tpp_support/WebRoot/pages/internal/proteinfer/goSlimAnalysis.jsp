@@ -21,24 +21,24 @@ function toggleGoSlimTable() {
 		$("#go_slim_table_link").text("Hide Table");
 	}
 }
-function togglePieChart() {
-	if($("#pie_chart_div").is(':visible')) {
-		$("#pie_chart_div").hide();
-		$("#pie_chart_link").text("Show Pie Chart");
+function toggleSlimPieChart() {
+	if($("#slim_pie_chart_div").is(':visible')) {
+		$("#slim_pie_chart_div").hide();
+		$("#slim_pie_chart_link").text("Show Pie Chart");
 	}
 	else {
-		$("#pie_chart_div").show();
-		$("#pie_chart_link").text("Hide");
+		$("#slim_pie_chart_div").show();
+		$("#slim_pie_chart_link").text("Hide");
 	}
 }
-function toggleBarChart() {
-	if($("#bar_chart_div").is(':visible')) {
-		$("#bar_chart_div").hide();
-		$("#bar_chart_link").text("Show Bar Chart");
+function toggleSlimBarChart() {
+	if($("#slim_bar_chart_div").is(':visible')) {
+		$("#slim_bar_chart_div").hide();
+		$("#slim_bar_chart_link").text("Show Bar Chart");
 	}
 	else {
-		$("#bar_chart_div").show();
-		$("#bar_chart_link").text("Hide");
+		$("#slim_bar_chart_div").show();
+		$("#slim_bar_chart_link").text("Hide");
 	}
 }
 </script>
@@ -90,9 +90,9 @@ function toggleBarChart() {
 	<tr>
 	<td>
 		<div style="font-weight:bold; font-size:8pt; padding: 1 3 1 3; color:#D74D2D; width:100%; margin-bottom:3px; background: #CBCBCB;">
-			<span class="clickable underline" onclick="togglePieChart();" id="pie_chart_link">Hide</span>
+			<span class="clickable underline" onclick="toggleSlimPieChart();" id="slim_pie_chart_link">Hide</span>
 		</div>
-		<div style="margin-bottom: 10px; padding: 3px; border:1px dashed #BBBBBB; width:100%;" align="center" id="pie_chart_div">
+		<div style="margin-bottom: 10px; padding: 3px; border:1px dashed #BBBBBB; width:100%;" align="center" id="slim_pie_chart_div">
 		<img src="<bean:write name='pieChartUrl'/>" alt="Can't see the Google Pie Chart??"/></img>
 		</div>
 	</td>
@@ -100,9 +100,9 @@ function toggleBarChart() {
 	<tr>
 	<td>
 		<div style="font-weight:bold; font-size:8pt; padding: 1 3 1 3; color:#D74D2D; width:100%; margin-bottom:3px; background: #CBCBCB;">
-			<span class="clickable underline" onclick="toggleBarChart();" id="bar_chart_link">Hide</span>
+			<span class="clickable underline" onclick="toggleSlimBarChart();" id="slim_bar_chart_link">Hide</span>
 		</div>
-		<div style="margin-bottom: 10px; padding: 3px; border:1px dashed #BBBBBB; width:100%;" align="center" id="bar_chart_div">
+		<div style="margin-bottom: 10px; padding: 3px; border:1px dashed #BBBBBB; width:100%;" align="center" id="slim_bar_chart_div">
 		<img src="<bean:write name='barChartUrl'/>" alt="Can't see the Google Bar Chart??"/></img>
 		</div>
 	</td>

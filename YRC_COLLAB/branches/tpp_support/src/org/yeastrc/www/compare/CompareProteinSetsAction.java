@@ -116,7 +116,6 @@ public class CompareProteinSetsAction extends Action {
         	}
         }
         
-        request.getSession().setAttribute("comparisonCommands", ComparisonCommand.values());
         myForm.setComparisonActionId(ComparisonCommand.FILTER.getId());
         
 //        // Do we have ProteinProphet datasets

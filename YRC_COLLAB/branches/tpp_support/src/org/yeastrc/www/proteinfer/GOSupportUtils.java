@@ -29,26 +29,30 @@ public class GOSupportUtils {
 		species.setId(TaxonomyUtils.CAENORHABDITIS_ELEGANS);
 		speciesList.add(species);
 		// Drosophila
-		species = new Species();
-		species.setId(TaxonomyUtils.DROSOPHILA_MELANOGASTER);
-		speciesList.add(species);
+//		species = new Species();
+//		species.setId(TaxonomyUtils.DROSOPHILA_MELANOGASTER);
+//		speciesList.add(species);
 		// Mouse
-		species = new Species();
-		species.setId(10090);
-		speciesList.add(species);
+//		species = new Species();
+//		species.setId(10090);
+//		speciesList.add(species);
 		// Rat
-		species = new Species();
-		species.setId(10116);
-		speciesList.add(species);
+//		species = new Species();
+//		species.setId(10116);
+//		speciesList.add(species);
 		// Budding Yeast
 		species = new Species();
 		species.setId(TaxonomyUtils.SACCHAROMYCES_CEREVISIAE);
 		speciesList.add(species);
 		// Fission Yeast
-		species = new Species();
-		species.setId(TaxonomyUtils.SCHIZOSACCHAROMYCES_POMBE);
-		speciesList.add(species);
+//		species = new Species();
+//		species.setId(TaxonomyUtils.SCHIZOSACCHAROMYCES_POMBE);
+//		speciesList.add(species);
 		
 		return speciesList;
+	}
+	
+	public static boolean isSpeciesSupported(int speciesId) {
+		return (speciesId == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE || speciesId == TaxonomyUtils.CAENORHABDITIS_ELEGANS);
 	}
 }

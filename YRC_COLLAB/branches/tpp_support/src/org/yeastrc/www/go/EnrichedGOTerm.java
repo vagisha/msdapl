@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.yeastrc.bio.go.GONode;
+import org.yeastrc.www.util.RoundingUtils;
 
 /**
  * 
@@ -46,6 +47,10 @@ public class EnrichedGOTerm implements Comparable<EnrichedGOTerm> {
         return goNode;
     }
 
+    public String getShortName() {
+		return goNode.getNameMax40();
+	}
+    
     public void addProtein(int nrseqProteinId) {
         nrseqProteinIds.add(nrseqProteinId);
     }
