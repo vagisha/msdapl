@@ -119,10 +119,12 @@ function toggleSlimBarChart() {
 	</div>
 	<div id="go_slim_table">
 	<table  style="border:1px dotted gray;margin-bottom:5px;">
+		<!--
 		<tr>
 			<td style="font-size:8pt;" valign="top"><b># Proteins(exact):</b></td>
 			<td style="font-size:8pt;" valign="top">Number of proteins in the input list annotated with the GO term</td>
 		</tr>
+		-->
 		<tr>
 			<td style="font-size:8pt;" valign="top"><b># Proteins:</b></td>
 			<td style="font-size:8pt;" valign="top">Number of proteins in the input list annotated with the GO term or any of its descendents</td>
@@ -133,7 +135,7 @@ function toggleSlimBarChart() {
 	<tr>
 	<th class="sort-alpha clickable">GO ID</th>
 	<th class="sort-alpha clickable">Name</th>
-	<th class="sort-int clickable"># Proteins(exact)</th>
+	<!-- <th class="sort-int clickable"># Proteins(exact)</th> -->
 	<th class="sort-int clickable"># Proteins</th>
 	<th class="sort-float clickable">%</th>
 	</tr>
@@ -153,7 +155,7 @@ function toggleSlimBarChart() {
         </span>
         </td>
 		<td><span title="<bean:write name="node" property="goNode.definition"/>" style="cursor:help;"><bean:write name="node" property="name"/></span></td>
-		<td><bean:write name="node" property="proteinCountForExactTerm"/></td>
+		<!-- <td><bean:write name="node" property="proteinCountForExactTerm"/></td> -->
 		<td><bean:write name="node" property="proteinCountForTerm"/></td>
 		<td><bean:write name="node" property="proteinCountForTermPerc"/></td>
 	</tr>
