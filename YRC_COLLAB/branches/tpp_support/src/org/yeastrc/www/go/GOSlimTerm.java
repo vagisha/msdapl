@@ -20,19 +20,29 @@ public class GOSlimTerm {
 	private final GONode goNode;
 	private int totalProteins;  // all proteins being considered
 	private Set<Integer> proteinIdsForTerm; // proteins annotated with this term
+	private Set<Integer> proteinIdsForExactTerm; // proteins annotated with this exact term
 	
 	public GOSlimTerm(GONode goNode, int totalProteins) {
         this.goNode = goNode;
         this.totalProteins = totalProteins;
         proteinIdsForTerm = new HashSet<Integer>();
+        proteinIdsForExactTerm = new HashSet<Integer>();
     }
 	
 	public void addProteinIdForTerm(int nrseqProteinId) {
 		proteinIdsForTerm.add(nrseqProteinId);
 	}
 	
+	public void addProteinIdForExactTerm(int nrseqProteinId) {
+		proteinIdsForExactTerm.add(nrseqProteinId);
+	}
+	
 	public int getProteinCountForTerm() {
 		return proteinIdsForTerm.size();
+	}
+	
+	public int getProteinCountForExactTerm() {
+		return proteinIdsForExactTerm.size();
 	}
 	
 	public double getProteinCountForTermPerc() {

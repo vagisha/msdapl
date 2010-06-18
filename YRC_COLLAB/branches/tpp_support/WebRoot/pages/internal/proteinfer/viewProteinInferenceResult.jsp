@@ -1361,7 +1361,7 @@ function hideAllDescriptionsForProtein(proteinId) {
     	<table cellpadding="5">
     	<tr>
     	<td valign="top" style="padding:5x;"><b>GO Slim Analysis: </b></td>
-    	<td style="padding:5x;">
+    	<td style="padding:5x;" valign="top">
     		GO Domain: 
     		<html:select name="proteinInferFilterForm" property="goAspect" styleId="goAspectField1">
 			<html:option
@@ -1373,14 +1373,17 @@ function hideAllDescriptionsForProtein(proteinId) {
 			</html:select>
     	</td>
     	
-    	<td style="padding:5x;">
+    	<td style="padding:5x;" valign="top">
     		GO Slim:
 			<html:select name="proteinInferFilterForm" property="goSlimTermId" styleId="goSlimTermIdField">
 			<html:options collection="goslims" property="id" labelProperty="name"/>
 			</html:select>
+			<div align="center" style="width:100%; font-size:8pt;">
+			<a href="http://www.geneontology.org/GO.slims.shtml" target="go_window">More information on GO Slims</a>
+			</div>
     	</td>
     	
-    	<td style="padding:5x;">
+    	<td style="padding:5x;" valign="top">
     		<a href="" onclick="javascript:goSlimAnalysisResults();return false;"><b>Update</b></a>
     	</td>
     	</tr>

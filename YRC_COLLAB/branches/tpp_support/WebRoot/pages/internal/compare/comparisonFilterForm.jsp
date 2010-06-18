@@ -459,7 +459,7 @@ function showActionOptions() {
 	<table cellpadding="5">
     	<tr>
     	<td valign="top" style="padding:5x;"><b>GO Slim Analysis: </b></td>
-    	<td style="padding:5x;">
+    	<td style="padding:5x;" valign="top">
     		GO Domain: 
     		<html:select name="proteinSetComparisonForm" property="goAspect" styleId="goAspectField1">
 			<html:option
@@ -471,11 +471,14 @@ function showActionOptions() {
 			</html:select>
     	</td>
     	
-    	<td style="padding:5x;">
+    	<td style="padding:5x;" valign="top">
     		GO Slim:
 			<html:select name="proteinSetComparisonForm" property="goSlimTermId">
 			<html:options collection="goslims" property="id" labelProperty="name"/>
 			</html:select>
+			<div align="center" style="width:100%; font-size:8pt;">
+			<a href="http://www.geneontology.org/GO.slims.shtml" target="go_window">More information on GO Slims</a>
+			</div>
     	</td>
     	</tr>
     	

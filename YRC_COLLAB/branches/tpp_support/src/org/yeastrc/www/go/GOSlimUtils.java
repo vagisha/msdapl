@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.bio.go.GOAnnotation;
 import org.yeastrc.bio.go.GONode;
 import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.db.DBConnectionManager;
@@ -167,7 +168,7 @@ public class GOSlimUtils {
 	}
 
 	/**
-	 * Returns a list of GONode, members of the given GO Slim, that the given protein is 
+	 * Returns a list of GONodeAnnotation, members of the given GO Slim, that the given protein is 
 	 * annotated with.
 	 * @param nrseqProteinId
 	 * @param goSlimTermId
@@ -175,7 +176,7 @@ public class GOSlimUtils {
 	 * @return
 	 * @throws SQLException 
 	 */
-	public static List<GONode> getAnnotations(int nrseqProteinId,
+	public static List<GONodeAnnotation> getAnnotations(int nrseqProteinId,
 			int goSlimTermId, int goAspect) throws SQLException {
 		
 		String term_type = "";
@@ -192,10 +193,10 @@ public class GOSlimUtils {
 		Statement stmt = null;
 		ResultSet rs = null;
 		
-		List<GONode> nodes = new ArrayList<GONode>();
+		List<GONodeAnnotation> nodes = new ArrayList<GONodeAnnotation>();
 		
 		try {
-			String sqlStr = "SELECT t.name, t.term_type, t.is_obsolete, d.term_definition, t.is_root, t.id, t.acc "+
+			String sqlStr = "SELECT t.name, t.term_type, t.is_obsolete, d.term_definition, t.is_root, t.id, t.acc, lookup.exact "+
 							"FROM term AS t, term_definition AS d, term_subset AS s, "+
 							"GOProteinLookup AS lookup "+
 							"WHERE t.id = s.term_id "+
@@ -227,7 +228,12 @@ public class GOSlimUtils {
 				if (rs.getInt(5) == 0) retNode.setRoot(false);
 				else retNode.setRoot(true);
 				
-				nodes.add(retNode);
+				GONodeAnnotation annotation = new GONodeAnnotation();
+				annotation.setNode(retNode);
+				if(rs.getInt(8) == 1)
+					annotation.setExact(true);
+				
+				nodes.add(annotation);
 			}
 			
 		} finally {

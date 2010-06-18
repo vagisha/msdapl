@@ -90,7 +90,7 @@ public class GOSlimStatsCalculator {
 		
 		for(int nrseqProteinId: nrseqProteinIds) {
 			
-			List<GONode> annotNodes = null;
+			List<GONodeAnnotation> annotNodes = null;
 			try {
 				annotNodes = GOSlimUtils.getAnnotations(nrseqProteinId, goSlimTermId, goAspect);
 			} catch (SQLException e) {
@@ -110,13 +110,16 @@ public class GOSlimStatsCalculator {
 			if(annotNodes.size() == 0)
 				this.numProteinsNotAnnotated++;
 			
-			for(GONode annot: annotNodes) {
-				GOSlimTerm slimTerm = slimTermMap.get(annot.getId());
+			for(GONodeAnnotation annot: annotNodes) {
+				GOSlimTerm slimTerm = slimTermMap.get(annot.getNode().getId());
 				if(slimTerm != null) {
 					slimTerm.addProteinIdForTerm(nrseqProteinId);
+					if(annot.isExact()) {
+						slimTerm.addProteinIdForExactTerm(nrseqProteinId);
+					}
 				}
 				else {
-					throw new GOException("Term "+annot.getAccession()+" not a member of GO Slim: "+goSlimTermId);
+					throw new GOException("Term "+annot.getNode().getAccession()+" not a member of GO Slim: "+goSlimTermId);
 				}
 			}
 		}

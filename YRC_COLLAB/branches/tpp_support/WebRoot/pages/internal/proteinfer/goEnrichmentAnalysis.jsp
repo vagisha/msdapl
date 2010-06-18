@@ -149,7 +149,7 @@ function toggleEnrichBarChart() {
         				</span>
 						</td>
 						
-						<td><bean:write name="term" property="goNode.name"/></td>
+						<td><span title="<bean:write name="term" property="goNode.definition"/>" style="cursor:help;"><bean:write name="term" property="goNode.name"/></span></td>
 						<td><bean:write name="term" property="pvalueString"/></td>
 						<td><bean:write name="term" property="numAnnotatedProteins"/></td>
 						<td><bean:write name="term" property="totalAnnotatedProteins"/></td>
