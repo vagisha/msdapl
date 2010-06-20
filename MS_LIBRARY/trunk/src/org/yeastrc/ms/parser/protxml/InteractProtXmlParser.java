@@ -158,6 +158,10 @@ public class InteractProtXmlParser {
         return new File(filePath).getName();
     }
     
+    public boolean isProteinProphetFile() {
+    	return (programName != null && programName.equalsIgnoreCase("proteinprophet"));
+    }
+    
     public String getProgramName() {
         return programName;
     }

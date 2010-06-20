@@ -114,7 +114,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     private StringBuilder preUploadCheckMsg;
     private boolean preUploadCheckDone = false;
     
-    private static final Pattern fileNamePattern = Pattern.compile("interact\\S*.prot.xml");
+    //private static final Pattern fileNamePattern = Pattern.compile("interact\\S*.prot.xml");
     private List<String> protXmlFiles = new ArrayList<String>();
     private List<Integer> runSearchAnalysisIds;  
     
@@ -897,21 +897,32 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             @Override
             public boolean accept(File dir, String name) {
                 String name_lc = name.toLowerCase();
-                return name_lc.endsWith(".prot.xml");
+                return name_lc.endsWith("prot.xml");
             }});
+        
         
         boolean found = false;
         for (int i = 0; i < files.length; i++) {
-            if (fileNamePattern.matcher(files[i].getName().toLowerCase()).matches()) {
-                protXmlFiles.add(files[i].getName());
-                found = true;
+        	String fileName = files[i].getName();
+        	
+        	InteractProtXmlParser parser = new InteractProtXmlParser();
+            try {
+                parser.open(this.protxmlDirectory+File.separator+fileName);
             }
+            catch (DataProviderException e) {
+                appendToMsg("Error opening file: "+fileName+"\n"+e.getMessage());
+                return false;
+            }
+            if(parser.isProteinProphetFile()) {
+            	protXmlFiles.add(fileName);
+            	found = true;
+            }
+            parser.close();
         }
         if(!found) {
-            appendToMsg("Could not find interact*.prot.xml file(s) in directory: "+protxmlDirectory);
+            appendToMsg("Could not find ProteinProphet file(s) in directory: "+protxmlDirectory);
             return false;
         }
-        
         
         preUploadCheckDone = true;
         
