@@ -90,7 +90,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
     private boolean checkPeptideProteinMatches = false;
     
     
-    private static final Pattern fileNamePattern = Pattern.compile("interact\\S*.pep.xml");
+    //private static final Pattern fileNamePattern = Pattern.compile("interact\\S*.pep.xml");
     
     private static final Logger log = Logger.getLogger(PepxmlAnalysisDataUploadService.class.getName());
     
@@ -169,7 +169,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
             return false;
         }
         
-        // 2. Look for interact*.pep.xml file
+        // 2. Look for files with PeptideProphet results
         File[] files = dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -179,13 +179,24 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         
         boolean found = false;
         for (int i = 0; i < files.length; i++) {
-            if (fileNamePattern.matcher(files[i].getName().toLowerCase()).matches()) {
-                  interactPepxmlFiles.add(files[i].getName());
-                  found = true;
-              }
+        	String fileName = files[i].getName();
+        	
+        	PepXmlBaseFileReader parser = new PepXmlBaseFileReader();
+            try {
+                parser.open(dataDirectory+File.separator+fileName);
+            }
+            catch (DataProviderException e) {
+                appendToMsg("Error opening file: "+fileName+"\n"+e.getMessage());
+                return false;
+            }
+            if (parser.isRefreshParserRun()) {
+            	interactPepxmlFiles.add(fileName);
+            	found = true;
+            }
+            parser.close();
         }
         if(!found) {
-            appendToMsg("Could not find interact*.pep.xml file(s) in directory: "+dataDirectory);
+            appendToMsg("Could not find PeptideProphet file(s) in directory: "+dataDirectory);
             return false;
         }
         

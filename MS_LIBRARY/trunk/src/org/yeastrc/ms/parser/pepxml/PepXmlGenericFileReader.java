@@ -205,6 +205,10 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
         return refreshParserRun;
     }
     
+    public boolean isPeptideProphetRun() {
+    	return peptideProphetRun;
+    }
+    
     public String getPeptideProphetVersion() {
         return this.peptideProphetVersion;
     }

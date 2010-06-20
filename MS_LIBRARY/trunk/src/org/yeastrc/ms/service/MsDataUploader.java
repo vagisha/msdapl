@@ -356,8 +356,11 @@ public class MsDataUploader {
         
         // Get the spectrum data uploader
         log.info("Initializing SpectrumDataUploadService");
+        log.info("\tDirectory: "+spectrumDataDirectory);
         SpectrumDataUploadService rdus = getSpectrumDataUploader(spectrumDataDirectory, remoteSpectrumDataDirectory);
         exptUploader.setSpectrumDataUploader(rdus);
+        log.info(rdus.getClass().getName());
+        
         
         // We cannot upload analysis data without uploading search data first.
         if(uploadAnalysis && !uploadSearch) {
@@ -370,22 +373,28 @@ public class MsDataUploader {
         // Get the search data uploader
         if(uploadSearch) {
             log.info("Initializing SearchDataUploadService");
+            log.info("\tDirectory: "+searchDirectory);
              sdus = getSearchDataUploader(searchDirectory, 
                     remoteServer, remoteSearchDataDirectory, searchDate);
             exptUploader.setSearchDataUploader(sdus);
             //sdus.setRawDataFileNames(rdus.getFileNames(), rdus.getFileFormat());
+            log.info(sdus.getClass().getName());
         }
         // Get the analysis data uploader
         if(uploadAnalysis) {
             log.info("Initializing AnalysisDataUploadService");
+            log.info("\tDirectory: "+analysisDirectory);
             AnalysisDataUploadService adus = getAnalysisDataUploader(analysisDirectory, sdus.getSearchProgram());
             exptUploader.setAnalysisDataUploader(adus);
+            log.info(adus.getClass().getName());
         }
         // Get the protein inference uploader
         if(uploadProtinfer) {
             log.info("Initializing ProtinferUploadService");
+            log.info("\tDirectory: "+protinferDirectory);
             ProtinferUploadService pidus = getProtinferUploader(protinferDirectory);
             exptUploader.setProtinferUploader(pidus);
+            log.info(pidus.getClass().getName());
         }
         
         return exptUploader;
