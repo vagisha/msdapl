@@ -83,7 +83,7 @@ public class DatasetSelectionFormAction extends Action {
         for(Project project: projects) {
             
         	// Add only projects on which user is listed as a researcher
-            if(project.checkAccess(user.getResearcher()))
+            if(!project.checkAccess(user.getResearcher()))
             	continue;
             
             // Get the protein inference runs for this project
