@@ -169,7 +169,7 @@ function openInformationPopup(url) {
 }
 </script>
 
-<div class="mainContainer"> 
+<div id="mainContainer"> <!-- This will end in footer.jsp -->
 
 <yrcwww:notauthenticated>
 <div id="login_header" align="center">
