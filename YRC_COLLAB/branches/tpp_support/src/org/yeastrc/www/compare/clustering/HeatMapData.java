@@ -155,7 +155,7 @@ public class HeatMapData {
 		plotUrl += "&chm=N,000000,0,,10|N,000000,1,,10";
 		
 		// legend
-		plotUrl += "&chdl=Spectrum+Count|Norm.+Spectrum+Count&chdlp=b";
+		plotUrl += "&chdl=Norm.+Spectrum+Count|Spectrum+Count&chdlp=b";
 		return plotUrl;
 	}
 	
