@@ -63,4 +63,10 @@ public class GOSlimTerm {
 	public String getAccession() {
 		return goNode.getAccession();
 	}
+	
+	public String getTreeLabel() {
+		return this.getName() + "\n[" + this.getAccession() + "]"
+		+"\n#Annot. "+this.getProteinCountForTerm()
+		+"\n#Exact "+this.getProteinCountForExactTerm();
+	}
 }

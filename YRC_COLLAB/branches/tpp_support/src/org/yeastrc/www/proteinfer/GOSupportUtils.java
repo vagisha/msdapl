@@ -53,6 +53,8 @@ public class GOSupportUtils {
 	}
 	
 	public static boolean isSpeciesSupported(int speciesId) {
-		return (speciesId == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE || speciesId == TaxonomyUtils.CAENORHABDITIS_ELEGANS);
+		return (speciesId == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE 
+				|| speciesId == TaxonomyUtils.CAENORHABDITIS_ELEGANS);
+//				|| speciesId == TaxonomyUtils.DROSOPHILA_MELANOGASTER);
 	}
 }

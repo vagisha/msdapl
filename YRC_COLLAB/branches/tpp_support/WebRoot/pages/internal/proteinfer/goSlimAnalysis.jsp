@@ -85,7 +85,9 @@ function toggleSlimBarChart() {
 		</logic:equal>
 		are displayed.</b>
 		<br/>
-		<a href="http://www.geneontology.org/GO.slims.shtml" target="go_window">More information on GO Slims</a>
+		<!--  <a href="" onclick="javascript:viewGoSlimGraph();return false;" style="font-size:11pt;"><b>[View Graph]</b></a>
+		&nbsp; &nbsp; &nbsp; -->
+		<a href="http://www.geneontology.org/GO.slims.shtml" target="go_window" style="font-size:10pt;"><b>[More information on GO Slims]</b></a>
 	</div>
 		
 	<table width="75%">
@@ -119,15 +121,13 @@ function toggleSlimBarChart() {
 	</div>
 	<div id="go_slim_table">
 	<table  style="border:1px dotted gray;margin-bottom:5px;">
-		<!--
 		<tr>
 			<td style="font-size:8pt;" valign="top"><b># Proteins(exact):</b></td>
 			<td style="font-size:8pt;" valign="top">Number of proteins in the input list annotated with the GO term</td>
 		</tr>
-		-->
 		<tr>
 			<td style="font-size:8pt;" valign="top"><b># Proteins:</b></td>
-			<td style="font-size:8pt;" valign="top">Number of proteins in the input list annotated with the GO term or any of its descendents</td>
+			<td style="font-size:8pt;" valign="top">Number of proteins in the input list annotated with the GO term or any of its descendants</td>
 		</tr>
 	</table>
 	<table class="table_basic" id="go_slim_table" width="75%">
@@ -135,7 +135,7 @@ function toggleSlimBarChart() {
 	<tr>
 	<th class="sort-alpha clickable">GO ID</th>
 	<th class="sort-alpha clickable">Name</th>
-	<!-- <th class="sort-int clickable"># Proteins(exact)</th> -->
+	<th class="sort-int clickable"># Proteins(exact)</th>
 	<th class="sort-int clickable"># Proteins</th>
 	<th class="sort-float clickable">%</th>
 	</tr>
@@ -155,7 +155,7 @@ function toggleSlimBarChart() {
         </span>
         </td>
 		<td><span title="<bean:write name="node" property="goNode.definition"/>" style="cursor:help;"><bean:write name="node" property="name"/></span></td>
-		<!-- <td><bean:write name="node" property="proteinCountForExactTerm"/></td> -->
+		<td><bean:write name="node" property="proteinCountForExactTerm"/></td>
 		<td><bean:write name="node" property="proteinCountForTerm"/></td>
 		<td><bean:write name="node" property="proteinCountForTermPerc"/></td>
 	</tr>

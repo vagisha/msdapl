@@ -353,6 +353,7 @@ public class ViewProjectAction extends Action {
         
 		List<ExperimentProteinferRun> idPickerRunList = new ArrayList<ExperimentProteinferRun>();
 		for(int piRunId: piRunIds) {
+			//log.info("Looking at pinfer runID: "+piRunId);
 		    ProteinferRun run = runDao.loadProteinferRun(piRunId);
 		    if(ProteinInferenceProgram.isIdPicker(run.getProgram())) { // is this a IdPicker run?
 		        ProteinferJob job = ProteinInferJobSearcher.getInstance().getJobForPiRunId(piRunId);

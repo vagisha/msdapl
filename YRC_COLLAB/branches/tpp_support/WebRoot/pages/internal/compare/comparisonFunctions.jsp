@@ -122,8 +122,39 @@ function submitFormForGoSlimAnalysis() {
     		 	hideGoEnrichmentDetails();
     });
 }
+
 // ---------------------------------------------------------------------------------------
-// SUBMIT FORM FOR GO SLIM ANALYSIS
+// SUBMIT FORM FOR GO SLIM ANALYSIS (TREE)
+// ---------------------------------------------------------------------------------------
+function viewGoSlimGraph() {
+	alert("tree!!");
+	submitFormForGoSlimAnalysisTree();
+}
+function submitFormForGoSlimAnalysisTree() {
+
+	// hide the main table
+	$("#result_table").hide();
+	
+	var goAspect = $("#goAspectField1").val();
+	$("form[name='proteinSetComparisonForm'] input[name='goAspect']").val(goAspect);
+	$("form[name='proteinSetComparisonForm'] input[name='comparisonActionId']").val(3);
+	
+	$.blockUI();
+	$.post( "<yrcwww:link path='updateProteinSetComparison.do'/>", 	//url, 
+			$("form[name='proteinSetComparisonForm']").serialize(), // data to submit
+    		 function(result, status) {
+    		 	// load the result
+    		 	$.unblockUI();
+    		 	winWidth="500";
+    		 	winHeight="500";
+    		 	var windowRef = window.open("http://google.com", "GO_TREE_WINDOW", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
+    		 	windowRef.location.reload("http://news.google.com");
+    });
+}
+
+
+// ---------------------------------------------------------------------------------------
+// SUBMIT FORM FOR GO ENRICHMENT ANALYSIS
 // ---------------------------------------------------------------------------------------
 function submitFormForGoEnrichmentAnalysis() {
 	

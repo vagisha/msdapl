@@ -103,7 +103,7 @@ public class DoComparisonAction extends Action {
         	List<Species> speciesList = getSpeciesList(speciesIds);
             request.setAttribute("speciesList", speciesList);
             
-            request.setAttribute("comparisonCommands", ComparisonCommand.values());
+            request.setAttribute("comparisonCommands", ComparisonCommand.getCommands());
         }
         else {
         	request.setAttribute("comparisonCommands", ComparisonCommand.getCommandsMinusGO());
@@ -198,8 +198,16 @@ public class DoComparisonAction extends Action {
                 	log.info("DOING GO Slim ANALYSIS...");
                 	return mapping.findForward("GOSlim");
                 }
+                else if(myForm.isDoGoSlimAnalysisTree()) {
+                	log.info("MAKING GO Slim Tree...");
+                	return mapping.findForward("GOSlim");
+                }
                 else if(myForm.isDoGoEnrichAnalysis()) {
                 	log.info("DOING GENE ONTOLOGY ENRICHMENT ANALYSIS...");
+                	return mapping.findForward("GOEnrichment");
+                }
+                else if(myForm.isDoGoEnrichAnalysisTree()) {
+                	log.info("MAKING GO Enriched Terms Tree...");
                 	return mapping.findForward("GOEnrichment");
                 }
             }

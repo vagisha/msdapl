@@ -215,13 +215,22 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
     public boolean isDoGoSlimAnalysis() {
 		return (action == ComparisonCommand.GO_SLIM);
 	}
+    
+    public boolean isDoGoSlimAnalysisTree() {
+    	return (action == ComparisonCommand.GO_SLIM_TREE);
+    }
 
 	public boolean isDoGoEnrichAnalysis() {
 		return (action == ComparisonCommand.GO_ENRICH);
 	}
 	
+	public boolean isDoGoEnrichAnalysisTree() {
+		return (action == ComparisonCommand.GO_ENRICH_TREE);
+	}
+	
 	public boolean isDoGoAnalysis() {
-		return isDoGoSlimAnalysis() || isDoGoEnrichAnalysis();
+		return isDoGoSlimAnalysis() || isDoGoEnrichAnalysis()
+				|| isDoGoSlimAnalysisTree() || isDoGoEnrichAnalysisTree();
 	}
 
     //-----------------------------------------------------------------------------

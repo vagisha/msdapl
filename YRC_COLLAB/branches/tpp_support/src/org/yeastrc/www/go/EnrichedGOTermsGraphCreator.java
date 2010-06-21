@@ -9,15 +9,12 @@ package org.yeastrc.www.go;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.yeastrc.bio.go.GOCache;
 import org.yeastrc.bio.go.GONode;
-import org.yeastrc.bio.go.GOUtils;
 
 import y.base.Node;
 import y.io.JPGIOHandler;
