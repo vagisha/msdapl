@@ -36,6 +36,7 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.util.StringUtils;
+import org.yeastrc.www.compare.ComparisonCommand;
 import org.yeastrc.www.compare.DisplayColumns;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
 import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
@@ -241,14 +242,35 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 		List<Integer> allRunIds = myForm.getAllSelectedRunIdsOrdered();
 		request.setAttribute("datasetIds", StringUtils.makeCommaSeparated(allRunIds));
 
-		// Species for GO analyses (required for rendering the form)
+		
+        // GO analysis supported only for some species
+        // Species list is required for rendering the form
         List<Integer> speciesIds = getMySpeciesIds(myForm.getAllSelectedRunIdsOrdered());
+        boolean supported = false;
+        for(Integer speciesId: speciesIds) {
+        	if(GOSupportUtils.isSpeciesSupported(speciesId)) {
+        		supported = true;
+        		break;
+        	}
+        }
+        if(supported) {
+        	request.setAttribute("goSupported", true);
+        	
+        	List<Species> speciesList = getSpeciesList(speciesIds);
+            request.setAttribute("speciesList", speciesList);
+            
+            request.setAttribute("comparisonCommands", ComparisonCommand.getCommands());
+        }
+        else {
+        	request.setAttribute("comparisonCommands", ComparisonCommand.getCommandsMinusGO());
+        }
+        
+        // Species for GO analyses
         if(myForm.getSpeciesId() == 0 && speciesIds.size() == 1) 
         	myForm.setSpeciesId(speciesIds.get(0));
-        List<Species> speciesList = getSpeciesList(speciesIds);
-        request.setAttribute("speciesList", speciesList);
         
-		
+        
+        
 		// Read the results
 		if(myForm.getGroupIndistinguishableProteins()) {
 			String grpComparisonFile = clustDir+File.separator+ClusteringConstants.PROT_GRP_SER;
