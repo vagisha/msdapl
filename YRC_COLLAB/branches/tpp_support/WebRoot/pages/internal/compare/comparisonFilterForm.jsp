@@ -330,6 +330,7 @@ function showActionOptions() {
 	
 	
 	<!-- ################## PROTEIN PROPHET OPTIONS	  ########################### -->
+	<html:hidden name="proteinSetComparisonForm" property="hasProteinProphetDatasets"/>
 	<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
 	<tr>
 		<td valign="top" style="padding-bottom: 10px;"><b>ProteinProphet Error: </b></td>

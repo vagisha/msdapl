@@ -22,6 +22,8 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.bio.go.GONode;
 import org.yeastrc.www.compare.dataset.DatasetBuilder;
+import org.yeastrc.www.compare.dataset.DatasetSource;
+import org.yeastrc.www.compare.dataset.FilterableDataset;
 import org.yeastrc.www.compare.dataset.SelectableDataset;
 import org.yeastrc.www.go.GOSlimUtils;
 import org.yeastrc.www.user.User;
@@ -103,6 +105,14 @@ public class CompareProteinSetsAction extends Action {
         myForm.setNotList(datasets);
         myForm.setXorList(datasets);
         
+        // Do we have ProteinProphet datasets
+        for(SelectableDataset dataset: datasets) {
+            if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
+                myForm.setHasProteinProphetDatasets(true);
+                myForm.setUseProteinGroupProbability(true);
+                break;
+            }
+        }
         
         // GO Slim terms
         List<GONode> goslims = GOSlimUtils.getGOSlims();

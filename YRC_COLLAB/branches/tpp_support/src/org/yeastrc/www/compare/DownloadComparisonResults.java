@@ -281,7 +281,7 @@ public class DownloadComparisonResults extends Action {
 		}
 		
 		//ProteinProphetFilters
-		if(filters.hasProteinProphetFilters()) {
+		if(filters.getHasProteinProphetFilters()) {
 			writer.write("\nProteinProphet FILTERS\n");
 			writer.write("ProteinProphetError: "+filters.getProteinProphetError()+"\n");
 			writer.write("Use ProteinProphet group probability: "+filters.isUseGroupProbability()+"\n");

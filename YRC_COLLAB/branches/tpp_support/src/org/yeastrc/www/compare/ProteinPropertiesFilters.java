@@ -70,7 +70,7 @@ public class ProteinPropertiesFilters {
         return true;
     }
  
-    public boolean hasProteinProphetFilters() {
+    public boolean getHasProteinProphetFilters() {
 		return hasProteinProphetFilters;
 	}
 

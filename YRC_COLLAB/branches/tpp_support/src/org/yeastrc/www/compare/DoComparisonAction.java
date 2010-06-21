@@ -139,15 +139,6 @@ public class DoComparisonAction extends Action {
         }
         
         
-        // Do we have ProteinProphet datasets
-        for(FilterableDataset dataset: datasets) {
-            if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
-                myForm.setHasProteinProphetDatasets(true);
-                myForm.setUseProteinGroupProbability(true);
-                break;
-            }
-        }
-        
         // Do the comparison
         log.info("Starting comparison");
         long s = System.currentTimeMillis();
