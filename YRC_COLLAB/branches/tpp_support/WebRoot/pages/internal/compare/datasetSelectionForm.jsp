@@ -45,6 +45,11 @@ function compareSelectedProtInfer() {
 		window.location.href = url;
 	// }
 }
+$(document).ready(function() {
+   $(".sorttable").each(function() {
+   		makeSortableTable($(this));
+   });
+});
 </script>
 
 <CENTER>
@@ -65,15 +70,15 @@ function compareSelectedProtInfer() {
 
 <logic:notEmpty name="datasetList">
 
-	<table width="90%" class="table_basic sortable" align="center">
+	<table width="90%" class="table_basic sorttable" align="center">
 	<thead>
 		<tr align="left">
 		<th></th>
-		<th class="sort-int">Prot. Infer ID</th>
-		<th class="sort-alpha">Program</th>
-		<th class="sort-int">ProjectID</th>
+		<th class="sort-int sortable">Prot. Infer ID</th>
+		<th class="sort-alpha sortable">Program</th>
+		<th class="sort-int sortable">ProjectID</th>
 		<th>Date</th>
-		<th class="sort-alpha">Comments</th>
+		<th class="sort-alpha sortable">Comments</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -110,8 +115,8 @@ function compareSelectedProtInfer() {
 			</td>
 			
 			<td>
-				<bean:write name="proteinferRun" property="runDate" />
 				<logic:notEmpty name="proteinferRun" property="runDate">
+					<bean:write name="proteinferRun" property="runDate" />
 				</logic:notEmpty>
 			</td>
 			

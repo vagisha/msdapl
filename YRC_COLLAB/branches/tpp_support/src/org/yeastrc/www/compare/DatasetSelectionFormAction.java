@@ -26,9 +26,11 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.project.Project;
-import org.yeastrc.project.ProjectsSearcher;
+import org.yeastrc.project.ProjectDAO;
+import org.yeastrc.www.proteinfer.ProteinInferToProjectMapper;
 import org.yeastrc.www.proteinfer.job.ProteinInferJobSearcher;
 import org.yeastrc.www.proteinfer.job.ProteinferJob;
+import org.yeastrc.www.taglib.HistoryTag;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -65,14 +67,27 @@ public class DatasetSelectionFormAction extends Action {
         }
         catch(Exception e) {}
         
+        // Get a list of selected projectIds
+        List<Integer> projectIds = new ArrayList<Integer>();
+        try {
+            String idStr = request.getParameter("projectIds");
+            if(idStr != null) {
+                String[] tokens = idStr.split(",");
+                for(String tok: tokens)
+                	projectIds.add(Integer.parseInt(tok.trim()));
+            }
+        }
+        catch(Exception e) {}
         
-        // Get a list of the user's projects (all projects to which user has READ access)
-        // if the user is an admin get ALL projects
-        ProjectsSearcher projSearcher = new ProjectsSearcher();
-        projSearcher.setResearcher(user.getResearcher());
-        List<Project> projects = projSearcher.search();
-//        List<Project> projects = user.getProjects();
-        
+        for(Integer pinferId: inputPiRunIds) {
+        	List<Integer> mappedIds = ProteinInferToProjectMapper.map(pinferId);
+        	for(Integer projectId: mappedIds) {
+        		if(projectIds.contains(projectId))
+        			continue;
+        		else
+        			projectIds.add(projectId);
+        	}
+        }
         
         // For each experiment in the project get a list of the protein inference id
         List<ProteinferRunFormBean> piRuns = new ArrayList<ProteinferRunFormBean>();
@@ -80,12 +95,12 @@ public class DatasetSelectionFormAction extends Action {
         ProjectExperimentDAO prExpDao = ProjectExperimentDAO.instance();
         ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
         
-        for(Project project: projects) {
+        Collections.sort(projectIds);
+        
+        for(Integer projectId: projectIds) {
             
-        	// Add only projects on which user is listed as a researcher
-            if(!project.checkAccess(user.getResearcher()))
-            	continue;
-            
+        	Project project = ProjectDAO.instance().load(projectId);
+        	
             // Get the protein inference runs for this project
             List<Integer> experimentIds = prExpDao.getExperimentIdsForProject(project.getID());
             
@@ -119,7 +134,8 @@ public class DatasetSelectionFormAction extends Action {
 //        myForm.setProteinferRunList(piRuns);
 //        myForm.setGroupProteins(groupProteins);
         
-        
+        // Don't add to history
+        request.setAttribute(HistoryTag.NO_HISTORY_ATTRIB, true); // We don't want this added to history.
         return mapping.findForward("Success");
     }
 }

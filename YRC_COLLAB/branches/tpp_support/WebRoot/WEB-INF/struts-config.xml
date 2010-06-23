@@ -1208,6 +1208,14 @@
 	</action>
 	
 	<action 
+		path="/selectComparisonDatasetProjects"
+		type="org.yeastrc.www.compare.DatasetProjectSelectionFormAction"
+	>
+		<forward name="Success" path="/pages/internal/compare/datasetProjectSelectionForm.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/compare/comparisonError.jsp" redirect="false" />
+	</action>
+	
+	<action 
 		path="/setComparisonFilters"
 		type="org.yeastrc.www.compare.DatasetFiltersFormAction"
 		name="datasetSelectionForm"

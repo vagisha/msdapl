@@ -340,7 +340,10 @@ function compareSelectedProtInferAndMore() {
 	});
 	
 	var groupIndistinguishable = $("input#grpProts:checked").val() != null;
-	var url = "<yrcwww:link path='selectComparisonDatasets.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;
+	var url = "<yrcwww:link path='selectComparisonDatasetProjects.do?'/>"+
+	"piRunIds="+pinferIds+
+	"&groupProteins="+groupIndistinguishable+
+	'&projectId=<bean:write name='project' property='ID'/>';
 	window.location.href = url;
 }
 
