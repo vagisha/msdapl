@@ -214,7 +214,8 @@
 			<td valign="top">
 				<span id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_text"><bean:write name="prpRun" property="proteinProphetRun.comments"/></span>
 				<logic:equal name="writeAccess" value="true">
-				<span class="editableComment clickable" id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>" style="font-size:8pt; color:red;">[Edit]</span>
+				<span class="editableComment clickable" title="expt_<bean:write name='experiment' property='id'/>" 
+				id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>" style="font-size:8pt; color:red;">[Edit]</span>
 				</logic:equal>
 			</td>
 			<td valign="top">
@@ -231,8 +232,10 @@
 			     style="display:none;">
 			     <textarea rows="5" cols="60" class="edit_text"></textarea>
 			     <br>
-			     <button class="savePiRunComments" id="<bean:write name='prpRun' property='proteinProphetRun.id'/>">Save</button>
-			     <button class="cancelPiRunComments" id="<bean:write name='prpRun' property='proteinProphetRun.id'/>">Cancel</button>
+			     <button class="savePiRunComments" title="expt_<bean:write name='experiment' property='id'/>"
+			     		id="<bean:write name='prpRun' property='proteinProphetRun.id'/>">Save</button>
+			     <button class="cancelPiRunComments" title="expt_<bean:write name='experiment' property='id'/>"
+			     		id="<bean:write name='prpRun' property='proteinProphetRun.id'/>">Cancel</button>
 				</div>
 				</td>
 			</tr>
@@ -315,7 +318,8 @@
 			<td valign="top">
 				<span id="piRun_<bean:write name='piRun' property='job.pinferId'/>_text"><bean:write name="piRun" property="job.comments"/></span>
 				<logic:equal name="writeAccess" value="true">
-				<span class="editableComment clickable" id="piRun_<bean:write name='piRun' property='job.pinferId'/>" style="font-size:8pt; color:red;">[Edit]</span>
+				<span class="editableComment clickable" title="expt_<bean:write name='experiment' property='id'/>" 
+				id="piRun_<bean:write name='piRun' property='job.pinferId'/>" style="font-size:8pt; color:red;">[Edit]</span>
 				</logic:equal>
 			</td>
 			<td valign="top">
@@ -364,8 +368,10 @@
 			     style="display:none;">
 			     <textarea rows="5" cols="60" class="edit_text"></textarea>
 			     <br>
-			     <button class="savePiRunComments" id="<bean:write name='piRun' property='job.pinferId'/>">Save</button>
-			     <button class="cancelPiRunComments" id="<bean:write name='piRun' property='job.pinferId'/>">Cancel</button>
+			     <button class="savePiRunComments" title="expt_<bean:write name='experiment' property='id'/>" 
+			     		id="<bean:write name='piRun' property='job.pinferId'/>">Save</button>
+			     <button class="cancelPiRunComments" title="expt_<bean:write name='experiment' property='id'/>" 
+			     		id="<bean:write name='piRun' property='job.pinferId'/>">Cancel</button>
 				</div>
 				</td>
 			</tr>

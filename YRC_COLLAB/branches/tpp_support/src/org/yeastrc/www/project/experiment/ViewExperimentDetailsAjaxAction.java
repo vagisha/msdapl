@@ -19,9 +19,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.ExperimentProteinProphetRun;
 import org.yeastrc.experiment.ExperimentProteinferRun;
 import org.yeastrc.experiment.ExperimentSearch;
@@ -46,6 +48,8 @@ import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.project.Project;
+import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.job.ProteinInferJobSearcher;
 import org.yeastrc.www.proteinfer.job.ProteinferJob;
@@ -117,7 +121,34 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 			return null;
 		}
 
+		// Load our project
+		Project project;
+		
+		try {
+			project = ProjectFactory.getProject(projectId);
+			if (!project.checkReadAccess(user.getResearcher())) {
+				
+				// This user doesn't have access to this project.
+				ActionErrors errors = new ActionErrors();
+				errors.add("username", new ActionMessage("error.project.noaccess"));
+				saveErrors( request, errors );
+				return mapping.findForward("Failure");
+			}
+		} catch (Exception e) {
+			
+			// Couldn't load the project.
+			ActionErrors errors = new ActionErrors();
+			errors.add("username", new ActionMessage("error.project.projectnotfound"));
+			saveErrors( request, errors );
+			return mapping.findForward("Failure");	
+		}
+		// Does the user have write access (edit comments)
+		boolean writeAccess = false;
+		if(project.checkAccess(user.getResearcher()))
+		    writeAccess = true;
+		request.setAttribute("writeAccess", writeAccess);
 
+		
 		// Get the data for this experiment
 		ProjectExperiment experiment = getProjectExperiment(projectId, experimentId);
 

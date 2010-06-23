@@ -40,7 +40,7 @@ function makeCommentEditable() {
 	});
 }
 function setupEditableComment(editable) {
-
+	//alert("making comment editable "+editable);
 	$(editable).click(function() {
 		var id = $(this).attr('id');
 		var currentComments = $.trim($("#"+id+"_text").text());
@@ -379,12 +379,17 @@ function confirmDeleteExperiment(experimentId) {
 							                        function(responseText, status, xhr) {	// callback
 								  						$.unblockUI();
 								  						// set up editable comments and instrument
-								  						setupEditableComment($(".editableComment #"+exptId));
-														setupSaveExptComments($(".saveExptComments #"+exptId));
-														setupCancelExptComments($(".cancelExptComments #"+exptId));
-														setupSavePiRunComments($(".savePiRunComments #"+exptId));
-														setupSavePiRunComments($(".cancelPiRunComments #"+exptId));
-														setupEditableInstrument($(".editableInstrument #"+exptId));
+								  						var title = "expt_"+exptId;
+								  						$(".editableComment[title='"+title+"']").each(function() {
+								  							setupEditableComment($(this));
+								  						});
+								  						$(".savePiRunComments[title='"+title+"']").each(function() {
+								  							setupSavePiRunComments($(this));
+								  						});
+								  						$(".cancelPiRunComments[title='"+title+"']").each(function() {
+								  							setupCancelPiRunComments($(this));
+								  						});
+														
 								  					});
  		
  	}
