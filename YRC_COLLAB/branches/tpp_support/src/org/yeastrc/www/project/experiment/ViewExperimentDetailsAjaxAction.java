@@ -8,6 +8,7 @@ package org.yeastrc.www.project.experiment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.yeastrc.experiment.ExperimentProteinProphetRun;
 import org.yeastrc.experiment.ExperimentProteinferRun;
 import org.yeastrc.experiment.ExperimentSearch;
 import org.yeastrc.experiment.ProjectExperiment;
+import org.yeastrc.experiment.ProjectProteinInferBookmarkDAO;
 import org.yeastrc.experiment.SearchAnalysis;
 import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.jobqueue.MSJob;
@@ -151,7 +153,10 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 		
 		// Get the data for this experiment
 		ProjectExperiment experiment = getProjectExperiment(projectId, experimentId);
-
+		
+		// any bookmarked protein inferences
+		getBookmarkedProteinInferences(experiment);
+		
 		// load the dtaselect results;
 		// Check for yates MS data
         YatesRunSearcher yrs = new YatesRunSearcher();
@@ -258,6 +263,27 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 		 pExpt.setProtInferRuns(piRuns);
 	     
 		 return pExpt;
+	 }
+	 
+	 private void getBookmarkedProteinInferences(ProjectExperiment pExpt) throws SQLException {
+
+		 int projectId = pExpt.getProjectId();
+		 List<Integer> bookmarked = ProjectProteinInferBookmarkDAO.getInstance().getBookmarkedProteinInferenceIds(projectId);
+		 Collections.sort(bookmarked);
+
+		 for(ExperimentProteinferRun run: pExpt.getProtInferRuns()) {
+			 if(Collections.binarySearch(bookmarked, run.getJob().getPinferId()) >= 0)
+				 run.setBookmarked(true);
+			 else
+				 run.setBookmarked(false);
+		 }
+
+		 for(ExperimentProteinProphetRun run: pExpt.getProteinProphetRuns()) {
+			 if(Collections.binarySearch(bookmarked, run.getProteinProphetRun().getId()) >= 0)
+				 run.setBookmarked(true);
+			 else
+				 run.setBookmarked(false);
+		 }
 	 }
 	    
 	 private ExperimentSearch getExperimentSearch(int searchId) {
