@@ -41,11 +41,14 @@ public class Projects {
 	 * will have to be present int this array, or no guarantees are made as to method behavior!
 	 * This array MUST BE SORTED alphabetically, for binary search purposes
 	 */
-	public static final String[] GROUPS = {"Aebersold", "Core", "Informatics", "MacCoss", "Microscopy", "Noble", "PSP","TwoHybrid","Yates"};
-	public static final String[] GROUPS_LONG = {"Mass Spectrometry (Aebersold)", "YRC Core", "Informatics", "Mass Spectrometry (MacCoss)", "Microscopy", "Computational Biology", "Protein Structure Prediction", "Yeast Two-Hybrid", "Mass Spectrometry (Yates)"};
+	public static final String[] GROUPS = {"Aebersold", "Core", "Dunham", "Informatics", "MacCoss", "Microscopy", "Noble", "PSP","TwoHybrid","Yates"};
+	public static final String[] GROUPS_LONG = {"Mass Spectrometry (Aebersold)", "YRC Core", "Dunham Lab", "Informatics", "Mass Spectrometry (MacCoss)", "Microscopy", "Computational Biology", "Protein Structure Prediction", "Yeast Two-Hybrid", "Mass Spectrometry (Yates)"};
 	
 	/** The defintion for the abersold group */
 	public static final String AEBERSOLD = "Aebersold";
+
+	/** The defintion for the dunham group */
+	public static final String DUNHAM = "Dunham";
 	
 	/** The defintion for the informatics group */
 	public static final String INFORMATICS = "Informatics";
