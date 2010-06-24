@@ -1747,7 +1747,7 @@ public class ProgressReportGenerator {
 	 * @throws Exception
 	 */
 	private void buildProjects() throws Exception {
-		this.projects = ReportProjectsSearcher.search(2009);
+		this.projects = ReportProjectsSearcher.search(2010);
 	}
 
 	/**
@@ -1945,10 +1945,10 @@ public class ProgressReportGenerator {
 	// Define the members of these groups... this shouldn't really be here, but is here for the interest of time
 	// Will later be moved out of the source
 	private final int[] microMembers = { 137, 194 };
-	private final int[] y2hMembers = { 272 };
+	private final int[] y2hMembers = { 272, 1650, 1886 };
 	private final int[] pspMembers = { 268 };
 	private final int[] infoMembers = { 254, 1880, 137 };
-	private final int[] yatesMembers = { 262, 1337, 1416, 1417 };
+	private final int[] yatesMembers = { 262 };
 	private final int[] nobleMembers = { 1122 };
 	private final int[] maccossMembers = { 1049 };
 	private final int[] coreMembers = { 137 };

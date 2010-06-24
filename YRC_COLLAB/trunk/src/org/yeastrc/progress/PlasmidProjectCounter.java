@@ -47,7 +47,7 @@ public class PlasmidProjectCounter {
 
 		// Our SQL statement
 		String sqlStr =  "SELECT count(*) FROM tblReportProjects AS a INNER JOIN tblProjects AS b ON a.projectID = b.projectID " +
-				"INNER JOIN tblDissemination AS c ON b.projectID = c.projectID WHERE a.reportYear = 2009 AND b.projectType = 'D' AND " +
+				"INNER JOIN tblDissemination AS c ON b.projectID = c.projectID WHERE a.reportYear = 2010 AND b.projectType = 'D' AND " +
 				"(c.shipPlasmidType = '" + type + "' OR c.shipPlasmidType = 'MT')";
 			
 		stmt = conn.prepareStatement( sqlStr );
