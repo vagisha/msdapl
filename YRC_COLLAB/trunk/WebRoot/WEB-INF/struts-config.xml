@@ -1018,6 +1018,11 @@
 		<forward name="Failure" path="/pages/internal/front.jsp" redirect="true"/>
 	</action>
 
+	<action
+	  path="/createOSheaMergedImages"
+	  type="org.yeastrc.www.sandbox.CreateOSheaMergedImages"
+	  validate="false">
+	</action>
 
 	<!-- ================================================================================== -->
 	<!-- Actions related to grants -->
