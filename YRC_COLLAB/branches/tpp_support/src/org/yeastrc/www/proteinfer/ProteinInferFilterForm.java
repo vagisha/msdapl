@@ -49,6 +49,7 @@ public class ProteinInferFilterForm extends ActionForm {
     
     private boolean doDownload = false;
     private boolean doGoSlimAnalysis = false;
+    private boolean getGoSlimTree = false;
     private boolean doGoEnrichAnalysis = false;
     
 	public ProteinInferFilterForm () {}
@@ -467,6 +468,14 @@ public class ProteinInferFilterForm extends ActionForm {
 		this.doGoSlimAnalysis = doGoSlimAnalysis;
 	}
 
+	public boolean isGetGoSlimTree() {
+		return getGoSlimTree;
+	}
+
+	public void setGetGoSlimTree(boolean getGoSlimTree) {
+		this.getGoSlimTree = getGoSlimTree;
+	}
+
 	public boolean isDoGoEnrichAnalysis() {
 		return doGoEnrichAnalysis;
 	}
@@ -486,8 +495,11 @@ public class ProteinInferFilterForm extends ActionForm {
         filterCriteria.setNumMaxUniquePeptides(getMaxUniquePeptidesInteger());
         filterCriteria.setNumSpectra(getMinSpectrumMatchesInteger());
         filterCriteria.setNumMaxSpectra(getMaxSpectrumMatchesInteger());
+        filterCriteria.setMinMolecularWt(getMinMolecularWtDouble());
+        filterCriteria.setMaxMolecularWt(getMaxMolecularWtDouble());
+        filterCriteria.setMinPi(getMinPiDouble());
+        filterCriteria.setMaxPi(getMaxPiDouble());
         filterCriteria.setPeptideDefinition(peptideDef);
-        filterCriteria.setSortOrder(ProteinFilterCriteria.defaultSortOrder());
         filterCriteria.setValidationStatus(getValidationStatus());
         filterCriteria.setAccessionLike(getAccessionLike());
         filterCriteria.setDescriptionLike(getDescriptionLike());
