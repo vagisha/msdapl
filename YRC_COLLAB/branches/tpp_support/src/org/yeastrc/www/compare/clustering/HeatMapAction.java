@@ -184,6 +184,7 @@ public class HeatMapAction extends Action {
 				if(ois != null) try {ois.close();} catch(IOException e){}
 			}
 			request.setAttribute("heatmap", new HeatMapData(grpComparison));
+			request.setAttribute("hasGroups", true);
 		}
 		
 		else {

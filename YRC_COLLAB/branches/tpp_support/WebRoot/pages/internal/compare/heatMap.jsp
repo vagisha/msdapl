@@ -70,6 +70,20 @@ function updatePage(rowIndex) {
 	window.opener.goToHeatMapIndex(rowIndex);
 }
 
+function toggleNames() {
+	var label = $("#allNamesTrigger").text();
+	if(label == "Show ALL Indistinguishable Protein Names") {
+		$(".allNames").show();
+		$(".oneName").hide();
+		$("#allNamesTrigger").text("Show ONE Indistinguishable Protein Names");
+	}
+	else if(label == "Show ONE Indistinguishable Protein Names") {
+		$(".oneName").show();
+		$(".allNames").hide();
+		$("#allNamesTrigger").text("Show ALL Indistinguishable Protein Names");
+	}
+}
+
 </script>
 
 <!-- Div to modal dialog with plot -->
@@ -111,13 +125,23 @@ function updatePage(rowIndex) {
 <logic:present name="heatmap">
 
 	<table width="90%" cellspacing="0" cellpadding="10" align="center">
-	<tr><td align="right" style="color: #3D4960;">
+	<tr>
+	
+	<logic:present name="hasGroups">
+	<td align="left" style="color: #3D4960;">
+	<span class="clickable" style="color:red; font-weight:bold;" 
+	id="allNamesTrigger" onclick="javascript:toggleNames();return false;">Show ALL Indistinguishable Protein Names</span>
+	</td>
+	</logic:present>
+	
+	<td align="right" style="color: #3D4960;">
 	<b>Font: &nbsp;<span class="clickable" 
 				style="background: white; border: 1px solid #CBCBCB; padding:3 3 3 3;" onclick="increaseFont();">+</span> 
 				&nbsp;
 				<span class="clickable" 
 				style="background:white; border: 1px solid #CBCBCB; padding:3 4 3 4;" onclick="decreaseFont()">-</span></b>
-	</td></tr>
+	</td>
+	</tr>
 	</table>
 	
 	<center>
@@ -135,7 +159,16 @@ function updatePage(rowIndex) {
 	
 	<logic:iterate name="heatmap" property="rows" id="row">
 	<tr>
-		<td class="rowname" style="font-size:2"><bean:write name="row" property="rowName" /></td>
+		<td class="rowname" style="font-size:2">
+			<span class="oneName"><bean:write name="row" property="rowName" /></span>
+			<logic:present name="hasGroups">
+			<div class="allNames" style="display:none;">
+				<logic:iterate name="row" property="rowAllNames" id="name">
+					<bean:write name="name"/> <br/>
+				</logic:iterate>
+			</div>
+			</logic:present>
+		</td>
 		<td class="rowname" style="font-size:2">
 			<a href='<bean:write name='row' property='plotUrl'/>' class="plotLink" 
 			   id='<bean:write name="row" property="rowName" />'>Plot</a>

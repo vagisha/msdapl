@@ -55,6 +55,12 @@ public class HeatMapData {
 			
 			row.setRowName(protein.getProteinListing().getFastaReferences().get(0).getShortAccession());
 			
+			List<String> allNames = new ArrayList<String>();
+			for(ComparisonProtein prot: grp.getProteins()) {
+				allNames.add(prot.getProteinListing().getFastaReferences().get(0).getShortAccession());
+			}
+			row.setRowAllNames(allNames);
+			
 			for(Dataset ds: grpComparison.getDatasets()) {
 				
 				HeatMapCell cell = new HeatMapCell();
@@ -181,6 +187,9 @@ public class HeatMapData {
 			List<HeatMapCell> cells = new ArrayList<HeatMapCell>();
 			
 			row.setRowName(protein.getProteinListing().getFastaReferences().get(0).getShortAccession());
+			List<String> allNames = new ArrayList<String>(1);
+			allNames.add(row.getRowName());
+			row.setRowAllNames(allNames);
 			
 			// add cell for molecular wt.
 			String molWtCellColor = getColorForMolWt(protein.getMolecularWeight());
@@ -264,6 +273,7 @@ public class HeatMapData {
 	public static final class HeatMapRow {
 		
 		private String rowName;
+		private List<String> rowAllNames;
 		private List<HeatMapCell> cells;
 		private int indexInList;
 		private String plotUrl = "NULL";
@@ -273,6 +283,12 @@ public class HeatMapData {
 		}
 		public void setRowName(String rowName) {
 			this.rowName = rowName;
+		}
+		public List<String> getRowAllNames() {
+			return rowAllNames;
+		}
+		public void setRowAllNames(List<String> rowAllNames) {
+			this.rowAllNames = rowAllNames;
 		}
 		public List<HeatMapCell> getCells() {
 			return cells;
