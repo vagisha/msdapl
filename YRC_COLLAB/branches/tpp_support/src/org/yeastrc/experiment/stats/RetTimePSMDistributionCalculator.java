@@ -107,8 +107,8 @@ public class RetTimePSMDistributionCalculator {
                 int runSearchId = rs.getInt("runSearchID");
                 
                 if(lastRunSearchId != -1 && (lastRunSearchId != runSearchId)) {
-                    String filename = runSearchDao.loadFilenameForRunSearch(runSearchId);
-                    FileStats stat = new FileStats(runSearchId, filename);
+                    String filename = runSearchDao.loadFilenameForRunSearch(lastRunSearchId);
+                    FileStats stat = new FileStats(lastRunSearchId, filename);
                     stat.setTotalCount(psmCnt);
                     stat.setGoodCount(goodPsmCnt);
                     fileStats.add(stat);
