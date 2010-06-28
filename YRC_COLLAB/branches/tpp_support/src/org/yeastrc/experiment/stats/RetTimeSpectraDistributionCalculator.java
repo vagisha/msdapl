@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -80,6 +81,7 @@ public class RetTimeSpectraDistributionCalculator {
                 List<Integer> runSearchIds = rsDao.loadRunSearchIdsForSearch(searchId);
                 log.info("SearchID: "+searchId+" has "+runSearchIds.size()+" runSearches");
                 
+                Collections.sort(runSearchIds);
                 for(int runSearchId: runSearchIds) {
                     // binUsingMsLib(scoreCutoff, runSearchId);
                     binUsingJDBC(scoreCutoff, runSearchId, analysisId);

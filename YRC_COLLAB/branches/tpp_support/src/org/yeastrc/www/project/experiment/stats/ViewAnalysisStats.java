@@ -24,6 +24,7 @@ import org.yeastrc.experiment.stats.RetTimePSMDistributionCalculator;
 import org.yeastrc.experiment.stats.RetTimeSpectraDistributionCalculator;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
+import org.yeastrc.www.util.RoundingUtils;
 
 /**
  * 
@@ -123,7 +124,7 @@ public class ViewAnalysisStats extends Action {
         log.info("#PSM-RT Plot URL: "+psmDistrUrl);
         
         for(FileStats stat: psmFileStats) { totalCount += stat.getTotalCount(); goodCount += stat.getGoodCount();}
-        goodPerc = Math.round(((double)goodCount/(double)totalCount) * 100.0);
+        goodPerc = RoundingUtils.getInstance().roundOne(((double)goodCount/(double)totalCount) * 100.0);
         request.setAttribute("psmRTDistributionChart", psmDistrUrl);
         request.setAttribute("psmRtFileStats", psmFileStats);
         request.setAttribute("totalPsmCount", totalCount);
@@ -147,7 +148,7 @@ public class ViewAnalysisStats extends Action {
         
         log.info("#Spectra-RT Plot URL: "+spectraDistrUrl);
         for(FileStats stat: spectraFileStats) { totalSpectraCount += stat.getTotalCount(); goodSpectraCount += stat.getGoodCount();}
-        goodSpectraPerc = Math.round(((double)goodSpectraCount/(double)totalSpectraCount) * 100.0);
+        goodSpectraPerc = RoundingUtils.getInstance().roundOne(((double)goodSpectraCount/(double)totalSpectraCount) * 100.0);
         request.setAttribute("spectraRTDistributionChart", spectraDistrUrl);
         request.setAttribute("spectraRtFileStats", spectraFileStats);
         request.setAttribute("totalSpectraCount", totalSpectraCount);

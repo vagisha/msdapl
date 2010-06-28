@@ -92,7 +92,8 @@ public class RetTimePSMDistributionCalculator {
                          "WHERE sa.searchAnalysisID="+analysisId+
                          " AND sa.id = pres.runSearchAnalysisID "+
                          "AND pres.resultID = res.id "+
-                         "AND res.scanID = scan.id";
+                         "AND res.scanID = scan.id "+
+                         "ORDER BY res.runSearchID";
             
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);

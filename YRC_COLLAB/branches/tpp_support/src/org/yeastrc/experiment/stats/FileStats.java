@@ -1,6 +1,7 @@
 package org.yeastrc.experiment.stats;
 
 import org.yeastrc.experiment.File;
+import org.yeastrc.www.util.RoundingUtils;
 
 public class FileStats implements File, Comparable<FileStats>{
 
@@ -32,7 +33,7 @@ public class FileStats implements File, Comparable<FileStats>{
     }
 
     public double getPercentGoodCount() {
-        return Math.round(((double)goodCount/(double)totalCount) * 100.0);
+    	return RoundingUtils.getInstance().roundOne(((double)goodCount/(double)totalCount)*100.0);
     }
     
     public String getFileName() {
