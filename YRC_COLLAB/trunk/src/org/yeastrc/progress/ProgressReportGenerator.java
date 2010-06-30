@@ -1944,7 +1944,7 @@ public class ProgressReportGenerator {
 	
 	// Define the members of these groups... this shouldn't really be here, but is here for the interest of time
 	// Will later be moved out of the source
-	private final int[] microMembers = { 137, 194 };
+	private final int[] microMembers = { 137, 194, 1212 };
 	private final int[] y2hMembers = { 272, 1650, 1886 };
 	private final int[] pspMembers = { 268 };
 	private final int[] infoMembers = { 254, 1880, 137 };
