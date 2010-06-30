@@ -14,6 +14,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.bio.go.GONode;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
@@ -24,6 +25,10 @@ import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.go.GOSlimAnalysis;
 import org.yeastrc.www.go.GOSlimChartUrlCreator;
 import org.yeastrc.www.go.GOSlimStatsCalculator;
+import org.yeastrc.www.go.GOSlimTerm;
+import org.yeastrc.www.go.GOSlimTreeCreator;
+import org.yeastrc.www.go.GOTree;
+import org.yeastrc.www.go.GOTreeNode;
 import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 
@@ -117,6 +122,41 @@ public class GOSlimAjaxAction extends Action {
             ProteinferProtein protein = protDao.loadProtein(proteinId);
             nrseqIds.add(protein.getNrseqProteinId());
         }
+        
+        
+        if(filterForm.isGetGoSlimTree()) {
+        	GOSlimTreeCreator treeCreator = new GOSlimTreeCreator(goSlimTermId, nrseqIds, goAspect);
+//        	BufferedImage img = treeCreator.createGraph();
+//        	request.setAttribute("image", img);
+        	GOTree tree = treeCreator.createTree();
+        	StringBuilder openInit = new StringBuilder();
+        	
+        	for(GOTreeNode root: tree.getRoots()) {
+        		openInit.append(",");
+    			openInit.append("\"");
+    			openInit.append(root.getGoNode().getAccession().replaceAll("GO:", ""));
+    			openInit.append("\"");
+        	}
+        	if(openInit.length() > 0)
+        		openInit.deleteCharAt(0); // remove the first comma
+        	request.setAttribute("openNodes", openInit);
+        	
+        	List<GONode> slimTerms = treeCreator.getSlimTerms();
+        	StringBuilder slimTermString = new StringBuilder();
+        	for(GONode slimTerm: slimTerms) {
+        		slimTermString.append(",");
+        		slimTermString.append("\"");
+        		slimTermString.append(slimTerm.getAccession().replaceAll("GO:", ""));
+        		slimTermString.append("\"");
+        	}
+        	if(slimTermString.length() > 0)
+        		slimTermString.deleteCharAt(0); // remove first comma
+        	request.setAttribute("slimTermIds", slimTermString);
+        	
+        	request.setAttribute("goTree", tree);
+        	return mapping.findForward("GoTree");
+        }
+        
         
         GOSlimStatsCalculator calculator = new GOSlimStatsCalculator();
         calculator.setGoAspect(goAspect);

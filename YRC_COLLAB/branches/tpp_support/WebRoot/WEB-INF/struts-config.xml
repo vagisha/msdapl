@@ -968,6 +968,7 @@
 		type="org.yeastrc.www.proteinfer.idpicker.GOSlimAjaxAction"
 	>
 		<forward name="Success" path="/pages/internal/proteinfer/goSlimAnalysis.jsp" redirect="false" />
+		<forward name="GoTree" path="/pages/internal/proteinfer/goTreeView.jsp" redirect="false" />
 	</action>
 	
 	<action 

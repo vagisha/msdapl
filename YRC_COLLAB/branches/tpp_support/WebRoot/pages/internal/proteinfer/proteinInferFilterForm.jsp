@@ -37,6 +37,7 @@
   <html:hidden name="proteinInferFilterForm" property="pinferId" />
   <html:hidden name="proteinInferFilterForm" property="doDownload" />
   <html:hidden name="proteinInferFilterForm" property="doGoSlimAnalysis" />
+  <html:hidden name="proteinInferFilterForm" property="getGoSlimTree" />
   <html:hidden name="proteinInferFilterForm" property="doGoEnrichAnalysis" />
   <html:hidden name="proteinInferFilterForm" property="goAspect" />
   <html:hidden name="proteinInferFilterForm" property="goSlimTermId" />

@@ -13,7 +13,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.bio.go.GOAnnotation;
 import org.yeastrc.bio.go.GONode;
 import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.db.DBConnectionManager;

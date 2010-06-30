@@ -134,7 +134,7 @@ public class GOEnrichmentCalculator {
     		try {
     			// setting the second argument (exact) to false should get us all terms for this protein
     			// This should include all ancestors of terms directly assigned to this protein.
-    			nodes  = GoTermSearcher.getTermsForProtein(nrseqId, false, goAspect);
+    			nodes  = GoTermSearcher.getTermsForProtein(nrseqId, goAspect);
     		}
     		catch (Exception e) {
     			log.error("Could not get GO annotations for proteinID: "+nrseqId, e);

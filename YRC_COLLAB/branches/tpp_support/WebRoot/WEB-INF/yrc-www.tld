@@ -204,6 +204,17 @@
 </tag>
 
 <tag>
+<name>gotree</name>
+<tagclass>org.yeastrc.www.taglib.GOTreeNodeTag</tagclass>
+<bodycontent>empty</bodycontent>
+<attribute>
+<name>treeName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
 <name>table</name>
 <tagclass>org.yeastrc.www.taglib.TableTag</tagclass>
 <bodycontent>empty</bodycontent>
