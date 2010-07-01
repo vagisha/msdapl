@@ -466,11 +466,13 @@
 					t = this;
 				if(!this._is_loaded(obj)) {
 					obj.children("a").addClass("jstree-loading");
+					obj.addClass("jstree-loading").removeClass("jstree-closed");
 					this.load_node(obj, function () { t.open_node(obj, callback, skip_animation); }, callback);
 				}
 				else {
 					if(s) { obj.children("ul").css("display","none"); }
 					obj.removeClass("jstree-closed").addClass("jstree-open").children("a").removeClass("jstree-loading");
+					obj.removeClass("jstree-loading");
 					if(s) { obj.children("ul").slideDown(s, function () { this.style.display = ""; }); }
 					this.__callback({ "obj" : obj });
 					if(callback) { callback.call(); }
@@ -2639,7 +2641,6 @@
 					$.ajax(s.ajax);
 					return;
 				}
-				alert("don't skip aync");
 				if(this.data.search.result.length) { this.clear_search(); }
 				this.data.search.result = this.get_container().find("a" + (this.data.languages ? "." + this.get_lang() : "" ) + ":" + (s.case_insensitive ? "jstree_contains" : "contains") + "(" + this.data.search.str + ")");
 				this.data.search.result.addClass("jstree-search").parents(".jstree-closed").parents(".jstree-closed").each(function () {

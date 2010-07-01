@@ -23,7 +23,7 @@ public class GOTree {
 		return roots;
 	}
 
-	public void addRoots(GOTreeNode root) {
+	public void addRoot(GOTreeNode root) {
 		this.roots.add(root);
 	}
 	

@@ -25,8 +25,8 @@ import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.go.GOSlimAnalysis;
 import org.yeastrc.www.go.GOSlimChartUrlCreator;
 import org.yeastrc.www.go.GOSlimStatsCalculator;
-import org.yeastrc.www.go.GOSlimTerm;
 import org.yeastrc.www.go.GOSlimTreeCreator;
+import org.yeastrc.www.go.GOSlimUtils;
 import org.yeastrc.www.go.GOTree;
 import org.yeastrc.www.go.GOTreeNode;
 import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
@@ -154,6 +154,15 @@ public class GOSlimAjaxAction extends Action {
         	request.setAttribute("slimTermIds", slimTermString);
         	
         	request.setAttribute("goTree", tree);
+        	request.setAttribute("pinferId", pinferId);
+        	request.setAttribute("goAspect", goAspect);
+        	
+        	List<GONode> slimNodes = GOSlimUtils.getGOSlims();
+			for(GONode node: slimNodes) {
+				if(node.getId() == goSlimTermId)
+					request.setAttribute("slimName", node.getName());
+			}
+			
         	return mapping.findForward("GoTree");
         }
         

@@ -3,24 +3,15 @@
  */
 package org.yeastrc.www.go;
 
-import java.awt.Color;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.bio.go.GONode;
-
-import y.base.Node;
-import y.view.Arrow;
-import y.view.EdgeRealizer;
-import y.view.Graph2D;
-import y.view.NodeLabel;
-import y.view.PolyLineEdgeRealizer;
-import y.view.ShapeNodeRealizer;
 
 /**
  * GOSlimTreeCreator.java
@@ -62,6 +53,67 @@ public class GOSlimTreeCreator {
 		return slimTerms;
 	}
 	
+	public List<GOTreeNode> getChildNodes(GONode node) throws GOException {
+		
+		Set<GONode> children;
+		try {
+			children = node.getChildren();
+		} catch (Exception e) {
+			throw new GOException("Error getting children for GO node: "+node.getAccession(), e);
+		}
+		
+		// First get a list of nrseq protein IDs annotated to this node
+		List<Integer> annotatedToNode = new ArrayList<Integer>();
+		for(int nrseqId: nrseqProteinIds) {
+			Annotation annot;
+			try {
+				annot = GoTermSearcher.isProteinAnnotated(nrseqId, node.getId());
+			} catch (SQLException e) {
+				throw new GOException("Error checking annotation for protein: "+nrseqId+" and go term ID: "+node.getId(), e);
+			}
+			if(annot != Annotation.NONE) {
+				annotatedToNode.add(nrseqId);
+			}
+		}
+		
+		Map<String, GOTreeNode> childNodes = new HashMap<String, GOTreeNode>(children.size());
+		// Now look for annotations to the children of this node
+		int numAnnotated = 0;
+		int numExactAnnotated = 0;
+		for(GONode child: children) {
+			
+			numAnnotated = 0;
+			numExactAnnotated = 0;
+			
+			GOTreeNode treeChild = childNodes.get(child.getAccession());
+			if(treeChild == null) {
+				treeChild = new GOTreeNode(child);
+				childNodes.put(child.getAccession(), treeChild);
+			}
+			
+			for(int nrseqProteinId: annotatedToNode) {
+				
+				Annotation annot;
+				try {
+					annot = GoTermSearcher.isProteinAnnotated(nrseqProteinId, child.getId());
+				} catch (SQLException e) {
+					throw new GOException("Error checking annotation for protein: "+nrseqProteinId+" and go term ID: "+child.getId(), e);
+				}
+				if(annot == Annotation.EXACT) {
+					numExactAnnotated++;
+					numAnnotated++;
+				}
+				else if(annot == Annotation.INDIRECT) {
+					numAnnotated++;
+				}
+			}
+			
+			treeChild.setNumAnnotated(numAnnotated);
+			treeChild.setNumExactAnnotated(numExactAnnotated);
+		}
+		return new ArrayList<GOTreeNode>(childNodes.values());
+	}
+	
 	public GOTree createTree() throws Exception {
 		
 		log.info("Creating GOTree... for "+nrseqProteinIds.size()+" proteins");
@@ -96,11 +148,11 @@ public class GOSlimTreeCreator {
 		for(GOTreeNode root: roots.values()) {
 			if(root.getGoNode().isRoot()) { // this will get rid of the root "all" node.
 				for(GOTreeNode child: root.getChildren()) {
-					tree.addRoots(child);
+					tree.addRoot(child);
 				}
 			}
 			else
-				tree.addRoots(root);
+				tree.addRoot(root);
 		}
 		
 		//getChildren(tree, seen);
@@ -211,179 +263,6 @@ public class GOSlimTreeCreator {
 		else {
 			treeNode.setNumAnnotated(annotNode.getProteinCountForTerm());
 			treeNode.setNumExactAnnotated(annotNode.getProteinCountForExactTerm());
-		}
-	}
-
-//	public BufferedImage createGraph() throws Exception {
-//
-//
-//		Graph2D graph = new Graph2D();
-//		ShapeNodeRealizer realizer = initGraphingProperties(graph);
-//
-//		Map<String, Node> addedNodes = new HashMap<String, Node>(); 
-//		Set<String> edges = new HashSet<String>();
-//
-//		for(GOSlimTerm term: goSlimAnalysis.getTermNodes()) {
-//			this.modifyRealize(realizer,term);
-//
-//			Node node = null;
-//			if (addedNodes.containsKey(term.getAccession()))
-//				node = (Node)(addedNodes.get(term.getAccession()));
-//			else {
-//				node = initNode(graph, term.getTreeLabel());
-//				addedNodes.put(term.getAccession(), node);
-//			}
-//
-//			// add parents of this node
-//			addParents(term.getGoNode(), addedNodes, edges, realizer, graph);
-//			addChildren(term.getGoNode(), addedNodes, edges, realizer, graph);
-//		}
-//
-//		HierarchicLayouter layouter = new HierarchicLayouter();
-//		layouter.setOrientationLayouter(new OrientationLayouter(OrientationLayouter.LEFT_TO_RIGHT));
-//		layouter.setLayoutStyle(HierarchicLayouter.TREE);
-//		layouter.doLayout(graph);       
-//
-//		JPGIOHandler jpg = new JPGIOHandler();
-//		jpg.setQuality((float)(7.0));
-//		Graph2DView view = jpg.createDefaultGraph2DView(graph);
-//		BufferedImage bi = (BufferedImage)(view.getImage());
-//
-//		return bi;
-//	}
-
-	private void addParents(GONode child, Map<String, Node> addedNodes, Set<String> edges, 
-			ShapeNodeRealizer realizer, Graph2D graph) throws Exception {
-		
-		Node node = addedNodes.get(child.getAccession());
-		
-		Set<GONode> parents = child.getParents();
-		if (parents != null) {
-			Iterator<GONode> piter = parents.iterator();
-			while (piter.hasNext()) {
-				GONode gparent = piter.next();
-				Node parent = null;
-
-				this.modifyRealize(realizer, null); 
-
-				if (addedNodes.containsKey(gparent.getAccession()))
-					parent = addedNodes.get(gparent.getAccession());
-				else {
-					parent = initNode(graph, gparent.toString());
-
-					addedNodes.put(gparent.getAccession(), parent);
-				}
-
-				// Create the directed edge in the graph, if one does not already exist
-				String edgeKey = gparent.getAccession()+"_"+child.getAccession();
-				if(!edges.contains(edgeKey)) {
-					edges.add(edgeKey);
-					graph.createEdge(parent, node);
-				}
-				
-				// recursion -- add all parents of the parent
-				addParents(gparent, addedNodes,edges, realizer, graph);
-			}
-		}
-	}
-	
-	private void addChildren(GONode parent, Map<String, Node> addedNodes, Set<String> edges, 
-			ShapeNodeRealizer realizer, Graph2D graph) throws Exception {
-		
-		Node node = addedNodes.get(parent.getAccession());
-		
-		Set<GONode> children = parent.getChildren();
-		if (children != null) {
-			
-			System.out.println("Adding children for: "+parent.getAccession()+" found "+children.size()+" children");
-			Iterator<GONode> piter = children.iterator();
-			while (piter.hasNext()) {
-				GONode gchild = piter.next();
-				Node child = null;
-
-				this.modifyRealize(realizer, null); 
-
-				if (addedNodes.containsKey(gchild.getAccession()))
-					child = addedNodes.get(gchild.getAccession());
-				else {
-					child = initNode(graph, gchild.toString());
-
-					addedNodes.put(gchild.getAccession(), child);
-					System.out.println("\t Adding child: "+gchild.getAccession());
-				}
-
-				// Create the directed edge in the graph, if one does not already exist
-				String edgeKey = parent.getAccession()+"_"+gchild.getAccession();
-				if(!edges.contains(edgeKey)) {
-					System.out.println("\t Adding child edge: "+gchild.getAccession());
-					edges.add(edgeKey);
-					graph.createEdge(node, child);
-				}
-				
-				// recursion -- add all parents of the parent
-				//addChildren(gchild, addedNodes,edges, realizer, graph);
-			}
-		}
-		
-	}
-
-	private Node initNode(Graph2D graph, String label) {
-		Node node;
-		node = graph.createNode();
-
-		graph.setLabelText(node, label);
-
-		graph.setSize(node, graph.getLabelLayout(node)[0].getBox().width + 10, graph.getLabelLayout(node)[0].getBox().height + 5);
-		return node;
-	}
-
-	private ShapeNodeRealizer initGraphingProperties(Graph2D graph) {
-		
-		ShapeNodeRealizer realizer = new ShapeNodeRealizer();
-		realizer.setShapeType(ShapeNodeRealizer.ROUND_RECT);
-
-		NodeLabel nl = new NodeLabel();
-		nl.setFontSize(12);
-		realizer.setLabel(nl); 
-
-		graph.setDefaultNodeRealizer(realizer);
-
-		EdgeRealizer er = new PolyLineEdgeRealizer();
-		er.setArrow(Arrow.SHORT);
-
-		graph.setDefaultNodeRealizer(realizer);
-		graph.setDefaultEdgeRealizer(er);
-		return realizer;
-	}
-
-	private Color getColor(GOSlimTerm term) {
-
-		if(term != null) {
-			return getColor(term.getProteinCountForTermPerc() / 100.0);
-		}
-		return new Color(169,169,169);
-	}
-
-	private Color getColor(double perc) {
-		int r = 255;
-		int g = (int)perc*255;
-		int b = (int)perc*255;
-		return new Color(r,g,b);
-	}
-
-	private void modifyRealize(ShapeNodeRealizer realizer, GOSlimTerm term) {
-
-		realizer.setFillColor(getColor(term));
-		if(term != null) {
-			NodeLabel nl = new NodeLabel();
-			nl.setFontSize(14);
-			nl.setTextColor( new Color (255, 255, 255) );
-			realizer.setLabel(nl); 
-		}
-		else {
-			NodeLabel nl = new NodeLabel();
-            nl.setFontSize(12);
-            realizer.setLabel(nl);
 		}
 	}
 }

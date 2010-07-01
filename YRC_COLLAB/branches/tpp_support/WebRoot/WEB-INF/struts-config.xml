@@ -972,6 +972,13 @@
 	</action>
 	
 	<action 
+		path="/protInferGoSlimNode"
+		type="org.yeastrc.www.proteinfer.idpicker.GOSlimNodeAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/goTreeNode.jsp" redirect="false" />
+	</action>
+	
+	<action 
 		path="/protInferGoEnrichment"
 		name="idPickerFilterForm"
 		scope="request"

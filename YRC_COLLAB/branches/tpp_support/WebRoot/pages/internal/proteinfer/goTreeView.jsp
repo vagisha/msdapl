@@ -17,6 +17,10 @@
 <script  type="text/javascript" src="<yrcwww:link path='js/jquery.jstree.js'/>"></script>
 
 
+
+<logic:present name="goTree">
+
+
 <script>
 $(function () {
 
@@ -49,7 +53,16 @@ $(function () {
 		"core" : { "initially_open" : [ <bean:write name="openNodes" filter="false"/> ] },
 		"search": { "case_insensitive": true, "ajax": false},
 		"html_data"  : {
-			"ajax" : { "url"  : "/msdapl/pages/internal/proteinfer/goTreeNode.html"  },
+			"ajax" : { 
+				"url"  : "<yrcwww:link path='protInferGoSlimNode.do'/>",
+				"data" : function(n) {
+						return {	
+							"pinferId" : <bean:write name="pinferId"/>,
+							"goAspect" : <bean:write name="goAspect"/>,
+							"goAccession"   : n.attr ? "GO:"+n.attr("id") : 0
+						}
+					}
+				},
 			"correct_state": "true",
 			"data": "<yrcwww:gotree treeName='goTree' />"
 			}
@@ -83,7 +96,6 @@ function showGoSlimNodes() {
 
 </script>
 
-<logic:present name="goTree">
 	<center>
 		<div align="center" style="margin:10px; padding:5px; border: 1px gray dashed; width:80%;">
 			<input type="text" id="searchbox"/>
@@ -92,8 +104,13 @@ function showGoSlimNodes() {
 			<br/>
 			<br/>
 			<input type="button" value="Close All" id="closeAll"/>
-			<input type="button" value="Open All" id="openAll"/>
-			<input type="button" value="Show All GO Slim Nodes" id="showGoSlim"/>
+			<!-- Open All will open all ajax loaded nodes as well. We don't want this. -->
+			<!--  <input type="button" value="Open All" id="openAll"/> -->
+			<input type="button" value="Show All GO Slim Nodes" id="showGoSlim"/> 
+			<br/>
+			<span style="color:green; font-weight:bold;">
+				Selected GO Slim: <bean:write name="slimName"/>
+			</span>
 			<br/>
 			<br/>
 			GO Slim Nodes in the tree below look like: <br/>
