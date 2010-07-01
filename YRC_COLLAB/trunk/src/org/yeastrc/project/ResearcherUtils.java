@@ -48,6 +48,8 @@ public class ResearcherUtils {
 			
 			String sql = "SELECT projectID FROM tblProjects WHERE projectPI = ? LIMIT 1";
 			stmt = conn.prepareStatement( sql );
+			stmt.setInt( 1, r.getID() );
+			
 			rs = stmt.executeQuery();
 			
 			if( rs.next() )
