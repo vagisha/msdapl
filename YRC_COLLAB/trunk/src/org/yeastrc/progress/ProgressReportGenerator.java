@@ -508,102 +508,105 @@ public class ProgressReportGenerator {
 			}
 
 			// handle funding for this Person
-			Map<Funding, Set<Integer>> fundingMap = this.getFundingForResearcher( researcher );
-			List<Funding> fkeys = new ArrayList<Funding>( fundingMap.keySet() );
-			Collections.sort( fkeys );
-			
-			for ( Funding fundingObject : fkeys ) {
-
-				// they no longer accept 'OTH' as funding agency (why?  i have NO idea)
-				if ( fundingObject.isFederal() && fundingObject.getSourceName().equals( "OTH" ) )
-					continue;
+			// Changed to only execute for project PIs (Mike Riffle, July 2010)
+			if( researcher.isPI() ) {
+				Map<Funding, Set<Integer>> fundingMap = this.getFundingForResearcher( researcher );
+				List<Funding> fkeys = new ArrayList<Funding>( fundingMap.keySet() );
+				Collections.sort( fkeys );
 				
-				/*
-				// Create a Funding element
-				Element funding = doc.createElement("Funding");
-				*/
-				
-				Element funding = null;
-				if (!fundingObject.isFederal() )
-					funding = doc.createElement( "Non_Federal_Funding" );
-				else if (!fundingObject.isPHS() )
-					funding = doc.createElement( "Federal_Non_PHS_Funding" );
-				else
-					funding = doc.createElement( "Federal_PHS_Funding" );
-				
-				Element sElem = null;
-				if ( !fundingObject.isFederal() ) {
-					sElem = doc.createElement("Source_Type");
-					sElem.appendChild(doc.createTextNode( fundingObject.getSourceType() ) );
-					funding.appendChild(sElem);
-				} else {
+				for ( Funding fundingObject : fkeys ) {
+	
+					// they no longer accept 'OTH' as funding agency (why?  i have NO idea)
+					if ( fundingObject.isFederal() && fundingObject.getSourceName().equals( "OTH" ) )
+						continue;
 					
-					String sn = fundingObject.getSourceName();
-					if ( sn.equals( "DVA" ) ) sn = "VA";
+					/*
+					// Create a Funding element
+					Element funding = doc.createElement("Funding");
+					*/
 					
-					sElem = doc.createElement("Organization");
-					sElem.appendChild(doc.createTextNode( sn ) );
-					funding.appendChild(sElem);
-				}
-				
-				// Get the projects associated with this
-				Iterator fpIter = fundingMap.get( fundingObject ).iterator();
-				while (fpIter.hasNext()) {
-					String projectString = ((Integer)(fpIter.next())).toString();
-					sElem = doc.createElement("Sub_ID");
-					sElem.appendChild(doc.createTextNode( projectString ));
-					funding.appendChild(sElem);
-				}
-				
-				if ( !fundingObject.isFederal() ) {
-					sElem = doc.createElement("Organization_Name");
-					sElem.appendChild(doc.createTextNode( fundingObject.getSourceName() ) );
-					funding.appendChild(sElem);
-				}
-				
-				if ( fundingObject.getGrantNumber() != null ) {
-					String gm = fundingObject.getGrantNumber();
-					if ( gm.length() > 50 )
-						gm = gm.substring(0, 49 );
+					Element funding = null;
+					if (!fundingObject.isFederal() )
+						funding = doc.createElement( "Non_Federal_Funding" );
+					else if (!fundingObject.isPHS() )
+						funding = doc.createElement( "Federal_Non_PHS_Funding" );
+					else
+						funding = doc.createElement( "Federal_PHS_Funding" );
 					
-					sElem = doc.createElement("Grant_Or_Contract_Number");
-					sElem.appendChild(doc.createTextNode( gm ) );
-					funding.appendChild(sElem);
-				} else {
-					sElem = doc.createElement("Grant_Or_Contract_Number");
-					sElem.appendChild(doc.createTextNode( "n/a" ) );
-					funding.appendChild(sElem);
-				}
-				
-				/*
-				sElem = doc.createElement("Source_Name");
-				sElem.appendChild(doc.createTextNode( fundingObject.getSourceName() ) );
-				funding.appendChild(sElem);
-				*/
-				
-				if ( fundingObject.getGrantAmount() != null ) {
-					String tsf = fundingObject.getGrantAmount();
-					int amt = 0;
-					try {
-						tsf = tsf.replace( "$", "" );
-						tsf = tsf.replaceAll( ",", "" );
-						amt = Integer.valueOf( tsf );
-					} catch ( Exception e ) { 
-						System.out.println( "Throwing out: " + fundingObject.getGrantAmount() );
+					Element sElem = null;
+					if ( !fundingObject.isFederal() ) {
+						sElem = doc.createElement("Source_Type");
+						sElem.appendChild(doc.createTextNode( fundingObject.getSourceType() ) );
+						funding.appendChild(sElem);
+					} else {
+						
+						String sn = fundingObject.getSourceName();
+						if ( sn.equals( "DVA" ) ) sn = "VA";
+						
+						sElem = doc.createElement("Organization");
+						sElem.appendChild(doc.createTextNode( sn ) );
+						funding.appendChild(sElem);
 					}
 					
-					sElem = doc.createElement("Total_Support_Funds");
-					sElem.appendChild(doc.createTextNode( String.valueOf( amt ) ) );
+					// Get the projects associated with this
+					Iterator fpIter = fundingMap.get( fundingObject ).iterator();
+					while (fpIter.hasNext()) {
+						String projectString = ((Integer)(fpIter.next())).toString();
+						sElem = doc.createElement("Sub_ID");
+						sElem.appendChild(doc.createTextNode( projectString ));
+						funding.appendChild(sElem);
+					}
+					
+					if ( !fundingObject.isFederal() ) {
+						sElem = doc.createElement("Organization_Name");
+						sElem.appendChild(doc.createTextNode( fundingObject.getSourceName() ) );
+						funding.appendChild(sElem);
+					}
+					
+					if ( fundingObject.getGrantNumber() != null ) {
+						String gm = fundingObject.getGrantNumber();
+						if ( gm.length() > 50 )
+							gm = gm.substring(0, 49 );
+						
+						sElem = doc.createElement("Grant_Or_Contract_Number");
+						sElem.appendChild(doc.createTextNode( gm ) );
+						funding.appendChild(sElem);
+					} else {
+						sElem = doc.createElement("Grant_Or_Contract_Number");
+						sElem.appendChild(doc.createTextNode( "n/a" ) );
+						funding.appendChild(sElem);
+					}
+					
+					/*
+					sElem = doc.createElement("Source_Name");
+					sElem.appendChild(doc.createTextNode( fundingObject.getSourceName() ) );
 					funding.appendChild(sElem);
-				} else {
-					sElem = doc.createElement("Total_Support_Funds");
-					sElem.appendChild(doc.createTextNode( "0" ) );
-					funding.appendChild(sElem);
+					*/
+					
+					if ( fundingObject.getGrantAmount() != null ) {
+						String tsf = fundingObject.getGrantAmount();
+						int amt = 0;
+						try {
+							tsf = tsf.replace( "$", "" );
+							tsf = tsf.replaceAll( ",", "" );
+							amt = Integer.valueOf( tsf );
+						} catch ( Exception e ) { 
+							System.out.println( "Throwing out: " + fundingObject.getGrantAmount() );
+						}
+						
+						sElem = doc.createElement("Total_Support_Funds");
+						sElem.appendChild(doc.createTextNode( String.valueOf( amt ) ) );
+						funding.appendChild(sElem);
+					} else {
+						sElem = doc.createElement("Total_Support_Funds");
+						sElem.appendChild(doc.createTextNode( "0" ) );
+						funding.appendChild(sElem);
+					}
+					
+					person.appendChild(funding);
+					person.insertBefore(doc.createTextNode("\n"), funding);
+	
 				}
-				
-				person.appendChild(funding);
-				person.insertBefore(doc.createTextNode("\n"), funding);
-
 			}
 			
 			root.appendChild(person);
