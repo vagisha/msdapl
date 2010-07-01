@@ -43,7 +43,14 @@ public class Researcher implements Comparable, IData {
 		phone = null;
 	}
 
-
+	/**
+	 * Is this researcher a PI?
+	 * @return true if this researcher is a PI listed for any project, false if not
+	 * @throws Exception
+	 */
+	public boolean isPI() throws Exception {
+		return ResearcherUtils.getInstance().isPI( this );
+	}
 
 	/**
 	 * For Comparable.  Does an alphabetical comparison of last names.
