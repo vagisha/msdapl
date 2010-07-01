@@ -41,7 +41,6 @@ public class GrantSorter {
 	
 	private static class GrantTitleComparator implements Comparator<Grant> {
 
-		@Override
 		public int compare(Grant g1, Grant g2) {
 			if (g1 == null && g2 == null)
 				return 0;
@@ -55,7 +54,6 @@ public class GrantSorter {
 	
 	private static class GrantPIComparator implements Comparator<Grant> {
 
-		@Override
 		public int compare(Grant g1, Grant g2) {
 			if (g1 == null && g2 == null)
 				return 0;
@@ -69,7 +67,6 @@ public class GrantSorter {
 	
 	private static class GrantSourceTypeComparator implements Comparator<Grant> {
 
-		@Override
 		public int compare(Grant g1, Grant g2) {
 			if (g1 == null && g2 == null)
 				return 0;
@@ -85,7 +82,6 @@ public class GrantSorter {
 	
 	private static class GrantSourceNameComparator implements Comparator<Grant> {
 
-		@Override
 		public int compare(Grant g1, Grant g2) {
 			if (g1 == null && g2 == null)
 				return 0;
@@ -105,7 +101,6 @@ public class GrantSorter {
 	
 	private static class GrantNumberComparator implements Comparator<Grant> {
 
-		@Override
 		public int compare(Grant g1, Grant g2) {
 			if (g1 == null && g2 == null)
 				return 0;
@@ -119,7 +114,6 @@ public class GrantSorter {
 	
 	private static class GrantAmountComparator implements Comparator<Grant> {
 
-		@Override
 		public int compare(Grant g1, Grant g2) {
 			if (g1 == null && g2 == null)
 				return 0;
