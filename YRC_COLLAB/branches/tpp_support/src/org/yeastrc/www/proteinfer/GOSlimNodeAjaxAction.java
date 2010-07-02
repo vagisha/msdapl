@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.yeastrc.www.proteinfer.idpicker;
+package org.yeastrc.www.proteinfer;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -14,7 +14,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.bio.go.GONode;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
@@ -22,13 +21,6 @@ import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.util.TimeUtils;
-import org.yeastrc.www.go.GOSlimAnalysis;
-import org.yeastrc.www.go.GOSlimChartUrlCreator;
-import org.yeastrc.www.go.GOSlimStatsCalculator;
-import org.yeastrc.www.go.GOSlimTreeCreator;
-import org.yeastrc.www.go.GOSlimUtils;
-import org.yeastrc.www.go.GOTree;
-import org.yeastrc.www.go.GOTreeNode;
 import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 
@@ -110,9 +102,13 @@ public class GOSlimAjaxAction extends Action {
             	proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria_request);
             }
         }
+        
+        long e = System.currentTimeMillis();
+        log.info("Got filtered nrseq protein ids for GO Slim analysis in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
 		
-        int goAspect = filterForm.getGoAspect();
-        int goSlimTermId = filterForm.getGoSlimTermId();
+        request.setAttribute("pinferId", pinferId);
+        request.setAttribute("goAspect", filterForm.getGoAspect());
+        request.setAttribute("goSlimTermId", filterForm.getGoSlimTermId());
         
         // We have the protein inference protein IDs; Get the corresponding nrseq protein IDs
         List<Integer> nrseqIds = new ArrayList<Integer>(proteinIds.size());
@@ -122,71 +118,15 @@ public class GOSlimAjaxAction extends Action {
             ProteinferProtein protein = protDao.loadProtein(proteinId);
             nrseqIds.add(protein.getNrseqProteinId());
         }
+        request.setAttribute("nrseqProteinIds", nrseqIds);
         
         
         if(filterForm.isGetGoSlimTree()) {
-        	GOSlimTreeCreator treeCreator = new GOSlimTreeCreator(goSlimTermId, nrseqIds, goAspect);
-//        	BufferedImage img = treeCreator.createGraph();
-//        	request.setAttribute("image", img);
-        	GOTree tree = treeCreator.createTree();
-        	StringBuilder openInit = new StringBuilder();
-        	
-        	for(GOTreeNode root: tree.getRoots()) {
-        		openInit.append(",");
-    			openInit.append("\"");
-    			openInit.append(root.getGoNode().getAccession().replaceAll("GO:", ""));
-    			openInit.append("\"");
-        	}
-        	if(openInit.length() > 0)
-        		openInit.deleteCharAt(0); // remove the first comma
-        	request.setAttribute("openNodes", openInit);
-        	
-        	List<GONode> slimTerms = treeCreator.getSlimTerms();
-        	StringBuilder slimTermString = new StringBuilder();
-        	for(GONode slimTerm: slimTerms) {
-        		slimTermString.append(",");
-        		slimTermString.append("\"");
-        		slimTermString.append(slimTerm.getAccession().replaceAll("GO:", ""));
-        		slimTermString.append("\"");
-        	}
-        	if(slimTermString.length() > 0)
-        		slimTermString.deleteCharAt(0); // remove first comma
-        	request.setAttribute("slimTermIds", slimTermString);
-        	
-        	request.setAttribute("goTree", tree);
-        	request.setAttribute("pinferId", pinferId);
-        	request.setAttribute("goAspect", goAspect);
-        	
-        	List<GONode> slimNodes = GOSlimUtils.getGOSlims();
-			for(GONode node: slimNodes) {
-				if(node.getId() == goSlimTermId)
-					request.setAttribute("slimName", node.getName());
-			}
-			
         	return mapping.findForward("GoTree");
         }
-        
-        
-        GOSlimStatsCalculator calculator = new GOSlimStatsCalculator();
-        calculator.setGoAspect(goAspect);
-        calculator.setGoSlimTermId(goSlimTermId);
-        calculator.setNrseqProteinIds(nrseqIds);
-        calculator.calculate();
+        else
+        	return mapping.findForward("Success");
 		
-        GOSlimAnalysis goAnalysis = calculator.getAnalysis();
-        request.setAttribute("goAnalysis",goAnalysis);
-        
-        if(goAnalysis.getNumAnnotated() > 0) {
-        	String pieChartUrl = GOSlimChartUrlCreator.getPieChartUrl(goAnalysis, 15);
-        	request.setAttribute("pieChartUrl", pieChartUrl);
-
-        	String barChartUrl = GOSlimChartUrlCreator.getBarChartUrl(goAnalysis, 15);
-        	request.setAttribute("barChartUrl", barChartUrl);
-        }
-        
-		long e = System.currentTimeMillis();
-		log.info("GOSlimAjaxAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
-		return mapping.findForward("Success");
 	}
 	
 	private boolean matchFilterCriteria(ProteinFilterCriteria filterCritSession,  ProteinFilterCriteria filterCriteria) {

@@ -967,15 +967,8 @@
 		validate="true"
 		type="org.yeastrc.www.proteinfer.idpicker.GOSlimAjaxAction"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/goSlimAnalysis.jsp" redirect="false" />
-		<forward name="GoTree" path="/pages/internal/proteinfer/goTreeView.jsp" redirect="false" />
-	</action>
-	
-	<action 
-		path="/protInferGoSlimNode"
-		type="org.yeastrc.www.proteinfer.idpicker.GOSlimNodeAjaxAction"
-	>
-		<forward name="Success" path="/pages/internal/proteinfer/goTreeNode.jsp" redirect="false" />
+		<forward name="Success" path="/protInferGoSlim.do" redirect="false" />
+		<forward name="GoTree" path="/protInferGoSlimTree.do" redirect="false" />
 	</action>
 	
 	<action 
@@ -1053,7 +1046,8 @@
 		validate="true"
 		type="org.yeastrc.www.proteinfer.proteinProphet.GOSlimAjaxAction"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/goSlimAnalysis.jsp" redirect="false" />
+		<forward name="Success" path="/protInferGoSlim.do" redirect="false" />
+		<forward name="GoTree" path="/protInferGoSlimTree.do" redirect="false" />
 	</action>
 	
 	<action 
@@ -1098,6 +1092,27 @@
 	<!-- ================================================================================== -->
 	<!-- Actions related to protein inference: General -->
 	<!-- ================================================================================== -->
+	
+	<action 
+		path="/protInferGoSlim"
+		type="org.yeastrc.www.proteinfer.GOSlimAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/goSlimAnalysis.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/protInferGoSlimTree"
+		type="org.yeastrc.www.proteinfer.GOSlimTreeAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/goTreeView.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/protInferGoSlimNode"
+		type="org.yeastrc.www.proteinfer.GOSlimNodeAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/goTreeNode.jsp" redirect="false" />
+	</action>
 	
 	<action
 	  path="/saveProtInferComments"

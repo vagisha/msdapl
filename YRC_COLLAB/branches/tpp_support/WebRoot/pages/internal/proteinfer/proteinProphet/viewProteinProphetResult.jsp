@@ -839,6 +839,7 @@ function goAnalysisResults() {
     
 	//alert("GO aspect "+goAspect+"; GO SLIM: "+goSlim);
 	$("form#filterForm input[name='doGoSlimAnalysis']").val("true");
+	$("form#filterForm input[name='getGoSlimTree']").val("false");
 	$("form#filterForm input[name='doGoEnrichAnalysis']").val("false");
 	
 	$("form#filterForm input[name='goAspect']").val(goAspect);
@@ -866,6 +867,31 @@ function hideGoSlimDetails() {
 	foldClose($("#goslim_fold"));
 }
 
+// SUBMIT FORM FOR GO SLIM ANALYSIS (TREE)
+function viewGoSlimGraph() {
+	//alert("tree!!");
+	submitFormForGoSlimAnalysisTree();
+}
+function submitFormForGoSlimAnalysisTree() {
+	
+	var goAspect = $("#goAspectField1").val();
+    var goSlim = $("#goSlimTermIdField").val();
+    
+	//alert("GO aspect "+goAspect+"; GO SLIM: "+goSlim);
+	$("form#filterForm input[name='doDownload']").val("false");
+	$("form#filterForm input[name='doGoSlimAnalysis']").val("true");
+	$("form#filterForm input[name='getGoSlimTree']").val("true");
+	$("form#filterForm input[name='doGoEnrichAnalysis']").val("false");
+	
+	$("form#filterForm input[name='goAspect']").val(goAspect);
+	$("form#filterForm input[name='goSlimTermId']").val(goSlim);
+	
+	// we want the result to open in a new window
+	window.open("wait.html", 'goslimgraph', 'scrollbars=yes,menubar=no,height=600,width=800,resizable=yes,toolbar=no,status=no');
+	$("form#filterForm").attr("target", "goslimgraph");
+	$("form#filterForm").submit();
+	
+}
 // ---------------------------------------------------------------------------------------
 // GENE ONTOLOGY ENRICHMENT
 // ---------------------------------------------------------------------------------------

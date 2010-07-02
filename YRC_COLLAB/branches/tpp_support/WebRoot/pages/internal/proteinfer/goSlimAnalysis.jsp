@@ -12,12 +12,12 @@ function toggleSpeciesTable() {
 	}
 }
 function toggleGoSlimTable() {
-	if($("#go_slim_table").is(':visible')) {
-		$("#go_slim_table").hide();
+	if($("#go_slim_table_div").is(':visible')) {
+		$("#go_slim_table_div").hide();
 		$("#go_slim_table_link").text("Show All GO Slim Terms");
 	}
 	else {
-		$("#go_slim_table").show();
+		$("#go_slim_table_div").show();
 		$("#go_slim_table_link").text("Hide Table");
 	}
 }
@@ -54,7 +54,7 @@ function toggleSlimBarChart() {
 	<div style="color:red; font-weight:bold;" align="center">
 		# Proteins: <bean:write name="goAnalysis" property="totalProteinCount"/> &nbsp; &nbsp; 
 		# Not annotated: <bean:write name="goAnalysis" property="numProteinsNotAnnotated"/>
-		&nbsp;&nbsp; <span class="underline clickable" onClick="toggleSpeciesTable();" style="color:#666666;">(Details)</span>
+		&nbsp;&nbsp; <span class="underline clickable" onClick="toggleSpeciesTable()" style="color:#666666;">(Details)</span>
 	</div>
 	<div align="center">
 		<table style="border: 1px dotted gray; display:none; margin-bottom:10px;" id="go_slim_species_table">
@@ -85,8 +85,8 @@ function toggleSlimBarChart() {
 		</logic:equal>
 		are displayed.</b>
 		<br/>
-		<!--  <a href="" onclick="javascript:viewGoSlimGraph();return false;" style="font-size:11pt;"><b>[View Graph]</b></a>
-		&nbsp; &nbsp; &nbsp; -->
+		<a href="" onclick="javascript:viewGoSlimGraph();return false;" style="font-size:11pt;"><b>[View Tree]</b></a>
+		&nbsp; &nbsp; &nbsp;
 		<a href="http://www.geneontology.org/GO.slims.shtml" target="go_window" style="font-size:10pt;"><b>[More information on GO Slims]</b></a>
 	</div>
 		
@@ -119,7 +119,7 @@ function toggleSlimBarChart() {
 	<div align="center" style="width:75%; font-weight:bold; font-size:8pt; margin-bottom:3px;color:#D74D2D">
 		<span class="clickable underline" onclick="toggleGoSlimTable();" id="go_slim_table_link">Hide Table</span>
 	</div>
-	<div id="go_slim_table">
+	<div id="go_slim_table_div">
 	<table  style="border:1px dotted gray;margin-bottom:5px;">
 		<tr>
 			<td style="font-size:8pt;" valign="top"><b># Proteins(exact):</b></td>
@@ -159,6 +159,7 @@ function toggleSlimBarChart() {
 		<td><bean:write name="node" property="proteinCountForTerm"/></td>
 		<td><bean:write name="node" property="proteinCountForTermPerc"/></td>
 	</tr>
+	
 	</logic:iterate>
 	</tbody>
 	</table>

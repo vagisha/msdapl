@@ -35,6 +35,7 @@
   
   <html:hidden name="proteinProphetFilterForm" property="pinferId" />
   <html:hidden name="proteinProphetFilterForm" property="doGoSlimAnalysis" />
+  <html:hidden name="proteinProphetFilterForm" property="getGoSlimTree" />
   <html:hidden name="proteinProphetFilterForm" property="doGoEnrichAnalysis" />
   <html:hidden name="proteinProphetFilterForm" property="goAspect" />
   <html:hidden name="proteinProphetFilterForm" property="goSlimTermId" />

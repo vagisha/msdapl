@@ -19,10 +19,6 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
-import org.yeastrc.ms.util.TimeUtils;
-import org.yeastrc.www.go.GOSlimAnalysis;
-import org.yeastrc.www.go.GOSlimChartUrlCreator;
-import org.yeastrc.www.go.GOSlimStatsCalculator;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 
 /**
@@ -102,8 +98,9 @@ public class GOSlimAjaxAction extends Action {
             }
         }
 		
-        int goAspect = filterForm.getGoAspect();
-        int goSlimTermId = filterForm.getGoSlimTermId();
+        request.setAttribute("pinferId", pinferId);
+        request.setAttribute("goAspect", filterForm.getGoAspect());
+        request.setAttribute("goSlimTermId", filterForm.getGoSlimTermId());
         
         // We have the protein inference protein IDs; Get the corresponding nrseq protein IDs
         List<Integer> nrseqIds = new ArrayList<Integer>(proteinIds.size());
@@ -113,27 +110,14 @@ public class GOSlimAjaxAction extends Action {
             ProteinferProtein protein = protDao.loadProtein(proteinId);
             nrseqIds.add(protein.getNrseqProteinId());
         }
+        request.setAttribute("nrseqProteinIds", nrseqIds);
         
-        GOSlimStatsCalculator calculator = new GOSlimStatsCalculator();
-        calculator.setGoAspect(goAspect);
-        calculator.setGoSlimTermId(goSlimTermId);
-        calculator.setNrseqProteinIds(nrseqIds);
-        calculator.calculate();
-		
-        GOSlimAnalysis goAnalysis = calculator.getAnalysis();
-        request.setAttribute("goAnalysis",goAnalysis);
         
-        if(goAnalysis.getNumAnnotated() > 0) {
-        	String pieChartUrl = GOSlimChartUrlCreator.getPieChartUrl(goAnalysis, 15);
-        	request.setAttribute("pieChartUrl", pieChartUrl);
-
-        	String barChartUrl = GOSlimChartUrlCreator.getBarChartUrl(goAnalysis, 15);
-        	request.setAttribute("barChartUrl", barChartUrl);
+        if(filterForm.isGetGoSlimTree()) {
+        	return mapping.findForward("GoTree");
         }
-        
-		long e = System.currentTimeMillis();
-		log.info("GOSlimAjaxAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
-		return mapping.findForward("Success");
+        else
+        	return mapping.findForward("Success");
 	}
 	
 	private boolean matchFilterCriteria(ProteinProphetFilterCriteria filterCritSession,  ProteinProphetFilterCriteria filterCriteria) {

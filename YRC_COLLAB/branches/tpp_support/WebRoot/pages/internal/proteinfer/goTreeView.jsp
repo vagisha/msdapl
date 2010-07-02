@@ -114,7 +114,7 @@ function showGoSlimNodes() {
 			<br/>
 			<br/>
 			GO Slim Nodes in the tree below look like: <br/>
-			<b><span style="color:navy; background-color:white;">GO:0008150: biological_process <font color="red">[#Annot. 892 #Exact 0]</font></span></b>
+			<b><span style="color:navy; background-color:#E6E6FA;">GO:0008150: biological_process <font color="red">[#Annot. 892 #Exact 0]</font></span></b>
 		</div>
 		</center>
 		<div id="tree" class="demo">
