@@ -54,7 +54,7 @@ public class GOSlimNodeAjaxAction extends Action {
 		if(pinferId == 0) {
 			log.info("NO valid protein inference Id found in request");
             response.setContentType("text/html");
-            response.getWriter().write("<ul><li><a href=\"#\">ERROR: Invalid protein inference ID</a></li></ul>");
+            response.getWriter().write("<ul><li style='color:red;font-weight-bold;'><a href=\"#\">ERROR: Invalid protein inference ID</a></li></ul>");
             return null;
 		}
 
@@ -73,7 +73,7 @@ public class GOSlimNodeAjaxAction extends Action {
         	
         	log.info("NO information in session for: "+pinferId);
             response.setContentType("text/html");
-            response.getWriter().write("<ul><li><a href=\"#\">ERROR: Stale protein inference ID</a></li></ul>");
+            response.getWriter().write("<ul><li style='color:red;font-weight-bold;'><a href=\"#\">ERROR: Stale protein inference ID</a></li></ul>");
             return null;
         }
         else {
@@ -93,7 +93,7 @@ public class GOSlimNodeAjaxAction extends Action {
 		if(goAspect == -1) {
 			log.info("NO valid GO Aspect found in request");
             response.setContentType("text/html");
-            response.getWriter().write("<ul><li><a href=\"#\">ERROR: Invalid GO Domain</a></li></ul>");
+            response.getWriter().write("<ul><li style='color:red;font-weight-bold;'><a href=\"#\">ERROR: Invalid GO Domain</a></li></ul>");
             return null;
 		}
 		
@@ -101,7 +101,7 @@ public class GOSlimNodeAjaxAction extends Action {
 		if(goAccession == null || goAccession.trim().length() == 0) {
 			log.info("NO valid GO Accesion found in request");
             response.setContentType("text/html");
-            response.getWriter().write("<ul><li><a href=\"#\">ERROR: Invalid GO Accession</a></li></ul>");
+            response.getWriter().write("<ul><li style='color:red;font-weight-bold;'><a href=\"#\">ERROR: Invalid GO Accession</a></li></ul>");
             return null;
 		}
 		
@@ -124,7 +124,7 @@ public class GOSlimNodeAjaxAction extends Action {
         if(node == null) {
         	log.info("Error looking up GONode for accession "+goAccession);
             response.setContentType("text/html");
-            response.getWriter().write("<ul><li><a href=\"#\">ERROR: Cannot find GO node</a></li></ul>");
+            response.getWriter().write("<ul><li style='color:red;font-weight-bold;'><a href=\"#\">ERROR: Cannot find GO node</a></li></ul>");
             return null;
         }
         
