@@ -46,6 +46,9 @@ public class ProteinFilterCriteria implements Serializable {
     private String descriptionNotLike;
     private boolean searchAllDescriptions = false;
     
+    private String goTerms = null;
+    private boolean matchAllGoTerms = false;
+    
     private double minMolWt = 0.0;
     private double maxMolWt = Double.MAX_VALUE;
     
@@ -178,6 +181,22 @@ public class ProteinFilterCriteria implements Serializable {
         this.excludeIndistinGroups = exclude;
     }
 
+    public String getGoTerms() {
+    	return goTerms;
+    }
+    
+    public void setGoTerms(String goTerms) {
+    	this.goTerms = goTerms;
+    }
+    
+    public boolean isMatchAllGoTerms() {
+		return matchAllGoTerms;
+	}
+
+	public void setMatchAllGoTerms(boolean matchAllGoTerms) {
+		this.matchAllGoTerms = matchAllGoTerms;
+	}
+	
     public String getAccessionLike() {
         return accessionLike;
     }
@@ -375,6 +394,17 @@ public class ProteinFilterCriteria implements Serializable {
         }
         
         if(!this.peptideDefinition.equals(that.peptideDefinition))  return false;
+        
+        if(goTerms == null) {
+        	if(that.goTerms != null)	return false;
+        }
+        else {
+        	if(!goTerms.equals(that.goTerms))
+        		return false;
+        	
+        	if(this.matchAllGoTerms != that.matchAllGoTerms)
+        		return false;
+        }
         
         if(accessionLike == null) {
             if(that.accessionLike != null)  return false;
