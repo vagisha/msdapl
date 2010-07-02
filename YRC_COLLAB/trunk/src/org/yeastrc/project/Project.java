@@ -44,14 +44,11 @@ public abstract class Project implements Comparable, IData {
 		this.id = 0;
 		this.NCRRID = 0;
 		
+		this.researchers = new HashSet<Researcher>();
+		
 		this.generalFunding = null;
 		this.federalFunding = null;
 		//this.federalFundingOther = null;
-
-		this.PI = null;
-		this.researcherB = null;
-		this.researcherC = null;
-		this.researcherD = null;
 
 		this.submitDate = null;
 		this.lastChange = null;
@@ -79,12 +76,8 @@ public abstract class Project implements Comparable, IData {
 	public boolean checkReadAccess(Researcher researcher) {		
 		if (researcher == null) { return false; }
 		
-		// First check if this is a researcher directly affiliated with the project
-		if ( (this.PI != null && this.PI.equals(researcher)) || 
-			(this.researcherB != null && this.researcherB.equals(researcher)) || 
-			(this.researcherC != null && this.researcherC.equals(researcher)) || 
-			(this.researcherD != null && this.researcherD.equals(researcher)))
-				return true;
+		if (this.researchers != null && this.researchers.contains( researcher ) )
+			return true;
 		
 		// Now check whether or not this is a YRC admin with access to this project.
 		Groups groupsMan = Groups.getInstance();
@@ -107,12 +100,8 @@ public abstract class Project implements Comparable, IData {
 	public boolean checkAccess(Researcher researcher) {		
 		if (researcher == null) { return false; }
 		
-		// First check if this is a researcher directly affiliated with the project
-		if ( (this.PI != null && this.PI.equals(researcher)) || 
-			(this.researcherB != null && this.researcherB.equals(researcher)) || 
-			(this.researcherC != null && this.researcherC.equals(researcher)) || 
-			(this.researcherD != null && this.researcherD.equals(researcher)))
-				return true;
+		if (this.researchers != null && this.researchers.contains( researcher ) )
+			return true;
 		
 		// Now check whether or not this is a YRC admin with access to this project.
 		Groups groupsMan = Groups.getInstance();
@@ -228,19 +217,7 @@ public abstract class Project implements Comparable, IData {
 				 * it will be set to 0.  This should be a self-correcting system if Researchers are
 				 * deleted from the system causing Projects to contain invalid researcher IDs.
 				 */
-				if (this.PI != null) {
-					rs.updateInt("projectPI", this.PI.getID());
-				} else { rs.updateNull("projectPI"); }
-				if (this.researcherB != null) {
-					rs.updateInt("projectResearcherB", this.researcherB.getID());
-				} else { rs.updateNull("projectResearcherB"); }
-				if (this.researcherC != null) {
-					rs.updateInt("projectResearcherC", this.researcherC.getID());
-				} else { rs.updateNull("projectResearcherC"); }
-				if (this.researcherD != null) {
-					rs.updateInt("projectResearcherD", this.researcherD.getID());
-				} else { rs.updateNull("projectResearcherD"); }
-				
+
 				if (this.generalFunding == null) { rs.updateNull("projectFundingTypes"); }
 				else { rs.updateString("projectFundingTypes", StringUtils.join(this.generalFunding.toArray(), ",")); }
 				
@@ -319,19 +296,7 @@ public abstract class Project implements Comparable, IData {
 				 * it will be set to 0.  This should be a self-correcting system if Researchers are
 				 * deleted from the system causing Projects to contain invalid researcher IDs.
 				 */
-				if (this.PI != null) {
-					rs.updateInt("projectPI", this.PI.getID());
-				} else { rs.updateNull("projectPI"); }
-				if (this.researcherB != null) {
-					rs.updateInt("projectResearcherB", this.researcherB.getID());
-				} else { rs.updateNull("projectResearcherB"); }
-				if (this.researcherC != null) {
-					rs.updateInt("projectResearcherC", this.researcherC.getID());
-				} else { rs.updateNull("projectResearcherC"); }
-				if (this.researcherD != null) {
-					rs.updateInt("projectResearcherD", this.researcherD.getID());
-				} else { rs.updateNull("projectResearcherD"); }
-				
+
 				if (this.generalFunding == null) { rs.updateNull("projectFundingTypes"); }
 				else { rs.updateString("projectFundingTypes", StringUtils.join(this.generalFunding.toArray(), ",")); }
 				
@@ -418,6 +383,66 @@ public abstract class Project implements Comparable, IData {
 				conn = null;
 			}
 		}
+		
+		// now, update the tblProjectResearcher table, which associates researchers with projects
+		PreparedStatement pstmt = null;
+		try {
+			
+			conn = DBConnectionManager.getConnection("yrc");
+			
+			// first delete all rows for this project
+			String sql = "DELETE FROM tblProjectResearcher WHERE projectID = ?";
+			pstmt = conn.prepareStatement( sql );
+			pstmt.setInt( 1, this.id );
+			pstmt.execute();
+			pstmt.close(); pstmt = null;
+			
+			// now recreate the rows for this project based on the researchers set
+			// TODO: would be nice to know if the researcher list changed, and whether or not we need to do all of this
+			if( this.researchers != null ) {
+				sql = "INSERT INTO tblProjectResearcher (projectID, researcherID, projectPI) VALUES (?, ?, ?)";
+				pstmt = conn.prepareStatement( sql );
+				
+				for( Researcher r : this.researchers ) {
+					pstmt.setInt( 1, this.id );
+					pstmt.setInt( 2, r.getID() );
+					if( this.PI != null && this.PI.getID() == r.getID() )
+						pstmt.setInt( 3, 1 );
+					else
+						pstmt.setInt( 3, 0 );
+					
+					pstmt.execute();
+				}
+			}
+			
+			if( pstmt != null ) {
+				pstmt.close();
+				pstmt = null;
+			}
+			
+			conn.close();
+			conn = null;
+		}
+		catch(SQLException e) { throw e; }
+		finally {
+
+			// Always make sure result sets and statements are closed,
+			// and the connection is returned to the pool
+			if (rs != null) {
+				try { rs.close(); } catch (SQLException e) { ; }
+				rs = null;
+			}
+			if (pstmt != null) {
+				try { pstmt.close(); } catch (SQLException e) { ; }
+				pstmt = null;
+			}
+			if (conn != null) {
+				try { conn.close(); } catch (SQLException e) { ; }
+				conn = null;
+			}
+		}
+		
+		
 	}
 
 
@@ -449,7 +474,7 @@ public abstract class Project implements Comparable, IData {
 			}
 
 			// Populate the object from this row.
-			this.id = rs.getInt("projectID");
+			this.id = id;
 			this.submitDate = rs.getDate("projectSubmitDate");
 			this.title = rs.getString("projectTitle");
 			
@@ -461,35 +486,7 @@ public abstract class Project implements Comparable, IData {
 			 * be deleted from the database) in the Project table without
 			 * blowing up project display pages.
 			 */
-			int tmpID;
-			tmpID = rs.getInt("projectPI");
-			if (tmpID != 0) {
-				this.PI = new Researcher();
-				try { this.PI.load(tmpID); }
-				catch (InvalidIDException e) { this.PI = null; }
-			}
 
-			tmpID = rs.getInt("projectResearcherB");
-			if (tmpID != 0) {
-				this.researcherB = new Researcher();
-				try { this.researcherB.load(tmpID); }
-				catch (InvalidIDException e) { this.researcherB = null; }
-			}
-
-			tmpID = rs.getInt("projectResearcherC");
-			if (tmpID != 0) {
-				this.researcherC = new Researcher();
-				try { this.researcherC.load(tmpID); }
-				catch (InvalidIDException e) { this.researcherC = null; }
-			}
-
-			tmpID = rs.getInt("projectResearcherD");
-			if (tmpID != 0) {
-				this.researcherD = new Researcher();
-				try { this.researcherD.load(tmpID); }
-				catch (InvalidIDException e) { this.researcherD = null; }
-			}
-			
 			// Set up the project general funding types.
 			String tmpStr;
 			tmpStr = rs.getString("projectFundingTypes");
@@ -560,6 +557,63 @@ public abstract class Project implements Comparable, IData {
 				conn = null;
 			}
 		}
+		
+		// Load the associated researchers
+		try {
+			
+			conn = DBConnectionManager.getConnection("yrc");
+			stmt = conn.createStatement();
+
+			// Our SQL statement
+			String sqlStr = "SELECT researcherID, projectPI FROM tblProjectResearcher WHERE projectID = " + this.id;
+
+			//System.out.println( sqlStr );
+			
+			// Our results
+			rs = stmt.executeQuery(sqlStr);
+			
+			while( rs.next() ) {
+				try {
+					Researcher r = new Researcher();
+					r.load( rs.getInt( 1 ) );
+					this.addResearcher( r );
+					
+					// set this project's PI if this is the PI
+					if( rs.getInt( 2 ) != 0 )
+						this.setPI( r );
+					
+				} catch(Exception InvalidIDException) { ; }
+			}
+			
+			
+			rs.close();
+			rs = null;
+			
+			stmt.close();
+			stmt = null;
+			
+			conn.close();
+			conn = null;
+		}
+		catch(SQLException e) { throw e; }
+		finally {
+
+			// Always make sure result sets and statements are closed,
+			// and the connection is returned to the pool
+			if (rs != null) {
+				try { rs.close(); } catch (SQLException e) { ; }
+				rs = null;
+			}
+			if (stmt != null) {
+				try { stmt.close(); } catch (SQLException e) { ; }
+				stmt = null;
+			}
+			if (conn != null) {
+				try { conn.close(); } catch (SQLException e) { ; }
+				conn = null;
+			}
+		}
+		
 	}
 
 	/**
@@ -657,23 +711,23 @@ public abstract class Project implements Comparable, IData {
 	public void setPI(Researcher PI) { this.PI = PI; }
 
 	/**
-	 * set Researcher B
-	 * @param res The researcher to set.
+	 * Add a researcher to this project
+	 * @param r
 	 */
-	public void setResearcherB(Researcher res) { this.researcherB = res; }
-
-	/** 
-	 * set Researcher C
-	 * @param res The researcher to set.
-	 */
-	public void setResearcherC(Researcher res) { this.researcherC = res; }
-
-	/**
-	 * set Researcher D
-	 * @param res The researcher to set.
-	 */
-	public void setResearcherD(Researcher res) { this.researcherD = res; }
+	public void addResearcher( Researcher r ) {
+		if( this.researchers == null )
+			this.researchers = new HashSet<Researcher>();
+		
+		this.researchers.add( r );
+	}
 	
+	/**
+	 * Set the researchers for this project (can include PI)
+	 * @param rset
+	 */
+	public void setResearcher( Set<Researcher> rset ) {
+		this.researchers = rset;
+	}
 	
 	/**
 	 * Set the title for the project.
@@ -825,23 +879,28 @@ public abstract class Project implements Comparable, IData {
 	public Researcher getPI() { return this.PI; }
 
 	/**
-	 * Get Researcher B for this project
-	 * @return researcher B
+	 * Get the researchers on this project (will include PI)
+	 * @return
 	 */
-	public Researcher getResearcherB() { return this.researcherB; }
-
+	public Set<Researcher> getResearchers() {
+		return this.researchers;
+	}
+	
 	/**
-	 * Get Researcher C for this project
-	 * @return researcher C
+	 * Get the researchers on this project (will not include PI)
+	 * @return
 	 */
-	public Researcher getResearcherC() { return this.researcherC; }
+	public Set<Researcher> getResearchersWithoutPI() {
+		Set<Researcher> tset = new HashSet<Researcher>();
 
-	/**
-	 * Get Researcher D for this project
-	 * @return researcher D
-	 */
-	public Researcher getResearcherD() { return this.researcherD; }
+		if( this.researchers != null )
+			tset.addAll( this.researchers );
 
+		if( this.getPI() != null )
+			tset.remove( this.getPI() );
+		
+		return tset;
+	}
 
 	/**
 	 * Returns the project submit date as a String
@@ -1134,10 +1193,8 @@ public abstract class Project implements Comparable, IData {
 	// the Principle Investigator
 	private Researcher PI;
 	
-	// researcher B, C and D
-	private Researcher researcherB;
-	private Researcher researcherC;
-	private Researcher researcherD;
+	// researchers on this project
+	private Set<Researcher> researchers;
 	
 	// Title of the project
 	private String title;

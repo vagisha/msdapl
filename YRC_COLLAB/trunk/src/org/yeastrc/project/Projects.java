@@ -126,8 +126,8 @@ public class Projects {
 	 * @param researcherID The researcher ID to use
 	 * @return An list of populated Project objects
 	 */
-	public static ArrayList getProjectsByResearcher(int researcherID) throws SQLException, InvalidProjectTypeException {
-		ArrayList retList = new ArrayList();
+	public static ArrayList<Project> getProjectsByResearcher(int researcherID) throws SQLException, InvalidProjectTypeException {
+		ArrayList<Project> retList = new ArrayList<Project>();
 
 		// Get our connection to the database.
 		Connection conn = DBConnectionManager.getConnection("yrc");
@@ -136,57 +136,27 @@ public class Projects {
 
 		try{
 			// Our SQL statement
-			String sqlStr =  "SELECT DISTINCT projectID, projectType FROM tblProjects WHERE ";
-				   sqlStr += "projectPI = ? OR ";
-				   sqlStr += "projectResearcherB = ? OR ";
-				   sqlStr += "projectResearcherC = ? OR ";
-				   sqlStr += "projectResearcherD = ? ";
-				   sqlStr += "ORDER BY projectID";
-			
+			String sqlStr = "SELECT projectID FROM tblProjectResearcher WHERE researcherID = ?";
+				   
 			stmt = conn.prepareStatement(sqlStr);
 			stmt.setInt(1, researcherID);
-			stmt.setInt(2, researcherID);
-			stmt.setInt(3, researcherID);
-			stmt.setInt(4, researcherID);
 
 			// Our results
 			rs = stmt.executeQuery();
 
 			// Iterate over list and populate our return list
 			while (rs.next()) {
-				int projectID = rs.getInt("projectID");
-				String type = rs.getString("projectType");
-				Project proj;
-				
-				if (type.equals("C")) {
-					proj = new Collaboration();
-				} else if (type.equals("D")) {
-					proj = new Dissemination();
-				} else if (type.equals("T")) {
-					proj = new Training();
-				} else if (type.equals("Tech")) {
-					proj = new Technology();
-				} else {
-					throw new InvalidProjectTypeException("Type wasn't C, D, T or Tech...");
-				}
 				
 				try {
-					proj.load(projectID);
+					retList.add( ProjectFactory.getProject( rs.getInt( 1 ) ) );
 				} catch(InvalidIDException iie) {
 					continue;
 				}
-				
-				retList.add(proj);
 			}
 
-			rs.close();
-			rs = null;
-			
-			stmt.close();
-			stmt = null;
-			
-			conn.close();
-			conn = null;
+			rs.close(); rs = null;
+			stmt.close(); stmt = null;
+			conn.close(); conn = null;
 		}
 		finally {
 
@@ -247,8 +217,8 @@ public class Projects {
 	 * Simply return an ArrayList of all the researchers in the database (as Researcher objects)
 	 * @return A list of all the Researchers in the database
 	 */
-	public static ArrayList getAllResearchers() throws SQLException, InvalidIDException {
-		ArrayList retList = new ArrayList();
+	public static ArrayList<Researcher> getAllResearchers() throws SQLException, InvalidIDException {
+		ArrayList<Researcher> retList = new ArrayList<Researcher>();
 
 		// Get our connection to the database.
 		Connection conn = DBConnectionManager.getConnection("yrc");

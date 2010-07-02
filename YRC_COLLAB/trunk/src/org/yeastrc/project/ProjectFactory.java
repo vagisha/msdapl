@@ -31,8 +31,7 @@ public class ProjectFactory {
 	 * @return The project corresponding to that ID.
 	 */
 	public static Project getProject(int projectID) throws SQLException, InvalidProjectTypeException, InvalidIDException {
-		ArrayList retList = new ArrayList();
-
+		
 		// Get our connection to the database.
 		Connection conn = DBConnectionManager.getConnection("yrc");
 		PreparedStatement stmt = null;

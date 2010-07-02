@@ -31,13 +31,14 @@ public class ProjectsSearcher {
 	 * Get a new ProjectSearch
 	 */
 	public ProjectsSearcher() {
-		this.searchTokens = new HashSet();
+		this.searchTokens = new HashSet<String>();
 		this.types = new HashSet();
 		this.groups = new HashSet();
 	}
 
 	public List search() throws SQLException {
 		ArrayList retList = new ArrayList();
+		Set<Integer> addedProjects = new HashSet<Integer>();
 		
 		// Get our connection to the database.
 		Connection conn = DBConnectionManager.getConnection("yrc");
@@ -46,12 +47,20 @@ public class ProjectsSearcher {
 		
 		try {
 			boolean haveConstraint = false;
+			
+			/*
 			String sqlStr = "SELECT P.projectID, P.projectSubmitDate ";
 			sqlStr += "FROM tblProjects AS P LEFT OUTER JOIN tblResearchers AS RPI ";
 			sqlStr += "ON RPI.researcherID = P.projectPI LEFT OUTER JOIN tblResearchers AS RB ";
 			sqlStr += "ON RB.researcherID = P.projectResearcherB LEFT OUTER JOIN tblResearchers AS RC ";
 			sqlStr += "ON RC.researcherID = P.projectResearcherC LEFT OUTER JOIN tblResearchers AS RD ";
 			sqlStr += "ON RD.researcherID = P.projectResearcherD";
+			*/
+			
+			String sqlStr = "SELECT P.projectID, P.projectSubmitDate FROM tblProjects AS P ";
+			sqlStr += "INNER JOIN tblProjectResearcher AS PR ON P.projectID = PR.projectID ";
+			sqlStr += "INNER JOIN tblResearchers AS R ON PR.researcherID = R.researcherID";
+			
 			
 			// We have a project type constraint
 			if (this.types.size() > 0) {
@@ -81,48 +90,44 @@ public class ProjectsSearcher {
 					haveConstraint = true;
 				}
 				
-				Iterator iter = this.searchTokens.iterator();
-				String tok = (String)(iter.next());
-				String tokSearchStr = "(RPI.researcherLastName LIKE '%" + tok + "%' OR ";
-				tokSearchStr += "RPI.researcherFirstName LIKE '%" + tok + "%' OR ";
-				tokSearchStr += "RB.researcherLastName LIKE '%" + tok + "%' OR ";
-				tokSearchStr += "RB.researcherFirstName LIKE '%" + tok + "%' OR ";
-				tokSearchStr += "RC.researcherLastName LIKE '%" + tok + "%' OR ";
-				tokSearchStr += "RC.researcherFirstName LIKE '%" + tok + "%' OR ";
-				tokSearchStr += "RD.researcherLastName LIKE '%" + tok + "%' OR ";
-				tokSearchStr += "RD.researcherFirstName LIKE '%" + tok + "%' OR ";
-				tokSearchStr += "P.projectAbstract LIKE '%" + tok + "%' OR ";
-				tokSearchStr += "P.publicAbstract LIKE '%" + tok + "%' OR ";
-				tokSearchStr += "P.projectKeywords LIKE '%" + tok + "%' OR ";
-				tokSearchStr += "P.projectProgress LIKE '%" + tok + "%' OR ";
-				tokSearchStr += "P.projectTitle LIKE '%" + tok + "%')";
+				// need this to be like (R.researcherLastName LIKE '%tok1' OR R.researcherLastName LIKE '%tok2' ... OR R.researcherLastName LIKE '%tokN%')
+				// then repeat for each of the searched fields, each of those also seperated by OR
 
+				Set<String> fieldsToSearch = new HashSet<String>();
+				fieldsToSearch.add( "R.researcherLastName" );
+				fieldsToSearch.add( "R.researcherFirstName" );
+				fieldsToSearch.add( "P.projectAbstract" );
+				fieldsToSearch.add( "P.publicAbstract" );
+				fieldsToSearch.add( "P.projectKeywords" );
+				fieldsToSearch.add( "P.projectProgress" );
+				fieldsToSearch.add( "P.projectTitle" );
 				
-				sqlStr += " (";				
+				// loop through the fields to search
+				int oc = 0;
+				for( String fieldToSearch : fieldsToSearch ) {
+					if( oc == 0 )
+						sqlStr += " (";
+					else
+						sqlStr += " OR (";
+					
+					int tc = 0;
+					for( String stoken : searchTokens ) {
+						if ( tc != 0 )
+							sqlStr += " OR ";
+						else
+							sqlStr += " ";
+						
+						sqlStr += fieldToSearch + " LIKE '%" + stoken + "%'";
+						tc++;
+
+					}//end token for loop	
+					
+					sqlStr += ")";
+					oc++;
+
+				}//end search field for loop
 				
-				sqlStr += tokSearchStr;
-				
-				while (iter.hasNext()) {
-					tok = (String)(iter.next());
-					tokSearchStr = "(RPI.researcherLastName LIKE '%" + tok + "%' OR ";
-					tokSearchStr += "RPI.researcherFirstName LIKE '%" + tok + "%' OR ";
-					tokSearchStr += "RB.researcherLastName LIKE '%" + tok + "%' OR ";
-					tokSearchStr += "RB.researcherFirstName LIKE '%" + tok + "%' OR ";
-					tokSearchStr += "RC.researcherLastName LIKE '%" + tok + "%' OR ";
-					tokSearchStr += "RC.researcherFirstName LIKE '%" + tok + "%' OR ";
-					tokSearchStr += "RD.researcherLastName LIKE '%" + tok + "%' OR ";
-					tokSearchStr += "RD.researcherFirstName LIKE '%" + tok + "%' OR ";
-					tokSearchStr += "P.projectAbstract LIKE '%" + tok + "%' OR ";
-					tokSearchStr += "P.publicAbstract LIKE '%" + tok + "%' OR ";
-					tokSearchStr += "P.projectKeywords LIKE '%" + tok + "%' OR ";
-					tokSearchStr += "P.projectProgress LIKE '%" + tok + "%' OR ";
-					tokSearchStr += "P.projectTitle LIKE '%" + tok + "%')";
-	
-					sqlStr += " AND " + tokSearchStr;
-				}
-				
-				sqlStr += ")";
-			}
+			}//end searchTokens size check
 			
 			// Start date constraint
 			if (this.startDate != null) {
@@ -156,6 +161,8 @@ public class ProjectsSearcher {
 			
 			sqlStr += " ORDER BY P.projectSubmitDate";
 			
+			//System.out.println( sqlStr );
+			
 			stmt = conn.prepareStatement(sqlStr);
 			rs = stmt.executeQuery();
 			
@@ -183,7 +190,10 @@ public class ProjectsSearcher {
 					 continue;
 				}
 
-				retList.add(p);
+				if( !addedProjects.contains( p.getID() ) ) {
+					retList.add(p);
+					addedProjects.add( p.getID() );
+				}
 			}
 
 			
@@ -275,7 +285,7 @@ public class ProjectsSearcher {
 	}
 
 	// The Strings we are using to conduct the search
-	private Set searchTokens;
+	private Set<String> searchTokens;
 	
 	// The project types to include in the results
 	private Set types;

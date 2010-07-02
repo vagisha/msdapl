@@ -46,7 +46,7 @@ public class ResearcherUtils {
 		try {
 			conn = DBConnectionManager.getConnection("yrc");
 			
-			String sql = "SELECT projectID FROM tblProjects WHERE projectPI = ? LIMIT 1";
+			String sql = "SELECT projectID FROM tblProjectResearcher WHERE researcherID = ? AND projectPI <> 0 LIMIT 1";
 			stmt = conn.prepareStatement( sql );
 			stmt.setInt( 1, r.getID() );
 			

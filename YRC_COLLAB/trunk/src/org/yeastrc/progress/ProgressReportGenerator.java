@@ -808,15 +808,16 @@ public class ProgressReportGenerator {
 			Researcher r = project.getPI();
 			if (r != null) { addResearcherToSubproject(doc, subproject, r.getID(), "P", projectResearchers); }
 			
-			r = project.getResearcherB();
-			if (r != null) { addResearcherToSubproject(doc, subproject, r.getID(), "C", projectResearchers); }
-
-			r = project.getResearcherC();
-			if (r != null) { addResearcherToSubproject(doc, subproject, r.getID(), "C", projectResearchers); }
-
-			r = project.getResearcherD();
-			if (r != null) { addResearcherToSubproject(doc, subproject, r.getID(), "C", projectResearchers); }
-
+			// add the rest of the researchers
+			for( Researcher tr : project.getResearchers() ) {
+				
+				// don't add the PI
+				if( project.getPI() != null && project.getPI().getID() == tr.getID() )
+					continue;
+				
+				addResearcherToSubproject(doc, subproject, tr.getID(), "C", projectResearchers);
+			}
+			
 			// Add YRC group members as researchers to this project
 			String[] groups = project.getGroupsArray();
 			for (int i = 0; i < groups.length; i++) {
@@ -1436,26 +1437,9 @@ public class ProgressReportGenerator {
 		while (pIter.hasNext()) {
 			Project p = (Project)(pIter.next());
 			
-			/*
-			// Skip dissemination and training projects
-			if (p.getShortType().equals("D") || p.getShortType().equals("T"))
-				continue;
-			*/
-			
-			Researcher rpi = p.getPI();
-			Researcher rb = p.getResearcherB();
-			Researcher rc = p.getResearcherC();
-			Researcher rd = p.getResearcherD();
-			
-			// See if this researcher is part of this project
-			boolean foundR = false;
-			if (rpi != null && rpi.equals(r)) foundR = true;
-			else if (rb != null && rb.equals(r)) foundR = true;
-			else if (rc != null && rc.equals(r)) foundR = true;
-			else if (rd != null && rd.equals(r)) foundR = true;
-			
 			// Researcher is not part of this project, go to next project
-			if (!foundR) continue;
+			if( !p.getResearchers().contains( r ) )
+				continue;
 			
 			// Loop through the funding types for this project
 			String[] fundingTypes = p.getFundingTypesArray();
@@ -1546,20 +1530,9 @@ public class ProgressReportGenerator {
 			if (p.getShortType().equals("D") || p.getShortType().equals("T"))
 				continue;
 			
-			Researcher rpi = p.getPI();
-			Researcher rb = p.getResearcherB();
-			Researcher rc = p.getResearcherC();
-			Researcher rd = p.getResearcherD();
-			
-			// See if this researcher is part of this project
-			boolean foundR = false;
-			if (rpi != null && rpi.equals(r)) foundR = true;
-			else if (rb != null && rb.equals(r)) foundR = true;
-			else if (rc != null && rc.equals(r)) foundR = true;
-			else if (rd != null && rd.equals(r)) foundR = true;
-			
 			// Researcher is not part of this project, go to next project
-			if (!foundR) continue;
+			if( !p.getResearchers().contains( r ) )
+				continue;
 			
 			// Loop through the funding types for this project
 			String[] fundingTypes = p.getFundingTypesArray();
@@ -1617,20 +1590,9 @@ public class ProgressReportGenerator {
 			if (p.getShortType().equals("D") || p.getShortType().equals("T"))
 				continue;
 			
-			Researcher rpi = p.getPI();
-			Researcher rb = p.getResearcherB();
-			Researcher rc = p.getResearcherC();
-			Researcher rd = p.getResearcherD();
-			
-			// See if this researcher is part of this project
-			boolean foundR = false;
-			if (rpi != null && rpi.equals(r)) foundR = true;
-			else if (rb != null && rb.equals(r)) foundR = true;
-			else if (rc != null && rc.equals(r)) foundR = true;
-			else if (rd != null && rd.equals(r)) foundR = true;
-			
 			// Researcher is not part of this project, go to next project
-			if (!foundR) continue;
+			if( !p.getResearchers().contains( r ) )
+				continue;
 			
 			// Loop through the funding types for this project
 			String[] fundingTypes = p.getFundingTypesArray();
@@ -1724,24 +1686,7 @@ public class ProgressReportGenerator {
 		Iterator iter = projects.iterator();
 		while (iter.hasNext()) {
 			Project project = (Project)(iter.next());
-			
-			/*
-			// DO NOT ADD RESEARCHERS FOR DISEEMINATION/TRAINING PROJECTS
-			if (project.getShortType().equals("D") || project.getShortType().equals("T"))
-				continue;
-			*/
-			
-			Researcher r = project.getPI();
-			if (r != null) { this.researchers.add(r); }
-			
-			r = project.getResearcherB();
-			if (r != null) { this.researchers.add(r); }
-
-			r = project.getResearcherC();
-			if (r != null) { this.researchers.add(r); }
-			
-			r = project.getResearcherD();
-			if (r != null) { this.researchers.add(r); }
+			this.researchers.addAll( project.getResearchers() );
 		}
 	}
 
