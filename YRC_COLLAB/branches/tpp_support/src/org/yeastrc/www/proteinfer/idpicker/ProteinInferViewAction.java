@@ -162,6 +162,7 @@ public class ProteinInferViewAction extends Action {
         request.setAttribute("filteredPercent", 
         		RoundingUtils.getInstance().roundTwo(filteredTargetHits*100.0/(double)totalTargetHits));
         request.setAttribute("filteredUniquePeptideCount", IdPickerResultsLoader.getUniquePeptideCount(pinferId));
+        request.setAttribute("filteredUniqueIonCount", IdPickerResultsLoader.getUniqueIonCount(pinferId));
         
         // Results summary
         WIdPickerResultSummary summary = IdPickerResultsLoader.getIdPickerResultSummary(pinferId, proteinIds);

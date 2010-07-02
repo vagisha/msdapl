@@ -156,6 +156,7 @@ public class ProteinProphetViewAction extends Action {
         
         // Input summary
         request.setAttribute("filteredUniquePeptideCount", ProteinProphetResultsLoader.getUniquePeptideCount(pinferId));
+        request.setAttribute("filteredUniqueIonCount", ProteinProphetResultsLoader.getUniqueIonCount(pinferId));
         
         // Results summary
         WProteinProphetResultSummary summary = ProteinProphetResultsLoader.getProteinProphetResultSummary(pinferId, proteinIds);

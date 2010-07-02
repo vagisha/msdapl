@@ -24,6 +24,9 @@
 	<tr><td style="background-color:#F2F2F2; font-weight:bold;">
 		# Unique peptide sequences: <bean:write name="filteredUniquePeptideCount"/>
 	</td></tr>
+	<tr><td style="background-color:#F2F2F2; font-weight:bold;">
+		# Unique ions (sequence + modifications + charge): <bean:write name="filteredUniqueIonCount"/>
+	</td></tr>
 	<tr>
 	<td style="background-color:#F2F2F2; font-weight:bold;">Total Hits: <bean:write name="totalTargetHits" />&nbsp;&nbsp; Filtered Hits: <bean:write name="filteredTargetHits"  /> &nbsp; (<bean:write name="filteredPercent"/>%)</td>
 	</tr>
@@ -57,12 +60,7 @@
  				<td><bean:write name="input" property="percentFilteredHits"/>%</td>
  			</tr>
 	 	</logic:iterate>
-	 	<tr>
-	 		<td class="left_align"><b>TOTAL</b></td>
-	 		<!-- <td><b><bean:write name="totalDecoyHits" /></b></td> -->
-	 		<td><b><bean:write name="totalTargetHits" /></b></td>
-	 		<td><b><bean:write name="filteredTargetHits"  /></b></td>
-	 	</tr>
+	 	
 	 	</tbody>
 		</table>
 	<br><br>

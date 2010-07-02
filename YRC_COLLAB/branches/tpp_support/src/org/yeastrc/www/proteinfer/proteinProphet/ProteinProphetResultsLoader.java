@@ -570,6 +570,10 @@ public class ProteinProphetResultsLoader {
         return peptDao.getUniquePeptideSequenceCountForRun(pinferId);
     }
     
+    public static int getUniqueIonCount(int pinferId) {
+        return peptDao.getUniqueIonCountForRun(pinferId);
+    }
+    
     //---------------------------------------------------------------------------------------------------
     // Peptide ions for a indistinguishable protein group 
     // (sorted by sequence, modification state and charge)
