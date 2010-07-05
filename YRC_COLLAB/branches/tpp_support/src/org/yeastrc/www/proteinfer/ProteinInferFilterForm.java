@@ -29,7 +29,11 @@ public class ProteinInferFilterForm extends ActionForm {
     private String minSpectrumMatches = "1";
     private String maxSpectrumMatches;
     
-    private String accessionLike = null;
+    private String goTerms = null;
+    private boolean matchAllGoTerms = false;
+    private boolean exactGoAnnotation = false;
+    
+	private String accessionLike = null;
     private String descriptionLike = null;
     private String descriptionNotLike = null;
     private boolean searchAllDescriptions = false;
@@ -278,8 +282,35 @@ public class ProteinInferFilterForm extends ActionForm {
         this.excludeIndistinGroups = exclude;
     }
     
+    // GO TERMS
+    public String getGoTerms() {
+    	if(goTerms == null || goTerms.trim().length() == 0)
+            return null;
+        else
+            return goTerms.trim();
+    }
     
-    // ACCESSION
+    public void setGoTerms(String goTerms) {
+    	this.goTerms = goTerms;
+    }
+    
+    public boolean isMatchAllGoTerms() {
+		return matchAllGoTerms;
+	}
+
+	public void setMatchAllGoTerms(boolean matchAllGoTerms) {
+		this.matchAllGoTerms = matchAllGoTerms;
+	}
+    
+    public boolean isExactGoAnnotation() {
+		return exactGoAnnotation;
+	}
+
+	public void setExactGoAnnotation(boolean exactGoAnnotation) {
+		this.exactGoAnnotation = exactGoAnnotation;
+	}
+
+	// ACCESSION
     public String getAccessionLike() {
         if(accessionLike == null || accessionLike.trim().length() == 0)
             return null;
@@ -511,6 +542,10 @@ public class ProteinInferFilterForm extends ActionForm {
         
         filterCriteria.setSortBy(ProteinFilterCriteria.defaultSortBy());
         filterCriteria.setSortOrder(ProteinFilterCriteria.defaultSortOrder());
+        
+        filterCriteria.setGoTerms(this.getGoTerms());
+        filterCriteria.setMatchAllGoTerms(this.isMatchAllGoTerms());
+        filterCriteria.setExactAnnotation(this.isExactGoAnnotation());
         
         return filterCriteria;
     }

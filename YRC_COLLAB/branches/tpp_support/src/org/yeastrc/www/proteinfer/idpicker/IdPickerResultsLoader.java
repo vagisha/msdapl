@@ -56,6 +56,7 @@ import org.yeastrc.www.protein.ProteinAbundanceDao;
 import org.yeastrc.www.proteinfer.MsResultLoader;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
 import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
+import org.yeastrc.www.proteinfer.ProteinGoTermsFilter;
 import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
 import org.yeastrc.www.proteinfer.ProteinProperties;
 import org.yeastrc.www.proteinfer.ProteinPropertiesFilter;
@@ -128,6 +129,17 @@ public class IdPickerResultsLoader {
         	log.info("Filtering by pI");
             proteinIds = ProteinPropertiesFilter.getInstance().filterForProtInferByPi(pinferId, proteinIds,
                     filterCriteria.getMinPi(), filterCriteria.getMaxPi());
+        }
+        
+        // filter by GO terms, if required
+        if(filterCriteria.getGoTerms() != null) {
+        	log.info("Filtering by GO terms: "+filterCriteria.getGoTerms());
+        	try {
+				proteinIds = ProteinGoTermsFilter.getInstance().filterPinferProteinsByGoAccession(proteinIds, 
+						filterCriteria.getGoTerms(), filterCriteria.isExactAnnotation(), filterCriteria.isMatchAllGoTerms());
+			} catch (Exception e1) {
+				log.error("Exception filtering proteins on GO terms", e1);
+			}
         }
         
         long s = System.currentTimeMillis();

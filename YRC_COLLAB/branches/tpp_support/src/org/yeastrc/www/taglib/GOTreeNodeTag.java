@@ -69,16 +69,22 @@ public class GOTreeNodeTag extends TagSupport {
     }
 
 	private void printNode(GOTreeNode node, JspWriter writer) throws IOException {
-		boolean hasChildren  = false;
-		if(!node.hasChildren() && !node.isLeaf()) {
-			hasChildren = true;
-		}
+		
 		String nodeId = node.getGoNode().getAccession();
 		nodeId = nodeId.replaceAll("GO:", "");
-		if(!hasChildren)
-			writer.print("<li id='"+nodeId+"'>");
-		else
+			
+		// A node should be displayed as a leaf node only if:
+		// 1. It is indeed a leaf node in the GO DAG
+		// 2. the number of annoations == # exact annotations.
+		// Normally a node will be displayed as a leaf node if node.hasChildren() == false
+		// However, since we are not loading the entire tree we may have nodes that have children but they have not been loaded in the tree
+		// node.hasChildren() will return false
+		// The children of such nodes will be AJAX-loaded. 
+		// We set the class for such nodes here so that jstree displays them as closed nodes.
+		if(!node.hasChildren() && !node.isLeaf())
 			writer.print("<li class='jstree-closed' id='"+nodeId+"'>");
+		else
+			writer.print("<li id='"+nodeId+"'>");
 		
 		if(node.isMarked()) {
 			writer.print("<span class='slim-node'>");
@@ -88,7 +94,7 @@ public class GOTreeNodeTag extends TagSupport {
 		writer.write("</a>");
 		
 		writer.print("<span ");
-		if(node.isLeaf())
+		if(node.isLeaf()) // a node with # annotations = # exact annotations (this should be true of "real" GO leaf nodes)
 			writer.print("class=\'green\'>");
 		else
 			writer.print("class=\'red\'>");
@@ -98,7 +104,7 @@ public class GOTreeNodeTag extends TagSupport {
 		writer.print("</span>");
 		//writer.write("\n");
 		
-		if(!node.isLeaf()) {
+		if(node.hasChildren()) {
 			writer.print("<ul>");
 			for(GOTreeNode child: node.getChildren()) {
 	    		printNode(child, writer);

@@ -154,9 +154,23 @@
   	</td>
   </tr>
   
+  
   <tr>
   	<td colspan="3">
   	<table align="left">
+  		<logic:present name="goSupported">
+  		<tr>
+  			<td valign="top">GO Term(s): <br/><span class="clickable underline" style="color:red; font-weight:bold;">Search</span></td>
+  			<td valign="top"><html:text name="proteinInferFilterForm" property="goTerms" size="40"></html:text><br>
+  				<span style="font-size:8pt;">Enter a comma-separated list of GO terms (e.g. GO:0006950)</span>
+  			</td>
+  			<td valign="top" colspan="2">
+  				<html:checkbox name="proteinInferFilterForm" property="matchAllGoTerms" title="Return proteins that match all terms">Match All: </html:checkbox>
+  				<html:checkbox name="proteinInferFilterForm" property="exactGoAnnotation" title="Return proteins directly annotated with the GO terms">Exact: </html:checkbox>
+  			</td>
+  		</tr>
+  		</logic:present>
+  		
   		<tr>
   			<td valign="top">Fasta ID(s): </td>
   			<td valign="top"><html:text name="proteinInferFilterForm" property="accessionLike" size="40"></html:text><br>
@@ -194,7 +208,6 @@
   	</td>
   </tr>
   
- <logic:notPresent name="goView">
   <tr>
     	<td colspan="3" align="center">
     		<button class="plain_button" style="margin-top:2px;" 
@@ -203,7 +216,6 @@
     	</td>
     	 
   </tr>
-  </logic:notPresent>
   
  </TABLE>
  
