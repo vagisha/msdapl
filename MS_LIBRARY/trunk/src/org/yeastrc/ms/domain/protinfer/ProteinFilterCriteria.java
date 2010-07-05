@@ -48,6 +48,7 @@ public class ProteinFilterCriteria implements Serializable {
     
     private String goTerms = null;
     private boolean matchAllGoTerms = false;
+    private boolean exactAnnotation = false;
     
     private double minMolWt = 0.0;
     private double maxMolWt = Double.MAX_VALUE;
@@ -197,7 +198,15 @@ public class ProteinFilterCriteria implements Serializable {
 		this.matchAllGoTerms = matchAllGoTerms;
 	}
 	
-    public String getAccessionLike() {
+    public boolean isExactAnnotation() {
+		return exactAnnotation;
+	}
+
+	public void setExactAnnotation(boolean exactAnnotation) {
+		this.exactAnnotation = exactAnnotation;
+	}
+
+	public String getAccessionLike() {
         return accessionLike;
     }
 
@@ -403,6 +412,8 @@ public class ProteinFilterCriteria implements Serializable {
         		return false;
         	
         	if(this.matchAllGoTerms != that.matchAllGoTerms)
+        		return false;
+        	if(this.exactAnnotation != that.exactAnnotation)
         		return false;
         }
         
