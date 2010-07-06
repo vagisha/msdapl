@@ -1,6 +1,7 @@
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
+<%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 
 <script>
 function toggleSpeciesTable() {
@@ -152,6 +153,13 @@ function toggleSlimBarChart() {
         AmiGO</a>
         &nbsp;
         <a target="go_window" href="http://www.yeastrc.org/pdr/viewGONode.do?acc=<bean:write name="node" property="accession"/>">PDR</a>
+        &nbsp;
+        <span class="go_filter_add" id="<bean:write name='node' property='accession'/>" title="Add GO term to filters">
+        	<img src="<yrcwww:link path='images/filter.png'/>"alt="Filter"/>
+        </span>
+        <span class="go_filter_remove" id="<bean:write name='node' property='accession'/>" title="Remove" style="display:none;">
+        	<img src="<yrcwww:link path='images/filter_yellow.png'/>"alt="Filter"/>
+        </span>
         </span>
         </td>
 		<td><span title="<bean:write name="node" property="goNode.definition"/>" style="cursor:help;"><bean:write name="node" property="name"/></span></td>

@@ -161,47 +161,7 @@ public class GOSlimTreeCreator {
 		return tree;
 	}
 	
-	private void getChildren(GOTree tree, Map<String, GOTreeNode> seenNodes) throws Exception {
-		
-		for(GOTreeNode node: tree.getRoots()) {
-			getChildren(node, seenNodes);
-		}
-	}
 	
-	private void getChildren(GOTreeNode node, Map<String, GOTreeNode> seenNodes) throws Exception {
-		
-		if(!seenNodes.containsKey(node.getGoNode().getAccession())) {
-			seenNodes.put(node.getGoNode().getAccession(), node);
-		}
-		
-		if(node.isLeaf()) {
-			GONode gonode = node.getGoNode();
-			Set<GONode> children = gonode.getChildren();
-			if(children == null)
-				return;
-			for(GONode child: children) {
-				GOTreeNode cnode = seenNodes.get(child.getAccession());
-				if(cnode == null) {
-					cnode = new GOTreeNode(child);
-					setAnnotations(cnode);
-				}
-				// add this as a child ONLY if this node has some annotations.
-				if(cnode.getNumAnnotated() != 0 ) {
-					node.addChild(cnode);
-					// recurse ONLY if the number of annotations != number of exact annotations.
-					if(cnode.getNumAnnotated() != cnode.getNumExactAnnotated()) {
-						getChildren(cnode, seenNodes);
-					}
-				}
-			}
-		}
-		else {
-			for(GOTreeNode child: node.getChildren()) {
-				getChildren(child, seenNodes);
-			}
-		}
-	}
-
 	private void getAllAnnotations(List<Integer> nrseqProteinIds, int goAspect) throws GOException {
 		
 		for(int nrseqProteinId: nrseqProteinIds) {

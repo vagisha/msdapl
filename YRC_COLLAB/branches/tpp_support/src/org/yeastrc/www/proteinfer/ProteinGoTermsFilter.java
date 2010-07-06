@@ -47,7 +47,8 @@ public class ProteinGoTermsFilter {
     	// Convert the GO accessions into GONode objects
     	List<GONode> goNodes = new ArrayList<GONode>(goAccessions.length);
     	for(String goAccession: goAccessions) {
-    		if(goAccession == null || goAccession.trim().length() == 0)
+    		goAccession = goAccession.trim();
+    		if(goAccession == null || goAccession.length() == 0)
     			continue;
     		GONode node = GOCache.getInstance().getGONode(goAccession);
     		if(node != null)
