@@ -23,7 +23,7 @@ import javax.xml.ws.WebServiceClient;
  * </p>
  * 
  */
-@WebServiceClient(name = "PhiliusPredictorService", targetNamespace = "http://ws.philius.yeastrc.org/", wsdlLocation = "http://www.yeastrc.org/philius2/servlet/PhiliusPredictorPort?wsdl")
+@WebServiceClient(name = "PhiliusPredictorService", targetNamespace = "http://ws.philius.yeastrc.org/", wsdlLocation = "http://www.yeastrc.org/philius/servlet/PhiliusPredictorPort?wsdl")
 public class PhiliusPredictorService extends Service {
 
 	private final static URL PHILIUSPREDICTORSERVICE_WSDL_LOCATION;
@@ -38,10 +38,10 @@ public class PhiliusPredictorService extends Service {
 			baseUrl = org.yeastrc.www.philiusws.PhiliusPredictorService.class
 					.getResource(".");
 			url = new URL(baseUrl,
-					"http://www.yeastrc.org/philius2/servlet/PhiliusPredictorPort?wsdl");
+					"http://www.yeastrc.org/philius/servlet/PhiliusPredictorPort?wsdl");
 		} catch (MalformedURLException e) {
 			logger
-					.warning("Failed to create URL for the wsdl Location: 'http://www.yeastrc.org/philius2/servlet/PhiliusPredictorPort?wsdl', retrying as a local file");
+					.warning("Failed to create URL for the wsdl Location: 'http://www.yeastrc.org/philius/servlet/PhiliusPredictorPort?wsdl', retrying as a local file");
 			logger.warning(e.getMessage());
 		}
 		PHILIUSPREDICTORSERVICE_WSDL_LOCATION = url;
