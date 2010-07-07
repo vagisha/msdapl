@@ -14,6 +14,8 @@
 
 <body>
 <script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
+<!-- http://johannburkard.de/blog/programming/javascript/highlight-javascript-text-higlighting-jquery-plugin.html -->
+<script src="<yrcwww:link path='js/jquery.highlight-3.js'/>"></script>
 <script src="<yrcwww:link path='js/msdapl.js'/>"></script>
 <script>
 $(document).ready(function() {
@@ -28,7 +30,23 @@ $(document).ready(function() {
    $(".selectedAdder").click(function() {
    		addSelected();
    });
+   
+   highlightSearchTerms();
+   
 });
+
+function highlightSearchTerms() {
+	var words = $("input[name='terms']").val();
+   if(words && words.length > 0) {
+	   	var wordsArr = words.split(" ");
+	   	for(var i = 0; i < wordsArr.length; i++) {
+	   		if(wordsArr[i].length > 0) {
+	   			$(".highlightable").highlight(wordsArr[i]);
+	   		}
+	   	}
+   }
+}
+
 
 function selectToggle() {
 	
@@ -140,14 +158,14 @@ function addSelected() {
 			<logic:equal name="node" property="aspect" value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">
 				<span style="color:green;" title="Cellular Component">CC</span></logic:equal>
 			</b></td>
-			<td>
+			<td class="highlightable" >
 				<bean:write name="node" property="name"/>
 				<logic:notEmpty name="node" property="synonymsE">
 					<div style="width:96%; border: 1px dotted #DDDDDD; font-size:8pt;padding:5px;">
 						<b>Synonyms:</b>
 						<ul style="list-style-type:none;padding-left:10px; margin-top:2px; margin-bottom: 2px;">
 						<logic:iterate name="node" property="synonyms" id="synonym">
-						<li><b>*</b>&nbsp;<bean:write name="synonym"/></li>
+						<li class="highlightable" ><b>*</b>&nbsp;<bean:write name="synonym"/></li>
 						</logic:iterate>
 						</ul>
 					</div>

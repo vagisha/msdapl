@@ -41,6 +41,11 @@ public class GOTermSearchAction extends Action {
 		if (myForm.getTerms() == null || myForm.getTerms().trim().length() == 0 )
 			return mapping.findForward( "Success" );
 		
+		String terms = myForm.getTerms();
+		terms = terms.replaceAll(",", " "); // replace commas with spaces
+		terms = terms.replaceAll("\\s+", " "); // replace multiple spaces with single space.
+		myForm.setTerms(terms);
+		
 		List<GONode> nodes = GoTermSearcher.getMatchingTerms(myForm.getTerms().trim(),
 											myForm.isBiologicalProcess(),
 											myForm.isMolecularFunction(),
