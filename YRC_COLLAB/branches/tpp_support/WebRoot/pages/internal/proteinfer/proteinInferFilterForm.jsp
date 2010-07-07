@@ -7,29 +7,85 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
 <script type="text/javascript">
-	$(document).ready(function() {
-		$("input[name='validationStatus'][value='All']").click(function() {
-			$("input[name='validationStatus'][value!='All']").each(function() {
-				this.checked = false;
-			});
-		});
-		$("input[name='validationStatus'][value!='All']").click(function() {
-			$("input[name='validationStatus'][value='All']").each(function() {
-				this.checked = false;
-			});
-		});
-		
-		$("input[name='chargeStates'][value='All']").click(function() {
-			$("input[name='chargeStates'][value!='All']").each(function() {
-				this.checked = false;
-			});
-		});
-		$("input[name='chargeStates'][value!='All']").click(function() {
-			$("input[name='chargeStates'][value='All']").each(function() {
-				this.checked = false;
-			});
+$(document).ready(function() {
+	$("input[name='validationStatus'][value='All']").click(function() {
+		$("input[name='validationStatus'][value!='All']").each(function() {
+			this.checked = false;
 		});
 	});
+	$("input[name='validationStatus'][value!='All']").click(function() {
+		$("input[name='validationStatus'][value='All']").each(function() {
+			this.checked = false;
+		});
+	});
+	
+	$("input[name='chargeStates'][value='All']").click(function() {
+		$("input[name='chargeStates'][value!='All']").each(function() {
+			this.checked = false;
+		});
+	});
+	$("input[name='chargeStates'][value!='All']").click(function() {
+		$("input[name='chargeStates'][value='All']").each(function() {
+			this.checked = false;
+		});
+	});
+});
+
+function openGOTermSearcher() {
+	var url = "<yrcwww:link path='goTermSearch.do'/>";
+	// we want the result to open in a new window
+	window.open(url, 'gotermsearcher', 'scrollbars=yes,menubar=no,height=500,width=650,resizable=yes,toolbar=no,status=no');
+}
+
+// terms is an array of goTerms
+function addToGoSearchTerms(terms) {
+	for(var i = 0; i < terms.length; i++) {
+		addToGoTermFilters(terms[i], false);
+	}
+}
+	
+function addToGoTermFilters(goTerm, warn) {
+	var current = $("form#filterForm input[name='goTerms']").val();
+	// If this terms in not already in the list add it.
+	if(current.indexOf(goTerm) == -1) {
+		var terms = current;
+		if(current)
+			terms = terms+","
+		terms = terms+goTerm;
+		$("form#filterForm input[name='goTerms']").val(terms);
+	}
+	else if(warn) {
+		alert(goTerm+" has already been added");
+	}
+	$(".go_filter_add[id='"+goTerm+"']").hide();
+	$(".go_filter_remove[id='"+goTerm+"']").show();
+}
+
+function removeFromGoTermFilters(goTerm, warn) {
+	var current = $("form#filterForm input[name='goTerms']").val();
+	// If this terms is in the list remove it
+	var idx = current.indexOf(goTerm);
+	if(idx != -1) {
+		// get everything before the goTerm
+		var term = current.substring(0,idx);
+		if(term.charAt(term.length - 1) == ',') {
+			term = term.substring(0,term.length-1);
+		}
+		// get everything after the goTerm
+		term = term+current.substring(idx+goTerm.length);
+		//alert(term);
+		if(term.charAt(term.length - 1) == ',') {
+			term = term.substring(0,term.length-1);
+		}
+		
+		$("form#filterForm input[name='goTerms']").val(term);
+	}
+	else if(warn) {
+		alert(goTerm+" was not found in the filter list");
+	}
+	$(".go_filter_add[id='"+goTerm+"']").show();
+	$(".go_filter_remove[id='"+goTerm+"']").hide();
+}
 </script>
 
   <html:form action="/proteinInferGateway" method="post" styleId="filterForm" >
@@ -160,7 +216,8 @@
   	<table align="left">
   		<logic:present name="goSupported">
   		<tr>
-  			<td valign="top">GO Term(s): <br/><span class="clickable underline" style="color:red; font-weight:bold;">Search</span></td>
+  			<td valign="top">GO Term(s): <br/><span class="clickable underline" style="color:red; font-weight:bold;" 
+  			onclick="javascript:openGOTermSearcher();return false;">Search</span></td>
   			<td valign="top"><html:text name="proteinInferFilterForm" property="goTerms" size="40"></html:text><br>
   				<span style="font-size:8pt;">Enter a comma-separated list of GO terms (e.g. GO:0006950)</span>
   			</td>

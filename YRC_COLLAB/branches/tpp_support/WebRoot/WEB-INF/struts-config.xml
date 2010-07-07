@@ -69,6 +69,7 @@
 	<form-bean name="datasetSelectionForm" type="org.yeastrc.www.compare.DatasetSelectionForm"></form-bean>
 	<form-bean name="datasetFiltersForm" type="org.yeastrc.www.compare.DatasetFiltersForm"></form-bean>
 	<form-bean name="peptideComparisonForm" type="org.yeastrc.www.compare.ComparePeptidesForm"></form-bean>
+	<form-bean name="goSearchForm" type="org.yeastrc.www.go.GOTermSearchForm"></form-bean>
 	<form-bean name="sequestPepxmlDownloadForm" type="org.yeastrc.www.project.experiment.SequestPepxmlDownloadForm"></form-bean>
 	
 	<form-bean name="rerunProtInferencesForm" type="org.yeastrc.www.proteinfer.job.RerunProteinInferenceForm"></form-bean>
@@ -1112,6 +1113,16 @@
 		type="org.yeastrc.www.proteinfer.GOSlimNodeAjaxAction"
 	>
 		<forward name="Success" path="/pages/internal/proteinfer/goTreeNode.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/goTermSearch"
+		type="org.yeastrc.www.go.GOTermSearchAction"
+		name="goSearchForm"
+		scope="request"
+		validate="true"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/goTermSearchForm.jsp" redirect="false" />
 	</action>
 	
 	<action
