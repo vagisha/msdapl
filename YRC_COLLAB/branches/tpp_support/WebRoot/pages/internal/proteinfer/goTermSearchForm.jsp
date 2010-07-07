@@ -139,7 +139,7 @@ function addSelected() {
 		<tr>
 			<th></th>
 			<th class="sort-alpha clickable">Term ID</th>
-			<th class="sort-alpha clickable">Domain</th>
+			<th class="sort-alpha clickable">Aspect</th>
 			<th class="sort-alpha clickable">Name</th>
 		</tr>
 	</thead>
@@ -152,11 +152,11 @@ function addSelected() {
 			<td><bean:write name="node" property="accession"/></td>
 			<td align="center"><b>
 			<logic:equal name="node" property="aspect" value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">
-				<span style="color:red;" title="Biological Process">BP</span></logic:equal>
+				<span style="color:red;" title="Biological Process">P</span></logic:equal>
 			<logic:equal name="node" property="aspect" value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">
-				<span style="color:blue;" title="Molecular Function">MF</span></logic:equal>
+				<span style="color:blue;" title="Molecular Function">F</span></logic:equal>
 			<logic:equal name="node" property="aspect" value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">
-				<span style="color:green;" title="Cellular Component">CC</span></logic:equal>
+				<span style="color:green;" title="Cellular Component">C</span></logic:equal>
 			</b></td>
 			<td class="highlightable" >
 				<bean:write name="node" property="name"/>

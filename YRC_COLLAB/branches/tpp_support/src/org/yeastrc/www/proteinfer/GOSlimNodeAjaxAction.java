@@ -93,7 +93,7 @@ public class GOSlimNodeAjaxAction extends Action {
 		if(goAspect == -1) {
 			log.info("NO valid GO Aspect found in request");
             response.setContentType("text/html");
-            response.getWriter().write("<ul><li style='color:red;font-weight-bold;'><a href=\"#\">ERROR: Invalid GO Domain</a></li></ul>");
+            response.getWriter().write("<ul><li style='color:red;font-weight-bold;'><a href=\"#\">ERROR: Invalid GO Aspect</a></li></ul>");
             return null;
 		}
 		

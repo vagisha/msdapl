@@ -1224,7 +1224,7 @@ function hideAllDescriptionsForProtein(proteinId) {
     	<tr>
     	<td valign="top" style="padding:5x;"><b>GO Slim Analysis: </b></td>
     	<td style="padding:5x;">
-    		GO Domain: 
+    		GO Aspect:
     		<html:select name="proteinProphetFilterForm" property="goAspect" styleId="goAspectField1">
 			<html:option
 				value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
@@ -1250,7 +1250,7 @@ function hideAllDescriptionsForProtein(proteinId) {
     	<tr>
     	<td valign="top" style="padding:5x;"><b>GO Enrichment: </b></td>
     	<td style="padding:5x;">
-    		GO Domain:
+    		GO Aspect:
     		<html:select name="proteinProphetFilterForm" property="goAspect" styleId="goAspectField2">
 			<html:option
 				value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
