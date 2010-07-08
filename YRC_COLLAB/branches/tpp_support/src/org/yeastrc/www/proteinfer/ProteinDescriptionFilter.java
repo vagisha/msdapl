@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import org.yeastrc.ms.domain.nrseq.NrProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nrseq.FastaProteinLookupUtil;
+import org.yeastrc.nrseq.FlyBaseUtils;
 import org.yeastrc.nrseq.StandardDatabase;
 import org.yeastrc.nrseq.StandardDatabaseCache;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
@@ -89,6 +91,35 @@ public class ProteinDescriptionFilter {
     	// filtered from any species-specific databases
     	s = System.currentTimeMillis();
     	List<Integer> speciesDbList = getSpeciesSpecificDatabases(pinferId);
+    	
+    	// If one of the databases is flybase lookup flybase for proteins matching description
+    	// The descriptions in YRC_NRSEQ's tblProteinDatabase for flybase are not helpful.
+    	Iterator<Integer> iter = speciesDbList.iterator();
+    	NrDatabase flybaseDb = StandardDatabaseCache.getNrDatabase(StandardDatabase.FLYBASE);
+    	while(iter.hasNext()) {
+    		Integer speciesDbId = iter.next();
+    		if(speciesDbId == flybaseDb.getId()) {
+    			
+    			List<Integer> nrseqFlybaseFiltered = null;
+				try {
+					nrseqFlybaseFiltered = FlyBaseUtils.getIdsMatchingDescription(new ArrayList<String>(reqDescriptions));
+				} catch (SQLException e1) {
+					log.error("Error getting flybase proteins matching description terms "+reqDescriptions, e1);
+				}
+				if(nrseqFlybaseFiltered != null) {
+					ProteinferProteinDAO protDao = ProteinferDAOFactory.instance().getProteinferProteinDao();
+					// Get the protein inference IDs corresponding to the matching NRSEQ IDs.
+					List<Integer> filteredFromFlybase = protDao.getProteinIdsForNrseqIds(pinferId, new ArrayList<Integer>(nrseqFlybaseFiltered));
+					filtered.addAll(filteredFromFlybase);
+				}
+				
+				// remove this from the database list; We will not search the flybase descriptions in nrseq.
+    			iter.remove();
+    			break;
+    		}
+    	}
+        
+        
     	List<Integer> filterFromStdDbs = FastaProteinLookupUtil.getInstance().getPiProteinIdsForDescriptions(new ArrayList<String>(reqDescriptions), speciesDbList, pinferId);
     	filtered.addAll(filterFromStdDbs);
     	e = System.currentTimeMillis();

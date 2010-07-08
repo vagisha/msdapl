@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.databases.flybase.FlyBaseUtils;
 import org.yeastrc.databases.sangerpombe.PombeUtils;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.sgd.SGDUtils;
@@ -67,8 +66,8 @@ public class CommonNameLookupUtil {
     	}
     	else if (db == StandardDatabase.FLYBASE) {
     		try {
-				commonName = FlyBaseUtils.getStandardName(accession);
-				description = FlyBaseUtils.getDescription(accession);
+				commonName = org.yeastrc.databases.flybase.FlyBaseUtils.getStandardName(accession);
+				description = org.yeastrc.databases.flybase.FlyBaseUtils.getDescription(accession);
 			} catch (SQLException e) {
 				log.error("Error using FlyBaseUtils", e);
 			}

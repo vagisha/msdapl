@@ -80,8 +80,10 @@ public class ProteinListingBuilder {
 		
 		// get references to Swiss-Prot
 		// We will always try to get Swiss-Prot references for Drosophila proteins
-		// since we want to display meaning ful descriptions.  Descriptions in FlyBase are 
+		// since we want to display meaningful descriptions.  Descriptions in FlyBase are 
 		// not very useful.
+		// UPDATE: we are now getting gene descriptions from flybase which are more helpful.
+		//         Still getting Swissprot descriptions.  May remove later.
 		List<ProteinReference> tierTwoRefs = null;
 		if(tierOneRefs.size() == 0 || protein.getSpeciesId() == TaxonomyUtils.DROSOPHILA_MELANOGASTER) {
 			tierTwoRefs = getReferences(protein, StandardDatabase.SWISSPROT);
@@ -90,22 +92,22 @@ public class ProteinListingBuilder {
 		}
 		
 		// get references to NCBI-NR if no tier-one or tier-two references were found
-		if(protein.getSpeciesId() != TaxonomyUtils.DROSOPHILA_MELANOGASTER) {
+//		if(protein.getSpeciesId() != TaxonomyUtils.DROSOPHILA_MELANOGASTER) {
 			if(tierOneRefs.size() == 0 && tierTwoRefs.size() == 0) {
 				List<ProteinReference> tierThreeRefs = getReferences(protein, StandardDatabase.NCBI_NR);
 				for(ProteinReference ref: tierThreeRefs)
 					listing.addTierThreeReference(ref);
 			}
-		}
-		else {
-			// FlyBase descriptions are not very useful, so if we did not get a SwissProt reference
-			// look for NCBI references.
-			if(tierTwoRefs.size() == 0) { 
-				List<ProteinReference> tierThreeRefs = getReferences(protein, StandardDatabase.NCBI_NR);
-				for(ProteinReference ref: tierThreeRefs)
-					listing.addTierThreeReference(ref);
-			}
-		}
+//		}
+//		else {
+//			// FlyBase descriptions are not very useful, so if we did not get a SwissProt reference
+//			// look for NCBI references.
+//			if(tierTwoRefs.size() == 0) { 
+//				List<ProteinReference> tierThreeRefs = getReferences(protein, StandardDatabase.NCBI_NR);
+//				for(ProteinReference ref: tierThreeRefs)
+//					listing.addTierThreeReference(ref);
+//			}
+//		}
 		
 		
 		
@@ -128,7 +130,10 @@ public class ProteinListingBuilder {
 		// skip HGNC(HUGO). If there was a common name we would have found it already
 		if(listing.getCommonReferences().size() == 0 && sdb != StandardDatabase.HGNC) {
 			for(ProteinReference ref: listing.getFastaReferences()) {
-				getCommonReference(sdb, ref);
+				ProteinCommonReference commonRef = getCommonReference(sdb, ref);
+				if(commonRef != null) {
+					ref.setCommonReference(commonRef);
+				}
 			}
 		}
 		
@@ -162,7 +167,15 @@ public class ProteinListingBuilder {
 
 					// if this is a tier one database try to get a common name
 					if(sdb.isTierOne()) {
-						getCommonReference(sdb, ref); // get a common name/description if one can be found
+						ProteinCommonReference commonRef = getCommonReference(sdb, ref); // get a common name/description if one can be found
+						if(commonRef != null) {
+							ref.setCommonReference(commonRef);
+							
+							// If this is a flybase protein get the description from the flybase (NOT yrc_nrseq) database
+							if(sdb == StandardDatabase.FLYBASE) {
+								ref.setDescription(commonRef.getDescription());
+							}
+						}
 					}
 
 					refs.add(ref);
@@ -172,7 +185,7 @@ public class ProteinListingBuilder {
 		return refs;
 	}
 	
-	private boolean getCommonReference(StandardDatabase db, ProteinReference reference) {
+	private ProteinCommonReference getCommonReference(StandardDatabase db, ProteinReference reference) {
 		
 		ProteinCommonReference commonRef = null;
 		// HGNC common names are in YRC_NRSQ -- accessionString == commonName
@@ -189,11 +202,7 @@ public class ProteinListingBuilder {
 					db);
 		}
 		
-		if(commonRef != null) {
-			reference.setCommonReference(commonRef);
-			return true; // we found a common reference
-		}
-		return false;
+		return commonRef;
 	}
 	
 }

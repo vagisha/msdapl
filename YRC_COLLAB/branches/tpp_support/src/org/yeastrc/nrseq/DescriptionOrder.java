@@ -24,7 +24,7 @@ public class DescriptionOrder {
 		case TaxonomyUtils.CAENORHABDITIS_ELEGANS:
 			return new StandardDatabase[] {StandardDatabase.WORMBASE, StandardDatabase.SWISSPROT, StandardDatabase.NCBI_NR};
 		case TaxonomyUtils.DROSOPHILA_MELANOGASTER:
-			return new StandardDatabase[] {StandardDatabase.SWISSPROT, StandardDatabase.NCBI_NR, StandardDatabase.WORMBASE};
+			return new StandardDatabase[] {StandardDatabase.WORMBASE, StandardDatabase.SWISSPROT, StandardDatabase.NCBI_NR};
 		case TaxonomyUtils.HOMO_SAPIENS:
 			return new StandardDatabase[] {StandardDatabase.HGNC, StandardDatabase.SWISSPROT, StandardDatabase.NCBI_NR};
 		default:
