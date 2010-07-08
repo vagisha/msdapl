@@ -57,15 +57,15 @@ public class FlyBaseUtils {
 					"FROM  proteinAnnotation AS p, geneAnnotation AS g, proteinGeneMapping AS m "+
 					"WHERE p.proteinAcc = m.proteinAcc "+
 					"AND g.geneAcc = m.geneAcc "+
-					"g.geneDescription LIKE ?";
+					"AND g.geneDescription LIKE ?";
 		try {
-			conn = DBConnectionManager.getConnection("wormbase");
+			conn = DBConnectionManager.getConnection("flybase");
 			stmt = conn.prepareStatement(sql);
 		
 			Set<String> accessions = new HashSet<String>();
 			for(String desc: descriptionTerms) {
 				
-				stmt.setString(1, desc);
+				stmt.setString(1, "%"+desc+"%");
 				rs = stmt.executeQuery();
 				
 				while (rs.next()) {

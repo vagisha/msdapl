@@ -113,13 +113,16 @@ public class ProteinDescriptionFilter {
 					filtered.addAll(filteredFromFlybase);
 				}
 				
+		    	e = System.currentTimeMillis();
+		    	log.info("Got filtered results for description from FLYBASE in "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+
 				// remove this from the database list; We will not search the flybase descriptions in nrseq.
     			iter.remove();
     			break;
     		}
     	}
         
-        
+        s = System.currentTimeMillis();
     	List<Integer> filterFromStdDbs = FastaProteinLookupUtil.getInstance().getPiProteinIdsForDescriptions(new ArrayList<String>(reqDescriptions), speciesDbList, pinferId);
     	filtered.addAll(filterFromStdDbs);
     	e = System.currentTimeMillis();
@@ -239,6 +242,35 @@ public class ProteinDescriptionFilter {
     	// filtered from any species-specific databases
     	s = System.currentTimeMillis();
     	List<Integer> speciesDbList = getSpeciesSpecificDatabases(pinferIds);
+    	
+    	// If one of the databases is flybase lookup flybase for proteins matching description
+    	// The descriptions in YRC_NRSEQ's tblProteinDatabase for flybase are not helpful.
+    	Iterator<Integer> iter = speciesDbList.iterator();
+    	NrDatabase flybaseDb = StandardDatabaseCache.getNrDatabase(StandardDatabase.FLYBASE);
+    	while(iter.hasNext()) {
+    		Integer speciesDbId = iter.next();
+    		if(speciesDbId == flybaseDb.getId()) {
+    			
+    			List<Integer> nrseqFlybaseFiltered = null;
+				try {
+					nrseqFlybaseFiltered = FlyBaseUtils.getIdsMatchingDescription(new ArrayList<String>(reqDescriptions));
+				} catch (SQLException e1) {
+					log.error("Error getting flybase proteins matching description terms "+reqDescriptions, e1);
+				}
+				if(nrseqFlybaseFiltered != null) {
+					filtered.addAll(nrseqFlybaseFiltered);
+				}
+				
+		    	e = System.currentTimeMillis();
+		    	log.info("Got filtered results for description from FLYBASE in "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+
+				// remove this from the database list; We will not search the flybase descriptions in nrseq.
+    			iter.remove();
+    			break;
+    		}
+    	}
+    	
+    	s = System.currentTimeMillis();
     	List<Integer> filterFromStdDbs = FastaProteinLookupUtil.getInstance().getNrseqIdsForDescriptions(new ArrayList<String>(reqDescriptions), speciesDbList);
     	Collections.sort(filterFromStdDbs);
     	filtered.addAll(getMatching(nrseqIds, filterFromStdDbs));
@@ -320,8 +352,8 @@ public class ProteinDescriptionFilter {
         	
         	// FlyBase is not a good database for descriptions; we will search Swiss-Prot instead
         	// Searching Swiss-Prot is done for individual proteins, so we will not add it here
-        	if(speciesId == TaxonomyUtils.DROSOPHILA_MELANOGASTER)
-        		continue;
+//        	if(speciesId == TaxonomyUtils.DROSOPHILA_MELANOGASTER)
+//        		continue;
         	
         	StandardDatabase sdb = StandardDatabase.getStandardDatabaseForSpecies(speciesId);
         	if(sdb != null) {

@@ -90,7 +90,7 @@
 				<logic:equal name="reference" property="hasExternalLink" value="false">
 					<span style="color:#000080;"><b>[<bean:write name="reference" property="databaseName"/>]</b></span>
 				</logic:equal>
-				 &nbsp; &nbsp; <bean:write name="reference" property="description"/>
+				 &nbsp; &nbsp; <bean:write name="reference" property="descriptionEscaped"/>
 				<br/>
 				
 			</li>

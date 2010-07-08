@@ -684,7 +684,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         	else {
         		fullContents += "["+dbName+"]";
         	}
-        	fullContents += "</b></span>&nbsp;&nbsp;"+ref.getDescription();
+        	fullContents += "</b></span>&nbsp;&nbsp;"+ref.getDescriptionEscaped();
         	fullContents += "<br>";
         }
         if(allReferences.size() > 1) { // uniqueDbRefs.size()) {
@@ -692,7 +692,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         	protein.getNrseqId()+")\">[-]</span></b>";
         }
         if(oneRef != null)
-        	shortContents += oneRef.getShortDescription();
+        	shortContents += oneRef.getShortDescriptionEscaped();
         shortContents += "<br>";
         	
         if(allReferences.size() > 1) {

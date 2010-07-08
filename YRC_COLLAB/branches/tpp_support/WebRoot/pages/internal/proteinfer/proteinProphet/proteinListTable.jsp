@@ -313,7 +313,7 @@
 			<logic:equal name="reference" property="hasExternalLink" value="false">
 				<span style="color:#000080;"><b>[<bean:write name="reference" property="databaseName"/>]</b></span>
 			</logic:equal>
-			 &nbsp; &nbsp; <bean:write name="reference" property="description"/>
+			 &nbsp; &nbsp; <bean:write name="reference" property="descriptionEscaped"/>
 			<br/>
 		</logic:iterate>
 		<logic:greaterThan value="1" name="refCount">
@@ -323,7 +323,7 @@
 	
 		<span class="short_description" id="short_desc_<bean:write name="protein" property="protein.id" />">
 		<logic:present name="protein" property="oneDescriptionReference">
-			<bean:write name="protein" property="oneDescriptionReference.shortDescription"/>
+			<bean:write name="protein" property="oneDescriptionReference.shortDescriptionEscaped"/>
 			<br/>
 		</logic:present>
 	

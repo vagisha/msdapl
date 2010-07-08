@@ -501,14 +501,14 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
         	String dbName = null;
         	try {dbName = ref.getDatabaseName();}
         	catch(SQLException e){log.error("Error getting database name"); dbName="ERROR";}
-        	fullContents += "<span style=\"color:#000080;\"<b>";//["+dbName+"]</b></span>&nbsp;&nbsp;"+ref.getDescription();
+        	fullContents += "<span style=\"color:#000080;\"<b>";//["+dbName+"]</b></span>&nbsp;&nbsp;"+ref.getDescriptionEscaped();
         	if(ref.getHasExternalLink()) {
         		fullContents += "<a href=\""+ref.getUrl()+"\" style=\"font-size:8pt;\" target=\"External Link\">["+dbName+"]</a>";
         	}
         	else {
         		fullContents += "["+dbName+"]";
         	}
-        	fullContents += "</b></span>&nbsp;&nbsp;"+ref.getDescription();
+        	fullContents += "</b></span>&nbsp;&nbsp;"+ref.getDescriptionEscaped();
         	fullContents += "<br>";
         }
         if(allReferences.size() > 1) { // uniqueDbRefs.size()) {
@@ -516,7 +516,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
         	protein.getNrseqId()+")\">[-]</span></b>";
         }
         if(oneRef != null)
-        	shortContents += oneRef.getShortDescription();
+        	shortContents += oneRef.getShortDescriptionEscaped();
         shortContents += "<br>";
         	
         if(allReferences.size() > 1) {

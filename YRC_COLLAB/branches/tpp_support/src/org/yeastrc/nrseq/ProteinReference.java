@@ -89,6 +89,20 @@ public class ProteinReference implements Serializable {
         return this.description;
     }
     
+    public String getDescriptionEscaped() {
+    	String desc = this.getDescription();
+    	return escaped(desc);
+    }
+    
+    private String escaped(String original) {
+    	if(original == null || original.trim().length() == 0)
+    		return original;
+    	String escaped = original;
+    	escaped = escaped.replaceAll(">", "&gt;");
+    	escaped = escaped.replaceAll("<", "&lt;");
+    	return escaped;
+    }
+    
     public String getShortDescription() {
     	if(description != null) {
 			if(description.length() > 90)
@@ -97,6 +111,11 @@ public class ProteinReference implements Serializable {
 				return description;
 		}
 		return "";
+    }
+    
+    public String getShortDescriptionEscaped() {
+    	String desc = getShortDescription();
+    	return escaped(desc);
     }
     
     public void setDatabaseId(int databaseId) {
