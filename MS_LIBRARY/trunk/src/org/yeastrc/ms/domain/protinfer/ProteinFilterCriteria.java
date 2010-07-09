@@ -46,9 +46,7 @@ public class ProteinFilterCriteria implements Serializable {
     private String descriptionNotLike;
     private boolean searchAllDescriptions = false;
     
-    private String goTerms = null;
-    private boolean matchAllGoTerms = false;
-    private boolean exactAnnotation = false;
+    private GOProteinFilterCriteria goFilterCriteria;
     
     private double minMolWt = 0.0;
     private double maxMolWt = Double.MAX_VALUE;
@@ -182,28 +180,13 @@ public class ProteinFilterCriteria implements Serializable {
         this.excludeIndistinGroups = exclude;
     }
 
-    public String getGoTerms() {
-    	return goTerms;
-    }
     
-    public void setGoTerms(String goTerms) {
-    	this.goTerms = goTerms;
-    }
-    
-    public boolean isMatchAllGoTerms() {
-		return matchAllGoTerms;
+    public GOProteinFilterCriteria getGoFilterCriteria() {
+		return goFilterCriteria;
 	}
 
-	public void setMatchAllGoTerms(boolean matchAllGoTerms) {
-		this.matchAllGoTerms = matchAllGoTerms;
-	}
-	
-    public boolean isExactAnnotation() {
-		return exactAnnotation;
-	}
-
-	public void setExactAnnotation(boolean exactAnnotation) {
-		this.exactAnnotation = exactAnnotation;
+	public void setGoFilterCriteria(GOProteinFilterCriteria goFilterCriteria) {
+		this.goFilterCriteria = goFilterCriteria;
 	}
 
 	public String getAccessionLike() {
@@ -404,16 +387,11 @@ public class ProteinFilterCriteria implements Serializable {
         
         if(!this.peptideDefinition.equals(that.peptideDefinition))  return false;
         
-        if(goTerms == null) {
-        	if(that.goTerms != null)	return false;
+        if(goFilterCriteria == null) {
+        	if(that.goFilterCriteria != null)	return false;
         }
         else {
-        	if(!goTerms.equals(that.goTerms))
-        		return false;
-        	
-        	if(this.matchAllGoTerms != that.matchAllGoTerms)
-        		return false;
-        	if(this.exactAnnotation != that.exactAnnotation)
+        	if(!(this.goFilterCriteria.equals(that.goFilterCriteria)))
         		return false;
         }
         
