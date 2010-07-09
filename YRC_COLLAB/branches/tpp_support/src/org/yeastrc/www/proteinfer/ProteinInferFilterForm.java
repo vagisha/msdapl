@@ -320,7 +320,7 @@ public class ProteinInferFilterForm extends ActionForm {
 		return excludeIea;
 	}
 
-	public void setExcludeIEa(boolean excludeIEa) {
+	public void setExcludeIea(boolean excludeIEa) {
 		this.excludeIea = excludeIEa;
 	}
 
