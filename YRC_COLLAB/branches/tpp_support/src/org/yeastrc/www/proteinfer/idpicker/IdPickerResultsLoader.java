@@ -26,6 +26,7 @@ import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerSpectrumMatchDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.domain.protinfer.GOProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferIon;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
@@ -132,11 +133,11 @@ public class IdPickerResultsLoader {
         }
         
         // filter by GO terms, if required
-        if(filterCriteria.getGoTerms() != null) {
-        	log.info("Filtering by GO terms: "+filterCriteria.getGoTerms());
+        if(filterCriteria.getGoFilterCriteria() != null) {
+        	GOProteinFilterCriteria goFilters = filterCriteria.getGoFilterCriteria();
+        	log.info("Filtering by GO terms: "+goFilters.toString());
         	try {
-				proteinIds = ProteinGoTermsFilter.getInstance().filterPinferProteinsByGoAccession(proteinIds, 
-						filterCriteria.getGoTerms(), filterCriteria.isExactAnnotation(), filterCriteria.isMatchAllGoTerms());
+				proteinIds = ProteinGoTermsFilter.getInstance().filterPinferProteinsByGoAccession(proteinIds, goFilters);
 			} catch (Exception e1) {
 				log.error("Exception filtering proteins on GO terms", e1);
 			}

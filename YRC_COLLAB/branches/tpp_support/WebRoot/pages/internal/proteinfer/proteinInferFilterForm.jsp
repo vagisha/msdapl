@@ -222,8 +222,15 @@ function removeFromGoTermFilters(goTerm, warn) {
   				<span style="font-size:8pt;">Enter a comma-separated list of GO terms (e.g. GO:0006950)</span>
   			</td>
   			<td valign="top" colspan="2">
-  				<html:checkbox name="proteinInferFilterForm" property="matchAllGoTerms" title="Return proteins that match all terms">Match All: </html:checkbox>
-  				<html:checkbox name="proteinInferFilterForm" property="exactGoAnnotation" title="Return proteins directly annotated with the GO terms">Exact: </html:checkbox>
+  				<html:checkbox name="proteinInferFilterForm" property="matchAllGoTerms" title="Return proteins that match all terms">Match All </html:checkbox>
+  				<html:checkbox name="proteinInferFilterForm" property="exactGoAnnotation" title="Return proteins directly annotated with the GO terms">Exact </html:checkbox>
+  				&nbsp;
+  				<nobr>
+  				Exclude: 
+  				<html:checkbox name="proteinInferFilterForm" property="excludeIea"><span title="Inferred from Electronic Annotation">IEA</span></html:checkbox>
+  				<html:checkbox name="proteinInferFilterForm" property="excludeNd"><span title="No Biological Data available">ND</span></html:checkbox>
+  				<html:checkbox name="proteinInferFilterForm" property="excludeCompAnalCodes"><span title="Computational Analysis Evidence Codes">ISS, ISO, ISA, ISM, IGC, RCA</span></html:checkbox>
+  				</nobr>
   			</td>
   		</tr>
   		</logic:present>

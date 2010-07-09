@@ -1,7 +1,9 @@
 package org.yeastrc.www.proteinfer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -9,6 +11,7 @@ import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.bio.go.GOUtils;
+import org.yeastrc.ms.domain.protinfer.GOProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 
@@ -32,6 +35,9 @@ public class ProteinInferFilterForm extends ActionForm {
     private String goTerms = null;
     private boolean matchAllGoTerms = false;
     private boolean exactGoAnnotation = false;
+    private boolean excludeIea = false;
+    private boolean excludeNd = false;
+    private boolean excludeCompAnalCodes = false;
     
 	private String accessionLike = null;
     private String descriptionLike = null;
@@ -309,6 +315,30 @@ public class ProteinInferFilterForm extends ActionForm {
 	public void setExactGoAnnotation(boolean exactGoAnnotation) {
 		this.exactGoAnnotation = exactGoAnnotation;
 	}
+	
+	public boolean isExcludeIea() {
+		return excludeIea;
+	}
+
+	public void setExcludeIEa(boolean excludeIEa) {
+		this.excludeIea = excludeIEa;
+	}
+
+	public boolean isExcludeNd() {
+		return excludeNd;
+	}
+
+	public void setExcludeNd(boolean excludeNd) {
+		this.excludeNd = excludeNd;
+	}
+
+	public boolean isExcludeCompAnalCodes() {
+		return excludeCompAnalCodes;
+	}
+
+	public void setExcludeCompAnalCodes(boolean excludeCompAnalCodes) {
+		this.excludeCompAnalCodes = excludeCompAnalCodes;
+	}
 
 	// ACCESSION
     public String getAccessionLike() {
@@ -543,9 +573,38 @@ public class ProteinInferFilterForm extends ActionForm {
         filterCriteria.setSortBy(ProteinFilterCriteria.defaultSortBy());
         filterCriteria.setSortOrder(ProteinFilterCriteria.defaultSortOrder());
         
-        filterCriteria.setGoTerms(this.getGoTerms());
-        filterCriteria.setMatchAllGoTerms(this.isMatchAllGoTerms());
-        filterCriteria.setExactAnnotation(this.isExactGoAnnotation());
+        if(this.getGoTerms() != null && this.getGoTerms().trim().length() > 0) {
+        	GOProteinFilterCriteria goFilters = new GOProteinFilterCriteria();
+        	
+        	goFilters.setExactAnnotation(this.isExactGoAnnotation());
+        	goFilters.setMatchAllGoTerms(this.isMatchAllGoTerms());
+        	
+        	// evidence codes
+        	List<String> evCodes = new ArrayList<String>();
+        	goFilters.setExcludeEvidenceCodes(evCodes);
+        	if(this.isExcludeIea())
+        		evCodes.add("IEA");
+        	if(this.isExcludeNd())
+        		evCodes.add("ND");
+        	if(this.isExcludeCompAnalCodes()) {
+        		evCodes.add("ISS");
+        		evCodes.add("ISO");
+        		evCodes.add("ISA");
+        		evCodes.add("ISM");
+        		evCodes.add("IGC");
+        		evCodes.add("RCA");
+        	}
+        	
+        	// accessions
+        	Set<String> goAccessions = new HashSet<String>();
+        	String[] tokens = this.getGoTerms().split(",");
+        	for(String token: tokens) {
+        		goAccessions.add(token.trim());
+        	}
+        	goFilters.setGoAccessions(new ArrayList<String>(goAccessions));
+        	
+        	filterCriteria.setGoFilterCriteria(goFilters);
+        }
         
         return filterCriteria;
     }
