@@ -16,16 +16,16 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerRunDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
-import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.nrseq.NrDbProtein;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;

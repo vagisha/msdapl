@@ -9,7 +9,7 @@ package edu.uwpr.protinfer.idpicker;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.SpectrumMatch;
