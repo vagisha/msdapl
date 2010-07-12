@@ -6,6 +6,7 @@
 
 package org.yeastrc.www.taglib;
 
+import javax.servlet.ServletContext;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
@@ -79,6 +80,8 @@ public class GOEvidenceTag extends TagSupport {
         
         String output = "";
         
+        String contextPath = pageContext.getServletContext().getContextPath();
+        
         try {
  
         	output = "";
@@ -87,14 +90,14 @@ public class GOEvidenceTag extends TagSupport {
 
             	output += "[<span title=\""+ec.getEvidenceCodeName()+"\">";
             	output += ec.getEvidenceCode();
-            	output += "</span>";
+            	output += "</span>&nbsp;";
         		
             	if ( annotation.getEvidence().get( ec ) != null && annotation.getEvidence().get( ec ).size() > 0 ) {
             		
             		for ( GOEvidence goe : annotation.getEvidence().get( ec ) ) {
                 		output += "<a title=\"Click to view the article on which this annotation was based. (PMID:"+ goe.getPMID() + ")\")";
-                		output += " target=\"pub_window\" href=\"/pdr/pubmedRedirect.do?PMID=" + goe.getPMID() + "\">";
-                		output += "<img style=\"margin-top:0px;margin-bottom:0px;\" border=\"0\" src=\"/pdr/images/pubmed.gif\" width=\"14\" height=\"15\" alt=\"Link to PubMed article\"></a>";            			
+                		output += " target=\"pub_window\" href=\"http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Search&db=PubMed&term=" + goe.getPMID() + "\">";
+                		output += "<img style=\"margin-top:0px;margin-bottom:0px;\" border=\"0\" src=\""+contextPath+"/images/pubmed.gif\" width=\"14\" height=\"15\" alt=\"Link to PubMed article\"></a>";            			
             		}
             		
             	}
