@@ -24,7 +24,6 @@ import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferInputDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferIonDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferPeptideDAO;
@@ -41,7 +40,6 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
-import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
@@ -72,6 +70,8 @@ import org.yeastrc.ms.service.ProtinferUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.util.TimeUtils;
+import org.yeastrc.nrseq.NrDbProtein;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
 /**
  * 

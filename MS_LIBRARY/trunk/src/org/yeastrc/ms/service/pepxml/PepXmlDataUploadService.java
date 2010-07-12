@@ -13,7 +13,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
@@ -55,6 +54,7 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.service.database.fasta.PeptideProteinMatch;
 import org.yeastrc.ms.service.database.fasta.PeptideProteinMatchingService;
 import org.yeastrc.ms.util.TimeUtils;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
 public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R>,
                                                G extends GenericPeptideProphetResultIn<R>, 

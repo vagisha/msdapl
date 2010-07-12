@@ -12,7 +12,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
@@ -51,6 +50,7 @@ import org.yeastrc.ms.service.DynamicModLookupUtil;
 import org.yeastrc.ms.service.SearchDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
 public abstract class AbstractSQTDataUploadService implements SearchDataUploadService {
 

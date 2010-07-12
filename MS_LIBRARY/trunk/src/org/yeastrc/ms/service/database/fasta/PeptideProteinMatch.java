@@ -6,7 +6,7 @@
  */
 package org.yeastrc.ms.service.database.fasta;
 
-import org.yeastrc.ms.domain.nrseq.NrDbProtein;
+import org.yeastrc.nrseq.NrDbProtein;
 
 /**
  * 

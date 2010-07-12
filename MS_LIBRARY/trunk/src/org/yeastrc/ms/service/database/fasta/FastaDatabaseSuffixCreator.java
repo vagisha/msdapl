@@ -22,11 +22,11 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.ConnectionFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
-import org.yeastrc.ms.domain.nrseq.NrDbProteinFull;
 import org.yeastrc.ms.service.database.DatabaseCopyException;
 import org.yeastrc.ms.util.AminoAcidUtilsFactory;
 import org.yeastrc.ms.util.TimeUtils;
+import org.yeastrc.nrseq.NrDbProteinFull;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
 /**
  * 

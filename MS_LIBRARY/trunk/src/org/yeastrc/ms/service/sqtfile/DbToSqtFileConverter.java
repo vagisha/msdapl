@@ -15,7 +15,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
@@ -42,6 +41,7 @@ import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 import org.yeastrc.ms.parser.sqtFile.SearchScan;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
 /**
  * 

@@ -37,6 +37,6 @@
 	</transactionManager>
 	
 	<!--  sqlmaps -->
-	<sqlMap resource="org/yeastrc/ms/sqlmap/nrseq/NrSeqSqlMap.xml" />
+	<sqlMap resource="org/yeastrc/sqlmap/nrseq/NrSeqSqlMap.xml" />
 		
 </sqlMapConfig>	

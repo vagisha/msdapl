@@ -20,12 +20,12 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.ConnectionFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.general.EnzymeRule;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.util.StringUtils;
+import org.yeastrc.nrseq.NrDbProtein;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
 /**
  * 

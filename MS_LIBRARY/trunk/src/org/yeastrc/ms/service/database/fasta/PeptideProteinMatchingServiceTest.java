@@ -4,11 +4,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.yeastrc.ms.domain.general.EnzymeRule;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.nrseq.NrDbProtein;
-
-import junit.framework.TestCase;
+import org.yeastrc.nrseq.NrDbProtein;
 
 public class PeptideProteinMatchingServiceTest extends TestCase {
 

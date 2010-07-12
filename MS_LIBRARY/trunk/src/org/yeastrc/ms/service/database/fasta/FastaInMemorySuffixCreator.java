@@ -14,9 +14,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
-import org.yeastrc.ms.domain.nrseq.NrDbProteinFull;
 import org.yeastrc.ms.util.TimeUtils;
+import org.yeastrc.nrseq.NrDbProteinFull;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
 public class FastaInMemorySuffixCreator {
 
