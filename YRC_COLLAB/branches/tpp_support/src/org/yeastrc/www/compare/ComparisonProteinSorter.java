@@ -11,12 +11,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.ms.util.ProteinUtils;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.nrseq.ProteinListingBuilder;
 import org.yeastrc.nrseq.ProteinReference;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 
 /**

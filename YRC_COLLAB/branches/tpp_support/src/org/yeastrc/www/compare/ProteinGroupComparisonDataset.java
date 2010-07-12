@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
@@ -31,6 +30,7 @@ import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.nrseq.ProteinListingBuilder;
 import org.yeastrc.nrseq.ProteinReference;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
 import org.yeastrc.www.compare.dataset.DatasetSource;

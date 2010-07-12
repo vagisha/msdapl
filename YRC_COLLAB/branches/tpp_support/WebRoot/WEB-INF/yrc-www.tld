@@ -35,6 +35,27 @@
 </tag>
 
 <tag>
+	<name>goEvidence</name>
+	<tagclass>org.yeastrc.www.taglib.GOEvidenceTag</tagclass>
+	<bodycontent>empty</bodycontent>
+	<attribute>
+		<name>name</name>
+		<required>true</required>
+		<rtexprvalue>true</rtexprvalue>
+	</attribute>
+	<attribute>
+		<name>property</name>
+		<required>false</required>
+		<rtexprvalue>true</rtexprvalue>
+	</attribute>
+	<attribute>
+		<name>scope</name>
+		<required>false</required>
+		<rtexprvalue>true</rtexprvalue>
+	</attribute>
+</tag>
+
+<tag>
 <name>proteinLink</name>
 <tagclass>org.yeastrc.www.taglib.ProteinLinkTag</tagclass>
 <bodycontent>empty</bodycontent>

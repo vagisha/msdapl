@@ -10,10 +10,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
-import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferProtein;
 import org.yeastrc.ms.util.ProteinUtils;
+import org.yeastrc.nrseq.NrDbProtein;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
 /**
  * 

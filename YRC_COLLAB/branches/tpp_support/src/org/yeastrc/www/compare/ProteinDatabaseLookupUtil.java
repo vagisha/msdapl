@@ -6,7 +6,6 @@
  */
 package org.yeastrc.www.compare;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,10 +16,9 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
-import org.yeastrc.ms.domain.nrseq.NrDatabase;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.nrseq.NrseqDatabaseDAO;
+import org.yeastrc.nrseq.NrDatabase;
 import org.yeastrc.nrseq.StandardDatabase;
 import org.yeastrc.nrseq.StandardDatabaseCache;
 

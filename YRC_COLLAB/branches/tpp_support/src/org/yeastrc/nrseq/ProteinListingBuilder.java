@@ -11,10 +11,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.bio.taxonomy.TaxonomyUtils;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
-import org.yeastrc.ms.domain.nrseq.NrDatabase;
-import org.yeastrc.ms.domain.nrseq.NrDbProtein;
-import org.yeastrc.ms.domain.nrseq.NrProtein;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
 /**
  * 
@@ -36,7 +33,7 @@ public class ProteinListingBuilder {
 	public ProteinListing build(int nrseqId, List<Integer> fastaDatabaseIds) {
 		
 		// Get the protein and determine its species
-		NrProtein nrProtein = NrSeqLookupUtil.getNrProtein(nrseqId);
+		NrsProtein nrProtein = NrSeqLookupUtil.getNrProtein(nrseqId);
 		int speciesId = nrProtein.getSpeciesId();
 		if(speciesId == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
 			
@@ -63,7 +60,7 @@ public class ProteinListingBuilder {
 		
 	}
 	
-	private ProteinListing build(NrProtein protein, List<Integer> fastaDatabaseIds,
+	private ProteinListing build(NrsProtein protein, List<Integer> fastaDatabaseIds,
 			StandardDatabase sdb) {
 		
 		int nrseqId = protein.getId();
@@ -150,7 +147,7 @@ public class ProteinListingBuilder {
 	}
 		
 	
-	private List<ProteinReference> getReferences(NrProtein protein, StandardDatabase sdb) {
+	private List<ProteinReference> getReferences(NrsProtein protein, StandardDatabase sdb) {
 		
 		List<ProteinReference> refs = new ArrayList<ProteinReference>();
 		

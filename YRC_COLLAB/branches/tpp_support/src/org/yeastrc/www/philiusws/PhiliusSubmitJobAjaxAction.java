@@ -13,7 +13,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 

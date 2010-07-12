@@ -1,6 +1,5 @@
 package org.yeastrc.www.proteinfer;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -15,9 +14,10 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.bio.go.GOAnnotation;
+import org.yeastrc.bio.go.GOSearcher;
 import org.yeastrc.bio.taxonomy.TaxonomyUtils;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
@@ -25,7 +25,7 @@ import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerPeptideBase;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptide;
 import org.yeastrc.ms.util.TimeUtils;
-import org.yeastrc.nrseq.GOSearcher;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 import org.yeastrc.www.protein.ProteinAbundanceDao;
 import org.yeastrc.www.protein.ProteinAbundanceDao.YeastOrfAbundance;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
@@ -139,15 +139,15 @@ public class ProteinDetailsAjaxAction extends Action {
             }
             
             // Gene Ontology information
-            Map goterms = GOSearcher.getGONodes(iProt.getProteinListing());
+            Map<String, Set<GOAnnotation>> goterms = GOSearcher.getInstance().getGOAnnotations(iProt.getProteinListing());
     		
-    		if ( ((Collection)goterms.get("P")).size() > 0)
+    		if ( (goterms.get("P")).size() > 0)
     			request.setAttribute("processes", goterms.get("P"));
 
-    		if ( ((Collection)goterms.get("C")).size() > 0)
+    		if ( (goterms.get("C")).size() > 0)
     			request.setAttribute("components", goterms.get("C"));
     		
-    		if ( ((Collection)goterms.get("F")).size() > 0)
+    		if ( (goterms.get("F")).size() > 0)
     			request.setAttribute("functions", goterms.get("F"));
 
     		
@@ -209,15 +209,15 @@ public class ProteinDetailsAjaxAction extends Action {
             }
             
             // Gene Ontology information
-            Map goterms = GOSearcher.getGONodes(pProt.getProteinListing());
+            Map<String, Set<GOAnnotation>> goterms = GOSearcher.getInstance().getGOAnnotations(pProt.getProteinListing());
     		
-    		if ( ((Collection)goterms.get("P")).size() > 0)
+    		if ( (goterms.get("P")).size() > 0)
     			request.setAttribute("processes", goterms.get("P"));
 
-    		if ( ((Collection)goterms.get("C")).size() > 0)
+    		if ( (goterms.get("C")).size() > 0)
     			request.setAttribute("components", goterms.get("C"));
     		
-    		if ( ((Collection)goterms.get("F")).size() > 0)
+    		if ( (goterms.get("F")).size() > 0)
     			request.setAttribute("functions", goterms.get("F"));
 
     		

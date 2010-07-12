@@ -15,7 +15,6 @@ import javax.naming.NamingException;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinDAO;
@@ -25,6 +24,7 @@ import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerPeptide;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProtein;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 import org.yeastrc.www.proteinfer.job.ProteinInferJobSearcher;
 
 public class IdPickerResultChecker {

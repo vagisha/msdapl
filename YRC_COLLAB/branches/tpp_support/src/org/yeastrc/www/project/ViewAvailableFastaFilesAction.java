@@ -18,7 +18,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.ms.domain.nrseq.NrDatabase;
+import org.yeastrc.nrseq.NrDatabase;
 import org.yeastrc.nrseq.NrseqDatabaseDAO;
 import org.yeastrc.project.Projects;
 import org.yeastrc.www.user.Groups;

@@ -15,18 +15,17 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.bio.taxonomy.TaxonomyUtils;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
-import org.yeastrc.ms.domain.nrseq.NrDatabase;
-import org.yeastrc.ms.domain.nrseq.NrProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nrseq.FastaProteinLookupUtil;
 import org.yeastrc.nrseq.FlyBaseUtils;
+import org.yeastrc.nrseq.NrDatabase;
+import org.yeastrc.nrseq.NrsProtein;
 import org.yeastrc.nrseq.StandardDatabase;
 import org.yeastrc.nrseq.StandardDatabaseCache;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 
 /**
@@ -140,7 +139,7 @@ public class ProteinDescriptionFilter {
     			// load the protein inference protein
     			ProteinferProtein protein = protDao.loadProtein(piProteinId);
 
-    			NrProtein nrProtein = NrSeqLookupUtil.getNrProtein(protein.getNrseqProteinId());
+    			NrsProtein nrProtein = NrSeqLookupUtil.getNrProtein(protein.getNrseqProteinId());
 
     			// first look for matching descriptions in Swiss-Prot
     			s = System.currentTimeMillis();

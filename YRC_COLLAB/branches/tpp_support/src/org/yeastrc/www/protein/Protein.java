@@ -8,8 +8,8 @@ package org.yeastrc.www.protein;
 
 import java.util.HashSet;
 
-import org.yeastrc.ms.domain.nrseq.NrProtein;
 import org.yeastrc.ms.util.ProteinUtils;
+import org.yeastrc.nrseq.NrsProtein;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.www.proteinfer.ProteinSequenceHtmlBuilder;
 
@@ -19,7 +19,7 @@ import org.yeastrc.www.proteinfer.ProteinSequenceHtmlBuilder;
 public class Protein {
 
 	private String sequence;
-	private NrProtein protein;
+	private NrsProtein protein;
 	private ProteinListing listing;
 	
 	public int getId() {
@@ -34,10 +34,10 @@ public class Protein {
 	public void setSequence(String sequence) {
 		this.sequence = sequence;
 	}
-	public NrProtein getProtein() {
+	public NrsProtein getProtein() {
 		return protein;
 	}
-	public void setProtein(NrProtein protein) {
+	public void setProtein(NrsProtein protein) {
 		this.protein = protein;
 	}
 	public ProteinListing getProteinListing() {

@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.util.ProteinUtils;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
 /**
  * 

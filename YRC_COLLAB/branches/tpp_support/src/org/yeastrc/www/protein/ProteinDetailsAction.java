@@ -7,9 +7,9 @@
 package org.yeastrc.www.protein;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,13 +21,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.bio.go.GOAnnotation;
+import org.yeastrc.bio.go.GOSearcher;
 import org.yeastrc.bio.taxonomy.TaxonomyUtils;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
-import org.yeastrc.ms.domain.nrseq.NrProtein;
 import org.yeastrc.ms.util.TimeUtils;
-import org.yeastrc.nrseq.GOSearcher;
+import org.yeastrc.nrseq.NrsProtein;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.nrseq.ProteinListingBuilder;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 import org.yeastrc.www.protein.ProteinAbundanceDao.YeastOrfAbundance;
 import org.yeastrc.www.proteinfer.ProteinDetailsAjaxAction;
@@ -113,7 +114,7 @@ private static final Logger log = Logger.getLogger(ProteinDetailsAjaxAction.clas
         
         // Load our protein
         Protein protein = new Protein();
-        NrProtein nrProtein = NrSeqLookupUtil.getNrProtein(proteinId);
+        NrsProtein nrProtein = NrSeqLookupUtil.getNrProtein(proteinId);
         protein.setProtein(nrProtein);
         
         ProteinListing listing = ProteinListingBuilder.getInstance().build(nrProtein.getId(), fastaDatabaseIds);
@@ -148,14 +149,14 @@ private static final Logger log = Logger.getLogger(ProteinDetailsAjaxAction.clas
         
         
         // Gene Ontology information
-        Map goterms = GOSearcher.getGONodes(protein.getProteinListing());
-        if ( ((Collection)goterms.get("P")).size() > 0)
+        Map<String, Set<GOAnnotation>> goterms = GOSearcher.getInstance().getGOAnnotations(protein.getProteinListing());
+        if ( (goterms.get("P")).size() > 0)
 			request.setAttribute("processes", goterms.get("P"));
 
-		if ( ((Collection)goterms.get("C")).size() > 0)
+		if ( (goterms.get("C")).size() > 0)
 			request.setAttribute("components", goterms.get("C"));
 		
-		if ( ((Collection)goterms.get("F")).size() > 0)
+		if ( (goterms.get("F")).size() > 0)
 			request.setAttribute("functions", goterms.get("F"));
 		
         long e = System.currentTimeMillis();
