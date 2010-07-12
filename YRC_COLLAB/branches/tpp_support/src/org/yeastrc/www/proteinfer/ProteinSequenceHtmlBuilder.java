@@ -26,7 +26,7 @@ public class ProteinSequenceHtmlBuilder {
         return instance;
     }
     
-    public String build(String sequence, Set<String> peptideSequences) {
+    public String build(String sequence, Set<String> peptideSequences) throws ProteinSequenceHtmlBuilderException {
         
         char[] reschars = sequence.toCharArray();
         String[] residues = new String[reschars.length];        // the array of strings, which are the residues of the matched protein
@@ -45,7 +45,7 @@ public class ProteinSequenceHtmlBuilder {
 
             // skip this peptide if it's not in the parent protein sequence
             if (pepIndex == -1)
-                continue;
+                throw new ProteinSequenceHtmlBuilderException("Peptide "+peptideSequence+" not found in protein!");
 
 //            if (ypep.getSequence().indexOf( "*" ) != -1 || ypep.getSequence().indexOf("@") != -1 || ypep.getSequence().indexOf("#") != -1) {
 //                char[] aas = ypep.getSequence().toCharArray();

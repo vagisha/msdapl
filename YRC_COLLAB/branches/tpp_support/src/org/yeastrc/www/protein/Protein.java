@@ -7,11 +7,13 @@
 package org.yeastrc.www.protein;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import org.yeastrc.ms.util.ProteinUtils;
 import org.yeastrc.nrseq.NrsProtein;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.www.proteinfer.ProteinSequenceHtmlBuilder;
+import org.yeastrc.www.proteinfer.ProteinSequenceHtmlBuilderException;
 
 /**
  * 
@@ -19,6 +21,7 @@ import org.yeastrc.www.proteinfer.ProteinSequenceHtmlBuilder;
 public class Protein {
 
 	private String sequence;
+	private Set<String> peptides;
 	private NrsProtein protein;
 	private ProteinListing listing;
 	
@@ -28,8 +31,11 @@ public class Protein {
 	public String getSequence() {
 		return sequence;
 	}
-	public String getHtmlSequence() {
-		return ProteinSequenceHtmlBuilder.getInstance().build(sequence, new HashSet<String>(0));
+	public String getHtmlSequence() throws ProteinSequenceHtmlBuilderException {
+		if(peptides != null)
+			return ProteinSequenceHtmlBuilder.getInstance().build(sequence, peptides);
+		else
+			return ProteinSequenceHtmlBuilder.getInstance().build(sequence, new HashSet<String>(0));
 	}
 	public void setSequence(String sequence) {
 		this.sequence = sequence;
@@ -51,5 +57,8 @@ public class Protein {
 	}
 	public double getPi() {
 		return ProteinUtils.calculatePi(sequence);
+	}
+	public void setPeptides(Set<String> peptides) {
+		this.peptides = peptides;
 	}
 }

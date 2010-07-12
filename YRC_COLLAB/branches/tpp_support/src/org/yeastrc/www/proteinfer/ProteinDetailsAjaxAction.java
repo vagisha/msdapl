@@ -180,7 +180,8 @@ public class ProteinDetailsAjaxAction extends Action {
             }
             nrseqProteinId = iProt.getProtein().getNrseqProteinId();
             
-        }
+        }// end if(ProteinInferenceProgram.isIdPicker(run.getProgram()))
+        
         else if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {
             
             // get the protein 

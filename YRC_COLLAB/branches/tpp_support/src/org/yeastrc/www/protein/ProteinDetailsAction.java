@@ -7,6 +7,7 @@
 package org.yeastrc.www.protein;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +25,12 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.bio.go.GOAnnotation;
 import org.yeastrc.bio.go.GOSearcher;
 import org.yeastrc.bio.taxonomy.TaxonomyUtils;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
+import org.yeastrc.ms.domain.protinfer.ProteinferPeptide;
+import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerPeptideBase;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nrseq.NrsProtein;
 import org.yeastrc.nrseq.ProteinListing;
@@ -123,6 +130,26 @@ private static final Logger log = Logger.getLogger(ProteinDetailsAjaxAction.clas
         // Get the sequence for this protein
         String sequence = NrSeqLookupUtil.getProteinSequence(nrProtein.getId());
         protein.setSequence(sequence);
+        
+        // get the peptides for this protein from the given protein inferences
+        // Get the unique peptide sequences for this protein (for building the protein sequence HTML)
+        Set<String> peptideSequences = new HashSet<String>();
+        ProteinferProteinDAO protDao = ProteinferDAOFactory.instance().getProteinferProteinDao();
+        
+        ArrayList<Integer> nrseqIds = new ArrayList<Integer>(1);
+        nrseqIds.add(proteinId);
+        for(int pinferId: pinferIds) {
+        	List<Integer> pinferProteinIds = protDao.getProteinIdsForNrseqIds(pinferId, nrseqIds);
+        	for(Integer piProteinId: pinferProteinIds) {
+        		ProteinferProtein piProtein = protDao.loadProtein(piProteinId);
+        		if(piProtein != null) {
+        			for(ProteinferPeptide peptide: piProtein.getPeptides()) {
+        				peptideSequences.add(peptide.getSequence());
+        			}
+        		}
+        	}
+        }
+        protein.setPeptides(peptideSequences);
         
         request.setAttribute("protein", protein);
         
