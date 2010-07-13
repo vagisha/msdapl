@@ -46,18 +46,24 @@ public class GOTermSearchAction extends Action {
 		terms = terms.replaceAll("\\s+", " "); // replace multiple spaces with single space.
 		myForm.setTerms(terms);
 		
-		List<GONode> nodes = GoTermSearcher.getMatchingTerms(myForm.getTerms().trim(),
-											myForm.isBiologicalProcess(),
-											myForm.isMolecularFunction(),
-											myForm.isCellularComponent(),
-											myForm.isMatchAllTerms(),
-											myForm.isSearchTermSynonyms());
+		GoTermSearcher searcher = new GoTermSearcher();
+		searcher.setQueryString(myForm.getTerms().trim());
+		searcher.setUseBiologicalProcess(myForm.isBiologicalProcess());
+		searcher.setUseMolecularFunction(myForm.isMolecularFunction());
+		searcher.setUseCellularComponent(myForm.isCellularComponent());
+		searcher.setMatchAll(myForm.isMatchAllTerms());
+		searcher.setSearchSynonyms(myForm.isSearchTermSynonyms());
+		
+		List<GONode> nodes = searcher.getMatchingTerms();
 		
 		
 		request.setAttribute( "nodes", nodes );
 		request.setAttribute( "numNodes", nodes.size() );
 		
-		
+//		List<Integer> dbIds = new ArrayList<Integer>();
+//		dbIds.add(161);
+//		ProteinListing listing = ProteinListingBuilder.getInstance().build(668248, dbIds);
+//    	
 		long e = System.currentTimeMillis();
 		log.info("GOTermSearchAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
 		return mapping.findForward("Success");

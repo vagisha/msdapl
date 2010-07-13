@@ -29,9 +29,9 @@ public class GOSupportUtils {
 		species.setId(TaxonomyUtils.CAENORHABDITIS_ELEGANS);
 		speciesList.add(species);
 		// Drosophila
-//		species = new Species();
-//		species.setId(TaxonomyUtils.DROSOPHILA_MELANOGASTER);
-//		speciesList.add(species);
+		species = new Species();
+		species.setId(TaxonomyUtils.DROSOPHILA_MELANOGASTER);
+		speciesList.add(species);
 		// Mouse
 //		species = new Species();
 //		species.setId(10090);

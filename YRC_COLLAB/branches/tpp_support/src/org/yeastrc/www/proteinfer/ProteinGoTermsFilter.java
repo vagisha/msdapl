@@ -18,6 +18,7 @@ import org.yeastrc.ms.domain.protinfer.GOProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.www.go.Annotation;
 import org.yeastrc.www.go.GoTermSearcher;
+import org.yeastrc.www.go.ProteinGOAnnotationChecker;
 
 /**
  * ProteinGoTermsFilter.java
@@ -96,11 +97,10 @@ public class ProteinGoTermsFilter {
     		
     		for(GONode node: goNodes) {
     			Annotation annot = null;
-    			
     			if(evidenceCodes.size() == 0)
-    				annot = GoTermSearcher.isProteinAnnotated(protein.getNrseqProteinId(), node.getId());
+    				annot = ProteinGOAnnotationChecker.isProteinAnnotated(protein.getNrseqProteinId(), node.getId());
     			else
-    				annot = GoTermSearcher.isProteinAnnotated(protein.getNrseqProteinId(), node.getId(), evidenceCodes);
+    				annot = ProteinGOAnnotationChecker.isProteinAnnotated(protein.getNrseqProteinId(), node.getId(), evidenceCodes);
     			
     			if(annot == Annotation.NONE)
     				continue;
@@ -136,9 +136,9 @@ public class ProteinGoTermsFilter {
     			Annotation annot = null;
     			
     			if(evidenceCodes.size() == 0)
-    				annot = GoTermSearcher.isProteinAnnotated(protein.getNrseqProteinId(), node.getId());
+    				annot = ProteinGOAnnotationChecker.isProteinAnnotated(protein.getNrseqProteinId(), node.getId());
     			else
-    				annot = GoTermSearcher.isProteinAnnotated(protein.getNrseqProteinId(), node.getId(), evidenceCodes);
+    				annot = ProteinGOAnnotationChecker.isProteinAnnotated(protein.getNrseqProteinId(), node.getId(), evidenceCodes);
     			
     			if(annot == Annotation.NONE) {
     				matchAll = false;

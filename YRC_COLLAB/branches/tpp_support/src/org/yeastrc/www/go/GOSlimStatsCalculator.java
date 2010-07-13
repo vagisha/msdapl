@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.bio.go.EvidenceUtils;
+import org.yeastrc.bio.go.GOAnnotation;
 import org.yeastrc.bio.go.GONode;
 import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.bio.taxonomy.TaxonomySearcher;
@@ -30,6 +32,7 @@ public class GOSlimStatsCalculator {
 	private List<Integer> nrseqProteinIds;
 	private int goSlimTermId = -1;
 	private int goAspect;
+	private List<String> excludeEvidenceCodes;
 	
 	private Map<Integer, SpeciesProteinCount> speciesCountMap;
 	
@@ -52,6 +55,9 @@ public class GOSlimStatsCalculator {
 	}
 	public void setGoAspect(int goAspect) {
 		this.goAspect = goAspect;
+	}
+	public void setExcludeEvidenceCodes(List<String> excludeEvidenceCodes) {
+		this.excludeEvidenceCodes = excludeEvidenceCodes;
 	}
 	
 	public void calculate() throws GOException {
@@ -90,9 +96,21 @@ public class GOSlimStatsCalculator {
 		
 		for(int nrseqProteinId: nrseqProteinIds) {
 			
-			List<GONodeAnnotation> annotNodes = null;
+			List<GOAnnotation> annotNodes = null;
 			try {
-				annotNodes = GOSlimUtils.getAnnotations(nrseqProteinId, goSlimTermId, goAspect);
+				GOSlimFilter filter = new GOSlimFilter();
+				filter.setGoAspect(this.goAspect);
+				filter.setSlimTermId(this.goSlimTermId);
+				if(excludeEvidenceCodes != null) {
+					List<Integer> excludeCodes = new ArrayList<Integer>(excludeEvidenceCodes.size());
+					for(String code: excludeEvidenceCodes) {
+						int id = EvidenceUtils.getEvidenceCodeId(code);
+						if(id != -1)
+							excludeCodes.add(id);
+					}
+					filter.setExcludeEvidenceCodes(excludeCodes);
+				}
+				annotNodes = GOSlimUtils.getAnnotations(nrseqProteinId, filter);
 			} catch (SQLException e) {
 				throw new GOException("Error getting terms for GO annotations for protein: "+nrseqProteinId, e);
 			}
@@ -110,7 +128,7 @@ public class GOSlimStatsCalculator {
 			if(annotNodes.size() == 0)
 				this.numProteinsNotAnnotated++;
 			
-			for(GONodeAnnotation annot: annotNodes) {
+			for(GOAnnotation annot: annotNodes) {
 				GOSlimTerm slimTerm = slimTermMap.get(annot.getNode().getId());
 				if(slimTerm != null) {
 					slimTerm.addProteinIdForTerm(nrseqProteinId);

@@ -7,15 +7,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.yeastrc.bio.go.EvidenceCode;
 import org.yeastrc.bio.go.GONode;
 import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.db.DBConnectionManager;
@@ -28,266 +28,39 @@ import org.yeastrc.db.DBConnectionManager;
  */
 public class GoTermSearcher {
 
-	private GoTermSearcher() {}
+	private String queryString;
+	private boolean bp;
+	private boolean mf;
+	private boolean cc;
+	private boolean matchAll;
+	private boolean searchSynonyms;
 	
-	public static Set<GONode> getTermsForProtein(int nrseqProteinId, int goAspect) throws SQLException {
-		
-		// Get our connection to the database.
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-		
-		Set<GONode> nodes = new HashSet<GONode>();
-		
-		try {
-			String sqlStr = "SELECT t.name, t.term_type, t.is_obsolete, d.term_definition, t.is_root, t.id, t.acc "+
-							"FROM (term AS t, GOProteinLookup AS prot) "+
-							"LEFT OUTER JOIN term_definition AS d ON t.id = d.term_id "+
-							"WHERE prot.proteinID="+nrseqProteinId+" "+
-							"AND prot.termID=t.id";
-			
-			conn = DBConnectionManager.getConnection("go");	
-			stmt = conn.createStatement();
-			
-			rs = stmt.executeQuery(sqlStr);
-			
-			
-			while (rs.next()) {
-				
-				int aspect = GOUtils.getGOTypeFromDatabase(rs.getString(2));
-				if(aspect != goAspect)
-					continue;
-				
-				// We found one
-				GONode retNode = new GONode();
-				retNode.setAccession(rs.getString(7));
-				retNode.setAspect(aspect);
-				retNode.setName(rs.getString(1));
-				retNode.setDefinition(rs.getString(4));
-				retNode.setId(rs.getInt(6));
-				
-				if (rs.getInt(3) == 0) retNode.setObsolete(false);
-				else retNode.setObsolete(true);
-				
-				if (rs.getInt(5) == 0) retNode.setRoot(false);
-				else retNode.setRoot(true);
-				
-				nodes.add(retNode);
-			}
-			
-		} finally {
-
-			// Always make sure result sets and statements are closed,
-			// and the connection is returned to the pool
-			if (rs != null) {
-				try { rs.close(); } catch (SQLException e) { ; }
-				rs = null;
-			}
-			if (stmt != null) {
-				try { stmt.close(); } catch (SQLException e) { ; }
-				stmt = null;
-			}
-			if (conn != null) {
-				try { conn.close(); } catch (SQLException e) { ; }
-				conn = null;
-			}
-		}
-		
-		return nodes;
+	private static Pattern GO_ACC_PATTERN = Pattern.compile("^GO:\\d+$");
+	
+	public void setQueryString(String queryString) {
+		this.queryString = queryString;
 	}
-	
-	public static Set<GONodeAnnotation> getAnnotationsForProtein(int nrseqProteinId, int goAspect) throws SQLException {
-		
-		// Get our connection to the database.
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-		
-		Set<GONodeAnnotation> nodes = new HashSet<GONodeAnnotation>();
-		
-		try {
-			String sqlStr = "SELECT t.name, t.term_type, t.is_obsolete, d.term_definition, t.is_root, t.id, t.acc, prot.exact "+
-							"FROM (term AS t, GOProteinLookup AS prot) "+
-							"LEFT OUTER JOIN term_definition AS d ON t.id = d.term_id "+
-							"WHERE prot.proteinID="+nrseqProteinId+" "+
-							"AND prot.termID=t.id";
-			
-			conn = DBConnectionManager.getConnection("go");	
-			stmt = conn.createStatement();
-			
-			rs = stmt.executeQuery(sqlStr);
-			
-			
-			while (rs.next()) {
-				
-				int aspect = GOUtils.getGOTypeFromDatabase(rs.getString(2));
-				if(aspect != goAspect)
-					continue;
-				
-				// We found one
-				GONode retNode = new GONode();
-				retNode.setAccession(rs.getString(7));
-				retNode.setAspect(aspect);
-				retNode.setName(rs.getString(1));
-				retNode.setDefinition(rs.getString(4));
-				retNode.setId(rs.getInt(6));
-				
-				if (rs.getInt(3) == 0) retNode.setObsolete(false);
-				else retNode.setObsolete(true);
-				
-				if (rs.getInt(5) == 0) retNode.setRoot(false);
-				else retNode.setRoot(true);
-				
-				GONodeAnnotation annotation = new GONodeAnnotation();
-				annotation.setNode(retNode);
-				if(rs.getInt(8) == 1)
-					annotation.setExact(true);
-				
-				nodes.add(annotation);
-			}
-			
-		} finally {
 
-			// Always make sure result sets and statements are closed,
-			// and the connection is returned to the pool
-			if (rs != null) {
-				try { rs.close(); } catch (SQLException e) { ; }
-				rs = null;
-			}
-			if (stmt != null) {
-				try { stmt.close(); } catch (SQLException e) { ; }
-				stmt = null;
-			}
-			if (conn != null) {
-				try { conn.close(); } catch (SQLException e) { ; }
-				conn = null;
-			}
-		}
-		
-		return nodes;
+	public void setUseBiologicalProcess(boolean useBiologicalProcess) {
+		this.bp = useBiologicalProcess;
 	}
-	
-	/**
-	 * Returns the appropriate Annotation type (NONE, EXACT, INDIRECT) for the given protein ID and go term ID
-	 * @param nrseqProteinId
-	 * @param goTermId
-	 * @return
-	 * @throws SQLException
-	 */
-	public static Annotation isProteinAnnotated(int nrseqProteinId, int goTermId) throws SQLException {
-		
-		// Get our connection to the database.
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-		
-		try {
-			String sqlStr = "SELECT exact "+
-							"FROM GOProteinLookup "+
-							"WHERE proteinID="+nrseqProteinId+" "+
-							"AND termID="+goTermId;
-			
-			conn = DBConnectionManager.getConnection("go");	
-			stmt = conn.createStatement();
-			
-			rs = stmt.executeQuery(sqlStr);
-			
-			
-			if (rs.next()) {
-				
-				if(rs.getInt(1) == 1)
-					return Annotation.EXACT;
-				else
-					return Annotation.INDIRECT;
-				
-			}
-			else
-				return Annotation.NONE;
-			
-		} finally {
 
-			// Always make sure result sets and statements are closed,
-			// and the connection is returned to the pool
-			if (rs != null) {
-				try { rs.close(); } catch (SQLException e) { ; }
-				rs = null;
-			}
-			if (stmt != null) {
-				try { stmt.close(); } catch (SQLException e) { ; }
-				stmt = null;
-			}
-			if (conn != null) {
-				try { conn.close(); } catch (SQLException e) { ; }
-				conn = null;
-			}
-		}
+	public void setUseMolecularFunction(boolean useMolecularFunction) {
+		this.mf = useMolecularFunction;
 	}
-	
-	/**
-	 * Returns the appropriate Annotation type (NONE, EXACT, INDIRECT) for the given protein ID and go term ID
-	 * @param nrseqProteinId
-	 * @param goTermId
-	 * @param excludeCodes -- a list of evidence codes to be excluded
-	 * @return
-	 * @throws SQLException
-	 */
-	public static Annotation isProteinAnnotated(int nrseqProteinId, int goTermId, List<EvidenceCode> excludeCodes) throws SQLException {
-		
-		// Get our connection to the database.
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-		
-		String evCodes = "";
-		for(EvidenceCode code: excludeCodes)
-			evCodes += ","+code.getId();
-		if(evCodes.length() > 0)
-			evCodes = evCodes.substring(1);
-		
-		try {
-			String sqlStr = "SELECT exact "+
-							"FROM GOProteinLookup_EvidenceCodes "+
-							"WHERE proteinID="+nrseqProteinId+" "+
-							"AND termID="+goTermId;
-			if(evCodes.length() > 0)
-				sqlStr += " AND evidenceCode NOT IN ("+evCodes+")";
-			
-			conn = DBConnectionManager.getConnection("go");	
-			stmt = conn.createStatement();
-			
-			rs = stmt.executeQuery(sqlStr);
-			
-			
-			if (rs.next()) {
-				
-				if(rs.getInt(1) == 1)
-					return Annotation.EXACT;
-				else
-					return Annotation.INDIRECT;
-				
-			}
-			else
-				return Annotation.NONE;
-			
-		} finally {
 
-			// Always make sure result sets and statements are closed,
-			// and the connection is returned to the pool
-			if (rs != null) {
-				try { rs.close(); } catch (SQLException e) { ; }
-				rs = null;
-			}
-			if (stmt != null) {
-				try { stmt.close(); } catch (SQLException e) { ; }
-				stmt = null;
-			}
-			if (conn != null) {
-				try { conn.close(); } catch (SQLException e) { ; }
-				conn = null;
-			}
-		}
+	public void setUseCellularComponent(boolean useCellularComponent) {
+		this.cc = useCellularComponent;
 	}
-	
+
+	public void setMatchAll(boolean matchAll) {
+		this.matchAll = matchAll;
+	}
+
+	public void setSearchSynonyms(boolean searchSynonyms) {
+		this.searchSynonyms = searchSynonyms;
+	}
+
 	/**
 	 * Returns a list "non obsolete" terms matching the given parameters
 	 * @param queryTerms
@@ -299,33 +72,179 @@ public class GoTermSearcher {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<GONode> getMatchingTerms(String queryTerms, boolean bp, boolean mf, boolean cc, 
-			boolean matchAll, boolean searchSyn) throws SQLException {
+	public List<GONode> getMatchingTerms() throws SQLException {
 		
-		if(queryTerms == null || queryTerms.trim().length() == 0)
+		if(queryString == null || queryString.trim().length() == 0)
 			return new ArrayList<GONode>(0);
 		
 		// If there are any commas remove them
-		queryTerms = queryTerms.replaceAll(",", "");
+		queryString = queryString.replaceAll(",", "");
+		String[] words = queryString.split("\\s+");
 		
-		List<GONode> matchedNodes = searchTermName(queryTerms, bp, mf, cc, matchAll);
-		Set<String> uniqAcc = new HashSet<String>(matchedNodes.size() * 2);
+		List<String> accessionWords = new ArrayList<String>();
+		List<String> nonAccWords = new ArrayList<String>();
+		Matcher m;
+		for(String word: words) {
+			m = GO_ACC_PATTERN.matcher(word);
+			if(m.matches())
+				accessionWords.add(word);
+			else
+				nonAccWords.add(word);
+		}
+		
+		Set<GONode> uniqNodes = new HashSet<GONode>();
+		
+		// Match GO accessions
+		List<GONode> accMatches = searchTermAccession(accessionWords);
+		for(GONode node: accMatches)
+			uniqNodes.add(node);
+		
+		// Match GO term names
+		List<GONode> matchedNodes = searchTermName(nonAccWords);
 		for(GONode node: matchedNodes)
-			uniqAcc.add(node.getAccession());
+			uniqNodes.add(node);
 		
-		if(searchSyn) {
-			List<GONode> synMatches = searchTermSynonyms(queryTerms, bp, mf, cc, matchAll);
+		// Match GO term synonyms
+		if(searchSynonyms) {
+			List<GONode> synMatches = searchTermSynonyms(nonAccWords);
 			for(GONode node: synMatches) {
-				if(!uniqAcc.contains(node.getAccession())) {
-					matchedNodes.add(node);
-				}
+				uniqNodes.add(node);
 			}
 		}
-		return matchedNodes;
+		return new ArrayList<GONode>(uniqNodes);
 	}
 
-	private static List<GONode> searchTermName(String queryTerms, boolean bp,
-			boolean mf, boolean cc, boolean matchAll) throws SQLException {
+	private List<GONode> searchTermAccession(List<String> words) throws SQLException {
+		// Get our connection to the database.
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try {
+			
+			String sqlStr = "SELECT  t.name, t.term_type, t.is_obsolete, d.term_definition, t.is_root, t.id, t.acc "+
+							"FROM term AS t "+
+							"LEFT OUTER JOIN term_definition AS d ON t.id = d.term_id "+
+							"WHERE t.acc = ? "+
+							"AND t.is_obsolete=0 ";
+			
+			if(bp && mf && cc) {
+				bp = false; mf = false; cc = false;
+			}
+			String domainString = "";
+			if(bp)
+				domainString += "\"biological_process\"";
+			if(mf) {
+				if(bp)	domainString += ",";
+				domainString += "\"molecular_function\"";
+			}
+			if(cc) {
+				if(bp || mf)	domainString += ",";
+				domainString += "\"cellular_component\"";
+			}
+			
+			if(domainString.length() > 0) {
+				if(domainString.indexOf(',') != -1)
+					sqlStr += " AND t.term_type IN ("+domainString+")";
+				else
+					sqlStr += " AND t.term_type = "+domainString;
+			}
+				
+			
+			conn = DBConnectionManager.getConnection("go");	
+			stmt = conn.prepareStatement(sqlStr);
+			
+			Map<Integer, GONode> nodeMap = new HashMap<Integer, GONode>();
+			Map<Integer, Integer> seenCount = new HashMap<Integer, Integer>();
+			
+			int wordCount = 0;
+			for(String word: words) {
+				word = word.trim();
+				if(word.length() == 0)
+					continue;
+				
+				stmt.setString(1, word);
+				rs = stmt.executeQuery();
+				wordCount++;
+				
+				while(rs.next()) {
+					int nodeId = rs.getInt("id");
+					
+					if(nodeMap.containsKey(nodeId)) {
+						if(matchAll) {
+							Integer count = seenCount.get(nodeId);
+							count++;
+							seenCount.put(nodeId, count);
+						}
+						continue;
+					}
+					
+					// We are matching ALL terms and this is NOT the first word we are looking at.
+					// This means that this GO term did not match the first word. So we ignore it.
+					if(matchAll && wordCount > 1)
+						continue;
+					
+					GONode node = new GONode();
+					node.setId(nodeId);
+					node.setAccession(rs.getString("acc"));
+					node.setName(rs.getString("name"));
+					node.setDefinition(rs.getString("term_definition"));
+					
+					String aspect = rs.getString("term_type");
+					if(aspect.equals("biological_process"))
+						node.setAspect(GOUtils.BIOLOGICAL_PROCESS);
+					else if(aspect.equals("molecular_function"))
+						node.setAspect(GOUtils.MOLECULAR_FUNCTION);
+					else if(aspect.equals("cellular_component"))
+						node.setAspect(GOUtils.CELLULAR_COMPONENT);
+					
+					if(rs.getInt("is_root") == 1)
+						node.setRoot(true);
+					if(rs.getInt("is_obsolete") == 1)
+						node.setObsolete(true);
+					
+					if(seenCount.containsKey(nodeId)) {
+						System.out.println("ALREADY SEEN id: "+nodeId);
+					}
+					seenCount.put(nodeId, 1);
+					
+					nodeMap.put(nodeId, node);
+				}
+			}
+			
+			if(!matchAll)
+				return new ArrayList<GONode>(nodeMap.values());
+			else {
+				List<GONode> goodNodes = new ArrayList<GONode>();
+				for(Integer nodeId: seenCount.keySet()) {
+					// add a term if it matched ALL words
+					if(seenCount.get(nodeId).intValue() == wordCount) {
+						goodNodes.add(nodeMap.get(nodeId));
+					}
+				}
+				return goodNodes;
+			}
+			
+		} finally {
+
+			// Always make sure result sets and statements are closed,
+			// and the connection is returned to the pool
+			if (rs != null) {
+				try { rs.close(); } catch (SQLException e) { ; }
+				rs = null;
+			}
+			if (stmt != null) {
+				try { stmt.close(); } catch (SQLException e) { ; }
+				stmt = null;
+			}
+			if (conn != null) {
+				try { conn.close(); } catch (SQLException e) { ; }
+				conn = null;
+			}
+		}
+	}
+	
+	private List<GONode> searchTermName(List<String> words) throws SQLException {
 		// Get our connection to the database.
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -368,9 +287,7 @@ public class GoTermSearcher {
 			Map<Integer, GONode> nodeMap = new HashMap<Integer, GONode>();
 			Map<Integer, Integer> seenCount = new HashMap<Integer, Integer>();
 			
-			String[] words = queryTerms.split("\\s+");
 			int wordCount = 0;
-			
 			for(String word: words) {
 				word = word.trim();
 				if(word.length() == 0)
@@ -458,8 +375,7 @@ public class GoTermSearcher {
 		}
 	}
 	
-	private static List<GONode> searchTermSynonyms(String queryTerms, boolean bp,
-			boolean mf, boolean cc, boolean matchAll) throws SQLException {
+	private List<GONode> searchTermSynonyms(List<String> words) throws SQLException {
 		// Get our connection to the database.
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -505,9 +421,7 @@ public class GoTermSearcher {
 			Map<Integer, GONode> nodeMap = new HashMap<Integer, GONode>();
 			Map<Integer, Integer> seenCount = new HashMap<Integer, Integer>();
 			
-			String[] words = queryTerms.split("\\s+");
 			int wordCount = 0;
-			
 			for(String word: words) {
 				word = word.trim();
 				if(word.length() == 0)

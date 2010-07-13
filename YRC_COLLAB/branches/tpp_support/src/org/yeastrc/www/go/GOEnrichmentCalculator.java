@@ -103,7 +103,7 @@ public class GOEnrichmentCalculator {
     
     private static int totalAnnotatedInputProteinCount(List<Integer> proteinIds) throws SQLException {
 		
-    	return GOAnnotationChecker.getAnnotatedProteins(proteinIds).size();
+    	return ProteinGOAnnotationChecker.getAnnotatedProteins(proteinIds).size();
 	}
 
 	private static void calculateEnrichment(List<EnrichedGOTerm> enrichedTerms, int numProteinsInSet, int totalAnnotatedProteins) throws Exception {
@@ -114,11 +114,7 @@ public class GOEnrichmentCalculator {
     }
     
     private static int totalAnnotatedProteinCount(int speciesId) throws Exception {
-    	List<GONode> nodes = new ArrayList<GONode>(3);
-    	nodes.add(GOUtils.getAspectRootNode(GOUtils.BIOLOGICAL_PROCESS));
-    	nodes.add(GOUtils.getAspectRootNode(GOUtils.CELLULAR_COMPONENT));
-    	nodes.add(GOUtils.getAspectRootNode(GOUtils.MOLECULAR_FUNCTION));
-    	return GOProteinCounter.getInstance().countProteins(nodes, false, speciesId);
+    	return GOProteinCounter.getInstance().countProteins(GOUtils.getRootNode(), speciesId);
     }
 
     
@@ -134,7 +130,7 @@ public class GOEnrichmentCalculator {
     		try {
     			// setting the second argument (exact) to false should get us all terms for this protein
     			// This should include all ancestors of terms directly assigned to this protein.
-    			nodes  = GoTermSearcher.getTermsForProtein(nrseqId, goAspect);
+    			nodes  = ProteinGOAnnotationSearcher.getTermsForProtein(nrseqId, goAspect);
     		}
     		catch (Exception e) {
     			log.error("Could not get GO annotations for proteinID: "+nrseqId, e);
@@ -159,7 +155,7 @@ public class GOEnrichmentCalculator {
     
     private static EnrichedGOTerm initEnrichedGOTerm(GONode node, int speciesId) throws Exception {
         int totalProteins = 0; // total proteins in the universe with this GO term
-        totalProteins = GOProteinCounter.getInstance().countProteins(node, false, speciesId);
+        totalProteins = GOProteinCounter.getInstance().countProteins(node, speciesId);
         return new EnrichedGOTerm(node, totalProteins);
     }
     

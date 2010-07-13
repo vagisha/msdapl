@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.bio.go.GOAnnotation;
 import org.yeastrc.bio.go.GONode;
 import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.db.DBConnectionManager;
@@ -167,7 +168,7 @@ public class GOSlimUtils {
 	}
 
 	/**
-	 * Returns a list of GONodeAnnotation, members of the given GO Slim, that the given protein is 
+	 * Returns a list of GOAnnotation, members of the given GO Slim, that the given protein is 
 	 * annotated with.
 	 * @param nrseqProteinId
 	 * @param goSlimTermId
@@ -175,15 +176,14 @@ public class GOSlimUtils {
 	 * @return
 	 * @throws SQLException 
 	 */
-	public static List<GONodeAnnotation> getAnnotations(int nrseqProteinId,
-			int goSlimTermId, int goAspect) throws SQLException {
+	public static List<GOAnnotation> getAnnotations(int nrseqProteinId, GOSlimFilter filter) throws SQLException {
 		
 		String term_type = "";
-		if(goAspect == GOUtils.BIOLOGICAL_PROCESS)
+		if(filter.getGoAspect() == GOUtils.BIOLOGICAL_PROCESS)
 			term_type = "biological_process";
-		else if(goAspect == GOUtils.MOLECULAR_FUNCTION)
+		else if(filter.getGoAspect() == GOUtils.MOLECULAR_FUNCTION)
 			term_type = "molecular_function";
-		else if(goAspect == GOUtils.CELLULAR_COMPONENT)
+		else if(filter.getGoAspect() == GOUtils.CELLULAR_COMPONENT)
 			term_type = "cellular_component";
 		
 		
@@ -192,18 +192,34 @@ public class GOSlimUtils {
 		Statement stmt = null;
 		ResultSet rs = null;
 		
-		List<GONodeAnnotation> nodes = new ArrayList<GONodeAnnotation>();
+		List<GOAnnotation> nodes = new ArrayList<GOAnnotation>();
 		
 		try {
+			String evidenceToExclude = null;
+			List<Integer> excludeCodes = filter.getExcludeEvidenceCodes();
+			if(excludeCodes != null && excludeCodes.size() > 0) {
+				evidenceToExclude = "";
+				for(Integer code: excludeCodes) {
+					evidenceToExclude += ","+code;
+				}
+				if(evidenceToExclude.length() > 0)
+					evidenceToExclude = evidenceToExclude.substring(1);
+			}
+			
+			String lookupTable = evidenceToExclude != null ? "GOProteinLookup_Ref_EvidenceCodes" : "GOProteinLookup_Ref";
+			
 			String sqlStr = "SELECT t.name, t.term_type, t.is_obsolete, d.term_definition, t.is_root, t.id, t.acc, lookup.exact "+
-							"FROM term AS t, term_definition AS d, term_subset AS s, "+
-							"GOProteinLookup AS lookup "+
+							"FROM (term AS t, term_subset AS s, "+lookupTable+" AS lookup) "+
+							"LEFT OUTER JOIN term_definition AS d ON t.id = d.term_id "+
 							"WHERE t.id = s.term_id "+
-							"AND t.id = d.term_id "+
 							"AND t.id = lookup.termID "+
 							"AND lookup.proteinID = "+nrseqProteinId+" "+
 							"AND t.term_type=\""+term_type+"\" "+
-							"AND s.subset_id="+goSlimTermId;
+							"AND s.subset_id="+filter.getSlimTermId();
+			if(evidenceToExclude != null)
+				sqlStr += " AND lookup.evidenceCode NOT IN ("+evidenceToExclude+")";
+			
+			//System.out.println(sqlStr);
 			
 			conn = DBConnectionManager.getConnection("go");	
 			stmt = conn.createStatement();
@@ -227,7 +243,7 @@ public class GOSlimUtils {
 				if (rs.getInt(5) == 0) retNode.setRoot(false);
 				else retNode.setRoot(true);
 				
-				GONodeAnnotation annotation = new GONodeAnnotation();
+				GOAnnotation annotation = new GOAnnotation();
 				annotation.setNode(retNode);
 				if(rs.getInt(8) == 1)
 					annotation.setExact(true);

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.bio.go.GOAnnotation;
 import org.yeastrc.bio.go.GONode;
 
 /**
@@ -67,7 +68,7 @@ public class GOSlimTreeCreator {
 		for(int nrseqId: nrseqProteinIds) {
 			Annotation annot;
 			try {
-				annot = GoTermSearcher.isProteinAnnotated(nrseqId, node.getId());
+				annot = ProteinGOAnnotationChecker.isProteinAnnotated(nrseqId, node.getId());
 			} catch (SQLException e) {
 				throw new GOException("Error checking annotation for protein: "+nrseqId+" and go term ID: "+node.getId(), e);
 			}
@@ -95,7 +96,7 @@ public class GOSlimTreeCreator {
 				
 				Annotation annot;
 				try {
-					annot = GoTermSearcher.isProteinAnnotated(nrseqProteinId, child.getId());
+					annot = ProteinGOAnnotationChecker.isProteinAnnotated(nrseqProteinId, child.getId());
 				} catch (SQLException e) {
 					throw new GOException("Error checking annotation for protein: "+nrseqProteinId+" and go term ID: "+child.getId(), e);
 				}
@@ -166,14 +167,14 @@ public class GOSlimTreeCreator {
 		
 		for(int nrseqProteinId: nrseqProteinIds) {
 			
-			Set<GONodeAnnotation> annotNodes = null;
+			Set<GOAnnotation> annotNodes = null;
 			try {
-				annotNodes = GoTermSearcher.getAnnotationsForProtein(nrseqProteinId, goAspect);
+				annotNodes = ProteinGOAnnotationSearcher.getAnnotationsForProtein(nrseqProteinId, goAspect);
 			} catch (SQLException e) {
 				throw new GOException("Error getting terms for GO annotations for protein: "+nrseqProteinId, e);
 			}
 			
-			for(GONodeAnnotation annot: annotNodes) {
+			for(GOAnnotation annot: annotNodes) {
 				GOSlimTerm node = nodesWithAnnotations.get(annot.getNode().getAccession());
 				
 				// If we haven't seen this node yet add it to the map
