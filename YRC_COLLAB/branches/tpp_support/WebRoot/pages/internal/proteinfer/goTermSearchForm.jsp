@@ -149,7 +149,15 @@ function addSelected() {
 			<td>
 				<input type="checkbox" class="selectable" id="<bean:write name='node' property='accession'/>"/>
 			</td>
-			<td><bean:write name="node" property="accession"/></td>
+			<td>
+				<nobr>
+				<bean:write name="node" property="accession"/>
+				<logic:equal name="node" property="obsolete" value="true">
+					<span class="go_obsolete"  
+					title="Obsolete GO Term">O</span>
+				</logic:equal>
+				</nobr>
+			</td>
 			<td align="center"><b>
 			<logic:equal name="node" property="aspect" value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">
 				<span style="color:red;" title="Biological Process">P</span></logic:equal>

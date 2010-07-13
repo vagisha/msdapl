@@ -62,7 +62,7 @@ public class GoTermSearcher {
 	}
 
 	/**
-	 * Returns a list "non obsolete" terms matching the given parameters
+	 * Returns a list of terms matching the given parameters
 	 * @param queryTerms
 	 * @param bp
 	 * @param mf
@@ -125,8 +125,7 @@ public class GoTermSearcher {
 			String sqlStr = "SELECT  t.name, t.term_type, t.is_obsolete, d.term_definition, t.is_root, t.id, t.acc "+
 							"FROM term AS t "+
 							"LEFT OUTER JOIN term_definition AS d ON t.id = d.term_id "+
-							"WHERE t.acc = ? "+
-							"AND t.is_obsolete=0 ";
+							"WHERE t.acc = ? ";
 			
 			if(bp && mf && cc) {
 				bp = false; mf = false; cc = false;
@@ -255,8 +254,7 @@ public class GoTermSearcher {
 			String sqlStr = "SELECT  t.name, t.term_type, t.is_obsolete, d.term_definition, t.is_root, t.id, t.acc "+
 							"FROM term AS t "+
 							"LEFT OUTER JOIN term_definition AS d ON t.id = d.term_id "+
-							"WHERE t.name LIKE ? "+
-							"AND t.is_obsolete=0 ";
+							"WHERE t.name LIKE ? ";
 			
 			if(bp && mf && cc) {
 				bp = false; mf = false; cc = false;
@@ -387,8 +385,7 @@ public class GoTermSearcher {
 							"FROM (term AS t, term_synonym AS ts ) "+
 							"LEFT OUTER JOIN term_definition AS d ON t.id = d.term_id "+
 							"WHERE ts.term_synonym LIKE ? "+
-							"AND ts.term_id = t.id "+
-							"AND t.is_obsolete=0 ";
+							"AND ts.term_id = t.id ";
 			
 			if(bp && mf && cc) {
 				bp = false; mf = false; cc = false;

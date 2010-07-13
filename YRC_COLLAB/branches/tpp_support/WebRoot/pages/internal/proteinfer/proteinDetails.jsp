@@ -112,6 +112,9 @@
 	 <a target="go_window"
 	    href="http://www.godatabase.org/cgi-bin/amigo/go.cgi?action=query&view=query&search_constraint=terms&query=<bean:write name="gonode" property="node.accession"/>">
       <bean:write name="gonode" property="node.name"/></a>
+      <logic:equal name="gonode" property="node.obsolete" value="true">
+		<span class="go_obsolete"  title="Obsolete GO Term">O</span>
+	  </logic:equal>
       <yrcwww:goEvidence name="gonode" />	 
       <br>
      </logic:iterate>    
@@ -132,6 +135,9 @@
 	 <a target="go_window"
 	    href="http://www.godatabase.org/cgi-bin/amigo/go.cgi?action=query&view=query&search_constraint=terms&query=<bean:write name="gonode" property="node.accession"/>">
       <bean:write name="gonode" property="node.name"/></a>
+      <logic:equal name="gonode" property="node.obsolete" value="true">
+		<span class="go_obsolete"  title="Obsolete GO Term">O</span>
+	  </logic:equal>
       <yrcwww:goEvidence name="gonode" />	 
       <br>
      </logic:iterate>    
@@ -153,6 +159,9 @@
 	 <a target="go_window"
 	    href="http://www.godatabase.org/cgi-bin/amigo/go.cgi?action=query&view=query&search_constraint=terms&query=<bean:write name="gonode" property="node.accession"/>">
       <bean:write name="gonode" property="node.name"/></a>
+      <logic:equal name="gonode" property="node.obsolete" value="true">
+		<span class="go_obsolete"  title="Obsolete GO Term">O</span>
+	  </logic:equal>
       <yrcwww:goEvidence name="gonode" />	 
       <br>
      </logic:iterate>    

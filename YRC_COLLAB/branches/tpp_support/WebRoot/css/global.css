@@ -600,4 +600,14 @@ SPAN.multiple_hash_residue {
 .highlight {
 	background-color:#FFFACD; /* LemonChiffon */
 }
+span.go_obsolete {
+	background-color:red;
+	color:white;
+	font-size:8pt;
+	font-weight:bold;
+	padding:0 2 0 2;	
+}
+span.go_obsolete:hover {
+	cursor:help;
+}
 

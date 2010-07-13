@@ -131,7 +131,7 @@ function toggleSlimBarChart() {
 			<td style="font-size:8pt;" valign="top">Number of proteins in the input list annotated with the GO term or any of its descendants</td>
 		</tr>
 	</table>
-	<table class="table_basic" id="go_slim_table" width="75%">
+	<table class="table_basic" id="go_slim_table" width="95%">
 	<thead>
 	<tr>
 	<th class="sort-alpha clickable">GO ID</th>
@@ -148,6 +148,7 @@ function toggleSlimBarChart() {
 		<bean:write name="node" property="accession"/>
 		&nbsp;&nbsp;
 		<span style="font-size:8pt;">
+		<nobr>
 		<a target="go_window"
 	    href="http://www.godatabase.org/cgi-bin/amigo/go.cgi?action=query&view=query&search_constraint=terms&query=<bean:write name="node" property="accession"/>">
         AmiGO</a>
@@ -160,6 +161,7 @@ function toggleSlimBarChart() {
         <span class="go_filter_remove" id="<bean:write name='node' property='accession'/>" title="Remove" style="display:none;">
         	<img src="<yrcwww:link path='images/filter_yellow.png'/>"alt="Filter"/>
         </span>
+        </nobr>
         </span>
         </td>
 		<td><span title="<bean:write name="node" property="goNode.definition"/>" style="cursor:help;"><bean:write name="node" property="name"/></span></td>

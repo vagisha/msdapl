@@ -88,7 +88,7 @@ public class GOEvidenceTag extends TagSupport {
         	
         	for ( EvidenceCode ec : annotation.getEvidence().keySet() ) {
 
-            	output += "[<span title=\""+ec.getEvidenceCodeName()+"\">";
+            	output += "[<span style=\"cursor:help\" title=\""+ec.getEvidenceCodeName()+"\">";
             	output += ec.getEvidenceCode();
             	output += "</span>&nbsp;";
         		
