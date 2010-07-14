@@ -131,6 +131,8 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetProteinIon.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetSubsumedProtein.xml"/>
 	
-	
+	<!-- Maps for summary tables -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/ProteinferRunSummary.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetRunSummary.xml"/>
 	
 </sqlMapConfig>	

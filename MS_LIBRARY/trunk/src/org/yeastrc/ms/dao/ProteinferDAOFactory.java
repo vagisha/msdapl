@@ -9,6 +9,7 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferIonDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferPeptideDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunSummaryDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferSpectrumMatchDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerInputDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerIonDAO;
@@ -26,6 +27,7 @@ import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinGroupDAO
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinIonDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRocDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunSummaryDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetSubsumedProteinDAO;
 
 import com.ibatis.common.resources.Resources;
@@ -90,6 +92,10 @@ public class ProteinferDAOFactory {
     private ProteinProphetProteinIonDAO ppProteinIonDao;
     private ProteinProphetSubsumedProteinDAO ppSubsumedDao;
     
+    // Summary table related
+    private ProteinferRunSummaryDAO pinferRunSummaryDao;
+    private ProteinProphetRunSummaryDAO ppRunSummaryDao;
+    
     
     
     private ProteinferDAOFactory() {
@@ -122,6 +128,10 @@ public class ProteinferDAOFactory {
        ppPeptideDao = new ProteinProphetPeptideDAO(sqlMap, peptideDao);
        ppProteinIonDao = new ProteinProphetProteinIonDAO(sqlMap);
        ppSubsumedDao = new ProteinProphetSubsumedProteinDAO(sqlMap);
+       
+       // Summary table related
+       pinferRunSummaryDao = new ProteinferRunSummaryDAO(sqlMap);
+       ppRunSummaryDao = new ProteinProphetRunSummaryDAO(sqlMap);
     }
     
     public static ProteinferDAOFactory instance() {
@@ -246,5 +256,16 @@ public class ProteinferDAOFactory {
     
     public ProteinProphetSubsumedProteinDAO getProteinProphetSubsumedProteinDao() {
         return ppSubsumedDao;
+    }
+    
+    //---------------------------------------------------------------------
+    // Summary table related
+    //---------------------------------------------------------------------
+    public ProteinferRunSummaryDAO getProteinferRunSummaryDao() {
+    	return pinferRunSummaryDao;
+    }
+    
+    public ProteinProphetRunSummaryDAO getProteinProphetRunSummaryDao() {
+    	return ppRunSummaryDao;
     }
 }

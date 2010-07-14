@@ -7,9 +7,7 @@ import java.util.Map;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.protinfer.GenericProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.GenericProteinferSpectrumMatchDAO;
-import org.yeastrc.ms.domain.protinfer.GenericProteinferRun;
 import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
-import org.yeastrc.ms.domain.search.Program;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
