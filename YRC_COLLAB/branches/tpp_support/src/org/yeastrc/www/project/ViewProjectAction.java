@@ -34,17 +34,14 @@ import org.yeastrc.experiment.ProjectExperiment;
 import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.experiment.ProjectProteinInferBookmarkDAO;
 import org.yeastrc.experiment.SearchAnalysis;
+import org.yeastrc.experiment.proteinfer.ProteinferRunSummaryLookup;
 import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
-import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferPeptideDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
-import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinDAO;
-import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerRunDAO;
-import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
@@ -52,7 +49,9 @@ import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.general.MsInstrument;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
+import org.yeastrc.ms.domain.protinfer.ProteinferRunSummary;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRunSummary;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.project.Project;
@@ -322,9 +321,7 @@ public class ViewProjectAction extends Action {
 	private List<ExperimentProteinProphetRun> getProteinProphetRuns(List<Integer> piRunIds) {
 		
 		ProteinProphetRunDAO pRunDao = ProteinferDAOFactory.instance().getProteinProphetRunDao();
-        ProteinProphetProteinDAO prophetProtDao = ProteinferDAOFactory.instance().getProteinProphetProteinDao();
         ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
-        ProteinferPeptideDAO peptDao = ProteinferDAOFactory.instance().getProteinferPeptideDao();
         
 		List<ExperimentProteinProphetRun> prophetRunList = new ArrayList<ExperimentProteinProphetRun>();
 		for(int piRunId: piRunIds) {
@@ -332,11 +329,14 @@ public class ViewProjectAction extends Action {
 		    if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {
 		        ProteinProphetRun ppRun = pRunDao.loadProteinferRun(piRunId);
 		        ExperimentProteinProphetRun eppRun = new ExperimentProteinProphetRun(ppRun);
-		        eppRun.setNumParsimoniousProteins(prophetProtDao.getProteinferProteinIds(piRunId, true).size());
-		        eppRun.setNumParsimoniousProteinGroups(prophetProtDao.getIndistinguishableGroupCount(piRunId, true));
-		        eppRun.setNumParsimoniousProteinProphetGroups(prophetProtDao.getProteinProphetGroupCount(piRunId, true));
-		        eppRun.setUniqPeptideSequenceCount(peptDao.getUniquePeptideSequenceCountForRun(piRunId));
-		        eppRun.setUniqIonCount(peptDao.getUniqueIonCountForRun(piRunId));
+		        
+		        ProteinProphetRunSummary summary = ProteinferRunSummaryLookup.getProteinProphetSummary(piRunId);
+		        
+		        eppRun.setNumParsimoniousProteins(summary.getProteinCount());
+		        eppRun.setNumParsimoniousProteinGroups(summary.getIndistGroupCount());
+		        eppRun.setNumParsimoniousProteinProphetGroups(summary.getProphetGroupCount());
+		        eppRun.setUniqPeptideSequenceCount(summary.getUniqPeptSeqCount());
+		        eppRun.setUniqIonCount(summary.getUniqIonCount());
 		        prophetRunList.add(eppRun);
 		    }
 		}
@@ -345,11 +345,7 @@ public class ViewProjectAction extends Action {
 	
 	private List<ExperimentProteinferRun> getProteinInferRuns(List<Integer> piRunIds) {
 		
-		
-		IdPickerRunDAO pRunDao = ProteinferDAOFactory.instance().getIdPickerRunDao();
-        IdPickerProteinDAO proteinDao = ProteinferDAOFactory.instance().getIdPickerProteinDao();
         ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
-        ProteinferPeptideDAO peptDao = ProteinferDAOFactory.instance().getProteinferPeptideDao();
         
 		List<ExperimentProteinferRun> idPickerRunList = new ArrayList<ExperimentProteinferRun>();
 		for(int piRunId: piRunIds) {
@@ -359,10 +355,12 @@ public class ViewProjectAction extends Action {
 		        ProteinferJob job = ProteinInferJobSearcher.getInstance().getJobForPiRunId(piRunId);
 		        ExperimentProteinferRun eppRun = new ExperimentProteinferRun(job);
 		        
-		        eppRun.setNumParsimoniousProteins(proteinDao.getIdPickerProteinIds(piRunId, true).size());
-		        eppRun.setNumParsimoniousProteinGroups(proteinDao.getIdPickerGroupCount(piRunId, true));
-		        eppRun.setUniqPeptideSequenceCount(peptDao.getUniquePeptideSequenceCountForRun(piRunId));
-		        eppRun.setUniqIonCount(peptDao.getUniqueIonCountForRun(piRunId));
+		        ProteinferRunSummary summary = ProteinferRunSummaryLookup.getIdPickerRunSummary(piRunId);
+		        
+		        eppRun.setNumParsimoniousProteins(summary.getParsimProteinCount());
+		        eppRun.setNumParsimoniousProteinGroups(summary.getParsimIndistGroupCount());
+		        eppRun.setUniqPeptideSequenceCount(summary.getUniqPeptSeqCount());
+		        eppRun.setUniqIonCount(summary.getUniqIonCount());
 		        
 		        idPickerRunList.add(eppRun);
 		    }
