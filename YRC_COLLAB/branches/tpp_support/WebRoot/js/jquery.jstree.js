@@ -250,9 +250,9 @@
 				'.jstree li { display:block; min-height:25px; line-height:25px; white-space:nowrap; margin-left:18px; } ' + 
 				'.jstree > ul > li { margin-left:0px; } ' + 
 				'.jstree ins { display:inline-block; text-decoration:none; width:25px; height:25px; margin:0 0 0 0; padding:0; } ' + 
-				'.jstree a { display:inline-block; line-height:16px; height:px; color:black; white-space:nowrap; text-decoration:none; padding:1px 2px; margin:0; } ' + 
+				'.jstree a { display:inline-block; line-height:16px; height:16px; color:black; white-space:nowrap; text-decoration:none; padding:1px 2px; margin:0; } ' + 
 				'.jstree a:focus { outline: none; } ' + 
-				'.jstree a > ins { height:0px; width:0px; } ' + 
+				'.jstree a > ins { height:16px; width:16px; } ' + 
 				'.jstree a > .jstree-icon { margin-right:3px; } ' + 
 				'li.jstree-open > ul { display:block; } ' + 
 				'li.jstree-closed > ul { display:none; } ';
