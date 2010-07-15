@@ -41,6 +41,7 @@ public class ProteinFilterCriteria implements Serializable {
     private double coverage = 0.0;
     private double maxCoverage = 100.0;
     
+    private String commonNameLike;
     private String accessionLike;
     private String descriptionLike;
     private String descriptionNotLike;
@@ -187,6 +188,14 @@ public class ProteinFilterCriteria implements Serializable {
 
 	public void setGoFilterCriteria(GOProteinFilterCriteria goFilterCriteria) {
 		this.goFilterCriteria = goFilterCriteria;
+	}
+
+	public String getCommonNameLike() {
+		return commonNameLike;
+	}
+
+	public void setCommonNameLike(String commonNameLike) {
+		this.commonNameLike = commonNameLike;
 	}
 
 	public String getAccessionLike() {
@@ -393,6 +402,14 @@ public class ProteinFilterCriteria implements Serializable {
         else {
         	if(!(this.goFilterCriteria.equals(that.goFilterCriteria)))
         		return false;
+        }
+        
+        if(commonNameLike == null) {
+            if(that.commonNameLike != null)  return false;
+        }
+        else {
+            if(!this.commonNameLike.equalsIgnoreCase(that.commonNameLike))
+                return false;
         }
         
         if(accessionLike == null) {
