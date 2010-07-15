@@ -34,6 +34,7 @@ import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.ms.util.TimeUtils;
+import org.yeastrc.nrseq.CommonNameSupportUtils;
 import org.yeastrc.www.compare.ProteinDatasetComparer.PARSIM;
 import org.yeastrc.www.compare.dataset.DatasetBuilder;
 import org.yeastrc.www.compare.dataset.DatasetSource;
@@ -107,6 +108,13 @@ public class DoComparisonAction extends Action {
         }
         else {
         	request.setAttribute("comparisonCommands", ComparisonCommand.getCommandsMinusGO());
+        }
+        
+        
+        for(Integer speciesId: speciesIds) {
+        	if(CommonNameSupportUtils.isSpeciesSupported(speciesId)) {
+        		request.setAttribute("commonNameSupported", true);
+        	}
         }
         
         // Species for GO analyses

@@ -12,6 +12,7 @@ package org.yeastrc.www.compare;
  */
 public class ProteinPropertiesFilters {
 
+	private String commonNameLike;
 	private String accessionLike;
     private String descriptionLike;
     private String descriptionNotLike;
@@ -36,6 +37,8 @@ public class ProteinPropertiesFilters {
     private double proteinProphetError = 0.01;
     private boolean useGroupProbability = true;
     
+   
+    public ProteinPropertiesFilters() {}
     
     public boolean equals(Object o) {
     	
@@ -45,6 +48,7 @@ public class ProteinPropertiesFilters {
             return false;
         ProteinPropertiesFilters that = (ProteinPropertiesFilters)o;
         
+        if(this.commonNameLike != that.commonNameLike)					return false;
         if(this.accessionLike != that.accessionLike)          			return false;
         if(this.descriptionLike != that.descriptionLike)      			return false;
         if(this.descriptionNotLike!= that.descriptionNotLike)          	return false;
@@ -150,9 +154,19 @@ public class ProteinPropertiesFilters {
 		this.maxUniqPeptideCount = maxUniqPeptideCount;
 	}
 
-	public ProteinPropertiesFilters() {}
-    
-    public String getAccessionLike() {
+    public String getCommonNameLike() {
+		return commonNameLike;
+	}
+
+	public void setCommonNameLike(String commonNameLike) {
+		this.commonNameLike = commonNameLike;
+	}
+	
+	public boolean hasCommonNameFilter() {
+    	return (this.commonNameLike != null && this.commonNameLike.trim().length() > 0);
+    }
+
+	public String getAccessionLike() {
         return accessionLike;
     }
 

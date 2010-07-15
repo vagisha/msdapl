@@ -48,6 +48,7 @@ public class DatasetFiltersForm extends ActionForm {
     private String maxUniquePeptides;
     private boolean peptideUniqueSequence = false;
     
+    private String commonNameLike = null;
     private String accessionLike = null;
     private String descriptionLike = null;
     private String descriptionNotLike = null;
@@ -134,6 +135,19 @@ public class DatasetFiltersForm extends ActionForm {
 
     public void setGroupIndistinguishableProteins(boolean groupProteins) {
         this.groupIndistinguishableProteins = groupProteins;
+    }
+    
+    // COMMON NAME FILTERS
+    public String getCommonNameLike() {
+        if(commonNameLike == null || commonNameLike.trim().length() == 0)
+            return null;
+        else
+            return commonNameLike.trim();
+            
+    }
+    
+    public void setCommonNameLike(String commonNameLike) {
+        this.commonNameLike = commonNameLike;
     }
     
     // ACCESSION STRING FILTERS
@@ -546,6 +560,7 @@ public class DatasetFiltersForm extends ActionForm {
         filters.setMinPi(this.getMinPiDouble());
         filters.setMaxPi(this.getMaxPiDouble());
         
+        filters.setCommonNameLike(this.getCommonNameLike());
         filters.setAccessionLike(this.getAccessionLike());
         filters.setDescriptionLike(this.getDescriptionLike());
         filters.setDescriptionNotLike(this.getDescriptionNotLike());
@@ -589,7 +604,7 @@ public class DatasetFiltersForm extends ActionForm {
         filterCriteria.setParsimonious(true);
         filterCriteria.setNonParsimonious(false);
         
-        filterCriteria.setSearchAllDescriptions(this.isSearchAllDescriptions());
+        //filterCriteria.setSearchAllDescriptions(this.isSearchAllDescriptions());
        
         return filterCriteria;
     }

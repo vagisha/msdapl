@@ -284,7 +284,7 @@ function removeFromGoTermFilters(goTerm, warn) {
   			<td valign="top">Exclude: </td>
   			<td valign="top">
   				<html:text name="proteinInferFilterForm" property="descriptionNotLike" size="40"></html:text>
-  				<span style="font-size:8pt;">Search All:<html:checkbox property="proteinInferFilterForm" property="searchAllDescriptions"></html:checkbox></span>
+  				<nobr><span style="font-size:8pt;">Search All:<html:checkbox property="proteinInferFilterForm" property="searchAllDescriptions"></html:checkbox></span></nobr>
   			</td>
   		</tr>
   		<tr>

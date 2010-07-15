@@ -19,6 +19,7 @@ import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.compare.util.FastaDatabaseLookupUtil;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
+import org.yeastrc.www.proteinfer.ProteinCommonNameFilter;
 import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
 import org.yeastrc.www.proteinfer.ProteinPropertiesFilter;
 
@@ -101,6 +102,10 @@ public class ProteinPropertiesFilterer {
 			List<? extends Dataset> datasets, List<Integer> nrseqIds)
 			throws SQLException {
 		log.info("Number of nrseq IDs BEFORE filtering: "+nrseqIds.size());
+		
+		// apply common name filter
+		nrseqIds = applyCommonNameFilter(filters, datasets, nrseqIds);
+		
 		// apply accession filter
 		nrseqIds = applyAccessionFilter(filters, datasets, nrseqIds);
 		
@@ -200,6 +205,25 @@ public class ProteinPropertiesFilterer {
 			long e = System.currentTimeMillis();
 			
 			log.info("Time to filter on accession: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+		}
+		return nrseqIds;
+	}
+	
+	// ----------------------------------------------------------------------
+	// COMMON NAME
+	// ----------------------------------------------------------------------
+	private List<Integer> applyCommonNameFilter(
+			ProteinPropertiesFilters filters, List<? extends Dataset> datasets,
+			List<Integer> nrseqIds) throws SQLException {
+		
+		if(filters.hasCommonNameFilter()) {
+			long s = System.currentTimeMillis();
+			
+			nrseqIds = ProteinCommonNameFilter.getInstance().filterNrseqIdsByCommonName(nrseqIds, 
+					filters.getCommonNameLike());
+			long e = System.currentTimeMillis();
+			
+			log.info("Time to filter on common name: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
 		}
 		return nrseqIds;
 	}

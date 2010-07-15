@@ -1402,6 +1402,7 @@ function hideAllDescriptionsForProtein(proteinId) {
     	<tr>
     	<td valign="top" style="padding:5x;"><b>GO Slim Analysis: </b></td>
     	<td style="padding:5x;" valign="top">
+    		<nobr>
     		GO Aspect: 
     		<html:select name="proteinInferFilterForm" property="goAspect" styleId="goAspectField1">
 			<html:option
@@ -1411,16 +1412,20 @@ function hideAllDescriptionsForProtein(proteinId) {
 			<html:option
 				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
 			</html:select>
+			</nobr>
     	</td>
     	
     	<td style="padding:5x;" valign="top">
+    		<nobr>
     		GO Slim:
 			<html:select name="proteinInferFilterForm" property="goSlimTermId" styleId="goSlimTermIdField">
 			<html:options collection="goslims" property="id" labelProperty="name"/>
 			</html:select>
+			</nobr>
 			<div align="center" style="width:100%; font-size:8pt;">
 			<a href="http://www.geneontology.org/GO.slims.shtml" target="go_window">More information on GO Slims</a>
 			</div>
+			
     	</td>
     	
     	<td style="padding:5x;" valign="top">
@@ -1431,6 +1436,7 @@ function hideAllDescriptionsForProtein(proteinId) {
     	<tr>
     	<td valign="top" style="padding:5x;"><b>GO Enrichment: </b></td>
     	<td style="padding:5x;">
+    		<nobr>
     		GO Aspect:
     		<html:select name="proteinInferFilterForm" property="goAspect" styleId="goAspectField2">
 			<html:option
@@ -1439,18 +1445,23 @@ function hideAllDescriptionsForProtein(proteinId) {
 				value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">Cellular Component</html:option>
 			<html:option
 				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
-		</html:select>
+			</html:select>
+			</nobr>
     	</td>
     	
     	<td style="padding:5x;">
+    		<nobr>
     		P-Value: <html:text name="proteinInferFilterForm" property="goEnrichmentPVal" styleId="goEnrichmentPValField"></html:text>
+    		</nobr>
     	</td>
 		
 		<td style="padding:5x;">
+			<nobr>
     		Species: <html:select name="proteinInferFilterForm" property="speciesId" styleId="speciesField">
     		<html:option value="0">None</html:option>
     		<html:options collection="speciesList" property="id" labelProperty="name"/>
     		</html:select>
+    		</nobr>
     	</td>
     	
 		<td style="padding:5x;">

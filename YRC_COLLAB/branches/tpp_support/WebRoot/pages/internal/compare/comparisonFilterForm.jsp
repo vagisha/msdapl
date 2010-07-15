@@ -357,11 +357,27 @@ function showActionOptions() {
 	<tr>
 		<!-- ################## SEARCH BOX	  ########################################### -->
 		<td style="padding-left:5px;" valign="top">Fasta ID(s):</td>
-		<td style="padding:0 5 5 0;" colspan="3"> 
+		
+		<logic:present name="commonNameSupported">
+			<td style="padding:0 5 5 0;"> 
+		</logic:present>
+		<logic:notPresent name="commonNameSupported">
+			<td style="padding:0 5 5 0;" colspan="3"> 
+		</logic:notPresent>
+		
 			<html:text name="proteinSetComparisonForm" property="accessionLike" size="40"></html:text><br>
- 			<span style="font-size:8pt;">Enter a comma-separated list of complete or partial FASTA identifiers.</span>
+ 			<span style="font-size:8pt;">Enter a comma-separated list of FASTA identifiers.</span>
  		</td>
- 		<td></td>
+ 		
+ 		<logic:present name="commonNameSupported">
+ 		<td style="padding-left:5px;" valign="top">
+ 			Common Name(s):
+ 		</td>
+ 		<td style="padding-left:5px;" valign="top">
+ 			<html:text name="proteinSetComparisonForm" property="commonNameLike" size="40"></html:text><br>
+ 			<span style="font-size:8pt;">Enter a comma-separated list of names.</span>
+ 		</td>
+ 		</logic:present>
  	</tr>
  	<tr>
  		<td style="padding-left:5px;" valign="top">Description Include: </td>
@@ -447,6 +463,7 @@ function showActionOptions() {
 	<!--  ====================================================================================== -->
 	<!-- GENE ONTOLOGY OPTIONS -->
 	<!--  ====================================================================================== -->
+	<div style="display:none;">
 	<logic:present name="goSupported">
 	<div style="background-color:#F2F2F2;width:80%; margin:5 0 0 0; padding:1 0 1 0; color:black; border: 1px solid gray; font-size:8pt;" align="left">
 	<span style="margin-left:5;" 
@@ -513,7 +530,7 @@ function showActionOptions() {
     	</table>
 	</div> <!-- END OF GENE ONTOLOGY OPTIONS -->	
 	</logic:present>
-	
+	</div>
 	
 	<!--  ====================================================================================== -->
 	<!-- DISPLAY OPTIONS -->
