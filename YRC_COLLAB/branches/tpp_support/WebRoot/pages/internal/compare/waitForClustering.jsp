@@ -13,7 +13,6 @@
 <%@ include file="/includes/errors.jsp" %>
 
 
-<script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
 <script src="<yrcwww:link path='js/jquery.form.js'/>"></script>
 
 <script src="<yrcwww:link path='js/comparison.js'/>"></script>

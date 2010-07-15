@@ -9,7 +9,7 @@
 <logic:notEmpty name="experiment" property="searches">
 	<logic:iterate name="experiment" property="searches" id="search">
 		<div style="background-color: #FFFFE0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
-		<table width="90%">
+		<table width="100%">
 			<tr>
 				<td width="33%"><b>Program: </b>&nbsp;
 				<b><bean:write name="search" property="searchProgram"/>
@@ -407,7 +407,7 @@
 
 
 <!-- FILES FOR THE EXPERIMENT (Placeholder)-->
-<div align="center">
+<div align="center" style="width:100%;">
 <span
 	id="listfileslink_<bean:write name='experiment' property='id'/>"  
 	class="clickable" style="font-weight:bold; color:#D74D2D;" 

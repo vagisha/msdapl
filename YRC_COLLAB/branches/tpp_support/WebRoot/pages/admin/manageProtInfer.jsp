@@ -12,12 +12,12 @@
 <%@ include file="/includes/errors.jsp" %>
 
 <center>
-<div align="center" style="margin:10; padding:10px; width:70%; border: 1px dashed gray; background:white;" >
+<div align="center" style="margin:10; padding:10px; width:700px; border: 1px dashed gray; background:white;" >
 	<b><a href="<yrcwww:link path='listProtInferJobs.do?status=pending' />">List Protein Inference Jobs</a></b>
 </div>
 
 
-<yrcwww:contentbox title="Re-run Protein Inferences" centered="true" width="70" widthRel="true" scheme="groups">
+<yrcwww:contentbox title="Re-run Protein Inferences" centered="true" width="700" scheme="groups">
 
 <html:form name="rerunForm" type="org.yeastrc.www.proteinfer.job.RerunProteinInferenceForm" 
 			action="rerunProteinInferences"
@@ -52,7 +52,7 @@
 <br/>
 
 
-<yrcwww:contentbox title="Delete Protein Inferences" centered="true" width="70" widthRel="true" scheme="groups">
+<yrcwww:contentbox title="Delete Protein Inferences" centered="true" width="700" scheme="groups">
 
 <html:form name="deleteForm" type="org.yeastrc.www.proteinfer.job.DeleteProteinInferenceForm" 
 			action="deleteProteinInferences"

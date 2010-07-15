@@ -89,9 +89,8 @@ public class GOTreeNodeTag extends TagSupport {
 		if(node.isMarked()) {
 			writer.print("<span class='slim-node'>");
 		}
-		writer.write("<a target='go_window' href='http://www.godatabase.org/cgi-bin/amigo/go.cgi?action=query&view=query&search_constraint=terms&query="+node.getGoNode().getAccession()+"'>");
+		
 		writer.write(node.getGoNode().getAccession()+": "+node.getGoNode().getName());
-		writer.write("</a>");
 		
 		writer.print("<span ");
 		if(node.isLeaf()) // a node with # annotations = # exact annotations (this should be true of "real" GO leaf nodes)
@@ -99,6 +98,10 @@ public class GOTreeNodeTag extends TagSupport {
 		else
 			writer.print("class=\'red\'>");
 		writer.print(node.getAnnotationLabel());
+		
+		writer.write("&nbsp;<a style='font-size:8pt;font-weight:normal;' target='go_window' href='http://www.godatabase.org/cgi-bin/amigo/go.cgi?action=query&view=query&search_constraint=terms&query="+node.getGoNode().getAccession()+"'>");
+		writer.write("[Amigo]");
+		writer.write("</a>");
 		
 		writer.print("</span>");
 		writer.print("</span>");

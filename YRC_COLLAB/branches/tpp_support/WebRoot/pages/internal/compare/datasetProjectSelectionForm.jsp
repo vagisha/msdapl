@@ -4,8 +4,6 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
-
 <yrcwww:notauthenticated>
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>

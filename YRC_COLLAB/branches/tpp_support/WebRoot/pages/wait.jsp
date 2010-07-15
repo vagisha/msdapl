@@ -1,4 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <html>
   <head>
     <title>wait.html</title>
@@ -14,7 +15,7 @@
   <body>
   	<b>Processing...</b>
   	<br/>
-    <img alt="Processing..." src="images/ajax-loader.gif"
- 	style="margin-top:25; margin-bottom:25;">
+    <img alt="Processing..." src="<yrcwww:link path="images/ajax-loader.gif"/>"
+ 	style="margin-top:25; margin-bottom:25;" />
   </body>
 </html>

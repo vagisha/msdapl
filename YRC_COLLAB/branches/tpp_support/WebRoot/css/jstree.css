@@ -13,9 +13,8 @@
 .jstree-default .jstree-closed > ins { background-image:url("../images/node-closed.png"); background-repeat:no-repeat; background-color:transparent; background-position: center center;}
 .jstree-default .jstree-leaf > ins { background-image:url("../images/node-leaf.png"); background-repeat:no-repeat; background-color:transparent; background-position: center center;}
 
-.jstree-default .slim-node {background:#E6E6FA; font-weight:bold;}
-.jstree-default .slim-node > a {color:navy;}
-.jstree-default a:hover {background:#3875D7; color:white;}
+.jstree-default .slim-node {background:#E6E6FA; color:navy; font-weight:bold;}
+.jstree-default .slim-node  a {color:#3875D7;}
 .jstree-default span.red {color:red;}
 .jstree-default span.green {color:green;}
 

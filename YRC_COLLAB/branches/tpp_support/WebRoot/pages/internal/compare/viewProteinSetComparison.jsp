@@ -23,7 +23,6 @@
 
 <bean:define name="comparison" id="comparison" type="org.yeastrc.www.compare.ProteinComparisonDataset"></bean:define>
 
-<script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
 <script src="<yrcwww:link path='js/jquery.form.js'/>"></script>
 <script src="<yrcwww:link path='js/jquery.blockUI.js'/>"></script>
 

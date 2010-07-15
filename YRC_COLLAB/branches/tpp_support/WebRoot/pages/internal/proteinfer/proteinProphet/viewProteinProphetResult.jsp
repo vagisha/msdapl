@@ -887,7 +887,7 @@ function submitFormForGoSlimAnalysisTree() {
 	$("form#filterForm input[name='goSlimTermId']").val(goSlim);
 	
 	// we want the result to open in a new window
-	window.open("wait.html", 'goslimgraph', 'scrollbars=yes,menubar=no,height=600,width=800,resizable=yes,toolbar=no,status=no');
+	window.open("paages/wait.jsp", 'goslimgraph', 'scrollbars=yes,menubar=no,height=600,width=800,resizable=yes,toolbar=no,status=no');
 	$("form#filterForm").attr("target", "goslimgraph");
 	$("form#filterForm").submit();
 	

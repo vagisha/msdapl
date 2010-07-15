@@ -244,7 +244,7 @@ function removeFromGoTermFilters(goTerm, warn) {
   
   		<logic:present name="goSupported">
   		<tr>
-  			<td valign="top">GO Term(s): <br/><span class="clickable underline" style="color:red; font-weight:bold;" 
+  			<td valign="top">GO Terms: <br/><span class="clickable underline" style="color:red; font-weight:bold;" 
   			onclick="javascript:openGOTermSearcher();return false;">Search</span></td>
   			<td valign="top"><html:text name="proteinInferFilterForm" property="goTerms" size="40"></html:text><br>
   				<span style="font-size:8pt;"></span>
@@ -255,22 +255,22 @@ function removeFromGoTermFilters(goTerm, warn) {
   				&nbsp;
   				<nobr>
   				Exclude: 
-  				<html:checkbox name="proteinInferFilterForm" property="excludeIea"><span title="Inferred from Electronic Annotation">IEA</span></html:checkbox>
-  				<html:checkbox name="proteinInferFilterForm" property="excludeNd"><span title="No Biological Data available">ND</span></html:checkbox>
-  				<html:checkbox name="proteinInferFilterForm" property="excludeCompAnalCodes"><span title="Computational Analysis Evidence Codes">ISS, ISO, ISA, ISM, IGC, RCA</span></html:checkbox>
+  				<html:checkbox name="proteinInferFilterForm" property="excludeIea" title="Inferred from Electronic Annotation">IEA</html:checkbox>
+  				<html:checkbox name="proteinInferFilterForm" property="excludeNd" title="No Biological Data available">ND</html:checkbox>
+  				<html:checkbox name="proteinInferFilterForm" property="excludeCompAnalCodes" title="Computational Analysis Evidence Codes">ISS, ISO, ISA, ISM, IGC, RCA</html:checkbox>
   				</nobr>
   			</td>
   		</tr>
   		</logic:present>
   		
   		<tr>
-  			<td valign="top">Fasta ID(s): </td>
+  			<td valign="top">Fasta IDs: </td>
   			<td valign="top"><html:text name="proteinInferFilterForm" property="accessionLike" size="40"></html:text><br>
   				<span style="font-size:8pt;">Enter a comma-separated list of identifiers</span>
   			</td>
   			
   			<logic:present name="commonNameSupported">
-  			<td valign="top">Common Name(s): </td>
+  			<td valign="top">Common Names: </td>
   			<td valign="top"><html:text name="proteinInferFilterForm" property="commonNameLike" size="40"></html:text><br>
   				<span style="font-size:8pt;">Enter a comma-separated list of common names</span>
   			</td>

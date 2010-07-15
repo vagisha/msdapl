@@ -7,7 +7,7 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
-<yrcwww:contentbox title="List Protein Inference Jobs" centered="true" width="1000" scheme="upload">
+<yrcwww:contentbox title="List Protein Inference Jobs" centered="true" width="800" scheme="upload">
 
 <logic:notPresent name="jobs" scope="request">
   <logic:forward name="listProtInferJobs" />

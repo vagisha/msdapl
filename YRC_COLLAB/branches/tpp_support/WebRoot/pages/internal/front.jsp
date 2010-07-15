@@ -26,7 +26,6 @@
  </logic:empty>
  
  <logic:notEmpty name="userProjects">
- <div style="margin: 10 10 10 10;">
  <TABLE BORDER="0" WIDTH="100%" class="table_basic">
  <thead>
   <TR>
@@ -52,7 +51,6 @@
 </logic:iterate>
 </tbody>
  </TABLE>
- </div>
  </logic:notEmpty>
 </yrcwww:contentbox>
 
@@ -64,7 +62,6 @@
 		 <p>Below are projects submitted by researchers to your group(s) within the last month.
 	 
 		 <p>
-		 <div style="margin: 10 10 10 10;">
 		 <table border="0" width="100%" class="table_basic">
 		 <thead>
 		  <tr>
@@ -91,8 +88,8 @@
 		</logic:iterate>
 		</tbody>
 		</table>
-		</div>
    		</logic:notEmpty>
+   		
    		<logic:empty name="newProjects" scope="request">
    		 <p>There have been no projects submitted to your group in the last month.
    		</logic:empty>
