@@ -56,6 +56,7 @@ import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 import org.yeastrc.www.protein.ProteinAbundanceDao;
 import org.yeastrc.www.proteinfer.MsResultLoader;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
+import org.yeastrc.www.proteinfer.ProteinCommonNameFilter;
 import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
 import org.yeastrc.www.proteinfer.ProteinGoTermsFilter;
 import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
@@ -98,6 +99,13 @@ public class IdPickerResultsLoader {
         long start = System.currentTimeMillis();
         List<Integer> proteinIds = idpProtBaseDao.getFilteredSortedProteinIds(pinferId, filterCriteria);
         log.info("Returned "+proteinIds.size()+" protein IDs for protein inference ID: "+pinferId);
+        
+        // filter by common name, if required
+        if(filterCriteria.getCommonNameLike() != null) {
+        	log.info("Filtering by common name: "+filterCriteria.getCommonNameLike());
+        	proteinIds = ProteinCommonNameFilter.getInstance().filterForProtInferByCommonName(pinferId, proteinIds, 
+        			filterCriteria.getCommonNameLike());
+        }
         
         // filter by accession, if required
         if(filterCriteria.getAccessionLike() != null) {

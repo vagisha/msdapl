@@ -25,6 +25,7 @@ import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.util.TimeUtils;
+import org.yeastrc.nrseq.CommonNameSupportUtils;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.www.go.GOSlimUtils;
@@ -203,6 +204,12 @@ public class ProteinInferViewAction extends Action {
         				break;
         			}
         		}
+        	}
+        }
+        
+        for(Integer speciesId: speciesIds) {
+        	if(CommonNameSupportUtils.isSpeciesSupported(speciesId)) {
+        		request.setAttribute("commonNameSupported", true);
         	}
         }
         

@@ -42,7 +42,7 @@
   <html:hidden name="proteinProphetFilterForm" property="goEnrichmentPVal" />
   <html:hidden name="proteinProphetFilterForm" property="speciesId" />
   
-  <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;">
+  <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;" width="100%" style="max-width:1000;">
   
   <!-- Filtering options -->
   <tr>

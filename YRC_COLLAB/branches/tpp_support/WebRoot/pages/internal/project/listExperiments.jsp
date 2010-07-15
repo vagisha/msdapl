@@ -464,7 +464,7 @@ function removeBookmark(imgElement, piRunId) {
 </script>
 
 
-<yrcwww:contentbox title="Experiments" centered="true" width="70" widthRel="true">
+<yrcwww:contentbox title="Experiments" centered="true" width="95" widthRel="true">
 
 	<logic:empty name="experiments">
 		<div align="center" style="margin:20">

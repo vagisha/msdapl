@@ -23,12 +23,6 @@ public class IdPickerFilterForm extends ProteinInferFilterForm {
     private boolean printDescription = false; // used for downloads only
     
     
-    public void reset() {
-        joinGroupProteins = true;
-        showAllProteins = true;
-        super.reset();
-    }
-    
     public boolean isJoinGroupProteins() {
         return joinGroupProteins;
     }

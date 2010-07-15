@@ -172,7 +172,7 @@ $(document).ready(function() {
 
 
 
-<yrcwww:contentbox centered="true" width="90" widthRel="true" title="Protein Dataset Comparison">
+<yrcwww:contentbox centered="true" width="95" widthRel="true" title="Protein Dataset Comparison">
 
 <table align="center">
 

@@ -26,18 +26,6 @@ public class ProteinProphetFilterForm extends ProteinInferFilterForm {
     
 	public ProteinProphetFilterForm () {}
     
-    public void reset() {
-        
-        joinProphetGroupProteins = true;
-        excludeSubsumed = false;
-        
-        minGroupProbability = "0.0";
-        maxGroupProbability = "1.0";
-        minProteinProbability = "0.0";
-        maxProteinProbability = "1.0";
-        
-        super.reset();
-    }
     
     /**
      * Validate the properties that have been sent from the HTTP request,

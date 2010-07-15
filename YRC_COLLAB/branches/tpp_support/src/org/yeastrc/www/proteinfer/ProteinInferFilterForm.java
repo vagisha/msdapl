@@ -39,6 +39,7 @@ public class ProteinInferFilterForm extends ActionForm {
     private boolean excludeNd = false;
     private boolean excludeCompAnalCodes = false;
     
+    private String commonNameLike = null;
 	private String accessionLike = null;
     private String descriptionLike = null;
     private String descriptionNotLike = null;
@@ -63,25 +64,6 @@ public class ProteinInferFilterForm extends ActionForm {
     private boolean doGoEnrichAnalysis = false;
     
 	public ProteinInferFilterForm () {}
-    
-    public void reset() {
-        // These need to be set to false because if a checkbox is not checked the browser does not
-        // send its value in the request.
-        // http://struts.apache.org/1.1/faqs/newbie.html#checkboxes
-        excludeIndistinGroups = false;
-        exactMatch = false;
-        
-        minCoverage = "0.0";
-        minMolecularWt = "0.0";
-        minPeptides = "1";
-        minUniquePeptides = "0";
-        minSpectrumMatches = "1";
-        accessionLike = null;
-        descriptionLike = null;
-        descriptionNotLike = null;
-        searchAllDescriptions = false;
-        
-    }
     
 
 	/**
@@ -340,6 +322,19 @@ public class ProteinInferFilterForm extends ActionForm {
 		this.excludeCompAnalCodes = excludeCompAnalCodes;
 	}
 
+	// COMMON NAME
+	public String getCommonNameLike() {
+        if(commonNameLike == null || commonNameLike.trim().length() == 0)
+            return null;
+        else
+            return commonNameLike.trim();
+            
+    }
+    
+    public void setCommonNameLike(String commonNameLike) {
+        this.commonNameLike = commonNameLike;
+    }
+    
 	// ACCESSION
     public String getAccessionLike() {
         if(accessionLike == null || accessionLike.trim().length() == 0)
@@ -562,6 +557,7 @@ public class ProteinInferFilterForm extends ActionForm {
         filterCriteria.setMaxPi(getMaxPiDouble());
         filterCriteria.setPeptideDefinition(peptideDef);
         filterCriteria.setValidationStatus(getValidationStatus());
+        filterCriteria.setCommonNameLike(getCommonNameLike());
         filterCriteria.setAccessionLike(getAccessionLike());
         filterCriteria.setDescriptionLike(getDescriptionLike());
         filterCriteria.setDescriptionNotLike(getDescriptionNotLike());

@@ -15,6 +15,9 @@ BODY    {
            font-style: normal;
            font-weight: 500;
         }
+TD {
+	vertical-align: top;
+}
 /* Make a footer stick to the bottom of the page code from: http://ryanfait.com/resources/footer-stick-to-bottom-of-page/ */
 
 DIV#mainContainer {
@@ -165,6 +168,7 @@ DIV.ms, DIV.pinfer, DIV.upload, DIV.adminSearch, DIV.groups, DIV.search, DIV.reg
         border-color: #939cb0;
         background-color: #FFFFFF;
         color: black;
+        max-width:1200;
 }
 
 DIV.ms_header, DIV.pinfer_header, DIV.upload_header, DIV.adminSearch_header, DIV.groups_header, DIV.search_header, DIV.register_header, DIV.error_header, DIV.login_header, DIV.project_header, DIV.account_header {
@@ -180,6 +184,7 @@ DIV.ms_header, DIV.pinfer_header, DIV.upload_header, DIV.adminSearch_header, DIV
         border-color: gray;
         background-color: #939cb0;
         color: white;
+        max-width:1200;
 }
 /* #939cb0 */
 

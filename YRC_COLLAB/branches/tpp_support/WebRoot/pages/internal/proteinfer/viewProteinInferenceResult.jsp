@@ -1283,7 +1283,7 @@ function hideAllDescriptionsForProtein(proteinId) {
 
 <CENTER>
 
-<yrcwww:contentbox title="Protein Inference* Results" centered="true" width="90" widthRel="true" scheme="pinfer" >
+<yrcwww:contentbox title="Protein Inference* Results" centered="true" width="95" widthRel="true" scheme="pinfer" >
   
   <div id="results" class="flora">
       <ul>
@@ -1316,7 +1316,7 @@ function hideAllDescriptionsForProtein(proteinId) {
     <!-- PROTEIN LIST -->
 	<div id="protlist">
 		<CENTER>
-		<table><tr><td>
+		<table width="100%" style="max-width:1000;"><tr><td>
 		
 		<!-- SUMMARY -->
 		<div style="padding:0 7 0 7; margin-bottom:5; border: 1px dashed gray;background-color: #F0F8FF;">

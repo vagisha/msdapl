@@ -101,7 +101,7 @@ function removeFromGoTermFilters(goTerm, warn) {
   <html:hidden name="proteinInferFilterForm" property="speciesId" />
   
   
-  <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;">
+  <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;" width="100%" style="max-width:1000;">
   
   <!-- Filtering options -->
   <tr>
@@ -110,22 +110,28 @@ function removeFromGoTermFilters(goTerm, warn) {
   <tr>
   <td>Peptides: </td>
   <td>
+  	<nobr>
   	Min <html:text name="proteinInferFilterForm" property="minPeptides" size="3"></html:text>
   	Max <html:text name="proteinInferFilterForm" property="maxPeptides" size="3"></html:text>
+  	</nobr>
   </td>
   </tr>
   <tr>
   <td>Unique Peptides: </td>
   <td>
+  	<nobr>
   	Min <html:text name="proteinInferFilterForm" property="minUniquePeptides" size="3"></html:text>
   	Max <html:text name="proteinInferFilterForm" property="maxUniquePeptides" size="3"></html:text>
+  	</nobr>
   </td>
   </tr>
   <tr>
   <td>Protein Mol. Wt.: </td>
   <td>
+  	<nobr>
   	Min <html:text name="proteinInferFilterForm" property="minMolecularWt" size="3"></html:text>
   	Max <html:text name="proteinInferFilterForm" property="maxMolecularWt" size="3"></html:text>
+  	</nobr>
   </td>
   </tr>
   </table></td>
@@ -134,22 +140,28 @@ function removeFromGoTermFilters(goTerm, warn) {
   <tr>
   <td>Coverage(%):</td>
   <td>
+  	<nobr>
   	Min <html:text name="proteinInferFilterForm" property="minCoverage" size="3"></html:text>
   	Max <html:text name="proteinInferFilterForm" property="maxCoverage" size="3"></html:text>
+  	</nobr>
   </td>
   </tr>
   <tr>
   <td>Spectrum Matches: </td>
   <td>
+  	<nobr>
   	Min <html:text name="proteinInferFilterForm" property="minSpectrumMatches" size="3"></html:text>
   	Max <html:text name="proteinInferFilterForm" property="maxSpectrumMatches" size="3"></html:text>
+  	</nobr>
   </td>
   </tr>
   <tr>
   <td>Protein pI: </td>
   <td>
+  	<nobr>
   	Min <html:text name="proteinInferFilterForm" property="minPi" size="3"></html:text>
   	Max <html:text name="proteinInferFilterForm" property="maxPi" size="3"></html:text>
+  	</nobr>
   </td>
   </tr>
   </table></td>
@@ -160,10 +172,14 @@ function removeFromGoTermFilters(goTerm, warn) {
   <tr>
   	<td colspan="2">Group Indistinguishable Proteins: </td>
   	<td>
+  		<nobr>
   		<html:radio name="proteinInferFilterForm" property="joinGroupProteins" value="true">Yes</html:radio>
+  		</nobr>
   	</td>
   	<td>
+  		<nobr>
   		<html:radio name="proteinInferFilterForm" property="joinGroupProteins" value="false">No</html:radio>
+  		</nobr>
   	</td>
   </tr>
   </logic:notPresent>
@@ -171,55 +187,67 @@ function removeFromGoTermFilters(goTerm, warn) {
   <tr>
   	<td colspan="2">Show Proteins: </td>
   	<td>
+  		<nobr>
   		<html:radio name="proteinInferFilterForm" property="showAllProteins" value="true">All</html:radio>
+  		</nobr>
   	</td>
   	<td>
+  		<nobr>
   		<html:radio name="proteinInferFilterForm" property="showAllProteins" value="false">Parsimonious</html:radio>
+  		</nobr>
   	</td>
   </tr>
-  </table></td>
+  <tr>
+  	<td colspan="4">Exclude Indistinguishable Groups: <html:checkbox name="proteinInferFilterForm" property="excludeIndistinProteinGroups" value="true"/></td>
   </tr>
+  </table></td>
   
   <tr>
   	<td colspan="2">
   		Validation Status: 
-  		<html:multibox name="proteinInferFilterForm" property="validationStatus" value="All"/> All
-  		<html:multibox name="proteinInferFilterForm" property="validationStatus" 
-  					   value="<%=String.valueOf(ProteinUserValidation.UNVALIDATED.getStatusChar()) %>"/> Unvalidated 
-  		<html:multibox name="proteinInferFilterForm" property="validationStatus"  
-  		               value="<%=String.valueOf(ProteinUserValidation.ACCEPTED.getStatusChar()) %>"/> Accepted
-  		<html:multibox name="proteinInferFilterForm" property="validationStatus"  
-  		               value="<%=String.valueOf(ProteinUserValidation.REJECTED.getStatusChar()) %>"/> Rejected
-  		<html:multibox name="proteinInferFilterForm" property="validationStatus"  
-  		               value="<%=String.valueOf(ProteinUserValidation.NOT_SURE.getStatusChar()) %>"/> Not Sure
+  		<nobr><html:multibox name="proteinInferFilterForm" property="validationStatus" value="All" /> All</nobr>
+  		<nobr><html:multibox name="proteinInferFilterForm" property="validationStatus" 
+  					   value="<%=String.valueOf(ProteinUserValidation.UNVALIDATED.getStatusChar()) %>"/> Unvalidated</nobr>
+  		<nobr><html:multibox name="proteinInferFilterForm" property="validationStatus"  
+  		               value="<%=String.valueOf(ProteinUserValidation.ACCEPTED.getStatusChar()) %>"/> Accepted</nobr>
+  		<nobr><html:multibox name="proteinInferFilterForm" property="validationStatus"  
+  		               value="<%=String.valueOf(ProteinUserValidation.REJECTED.getStatusChar()) %>"/> Rejected</nobr>
+  		<nobr><html:multibox name="proteinInferFilterForm" property="validationStatus"  
+  		               value="<%=String.valueOf(ProteinUserValidation.NOT_SURE.getStatusChar()) %>" /> Not Sure</nobr>
   	</td>
-  	<td>
-  		Exclude Indistinguishable Groups: <html:checkbox name="proteinInferFilterForm" property="excludeIndistinProteinGroups" value="true"/>
-  	</td>
+  	
   </tr>
   
-  <tr>
-  	<td colspan="2">
-  		Include Charge: &nbsp;&nbsp;
-  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="All"/> All &nbsp;
-  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="1"/> +1 &nbsp;
-  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="2"/> +2 &nbsp;
-  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="3"/> +3 &nbsp;
-  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="4"/> +4 &nbsp;
-  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value=">4"/> &gt; +4   
-  	</td>
-  </tr>
   
   
   <tr>
   	<td colspan="3">
   	<table align="left">
+  		
+  	<tr>
+  	<td>Peptide:</td>
+  	<td><html:text name="proteinInferFilterForm" property="peptide" size="40"></html:text>
+  		<nobr><span style="font-size:8pt;">Exact Match:<html:checkbox property="proteinInferFilterForm" property="exactPeptideMatch"></html:checkbox></span></nobr>
+  	</td>
+  	<td> Charge:</td>
+  	<td>
+  		<nobr><html:multibox name="proteinInferFilterForm" property="chargeStates" value="All"/> All</nobr> &nbsp;
+  		<nobr><html:multibox name="proteinInferFilterForm" property="chargeStates" value="1"/> +1</nobr> &nbsp;
+  		<nobr><html:multibox name="proteinInferFilterForm" property="chargeStates" value="2"/> +2</nobr> &nbsp;
+  		<nobr><html:multibox name="proteinInferFilterForm" property="chargeStates" value="3"/> +3</nobr> &nbsp;
+  		<nobr><html:multibox name="proteinInferFilterForm" property="chargeStates" value="4"/> +4</nobr> &nbsp;
+  		<nobr><html:multibox name="proteinInferFilterForm" property="chargeStates" value=">4"/> &gt; +4</nobr>
+  		<br>
+  		<span style="font-size:8pt;">Filter proteins with peptides identifies in the selected charge states</span> 
+  	</td>
+  </tr>
+  
   		<logic:present name="goSupported">
   		<tr>
   			<td valign="top">GO Term(s): <br/><span class="clickable underline" style="color:red; font-weight:bold;" 
   			onclick="javascript:openGOTermSearcher();return false;">Search</span></td>
   			<td valign="top"><html:text name="proteinInferFilterForm" property="goTerms" size="40"></html:text><br>
-  				<span style="font-size:8pt;">Enter a comma-separated list of GO terms (e.g. GO:0006950)</span>
+  				<span style="font-size:8pt;"></span>
   			</td>
   			<td valign="top" colspan="2">
   				<html:checkbox name="proteinInferFilterForm" property="matchAllGoTerms" title="Return proteins that match all terms">Match All </html:checkbox>
@@ -238,13 +266,15 @@ function removeFromGoTermFilters(goTerm, warn) {
   		<tr>
   			<td valign="top">Fasta ID(s): </td>
   			<td valign="top"><html:text name="proteinInferFilterForm" property="accessionLike" size="40"></html:text><br>
-  				<span style="font-size:8pt;">Enter a comma-separated list of complete or partial identifiers</span>
+  				<span style="font-size:8pt;">Enter a comma-separated list of identifiers</span>
   			</td>
-  			<td valign="top">Peptide: </td>
-  			<td valign="top">
-  				<html:text name="proteinInferFilterForm" property="peptide" size="40"></html:text>
-  				<span style="font-size:8pt;">Exact Match:<html:checkbox property="proteinInferFilterForm" property="exactPeptideMatch"></html:checkbox></span>
+  			
+  			<logic:present name="commonNameSupported">
+  			<td valign="top">Common Name(s): </td>
+  			<td valign="top"><html:text name="proteinInferFilterForm" property="commonNameLike" size="40"></html:text><br>
+  				<span style="font-size:8pt;">Enter a comma-separated list of common names</span>
   			</td>
+  			</logic:present>
   			
   		</tr>
   		<tr>
