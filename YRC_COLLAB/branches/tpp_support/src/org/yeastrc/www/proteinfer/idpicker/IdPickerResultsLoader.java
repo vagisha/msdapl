@@ -145,7 +145,7 @@ public class IdPickerResultsLoader {
         	GOProteinFilterCriteria goFilters = filterCriteria.getGoFilterCriteria();
         	log.info("Filtering by GO terms: "+goFilters.toString());
         	try {
-				proteinIds = ProteinGoTermsFilter.getInstance().filterPinferProteinsByGoAccession(proteinIds, goFilters);
+				proteinIds = ProteinGoTermsFilter.getInstance().filterPinferProteins(proteinIds, goFilters);
 			} catch (Exception e1) {
 				log.error("Exception filtering proteins on GO terms", e1);
 			}

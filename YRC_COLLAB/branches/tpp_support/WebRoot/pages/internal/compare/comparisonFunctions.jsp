@@ -181,4 +181,33 @@ function submitFormForGoEnrichmentAnalysis() {
 
 }
 
+function openGOTermSearcher() {
+	var url = "<yrcwww:link path='goTermSearch.do'/>";
+	// we want the result to open in a new window
+	window.open(url, 'gotermsearcher', 'scrollbars=yes,menubar=no,height=500,width=650,resizable=yes,toolbar=no,status=no');
+}
+
+// terms is an array of goTerms
+function addToGoSearchTerms(terms) {
+	for(var i = 0; i < terms.length; i++) {
+		addToGoTermFilters(terms[i], false);
+	}
+}
+	
+function addToGoTermFilters(goTerm, warn) {
+	var current = $("form[name='proteinSetComparisonForm'] input[name='goTerms']").val();
+	// If this terms in not already in the list add it.
+	if(current.indexOf(goTerm) == -1) {
+		var terms = current;
+		if(current)
+			terms = terms+","
+		terms = terms+goTerm;
+		$("form[name='proteinSetComparisonForm'] input[name='goTerms']").val(terms);
+	}
+	else if(warn) {
+		alert(goTerm+" has already been added");
+	}
+	$(".go_filter_add[id='"+goTerm+"']").hide();
+	$(".go_filter_remove[id='"+goTerm+"']").show();
+}
 </script>

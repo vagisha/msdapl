@@ -354,8 +354,29 @@ function showActionOptions() {
 	
 	
 	
-	<tr>
 		<!-- ################## SEARCH BOX	  ########################################### -->
+	<logic:present name="goSupported">
+	<tr>
+		<td valign="top">GO Terms: <br/><span class="clickable underline" style="color:red; font-weight:bold;" 
+		onclick="javascript:openGOTermSearcher();return false;">Search</span></td>
+		<td valign="top"><html:text name="proteinSetComparisonForm" property="goTerms" size="40"></html:text><br>
+			<span style="font-size:8pt;"></span>
+		</td>
+		<td valign="top" colspan="2">
+			<html:checkbox name="proteinSetComparisonForm" property="matchAllGoTerms" title="Return proteins that match all terms">Match All </html:checkbox>
+			<html:checkbox name="proteinSetComparisonForm" property="exactGoAnnotation" title="Return proteins directly annotated with the GO terms">Exact </html:checkbox>
+			&nbsp;
+			<nobr>
+			Exclude: 
+			<html:checkbox name="proteinSetComparisonForm" property="excludeIea" title="Inferred from Electronic Annotation">IEA</html:checkbox>
+			<html:checkbox name="proteinSetComparisonForm" property="excludeNd" title="No Biological Data available">ND</html:checkbox>
+			<html:checkbox name="proteinSetComparisonForm" property="excludeCompAnalCodes" title="Computational Analysis Evidence Codes">ISS, ISO, ISA, ISM, IGC, RCA</html:checkbox>
+			</nobr>
+		</td>
+	</tr>
+	</logic:present>
+	
+	<tr>
 		<td style="padding-left:5px;" valign="top">Fasta ID(s):</td>
 		
 		<logic:present name="commonNameSupported">

@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.domain.protinfer.GOProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.compare.dataset.Dataset;
@@ -21,6 +22,7 @@ import org.yeastrc.www.compare.util.FastaDatabaseLookupUtil;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
 import org.yeastrc.www.proteinfer.ProteinCommonNameFilter;
 import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
+import org.yeastrc.www.proteinfer.ProteinGoTermsFilter;
 import org.yeastrc.www.proteinfer.ProteinPropertiesFilter;
 
 /**
@@ -42,7 +44,7 @@ public class ProteinPropertiesFilterer {
 
 	public void applyProteinPropertiesFilters(List<ComparisonProtein> proteins, 
 			ProteinPropertiesFilters filters, List<? extends Dataset> datasets) 
-		throws SQLException {
+		throws Exception {
 		
 		List<Integer> nrseqIds = new ArrayList<Integer>(proteins.size());
 		for(ComparisonProtein protein: proteins) {
@@ -64,7 +66,7 @@ public class ProteinPropertiesFilterer {
 
 	
 	public void applyProteinPropertiesFiltersToGroup(List<ComparisonProteinGroup> proteinGroups, 
-			ProteinPropertiesFilters filters, List<? extends Dataset> datasets) throws SQLException {
+			ProteinPropertiesFilters filters, List<? extends Dataset> datasets) throws Exception {
 		
 		List<Integer> nrseqIds = new ArrayList<Integer>(proteinGroups.size());
 		for(ComparisonProteinGroup proteinGrp: proteinGroups) {
@@ -100,11 +102,11 @@ public class ProteinPropertiesFilterer {
 	// ----------------------------------------------------------------------
 	private List<Integer> filterNrseqIds(ProteinPropertiesFilters filters,
 			List<? extends Dataset> datasets, List<Integer> nrseqIds)
-			throws SQLException {
+			throws Exception {
 		log.info("Number of nrseq IDs BEFORE filtering: "+nrseqIds.size());
 		
 		// apply common name filter
-		nrseqIds = applyCommonNameFilter(filters, datasets, nrseqIds);
+		nrseqIds = applyCommonNameFilter(filters, nrseqIds);
 		
 		// apply accession filter
 		nrseqIds = applyAccessionFilter(filters, datasets, nrseqIds);
@@ -112,6 +114,8 @@ public class ProteinPropertiesFilterer {
 		// apply description LIKE filter
 		nrseqIds = applyDescriptionLikeFilter(filters, datasets, nrseqIds);
 		
+		// apply GO terms filter
+		nrseqIds = applyGOTermsFilter(filters, nrseqIds);
 		
 		// apply description NOT LIKE filter
 		nrseqIds = applyDescriptionNotLikeFilter(filters, datasets, nrseqIds);
@@ -213,8 +217,7 @@ public class ProteinPropertiesFilterer {
 	// COMMON NAME
 	// ----------------------------------------------------------------------
 	private List<Integer> applyCommonNameFilter(
-			ProteinPropertiesFilters filters, List<? extends Dataset> datasets,
-			List<Integer> nrseqIds) throws SQLException {
+			ProteinPropertiesFilters filters, List<Integer> nrseqIds) throws SQLException {
 		
 		if(filters.hasCommonNameFilter()) {
 			long s = System.currentTimeMillis();
@@ -224,6 +227,25 @@ public class ProteinPropertiesFilterer {
 			long e = System.currentTimeMillis();
 			
 			log.info("Time to filter on common name: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+		}
+		return nrseqIds;
+	}
+	
+	// ----------------------------------------------------------------------
+	// GO FILTERS
+	// ----------------------------------------------------------------------
+	private List<Integer> applyGOTermsFilter(
+			ProteinPropertiesFilters filters, List<Integer> nrseqIds) throws Exception {
+		
+		GOProteinFilterCriteria goFilters = filters.getGoFilter();
+		
+		if(goFilters != null) {
+			long s = System.currentTimeMillis();
+			
+			nrseqIds = ProteinGoTermsFilter.getInstance().filterNrseqProteins(nrseqIds, filters.getGoFilter());
+			long e = System.currentTimeMillis();
+			
+			log.info("Time to filter on GO terms: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
 		}
 		return nrseqIds;
 	}

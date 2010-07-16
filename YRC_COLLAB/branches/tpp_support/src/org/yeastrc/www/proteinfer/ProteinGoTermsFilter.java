@@ -17,7 +17,6 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.GOProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.www.go.Annotation;
-import org.yeastrc.www.go.GoTermSearcher;
 import org.yeastrc.www.go.ProteinGOAnnotationChecker;
 
 /**
@@ -41,8 +40,31 @@ public class ProteinGoTermsFilter {
     	return instance;
     }
 
-
-    public List<Integer> filterPinferProteinsByGoAccession(List<Integer> allProteinIds, GOProteinFilterCriteria filters) throws Exception {
+    public List<Integer> filterNrseqProteins(List<Integer> nrseqIds, GOProteinFilterCriteria filters) throws Exception {
+    	
+    	if(filters == null)
+    		return nrseqIds;
+    	
+    	List<String> goAccessions = filters.getGoAccessions();
+    	if(goAccessions == null || goAccessions.size() == 0)
+    		return nrseqIds;
+    	
+    	// Convert the GO accessions into GONode objects
+    	List<GONode> goNodes = getGoNodes(goAccessions);
+    	
+    	// Get any evidence codes to exclude
+    	List<EvidenceCode> evidenceCodes = getEvidenceCodes(filters);
+    	
+    	List<Integer> filteredIds = null;
+    	if(!filters.isMatchAllGoTerms())
+    		filteredIds = getFilteredNrseqProteinIdsAnyMatch(nrseqIds, filters.isExactAnnotation(), goNodes, evidenceCodes);
+    	else
+    		filteredIds = getFilteredNrseqProteinIdsAllMatch(nrseqIds, filters.isExactAnnotation(), goNodes, evidenceCodes);
+    	
+        return filteredIds;
+    }
+    
+    public List<Integer> filterPinferProteins(List<Integer> allProteinIds, GOProteinFilterCriteria filters) throws Exception {
         
     	if(filters == null)
     		return allProteinIds;
@@ -52,18 +74,22 @@ public class ProteinGoTermsFilter {
     		return allProteinIds;
     	
     	// Convert the GO accessions into GONode objects
-    	List<GONode> goNodes = new ArrayList<GONode>(goAccessions.size());
-    	for(String goAccession: goAccessions) {
-    		goAccession = goAccession.trim();
-    		if(goAccession == null || goAccession.length() == 0)
-    			continue;
-    		GONode node = GOCache.getInstance().getGONode(goAccession);
-    		if(node != null)
-    			goNodes.add(node);
-    	}
+    	List<GONode> goNodes = getGoNodes(goAccessions);
     	
     	// Get any evidence codes to exclude
-    	List<EvidenceCode> evidenceCodes = new ArrayList<EvidenceCode>();
+    	List<EvidenceCode> evidenceCodes = getEvidenceCodes(filters);
+    	
+    	List<Integer> filteredIds = null;
+    	if(!filters.isMatchAllGoTerms())
+    		filteredIds = getFilteredPinferProteinIdsAnyMatch(allProteinIds, filters.isExactAnnotation(), goNodes, evidenceCodes);
+    	else
+    		filteredIds = getFilteredPinferProteinIdsAllMatch(allProteinIds, filters.isExactAnnotation(), goNodes, evidenceCodes);
+    	
+        return filteredIds;
+    }
+
+	private List<EvidenceCode> getEvidenceCodes(GOProteinFilterCriteria filters) {
+		List<EvidenceCode> evidenceCodes = new ArrayList<EvidenceCode>();
     	for(String codeStr: filters.getExcludeEvidenceCodes()) {
     		int id = EvidenceUtils.getEvidenceCodeId(codeStr);
     		if(id == -1) {
@@ -74,18 +100,24 @@ public class ProteinGoTermsFilter {
     			evidenceCodes.add(code);
     		}
     	}
-    	
-    	List<Integer> filteredIds = null;
-    	if(!filters.isMatchAllGoTerms())
-    		filteredIds = getFilteredAnyMatch(allProteinIds, filters.isExactAnnotation(), goNodes, evidenceCodes);
-    	else
-    		filteredIds = getFilteredAllMatch(allProteinIds, filters.isExactAnnotation(), goNodes, evidenceCodes);
-    	
-        return filteredIds;
-    }
+		return evidenceCodes;
+	}
 
-    // Returns a list of proteinIds that match any one of the given GO terms
-	private List<Integer> getFilteredAnyMatch(List<Integer> allProteinIds,
+	private List<GONode> getGoNodes(List<String> goAccessions) throws Exception {
+		List<GONode> goNodes = new ArrayList<GONode>(goAccessions.size());
+    	for(String goAccession: goAccessions) {
+    		goAccession = goAccession.trim();
+    		if(goAccession == null || goAccession.length() == 0)
+    			continue;
+    		GONode node = GOCache.getInstance().getGONode(goAccession);
+    		if(node != null)
+    			goNodes.add(node);
+    	}
+		return goNodes;
+	}
+
+    // Returns a list of protein inference proteinIds that match any one of the given GO terms
+	private List<Integer> getFilteredPinferProteinIdsAnyMatch(List<Integer> allProteinIds,
 			boolean exact, List<GONode> goNodes, List<EvidenceCode> evidenceCodes) throws SQLException {
 		
 		List<Integer> filteredIds = new ArrayList<Integer>();
@@ -95,32 +127,14 @@ public class ProteinGoTermsFilter {
     	for(Integer proteinId: allProteinIds) {
     		ProteinferProtein protein = protDao.loadProtein(proteinId);
     		
-    		for(GONode node: goNodes) {
-    			Annotation annot = null;
-    			if(evidenceCodes.size() == 0)
-    				annot = ProteinGOAnnotationChecker.isProteinAnnotated(protein.getNrseqProteinId(), node.getId());
-    			else
-    				annot = ProteinGOAnnotationChecker.isProteinAnnotated(protein.getNrseqProteinId(), node.getId(), evidenceCodes);
-    			
-    			if(annot == Annotation.NONE)
-    				continue;
-    			if(exact) {
-    				if(annot == Annotation.EXACT) {
-    					filteredIds.add(proteinId);
-    					break;
-    				}
-    			}
-    			else {
-    				filteredIds.add(proteinId);
-    				break;
-    			}
-    		}
+    		if(anyMatch(protein.getNrseqProteinId(), exact, goNodes, evidenceCodes))
+    			filteredIds.add(proteinId);
     	}
 		return filteredIds;
 	}
 	
-	// Returns a list of proteinIds that match all of the given GO terms
-	private List<Integer> getFilteredAllMatch(List<Integer> allProteinIds,
+	// Returns a list of protein inference proteinIds that match all of the given GO terms
+	private List<Integer> getFilteredPinferProteinIdsAllMatch(List<Integer> allProteinIds,
 			boolean exact, List<GONode> goNodes, List<EvidenceCode> evidenceCodes) throws SQLException {
 		
 		List<Integer> filteredIds = new ArrayList<Integer>();
@@ -129,32 +143,85 @@ public class ProteinGoTermsFilter {
         
     	for(Integer proteinId: allProteinIds) {
     		ProteinferProtein protein = protDao.loadProtein(proteinId);
-    		
-    		boolean matchAll = true;
-    		
-    		for(GONode node: goNodes) {
-    			Annotation annot = null;
-    			
-    			if(evidenceCodes.size() == 0)
-    				annot = ProteinGOAnnotationChecker.isProteinAnnotated(protein.getNrseqProteinId(), node.getId());
-    			else
-    				annot = ProteinGOAnnotationChecker.isProteinAnnotated(protein.getNrseqProteinId(), node.getId(), evidenceCodes);
-    			
-    			if(annot == Annotation.NONE) {
-    				matchAll = false;
-    				break;
-    			}
-    			if(exact) {
-    				if(annot != Annotation.EXACT) {
-    					matchAll = false;
-    					break;
-    				}
-    					
-    			}
-    		}
-    		if(matchAll)
+    		if(allMatch(protein.getNrseqProteinId(), exact, goNodes, evidenceCodes))
     			filteredIds.add(proteinId);
     	}
 		return filteredIds;
+	}
+	
+	// Returns a list of nrseq proteinIds that match any one of the given GO terms
+	private List<Integer> getFilteredNrseqProteinIdsAnyMatch(List<Integer> nrseqProteinIds,
+			boolean exact, List<GONode> goNodes, List<EvidenceCode> evidenceCodes) throws SQLException {
+		
+		List<Integer> filteredIds = new ArrayList<Integer>();
+        
+    	for(Integer proteinId: nrseqProteinIds) {
+    		if(anyMatch(proteinId, exact, goNodes, evidenceCodes))
+    			filteredIds.add(proteinId);
+    	}
+		return filteredIds;
+	}
+	
+	// Returns a list of nrseq proteinIds that match all of the given GO terms
+	private List<Integer> getFilteredNrseqProteinIdsAllMatch(List<Integer> nrseqProteinIds,
+			boolean exact, List<GONode> goNodes, List<EvidenceCode> evidenceCodes) throws SQLException {
+		
+		List<Integer> filteredIds = new ArrayList<Integer>();
+        
+    	for(Integer proteinId: nrseqProteinIds) {
+    		if(allMatch(proteinId, exact, goNodes, evidenceCodes))
+    			filteredIds.add(proteinId);
+    	}
+		return filteredIds;
+	}
+	
+	// Returns a list of proteinIds that match any one of the given GO terms
+	private boolean anyMatch(int nrseqProteinId,
+			boolean exact, List<GONode> goNodes, List<EvidenceCode> evidenceCodes) throws SQLException {
+		
+		for(GONode node: goNodes) {
+			Annotation annot = null;
+			if(evidenceCodes.size() == 0)
+				annot = ProteinGOAnnotationChecker.isProteinAnnotated(nrseqProteinId, node.getId());
+			else
+				annot = ProteinGOAnnotationChecker.isProteinAnnotated(nrseqProteinId, node.getId(), evidenceCodes);
+
+			if(annot == Annotation.NONE)
+				continue;
+			if(exact) {
+				if(annot == Annotation.EXACT) {
+					return true;
+				}
+			}
+			else {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	// Returns a list of proteinIds that match all of the given GO terms
+	private boolean allMatch(int nrseqProteinId,
+			boolean exact, List<GONode> goNodes, List<EvidenceCode> evidenceCodes) throws SQLException {
+		
+
+		for(GONode node: goNodes) {
+			Annotation annot = null;
+
+			if(evidenceCodes.size() == 0)
+				annot = ProteinGOAnnotationChecker.isProteinAnnotated(nrseqProteinId, node.getId());
+			else
+				annot = ProteinGOAnnotationChecker.isProteinAnnotated(nrseqProteinId, node.getId(), evidenceCodes);
+
+			if(annot == Annotation.NONE) {
+				return false;
+			}
+			if(exact) {
+				if(annot != Annotation.EXACT) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 }

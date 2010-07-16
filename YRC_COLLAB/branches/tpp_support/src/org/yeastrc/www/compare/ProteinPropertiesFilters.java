@@ -6,6 +6,9 @@
  */
 package org.yeastrc.www.compare;
 
+import org.yeastrc.ms.domain.protinfer.GOProteinFilterCriteria;
+
+
 
 /**
  * 
@@ -17,6 +20,8 @@ public class ProteinPropertiesFilters {
     private String descriptionLike;
     private String descriptionNotLike;
     private boolean searchAllDescriptions = false;
+    
+    private GOProteinFilterCriteria goFilter;
     
     private double minMolWt = 0.0;
     private double maxMolWt = Double.MAX_VALUE;
@@ -258,4 +263,12 @@ public class ProteinPropertiesFilters {
     public boolean hasUniquePeptideCountFilter() {
     	return (minUniqPeptideCount != 0 || maxUniqPeptideCount != Integer.MAX_VALUE);
     }
+
+	public GOProteinFilterCriteria getGoFilter() {
+		return goFilter;
+	}
+
+	public void setGoFilter(GOProteinFilterCriteria goFilter) {
+		this.goFilter = goFilter;
+	}
 }

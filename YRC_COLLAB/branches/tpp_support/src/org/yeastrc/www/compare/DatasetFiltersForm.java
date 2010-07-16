@@ -9,12 +9,15 @@ package org.yeastrc.www.compare;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.ms.domain.protinfer.GOProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
@@ -53,6 +56,13 @@ public class DatasetFiltersForm extends ActionForm {
     private String descriptionLike = null;
     private String descriptionNotLike = null;
     private boolean searchAllDescriptions = false;
+    
+    private String goTerms = null;
+    private boolean matchAllGoTerms = false;
+    private boolean exactGoAnnotation = false;
+    private boolean excludeIea = false;
+    private boolean excludeNd = false;
+    private boolean excludeCompAnalCodes = false;
     
     private boolean keepProteinGroups = true;
 
@@ -194,6 +204,58 @@ public class DatasetFiltersForm extends ActionForm {
 
 	public void setSearchAllDescriptions(boolean searchAllDescriptions) {
 		this.searchAllDescriptions = searchAllDescriptions;
+	}
+	
+	// GO TERMS
+    public String getGoTerms() {
+    	if(goTerms == null || goTerms.trim().length() == 0)
+            return null;
+        else
+            return goTerms.trim();
+    }
+    
+    public void setGoTerms(String goTerms) {
+    	this.goTerms = goTerms;
+    }
+    
+    public boolean isMatchAllGoTerms() {
+		return matchAllGoTerms;
+	}
+
+	public void setMatchAllGoTerms(boolean matchAllGoTerms) {
+		this.matchAllGoTerms = matchAllGoTerms;
+	}
+    
+    public boolean isExactGoAnnotation() {
+		return exactGoAnnotation;
+	}
+
+	public void setExactGoAnnotation(boolean exactGoAnnotation) {
+		this.exactGoAnnotation = exactGoAnnotation;
+	}
+	
+	public boolean isExcludeIea() {
+		return excludeIea;
+	}
+
+	public void setExcludeIea(boolean excludeIEa) {
+		this.excludeIea = excludeIEa;
+	}
+
+	public boolean isExcludeNd() {
+		return excludeNd;
+	}
+
+	public void setExcludeNd(boolean excludeNd) {
+		this.excludeNd = excludeNd;
+	}
+
+	public boolean isExcludeCompAnalCodes() {
+		return excludeCompAnalCodes;
+	}
+
+	public void setExcludeCompAnalCodes(boolean excludeCompAnalCodes) {
+		this.excludeCompAnalCodes = excludeCompAnalCodes;
 	}
     
 	// MIN PEPTIDES
@@ -570,6 +632,39 @@ public class DatasetFiltersForm extends ActionForm {
         filters.setMaxPeptideCount(this.getMaxPeptidesInteger());
         filters.setMinUniqPeptideCount(this.getMinUniquePeptidesInteger());
         filters.setMaxUniqPeptideCount(this.getMaxUniquePeptidesInteger());
+        
+        if(this.getGoTerms() != null && this.getGoTerms().trim().length() > 0) {
+        	GOProteinFilterCriteria goFilters = new GOProteinFilterCriteria();
+        	
+        	goFilters.setExactAnnotation(this.isExactGoAnnotation());
+        	goFilters.setMatchAllGoTerms(this.isMatchAllGoTerms());
+        	
+        	// evidence codes
+        	List<String> evCodes = new ArrayList<String>();
+        	goFilters.setExcludeEvidenceCodes(evCodes);
+        	if(this.isExcludeIea())
+        		evCodes.add("IEA");
+        	if(this.isExcludeNd())
+        		evCodes.add("ND");
+        	if(this.isExcludeCompAnalCodes()) {
+        		evCodes.add("ISS");
+        		evCodes.add("ISO");
+        		evCodes.add("ISA");
+        		evCodes.add("ISM");
+        		evCodes.add("IGC");
+        		evCodes.add("RCA");
+        	}
+        	
+        	// accessions
+        	Set<String> goAccessions = new HashSet<String>();
+        	String[] tokens = this.getGoTerms().split(",");
+        	for(String token: tokens) {
+        		goAccessions.add(token.trim());
+        	}
+        	goFilters.setGoAccessions(new ArrayList<String>(goAccessions));
+        	
+        	filters.setGoFilter(goFilters);
+        }
         
         if (this.hasProteinProphetDatasets) {
         	filters.setHasProteinProphetFilters(true);
