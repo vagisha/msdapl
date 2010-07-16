@@ -147,6 +147,12 @@ function toggleEnrichBarChart() {
         				&nbsp;
         				<a target="go_window" href="http://www.yeastrc.org/pdr/viewGONode.do?acc=<bean:write name="term" property="goNode.accession"/>">PDR</a>
         				</span>
+        				<span class="go_filter_add" id="<bean:write name='term' property='goNode.accession'/>" title="Add GO term to filters">
+        					<img src="<yrcwww:link path='images/filter.png'/>"alt="Filter"/>
+        				</span>
+        				<span class="go_filter_remove" id="<bean:write name='term' property='goNode.accession'/>" title="Remove" style="display:none;">
+        					<img src="<yrcwww:link path='images/filter_yellow.png'/>"alt="Filter"/>
+        				</span>
 						</td>
 						
 						<td><span title="<bean:write name="term" property="goNode.definition"/>" style="cursor:help;"><bean:write name="term" property="goNode.name"/></span></td>

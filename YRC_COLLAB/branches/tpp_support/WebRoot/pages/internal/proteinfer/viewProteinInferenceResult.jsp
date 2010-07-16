@@ -1006,16 +1006,20 @@ function goSlimAnalysisResults() {
     		 	makeStripedTable($("#go_slim_table")[0]);
     		 	makeSortableTable($("#go_slim_table")[0]);
     		 	$(".go_filter_add").each(function() {
-    		 		$(this).addClass("clickable");
-    		 		$(this).click(function() {
-    		 			addToGoTermFilters($(this).attr('id'));
-    		 		});
+    		 		if(!$(this).is(".clickable")) {
+	    		 		$(this).addClass("clickable");
+	    		 		$(this).click(function() {
+	    		 			addToGoTermFilters($(this).attr('id'));
+	    		 		});
+    		 		}
     		 	});
     		 	$(".go_filter_remove").each(function() {
-    		 		$(this).addClass("clickable");
-    		 		$(this).click(function() {
-    		 			removeFromGoTermFilters($(this).attr('id'));
-    		 		});
+    		 		if(!$(this).is(".clickable")) {
+	    		 		$(this).addClass("clickable");
+	    		 		$(this).click(function() {
+	    		 			removeFromGoTermFilters($(this).attr('id'));
+	    		 		});
+    		 		}
     		 	});
     		 	hideGoEnrichmentDetails();
     });
@@ -1085,6 +1089,24 @@ function goEnrichmentResults() {
     		 	// stripe the table
     		 	makeStripedTable($("#go_enrichment_table")[0]);
     		 	makeSortableTable($("#go_enrichment_table")[0]);
+    		 	
+    		 	$(".go_filter_add").each(function() {
+    		 		if(!$(this).is(".clickable")) {
+	    		 		$(this).addClass("clickable");
+	    		 		$(this).click(function() {
+	    		 			addToGoTermFilters($(this).attr('id'));
+	    		 		});
+    		 		}
+    		 	});
+    		 	$(".go_filter_remove").each(function() {
+    		 		if(!$(this).is(".clickable")) {
+	    		 		$(this).addClass("clickable");
+	    		 		$(this).click(function() {
+	    		 			removeFromGoTermFilters($(this).attr('id'));
+	    		 		});
+    		 		}
+    		 	});
+    		 	
     		 	hideGoSlimDetails();
     		 });
 	
