@@ -247,7 +247,7 @@ function removeFromGoTermFilters(goTerm, warn) {
   			<td valign="top">GO Terms: <br/><span class="clickable underline" style="color:red; font-weight:bold;" 
   			onclick="javascript:openGOTermSearcher();return false;">Search</span></td>
   			<td valign="top"><html:text name="proteinInferFilterForm" property="goTerms" size="40"></html:text><br>
-  				<span style="font-size:8pt;"></span>
+  				<span style="font-size:8pt;">Enter a comma-separated list of GO terms (e.g. GO:0006950)</span>
   			</td>
   			<td valign="top" colspan="2">
   				<html:checkbox name="proteinInferFilterForm" property="matchAllGoTerms" title="Return proteins that match all terms">Match All </html:checkbox>
