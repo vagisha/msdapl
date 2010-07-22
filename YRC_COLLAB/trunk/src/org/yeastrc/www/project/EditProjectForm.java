@@ -16,6 +16,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.struts.action.*;
 import org.yeastrc.grant.Grant;
+import org.yeastrc.project.Researcher;
 
 /**
  * @author Michael Riffle <mriffle@u.washington.edu>
@@ -32,7 +33,7 @@ public class EditProjectForm extends ActionForm {
 	 */
 	public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
 		ActionErrors errors = new ActionErrors();
-
+		
 		if (this.getPI() == 0) {
 			errors.add("PI", new ActionMessage("error.project.nopi"));
 		}
@@ -73,17 +74,6 @@ public class EditProjectForm extends ActionForm {
 	/** Set the PI ID */
 	public void setPI(int arg) { this.pi = arg; }
 
-	/** Set Researcher B ID */
-	public void setResearcherB(int arg) { this.researcherB = arg; }
-
-	/** Set Researcher C ID */
-	public void setResearcherC(int arg) { this.researcherC = arg; }
-
-	/** Set Researcher D ID */
-	public void setResearcherD(int arg) { this.researcherD = arg; }
-
-
-
 	/** Get the title */
 	public String getTitle() { return this.title; }
 
@@ -116,15 +106,6 @@ public class EditProjectForm extends ActionForm {
 
 	/** Get the PI ID */
 	public int getPI() { return this.pi; }
-	
-	/** Get the Researcher B ID */
-	public int getResearcherB() { return this.researcherB; }
-
-	/** Get the Researcher C ID */
-	public int getResearcherC() { return this.researcherC; }
-
-	/** Get the Researcher D ID */
-	public int getResearcherD() { return this.researcherD; }
 
 
 	// The form variables we'll be tracking
@@ -138,11 +119,10 @@ public class EditProjectForm extends ActionForm {
 	private float bta = (float)0;
 	private String axisi = null;
 	private String axisii = null;
+    private List<Researcher> researchers = new ArrayList<Researcher>();
+
 	
 	private int pi = 0;
-	private int researcherB = 0;
-	private int researcherC = 0;
-	private int researcherD = 0;
 
 	private List<Grant> grants = new ArrayList<Grant>();
 	
@@ -191,4 +171,37 @@ public class EditProjectForm extends ActionForm {
 	public void setSubmitDate(Date date) {
 		this.submitDate = date;
 	}
+	
+	//----------------------------------------------------------------
+    // Researchers
+    //----------------------------------------------------------------
+	public Researcher getResearcher(int index) {
+	    //System.out.println("Getting researcher id at index: "+index);
+	    while(index >= researchers.size())
+	        researchers.add(new Researcher());
+	    return researchers.get(index);
+	}
+	
+	public List<Researcher> getResearcherList() {
+	    //System.out.println("Getting researcher list");
+	    List<Researcher> rList = new ArrayList<Researcher>();
+	    for(Researcher r: researchers) {
+	        if(r != null && r.getID() > 0)
+	            rList.add(r);
+	    }
+	    return rList;
+	}
+	
+	public void setResearcherList(List<Researcher> researchers) {
+	    //System.out.println("Setting researcher");
+	    this.researchers = researchers;
+	}
+	
+	private int validResearcherCount() {
+        int i = 0;
+        for (Researcher researcher: researchers) {
+            if (researcher != null && researcher.getID() > 0) i++;
+        }
+        return i;
+    }
 }
