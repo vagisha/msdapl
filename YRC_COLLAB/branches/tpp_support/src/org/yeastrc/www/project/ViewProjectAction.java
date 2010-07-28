@@ -355,13 +355,14 @@ public class ViewProjectAction extends Action {
 		        ProteinferJob job = ProteinInferJobSearcher.getInstance().getJobForPiRunId(piRunId);
 		        ExperimentProteinferRun eppRun = new ExperimentProteinferRun(job);
 		        
-		        ProteinferRunSummary summary = ProteinferRunSummaryLookup.getIdPickerRunSummary(piRunId);
-		        
-		        eppRun.setNumParsimoniousProteins(summary.getParsimProteinCount());
-		        eppRun.setNumParsimoniousProteinGroups(summary.getParsimIndistGroupCount());
-		        eppRun.setUniqPeptideSequenceCount(summary.getUniqPeptSeqCount());
-		        eppRun.setUniqIonCount(summary.getUniqIonCount());
-		        
+		        if(job.getStatus() == JobUtils.STATUS_COMPLETE) {
+			        ProteinferRunSummary summary = ProteinferRunSummaryLookup.getIdPickerRunSummary(piRunId);
+			        
+			        eppRun.setNumParsimoniousProteins(summary.getParsimProteinCount());
+			        eppRun.setNumParsimoniousProteinGroups(summary.getParsimIndistGroupCount());
+			        eppRun.setUniqPeptideSequenceCount(summary.getUniqPeptSeqCount());
+			        eppRun.setUniqIonCount(summary.getUniqIonCount());
+		        }
 		        idPickerRunList.add(eppRun);
 		    }
 		}
