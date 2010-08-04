@@ -8,77 +8,214 @@
     <script type="text/javascript" src="/msdapl/js/jquery.flot.js"></script>
     <script type="text/javascript" src="/msdapl/js/jquery.flot.selection.js"></script>
     
+    <script type="text/javascript" src="/msdapl/js/ui.core.js"></script>
+    <script type="text/javascript" src="/msdapl/js/ui.draggable.js"></script>
+    <script type="text/javascript" src="/msdapl/js/ui.droppable.js"></script>
+    
     <script type="text/javascript" src="/msdapl/js/aminoacid.js"></script>
     <script type="text/javascript" src="/msdapl/js/ion.js"></script>
     <script type="text/javascript" src="/msdapl/js/peptide.js"></script>
+    
+    <style type="text/css">
+    
+    	BODY    {
+           background-color: #F2F2F2;
+           color: #000000;
+           height: 100%;
+           margin: 0;
+           padding: 0;
+           font-family: "Trebuchet MS",Arial,sans-serif;
+           font-size: 10pt;
+           font-style: normal;
+           font-weight: 500;
+        }
+        
+        #ionTable {
+        	border-collapse:collapse;
+			border-color:#DDDDDD;
+		}
+        #ionTable th {
+        	background-color:#AAAAAA;
+        	border: 1px solid #666666;
+        }
+        #ionTable td {
+        	border: 1px solid #666666;
+        	text-align: center;
+        	background-color:#FFFFFF;
+        }
+        #ionTable td.seq {
+        	font-weight: bold;
+        	background-color:#AAAAAA;
+        }
+        #ionTable td.modified{
+        	background-color:gold;
+        }
+        #ionTable td.numCell {
+        	background-color:#EEEEEE;
+        	color:#777777;
+        }
+        #ionTable td.matchIon {
+        	font-weight:bold;
+        	opacity:0.8;
+        	filter: alpha(opacity=80); /*For IE*/
+        	-moz-opacity:0.8; /*Old Mozilla browsers*/
+        	color:white;
+        }
+        .droppable-hover {
+        	background-color:red;
+        }
+	</style>
 
  </head>
     <body>
-    <h1>Spectrum</h1>
     
     <table>
     	<tbody>
     	<tr>
-    		<td valign="top" style="background-color: #CCCCCC; border: 1px solid #666666;">
+			<td colspan="3" style="background-color:#DDDDDD; border:1px solid black">
+				<div align="center" style="width:100%;">
+					<b>Spectrum Viewer</b>
+				</div>
+			</td>
+		</tr>
+    	<tr>
+    		<td valign="top" style="background-color: #DDDDDD; border: 1px solid #666666;">
     			<table>
     				<tbody>
     				<tr>
-    					<td>
-    						Ions:
+    					<td style="background-color: #EEEEEE; border: 1px dashed #666666; padding: 5px;">
+    						<b>Ions:</b>
     						<div id="ion_choice" style="margin-bottom: 10px">
-   							<input id="a" type="checkbox"/><b>a</b>
-    						<input id="b" type="checkbox" checked="checked"/><b>b</b>
-    						<input id="c" type="checkbox"/><b>c</b>
+    						
+    						<!-- a ions -->
+    						<nobr>
+    						<b>a</b>
+    						<input type="checkbox" value="1" id="a_1"/>1<sup>+</sup>
+    						<input type="checkbox" value="2" id="a_2"/>2<sup>+</sup>
+    						<input type="checkbox" value="3" id="a_3"/>3<sup>+</sup>
+    						</nobr>
+    						
     						<br/>
-    						<input id="y" type="checkbox" checked="checked"/><b>y</b>
-    						<input id="z" type="checkbox"/><b>z</b>
+    						<!-- b ions -->
+    						<nobr>
+    						<b>b</b>
+    						<input type="checkbox" value="1" id="b_1" checked="checked"/>1<sup>+</sup>
+    						<input type="checkbox" value="2" id="b_2"/>2<sup>+</sup>
+    						<input type="checkbox" value="3" id="b_3"/>3<sup>+</sup>
+    						</nobr>
+    						
+    						<br/>
+    						<!-- c ions -->
+    						<nobr>
+    						<b>c</b>
+    						<input type="checkbox" value="1" id="c_1"/>1<sup>+</sup>
+    						<input type="checkbox" value="2" id="c_2"/>2<sup>+</sup>
+    						<input type="checkbox" value="3" id="c_3"/>3<sup>+</sup>
+    						</nobr>
+    						
+    						<br/>
+    						<!-- x ions -->
+    						<nobr>
+    						<b>x</b>
+    						<input type="checkbox" value="1" id="x_1"/>1<sup>+</sup>
+    						<input type="checkbox" value="2" id="x_2"/>2<sup>+</sup>
+    						<input type="checkbox" value="3" id="x_3"/>3<sup>+</sup>
+    						</nobr>
+    						
+    						<br/>
+    						<!-- y ions -->
+    						<nobr>
+    						<b>y</b>
+    						<input type="checkbox" value="1" id="y_1" checked="checked"/>1<sup>+</sup>
+    						<input type="checkbox" value="2" id="y_2"/>2<sup>+</sup>
+    						<input type="checkbox" value="3" id="y_3"/>3<sup>+</sup>
+    						</nobr>
+    						
+    						<br/>
+    						<!-- z ions -->
+    						<nobr>
+    						<b>z</b>
+    						<input type="checkbox" value="1" id="z_1"/>1<sup>+</sup>
+    						<input type="checkbox" value="2" id="z_2"/>2<sup>+</sup>
+    						<input type="checkbox" value="3" id="z_3"/>3<sup>+</sup>
+    						</nobr>
+   							
+   							<br/>
+   							<span id="deselectIonsLink" 
+   								  style="font-size:8pt;text-decoration: underline; color:sienna;cursor:pointer;">[Deselect All]</span>
+    						</div>
+    						
+    						<b>Neutral Loss:</b>
+    						<div id="nl_choice">
+    						
+    						<nobr>
+    						H<sub>2</sub>O
+    						<input type="checkbox" value="h2o" id="h2o"/>
+    						</nobr>
+    						
+    						<nobr>
+    						NH<sub>3</sub>
+    						<input type="checkbox" value="nh3" id="nh3"/>
+    						</nobr>
+    						
     						</div>
     					</td>
     				</tr>
+    				
     				<tr>
-    					<td>
-    						Charge:
-    						<div id="charge_choice" style="margin-bottom: 10px">
-   							<input id="1" type="checkbox" checked="checked" /><b>+1</b>
-    						<input id="2" type="checkbox" /><b>+2</b>
-    						<input id="3" type="checkbox"/><b>+3</b>
+    					<td style="background-color: #EEEEEE; border: 1px dashed #666666; padding: 5px;">
+    						<div>
+    						Mass Type:<br/>
+    						<nobr>
+    							<input type="radio" name="massTypeOpt" value="mono" checked="checked"/><b>Mono</b>
+    							<input type="radio" name="massTypeOpt" value="avg"/><b>Avg</b>
+    						</nobr>
     						</div>
-    					</td>
-    				</tr>
-    				<tr>
-    					<td>
-    						Mass Error: <input id="massError" type="text" value="0.95" size="4"/>
-    					</td>
-    				</tr>
-    				<tr>
-    					<td>
+    						<div style="margin-top:10px;">
+    						<nobr>Mass Tol: <input id="massError" type="text" value="0.95" size="4"/></nobr>
+    						</div>
+    						<div style="margin-top:10px;" align="center">
     						<input id="update" type="button" value="Update"/>
+    						</div>
     					</td>
     				</tr>
+    				
     				<tr>
-    					<td>
+    					<td style="padding:5px;">
     						<input id="enableTooltip" type="checkbox">Enable tooltip
     					</td>
     				</tr>
     				<tr>
-    					<td>
+    					<td align="center" style="padding:5px;">
     						<input id="resetZoom" type="button" value="Reset Zoom" />
     					</td>
     				</tr>
     				</tbody>
     			</table>
     		</td>
-    		<td>
-    			<div id="placeholder" style="width:800px;height:450px"></div>
-				<div id="overview" style="margin-left:25px;margin-top:20px;width:775px;height:50px"></div>
+    		<td style="background-color: white; border: 1px solid black;">
+    			<div id="placeholder" style="width:800px;height:450px;"></div>
+				<div id="overview" style="margin-left:25px;margin-top:20px;width:775px;height:50px;"></div>
     		</td>
     		
-    		<td style="background-color: #FFFFFF; border: 1px solid #666666;" valign="top">
+    		<td style="background-color: #DDDDDD; border: 1px solid #666666;" valign="top">
     			<div id="ionTableDiv">
     			
     			</div>
     		</td>
     	</tr>
+    	
+    	<tr>
+			<td colspan="3" style="background-color:#DDDDDD; border:1px solid black">
+				<div id="droppable" style="width:100%;">
+				Droppable
+				</div>
+				<div align="center" style="width:100%; font-size: 8pt;">
+					<b>Spectrum Viewer</b>
+				</div>
+			</td>
+		</tr>
+		
     	</tbody>
     </table>
 	
@@ -99,16 +236,26 @@ $(function () {
 
     var colors = {peaks: "#bbbbbb", bions: "#0000ff", yions: "#ff0000"};
     var allPeaks = {data: data_allPeaks, color: colors.peaks};
-    //var bions = {data: data_bions, color: Ion.B_1.color, label: "bion", labels: labels_bions};
-    //var yions = {data: data_yions, color: Ion.Y_1.color, label: "yion", labels: labels_yions}
     
     var zoomRange; // for zooming
     
     var ionChoiceContainer = $("#ion_choice");
-	var chgChoiceContainer = $("#charge_choice");
 	var massErrorField = $("#massError");
 	var massErrorChanged = false;
 	var massError = parseFloat(massErrorField.val());
+	
+	$("#ionTableDiv").draggable({ revert: 'invalid' });
+	$("#droppable").droppable({
+			hoverClass: 'droppable-hover',
+			drop: function(event, ui) {
+				//$(this).addClass('ui-state-highlight').find('p').html('Dropped!');
+				alert("Dropped");
+				$("#ionTableDiv").appendTo("#droppable");
+			},
+			stop: function (event, ui) {
+				alert("Stopped");
+			}
+		});
 	
     // -----------------------------------------------
 	// CREATE PLOTS
@@ -128,21 +275,21 @@ $(function () {
     function createPlot(datasets) {
     	if(!zoomRange) {
     		plot = $.plot($("#placeholder"), datasets,  options);
-    		makeIonTable();
     	}
     	else {
     		plot = $.plot($("#placeholder"), datasets,
                       $.extend(true, {}, options, {
                           xaxis: { min: zoomRange.xaxis.from, max: zoomRange.xaxis.to }
-                      }));
+             }));
     	}
     }
     
     createPlot(getDatasets()); // Initial Plot
+    makeIonTable();
     
     
     // Overview plot
-    var overview = $.plot($("#overview"), [allPeaks], {
+    var overview = $.plot($("#overview"), [{data: data_allPeaks, color: "#666666"}], {
         series: {
             lines: { show: true, lineWidth: 1 },
             shadowSize: 0
@@ -185,14 +332,15 @@ $(function () {
 	$("#update").click(function() {
 		zoomRange = null; // zoom out fully
 		setMassError();
-		createPlot(getDatasets());	
+		createPlot(getDatasets());
 		overview.clearSelection();
+		makeIonTable();
    	});
    	
    	function setMassError() {
-   		var me = massErrorField.val();
+   		var me = parseFloat(massErrorField.val());
 		if(me != massError) {
-			me = massError;
+			massError = me;
 			massErrorChanged = true;
 		}
 		else {
@@ -204,15 +352,23 @@ $(function () {
 	// SHOW / HIDE ION SERIES
 	// -----------------------------------------------
 	ionChoiceContainer.find("input").click(plotAccordingToChoices);
-	chgChoiceContainer.find("input").click(plotAccordingToChoices);
     
     function plotAccordingToChoices() {
         var data = getDatasets();
 
 		if (data.length > 0) {
             createPlot(data);
+            makeIonTable();
         }
     }
+    
+    $("#deselectIonsLink").click(function() {
+		ionChoiceContainer.find("input:checkbox:checked").each(function() {
+			$(this).attr('checked', "");
+		});
+		
+		plotAccordingToChoices();
+	});
     
     // -----------------------------------------------
 	// TOOLTIPS
@@ -225,7 +381,7 @@ $(function () {
             left: x + 5,
             border: '1px solid #fdd',
             padding: '2px',
-            'background-color': '#fee',
+            'background-color': '#F0E68C',
             opacity: 0.80
         }).appendTo("body").fadeIn(200);
     }
@@ -265,19 +421,14 @@ $(function () {
     	
     	ionChoiceContainer.find("input:checked").each(function () {
             var key = $(this).attr("id");
-            ions.push(key);
-        });
-        
-        chgChoiceContainer.find("input:checked").each(function () {
-            var key = $(this).attr("id");
-            charges.push(key); 
-        });
+            var tokens = key.split("_");
+            ions.push(tokens[0]);
+            charges.push(tokens[1]);
+      	});
         
         var selected = [];
         for(var i = 0; i < ions.length; i++) {
-        	for(j = 0; j < charges.length; j++) {
-        		selected.push(ion = Ion.get(ions[i], charges[j]));
-        	}
+        	selected.push(ion = Ion.get(ions[i], charges[i]));
         }
         
         return selected;
@@ -315,6 +466,19 @@ $(function () {
     		var ion = selectedIonTypes[j];
 							
 			
+			if(ion.type == "a") {
+				if(massErrorChanged || !ionSeriesMatch.a[ion.charge]) { // re-calculate only if mass error has changed OR
+																		// matching peaks for this series have not been calculated
+					// calculated matching peaks
+					var adata = calculateMatchingPeaks(ionSeries.a[ion.charge], data_allPeaks, massError);
+					if(adata && adata.length > 0) {
+						ionSeriesMatch.a[ion.charge] = adata[0];
+						ionSeriesLabels.a[ion.charge] = adata[1];
+					}
+				}
+				dataSeries.push({data: ionSeriesMatch.a[ion.charge], color: ion.color, labels: ionSeriesLabels.a[ion.charge]});
+			}
+			
 			if(ion.type == "b") {
 				if(massErrorChanged || !ionSeriesMatch.b[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
@@ -328,6 +492,32 @@ $(function () {
 				dataSeries.push({data: ionSeriesMatch.b[ion.charge], color: ion.color, labels: ionSeriesLabels.b[ion.charge]});
 			}
 			
+			if(ion.type == "c") {
+				if(massErrorChanged || !ionSeriesMatch.c[ion.charge]) { // re-calculate only if mass error has changed OR
+																		// matching peaks for this series have not been calculated
+					// calculated matching peaks
+					var cdata = calculateMatchingPeaks(ionSeries.c[ion.charge], data_allPeaks, massError);
+					if(cdata && cdata.length > 0) {
+						ionSeriesMatch.c[ion.charge] = cdata[0];
+						ionSeriesLabels.c[ion.charge] = cdata[1];
+					}
+				}
+				dataSeries.push({data: ionSeriesMatch.c[ion.charge], color: ion.color, labels: ionSeriesLabels.c[ion.charge]});
+			}
+			
+			if(ion.type == "x") {
+				if(massErrorChanged || !ionSeriesMatch.x[ion.charge]) { // re-calculate only if mass error has changed OR
+																		// matching peaks for this series have not been calculated
+					// calculated matching peaks
+					var xdata = calculateMatchingPeaks(ionSeries.x[ion.charge], data_allPeaks, massError);
+					if(xdata && xdata.length > 0) {
+						ionSeriesMatch.x[ion.charge] = xdata[0];
+						ionSeriesLabels.x[ion.charge] = xdata[1];
+					}
+				}
+				dataSeries.push({data: ionSeriesMatch.x[ion.charge], color: ion.color, labels: ionSeriesLabels.x[ion.charge]});
+			}
+			
 			if(ion.type == "y") {
 				if(massErrorChanged || !ionSeriesMatch.y[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
@@ -339,6 +529,19 @@ $(function () {
 					}
 				}
 				dataSeries.push({data: ionSeriesMatch.y[ion.charge], color: ion.color, labels: ionSeriesLabels.y[ion.charge]});
+			}
+			
+			if(ion.type == "z") {
+				if(massErrorChanged || !ionSeriesMatch.z[ion.charge]) { // re-calculate only if mass error has changed OR
+																		// matching peaks for this series have not been calculated
+					// calculated matching peaks
+					var zdata = calculateMatchingPeaks(ionSeries.z[ion.charge], data_allPeaks, massError);
+					if(zdata && zdata.length > 0) {
+						ionSeriesMatch.z[ion.charge] = zdata[0];
+						ionSeriesLabels.z[ion.charge] = zdata[1];
+					}
+				}
+				dataSeries.push({data: ionSeriesMatch.z[ion.charge], color: ion.color, labels: ionSeriesLabels.z[ion.charge]});
 			}
     	}
     	return dataSeries;
@@ -395,65 +598,79 @@ $(function () {
 		return matchData;
 	}
     
-    // -----------------------------------------------
-	// CALCUALTE THEORETICAL MASSES FOR AN ION SERIES
-	// -----------------------------------------------
+    // ---------------------------------------------------------
+	// CALCUALTE THEORETICAL MASSES FOR THE SELECTED ION SERIES
+	// ---------------------------------------------------------
 	function calculateTheoreticalSeries(selectedIons) {
 	
 		if(selectedIons) {
+		
+			var todoIonSeries = [];
+			var todoIonSeriesData = [];
+			for(var i = 0; i < selectedIons.length; i++) {
+				var sion = selectedIons[i];
+				if(sion.type == "a") {
+					if(ionSeries.a[sion.charge])	continue; // already calculated
+					else {
+						todoIonSeries.push(sion);
+						ionSeries.a[sion.charge] = [];
+						todoIonSeriesData.push(ionSeries.a[sion.charge]);
+					}
+				}
+				if(sion.type == "b") {
+					if(ionSeries.b[sion.charge])	continue; // already calculated
+					else {
+						todoIonSeries.push(sion);
+						ionSeries.b[sion.charge] = [];
+						todoIonSeriesData.push(ionSeries.b[sion.charge]);
+					}
+				}
+				if(sion.type == "c") {
+					if(ionSeries.c[sion.charge])	continue; // already calculated
+					else {
+						todoIonSeries.push(sion);
+						ionSeries.c[sion.charge] = [];
+						todoIonSeriesData.push(ionSeries.c[sion.charge]);
+					}
+				}
+				if(sion.type == "x") {
+					if(ionSeries.x[sion.charge])	continue; // already calculated
+					else {
+						todoIonSeries.push(sion);
+						ionSeries.x[sion.charge] = [];
+						todoIonSeriesData.push(ionSeries.x[sion.charge]);
+					}
+				}
+				if(sion.type == "y") {
+					if(ionSeries.y[sion.charge])	continue; // already calculated
+					else {
+						todoIonSeries.push(sion);
+						ionSeries.y[sion.charge] = [];
+						todoIonSeriesData.push(ionSeries.y[sion.charge]);
+					}
+				}
+				if(sion.type == "z") {
+					if(ionSeries.z[sion.charge])	continue; // already calculated
+					else {
+						todoIonSeries.push(sion);
+						ionSeries.z[sion.charge] = [];
+						todoIonSeriesData.push(ionSeries.z[sion.charge]);
+					}
+				}
+			}
 	
 			if(sequence) {
 				
 				for(var i = 1; i < sequence.length; i++) {
 					
-					var nterm = sequence.substring(0, i);
-					var cterm = sequence.substring(i, sequence.length);
-					
-					for(var j = 0; j < selectedIons.length; j++) {
+					for(var j = 0; j < todoIonSeries.length; j++) {
 						
-						var ion = selectedIons[j];
-						
-						if(ion.type == "a") {
-							if(i == 1 && ionSeries.a[ion.charge]) {
-								continue; // already calculated
-							}
-							if(!ionSeries.a[ion.charge])
-								ionSeries.a[ion.charge] = [];
-							ionSeries.a[ion.charge].push(aion = new Ion_A(nterm, i, ion.charge));
-						}
-						else if(ion.type == "b") {
-							if(i == 1 && ionSeries.b[ion.charge]) {
-								continue; // already calculated
-							}
-							if(!ionSeries.b[ion.charge])
-								ionSeries.b[ion.charge] = [];
-							ionSeries.b[ion.charge].push(bion = new Ion_B(nterm, i, ion.charge));
-						}
-						else if(ion.type == "c") {
-							if(i == 1 && ionSeries.c[ion.charge]) {
-								continue; // already calculated
-							}
-							if(!ionSeries.c[ion.charge])
-								ionSeries.c[ion.charge] = [];
-							ionSeries.c[ion.charge].push(cion = new Ion_C(nterm, i, ion.charge));
-						}
-						else if(ion.type == "y") {
-							if(i == 1 && ionSeries.y[ion.charge]) {
-								continue; // already calculated
-							}
-							if(!ionSeries.y[ion.charge])
-								ionSeries.y[ion.charge] = [];
-							ionSeries.y[ion.charge].unshift(yion = new Ion_Y(cterm, sequence.length - i, ion.charge));
-						}
-						else if(ion.type == "z") {
-							if(i == 1 && ionSeries.z[ion.charge]) {
-								alert("already calculated");
-								continue;
-							}
-							if(!ionSeries.z[ion.charge])
-								ionSeries.z[ion.charge] = [];
-							ionSeries.z[ion.charge].unshift(zion = new Ion_Z(cterm, sequence.length - i, ion.charge));
-						}
+						var ion = todoIonSeries[j];
+						var ionSeriesData = todoIonSeriesData[j];
+						if(ion.term == "n")
+							ionSeriesData.push(sion = Ion.getSeriesIon(ion, sequence, i));
+						else
+							ionSeriesData.unshift(sion = Ion.getSeriesIon(ion, sequence, i));
 					}
 				}
 			}
@@ -505,6 +722,8 @@ $(function () {
 			return ionSeries.b[ion.charge];
 		if(ion.type == "c")
 			return ionSeries.c[ion.charge];
+		if(ion.type == "x")
+			return ionSeries.x[ion.charge];
 		if(ion.type == "y")
 			return ionSeries.y[ion.charge];
 		if(ion.type == "z")
@@ -519,7 +738,7 @@ $(function () {
     	var ctermIons = getSelectedCtermIons(selectedIonTypes);
 		
 		var myTable = '' ;
-		myTable += '<table id="ionTable" cellspacing=0 cellpadding=2>' ;
+		myTable += '<table id="ionTable" cellpadding=2>' ;
 		myTable +=  "<thead>" ;
 		myTable +=   "<tr>";
 		// nterm ions
@@ -544,22 +763,38 @@ $(function () {
 			for(var n = 0; n < ntermIons.length; n++) {
 				if(i < sequence.length - 1) {
 					var seriesData = getCalculatedSeries(ntermIons[n]);
-					myTable +=    "<td>" +round(seriesData[i].mz)+  "</td>";  
+					var cls = "";
+					var style = "";
+					if(seriesData[i].match) {
+						cls="matchIon";
+						style="style='background-color:"+Ion.getSeriesColor(ntermIons[n])+";'";
+					}
+					myTable +=    "<td class='"+cls+"' "+style+" >" +round(seriesData[i].mz)+  "</td>";  
 				}
 				else {
 					myTable +=    "<td>" +"&nbsp;"+  "</td>"; 
 				} 
 			}
 			
-			myTable += "<td class='graycell'>"+(i+1)+"</td>";
-			myTable += "<td class='graycell'>"+sequence[i]+"</td>";
-			myTable += "<td class='graycell'>"+(sequence.length - i)+"</td>";
+			myTable += "<td class='numCell'>"+(i+1)+"</td>";
+			if(Peptide.varMods[i+1])
+				myTable += "<td class='seq modified'>"+sequence[i]+"</td>";
+			else
+				myTable += "<td class='seq'>"+sequence[i]+"</td>";
+			myTable += "<td class='numCell'>"+(sequence.length - i)+"</td>";
 			
 			// cterm ions
-			for(var n = 0; n < ctermIons.length; n++) {
+			for(var c = 0; c < ctermIons.length; c++) {
 				if(i > 0) {
-					var seriesData = getCalculatedSeries(ctermIons[n]);
-					myTable +=    "<td>" +round(seriesData[sequence.length - i - 1].mz)+  "</td>";  
+					var seriesData = getCalculatedSeries(ctermIons[c]);
+					var idx = sequence.length - i - 1;
+					var cls = "";
+					var style = "";
+					if(seriesData[idx].match) {
+						cls="matchIon";
+						style="style='background-color:"+Ion.getSeriesColor(ctermIons[c])+";'";
+					}
+					myTable +=    "<td class='"+cls+"' "+style+" >" +round(seriesData[idx].mz)+  "</td>";  
 				}
 				else {
 					myTable +=    "<td>" +"&nbsp;"+  "</td>"; 
@@ -601,9 +836,9 @@ variableMods[0] = new VariableModification(14, 16.0, AminoAcid.M);
 
 var input = new Peptide(sequence, staticMods, variableMods, 164.07, 0);
 
-var ionSeries = {a: [], b: [], c: [], y: [], z: []};
-var ionSeriesMatch = {a: [], b: [], c: [], y: [], z: []};
-var ionSeriesLabels = {a: [], b: [], c: [], y: [], z: []};
+var ionSeries = {a: [], b: [], c: [], x:[], y: [], z: []};
+var ionSeriesMatch = {a: [], b: [], c: [], x: [], y: [], z: []};
+var ionSeriesLabels = {a: [], b: [], c: [], x: [], y: [], z: []};
 
 
  

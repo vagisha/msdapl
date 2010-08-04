@@ -1668,7 +1668,7 @@
                 if(series.lines.peaks)
                 	incr = ps*2;
                 
-                var l = 0;
+                var l = -1;
                 //for (var i = ps; i < points.length; i += ps) {
                 for (var i = 0; i < points.length; i += ps) {
                     /*var x1 = points[i - ps], y1 = points[i - ps + 1],
@@ -1679,6 +1679,7 @@
                     if (x1 == null || x2 == null)
                         continue;
 
+                    l += 1;
                     // clip with ymin
                     if (y1 <= y2 && y1 < axisy.min) {
                         if (y2 < axisy.min)
@@ -1747,10 +1748,10 @@
                     	ctx.stroke();
                     	if(series.labels) {
                     		var label = series.labels[l];
-                    		l += 1;
                     		ctx.fillText(label, axisx.p2c(x2) + xoffset, axisy.p2c(y2) + yoffset-5);
                     	}
                     }
+                    
                 }
                 if(!series.lines.peaks) {
                 	ctx.stroke();
