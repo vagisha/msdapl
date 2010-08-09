@@ -43,6 +43,7 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
     			dbIdStr += ","+dbId;
     		}
     		dbIdStr = dbIdStr.substring(1);
+    		dbIdStr = "("+dbIdStr+")";
     		map.put("searchDbIds", dbIdStr);
     	}
     	

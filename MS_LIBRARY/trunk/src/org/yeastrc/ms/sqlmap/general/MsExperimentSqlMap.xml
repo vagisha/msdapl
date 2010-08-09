@@ -38,7 +38,7 @@
     	AND search.id = db.searchID
     	<!-- fasta databases -->
     	<isNotNull property="searchDbIds">
-    		AND db.databaseID IN (#searchDbIds#)
+    		AND db.databaseID IN $searchDbIds$
     	</isNotNull>
     	<!-- date -->
     	<isNotNull property="startDate">
