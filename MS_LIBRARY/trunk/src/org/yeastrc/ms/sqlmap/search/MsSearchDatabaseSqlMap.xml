@@ -52,6 +52,11 @@
     	SELECT sequenceDatabaseID FROM msSequenceDatabaseDetail WHERE 
     	serverPath = #serverPath#
     </select>
+    
+    <select id="findSearchDatabases" resultMap="msDatabaseResult" parameterClass="String">
+    	SELECT * FROM msSequenceDatabaseDetail WHERE 
+    	serverPath LIKE #matchString#
+    </select>
 
 
     <insert id="insertDatabase" parameterMap="msDatabaseParam">

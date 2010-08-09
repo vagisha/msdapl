@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
+import org.yeastrc.ms.domain.general.ExperimentSearchCriteria;
 import org.yeastrc.ms.domain.general.MsExperiment;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -28,6 +29,30 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
     @Override
     public List<Integer> getAllExperimentIds() {
         return queryForList("MsExperiment.selectAllExperimentIds");
+    }
+    
+    @Override
+    public List<Integer> getExperimentIds(ExperimentSearchCriteria searchCriteria) {
+        
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	
+    	List<Integer> searchDbIds = searchCriteria.getSearchDatabaseIds();
+    	if(searchDbIds != null && searchDbIds.size() > 0) {
+    		String dbIdStr = "";
+    		for(Integer dbId: searchDbIds) {
+    			dbIdStr += ","+dbId;
+    		}
+    		dbIdStr = dbIdStr.substring(1);
+    		map.put("searchDbIds", dbIdStr);
+    	}
+    	
+    	if(searchCriteria.getStartDate() != null) 
+    		map.put("startDate", searchCriteria.getStartDate());
+    	
+    	if(searchCriteria.getEndDate() != null) 
+    		map.put("endDate", searchCriteria.getEndDate());
+    	
+    	return queryForList("MsExperiment.searchExperiments", map);
     }
     
     @Override

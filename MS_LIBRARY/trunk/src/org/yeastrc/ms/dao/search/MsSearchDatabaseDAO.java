@@ -7,6 +7,7 @@ import org.yeastrc.ms.domain.search.MsSearchDatabase;
 public interface MsSearchDatabaseDAO {
 
     public abstract List<MsSearchDatabase> loadSearchDatabases(int searchId);
+    
 
     public abstract void deleteSearchDatabases(int searchId);
 
@@ -45,5 +46,13 @@ public interface MsSearchDatabaseDAO {
      * @return
      */
     public abstract List<Integer> loadMatchingDatabaseIds(MsSearchDatabase database);
+    
+    /**
+     * Returns a list of search databases that contain the given query string in the
+     * file name.
+     * @param matchString
+     * @return
+     */
+    public abstract List<MsSearchDatabase> findSearchDatabases(String matchString);
     
 }

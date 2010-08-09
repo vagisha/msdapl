@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.dao.search.ibatis;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,5 +73,13 @@ public class MsSearchDatabaseDAOImpl extends BaseSqlMapDAO implements MsSearchDa
         if(ids.size() == 1) // return an id only if there is a unique entry with this filepath
             return ids.get(0);
         return 0;
+    }
+    
+    public List<MsSearchDatabase> findSearchDatabases(String matchString) {
+    	if(matchString == null || matchString.trim().length() == 0)
+    		return new ArrayList<MsSearchDatabase>(0);
+    	
+    	matchString = "%"+matchString+"%";
+    	return queryForList("MsDatabase.findSearchDatabases", matchString);
     }
 }

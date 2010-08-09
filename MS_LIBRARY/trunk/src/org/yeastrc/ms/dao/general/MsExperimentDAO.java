@@ -8,6 +8,7 @@ package org.yeastrc.ms.dao.general;
 
 import java.util.List;
 
+import org.yeastrc.ms.domain.general.ExperimentSearchCriteria;
 import org.yeastrc.ms.domain.general.MsExperiment;
 
 /**
@@ -18,6 +19,8 @@ public interface MsExperimentDAO {
     public MsExperiment loadExperiment(int experimentId);
     
     public List<Integer> getAllExperimentIds();
+    
+    public List<Integer> getExperimentIds(ExperimentSearchCriteria searchCriteria);
     
     public List<Integer> getRunIdsForExperiment(int experimentId);
     
