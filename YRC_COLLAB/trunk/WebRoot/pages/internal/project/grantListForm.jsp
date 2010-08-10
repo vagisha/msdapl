@@ -236,6 +236,10 @@ function addFundingSource() {
 	EDIT_CLICKED = false;
 	
 	var uniqIDs = new Array();
+	if( document.forms[0].elements["piid"].value != 0 ) {
+		uniqIDs[ document.forms[0].elements["piid"].value ] = 1;
+	
+	/*
 	// get the selected PI ID from the drop-down list
 	var piList = document.getElementsByName("PI")[0];
 	for (var i = 0; i < piList.length; i+=1) {
@@ -244,6 +248,8 @@ function addFundingSource() {
 			break;
 		}
 	}
+	*/
+	
 	// If some grants have already been added, get the PI's of those grants
 	var piIds = document.getElementsByName("PIID");
 	for (var i = 0; i < piIds.length; i += 1) {

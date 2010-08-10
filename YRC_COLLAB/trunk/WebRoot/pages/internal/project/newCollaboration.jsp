@@ -19,6 +19,204 @@
 </logic:present>
 
 <script type="text/javascript" src="/yrc/js/grants.js" ></script>
+<script> 
+// ---------------------------------------------------------------------------------------
+// SETUP ANY BASIC TABLES
+// ---------------------------------------------------------------------------------------
+$(document).ready(function() {
+   $(".table_basic").each(function() {
+   		var $table = $(this);
+   		$('tbody > tr:odd', $table).addClass("tr_odd");
+   		$('tbody > tr:even', $table).addClass("tr_even");
+   });
+   
+   $(".foldable").each(function() {
+   		$(this).click(function() {
+   			fold($(this));
+   		});
+   });
+});
+  
+// ---------------------------------------------------------------------------------------
+// MAKE A TABLE STRIPED
+// ---------------------------------------------------------------------------------------
+function makeStripedTable(table) {
+	var $table = $(table);
+	$('tbody > tr:odd', $table).addClass("tr_odd");
+   	$('tbody > tr:even', $table).addClass("tr_even");
+}
+ 
+// ---------------------------------------------------------------------------------------
+// MAKE A TABLE SORTABLE
+// ---------------------------------------------------------------------------------------
+function makeSortableTable(table) {
+  	
+	var $table = $(table);
+	$('th', $table).each(function(column) {
+  		
+  		if ($(this).is('.sort-alpha') || $(this).is('.sort-int') 
+  			|| $(this).is('.sort-float') ) {
+  		
+  			var $header = $(this);
+      		$(this).click(function() {
+ 
+				// remove row striping
+				if($table.is('.stripe_table')) {
+					$("tbody > tr:odd", $table).removeClass("tr_odd");
+					$("tbody > tr:even", $table).removeClass("tr_even");
+				}
+				
+				// sorting direction
+				var newDirection = 1;
+        		if ($(this).is('.sorted-asc')) {
+          			newDirection = -1;
+        		}
+        				
+        		var rows = $table.find('tbody > tr').get();
+        				
+        		if ($header.is('.sort-alpha')) {
+        			$.each(rows, function(index, row) {
+						row.sortKey = $(row).children('td').eq(column).text().toUpperCase();
+					});
+				}
+				
+				if ($header.is('.sort-int')) {
+        					$.each(rows, function(index, row) {
+								var key = parseInt($(row).children('td').eq(column).text());
+						row.sortKey = isNaN(key) ? 0 : key;
+					});
+				}
+				
+				if ($header.is('.sort-float')) {
+        					$.each(rows, function(index, row) {
+								var key = parseFloat($(row).children('td').eq(column).text());
+						row.sortKey = isNaN(key) ? 0 : key;
+					});
+				}
+ 
+     			rows.sort(function(a, b) {
+       				if (a.sortKey < b.sortKey) return -newDirection;
+					if (a.sortKey > b.sortKey) return newDirection;
+					return 0;
+     			});
+ 
+     			$.each(rows, function(index, row) {
+       				$table.children('tbody').append(row);
+       				row.sortKey = null;
+     			});
+     			
+     			// the header for the column used for sorting is highlighted
+				$('th', $table).each(function(){
+					$(this).removeClass('sorted-desc');
+	    			$(this).removeClass('sorted-asc');
+				});
+				
+     			var $sortHead = $table.find('th').filter(':nth-child(' + (column + 1) + ')');
+ 
+	          	if (newDirection == 1) {$sortHead.addClass('sorted-asc'); $sortHead.removeClass('sorted-desc');} 
+	          	else {$sortHead.addClass('sorted-desc'); $sortHead.removeClass('sorted-asc');}
+        
+        		
+        		// add row striping back
+        		if($table.is('.stripe_table')) {
+					$('tbody > tr:odd', $table).addClass("tr_odd");
+   					$('tbody > tr:even', $table).addClass("tr_even");
+        		}
+      		});
+	}
+  });
+}
+ 
+// ---------------------------------------------------------------------------------------
+// FOLDABLE
+// ---------------------------------------------------------------------------------------
+function fold(foldable) {
+	//alert("foldable clicked");
+	if(!foldClose(foldable))
+	foldOpen(foldable);
+}
+function foldClose(foldable) {
+	var target_id = foldable.attr('id')+"_target";
+   	//alert("target is: "+target_id);
+	
+	if(foldable.is('.fold-open')) {
+		foldable.removeClass('fold-open');
+		foldable.addClass('fold-close');
+		$("#"+target_id).hide();
+		
+		return true;
+ 	}
+ 	return false;
+}
+function foldOpen(foldable) {
+	var target_id = foldable.attr('id')+"_target";
+   	//alert("target is: "+target_id);
+	
+	if(foldable.is('.fold-close')) {
+		foldable.removeClass('fold-close');
+		foldable.addClass('fold-open');
+		$("#"+target_id).show();
+		return true;
+	}
+	return false;
+}
+ 
+
+</script> 
+
+<script>
+
+	var lastResearcherIndex = -1;
+	var myarr = [];
+	
+	function removeResearcher(rowIdx) {
+		//alert("removing researcher at index "+rowIdx);
+		$("#researcherRow_"+rowIdx).hide();
+		document.forms[0].elements["researcher[" + rowIdx + "].ID"].value = 0;
+	}
+	 
+	function confirmRemoveResearcher(rowIdx) {
+		if(confirm("Are you sure you want to remove this researcher from the project?")) {
+			removeResearcher(rowIdx);
+		}
+	}
+	
+	function addResearcher() {
+
+		lastResearcherIndex++;
+
+		var newRow = "<tr id=\"researcherRow_" + lastResearcherIndex + "\">";
+			newRow += "<TD WIDTH='25%' VALIGN='top'>Researcher:</TD>";
+			newRow += "<td WIDTH='25%' VALIGN='top'>";
+			newRow += "<input class='researcher' type='hidden' name=\"researcher[" + lastResearcherIndex + "].ID\" value='0' />";
+			newRow += "<input size='40' type='text' name='researcher[" + lastResearcherIndex + "]' id='researcher" + lastResearcherIndex + "' />";
+			newRow += " <a href=\"javascript:confirmRemoveResearcher('" + lastResearcherIndex + "')\" style='color:red;font-size:8pt;'>[Remove]</a>";
+			newRow += "</td>";
+			newRow += "</tr>";
+
+				
+		if(lastResearcherIndex == 0) {
+			$("#piRow").after(newRow);
+		}
+		else {
+			$("#researcherRow_"+(lastResearcherIndex - 1)).after(newRow);
+		}
+		
+		var tidx = lastResearcherIndex;
+	    var options = {
+	      serviceUrl: '/yrc/service/researcherAutocomplete.do',
+	      onSelect: function(value, data){ document.forms[0].elements["researcher[" + tidx + "].ID"].value = data; },
+	      width: 500,
+	      delimiter: /(,|;)\s*/,
+	      deferRequestBy: 0, //miliseconds
+	      noCache: false //set to true, to disable caching
+	    };
+				
+    	myarr[ lastResearcherIndex ] = $('#researcher' + lastResearcherIndex).autocomplete( options );
+	}
+	
+	
+</script>
 
 <yrcwww:contentbox title="Create a New Collaboration" centered="true" width="750" scheme="search">
 
@@ -26,7 +224,7 @@
 Please review our <html:link href="/yrc/pages/internal/project/collaborationPolicies.jsp">collaboration policies</html:link> first.
 The appropriate members of the YRC will automatically be notified of your request, and you should followup with you shortly.
 
-<P><B>NOTE:</B>  If an individual you are listing as the PI, researcher B, C or D is not currently in the database, you must add them to the database first.
+<P><B>NOTE:</B>  If an individual you are listing as a researcher is not currently in the database, you must add them to the database first.
 Go <html:link href="/yrc/newResearcher.do">here</html:link> to add a new researcher to our database.
 
  <CENTER>
@@ -40,53 +238,48 @@ Go <html:link href="/yrc/newResearcher.do">here</html:link> to add a new researc
    </TR>
    </yrcwww:member>
 
-   <TR>
-    <TD WIDTH="25%" VALIGN="top">PI:</TD>
-    <TD WIDTH="75%" VALIGN="top">
-    
-    	<html:select property="PI">
-    		<html:option value="0">None</html:option>
-			<html:options collection="researchers" property="ID" labelProperty="listing"/>
-    	</html:select>
-    
-    </TD>
-   </TR>
 
-   <TR>
-    <TD WIDTH="25%" VALIGN="top">Researcher B:</TD>
-    <TD WIDTH="75%" VALIGN="top">
-    
-    	<html:select property="researcherB">
-    		<html:option value="0">None</html:option>
-			<html:options collection="researchers" property="ID" labelProperty="listing"/>
-    	</html:select>
-    
-    </TD>
-   </TR>
+	<tr><td colspan="2"><hr width="85%"></td></tr>
 
-   <TR>
-    <TD WIDTH="25%" VALIGN="top">Researcher C:</TD>
-    <TD WIDTH="75%" VALIGN="top">
-    
-    	<html:select property="researcherC">
-    		<html:option value="0">None</html:option>
-			<html:options collection="researchers" property="ID" labelProperty="listing"/>
-    	</html:select>
-    
-    </TD>
-   </TR>
+	<tr> 
+   		<td colspan="2" align="left"><div style="margin-bottom:10px;padding:10px;border-style:solid;border-width:1px;border-color:red;color:red;">*To add researchers, begin typing in the last name and select researcher
+   		from resulting pull-down menu.<br />*To add more researchers, click the &quot;+Add Researcher&quot; link.<br />*If researcher is not found, you must add them first
+   		<a href="/yrc/newResearcher.do">using this form</a>.</div></td> 
+   	</tr> 
 
-   <TR>
-    <TD WIDTH="25%" VALIGN="top">Researcher D:</TD>
-    <TD WIDTH="75%" VALIGN="top">
-    
-    	<html:select property="researcherD">
-    		<html:option value="0">None</html:option>
-			<html:options collection="researchers" property="ID" labelProperty="listing"/>
-    	</html:select>
-    
-    </TD>
-   </TR>
+	<tr id="piRow">
+		<td style="width:25%;vertical-align:top;">
+			PI:
+		</td>
+
+		<td style="width:75%;vertical-align:top;">
+			<logic:notEmpty name="editCollaborationForm" property="PI" scope="request">
+				<html:hidden name="editCollaborationForm" property="piid"/>
+				<input size="40" type="text" name="pi" id="pi" value="<bean:write name="editCollaborationForm" property="PI.lastName" />, <bean:write name="editCollaborationForm" property="PI.firstName" /> (<bean:write name="editCollaborationForm" property="PI.organization" />)" />
+			</logic:notEmpty>
+			
+			<logic:empty name="editCollaborationForm" property="PI" scope="request">
+				<input size="40" type="text" name="pi" id="pi" />
+				<html:hidden name="editCollaborationForm" property="piid"/>
+			</logic:empty>
+		</td>
+	
+	</tr>
+
+   <logic:iterate id="researcher" property="researcherList" name="editCollaborationForm" indexId="cnt">
+	   <tr id="researcherRow_<%=cnt%>" >
+	   	<TD WIDTH="25%" VALIGN="top">Researcher:</TD>
+	   	<td WIDTH="25%" VALIGN="top">
+			<html:hidden name="researcher" property="ID" indexed="true" />
+			<input class="researcher" size="40" type="text" name="researcher[<%=(cnt)%>]" id="researcher<%=(cnt)%>" value="<bean:write name="researcher" property="lastName" />, <bean:write name="researcher" property="firstName" /> (<bean:write name="researcher" property="organization" />)" />
+	   		<a href="javascript:confirmRemoveResearcher('<%=(cnt)%>')" style="color:red; font-size:8pt;">[Remove]</a>
+	   	</td>
+	   </tr>
+   </logic:iterate>
+
+	<tr> 
+   		<td colspan="2" align="center"><a href="javascript:addResearcher()">+Add Researcher</a></td> 
+   	</tr> 
 
 	<tr><td colspan="2"><hr width="85%"></td></tr>
 
@@ -160,5 +353,46 @@ Go <html:link href="/yrc/newResearcher.do">here</html:link> to add a new researc
   
  </CENTER>
 </yrcwww:contentbox>
+
+<script type="text/javascript"> 
+  //<![CDATA[
+ 
+  var a1; 
+
+  jQuery(function() {
+ 
+     var piOptions = {
+      serviceUrl: '/yrc/service/researcherAutocomplete.do',
+      onSelect: function(value, data){ document.forms[0].elements["piid"].value = data; },
+      width: 500,
+      delimiter: /(,|;)\s*/,
+      deferRequestBy: 0, //miliseconds
+      noCache: false //set to true, to disable caching
+    };
+ 
+	// set up the PI auto complete
+    a1 = $('#pi').autocomplete(piOptions);
+
+	// set up the auto complete for each researcher
+	$('.researcher').each(function(index) {
+		//piOptions[ 'onSelect' ] =  function(value, data){ document.forms[0].elements["researcher[" + index + "].ID"].value = data; },
+
+	    var options = {
+	      serviceUrl: '/yrc/service/researcherAutocomplete.do',
+	      onSelect: function(value, data){ document.forms[0].elements["researcher[" + index + "].ID"].value = data; },
+	      width: 500,
+	      delimiter: /(,|;)\s*/,
+	      deferRequestBy: 0, //miliseconds
+	      noCache: false //set to true, to disable caching
+	    };
+
+    	myarr[ index ] = $('#researcher' + index).autocomplete( options );
+    	lastResearcherIndex = index;
+    });
+ 
+  });
+  
+//]]>
+</script> 
 
 <%@ include file="/includes/footer.jsp" %>
