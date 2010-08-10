@@ -84,14 +84,7 @@ function confirmRemoveGrant(rowIdx) {
 	
 function addFundingSource() {
 	// get the selected PI ID from the drop-down list
-	var piList = document.getElementsByName("PI")[0];
-	PI = 0;
-	for (var i = 0; i < piList.length; i+=1) {
-		if (piList[i].selected) {
-			PI = piList[i].value;
-			break;
-		}
-	}
+	PI = document.forms[0].elements["piid"].value;
 	
 	var winHeight = 500
 	var winWidth = 700;
