@@ -103,7 +103,7 @@ public class DAOFactory {
         }
         String value = props.getProperty("db.peakdata.storage");
         peakStorageType = PeakStorageType.instance(value);
-        log.info("PeakStorageType is "+peakStorageType.name());
+        log.debug("PeakStorageType is "+peakStorageType.name());
     }
     
     static {
