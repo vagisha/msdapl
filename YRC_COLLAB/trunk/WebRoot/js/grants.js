@@ -26,7 +26,7 @@ function addGrant(grantID, grantTitle, piID, PI, sourceType, sourceName, grantNu
 	var removeCell = row.insertCell(7);
 	var editCell = row.insertCell(8);
 	
-	grantIDCell.innerHTML = '<input type="hidden" name="grant['+sourceIdx+']" value="'+grantID+'" />';
+	grantIDCell.innerHTML = '<input type="hidden" name="grant['+sourceIdx+'].ID" value="'+grantID+'" />';
 	sourceTypeCell.innerHTML = sourceType;
 	sourceTypeCell.style.fontSize = "8pt";
 	sourceNameCell.innerHTML = sourceName;
@@ -41,6 +41,7 @@ function addGrant(grantID, grantTitle, piID, PI, sourceType, sourceName, grantNu
 	grantAmtCell.innerHTML = grantAmount;
 	removeCell.innerHTML = '<a href="javascript:confirmRemoveGrant('+numRows+');" style="color:red; font-size:8pt;">[Remove]</a>';
 	editCell.innerHTML = '<a href="javascript:editGrant('+grantID+');" style="font-size:8pt;">Edit</a>';
+
 }
 
 function addHeaderRow(table) {
@@ -72,7 +73,10 @@ function removeGrant(rowIdx) {
 	var row = table.getElementsByTagName("tr")[rowIdx];
 	var idCell = row.getElementsByTagName("td")[0];
 	// set the value to 0 so that we know it is not valid
-	idCell.childNodes[0].value='0';
+	for (var i = 0; i < idCell.childNodes.length; i++) {
+		if (idCell.childNodes[i].value)
+			idCell.childNodes[i].value = '0';
+	}
 	row.style.display = 'none';
 }
 
