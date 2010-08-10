@@ -1018,10 +1018,19 @@
 		<forward name="Failure" path="/pages/internal/front.jsp" redirect="true"/>
 	</action>
 
+	<!-- 
 	<action
 	  path="/createOSheaMergedImages"
 	  type="org.yeastrc.www.sandbox.CreateOSheaMergedImages"
 	  validate="false">
+	</action>
+	-->
+
+	<action
+	  path="/service/researcherAutocomplete"
+	  type="org.yeastrc.www.service.ResearcherAutocompleteService"
+	  validate="false">
+		<forward name="Success" path="/pages/utils/showText.jsp" redirect="false"/>
 	</action>
 
 	<!-- ================================================================================== -->

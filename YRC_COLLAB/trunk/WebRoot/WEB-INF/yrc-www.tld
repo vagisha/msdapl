@@ -55,6 +55,26 @@
 </attribute>
 </tag>
 
+<tag>
+<name>researcherLink</name>
+<tagclass>org.yeastrc.www.taglib.ResearcherLinkTag</tagclass>
+<bodycontent>empty</bodycontent>
+<attribute>
+<name>name</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+<attribute>
+<name>property</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+<attribute>
+<name>scope</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
 
 
 <tag>
