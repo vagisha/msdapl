@@ -15,6 +15,8 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
+<script type="text/javascript" src="/yrc/js/grants.js" ></script>
+
 <script>
 
 	var lastResearcherIndex = -1;

@@ -183,6 +183,8 @@ function addGrant(grantID, grantTitle, piID, PI, sourceType, sourceName, grantNu
 		editCell.innerHTML = '<a href="javascript:editGrant('+grantID+');" style="font-size:8pt;">Edit</a>';
 		// remove link
 		removeCell.innerHTML = '<a href="javascript:confirmRemoveGrant('+numRows+');" style="color:red; font-size:8pt;">[Remove]</a>';
+		
+		alert( row.innerHTML );
 	}
 	else {
 		//alert("Grant already added: "+grantTitle);
