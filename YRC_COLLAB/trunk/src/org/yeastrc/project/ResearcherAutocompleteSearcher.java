@@ -36,14 +36,14 @@ public class ResearcherAutocompleteSearcher {
 		
 		try {
 			
-			String sql = "SELECT researcherID, researcherFirstName, researcherLastName, researcherEmail FROM tblResearchers WHERE researcherLastName LIKE ?";
+			String sql = "SELECT researcherID, researcherFirstName, researcherLastName, researcherOrganization FROM tblResearchers WHERE researcherLastName LIKE ? ORDER BY researcherLastName, researcherFirstName, researcherOrganization";
 			stmt = conn.prepareStatement( sql );
 			stmt.setString( 1, query + "%" );
 			
 			rs = stmt.executeQuery();
 			
 			while ( rs.next() ) {
-				retMap.put( rs.getString( 3 ) + ", " + rs.getString( 2 ) + " <" + rs.getString( 4 ) + ">", rs.getInt( 1 ) );
+				retMap.put( rs.getString( 3 ) + ", " + rs.getString( 2 ) + " (" + rs.getString( 4 ) + ")", rs.getInt( 1 ) );
 			}
 			
 			rs.close(); rs = null;

@@ -400,7 +400,7 @@ public abstract class Project implements Comparable, IData {
 			// now recreate the rows for this project based on the researchers set
 			// TODO: would be nice to know if the researcher list changed, and whether or not we need to do all of this
 			if( this.researchers != null ) {
-				sql = "INSERT INTO tblProjectResearcher (projectID, researcherID, projectPI) VALUES (?, ?, ?)";
+				sql = "INSERT IGNORE INTO tblProjectResearcher (projectID, researcherID, projectPI) VALUES (?, ?, ?)";
 				pstmt = conn.prepareStatement( sql );
 				
 				for( Researcher r : this.researchers ) {
@@ -708,7 +708,10 @@ public abstract class Project implements Comparable, IData {
 	 * set the PI
 	 * @param PI The PI for the project.
 	 */
-	public void setPI(Researcher PI) { this.PI = PI; }
+	public void setPI(Researcher PI) { 
+		this.addResearcher( PI );
+		this.PI = PI;
+	}
 
 	/**
 	 * Add a researcher to this project
@@ -725,7 +728,7 @@ public abstract class Project implements Comparable, IData {
 	 * Set the researchers for this project (can include PI)
 	 * @param rset
 	 */
-	public void setResearcher( Set<Researcher> rset ) {
+	public void setResearchers( Collection<Researcher> rset ) {
 		this.researchers = rset;
 	}
 	
@@ -882,7 +885,7 @@ public abstract class Project implements Comparable, IData {
 	 * Get the researchers on this project (will include PI)
 	 * @return
 	 */
-	public Set<Researcher> getResearchers() {
+	public Collection<Researcher> getResearchers() {
 		return this.researchers;
 	}
 	
@@ -890,7 +893,7 @@ public abstract class Project implements Comparable, IData {
 	 * Get the researchers on this project (will not include PI)
 	 * @return
 	 */
-	public Set<Researcher> getResearchersWithoutPI() {
+	public Collection<Researcher> getResearchersWithoutPI() {
 		Set<Researcher> tset = new HashSet<Researcher>();
 
 		if( this.researchers != null )
@@ -1194,7 +1197,7 @@ public abstract class Project implements Comparable, IData {
 	private Researcher PI;
 	
 	// researchers on this project
-	private Set<Researcher> researchers;
+	private Collection<Researcher> researchers;
 	
 	// Title of the project
 	private String title;

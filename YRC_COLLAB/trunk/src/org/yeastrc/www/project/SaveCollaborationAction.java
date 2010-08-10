@@ -33,10 +33,6 @@ public class SaveCollaborationAction extends Action {
 		
 		// The form elements we're after
 		String title = null;
-		int pi = 0;
-		int researcherB = 0;
-		int researcherC = 0;
-		int researcherD = 0;
 		String[] groups = null;
 		String projectAbstract = null;
 		String publicAbstract = null;
@@ -105,10 +101,6 @@ public class SaveCollaborationAction extends Action {
 
 		// We're saving!
 		title = ((EditCollaborationForm)(form)).getTitle();
-		pi = ((EditCollaborationForm)(form)).getPI();
-		researcherB = ((EditCollaborationForm)(form)).getResearcherB();
-		researcherC = ((EditCollaborationForm)(form)).getResearcherC();
-		researcherD = ((EditCollaborationForm)(form)).getResearcherD();
 		groups = ((EditCollaborationForm)(form)).getGroups();
 		projectAbstract = ((EditCollaborationForm)(form)).getAbstract();
 		publicAbstract = ((EditCollaborationForm)(form)).getPublicAbstract();
@@ -127,41 +119,6 @@ public class SaveCollaborationAction extends Action {
 		if (progress.equals("")) progress = null;
 		if (publications.equals("")) publications = null;
 		if (comments.equals("")) comments = null;
-		if (axisI != null && axisI.equals("")) axisI = null;
-		if (axisII != null && axisII.equals("")) axisII = null;
-		
-		// Set up our researchers
-		Researcher oPI = null;
-		Researcher orB = null;
-		Researcher orC = null;
-		Researcher orD = null;		
-		try {
-			if (pi != 0) {
-				oPI = new Researcher();
-				oPI.load(pi);
-			}			
-			if (researcherB != 0) {
-				orB = new Researcher();
-				orB.load(researcherB);
-			}
-			
-			if (researcherC != 0) {
-				orC = new Researcher();
-				orC.load(researcherC);
-			}
-			
-			if (researcherD != 0) {
-				orD = new Researcher();
-				orD.load(researcherD);
-			}
-		} catch (InvalidIDException iie) {
-
-			// Couldn't load the researcher.
-			ActionErrors errors = new ActionErrors();
-			errors.add("project", new ActionMessage("error.project.invalidresearcher"));
-			saveErrors( request, errors );
-			return mapping.findForward("Failure");
-		}
 
 		// Set up the groups
 		project.clearGroups();
@@ -184,10 +141,13 @@ public class SaveCollaborationAction extends Action {
 
 		// Set all of the new values in the project
 		project.setTitle(title);
-		project.setPI(oPI);
-		project.setResearcherB(orB);
-		project.setResearcherC(orC);
-		project.setResearcherD(orD);
+
+		// set the researchers
+		project.setResearchers( null );
+		project.setResearchers( ((EditCollaborationForm)(form)).getResearcherList() );
+		project.setPI( ((EditCollaborationForm)(form)).getPI());		
+
+		
 		project.setAbstract(projectAbstract);
 		project.setPublicAbstract(publicAbstract);
 		//project.setKeywords(keywords);

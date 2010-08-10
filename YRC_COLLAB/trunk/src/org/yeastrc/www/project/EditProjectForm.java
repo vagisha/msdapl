@@ -11,7 +11,7 @@ package org.yeastrc.www.project;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import org.apache.struts.action.*;
@@ -34,7 +34,7 @@ public class EditProjectForm extends ActionForm {
 	public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
 		ActionErrors errors = new ActionErrors();
 		
-		if (this.getPI() == 0) {
+		if (this.getPI() == null) {
 			errors.add("PI", new ActionMessage("error.project.nopi"));
 		}
 
@@ -71,9 +71,6 @@ public class EditProjectForm extends ActionForm {
 	/** Set the AXIS II */
 	public void setAxisII(String arg) { this.axisii = arg; }
 
-	/** Set the PI ID */
-	public void setPI(int arg) { this.pi = arg; }
-
 	/** Get the title */
 	public String getTitle() { return this.title; }
 
@@ -104,8 +101,10 @@ public class EditProjectForm extends ActionForm {
 	/** Get the AXIS II */
 	public String getAxisII() { return this.axisii; }
 
-	/** Get the PI ID */
-	public int getPI() { return this.pi; }
+	/** Get the PI  */
+	public Researcher getPI() {
+		return this.pi;
+	}
 
 
 	// The form variables we'll be tracking
@@ -122,7 +121,8 @@ public class EditProjectForm extends ActionForm {
     private List<Researcher> researchers = new ArrayList<Researcher>();
 
 	
-	private int pi = 0;
+	private Researcher pi = null;
+	private int piid = 0;
 
 	private List<Grant> grants = new ArrayList<Grant>();
 	
@@ -182,12 +182,14 @@ public class EditProjectForm extends ActionForm {
 	    return researchers.get(index);
 	}
 	
-	public List<Researcher> getResearcherList() {
+	public Collection<Researcher> getResearcherList() {
 	    //System.out.println("Getting researcher list");
 	    List<Researcher> rList = new ArrayList<Researcher>();
 	    for(Researcher r: researchers) {
-	        if(r != null && r.getID() > 0)
-	            rList.add(r);
+	        if(r != null && r.getID() > 0) {
+	            try { r.load( r.getID() ); } catch ( Exception e ) { ; }
+	        	rList.add(r);
+	        }
 	    }
 	    return rList;
 	}
@@ -204,4 +206,19 @@ public class EditProjectForm extends ActionForm {
         }
         return i;
     }
+
+	public int getPiid() {
+		return piid;
+	}
+
+	public void setPiid(int piid) {
+		try {
+			Researcher r = new Researcher();
+			r.load( piid );
+			r.setID( piid );
+			this.pi = r;
+		} catch (Exception e ) { ; }
+		this.piid = piid;
+	}
+	
 }

@@ -31,6 +31,7 @@ public class EditCollaborationForm extends EditProjectForm {
 	public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
 		ActionErrors errors = super.validate(mapping, request);
 		
+		/*
 		// we need atleast one grant
 		if (validGrantCount() < 1) {
 		    // there could be grant information for the project entered via the old interface.
@@ -42,28 +43,7 @@ public class EditCollaborationForm extends EditProjectForm {
 		        errors.add("grants", new ActionMessage("error.grant.nogrants"));
 		    }
 		}
-		
-//		if (this.getFundingTypes() == null || this.getFundingTypes().length < 1) {
-//			errors.add("fundingTypes", new ActionMessage("error.project.nofundingtypes"));
-//		} else {
-//			
-//			for (int i = 0; i < this.getFundingTypes().length; i++) {
-//				if (this.getFundingTypes()[i].equals("FEDERAL")) {
-//					if (this.getFederalFundingTypes() == null || this.getFederalFundingTypes().length < 1) {
-//						errors.add("fundingTypes", new ActionMessage("error.project.nofederalfundingtypes"));
-//						break;
-//					}					
-//				}
-//				
-//				if (!this.getFundingTypes()[i].equals("FEDERAL")) {
-//					if (this.getFoundationName() == null || this.getFoundationName().length() < 2) {
-//						errors.add("fundingTypes", new ActionMessage("error.project.nofoundationname"));
-//						break;
-//					}
-//				}
-//				
-//			}
-//		}
+		*/
 		
 		if (this.getTitle() == null || this.getTitle().length() < 1) {
 			errors.add("title", new ActionMessage("error.project.notitle"));
@@ -72,12 +52,6 @@ public class EditCollaborationForm extends EditProjectForm {
 		if (this.getAbstract() == null || this.getAbstract().length() < 1) {
 			errors.add("project", new ActionMessage("error.project.noabstract"));
 		}
-		
-		/*
-		if (this.getKeywords() == null || this.getKeywords().length() < 1) {
-			errors.add("project", new ActionMessage("error.project.nokeywords"));
-		}
-		*/
 		
 		String[] groups = this.getGroups();
 		if (groups == null || groups.length < 1) {

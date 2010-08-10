@@ -33,13 +33,7 @@ public class SaveNewDisseminationAction extends Action {
 		int projectID;			// Get the projectID they're after
 		
 		// The form elements we're after
-		int pi = 0;
-		int researcherB = 0;
-		int researcherC = 0;
-		int researcherD = 0;
 		String[] groups = null;
-		//String[] fundingTypes = null;
-		//String[] federalFundingTypes = null;
 		String description = null;
 		String name = null;
 		String phone = null;
@@ -67,14 +61,7 @@ public class SaveNewDisseminationAction extends Action {
 		//request.setAttribute("project", project);
 
 		// We're saving!
-		pi = ((EditDisseminationForm)(form)).getPI();
-		researcherB = ((EditDisseminationForm)(form)).getResearcherB();
-		researcherC = ((EditDisseminationForm)(form)).getResearcherC();
-		researcherD = ((EditDisseminationForm)(form)).getResearcherD();
 		groups = ((EditDisseminationForm)(form)).getGroups();
-		//fundingTypes = ((EditDisseminationForm)(form)).getFundingTypes();
-		//federalFundingTypes = ((EditDisseminationForm)(form)).getFederalFundingTypes();
-
 		description = ((EditDisseminationForm)(form)).getDescription();
 		name = ((EditDisseminationForm)(form)).getName();
 		phone = ((EditDisseminationForm)(form)).getPhone();
@@ -94,63 +81,6 @@ public class SaveNewDisseminationAction extends Action {
 		if (address.equals("")) address = null;
 		if (comments.equals("")) comments = null;
 		if (FEDEX.equals("")) FEDEX = null;
-		
-		// Set up our researchers
-		Researcher oPI = null;
-		Researcher orB = null;
-		Researcher orC = null;
-		Researcher orD = null;		
-		try {
-			if (pi != 0) {
-				oPI = new Researcher();
-				oPI.load(pi);
-			}			
-			if (researcherB != 0) {
-				orB = new Researcher();
-				orB.load(researcherB);
-			}
-			
-			if (researcherC != 0) {
-				orC = new Researcher();
-				orC.load(researcherC);
-			}
-			
-			if (researcherD != 0) {
-				orD = new Researcher();
-				orD.load(researcherD);
-			}
-		} catch (InvalidIDException iie) {
-
-			// Couldn't load the researcher.
-			ActionErrors errors = new ActionErrors();
-			errors.add("project", new ActionMessage("error.project.invalidresearcher"));
-			saveErrors( request, errors );
-			return mapping.findForward("Failure");
-		}
-
-		/*
-		// Set up the funding types
-		project.clearFundingTypes();
-		
-		if (fundingTypes != null) {
-			if (fundingTypes.length > 0) {
-				for (int i = 0; i < fundingTypes.length; i++) {
-					project.setFundingType(fundingTypes[i]);
-				}
-			}
-		}
-		
-		// Set up the federal funding types
-		project.clearFederalFundingTypes();
-		
-		if (federalFundingTypes != null) {
-			if (federalFundingTypes.length > 0) {
-				for (int i = 0; i < federalFundingTypes.length; i++) {
-					project.setFederalFundingType(federalFundingTypes[i]);
-				}
-			}
-		}
-		*/
 		
 		// Set up the groups
 		project.clearGroups();
@@ -172,10 +102,13 @@ public class SaveNewDisseminationAction extends Action {
 		}
 
 		// Set all of the new values in the project
-		project.setPI(oPI);
-		project.setResearcherB(orB);
-		project.setResearcherC(orC);
-		project.setResearcherD(orD);
+
+		// set the researchers
+		project.setResearchers( null );
+		project.setResearchers( ((EditDisseminationForm)(form)).getResearcherList() );
+		project.setPI( ((EditDisseminationForm)(form)).getPI());
+		
+		
 		project.setDescription(description);
 		project.setName(name);
 		project.setPhone(phone);
@@ -223,8 +156,8 @@ public class SaveNewDisseminationAction extends Action {
 			text += "has requested plasmids from your group.  Replying to this email should reply directly to the researcher.\n\n";
 			text += "Details:\n\n";
 			
-			if (oPI != null)
-				text += "PI: " + oPI.getListing() + "\n\n";
+			if (project.getPI() != null)
+				text += "PI: " + project.getPI().getListing() + "\n\n";
 
 			text += "Groups: " + project.getGroupsString() + "\n\n";
 			text += "Title: " + project.getTitle() + "\n\n";

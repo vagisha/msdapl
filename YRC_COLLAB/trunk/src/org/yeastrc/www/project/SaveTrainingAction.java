@@ -29,13 +29,7 @@ public class SaveTrainingAction extends Action {
 		
 		// The form elements we're after
 		String title = null;
-		int pi = 0;
-		int researcherB = 0;
-		int researcherC = 0;
-		int researcherD = 0;
 		String[] groups = null;
-//		String[] fundingTypes = null;
-//		String[] federalFundingTypes = null;
 		String comments = null;
 		String description = null;
 		int hours = 0;
@@ -101,13 +95,7 @@ public class SaveTrainingAction extends Action {
 
 		// We're saving!
 		title = ((EditTrainingForm)(form)).getTitle();
-		pi = ((EditTrainingForm)(form)).getPI();
-		researcherB = ((EditTrainingForm)(form)).getResearcherB();
-		researcherC = ((EditTrainingForm)(form)).getResearcherC();
-		researcherD = ((EditTrainingForm)(form)).getResearcherD();
 		groups = ((EditTrainingForm)(form)).getGroups();
-//		fundingTypes = ((EditTrainingForm)(form)).getFundingTypes();
-//		federalFundingTypes = ((EditTrainingForm)(form)).getFederalFundingTypes();
 		comments = ((EditTrainingForm)(form)).getComments();
 		description = ((EditTrainingForm)(form)).getDescription();
 		hours = ((EditTrainingForm)(form)).getHours();
@@ -123,61 +111,6 @@ public class SaveTrainingAction extends Action {
 		
 		if (axisI != null && axisI.equals("")) axisI = null;
 		if (axisII != null && axisII.equals("")) axisII = null;
-		
-		// Set up our researchers
-		Researcher oPI = null;
-		Researcher orB = null;
-		Researcher orC = null;
-		Researcher orD = null;		
-		try {
-			if (pi != 0) {
-				oPI = new Researcher();
-				oPI.load(pi);
-			}			
-			if (researcherB != 0) {
-				orB = new Researcher();
-				orB.load(researcherB);
-			}
-			
-			if (researcherC != 0) {
-				orC = new Researcher();
-				orC.load(researcherC);
-			}
-			
-			if (researcherD != 0) {
-				orD = new Researcher();
-				orD.load(researcherD);
-			}
-		} catch (InvalidIDException iie) {
-
-			// Couldn't load the researcher.
-			ActionErrors errors = new ActionErrors();
-			errors.add("project", new ActionMessage("error.project.invalidresearcher"));
-			saveErrors( request, errors );
-			return mapping.findForward("Failure");
-		}
-
-		// Set up the funding types
-//		project.clearFundingTypes();
-//		
-//		if (fundingTypes != null) {
-//			if (fundingTypes.length > 0) {
-//				for (int i = 0; i < fundingTypes.length; i++) {
-//					project.setFundingType(fundingTypes[i]);
-//				}
-//			}
-//		}
-//		
-//		// Set up the federal funding types
-//		project.clearFederalFundingTypes();
-//		
-//		if (federalFundingTypes != null) {
-//			if (federalFundingTypes.length > 0) {
-//				for (int i = 0; i < federalFundingTypes.length; i++) {
-//					project.setFederalFundingType(federalFundingTypes[i]);
-//				}
-//			}
-//		}
 
 		// Set up the groups
 		project.clearGroups();
@@ -200,10 +133,12 @@ public class SaveTrainingAction extends Action {
 
 		// Set all of the new values in the project
 		project.setTitle(title);
-		project.setPI(oPI);
-		project.setResearcherB(orB);
-		project.setResearcherC(orC);
-		project.setResearcherD(orD);
+
+		// set the researchers
+		project.setResearchers( null );
+		project.setResearchers( ((EditTrainingForm)(form)).getResearcherList() );
+		project.setPI( ((EditTrainingForm)(form)).getPI());
+		
 		project.setComments(comments);
 		project.setDescription(description);
 		project.setHours(hours);

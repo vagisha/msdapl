@@ -8,7 +8,7 @@
 
 package org.yeastrc.www.project;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +20,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+
 import org.yeastrc.grant.Grant;
 import org.yeastrc.grant.GrantRecord;
 import org.yeastrc.project.Dissemination;
@@ -194,37 +195,20 @@ public class EditProjectAction extends Action {
 		newForm.setAbstract(project.getAbstract());
 		newForm.setPublicAbstract(project.getPublicAbstract());
 		newForm.setProgress(project.getProgress());
-		//newForm.setKeywords(project.getKeywords());
 		newForm.setComments(project.getComments());
 		newForm.setPublications(project.getPublications());
-		
-		// Set the admin parameters
 		newForm.setBTA(project.getBTA());
-		//newForm.setAxisI(project.getAxisI());
-		//newForm.setAxisII(project.getAxisII());
-
 		newForm.setID(project.getID());
 		newForm.setSubmitDate(project.getSubmitDate());
 		
 		// Set the Researchers
 		Researcher res = project.getPI();
-		if (res != null) newForm.setPI(res.getID());
+		if (res != null) newForm.setPiid( res.getID() );
+		newForm.setResearcherList( new ArrayList<Researcher>( project.getResearchersWithoutPI() ) );
 		
-		res = project.getResearcherB();
-		if (res != null) newForm.setResearcherB(res.getID());
-
-		res = project.getResearcherC();
-		if (res != null) newForm.setResearcherC(res.getID());
-
-		res = project.getResearcherD();
-		if (res != null) newForm.setResearcherD(res.getID());
-
-
-		// Set up a Collection of all the Researchers to use in the form as a pull-down menu for researchers
-		Collection researchers = Projects.getAllResearchers();
-		request.getSession().setAttribute("researchers", researchers);
-
-
+		request.setAttribute( "pi", project.getPI() );
+		request.setAttribute( "researchers", project.getResearchersWithoutPI() );
+		
 		// Go!
 		return mapping.findForward(forwardStr);
 

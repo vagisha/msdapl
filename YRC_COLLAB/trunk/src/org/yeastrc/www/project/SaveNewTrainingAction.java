@@ -34,13 +34,7 @@ public class SaveNewTrainingAction extends Action {
 		
 		// The form elements we're after
 		String title = null;
-		int pi = 0;
-		int researcherB = 0;
-		int researcherC = 0;
-		int researcherD = 0;
 		String[] groups = null;
-//		String[] fundingTypes = null;
-//		String[] federalFundingTypes = null;
 		String comments = null;
 		String description = null;
 		int hours = 0;
@@ -66,13 +60,7 @@ public class SaveNewTrainingAction extends Action {
 
 		// We're saving!
 		title = ((EditTrainingForm)(form)).getTitle();
-		pi = ((EditTrainingForm)(form)).getPI();
-		researcherB = ((EditTrainingForm)(form)).getResearcherB();
-		researcherC = ((EditTrainingForm)(form)).getResearcherC();
-		researcherD = ((EditTrainingForm)(form)).getResearcherD();
 		groups = ((EditTrainingForm)(form)).getGroups();
-//		fundingTypes = ((EditTrainingForm)(form)).getFundingTypes();
-//		federalFundingTypes = ((EditTrainingForm)(form)).getFederalFundingTypes();
 		comments = ((EditTrainingForm)(form)).getComments();
 		description = ((EditTrainingForm)(form)).getDescription();
 		hours = ((EditTrainingForm)(form)).getHours();
@@ -85,72 +73,12 @@ public class SaveNewTrainingAction extends Action {
 		if (comments != null && comments.equals("")) comments = null;
 		if (description != null && description.equals("")) description = null;
 
-		// Set up our researchers
-		Researcher oPI = null;
-		Researcher orB = null;
-		Researcher orC = null;
-		Researcher orD = null;		
-		try {
-			if (pi != 0) {
-				oPI = new Researcher();
-				oPI.load(pi);
-			}			
-			if (researcherB != 0) {
-				orB = new Researcher();
-				orB.load(researcherB);
-			}
-			
-			if (researcherC != 0) {
-				orC = new Researcher();
-				orC.load(researcherC);
-			}
-			
-			if (researcherD != 0) {
-				orD = new Researcher();
-				orD.load(researcherD);
-			}
-		} catch (InvalidIDException iie) {
-
-			// Couldn't load the researcher.
-			ActionErrors errors = new ActionErrors();
-			errors.add("project", new ActionMessage("error.project.invalidresearcher"));
-			saveErrors( request, errors );
-			return mapping.findForward("Failure");
-		}
-
 		if (title == null && isSeminars) {
-			if (orB != null)
-				title = "Seminars given by " + orB.getFirstName() + " " + orB.getLastName();
-			else if (oPI != null)
-				title = "Seminars given by " + oPI.getFirstName() + " " + oPI.getLastName();
+			if (((EditTrainingForm)(form)).getPI() != null)
+				title = "Seminars given by " + ((EditTrainingForm)(form)).getPI().getFirstName() + " " + ((EditTrainingForm)(form)).getPI().getLastName();
 			else
 				title = "Seminars given";
 		}
-		
-		
-		/*
-		// Set up the funding types
-		project.clearFundingTypes();
-		
-		if (fundingTypes != null) {
-			if (fundingTypes.length > 0) {
-				for (int i = 0; i < fundingTypes.length; i++) {
-					project.setFundingType(fundingTypes[i]);
-				}
-			}
-		}
-		
-		// Set up the federal funding types
-		project.clearFederalFundingTypes();
-		
-		if (federalFundingTypes != null) {
-			if (federalFundingTypes.length > 0) {
-				for (int i = 0; i < federalFundingTypes.length; i++) {
-					project.setFederalFundingType(federalFundingTypes[i]);
-				}
-			}
-		}
-		*/
 		
 		// Set up the groups
 		project.clearGroups();
@@ -173,10 +101,13 @@ public class SaveNewTrainingAction extends Action {
 
 		// Set all of the new values in the project
 		project.setTitle(title);
-		project.setPI(oPI);
-		project.setResearcherB(orB);
-		project.setResearcherC(orC);
-		project.setResearcherD(orD);
+
+		// set the researchers
+		project.setResearchers( null );
+		project.setResearchers( ((EditTrainingForm)(form)).getResearcherList() );
+		project.setPI( ((EditTrainingForm)(form)).getPI());
+		
+		
 		project.setComments(comments);
 		project.setDescription(description);
 		project.setHours(hours);
@@ -221,8 +152,8 @@ public class SaveNewTrainingAction extends Action {
 				text += "has requested training from your group.  Replying to this email should reply directly to the researcher.\n\n";
 				text += "Details:\n\n";
 				
-				if (oPI != null)
-					text += "PI: " + oPI.getListing() + "\n\n";
+				if (project.getPI() != null)
+					text += "PI: " + project.getPI().getListing() + "\n\n";
 	
 				text += "Groups: " + project.getGroupsString() + "\n\n";
 				text += "Title: " + project.getTitle() + "\n\n";

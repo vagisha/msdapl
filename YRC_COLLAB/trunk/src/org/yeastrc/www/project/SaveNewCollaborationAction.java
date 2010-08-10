@@ -38,10 +38,6 @@ public class SaveNewCollaborationAction extends Action {
 		
 		// The form elements we're after
 		String title = null;
-		int pi = 0;
-		int researcherB = 0;
-		int researcherC = 0;
-		int researcherD = 0;
 		String[] groups = null;
 		String projectAbstract = null;
 		String publicAbstract = null;
@@ -65,14 +61,9 @@ public class SaveNewCollaborationAction extends Action {
 
 		// We're saving!
 		title = ((EditCollaborationForm)(form)).getTitle();
-		pi = ((EditCollaborationForm)(form)).getPI();
-		researcherB = ((EditCollaborationForm)(form)).getResearcherB();
-		researcherC = ((EditCollaborationForm)(form)).getResearcherC();
-		researcherD = ((EditCollaborationForm)(form)).getResearcherD();
 		groups = ((EditCollaborationForm)(form)).getGroups();
 		projectAbstract = ((EditCollaborationForm)(form)).getAbstract();
 		publicAbstract = ((EditCollaborationForm)(form)).getPublicAbstract();
-		//keywords = ((EditCollaborationForm)(form)).getKeywords();
 		progress = ((EditCollaborationForm)(form)).getProgress();
 		publications = ((EditCollaborationForm)(form)).getPublications();
 		comments = ((EditCollaborationForm)(form)).getComments();
@@ -97,39 +88,6 @@ public class SaveNewCollaborationAction extends Action {
 
 		// Set this project in the request, as a bean to be displayed on the view
 		//request.setAttribute("project", project);
-		
-		// Set up our researchers
-		Researcher oPI = null;
-		Researcher orB = null;
-		Researcher orC = null;
-		Researcher orD = null;		
-		try {
-			if (pi != 0) {
-				oPI = new Researcher();
-				oPI.load(pi);
-			}			
-			if (researcherB != 0) {
-				orB = new Researcher();
-				orB.load(researcherB);
-			}
-			
-			if (researcherC != 0) {
-				orC = new Researcher();
-				orC.load(researcherC);
-			}
-			
-			if (researcherD != 0) {
-				orD = new Researcher();
-				orD.load(researcherD);
-			}
-		} catch (InvalidIDException iie) {
-
-			// Couldn't load the researcher.
-			ActionErrors errors = new ActionErrors();
-			errors.add("project", new ActionMessage("error.project.invalidresearcher"));
-			saveErrors( request, errors );
-			return mapping.findForward("Failure");
-		}
 
 		// Set up the groups
 		project.clearGroups();
@@ -152,13 +110,14 @@ public class SaveNewCollaborationAction extends Action {
 
 		// Set all of the new values in the project
 		project.setTitle(title);
-		project.setPI(oPI);
-		project.setResearcherB(orB);
-		project.setResearcherC(orC);
-		project.setResearcherD(orD);
+
+		// set the researchers
+		project.setResearchers( null );
+		project.setResearchers( ((EditCollaborationForm)(form)).getResearcherList() );
+		project.setPI( ((EditCollaborationForm)(form)).getPI());
+		
 		project.setAbstract(projectAbstract);
 		project.setPublicAbstract(publicAbstract);
-		//project.setKeywords(keywords);
 		project.setProgress(progress);
 		project.setPublications(publications);
 		project.setComments(comments);
@@ -201,8 +160,8 @@ public class SaveNewCollaborationAction extends Action {
 				text += "has requested a new collaboration with your group.  Replying to this email should reply directly to the researcher.\n\n";
 				text += "Details:\n\n";
 				
-				if (oPI != null)
-					text += "PI: " + oPI.getListing() + "\n\n";
+				if (project.getPI() != null)
+					text += "PI: " + project.getPI().getListing() + "\n\n";
 	
 				text += "Groups: " + project.getGroupsString() + "\n\n";
 				text += "Title: " + project.getTitle() + "\n\n";

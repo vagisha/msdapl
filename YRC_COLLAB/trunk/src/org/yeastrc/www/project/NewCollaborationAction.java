@@ -42,11 +42,7 @@ public class NewCollaborationAction extends Action {
 		request.setAttribute("editCollaborationForm", newForm);
 		
 		// Set the default PI to this user.
-		newForm.setPI(researcher.getID());
-
-		// Set up a Collection of all the Researchers to use in the form as a pull-down menu for researchers
-		Collection researchers = Projects.getAllResearchers();
-		session.setAttribute("researchers", researchers);
+		newForm.setPiid(researcher.getID());
 
 		// remove any project, if it exists in the session.  Could have been placed in the session by EditProjectAction
         request.getSession().removeAttribute("project");

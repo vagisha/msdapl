@@ -23,7 +23,6 @@ import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.grant.Grant;
 import org.yeastrc.grant.ProjectGrantRecord;
 import org.yeastrc.project.ProjectFactory;
-import org.yeastrc.project.Researcher;
 import org.yeastrc.project.Technology;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -42,10 +41,6 @@ public class SaveTechnologyAction extends Action {
 		
 		// The form elements we're after
 		String title = null;
-		int pi = 0;
-		int researcherB = 0;
-		int researcherC = 0;
-		int researcherD = 0;
 		String[] groups = null;
 		String projectAbstract = null;
 		String publicAbstract = null;
@@ -54,8 +49,6 @@ public class SaveTechnologyAction extends Action {
 		String publications = null;
 		String comments;
 		float bta = (float)0.0;
-		String axisI = null;
-		String axisII = null;
 		
 		// User making this request
 		User user = UserUtils.getUser(request);
@@ -112,11 +105,7 @@ public class SaveTechnologyAction extends Action {
 		//request.setAttribute("project", project);
 
 		// We're saving!
-		title = ((EditTechnologyForm)(form)).getTitle();
-		pi = ((EditTechnologyForm)(form)).getPI();
-		researcherB = ((EditTechnologyForm)(form)).getResearcherB();
-		researcherC = ((EditTechnologyForm)(form)).getResearcherC();
-		researcherD = ((EditTechnologyForm)(form)).getResearcherD();
+		title = ((EditTechnologyForm)(form)).getTitle();		
 		groups = ((EditTechnologyForm)(form)).getGroups();
 		projectAbstract = ((EditTechnologyForm)(form)).getAbstract();
 		publicAbstract = ((EditTechnologyForm)(form)).getPublicAbstract();
@@ -125,8 +114,6 @@ public class SaveTechnologyAction extends Action {
 		publications = ((EditTechnologyForm)(form)).getPublications();
 		comments = ((EditTechnologyForm)(form)).getComments();
 		bta = ((EditTechnologyForm)(form)).getBTA();
-		axisI = ((EditTechnologyForm)(form)).getAxisI();
-		axisII = ((EditTechnologyForm)(form)).getAxisII();
 		
 		// Set blank items to null
 		if (title.equals("")) title = null;
@@ -135,42 +122,6 @@ public class SaveTechnologyAction extends Action {
 		if (progress.equals("")) progress = null;
 		if (publications.equals("")) publications = null;
 		if (comments.equals("")) comments = null;
-		if (axisI != null && axisI.equals("")) axisI = null;
-		if (axisII != null && axisII.equals("")) axisII = null;
-		
-		// Set up our researchers
-		Researcher oPI = null;
-		Researcher orB = null;
-		Researcher orC = null;
-		Researcher orD = null;		
-		try {
-			if (pi != 0) {
-				oPI = new Researcher();
-				oPI.load(pi);
-			}			
-			if (researcherB != 0) {
-				orB = new Researcher();
-				orB.load(researcherB);
-			}
-			
-			if (researcherC != 0) {
-				orC = new Researcher();
-				orC.load(researcherC);
-			}
-			
-			if (researcherD != 0) {
-				orD = new Researcher();
-				orD.load(researcherD);
-			}
-		} catch (InvalidIDException iie) {
-
-			// Couldn't load the researcher.
-			ActionErrors errors = new ActionErrors();
-			errors.add("project", new ActionMessage("error.project.invalidresearcher"));
-			saveErrors( request, errors );
-			return mapping.findForward("Failure");
-		}
-
 
 		// Set up the groups
 		project.clearGroups();
@@ -193,10 +144,12 @@ public class SaveTechnologyAction extends Action {
 
 		// Set all of the new values in the project
 		project.setTitle(title);
-		project.setPI(oPI);
-		project.setResearcherB(orB);
-		project.setResearcherC(orC);
-		project.setResearcherD(orD);
+
+		// set the researchers
+		project.setResearchers( null );
+		project.setResearchers( ((EditTechnologyForm)(form)).getResearcherList() );
+		project.setPI( ((EditTechnologyForm)(form)).getPI());		
+
 		project.setAbstract(projectAbstract);
 		project.setPublicAbstract(publicAbstract);
 		//project.setKeywords(keywords);
