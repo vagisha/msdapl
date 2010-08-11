@@ -140,13 +140,14 @@
    <TR>
     <TD WIDTH="25%" VALIGN="top">Training with:</TD>
     <TD WIDTH="75%" VALIGN="top">	
-     <NOBR><html:multibox property="groups" value="Noble"/>Computational Biology</NOBR>
-     <NOBR><html:multibox property="groups" value="Informatics"/>Informatics</NOBR>    
+     <NOBR><html:multibox property="groups" value="Noble"/>Computational Biology (Noble)</NOBR>
+     <NOBR><html:multibox property="groups" value="Dunham"/>Genomic Analysis (Dunham)</NOBR>
+     <NOBR><html:multibox property="groups" value="Informatics"/>Informatics (Riffle)</NOBR>
      <NOBR><html:multibox property="groups" value="MacCoss"/>Mass Spectrometry (MacCoss)</NOBR>
      <NOBR><html:multibox property="groups" value="Yates"/>Mass Spectrometry (Yates)</NOBR>
-     <NOBR><html:multibox property="groups" value="Microscopy"/>Microscopy</NOBR>
-     <NOBR><html:multibox property="groups" value="PSP"/>Protein Structure Prediction</NOBR>
-     <NOBR><html:multibox property="groups" value="TwoHybrid"/>Yeast Two-Hybrid</NOBR>   
+     <NOBR><html:multibox property="groups" value="Microscopy"/>Microscopy (Davis and Muller)</NOBR>
+     <NOBR><html:multibox property="groups" value="PSP"/>Protein Structure Prediction (Baker)</NOBR>
+     <NOBR><html:multibox property="groups" value="TwoHybrid"/>Yeast Two-Hybrid (Fields)</NOBR>  
     </TD>
    </TR>
 

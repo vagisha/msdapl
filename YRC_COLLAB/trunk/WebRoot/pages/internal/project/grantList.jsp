@@ -59,10 +59,4 @@
    		<TD valign="top" width="75%"><bean:write name="project" property="grantAmount"/></TD>
   	</yrcwww:colorrow>
 
-   	<yrcwww:member group="any">
-    	<yrcwww:colorrow>
-     		<TD WIDTH="25%" VALIGN="top">BTA:</TD>
-    		 <TD WIDTH="75%" VALIGN="top"><bean:write name="project" property="BTA"/>%</TD>
-   		 </yrcwww:colorrow>
-   	</yrcwww:member>
    	</logic:empty>
