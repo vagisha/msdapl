@@ -194,8 +194,8 @@
     			</table>
     		</td>
     		<td style="background-color: white; border: 1px solid black;">
-    			<div id="placeholder" style="width:800px;height:450px;"></div>
-				<div id="overview" style="margin-left:25px;margin-top:20px;width:775px;height:50px;"></div>
+    			<div id="placeholder" style="width:750px;height:400px;" align="left"></div>
+				<div id="overview" style="margin-left:25px;margin-top:20px;width:725px;height:50px;"></div>
     		</td>
     		
     		<td style="background-color: #DDDDDD; border: 1px solid #666666;" valign="top">
@@ -243,6 +243,7 @@ $(function () {
 	var massErrorField = $("#massError");
 	var massErrorChanged = false;
 	var massError = parseFloat(massErrorField.val());
+	var massTypeChanged = false;
 	
 	$("#ionTableDiv").draggable({ revert: 'invalid' });
 	$("#droppable").droppable({
@@ -262,7 +263,7 @@ $(function () {
 	// -----------------------------------------------
     var options = {
     	series: {
-            lines: { show: true, lineWidth: 1, peaks: true},
+            lines: { show: true, lineWidth: 1, shadowSize: 0, peaks: true},
             shadowSize: 0
         },
         selection: { mode: "x" },
@@ -282,6 +283,9 @@ $(function () {
                           xaxis: { min: zoomRange.xaxis.from, max: zoomRange.xaxis.to }
              }));
     	}
+    	// we have re-calculated and re-drawn everything..
+    	massTypeChanged = false;
+    	massErrorChanged = false;
     }
     
     createPlot(getDatasets()); // Initial Plot
@@ -349,9 +353,13 @@ $(function () {
    	}
 	
 	// -----------------------------------------------
-	// SHOW / HIDE ION SERIES
+	// SHOW / HIDE ION SERIES; UPDATE ON MASS TYPE CHANGE
 	// -----------------------------------------------
 	ionChoiceContainer.find("input").click(plotAccordingToChoices);
+    $("input[name='massTypeOpt']").click(function() {
+    	massTypeChanged = true;
+    	plotAccordingToChoices();
+    });
     
     function plotAccordingToChoices() {
         var data = getDatasets();
@@ -454,9 +462,14 @@ $(function () {
     	return data;
     }
 	
+	
     // -----------------------------------------------
 	// MATCH THEORETICAL MASSES WITH PEAKS IN THE SCAN
 	// -----------------------------------------------
+	function recalculate() {
+		return (massErrorChanged || massTypeChanged);
+	}
+	
     function getSeriesMatches(selectedIonTypes) {
     	
     	var dataSeries = [];
@@ -467,7 +480,7 @@ $(function () {
 							
 			
 			if(ion.type == "a") {
-				if(massErrorChanged || !ionSeriesMatch.a[ion.charge]) { // re-calculate only if mass error has changed OR
+				if(recalculate() || !ionSeriesMatch.a[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
 					var adata = calculateMatchingPeaks(ionSeries.a[ion.charge], data_allPeaks, massError);
@@ -480,7 +493,7 @@ $(function () {
 			}
 			
 			if(ion.type == "b") {
-				if(massErrorChanged || !ionSeriesMatch.b[ion.charge]) { // re-calculate only if mass error has changed OR
+				if(recalculate() || !ionSeriesMatch.b[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
 					var bdata = calculateMatchingPeaks(ionSeries.b[ion.charge], data_allPeaks, massError);
@@ -493,7 +506,7 @@ $(function () {
 			}
 			
 			if(ion.type == "c") {
-				if(massErrorChanged || !ionSeriesMatch.c[ion.charge]) { // re-calculate only if mass error has changed OR
+				if(recalculate() || !ionSeriesMatch.c[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
 					var cdata = calculateMatchingPeaks(ionSeries.c[ion.charge], data_allPeaks, massError);
@@ -506,7 +519,7 @@ $(function () {
 			}
 			
 			if(ion.type == "x") {
-				if(massErrorChanged || !ionSeriesMatch.x[ion.charge]) { // re-calculate only if mass error has changed OR
+				if(recalculate() || !ionSeriesMatch.x[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
 					var xdata = calculateMatchingPeaks(ionSeries.x[ion.charge], data_allPeaks, massError);
@@ -519,7 +532,7 @@ $(function () {
 			}
 			
 			if(ion.type == "y") {
-				if(massErrorChanged || !ionSeriesMatch.y[ion.charge]) { // re-calculate only if mass error has changed OR
+				if(recalculate() || !ionSeriesMatch.y[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
 					var ydata = calculateMatchingPeaks(ionSeries.y[ion.charge], data_allPeaks, massError);
@@ -532,7 +545,7 @@ $(function () {
 			}
 			
 			if(ion.type == "z") {
-				if(massErrorChanged || !ionSeriesMatch.z[ion.charge]) { // re-calculate only if mass error has changed OR
+				if(recalculate() || !ionSeriesMatch.z[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
 					var zdata = calculateMatchingPeaks(ionSeries.z[ion.charge], data_allPeaks, massError);
@@ -610,7 +623,7 @@ $(function () {
 			for(var i = 0; i < selectedIons.length; i++) {
 				var sion = selectedIons[i];
 				if(sion.type == "a") {
-					if(ionSeries.a[sion.charge])	continue; // already calculated
+					if(!massTypeChanged && ionSeries.a[sion.charge])	continue; // already calculated
 					else {
 						todoIonSeries.push(sion);
 						ionSeries.a[sion.charge] = [];
@@ -618,7 +631,7 @@ $(function () {
 					}
 				}
 				if(sion.type == "b") {
-					if(ionSeries.b[sion.charge])	continue; // already calculated
+					if(!massTypeChanged && ionSeries.b[sion.charge])	continue; // already calculated
 					else {
 						todoIonSeries.push(sion);
 						ionSeries.b[sion.charge] = [];
@@ -626,7 +639,7 @@ $(function () {
 					}
 				}
 				if(sion.type == "c") {
-					if(ionSeries.c[sion.charge])	continue; // already calculated
+					if(!massTypeChanged && ionSeries.c[sion.charge])	continue; // already calculated
 					else {
 						todoIonSeries.push(sion);
 						ionSeries.c[sion.charge] = [];
@@ -634,7 +647,7 @@ $(function () {
 					}
 				}
 				if(sion.type == "x") {
-					if(ionSeries.x[sion.charge])	continue; // already calculated
+					if(!massTypeChanged && ionSeries.x[sion.charge])	continue; // already calculated
 					else {
 						todoIonSeries.push(sion);
 						ionSeries.x[sion.charge] = [];
@@ -642,7 +655,7 @@ $(function () {
 					}
 				}
 				if(sion.type == "y") {
-					if(ionSeries.y[sion.charge])	continue; // already calculated
+					if(!massTypeChanged && ionSeries.y[sion.charge])	continue; // already calculated
 					else {
 						todoIonSeries.push(sion);
 						ionSeries.y[sion.charge] = [];
@@ -650,7 +663,7 @@ $(function () {
 					}
 				}
 				if(sion.type == "z") {
-					if(ionSeries.z[sion.charge])	continue; // already calculated
+					if(!massTypeChanged && ionSeries.z[sion.charge])	continue; // already calculated
 					else {
 						todoIonSeries.push(sion);
 						ionSeries.z[sion.charge] = [];
@@ -661,6 +674,8 @@ $(function () {
 	
 			if(sequence) {
 				
+				var massType = $("input[name='massTypeOpt']:checked").val();
+		
 				for(var i = 1; i < sequence.length; i++) {
 					
 					for(var j = 0; j < todoIonSeries.length; j++) {
@@ -668,9 +683,9 @@ $(function () {
 						var ion = todoIonSeries[j];
 						var ionSeriesData = todoIonSeriesData[j];
 						if(ion.term == "n")
-							ionSeriesData.push(sion = Ion.getSeriesIon(ion, sequence, i));
+							ionSeriesData.push(sion = Ion.getSeriesIon(ion, sequence, i, massType));
 						else
-							ionSeriesData.unshift(sion = Ion.getSeriesIon(ion, sequence, i));
+							ionSeriesData.unshift(sion = Ion.getSeriesIon(ion, sequence, i, massType));
 					}
 				}
 			}

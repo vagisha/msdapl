@@ -1661,9 +1661,9 @@
                 
                 ctx.fillStyle = series.color;
                 ctx.textAlign = "center";
-        		ctx.font = '14px Unknown Font, sans-serif';
+        		ctx.font = '12px Unknown Font, sans-serif';
         		
-                ctx.beginPath();
+                //ctx.beginPath();
                 var incr = ps;
                 if(series.lines.peaks)
                 	incr = ps*2;
@@ -1737,25 +1737,44 @@
                         x2 = axisx.max;
                     }
 
-                    if (x1 != prevx || y1 != prevy)
-                        ctx.moveTo(axisx.p2c(x1) + xoffset, axisy.p2c(y1) + yoffset);
+                    ctx.beginPath();
+                    //if (x1 != prevx || y1 != prevy)
+                    var myx1 = axisx.p2c(x1) + xoffset
+                    var tempx = Math.round(myx1);
+                    if(tempx > myx1)
+                    	myx1 = tempx - 0.5;
+                    else
+                    	myx1 = tempx + 0.5;
+                    ctx.moveTo(myx1, axisy.p2c(y1) + yoffset);
                     
                     prevx = x2;
                     prevy = y2;
-                    ctx.lineTo(axisx.p2c(x2) + xoffset, axisy.p2c(y2) + yoffset);
+                    var myx2 = myx1;
+                    /*tempx = Math.round(myx2);
+                    if(tempx > myx2)
+                    	myx2 = tempx - 0.5;
+                    else
+                    	myx2 = tempx + 0.5;*/
+                    
+                    ctx.lineTo(myx2, axisy.p2c(y2) + yoffset);
+                    //ctx.fillRect( (axisx.p2c(x1) + xoffset + axisx.p2c(x2) + xoffset), axisy.p2c(y2) + yoffset, 1, (axisy.p2c(y2) + yoffset - (axisy.p2c(y1) + yoffset)));
                     
                     if(series.lines.peaks) {
                     	ctx.stroke();
                     	if(series.labels) {
+                    		//alert(myx1+", "+myx2);
                     		var label = series.labels[l];
-                    		ctx.fillText(label, axisx.p2c(x2) + xoffset, axisy.p2c(y2) + yoffset-5);
+                    		ctx.save();
+                    		ctx.translate(myx1, axisy.p2c(y2) + yoffset)
+                    		ctx.rotate(-90 * Math.PI/180);
+                    		ctx.fillText(label, 20,3);
+                    		ctx.restore();
                     	}
                     }
                     
                 }
-                if(!series.lines.peaks) {
-                	ctx.stroke();
-                }
+                
+                //ctx.restore();
             }
             
             function plotLineArea(datapoints, axisx, axisy) {

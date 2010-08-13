@@ -27,7 +27,7 @@ function Peptide(seq, staticModifications, varModifications, ntermModification, 
 // index: index in the seq.
 // If this is a N-term sequence we will get the neutral mass of the sequence up-to index (exclusive).
 // If this is a C-term sequence we will get the neutral mass of the sequence starting from index (inclusive)
-Peptide.getSeqMass = function _seqMass(seq, index, term) {
+Peptide.getSeqMassMono = function _seqMassMono(seq, index, term) {
 	
 	var mass = 0;
 	var aa_obj = new AminoAcid();
@@ -46,6 +46,34 @@ Peptide.getSeqMass = function _seqMass(seq, index, term) {
 		}
 	}
 	
+	return _addModMasses(mass, seq, index, term);
+}
+
+Peptide.getSeqMassAvg = function _seqMassAvg(seq, index, term) {
+	
+	var mass = 0;
+	var aa_obj = new AminoAcid();
+	if(seq) {
+		if(term == "n") {
+			for( var i = 0; i < index; i += 1) {
+				var aa = aa_obj.get(seq[i]);
+				mass += aa.avg;
+			}
+		}
+		if (term == "c") {
+			for( var i = index; i < seq.length; i += 1) {
+				var aa = aa_obj.get(seq[i]);
+				mass += aa.avg;
+			}
+		}
+	}
+	
+	return _addModMasses(mass, seq, index, term);
+}
+
+function _addModMasses(seqMass, seq, index, term) {
+	
+	var mass = seqMass;
 	// add any terminal modifications
 	if(term == "n" && Peptide.ntermMod)
 		mass += Peptide.ntermMod;
