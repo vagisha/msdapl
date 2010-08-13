@@ -147,7 +147,7 @@
    </TR>
    
    <TR>
-    <TD WIDTH="25%" VALIGN="top">Title: <font style="font-size:8pt;color:red;">(Appears in NIH CRISP database)</font></TD>
+    <TD WIDTH="25%" VALIGN="top">Title: <font style="font-size:8pt;color:red;">(Appears in NIH public database)</font></TD>
     <TD WIDTH="75%" VALIGN="top"><html:text property="title" size="60" maxlength="80"/></TD>
    </TR>
 
@@ -157,7 +157,7 @@
    </TR>
 
    <TR>
-    <TD WIDTH="25%" VALIGN="top">Public Abstract:<br><font style="font-size:8pt;color:red;">To appear in NIH CRISP database.</font></TD>
+    <TD WIDTH="25%" VALIGN="top">Public Abstract:<br><font style="font-size:8pt;color:red;">To appear in NIH public database.</font></TD>
     <TD WIDTH="75%" VALIGN="top"><html:textarea property="publicAbstract" rows="7" cols="50"/></TD>
    </TR>
 

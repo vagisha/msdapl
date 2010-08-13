@@ -298,7 +298,7 @@ Go <html:link href="/yrc/newResearcher.do">here</html:link> to add a new researc
    </TR>
 
    <TR>
-    <TD WIDTH="25%" VALIGN="top">Project Title: <font style="font-size:8pt;color:red;">(Appears in NIH CRISP database)</font></TD>
+    <TD WIDTH="25%" VALIGN="top">Project Title: <font style="font-size:8pt;color:red;">(Appears in NIH public database)</font></TD>
     <TD WIDTH="75%" VALIGN="top"><html:text property="title" size="60" maxlength="80"/></TD>
    </TR>
    
@@ -308,7 +308,7 @@ Go <html:link href="/yrc/newResearcher.do">here</html:link> to add a new researc
    </TR>
 
    <TR>
-    <TD WIDTH="25%" VALIGN="top">Public Abstract:<br><font style="font-size:8pt;color:red;">To appear in NIH CRISP database.</font></TD>
+    <TD WIDTH="25%" VALIGN="top">Public Abstract:<br><font style="font-size:8pt;color:red;">To appear in NIH public database.</font></TD>
     <TD WIDTH="75%" VALIGN="top"><html:textarea property="publicAbstract" rows="7" cols="50"/></TD>
    </TR>
 
