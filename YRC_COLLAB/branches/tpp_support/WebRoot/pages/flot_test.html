@@ -64,12 +64,20 @@
         .droppable-hover {
         	background-color:red;
         }
+        
+        td.optionCell {
+        	background-color: #EFEFEF; 
+        	border: 1px dashed #666666; 
+        	padding: 5px;
+        	margin:5px;
+        }
 	</style>
 
  </head>
     <body>
     
-    <table>
+    <div align="center" style="width:95%; margin-top:20px; margin-bottom:20px;">
+    <table cellpadding="0" cellspacing="0">
     	<tbody>
     	<tr>
 			<td colspan="3" style="background-color:#DDDDDD; border:1px solid black">
@@ -79,11 +87,11 @@
 			</td>
 		</tr>
     	<tr>
-    		<td valign="top" style="background-color: #DDDDDD; border: 1px solid #666666;">
-    			<table>
+    		<td valign="top" style="background-color:#DDDDDD; border:1px solid black">
+    			<table cellpadding="2" cellspacing="2">
     				<tbody>
     				<tr>
-    					<td style="background-color: #EEEEEE; border: 1px dashed #666666; padding: 5px;">
+    					<td class="optionCell">
     						<b>Ions:</b>
     						<div id="ion_choice" style="margin-bottom: 10px">
     						
@@ -163,7 +171,7 @@
     				</tr>
     				
     				<tr>
-    					<td style="background-color: #EEEEEE; border: 1px dashed #666666; padding: 5px;">
+    					<td class="optionCell">
     						<div>
     						Mass Type:<br/>
     						<nobr>
@@ -181,6 +189,17 @@
     				</tr>
     				
     				<tr>
+    					<td class="optionCell">
+    						<div>
+    							Peak Assignment:<br/>
+    							<input type="radio" name="peakAssignOpt" value="intense" checked="checked"/><b>Most Intense</b><br/>
+    							<input type="radio" name="peakAssignOpt" value="close"/><b>Nearest Match</b>
+    						</div>
+    					</td>
+    				
+    				</tr>
+    				
+    				<tr>
     					<td style="padding:5px;">
     						<input id="enableTooltip" type="checkbox">Enable tooltip
     					</td>
@@ -193,12 +212,12 @@
     				</tbody>
     			</table>
     		</td>
-    		<td style="background-color: white; border: 1px solid black;">
+    		<td style="background-color: white; border: 1px solid black; padding:5px;">
     			<div id="placeholder" style="width:750px;height:400px;" align="left"></div>
 				<div id="overview" style="margin-left:25px;margin-top:20px;width:725px;height:50px;"></div>
     		</td>
     		
-    		<td style="background-color: #DDDDDD; border: 1px solid #666666;" valign="top">
+    		<td style="background-color: #DDDDDD; border: 1px solid #666666; padding:5px;" valign="top">
     			<div id="ionTableDiv">
     			
     			</div>
@@ -223,7 +242,7 @@
     <p id="hoverdata">Mouse hovers at
     (<span id="x">0</span>, <span id="y">0</span>). <span id="clickdata"></span></p>
 	-->
-
+</div>
     
     
     
@@ -244,6 +263,7 @@ $(function () {
 	var massErrorChanged = false;
 	var massError = parseFloat(massErrorField.val());
 	var massTypeChanged = false;
+	var peakAssignmentTypeChanged = false;
 	
 	$("#ionTableDiv").draggable({ revert: 'invalid' });
 	$("#droppable").droppable({
@@ -263,7 +283,7 @@ $(function () {
 	// -----------------------------------------------
     var options = {
     	series: {
-            lines: { show: true, lineWidth: 1, shadowSize: 0, peaks: true},
+            peaks: { show: true, lineWidth: 1, shadowSize: 0},
             shadowSize: 0
         },
         selection: { mode: "x" },
@@ -286,6 +306,7 @@ $(function () {
     	// we have re-calculated and re-drawn everything..
     	massTypeChanged = false;
     	massErrorChanged = false;
+    	peakAssignmentTypeChanged = false;
     }
     
     createPlot(getDatasets()); // Initial Plot
@@ -293,9 +314,9 @@ $(function () {
     
     
     // Overview plot
-    var overview = $.plot($("#overview"), [{data: data_allPeaks, color: "#666666"}], {
+    var overview = $.plot($("#overview"), [{data: data_allPeaks, color: "#000"}], {
         series: {
-            lines: { show: true, lineWidth: 1 },
+            peaks: { show: true, lineWidth: 1 },
             shadowSize: 0
         },
         xaxis: { ticks: [] },
@@ -352,12 +373,17 @@ $(function () {
 		}
    	}
 	
-	// -----------------------------------------------
-	// SHOW / HIDE ION SERIES; UPDATE ON MASS TYPE CHANGE
-	// -----------------------------------------------
+	// ---------------------------------------------------------------------------------
+	// SHOW / HIDE ION SERIES; UPDATE ON MASS TYPE CHANGE; PEAK ASSIGNMENT TYPE CHANGED
+	// ---------------------------------------------------------------------------------
 	ionChoiceContainer.find("input").click(plotAccordingToChoices);
+	
     $("input[name='massTypeOpt']").click(function() {
     	massTypeChanged = true;
+    	plotAccordingToChoices();
+    });
+    $("input[name='peakAssignOpt']").click(function() {
+    	peakAssignmentTypeChanged = true;
     	plotAccordingToChoices();
     });
     
@@ -467,12 +493,14 @@ $(function () {
 	// MATCH THEORETICAL MASSES WITH PEAKS IN THE SCAN
 	// -----------------------------------------------
 	function recalculate() {
-		return (massErrorChanged || massTypeChanged);
+		return (massErrorChanged || massTypeChanged || peakAssignmentTypeChanged);
 	}
 	
     function getSeriesMatches(selectedIonTypes) {
     	
     	var dataSeries = [];
+    	
+    	var peakAssignmentType = $("input[name='peakAssignOpt']:checked").val();
     	
     	for(var j = 0; j < selectedIonTypes.length; j++) {
     	
@@ -483,7 +511,7 @@ $(function () {
 				if(recalculate() || !ionSeriesMatch.a[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
-					var adata = calculateMatchingPeaks(ionSeries.a[ion.charge], data_allPeaks, massError);
+					var adata = calculateMatchingPeaks(ionSeries.a[ion.charge], data_allPeaks, massError, peakAssignmentType);
 					if(adata && adata.length > 0) {
 						ionSeriesMatch.a[ion.charge] = adata[0];
 						ionSeriesLabels.a[ion.charge] = adata[1];
@@ -496,7 +524,7 @@ $(function () {
 				if(recalculate() || !ionSeriesMatch.b[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
-					var bdata = calculateMatchingPeaks(ionSeries.b[ion.charge], data_allPeaks, massError);
+					var bdata = calculateMatchingPeaks(ionSeries.b[ion.charge], data_allPeaks, massError, peakAssignmentType);
 					if(bdata && bdata.length > 0) {
 						ionSeriesMatch.b[ion.charge] = bdata[0];
 						ionSeriesLabels.b[ion.charge] = bdata[1];
@@ -509,7 +537,7 @@ $(function () {
 				if(recalculate() || !ionSeriesMatch.c[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
-					var cdata = calculateMatchingPeaks(ionSeries.c[ion.charge], data_allPeaks, massError);
+					var cdata = calculateMatchingPeaks(ionSeries.c[ion.charge], data_allPeaks, massError, peakAssignmentType);
 					if(cdata && cdata.length > 0) {
 						ionSeriesMatch.c[ion.charge] = cdata[0];
 						ionSeriesLabels.c[ion.charge] = cdata[1];
@@ -522,7 +550,7 @@ $(function () {
 				if(recalculate() || !ionSeriesMatch.x[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
-					var xdata = calculateMatchingPeaks(ionSeries.x[ion.charge], data_allPeaks, massError);
+					var xdata = calculateMatchingPeaks(ionSeries.x[ion.charge], data_allPeaks, massError, peakAssignmentType);
 					if(xdata && xdata.length > 0) {
 						ionSeriesMatch.x[ion.charge] = xdata[0];
 						ionSeriesLabels.x[ion.charge] = xdata[1];
@@ -535,7 +563,7 @@ $(function () {
 				if(recalculate() || !ionSeriesMatch.y[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
-					var ydata = calculateMatchingPeaks(ionSeries.y[ion.charge], data_allPeaks, massError);
+					var ydata = calculateMatchingPeaks(ionSeries.y[ion.charge], data_allPeaks, massError, peakAssignmentType);
 					if(ydata && ydata.length > 0) {
 						ionSeriesMatch.y[ion.charge] = ydata[0];
 						ionSeriesLabels.y[ion.charge] = ydata[1];
@@ -548,7 +576,7 @@ $(function () {
 				if(recalculate() || !ionSeriesMatch.z[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
-					var zdata = calculateMatchingPeaks(ionSeries.z[ion.charge], data_allPeaks, massError);
+					var zdata = calculateMatchingPeaks(ionSeries.z[ion.charge], data_allPeaks, massError, peakAssignmentType);
 					if(zdata && zdata.length > 0) {
 						ionSeriesMatch.z[ion.charge] = zdata[0];
 						ionSeriesLabels.z[ion.charge] = zdata[1];
@@ -560,7 +588,7 @@ $(function () {
     	return dataSeries;
     }
     
-    function calculateMatchingPeaks(ionSeries, allPeaks, massTolerance) {
+    function calculateMatchingPeaks(ionSeries, allPeaks, massTolerance, peakAssignmentType) {
 		
 		var bestPeak;
 		var peakIndex = 0;
@@ -575,6 +603,7 @@ $(function () {
 			bestPeak = null; // reset
 			var sion = ionSeries[i];
 			sion.match = false; // reset;
+			var bestDistance;
 			
 			for(var j = peakIndex; j < allPeaks.length; j++) {
 				
@@ -599,13 +628,29 @@ $(function () {
 				}
 					
 				// peak is within +/- massTolerance of the current ion we are looking at
-				if(!bestPeak || (peak[1] > bestPeak[1])) {
-					// If this is the first peak in the range OR
-					// this is a higher intensity peak than the ones we have seen so far
-					// we save it as the best peak
+				
+				// if this is the first peak in the range
+				if(!bestPeak) {
 					bestPeak = peak;
+					continue;
 				}
 				
+				// if peak assignment method is Most Intense
+				if(peakAssignmentType == "intense") {
+					if(peak[1] > bestPeak[1]) {
+						bestPeak = peak;
+						continue;
+					}
+				}
+				
+				// if peak assignment method is Closest Peak
+				if(peakAssignmentType == "close") {
+					var dist = Math.abs(sion.mz - peak[0]);
+					if(!bestDistance || dist < bestDistance) {
+						bestPeak = peak;
+						bestDistance = dist;
+					}
+				}
 			}
 		}
 		return matchData;

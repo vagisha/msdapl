@@ -96,8 +96,10 @@
                         lineWidth: 2, // in pixels
                         fill: false,
                         fillColor: null,
-                        steps: false,
-                        peaks: false // for Spectrum viewer
+                        steps: false
+                    },
+                    peaks: {
+                        lineWidth: 1, // in pixels
                     },
                     bars: {
                         show: false,
@@ -876,7 +878,7 @@
                 padding = options.grid.labelMargin,
                 all = axis.direction == "x" ? xaxes : yaxes,
                 index;
-            
+
             // determine axis margin
             var samePosition = $.grep(all, function (a) {
                 return a && a.options.position == pos && (a.labelHeight || a.labelWidth);
@@ -1495,7 +1497,7 @@
             
             // draw the ticks
             var axes = getUsedAxes(), bw = options.grid.borderWidth;
-            
+
             for (var j = 0; j < axes.length; ++j) {
                 var axis = axes[j], box = axis.box,
                     t = axis.tickLength, x, y, xoff, yoff;
@@ -1647,34 +1649,34 @@
         function drawSeries(series) {
             if (series.lines.show)
                 drawSeriesLines(series);
+            if(series.peaks.show)
+            	drawSeriesPeaks(series);
             if (series.bars.show)
                 drawSeriesBars(series);
             if (series.points.show)
                 drawSeriesPoints(series);
         }
         
-        function drawSeriesLines(series) {
-            function plotLine(datapoints, xoffset, yoffset, axisx, axisy) {
+        function drawSeriesPeaks(series) {
+        	
+        	function plotPeaks(datapoints, xoffset, yoffset, axisx, axisy) {
+        		
                 var points = datapoints.points,
-                    ps = datapoints.pointsize,
-                    prevx = null, prevy = null;
+                    ps = datapoints.pointsize;
                 
                 ctx.fillStyle = series.color;
                 ctx.textAlign = "center";
         		ctx.font = '12px Unknown Font, sans-serif';
         		
-                //ctx.beginPath();
                 var incr = ps;
                 if(series.lines.peaks)
                 	incr = ps*2;
                 
                 var l = -1;
-                //for (var i = ps; i < points.length; i += ps) {
                 for (var i = 0; i < points.length; i += ps) {
-                    /*var x1 = points[i - ps], y1 = points[i - ps + 1],
-                        x2 = points[i], y2 = points[i + 1];*/
+                	
                     var x1 = points[i], y1 = 0,
-                    x2 = points[i], y2 = points[i+1];
+                    x2 = x1, y2 = points[i+1];
                     
                     if (x1 == null || x2 == null)
                         continue;
@@ -1738,45 +1740,125 @@
                     }
 
                     ctx.beginPath();
-                    //if (x1 != prevx || y1 != prevy)
+                    
                     var myx1 = axisx.p2c(x1) + xoffset
                     var tempx = Math.round(myx1);
                     if(tempx > myx1)
                     	myx1 = tempx - 0.5;
                     else
                     	myx1 = tempx + 0.5;
+                    
+                    var myx2 = myx1;
+                    
                     ctx.moveTo(myx1, axisy.p2c(y1) + yoffset);
+                    ctx.lineTo(myx2, axisy.p2c(y2) + yoffset);
+                	ctx.stroke();
+                	
+                	if(series.labels) {
+                		//alert(myx1+", "+myx2);
+                		var label = series.labels[l];
+                		ctx.save();
+                		ctx.translate(myx1, axisy.p2c(y2) + yoffset)
+                		ctx.rotate(-90 * Math.PI/180);
+                		ctx.fillText(label, 20,3);
+                		ctx.restore();
+                	}
+                }
+            }
+        	
+        	ctx.save();
+            ctx.translate(plotOffset.left, plotOffset.top);
+            ctx.lineJoin = "round";
+
+            var lw = series.peaks.lineWidth;
+            ctx.lineWidth = lw;
+            ctx.strokeStyle = series.color;
+            if (lw > 0)
+                plotPeaks(series.datapoints, 0, 0, series.xaxis, series.yaxis);
+            ctx.restore();
+        }
+        
+        function drawSeriesLines(series) {
+            function plotLine(datapoints, xoffset, yoffset, axisx, axisy) {
+                var points = datapoints.points,
+                    ps = datapoints.pointsize,
+                    prevx = null, prevy = null;
+                
+                ctx.beginPath();
+                for (var i = ps; i < points.length; i += ps) {
+                    var x1 = points[i - ps], y1 = points[i - ps + 1],
+                        x2 = points[i], y2 = points[i + 1];
+                    
+                    if (x1 == null || x2 == null)
+                        continue;
+
+                    // clip with ymin
+                    if (y1 <= y2 && y1 < axisy.min) {
+                        if (y2 < axisy.min)
+                            continue;   // line segment is outside
+                        // compute new intersection point
+                        x1 = (axisy.min - y1) / (y2 - y1) * (x2 - x1) + x1;
+                        y1 = axisy.min;
+                    }
+                    else if (y2 <= y1 && y2 < axisy.min) {
+                        if (y1 < axisy.min)
+                            continue;
+                        x2 = (axisy.min - y1) / (y2 - y1) * (x2 - x1) + x1;
+                        y2 = axisy.min;
+                    }
+
+                    // clip with ymax
+                    if (y1 >= y2 && y1 > axisy.max) {
+                        if (y2 > axisy.max)
+                            continue;
+                        x1 = (axisy.max - y1) / (y2 - y1) * (x2 - x1) + x1;
+                        y1 = axisy.max;
+                    }
+                    else if (y2 >= y1 && y2 > axisy.max) {
+                        if (y1 > axisy.max)
+                            continue;
+                        x2 = (axisy.max - y1) / (y2 - y1) * (x2 - x1) + x1;
+                        y2 = axisy.max;
+                    }
+
+                    // clip with xmin
+                    if (x1 <= x2 && x1 < axisx.min) {
+                        if (x2 < axisx.min)
+                            continue;
+                        y1 = (axisx.min - x1) / (x2 - x1) * (y2 - y1) + y1;
+                        x1 = axisx.min;
+                    }
+                    else if (x2 <= x1 && x2 < axisx.min) {
+                        if (x1 < axisx.min)
+                            continue;
+                        y2 = (axisx.min - x1) / (x2 - x1) * (y2 - y1) + y1;
+                        x2 = axisx.min;
+                    }
+
+                    // clip with xmax
+                    if (x1 >= x2 && x1 > axisx.max) {
+                        if (x2 > axisx.max)
+                            continue;
+                        y1 = (axisx.max - x1) / (x2 - x1) * (y2 - y1) + y1;
+                        x1 = axisx.max;
+                    }
+                    else if (x2 >= x1 && x2 > axisx.max) {
+                        if (x1 > axisx.max)
+                            continue;
+                        y2 = (axisx.max - x1) / (x2 - x1) * (y2 - y1) + y1;
+                        x2 = axisx.max;
+                    }
+
+                    if (x1 != prevx || y1 != prevy)
+                        ctx.moveTo(axisx.p2c(x1) + xoffset, axisy.p2c(y1) + yoffset);
                     
                     prevx = x2;
                     prevy = y2;
-                    var myx2 = myx1;
-                    /*tempx = Math.round(myx2);
-                    if(tempx > myx2)
-                    	myx2 = tempx - 0.5;
-                    else
-                    	myx2 = tempx + 0.5;*/
-                    
-                    ctx.lineTo(myx2, axisy.p2c(y2) + yoffset);
-                    //ctx.fillRect( (axisx.p2c(x1) + xoffset + axisx.p2c(x2) + xoffset), axisy.p2c(y2) + yoffset, 1, (axisy.p2c(y2) + yoffset - (axisy.p2c(y1) + yoffset)));
-                    
-                    if(series.lines.peaks) {
-                    	ctx.stroke();
-                    	if(series.labels) {
-                    		//alert(myx1+", "+myx2);
-                    		var label = series.labels[l];
-                    		ctx.save();
-                    		ctx.translate(myx1, axisy.p2c(y2) + yoffset)
-                    		ctx.rotate(-90 * Math.PI/180);
-                    		ctx.fillText(label, 20,3);
-                    		ctx.restore();
-                    	}
-                    }
-                    
+                    ctx.lineTo(axisx.p2c(x2) + xoffset, axisy.p2c(y2) + yoffset);
                 }
-                
-                //ctx.restore();
+                ctx.stroke();
             }
-            
+
             function plotLineArea(datapoints, axisx, axisy) {
                 var points = datapoints.points,
                     ps = datapoints.pointsize,
@@ -2249,7 +2331,7 @@
                     maxx = maxDistance / axisx.scale,
                     maxy = maxDistance / axisy.scale;
 
-                if (s.lines.show || s.points.show) {
+                if (s.lines.show || s.points.show || s.peaks.show) {
                     for (j = 0; j < points.length; j += ps) {
                         var x = points[j], y = points[j + 1];
                         if (x == null)
