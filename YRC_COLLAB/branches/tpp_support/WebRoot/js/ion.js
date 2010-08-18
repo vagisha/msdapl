@@ -15,25 +15,25 @@ function Ion (t, color, charge, terminus) {
 Ion.A_1 = new Ion("a", "#008000", 1, "n"); // green
 Ion.B_1 = new Ion("b", "#ff0000", 1, "n"); // red
 Ion.C_1 = new Ion("c", "#FF8C00", 1, "n"); // dark orange
-Ion.X_1 = new Ion("x", "#4B0082", 1, "y"); // indigo
-Ion.Y_1 = new Ion("y", "#0000ff", 1, "y"); // blue
-Ion.Z_1 = new Ion("z", "#008B8B", 1, "y"); // dark cyan
+Ion.X_1 = new Ion("x", "#4B0082", 1, "c"); // indigo
+Ion.Y_1 = new Ion("y", "#0000ff", 1, "c"); // blue
+Ion.Z_1 = new Ion("z", "#008B8B", 1, "c"); // dark cyan
 
 // charge +2
 Ion.A_2 = new Ion("a", "#2E8B57", 2, "n"); // sea green
 Ion.B_2 = new Ion("b", "#FA8072", 2, "n"); // salmon
 Ion.C_2 = new Ion("c", "#FFA500", 2, "n"); // orange
-Ion.X_2 = new Ion("x", "#800080", 2, "y"); // purple
-Ion.Y_2 = new Ion("y", "#4169E1", 2, "y"); // royal blue
-Ion.Z_2 = new Ion("z", "#20B2AA", 2, "y"); // light sea green
+Ion.X_2 = new Ion("x", "#800080", 2, "c"); // purple
+Ion.Y_2 = new Ion("y", "#4169E1", 2, "c"); // royal blue
+Ion.Z_2 = new Ion("z", "#20B2AA", 2, "c"); // light sea green
 
 // charge +3
 Ion.A_3 = new Ion("a", "#9ACD32", 3, "n"); // yellow green
 Ion.B_3 = new Ion("b", "#FFA07A", 3, "n"); // light salmon
 Ion.C_3 = new Ion("c", "#FFD700", 3, "n"); // gold
-Ion.X_3 = new Ion("x", "#9932CC", 3, "y"); // dark orchid
-Ion.Y_3 = new Ion("y", "#00BFFF", 3, "y"); // deep sky blue
-Ion.Z_3 = new Ion("z", "#66CDAA", 3, "y"); // medium aquamarine
+Ion.X_3 = new Ion("x", "#9932CC", 3, "c"); // dark orchid
+Ion.Y_3 = new Ion("y", "#00BFFF", 3, "c"); // deep sky blue
+Ion.Z_3 = new Ion("z", "#66CDAA", 3, "c"); // medium aquamarine
 
 var _ions = [];
 _ions["a"] = [];
@@ -75,11 +75,11 @@ Ion.getSeriesColor = function _getSeriesColor(ion) {
 //-----------------------------------------------------------------------------
 // Ion Series
 //-----------------------------------------------------------------------------
-MASS_H = 1.00794;
-MASS_C = 12.011;
-MASS_N = 14.00674;
-MASS_O = 15.9994;
-MASS_PROTON = 1.007276;
+var MASS_H = 1.00794;
+var MASS_C = 12.011;
+var MASS_N = 14.00674;
+var MASS_O = 15.9994;
+var MASS_PROTON = 1.007276;
 
 // massType can be "mono" or "avg"
 Ion.getSeriesIon = function _getSeriesIon(ion, sequence, idxInSeq, massType) {
@@ -105,7 +105,7 @@ function _makeIonLabel(type, index, charge) {
 }
 
 function _getMz(neutralMass, charge) {
-	return ( neutralMass + (charge * MASS_PROTON) ) / charge
+	return ( neutralMass + (charge * MASS_PROTON) ) / charge;
 }
 
 function Ion_A (sequence, endIdxPlusOne, charge, massType) {
