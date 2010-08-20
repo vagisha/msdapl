@@ -81,6 +81,12 @@ var MASS_N = 14.00674;
 var MASS_O = 15.9994;
 var MASS_PROTON = 1.007276;
 
+Ion.MASS_PROTON = MASS_PROTON;
+Ion.MASS_H = MASS_H;
+Ion.MASS_C = MASS_C;
+Ion.MASS_N = MASS_N;
+Ion.MASS_O = MASS_O;
+
 // massType can be "mono" or "avg"
 Ion.getSeriesIon = function _getSeriesIon(ion, sequence, idxInSeq, massType) {
 	if(ion.type == "a")	
@@ -107,6 +113,7 @@ function _makeIonLabel(type, index, charge) {
 function _getMz(neutralMass, charge) {
 	return ( neutralMass + (charge * MASS_PROTON) ) / charge;
 }
+Ion.getMz = _getMz;
 
 function Ion_A (sequence, endIdxPlusOne, charge, massType) {
 	// Neutral mass:  	 [N]+[M]-CHO  ; N = mass of neutral N terminal group

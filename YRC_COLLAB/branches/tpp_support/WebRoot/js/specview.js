@@ -8,14 +8,15 @@
 			var defaults = {
 					sequence: null,
 					scanNum: null,
-					
+					fileName: null,
+					charge: null,
 					staticMods: [],
 					variableMods: [],
 					ntermMod: 0,
 					ctermMod: 0,
 					peaks: [],
 					width: 750, 	// width of the ms/ms plot
-					height: 400, 	// height of the ms/ms plot
+					height: 450, 	// height of the ms/ms plot
 					massError: 0.5, // mass tolerance for labeling peaks
 			};
 		
@@ -31,11 +32,12 @@
 				container = $(this);
 				initContainer(container, options);
 				makeOptionsTable();
+				showSequenceInfo();
+				showSpecModInfo();
 				
 				massError = options.massError;
 				
 				createPlot(getDatasets()); // Initial Plot
-				createOverviewPlot();
 				setupInteractions();
 				
 				makeIonTable();
@@ -63,7 +65,6 @@
 	};
 	
 	var plot;
-	var overviewPlot;
 	var zoomRange; 				// for zooming
 	var previousPoint = null; 	// for tooltips
 	
@@ -73,7 +74,7 @@
 	
 	
 	function round(number) {
-		return Math.round(number * 10000.0) / 10000.0;
+		return number.toFixed(4);
 	}
 	
 	function setMassError() {
@@ -103,21 +104,6 @@
     	peakAssignmentTypeChanged = false;
     }
 	
-	
-	// Overview plot
-	function createOverviewPlot() {
-	    overviewPlot = $.plot($("#msmsoverview"), [{data: options.peaks, color: "#000"}], {
-	        series: {
-	            peaks: { show: true, lineWidth: 1 },
-	            shadowSize: 0
-	        },
-	        xaxis: { ticks: [] },
-	        yaxis: { ticks: [], min: 0, autoscaleMargin: 0.1 },
-	        selection: { mode: "x" }
-	    });
-	}
-	
-	
 	// -----------------------------------------------
 	// SET UP INTERACTIVE ACTIONS
 	// -----------------------------------------------
@@ -127,15 +113,7 @@
 	    container.find("#msmsplot").bind("plotselected", function (event, ranges) {
 	    	
 	    	zoomRange = ranges;
-	    	
 	    	createPlot(getDatasets());
-	        // don't fire event on the overview to prevent eternal loop
-	        overviewPlot.setSelection(ranges, true);
-	    });
-	    
-	    container.find("#msmsoverview").bind("plotselected", function (event, ranges) {
-	    	zoomRange = ranges;
-	        plot.setSelection(ranges);
 	    });
 	    
 		// RESET ZOOM
@@ -143,7 +121,6 @@
 			zoomRange = null;
 			setMassError();
 			createPlot(getDatasets());	
-			overviewPlot.clearSelection();
 	   	});
 		
 		// UPDATE
@@ -151,7 +128,6 @@
 			zoomRange = null; // zoom out fully
 			setMassError();
 			createPlot(getDatasets());
-			overviewPlot.clearSelection();
 			makeIonTable();
 	   	});
 		
@@ -197,6 +173,13 @@
 			
 			plotAccordingToChoices();
 		});
+	    
+	    
+	    // MOVING THE ION TABLE
+	    makeIonTableMovable();
+	    
+	    // CHANGING THE PLOT SIZE
+	    makePlotResizable();
 		
 	}
 	
@@ -222,8 +205,38 @@
         }).appendTo("body").fadeIn(200);
     }
 	
-	
-    
+	function makePlotResizable() {
+		
+		container.find("#slider_width").slider({
+			value:options.width,
+			min: 100,
+			max: 1500,
+			step: 50,
+			slide: function(event, ui) {
+				var width = ui.value;
+				//console.log(ui.value);
+				options.width = width;
+				container.find("#msmsplot").css({width: width});
+				plotAccordingToChoices();
+				container.find("#slider_width_val").text(width);
+			}
+		});
+		
+		container.find("#slider_height").slider({
+			value:options.height,
+			min: 100,
+			max: 1000,
+			step: 50,
+			slide: function(event, ui) {
+				var height = ui.value;
+				//console.log(ui.value);
+				options.height = height
+				container.find("#msmsplot").css({height: height});
+				plotAccordingToChoices();
+				container.find("#slider_height_val").text(height);
+			}
+		});
+	}
 	
 
 	// -----------------------------------------------
@@ -502,7 +515,7 @@
 			sion.match = false; // reset;
 			var bestDistance;
 			
-			for(var j = peakIndex; j < allPeaks.length; j++) {
+			for(var j = peakIndex; j < allPeaks.length; j += 1) {
 				
 				var peak = allPeaks[j];
 				
@@ -562,40 +575,91 @@
 		
 		container.addClass("mainContainer");
 		
-		var parentTable = '<table cellpadding="0" cellspacing="0"> ';
+		var parentTable = '<table cellpadding="0" cellspacing="5"> ';
 		parentTable += '<tbody> ';
 		parentTable += '<tr> ';
 		
-		// Top title bar
-		parentTable += '<td colspan="3"> ';
-		parentTable += '<div align="center" style="width:100%;"> ';
-		parentTable += '<b>Spectrum Viewer</b> ';
+		// Header
+		parentTable += '<td colspan="3" style="background-color:#939CB0; color:white; padding:0px;"> ';
+		parentTable += '<div align="center" style="width:100%; height:15px;"> ';
 		parentTable += '</div> ';
 		parentTable += '</td> ';
 		parentTable += '</tr> ';
 	
 		// options table
 		parentTable += '<tr> ';
-		parentTable += '<td valign="top" id="optionsTable" > ';
+		parentTable += '<td rowspan="3" valign="top" id="optionsTable" > ';
 		parentTable += '</td> ';
 		
-		// placeholders for the plots
-		parentTable += '<td style="background-color: white; padding:5px;"> '; 
-		parentTable += '<div id="msmsplot" style="width:'+options.width+'px;height:'+options.height+'px;" align="left"></div> ';
-		parentTable += '<div id="msmsoverview" style="margin-left:25px;margin-top:20px;width:725px;height:50px;"></div> ';
+		// placeholder for sequence, m/z, scan number etc
+		parentTable += '<td style="background-color: white; padding:5px; border:1px dotted #cccccc;" valign="bottom" align="center"> '; 
+		parentTable += '<div id="seqinfo" style="width:100%;"></div> ';
 		parentTable += '</td> ';
 		
 		// placeholder for the ion table
-		parentTable += '<td style="padding:5px;" valign="top"> ';
-		parentTable += '<div id="ionTableDiv"></div> ';
+		parentTable += '<td rowspan="3" style="padding:5px;" valign="top" id="ionTableLoc1"> ';
+		parentTable += '<div id="ionTableDiv"><span id="moveIonTable" style="color: sienna; text-decoration:underline;">[Move]</span></div> ';
 		parentTable += '</td> ';
-		
 		parentTable += '</tr> ';
+		
+		// placeholders for the plots
+		parentTable += '<tr> ';
+		parentTable += '<td style="background-color: white; padding:5px; border:1px dotted #cccccc;" valign="middle" align="center"> '; 
+		parentTable += '<div id="msmsplot" style="width:'+options.width+'px;height:'+options.height+'px;"></div> ';
+		parentTable += '</td> ';
+		parentTable += '</tr> ';
+		
+		// placeholder for file name, scan number, modifications etc.
+		parentTable += '<tr> ';
+		parentTable += '<td style="background-color: white; padding:5px; border:1px dotted #cccccc;" valign="bottom" align="center"> '; 
+		parentTable += '<div id="specmodinfo" style="width:100%;"></div> ';
+		parentTable += '</td> ';
+		parentTable += '</tr> ';
+		
+		// Placeholder for moving ion table
+		parentTable += '<tr> ';
+		parentTable += '<td colspan="3" style="padding:2px;" valign="top" align="center" id="ionTableLoc2"> ';
+		parentTable += '</td> ';
+		parentTable += '</tr> ';
+		
+		// Footer
+		parentTable += '<tr> ';
+		parentTable += '<td colspan="3" style="background-color:#939CB0; color:white; padding:2px;"> ';
+		parentTable += '<div align="center" style="width:100%;font-size:10pt;"> ';
+		parentTable += '<b>Spectrum Viewer</b> by vsharma@uw.edu';
+		parentTable += '</div> ';
+		parentTable += '</td> ';
+		parentTable += '</tr> ';
+		
 		parentTable += '</tbody> ';
 		parentTable += '</table> ';
 		
 		container.append(parentTable);
 	}
+	
+	function makeIonTableMovable() {
+		
+		container.find("#moveIonTable").hover(
+			function(){
+		         $(this).css({cursor:'pointer'}); //mouseover
+		    }
+		);
+		
+		container.find("#moveIonTable").click(function() {
+			var ionTableDiv = container.find("#ionTableDiv");
+			if(ionTableDiv.is(".moved")) {
+				ionTableDiv.removeClass("moved");
+				ionTableDiv.detach();
+				container.find("#ionTableLoc1").append(ionTableDiv);
+			}
+			else {
+				ionTableDiv.addClass("moved");
+				ionTableDiv.detach();
+				container.find("#ionTableLoc2").append(ionTableDiv);
+			}
+		});
+	}
+	
 	
 	//---------------------------------------------------------
 	// ION TABLE
@@ -608,7 +672,7 @@
 		var ctermIons = getSelectedCtermIons(selectedIonTypes);
 		
 		var myTable = '' ;
-		myTable += '<table id="ionTable" cellpadding=2>' ;
+		myTable += '<table id="ionTable" cellpadding="2">' ;
 		myTable +=  "<thead>" ;
 		myTable +=   "<tr>";
 		// nterm ions
@@ -679,7 +743,7 @@
 		
 		//alert(myTable);
 		container.find("#ionTable").remove();
-		container.find("#ionTableDiv").append(myTable);
+		container.find("#ionTableDiv").prepend(myTable); // add as the first child
 	}
 	
 	function getCalculatedSeries(ion) {
@@ -695,6 +759,117 @@
 			return ionSeries.y[ion.charge];
 		if(ion.type == "z")
 			return ionSeries.z[ion.charge];
+	}
+	
+	
+	//---------------------------------------------------------
+	// SEQUENCE INFO
+	//---------------------------------------------------------
+	function showSequenceInfo () {
+		
+		var specinfo = '';
+		if(options.sequence) {
+			
+			specinfo += '<div>';
+			specinfo += '<span style="font-weight:bold; color:#8B0000;">'+getModifiedSequence()+'</span>';
+			var mass = Peptide.getSeqMassMono(options.sequence, options.sequence.length, "n");
+			// add C-terminal OH
+			mass = mass + Ion.MASS_O + Ion.MASS_H;
+			var mz;
+			if(options.charge) {
+				mz = Ion.getMz(mass, options.charge);
+			}
+			mass = mass + Ion.MASS_PROTON;
+			specinfo += ', MH+ '+mass.toFixed(4);
+			if(mz) 
+				specinfo += ', m/z '+mz.toFixed(4);
+			specinfo += '</div>';
+			
+		}
+		
+		container.find("#seqinfo").append(specinfo);
+	}
+	
+	function getModifiedSequence() {
+		
+		var modSeq = '';
+		for(var i = 0; i < options.sequence.length; i += 1) {
+			
+			if(Peptide.varMods[i+1])
+				modSeq += '<span style="background-color:yellow;padding:1px;border:1px dotted #CFCFCF;">'+options.sequence[i]+"</span>";
+			else
+				modSeq += options.sequence[i];
+		}
+		
+		return modSeq;
+	}
+	
+	//---------------------------------------------------------
+	// SPECTRUM INFO
+	//---------------------------------------------------------
+	function showSpecModInfo () {
+		
+		var specinfo = '';
+		if(options.sequence) {
+			
+			specinfo += '<div>';
+			if(options.ntermMod || options.ntermMod > 0) {
+				specinfo += 'Add to N-term: <b>'+options.ntermMod+'</b>';
+			}
+			if(options.ctermMod || options.ctermMod > 0) {
+				specinfo += 'Add to C-term: <b>'+options.ctermMod+'</b>';
+			}
+			specinfo += '</div>';
+			
+			if(options.staticMods && options.staticMods.length > 0) {
+				specinfo += '<div style="margin-top:10px;>';
+				specinfo += 'Static Modifications: ';
+				for(var i = 0; i < options.staticMods.length; i += 1) {
+					var mod = options.staticMods[i];
+					if(i > 0) specinfo += ', ';
+					specinfo += mod.aa.code+": "+mod.modMass;
+				}
+				specinfo += '</div>';
+			}
+			
+			if(options.variableMods && options.variableMods.length > 0) {
+				
+				var modChars = [];
+				var uniqvarmods = [];
+				for(var i = 0; i < options.variableMods.length; i += 1) {
+					var mod = options.variableMods[i];
+					if(modChars[mod.aa.code])
+						continue;
+					modChars[mod.aa.code] = 1;
+					uniqvarmods.push(mod);
+				}  
+				
+				specinfo += '<div style="margin-top:10px;">';
+				specinfo += 'Variable Modifications: ';
+				for(var i = 0; i < uniqvarmods.length; i += 1) {
+					var mod = uniqvarmods[i];
+					if(i > 0) specinfo += ', ';
+					specinfo += "<b>"+mod.aa.code+" ("+mod.modMass+")</b>";
+				}
+				specinfo += '</div>';
+			}
+			
+			if(options.fileName || options.scanNum) {
+				specinfo += '<div style="margin-top:10px;">';
+				if(options.fileName) {
+					specinfo += 'File: '+options.fileName;
+				}
+				if(options.scanNum) {
+					specinfo += ', Scan: '+options.scanNum;
+				}	
+				if(options.charge) {
+					specinfo += ', Charge: '+options.charge;
+				}
+				specinfo += '</div>';
+			}
+		}
+		
+		container.find("#specmodinfo").append(specinfo);
 	}
 	
 	
@@ -805,7 +980,17 @@
 		myTable += '<br><br>';
 		
 		// reset zoom option
-		myTable += '<input id="resetZoom" type="button" value="Reset Zoom" /> ';
+		myTable += '<div style="width:100%; font-size:8pt; margin-top:5px; color:sienna;">Click and drag <br> in the plot to zoom</div> ';
+		myTable += '<input id="resetZoom" type="button" value="Zoom Out" /> ';
+		myTable += '</td> </tr> ';
+		
+		
+		// sliders to change plot size
+		myTable += '<tr><td class="optionCell"> ';
+		myTable += '<div>Width: <span id="slider_width_val">'+options.width+'</span></div> '
+		myTable += '<div id="slider_width" style="margin-bottom:15px;"></div> ';
+		myTable += '<div>Height: <span id="slider_height_val">'+options.height+'</span></div> '
+		myTable += '<div id="slider_height"></div> ';
 		myTable += '</td> </tr> ';
 		
 		
