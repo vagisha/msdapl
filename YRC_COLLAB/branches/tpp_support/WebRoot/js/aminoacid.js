@@ -53,10 +53,11 @@ AminoAcid.aa["W"] = AminoAcid.W;
 AminoAcid.aa["Y"] = AminoAcid.Y;
 AminoAcid.aa["V"] = AminoAcid.V;
 
+AminoAcid.get = _getAA;
 
 function _getAA(aaCode) {
 	if(AminoAcid.aa[aaCode])
 		return AminoAcid.aa[aaCode];
 	else
-		return 0;
+		return null;
 }

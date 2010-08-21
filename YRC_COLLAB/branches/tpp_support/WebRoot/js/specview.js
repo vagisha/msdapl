@@ -421,7 +421,7 @@
 				if(recalculate() || !ionSeriesMatch.a[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
-					var adata = calculateMatchingPeaks(ionSeries.a[ion.charge], data_allPeaks, massError, peakAssignmentType);
+					var adata = calculateMatchingPeaks(ionSeries.a[ion.charge], options.peaks, massError, peakAssignmentType);
 					if(adata && adata.length > 0) {
 						ionSeriesMatch.a[ion.charge] = adata[0];
 						ionSeriesLabels.a[ion.charge] = adata[1];
@@ -434,7 +434,7 @@
 				if(recalculate() || !ionSeriesMatch.b[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
-					var bdata = calculateMatchingPeaks(ionSeries.b[ion.charge], data_allPeaks, massError, peakAssignmentType);
+					var bdata = calculateMatchingPeaks(ionSeries.b[ion.charge], options.peaks, massError, peakAssignmentType);
 					if(bdata && bdata.length > 0) {
 						ionSeriesMatch.b[ion.charge] = bdata[0];
 						ionSeriesLabels.b[ion.charge] = bdata[1];
@@ -447,7 +447,7 @@
 				if(recalculate() || !ionSeriesMatch.c[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
-					var cdata = calculateMatchingPeaks(ionSeries.c[ion.charge], data_allPeaks, massError, peakAssignmentType);
+					var cdata = calculateMatchingPeaks(ionSeries.c[ion.charge], options.peaks, massError, peakAssignmentType);
 					if(cdata && cdata.length > 0) {
 						ionSeriesMatch.c[ion.charge] = cdata[0];
 						ionSeriesLabels.c[ion.charge] = cdata[1];
@@ -460,7 +460,7 @@
 				if(recalculate() || !ionSeriesMatch.x[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
-					var xdata = calculateMatchingPeaks(ionSeries.x[ion.charge], data_allPeaks, massError, peakAssignmentType);
+					var xdata = calculateMatchingPeaks(ionSeries.x[ion.charge], options.peaks, massError, peakAssignmentType);
 					if(xdata && xdata.length > 0) {
 						ionSeriesMatch.x[ion.charge] = xdata[0];
 						ionSeriesLabels.x[ion.charge] = xdata[1];
@@ -473,7 +473,7 @@
 				if(recalculate() || !ionSeriesMatch.y[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
-					var ydata = calculateMatchingPeaks(ionSeries.y[ion.charge], data_allPeaks, massError, peakAssignmentType);
+					var ydata = calculateMatchingPeaks(ionSeries.y[ion.charge], options.peaks, massError, peakAssignmentType);
 					if(ydata && ydata.length > 0) {
 						ionSeriesMatch.y[ion.charge] = ydata[0];
 						ionSeriesLabels.y[ion.charge] = ydata[1];
@@ -486,7 +486,7 @@
 				if(recalculate() || !ionSeriesMatch.z[ion.charge]) { // re-calculate only if mass error has changed OR
 																		// matching peaks for this series have not been calculated
 					// calculated matching peaks
-					var zdata = calculateMatchingPeaks(ionSeries.z[ion.charge], data_allPeaks, massError, peakAssignmentType);
+					var zdata = calculateMatchingPeaks(ionSeries.z[ion.charge], options.peaks, massError, peakAssignmentType);
 					if(zdata && zdata.length > 0) {
 						ionSeriesMatch.z[ion.charge] = zdata[0];
 						ionSeriesLabels.z[ion.charge] = zdata[1];
@@ -507,7 +507,6 @@
 		matchData[0] = []; // peaks
 		matchData[1] = []; // labels;
 		
-		//alert("calculating matching peaks for "+ionSeries.length);
 		for(var i = 0; i < ionSeries.length; i += 1) {
 			
 			bestPeak = null; // reset
@@ -528,7 +527,7 @@
 				
 					// if we found a matching peak for the current ion, save it
 					if(bestPeak) {
-						//alert("found match "+sion.label+", "+sion.mz+";  peak: "+bestPeak[0]);
+						//console.log("found match "+sion.label+", "+sion.mz+";  peak: "+bestPeak[0]);
 						matchData[0].push([bestPeak[0], bestPeak[1]]);
 						matchData[1].push(sion.label);
 						sion.match = true;
@@ -541,6 +540,7 @@
 				
 				// if this is the first peak in the range
 				if(!bestPeak) {
+					//console.log("found a peak in range, "+peak.mz);
 					bestPeak = peak;
 					bestDistance = Math.abs(sion.mz - peak[0]);
 					continue;
