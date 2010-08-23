@@ -70,6 +70,9 @@ public class Projects {
     
     /** The definition for the Bruce group */
     public static final String BRUCE = "Bruce";
+    
+    /** The definition for the Villen group */
+    public static final String VILLEN = "Villen";
 
 	/** The definitioni for the Noble group */
 	public static final String NOBLE = "Noble";

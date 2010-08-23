@@ -67,6 +67,11 @@ public class NewProjectAction extends Action {
 			if(piId != 0)
 				newForm.setPI(piId);
 		}
+		else if(groupMan.isMember(user.getResearcher().getID(), "Villen")) {
+			int piId = LabDirector.getVillen();
+			if(piId != 0)
+				newForm.setPI(piId);
+		}
 		
 		List<Researcher> researcherIds = new ArrayList<Researcher>();
 		Researcher tempR = new Researcher();

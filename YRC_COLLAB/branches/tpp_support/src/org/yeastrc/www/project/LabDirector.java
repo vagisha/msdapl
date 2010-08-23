@@ -31,6 +31,7 @@ public class LabDirector {
 	private static int MACCOSS = 0;
 	private static int GOODLETT = 0;
 	private static int BRUCE = 0;
+	private static int VILLEN = 0;
 	
 	public static int getMacCoss() {
 		if(MACCOSS == 0) {
@@ -94,11 +95,34 @@ public class LabDirector {
 					BRUCE = id;
 				}
 				else {
-					log.error("User with last name Goodlett is not a member of Bruce group");
+					log.error("User with last name Bruce is not a member of Bruce group");
 				}
 			}
 		}
 		return BRUCE;
+	}
+	
+	public static int getVillen() {
+		if(VILLEN == 0) {
+			
+			List<Integer> idsForVillen = getUserId("Villen");
+			if(idsForVillen.size() == 0) {
+				log.error("No ID found for Villen");
+			}
+			else if(idsForVillen.size() > 1) {
+				log.error("Multiple IDs found for Villen");
+			}
+			else {
+				int id = idsForVillen.get(0);
+				if (Groups.getInstance().isMember(id, Projects.VILLEN)) {
+					VILLEN = id;
+				}
+				else {
+					log.error("User with last name Villen is not a member of Villen group");
+				}
+			}
+		}
+		return VILLEN;
 	}
 	
 	private static List<Integer> getUserId(String lastName) {
