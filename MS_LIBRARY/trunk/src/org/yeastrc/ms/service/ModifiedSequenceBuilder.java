@@ -6,11 +6,13 @@
  */
 package org.yeastrc.ms.service;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
@@ -28,22 +30,31 @@ public class ModifiedSequenceBuilder {
     public static String build(String sequence, List<MsResultResidueMod> dynamicResidueMods,
             List<MsResultTerminalMod> dynamicTerminalMods) throws ModifiedSequenceBuilderException {
     	
-    	return build(sequence, dynamicResidueMods, dynamicTerminalMods, false);
+    	return build(sequence, dynamicResidueMods, dynamicTerminalMods, null, false, 0);
     }
     
     public static String buildWithDiffMass(String sequence, List<MsResultResidueMod> dynamicResidueMods,
             List<MsResultTerminalMod> dynamicTerminalMods) throws ModifiedSequenceBuilderException {
     	
-    	return build(sequence, dynamicResidueMods, dynamicTerminalMods, true);
+    	return build(sequence, dynamicResidueMods, dynamicTerminalMods, null, true, 0);
     }
     
     
-    private static String build(String sequence, List<MsResultResidueMod> dynamicResidueMods,
-            List<MsResultTerminalMod> dynamicTerminalMods, boolean diffMassOnly) throws ModifiedSequenceBuilderException {
+    public static String build(String sequence, List<MsResultResidueMod> dynamicResidueMods,
+            List<MsResultTerminalMod> dynamicTerminalMods, 
+            List<MsResidueModification> staticResidueMods, 
+            boolean diffMassOnly,
+            int precision) throws ModifiedSequenceBuilderException {
         
         if((dynamicResidueMods == null || dynamicResidueMods.size() == 0) &&
-           (dynamicTerminalMods == null || dynamicTerminalMods.size() == 0))
+           (dynamicTerminalMods == null || dynamicTerminalMods.size() == 0) &&
+           (staticResidueMods == null || staticResidueMods.size() == 0))
             return sequence;
+        
+        DecimalFormat format = null;
+        if(precision > 0)
+        	format = makeDecimalFormatter(precision);
+        
         
         // map of dynamic residue modifications
         Map<Integer, List<MsResultResidueMod>> dynaResModMap = new HashMap<Integer, List<MsResultResidueMod>>();
@@ -56,6 +67,16 @@ public class ModifiedSequenceBuilder {
             mods.add(mod);
         }
         
+        // map of static residue modifications
+        Map<Character, List<MsResidueModification>> staticResModMap = new HashMap<Character, List<MsResidueModification>>();
+        for(MsResidueModification mod: staticResidueMods) {
+        	List<MsResidueModification> mods = staticResModMap.get(Character.valueOf(mod.getModificationSymbol()));
+            if(mods == null) {
+                mods = new ArrayList<MsResidueModification>();
+                staticResModMap.put(Character.valueOf(mod.getModifiedResidue()), mods);
+            }
+            mods.add(mod);
+        }
         
         // dynamic terminal modifications
         List<MsResultTerminalMod> ntermMods = new ArrayList<MsResultTerminalMod>();
@@ -81,7 +102,7 @@ public class ModifiedSequenceBuilder {
                 	ntermmod += mod.getModificationMass().doubleValue();
                 if(ntermmod > 0) {
                 	ntermmod += BaseAminoAcidUtils.NTERM_MASS;
-                	buf.append("n["+Math.round(ntermmod)+"]");
+                	buf.append("n["+getNumber(format, ntermmod)+"]");
                 }
             }
             
@@ -102,6 +123,17 @@ public class ModifiedSequenceBuilder {
                 }
             }
             
+            // add any static residue modifications for this amino acid
+            List<MsResidueModification> staticMods = staticResModMap.get(Character.valueOf(sequence.charAt(i)));
+            if(staticMods != null) {
+                for(MsResidueModification mod: staticMods) {
+                    if(mod.getModifiedResidue() != sequence.charAt(i)) {
+                        throw new ModifiedSequenceBuilderException("Amino acid at index: "+i+" of sequence: "+sequence+
+                                " does not match static modified residue: "+mod.getModifiedResidue());
+                    }
+                    mass += mod.getModificationMass().doubleValue();
+                }
+            }
             
             // If this position is modified add a string representing the mass of the residue at this position.
             if(mass != 0) {
@@ -109,7 +141,7 @@ public class ModifiedSequenceBuilder {
             		double charMass = AminoAcidUtilsFactory.getAminoAcidUtils().monoMass(sequence.charAt(i));
             		mass += charMass;
             	}
-                String modStr = ""+Math.round(mass); // (AminoAcidUtils.monoMass(sequence.charAt(i)) + mass);
+                String modStr = ""+getNumber(format, mass); // (AminoAcidUtils.monoMass(sequence.charAt(i)) + mass);
                 if(diffMassOnly) {
                 	if(mass > 0) 
                 		modStr = "+"+modStr; // positive mass diff
@@ -126,11 +158,26 @@ public class ModifiedSequenceBuilder {
                 	ctermmod += mod.getModificationMass().doubleValue();
                 if(ctermmod > 0) {
                 	ctermmod += BaseAminoAcidUtils.CTERM_MASS;
-                	buf.append("c["+Math.round(ctermmod)+"]");
+                	buf.append("c["+getNumber(format, ctermmod)+"]");
                 }
             }
         }
         
         return buf.toString();
+    }
+    
+    private static String getNumber(DecimalFormat fmt, double number) {
+    	if(fmt == null)
+    		return String.valueOf(Math.round(number));
+    	else 
+    		return fmt.format(number);
+    }
+    
+    private static DecimalFormat makeDecimalFormatter(int precision) {
+    	String fmtString = "0.";
+    	for(int i = 0; i < precision; i++)
+    		fmtString += "0";
+    	DecimalFormat format = new DecimalFormat(fmtString);
+    	return format;
     }
 }
