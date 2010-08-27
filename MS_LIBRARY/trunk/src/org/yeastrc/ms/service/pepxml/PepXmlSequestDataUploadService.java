@@ -78,7 +78,7 @@ public class PepXmlSequestDataUploadService extends PepXmlDataUploadService<PepX
         // Make sure the search parameters file is present
         File paramsFile = new File(dataDirectory+File.separator+searchParamsFile());
         if(!paramsFile.exists()) {
-            appendToMsg("Cannot fild search parameters file: "+paramsFile.getAbsolutePath());
+            appendToMsg("Cannot find search parameters file: "+paramsFile.getAbsolutePath());
             return false;
         }
         

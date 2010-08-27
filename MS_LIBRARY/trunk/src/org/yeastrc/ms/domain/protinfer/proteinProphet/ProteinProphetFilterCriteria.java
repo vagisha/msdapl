@@ -59,6 +59,8 @@ public class ProteinProphetFilterCriteria extends ProteinFilterCriteria {
         super.setDescriptionLike(filterCriteria.getDescriptionLike());
         super.setDescriptionNotLike(filterCriteria.getDescriptionNotLike());
         super.setSearchAllDescriptions(filterCriteria.isSearchAllDescriptions());
+        // common name
+        super.setCommonNameLike(filterCriteria.getCommonNameLike());
         // peptide string
         super.setPeptide(filterCriteria.getPeptide());
         super.setExactPeptideMatch(filterCriteria.getExactPeptideMatch());
@@ -79,6 +81,8 @@ public class ProteinProphetFilterCriteria extends ProteinFilterCriteria {
         // sorting 
         super.setSortOrder(filterCriteria.getSortOrder());
         super.setSortBy(filterCriteria.getSortBy());
+        // gene ontology filter(s)
+        super.setGoFilterCriteria(filterCriteria.getGoFilterCriteria());
     }
     
     public boolean equals(Object o) {
@@ -86,6 +90,8 @@ public class ProteinProphetFilterCriteria extends ProteinFilterCriteria {
             return false;
         if(!(o instanceof ProteinProphetFilterCriteria))
             return false;
+        if(!super.equals(o))
+        	return false;
         ProteinProphetFilterCriteria that = (ProteinProphetFilterCriteria)o;
         if(this.minGroupProbability != that.minGroupProbability)          return false;
         if(this.maxGroupProbability != that.maxGroupProbability)          return false;
