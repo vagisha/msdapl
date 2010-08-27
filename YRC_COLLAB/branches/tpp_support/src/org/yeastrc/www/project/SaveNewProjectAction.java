@@ -105,24 +105,6 @@ public class SaveNewProjectAction extends Action {
 			return mapping.findForward("Failure");
 		}
 
-		// Set up the groups
-//		project.clearGroups();
-//		
-//		if (groups != null) {
-//			if (groups.length > 0) {
-//				for (int i = 0; i < groups.length; i++) {
-//					try { project.setGroup(groups[i]); }
-//					catch (InvalidIDException iie) {
-//					
-//						// Somehow got an invalid group...
-//						ActionErrors errors = new ActionErrors();
-//						errors.add("project", new ActionMessage("error.project.invalidgroup"));
-//						saveErrors( request, errors );
-//						return mapping.findForward("Failure");					
-//					}
-//				}
-//			}
-//		}
 
 		// Set all of the new values in the project
 		project.setTitle(title);
@@ -132,12 +114,16 @@ public class SaveNewProjectAction extends Action {
 		project.setPublications(publications);
 		project.setComments(comments);
 		
-		// TODO Add checkboxes for grops on the project page. 
-		// For now we add all projects to the MacCoss groups
-		int groupId = Groups.getInstance().getGroupID("MacCoss");
-		List<Group> groups = new ArrayList<Group>(1);
-		Group grp = GroupDAO.instance().load(groupId);
-		groups.add(grp);
+		// Get a list of this user's groups
+		List<String> userGroupNames = Groups.getInstance().getUserGroups(user.getResearcher().getID());
+		List<Group> groups = new ArrayList<Group>(userGroupNames.size());
+		for(String groupName: userGroupNames) {
+			if(groupName.equalsIgnoreCase("administrators"))
+				continue;
+			Group grp = GroupDAO.instance().load(groupName);
+			if(grp != null)
+				groups.add(grp);
+		}
 		project.setGroups(groups);
 		
 		// project grants

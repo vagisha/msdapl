@@ -48,7 +48,9 @@ private static final Logger log = Logger.getLogger(ViewProteinProphetResultActio
         
         int pinferId = 0;
         try {pinferId = Integer.parseInt(request.getParameter("pinferId"));}
-        catch(NumberFormatException e){};
+        catch(NumberFormatException e){
+        	log.error("Error parsing 'pinferId': "+request.getParameter("pinferId"));
+        }
         
         // if we still do not have a valid protein inference run id
         // return an error.

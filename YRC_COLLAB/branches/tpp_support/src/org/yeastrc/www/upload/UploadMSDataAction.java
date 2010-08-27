@@ -90,6 +90,8 @@ public class UploadMSDataAction extends Action {
         boolean yates = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.YATES);
         boolean goodlett = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.GOODLETT);
         boolean bruce = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.BRUCE);
+        boolean villen = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.VILLEN);
+        // NOTE: The groupID values come from org.yeastrc.jqs.queue.MSJobUtils of the JOB_QUEUE project
         if (yates)
             jobSaver.setGroupID(0);
         else if (maccoss)
@@ -98,6 +100,10 @@ public class UploadMSDataAction extends Action {
             jobSaver.setGroupID(2);
         else if( bruce )
             jobSaver.setGroupID(3);
+        else if( villen )
+        	jobSaver.setGroupID(4);
+        else
+        	jobSaver.setGroupID(1000); // unknown group; needs to be a positive number
 		
 		
 		jobSaver.setProjectID( projectID );

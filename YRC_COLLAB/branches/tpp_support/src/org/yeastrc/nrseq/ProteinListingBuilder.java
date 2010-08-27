@@ -139,6 +139,9 @@ public class ProteinListingBuilder {
 
 	public void getFastaReferences(List<Integer> fastaDatabaseIds,
 			int nrseqId, ProteinListing listing) {
+		
+		if(fastaDatabaseIds == null || fastaDatabaseIds.size() == 0)
+			return;
 		List<NrDbProtein> matchingProteins = NrSeqLookupUtil.getDbProteins(nrseqId, fastaDatabaseIds);
 		for(NrDbProtein prot: matchingProteins) {
 			if(prot.isCurrent()) // add only current references

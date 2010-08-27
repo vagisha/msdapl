@@ -3,11 +3,20 @@
  */
 package org.yeastrc.www.user;
 
-import java.util.*;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
+import org.yeastrc.db.DBConnectionManager;
 import org.yeastrc.project.Researcher;
-import org.yeastrc.db.*;
 
 /**
  * Singleton class providing access and methods for YRC group information.
@@ -22,11 +31,11 @@ public class Groups {
 	private static final Groups INSTANCE = new Groups();
 
 	// Our HashMap of groups
-	private HashMap groups;
+	private HashMap<String, ArrayList<Integer>> groups;
 	
 	// Our constructor
 	private Groups() {
-		this.groups = new HashMap();
+		this.groups = new HashMap<String, ArrayList<Integer>>();
 
 		try { this.loadGroups(); }
 		catch (Exception e) { ; }
@@ -48,14 +57,14 @@ public class Groups {
 			while (rs.next()) {
 				String groupName = rs.getString("groupName");
 				int researcherID = rs.getInt("researcherID");
-				ArrayList rList;
+				ArrayList<Integer> rList;
 				
 				// Get our ArrayList of members of this group, so far
 				if (groups.get(groupName) == null) {
-					rList = new ArrayList();
+					rList = new ArrayList<Integer>();
 					groups.put(groupName, rList);
 				} else {
-					rList = (ArrayList)(groups.get(groupName));
+					rList = groups.get(groupName);
 				}
 
 				// Add this member to the group
@@ -158,7 +167,7 @@ public class Groups {
 	 * Reload the groups list from the database
 	 */
 	public void reloadGroups() throws SQLException {
-		this.groups = new HashMap();
+		this.groups = new HashMap<String, ArrayList<Integer>>();
 
 		this.loadGroups();
 	}
@@ -169,10 +178,10 @@ public class Groups {
 	 * @param gName The group name
 	 */
 	public boolean isMember(int rID, String gName) {
-		ArrayList members;
+		ArrayList<Integer> members;
 		if (gName == null) { return false; }
 		
-		members = (ArrayList)(this.groups.get(gName));
+		members = this.groups.get(gName);
 		if (members == null) { return false; }
 		
 		return members.contains(new Integer(rID));
@@ -187,8 +196,8 @@ public class Groups {
 	public boolean isInAGroup(int rID) {
 		
 		// Look through each group check for membership
-		List groupList = this.getGroups();
-		Iterator iter = groupList.iterator();
+		List<String> groupList = this.getGroups();
+		Iterator<String> iter = groupList.iterator();
 		while (iter.hasNext()) {
 			String groupName = (String)(iter.next());
 			if (this.isMember(rID, groupName)) return true;
@@ -201,9 +210,9 @@ public class Groups {
 	 * List all of the groups.
 	 * @return An ordered list of the groups by name
 	 */
-	public List getGroups() {
-		Set groupSet = this.groups.keySet();
-		ArrayList groupNames = new ArrayList(groupSet);
+	public List<String> getGroups() {
+		Set<String> groupSet = this.groups.keySet();
+		ArrayList<String> groupNames = new ArrayList<String>(groupSet);
 		Collections.sort(groupNames);
 		
 		return groupNames;
@@ -214,15 +223,15 @@ public class Groups {
 	 * @param groupName The name of the group.
 	 * @return A sorted list of Researcher objects.
 	 */
-	public List getMembers(String groupName) {
-		ArrayList retList = new ArrayList();
+	public List<Researcher> getMembers(String groupName) {
+		ArrayList<Researcher> retList = new ArrayList<Researcher>();
 			
 		if (groupName == null) { return retList; }
 		
-		ArrayList members = (ArrayList)(this.groups.get(groupName));
+		ArrayList<Integer> members = this.groups.get(groupName);
 		if (members == null) { return retList; }
 		
-		Iterator iter = members.iterator();
+		Iterator<Integer> iter = members.iterator();
 		while (iter.hasNext()) {
 			Integer resID = (Integer)(iter.next());
 			
@@ -235,9 +244,25 @@ public class Groups {
 			
 			retList.add(res);
 		}
-		
 		Collections.sort(retList);
 		return retList;
+	}
+	
+	/**
+	 * Returns a list of group names of which the given user is a member.
+	 * @param researcherId
+	 * @return
+	 * @throws SQLException 
+	 */
+	public List<String> getUserGroups(int researcherId) throws SQLException {
+		
+		List<String> groupNames = new ArrayList<String>();
+		for(String groupName: this.getGroups()) {
+			ArrayList<Integer> memberIds = this.groups.get(groupName);
+			if(memberIds != null && memberIds.contains(researcherId))
+				groupNames.add(groupName);
+		}
+		return groupNames;
 	}
 
 	/**
@@ -252,7 +277,7 @@ public class Groups {
 		if (groupName == null) return;
 		
 		// Invalid group name
-		List members = this.getMembers(groupName);
+		List<Researcher> members = this.getMembers(groupName);
 		if (members == null) return;
 		
 		// Researcher is already in that group
@@ -314,7 +339,7 @@ public class Groups {
 		if (groupName == null) return;
 		
 		// Invalid group name
-		List members = this.getMembers(groupName);
+		List<Researcher> members = this.getMembers(groupName);
 		if (members == null) return;
 		
 		// Researcher is already in that group

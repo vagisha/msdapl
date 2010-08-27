@@ -74,6 +74,65 @@ public class GroupDAO {
         }
     }
     
+    /**
+	 * Returns a Group object for the supplied group name
+	 * @param groupName the name of the group
+	 * @return Group object, null if not found
+	 */
+    public Group load(String groupName) throws SQLException, InvalidIDException {
+    	
+		if (groupName == null) return null;
+		
+		// Get our connection to the database.
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try {
+			String sqlStr = "SELECT * FROM tblYRCGroups WHERE groupName = ?";
+			
+			conn = DBConnectionManager.getConnection("yrc");	
+			stmt = conn.prepareStatement(sqlStr);
+			stmt.setString(1, groupName);
+			
+			rs = stmt.executeQuery();
+			
+			if (rs.next()) {
+				Group group = new Group();
+                group.setId(rs.getInt("groupID"));
+                group.setName(rs.getString("groupName"));
+                group.setDescription(rs.getString("groupDesc"));
+                return group;
+			}
+			
+			rs.close();
+			rs = null;
+			
+			stmt.close();
+			stmt = null;
+			
+			conn.close();
+			conn = null;
+
+		} finally {
+
+			// Always make sure result sets and statements are closed,
+			// and the connection is returned to the pool
+			if (rs != null) {
+				try { rs.close(); } catch (SQLException e) { ; }
+				rs = null;
+			}
+			if (stmt != null) {
+				try { stmt.close(); } catch (SQLException e) { ; }
+				stmt = null;
+			}
+			if (conn != null) {
+				try { conn.close(); } catch (SQLException e) { ; }
+				conn = null;
+			}
+		}
+		return null;
+	}
     
     public List<Group> loadProjectGroups(int projectId) throws SQLException {
         
