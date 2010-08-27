@@ -319,7 +319,7 @@ The plugin allso adds the following methods to the plot object:
         options: {
             selection: {
                 mode: null, // one of null, "x", "y" or "xy"
-                color: "#e8cfac"
+                color: "#F0E68C"
             }
         },
         name: 'selection',

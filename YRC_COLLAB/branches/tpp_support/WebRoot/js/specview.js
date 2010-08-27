@@ -32,6 +32,7 @@
 				container = $(this);
 				initContainer(container, options);
 				makeOptionsTable();
+				makeViewingOptions();
 				showSequenceInfo();
 				showSpecModInfo();
 				
@@ -52,6 +53,7 @@
 	var massErrorChanged = false;
 	var massTypeChanged = false;
 	var peakAssignmentTypeChanged = false;
+	var selectedNeutralLossChanged = false;
 	
 	var plotOptions = {
     	series: {
@@ -102,6 +104,7 @@
     	massTypeChanged = false;
     	massErrorChanged = false;
     	peakAssignmentTypeChanged = false;
+    	selectedNeutralLossChanged = false;
     }
 	
 	// -----------------------------------------------
@@ -109,7 +112,7 @@
 	// -----------------------------------------------
 	function setupInteractions () {
 		
-		// CONNECT PLOTS FOR ZOOMING
+		// ZOOMING
 	    container.find("#msmsplot").bind("plotselected", function (event, ranges) {
 	    	
 	    	zoomRange = ranges;
@@ -153,10 +156,19 @@
 	            }
 	        }
 	    });
+		container.find("#enableTooltip").click(function() {
+			$("#msmstooltip").remove();
+		});
 		
 		// SHOW / HIDE ION SERIES; UPDATE ON MASS TYPE CHANGE; PEAK ASSIGNMENT TYPE CHANGED
 		var ionChoiceContainer = container.find("#ion_choice");
 		ionChoiceContainer.find("input").click(plotAccordingToChoices);
+		
+		var neutralLossContainer = container.find("#nl_choice");
+		neutralLossContainer.find("input").click(function() {
+			selectedNeutralLossChanged = true;
+			plotAccordingToChoices();
+		});
 		
 	    container.find("input[name='massTypeOpt']").click(function() {
 	    	massTypeChanged = true;
@@ -180,6 +192,9 @@
 	    
 	    // CHANGING THE PLOT SIZE
 	    makePlotResizable();
+	    
+	    // PRINT SPECTRUM
+	    //makePlotPrintable();
 		
 	}
 	
@@ -237,6 +252,41 @@
 			}
 		});
 	}
+	
+	function makePlotPrintable() {
+		container.find("#printLink").click(function() {
+			var canvas = plot.getCanvas();
+			var iWidth=3500;
+			var iHeight = 3050;
+			var oSaveCanvas = document.createElement("canvas");
+			oSaveCanvas.width = iWidth;
+			oSaveCanvas.height = iHeight;
+			oSaveCanvas.style.width = iWidth+"px";
+			oSaveCanvas.style.height = iHeight+"px";
+			var oSaveCtx = oSaveCanvas.getContext("2d");
+			oSaveCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, iWidth, iHeight);
+			
+			var dataURL = oSaveCanvas.toDataURL("image/png");
+			window.location = dataURL;
+		});
+	}
+	
+	var scaleCanvas = function(oCanvas, iWidth, iHeight) {
+		if (iWidth && iHeight) {
+			var oSaveCanvas = document.createElement("canvas");
+			oSaveCanvas.width = iWidth;
+			oSaveCanvas.height = iHeight;
+			oSaveCanvas.style.width = iWidth+"px";
+			oSaveCanvas.style.height = iHeight+"px";
+
+			var oSaveCtx = oSaveCanvas.getContext("2d");
+
+			oSaveCtx.drawImage(oCanvas, 0, 0, oCanvas.width, oCanvas.height, 0, 0, iWidth, iHeight);
+			return oSaveCanvas;
+		}
+		return oCanvas;
+	}
+
 	
 
 	// -----------------------------------------------
@@ -403,7 +453,7 @@
 	// MATCH THEORETICAL MASSES WITH PEAKS IN THE SCAN
 	// -----------------------------------------------
 	function recalculate() {
-		return (massErrorChanged || massTypeChanged || peakAssignmentTypeChanged);
+		return (massErrorChanged || massTypeChanged || peakAssignmentTypeChanged || selectedNeutralLossChanged);
 	}
 
 	function getSeriesMatches(selectedIonTypes) {
@@ -500,71 +550,115 @@
 
 	function calculateMatchingPeaks(ionSeries, allPeaks, massTolerance, peakAssignmentType) {
 		
-		var bestPeak;
 		var peakIndex = 0;
 		
 		var matchData = [];
 		matchData[0] = []; // peaks
 		matchData[1] = []; // labels;
 		
+		var neutralLosses = [];
+		container.find("#nl_choice").find("input:checked").each(function() {
+			neutralLosses.push($(this).val());
+		});
 		for(var i = 0; i < ionSeries.length; i += 1) {
 			
-			bestPeak = null; // reset
 			var sion = ionSeries[i];
-			sion.match = false; // reset;
-			var bestDistance;
 			
-			for(var j = peakIndex; j < allPeaks.length; j += 1) {
+			// get match for water and or ammonia loss
+			for(var n = 0; n < neutralLosses.length; n += 1) {
+				getMatchForIon(sion, matchData, allPeaks, peakIndex, massTolerance, peakAssignmentType, neutralLosses[n]);
+			}
+			// get match for the ion
+			peakIndex = getMatchForIon(sion, matchData, allPeaks, peakIndex, massTolerance, peakAssignmentType);
+		}
+		
+		return matchData;
+	}
+	
+	// sion -- theoretical ion
+	// matchData -- array to wich we will add a peak if there is a match
+	// allPeaks -- array with all the scan peaks
+	// peakIndex -- current index in peaks array
+	// Returns the index of the matching peak, if one is found
+	function getMatchForIon(sion, matchData, allPeaks, peakIndex, massTolerance, peakAssignmentType, neutralLoss) {
+		
+		var bestPeak = null;
+		if(!neutralLoss)
+			sion.match = false; // reset;
+		var ionmz;
+		if(!neutralLoss)
+			ionmz = sion.mz;
+		else {
+			if(neutralLoss == 'h2o') {
+				ionmz = Ion.getWaterLossMz(sion);
+			}
+			else if(neutralLoss = 'nh3') {
+				ionmz = Ion.getAmmoniaLossMz(sion);
+			}
+		}
+		var bestDistance;
+		
+		for(var j = peakIndex; j < allPeaks.length; j += 1) {
+			
+			var peak = allPeaks[j];
+			
+			// peak is before the current ion we are looking at
+			if(peak[0] < ionmz - massTolerance)
+				continue;
 				
-				var peak = allPeaks[j];
-				
-				// peak is before the current ion we are looking at
-				if(peak[0] < sion.mz - massTolerance)
-					continue;
-					
-				// peak is beyond the current ion we are looking at
-				if(peak[0] > sion.mz + massTolerance) {
-				
-					// if we found a matching peak for the current ion, save it
-					if(bestPeak) {
-						//console.log("found match "+sion.label+", "+sion.mz+";  peak: "+bestPeak[0]);
-						matchData[0].push([bestPeak[0], bestPeak[1]]);
+			// peak is beyond the current ion we are looking at
+			if(peak[0] > ionmz + massTolerance) {
+			
+				// if we found a matching peak for the current ion, save it
+				if(bestPeak) {
+					//console.log("found match "+sion.label+", "+ionmz+";  peak: "+bestPeak[0]);
+					matchData[0].push([bestPeak[0], bestPeak[1]]);
+					if(!neutralLoss) {
 						matchData[1].push(sion.label);
 						sion.match = true;
 					}
-					peakIndex = j;
-					break;
+					else {
+						if(neutralLoss == 'h2o') {
+							matchData[1].push(sion.label+'o');
+						}
+						else if(neutralLoss = 'nh3') {
+							matchData[1].push(sion.label+'*');
+						}
+					}
 				}
-					
-				// peak is within +/- massTolerance of the current ion we are looking at
+				peakIndex = j;
+				break;
+			}
 				
-				// if this is the first peak in the range
-				if(!bestPeak) {
-					//console.log("found a peak in range, "+peak.mz);
+			// peak is within +/- massTolerance of the current ion we are looking at
+			
+			// if this is the first peak in the range
+			if(!bestPeak) {
+				//console.log("found a peak in range, "+peak.mz);
+				bestPeak = peak;
+				bestDistance = Math.abs(ionmz - peak[0]);
+				continue;
+			}
+			
+			// if peak assignment method is Most Intense
+			if(peakAssignmentType == "intense") {
+				if(peak[1] > bestPeak[1]) {
 					bestPeak = peak;
-					bestDistance = Math.abs(sion.mz - peak[0]);
 					continue;
 				}
-				
-				// if peak assignment method is Most Intense
-				if(peakAssignmentType == "intense") {
-					if(peak[1] > bestPeak[1]) {
-						bestPeak = peak;
-						continue;
-					}
-				}
-				
-				// if peak assignment method is Closest Peak
-				if(peakAssignmentType == "close") {
-					var dist = Math.abs(sion.mz - peak[0]);
-					if(!bestDistance || dist < bestDistance) {
-						bestPeak = peak;
-						bestDistance = dist;
-					}
+			}
+			
+			// if peak assignment method is Closest Peak
+			if(peakAssignmentType == "close") {
+				var dist = Math.abs(ionmz - peak[0]);
+				if(!bestDistance || dist < bestDistance) {
+					bestPeak = peak;
+					bestDistance = dist;
 				}
 			}
 		}
-		return matchData;
+		
+		return peakIndex;
 	}
 	
 	
@@ -580,15 +674,14 @@
 		parentTable += '<tr> ';
 		
 		// Header
-		parentTable += '<td colspan="3" style="background-color:#939CB0; color:white; padding:0px;"> ';
-		parentTable += '<div align="center" style="width:100%; height:15px;"> ';
+		parentTable += '<td colspan="4" class="bar"> ';
 		parentTable += '</div> ';
 		parentTable += '</td> ';
 		parentTable += '</tr> ';
 	
 		// options table
 		parentTable += '<tr> ';
-		parentTable += '<td rowspan="3" valign="top" id="optionsTable" > ';
+		parentTable += '<td rowspan="4" valign="top" id="optionsTable" > ';
 		parentTable += '</td> ';
 		
 		// placeholder for sequence, m/z, scan number etc
@@ -597,8 +690,8 @@
 		parentTable += '</td> ';
 		
 		// placeholder for the ion table
-		parentTable += '<td rowspan="3" style="padding:5px;" valign="top" id="ionTableLoc1"> ';
-		parentTable += '<div id="ionTableDiv"><span id="moveIonTable" style="color: sienna; text-decoration:underline;">[Move]</span></div> ';
+		parentTable += '<td rowspan="4" valign="top" id="ionTableLoc1"> ';
+		parentTable += '<div id="ionTableDiv" class="font_small"><span id="moveIonTable" class="link">[Click]</span> <span>to move table</span></div> ';
 		parentTable += '</td> ';
 		parentTable += '</tr> ';
 		
@@ -609,6 +702,13 @@
 		parentTable += '</td> ';
 		parentTable += '</tr> ';
 		
+		// placeholder for viewing options (zoom, plot size etc.)
+		parentTable += '<tr> ';
+		parentTable += '<td style="background-color: white; padding:5px; border:1px dotted #cccccc;" valign="middle" align="center"> '; 
+		parentTable += '<div id="viewOptionsDiv"></div> ';
+		parentTable += '</td> ';
+		parentTable += '</tr> ';
+		
 		// placeholder for file name, scan number, modifications etc.
 		parentTable += '<tr> ';
 		parentTable += '<td style="background-color: white; padding:5px; border:1px dotted #cccccc;" valign="bottom" align="center"> '; 
@@ -616,17 +716,11 @@
 		parentTable += '</td> ';
 		parentTable += '</tr> ';
 		
-		// Placeholder for moving ion table
-		parentTable += '<tr> ';
-		parentTable += '<td colspan="3" style="padding:2px;" valign="top" align="center" id="ionTableLoc2"> ';
-		parentTable += '</td> ';
-		parentTable += '</tr> ';
 		
-		// Footer
+		// Footer & placeholder for moving ion table
 		parentTable += '<tr> ';
-		parentTable += '<td colspan="3" style="background-color:#939CB0; color:white; padding:2px;"> ';
+		parentTable += '<td colspan="4" class="bar" valign="top" align="center" id="ionTableLoc2" > ';
 		parentTable += '<div align="center" style="width:100%;font-size:10pt;"> ';
-		parentTable += '<b>Spectrum Viewer</b> by vsharma@uw.edu';
 		parentTable += '</div> ';
 		parentTable += '</td> ';
 		parentTable += '</tr> ';
@@ -872,6 +966,32 @@
 		container.find("#specmodinfo").append(specinfo);
 	}
 	
+	//---------------------------------------------------------
+	// VIEWING OPTIONS TABLE
+	//---------------------------------------------------------
+	function makeViewingOptions() {
+		
+		var myTable = '';
+		
+		// reset zoom option
+		myTable += '<nobr> ';
+		myTable += '<span style="width:100%; font-size:8pt; margin-top:5px; color:sienna;">Click and drag in the plot to zoom</span> ';
+		myTable += '<input id="resetZoom" type="button" value="Zoom Out" /> ';
+		myTable += '</nobr> ';
+		
+		myTable += '&nbsp;&nbsp;';
+		
+		// tooltip option
+		myTable += '<nobr> ';
+		myTable += '<input id="enableTooltip" type="checkbox">Enable tooltip ';
+		myTable += '</nobr> ';
+		
+		myTable += '<br>';
+		
+		container.find("#viewOptionsDiv").append(myTable);
+		
+	}
+	
 	
 	//---------------------------------------------------------
 	// OPTIONS TABLE
@@ -940,11 +1060,12 @@
 		
 		myTable += '<b>Neutral Loss:</b> ';
 		myTable += '<div id="nl_choice"> ';
-		myTable += '<nobr> H<sub>2</sub>O ';
-		myTable += '<input type="checkbox" value="h2o" id="h2o"/> ';
+		myTable += '<nobr> <input type="checkbox" value="h2o" id="h2o"/> ';
+		myTable += ' H<sub>2</sub>O (<b>o</b>)';
 		myTable += '</nobr> ';
-		myTable += '<nobr> NH<sub>3</sub> ';
-		myTable += '<input type="checkbox" value="nh3" id="nh3"/> ';
+		myTable += '<br> ';
+		myTable += '<nobr> <input type="checkbox" value="nh3" id="nh3"/> ';
+		myTable += ' NH<sub>3</sub> (<b>*</b>)';
 		myTable += '</nobr> ';
 		myTable += '</div> ';
 		
@@ -974,16 +1095,6 @@
 		myTable+= '</div> ';
 		myTable += '</td> </tr> ';
 		
-		// tooltip option
-		myTable += '<tr><td class="optionCell"> ';
-		myTable += '<input id="enableTooltip" type="checkbox">Enable tooltip ';
-		myTable += '<br><br>';
-		
-		// reset zoom option
-		myTable += '<div style="width:100%; font-size:8pt; margin-top:5px; color:sienna;">Click and drag <br> in the plot to zoom</div> ';
-		myTable += '<input id="resetZoom" type="button" value="Zoom Out" /> ';
-		myTable += '</td> </tr> ';
-		
 		
 		// sliders to change plot size
 		myTable += '<tr><td class="optionCell"> ';
@@ -992,8 +1103,7 @@
 		myTable += '<div>Height: <span id="slider_height_val">'+options.height+'</span></div> '
 		myTable += '<div id="slider_height"></div> ';
 		myTable += '</td> </tr> ';
-		
-		
+
 		myTable += '</tbody>';
 		myTable += '</table>';
 		

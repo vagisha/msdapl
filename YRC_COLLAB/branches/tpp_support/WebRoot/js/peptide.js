@@ -45,7 +45,6 @@ Peptide.getSeqMassMono = function _seqMassMono(seq, index, term) {
 			}
 		}
 	}
-	
 	return _addModMasses(mass, seq, index, term);
 }
 
@@ -79,7 +78,7 @@ function _addModMasses(seqMass, seq, index, term) {
 		mass += Peptide.ntermMod;
 	if(term == "c" && Peptide.ctermMod)
 		mass += Peptide.ctermMod;
-	
+
 	// add any static modifications
 	for(var i = 0; i < seq.length; i += 1) {
 		var mod = Peptide.staticMods[seq[i]];
@@ -104,7 +103,6 @@ function _addModMasses(seqMass, seq, index, term) {
 			}
 		}
 	}
-	
 	return mass;
 }
 
@@ -118,7 +116,7 @@ function Modification(aminoAcid, mass) {
 }
 
 function VariableModification(pos, mass, aminoAcid) {
-	this.position = pos
+	this.position = parseInt(pos);
 	this.aa = aminoAcid;
 	this.modMass = mass;
 }

@@ -1666,7 +1666,7 @@
                 
                 ctx.fillStyle = series.color;
                 ctx.textAlign = "center";
-        		ctx.font = '12px Unknown Font, sans-serif';
+        		ctx.font = '14px Arial';
         		
                 var incr = ps;
                 if(series.lines.peaks)

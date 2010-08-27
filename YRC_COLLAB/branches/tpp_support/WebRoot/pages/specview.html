@@ -2,170 +2,93 @@
 <html>
  <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Starling Spectrum Viewer</title>
+    <title>Lorikeet Spectrum Viewer</title>
     
     <!--[if IE]><script language="javascript" type="text/javascript" src="/msdapl/js/excanvas.min.js"></script><![endif]-->
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.4/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="/msdapl/js/jquery.flot.js"></script>
-    <script type="text/javascript" src="/msdapl/js/jquery.flot.selection.js"></script>
+    <script type="text/javascript" src="../js/jquery.flot.js"></script>
+    <script type="text/javascript" src="../js/jquery.flot.selection.js"></script>
     
-    <script type="text/javascript" src="/msdapl/js/specview.js"></script>
-    <script type="text/javascript" src="/msdapl/js/peptide.js"></script>
-    <script type="text/javascript" src="/msdapl/js/aminoacid.js"></script>
-    <script type="text/javascript" src="/msdapl/js/ion.js"></script>
+    <script type="text/javascript" src="../js/specview.js"></script>
+    <script type="text/javascript" src="../js/peptide.js"></script>
+    <script type="text/javascript" src="../js/aminoacid.js"></script>
+    <script type="text/javascript" src="../js/ion.js"></script>
     
+    <link REL="stylesheet" TYPE="text/css" HREF="../css/lorikeet.css">
     
-    <style type="text/css">
-    
-    	BODY    {
-           background-color: #F2F2F2;
-           color: #000000;
-           height: 100%;
-           margin: 0;
-           padding: 0;
-           font-family: "Trebuchet MS",Arial,sans-serif;
-           font-size: 10pt;
-           font-style: normal;
-           font-weight: 500;
-        }
-        
-        div.mainContainer {
-        	width:95%; 
-        	margin:10px; 
-        }
-        
-        div.mainContainer td {
-        	background-color:#F2F2F2; 
-        	border:1px solid black;
-        	padding: 5px;
-        }
-        
-        div.mainContainer td.optionCell {
-        	background-color: #EFEFEF; 
-        	border: 1px dotted #666666; 
-        	padding: 5px;
-        	margin:5px;
-        }
-        
-        #ionTable {
-        	border-collapse:collapse;
-			border-color:#DDDDDD;
-		}
-        #ionTable th {
-        	background-color:#AAAAAA;
-        	border: 1px solid #666666;
-        }
-        #ionTable td {
-        	border: 1px solid #666666;
-        	text-align: center;
-        	background-color:#FFFFFF;
-        }
-        #ionTable td.seq {
-        	font-weight: bold;
-        	background-color:#AAAAAA;
-        }
-        #ionTable td.modified{
-        	background-color:gold;
-        }
-        #ionTable td.numCell {
-        	background-color:#EEEEEE;
-        	color:#777777;
-        }
-        #ionTable td.matchIon {
-        	font-weight:bold;
-        	opacity:0.8;
-        	filter: alpha(opacity=80); /*For IE*/
-        	-moz-opacity:0.8; /*Old Mozilla browsers*/
-        	color:white;
-        }
-        
-        /*
-		 * jQuery UI Slider @VERSION
-		 *
-		 * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
-		 * Dual licensed under the MIT or GPL Version 2 licenses.
-		 * http://jquery.org/license
-		 *
-		 * http://docs.jquery.com/UI/Slider#theming
-		 */
-		.ui-slider { position: relative; text-align: left; }
-		.ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 1.0em; height: 0.8em; cursor: default; }
-		.ui-slider .ui-slider-range { position: absolute; z-index: 1; font-size: .7em; display: block; border: 0; background-position: 0 0;}
-		
-		.ui-slider-horizontal { height: .3em; }
-		.ui-slider-horizontal .ui-slider-handle { top: -.3em; margin-left: -.6em; }
-		.ui-slider-horizontal .ui-slider-range { top: 0; height: 100%; }
-		.ui-slider-horizontal .ui-slider-range-min { left: 0; }
-		.ui-slider-horizontal .ui-slider-range-max { right: 0; }
-		
-		.ui-corner-all { -moz-border-radius: 4px/*{cornerRadius}*/; -webkit-border-radius: 4px/*{cornerRadius}*/; border-radius: 4px/*{cornerRadius}*/; }
-		.ui-state-default, .ui-widget-content .ui-state-default { border: 1px solid #d3d3d3/*{borderColorDefault}*/; 
-		background: #3D4960/*{bgColorDefault}*/; 
-		font-weight: normal/*{fwDefault}*/; color: #555555/*{fcDefault}*/; }
-		
-		/* Component containers
-		----------------------------------*/
-		.ui-widget { }
-		.ui-widget .ui-widget { }
-		.ui-widget-content { border: 1px solid #888888/*{borderColorContent}*/; background: #CFCFCF/*{bgColorContent}*/ ; color: #111111/*{fcContent}*/; }
-		.ui-widget-content a { color: #000000/*{fcContent}*/; }
-		
-		.link {
-			text-decoration: underline;
-			cursor:pointer;
-			color:sienna;
-		}
-		.font_small {
-			font-size: 8pt;
-		}
-		
-	</style>
-	
 </head>
 
 <body>
 
-<div id="specview_form_div" style="padding:20px;">
+<div id="header">
+	<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td valign="bottom" align="left">
+				<img src="../images/lorikeet/header_text.png" style="margin:0px; padding:0px;"/>
+			</td>
+			<td valign="bottom" align="left" style="background-image:url(../images/lorikeet/header_scan.png);background-repeat:repeat-x; width:100%;">
+			</td>
+			<td valign="bottom" align="right">
+				<img src="../images/lorikeet/header_lorikeet.png" style="margin:0px; padding:0px;" />
+			</td>
+		</tr>
+	</tbody>
+	
+	</table>
+</div>
+<div id="specview_form_div" style="padding:20px; margin:20px; width:500pt; border:1px dotted black; background-color:#FFFFEF;">
 
 <table>
 <tbody>
 <tr>
-	<td>Peptide Sequence: </td>
+	<td><b>Peptide Sequence:</b> </td>
 	<td><input type="text" size="50" name="sequence"/></td>
 </tr>
 
 <tr>
-	<td>Add to N-term: </td>
+	<td><b>Add to N-term:</b> </td>
 	<td><input type="text" name="ntermMod"/></td>
 </tr>
 
 <tr>
-	<td>Add to C-term: </td>
+	<td><b>Add to C-term:</b> </td>
 	<td><input type="text" name="ctermMod"/></td>
 </tr>
 
 <tr>
 	<td colspan="2">
-		Static Modifications: <span class="link staticmod_add">[ADD]</span>
+		<b>Fixed Modifications:</b> <span class="link staticmod_add">[ADD]</span>
 		<br/>
-		<span class="font_small">(Enter the mass of the modification.)</span>
+		<!-- <span class="font_small">(Enter the mass of the modification.)</span>-->
 		<ul id="staticmod_list"></ul>
 	</td>
 </tr>
 
 <tr>
 	<td colspan="2">
-		Variable Modifications: <span class="link varmod_add">[ADD]</span>
+		<b>Variable Modifications:</b> <span class="link varmod_add">[ADD]</span>
 		<br/>
-		<span class="font_small">(Position in the sequence is 1-based. <br>Enter the mass of the modification.)</span>
+		<span class="font_small">Residue position in the sequence is 1-based. <br/>
+		Enter a comma-separated list of positions if multiple positions in the sequence have the same modification.</span>
+		<!-- <br>Enter the mass of the modification.)</span>-->
 		<ul id="varmod_list"></ul>
 	</td>
 </tr>
 
 <tr>
 	<td colspan="2">
-		Spectrum Peaks:
+		<b>Spectrum Peaks:</b>
+		<br/>
+		<span class="font_small">
+		Enter one m/z, intensity pair on a single line. <br/>
+		Example:</span><br/>
+		<div class="font_small" style="padding:5px;">
+		283.751526 6.493506<br/>
+		287.601379 11.096813<br/>
+		295.031097 2.801403<br/>
+		</div>
 		<br/>
 		<textarea  id="peaks" rows="20" cols="50"></textarea>
 	</td>
@@ -182,7 +105,32 @@
 
 
 
-<div id="specview_div"></div>
+<div id="specview_div" style="margin:20px;">
+	<table cellspacing="0" cellpadding="0">
+		<tbody>
+			<tr>
+				<td align="left"><span id="showInput" class="link" style="padding:10px;display:none;"><b>Change Input</b></span></td>
+			</tr>
+			<tr>
+				<td><div id="specview_plot_div"></div></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<hr style="margin:50px 0px 0px 0px;"/>
+<div align="left" style="margin-left:20px; margin-bottom:0px;">
+<img src="../images/lorikeet/lorikeet_text_small.png" style="margin:0px; padding:0px"/>
+<span style="margin-left:5px;color:gray;">
+<b>by vsharma@uw.edu</b>
+</span>
+</div>
+<hr style="margin:0px 0px 5px 0px"/>
+<div class="font_small" align="left" style="margin-left:20px; margin-bottom:0px;">
+<a href="http://code.google.com/p/lorikeet/downloads/list">Lorikeet Spectrum Viewer</a> is a Javascript plugin for <a href="http://jquery.com/">JQuery</a> that uses a modified version of the  
+<a href="http://code.google.com/p/flot/">Flot</a> plotting library.
+</div>
+
 
 
 <script type="text/javascript">
@@ -190,7 +138,16 @@
 $(document).ready(function () {
 	
 	$("input[name='create']").click(function() {
-		createSpectrum();
+	
+		$("#specview_div").show();
+		$("#showInput").show();
+		$("#specview_form_div").hide();
+		
+		if(!createSpectrum()) {
+			$("#specview_div").hide();
+			$("#showInput").hide();
+			$("#specview_form_div").show();
+		}
 	});
 	
 	$("input[name='clear']").click(function() {
@@ -208,6 +165,12 @@ $(document).ready(function () {
 	$("#example_data_link").click(function() {
 		setExampleData();
 	});
+	
+	$("#showInput").click(function() {
+		$("#specview_div").hide();
+		$("#showInput").hide();
+		$("#specview_form_div").show();
+	})
 
 });
 
@@ -265,7 +228,7 @@ function clearFields() {
 function createSpectrum() {
 
 	// first remove the existing spectrum
-	$("#specview_div").html("");
+	$("#specview_plot_div").html("");
 	
 	// -----------------------------------------------------------
 	// get the sequence
@@ -428,7 +391,7 @@ function createSpectrum() {
 	// -----------------------------------------------------------
 	// We have all the data. Create the plot
 	// -----------------------------------------------------------
-	$("#specview_div").specview({sequence: sequence, 
+	$("#specview_plot_div").specview({sequence: sequence, 
 								//scanNum: 2441,
 								//charge: 2,
 								//fileName:'sh_1617_JX_070209p_KO410_run1',
@@ -437,11 +400,16 @@ function createSpectrum() {
 								ntermMod: ntermMod, 
 								ctermMod: ctermMod,
 								peaks: peaks});	
+								
+	
+	return true;
 }
 
 
 function setExampleData() {
 
+	clearFields();
+	
 	var seq = "FDSFGDLSSASAIMGNPK";
 	$('input[name="sequence"]').val(seq);
 	
