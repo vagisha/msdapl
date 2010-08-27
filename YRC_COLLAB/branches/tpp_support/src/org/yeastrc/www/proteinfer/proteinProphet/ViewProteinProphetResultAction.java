@@ -6,8 +6,6 @@
  */
 package org.yeastrc.www.proteinfer.proteinProphet;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,8 +16,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.bio.go.GONode;
-import org.yeastrc.www.go.GOSlimUtils;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 

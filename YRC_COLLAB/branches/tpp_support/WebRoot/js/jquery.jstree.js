@@ -2642,7 +2642,7 @@
 					return;
 				}
 				if(this.data.search.result.length) { this.clear_search(); }
-				this.data.search.result = this.get_container().find("a" + (this.data.languages ? "." + this.get_lang() : "" ) + ":" + (s.case_insensitive ? "jstree_contains" : "contains") + "(" + this.data.search.str + ")");
+				this.data.search.result = this.get_container().find(".searchable" + (this.data.languages ? "." + this.get_lang() : "" ) + ":" + (s.case_insensitive ? "jstree_contains" : "contains") + "(" + this.data.search.str + ")");
 				this.data.search.result.addClass("jstree-search").parents('.jstree-closed, .jstree-leaf').parents(".jstree-closed").each(function () {
 					t.open_node(this, false, true);
 				});

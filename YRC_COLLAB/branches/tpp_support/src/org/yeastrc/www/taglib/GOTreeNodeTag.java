@@ -89,8 +89,9 @@ public class GOTreeNodeTag extends TagSupport {
 		if(node.isMarked()) {
 			writer.print("<span class='slim-node'>");
 		}
-		
+		writer.write("<span class='searchable'>");
 		writer.write(node.getGoNode().getAccession()+": "+node.getGoNode().getName());
+		writer.write("</span>");
 		
 		writer.print("<span ");
 		if(node.isLeaf()) // a node with # annotations = # exact annotations (this should be true of "real" GO leaf nodes)

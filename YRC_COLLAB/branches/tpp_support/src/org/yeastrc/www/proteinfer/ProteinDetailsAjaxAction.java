@@ -267,9 +267,20 @@ public class ProteinDetailsAjaxAction extends Action {
         
         // Get the sequence for this protein
         String sequence = NrSeqLookupUtil.getProteinSequence(nrseqProteinId);
+        try {
         String proteinSequenceHtml = ProteinSequenceHtmlBuilder.getInstance().build(sequence, peptideSequences);
         request.setAttribute("proteinSequenceHtml", proteinSequenceHtml);
         request.setAttribute("proteinSequence", sequence);
+        }
+        catch(ProteinSequenceHtmlBuilderException e) {
+        	response.setContentType("text/html");
+            response.getWriter().write("<b>Error getting sequence coverage</b><br>");
+            response.getWriter().write("<b>Sequence:</b><br>");
+            response.getWriter().write(sequence+"<br>");
+            response.getWriter().write("<b>Error msessage:</b><br>");
+            response.getWriter().write(e.getMessage());
+            return null;
+        }
         
         
         

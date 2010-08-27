@@ -13,7 +13,7 @@
 
 <body>
 
-<script src="<yrcwww:link path='js/jquery.js'/>"></script>
+<script src="<yrcwww:link path='js/jquery-1.4.2.js'/>"></script>
 <script  type="text/javascript" src="<yrcwww:link path='js/jquery.jstree.js'/>"></script>
 
 

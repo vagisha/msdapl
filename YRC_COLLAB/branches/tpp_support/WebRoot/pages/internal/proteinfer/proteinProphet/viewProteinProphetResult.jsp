@@ -53,7 +53,7 @@
   	type: 'POST',
   	//timeout: 5000,
   	dataType: 'html',
-  	error: function(xhr) {
+  	error: function(xhr, textstatus, errorthrown) {
   			
   				var statusCode = xhr.status;
 		  		// status code returned if user is not logged in
@@ -63,7 +63,7 @@
  				
  				// otherwise just display an alert
  				else {
- 					alert("Request Failed: "+statusCode+"\n"+xhr.statusText);
+ 					alert("Request Failed: "+statusCode+"\n"+xhr.statusText+"\n"+textstatus+"\n"+errorthrown);
  				}
   			}
   });
@@ -829,7 +829,7 @@ function refreshProteinList(responseText) {
 // ---------------------------------------------------------------------------------------
 // GENE ONTOLOGY ANALYSIS RESULTS
 // ---------------------------------------------------------------------------------------
-function goAnalysisResults() {
+function goSlimAnalysisResults() {
 
 	if(!validateForm())
     	return false;
@@ -856,6 +856,22 @@ function goAnalysisResults() {
     		 	// stripe the table
     		 	makeStripedTable($("#go_slim_table")[0]);
     		 	makeSortableTable($("#go_slim_table")[0]);
+    		 	$(".go_filter_add").each(function() {
+    		 		if(!$(this).is(".clickable")) {
+	    		 		$(this).addClass("clickable");
+	    		 		$(this).click(function() {
+	    		 			addToGoTermFilters($(this).attr('id'));
+	    		 		});
+    		 		}
+    		 	});
+    		 	$(".go_filter_remove").each(function() {
+    		 		if(!$(this).is(".clickable")) {
+	    		 		$(this).addClass("clickable");
+	    		 		$(this).click(function() {
+	    		 			removeFromGoTermFilters($(this).attr('id'));
+	    		 		});
+    		 		}
+    		 	});
     		 	hideGoEnrichmentDetails();
     		 });
     		 
@@ -922,6 +938,23 @@ function goEnrichmentResults() {
     		 	// stripe the table
     		 	makeStripedTable($("#go_enrichment_table")[0]);
     		 	makeSortableTable($("#go_enrichment_table")[0]);
+    		 	
+    		 	$(".go_filter_add").each(function() {
+    		 		if(!$(this).is(".clickable")) {
+	    		 		$(this).addClass("clickable");
+	    		 		$(this).click(function() {
+	    		 			addToGoTermFilters($(this).attr('id'));
+	    		 		});
+    		 		}
+    		 	});
+    		 	$(".go_filter_remove").each(function() {
+    		 		if(!$(this).is(".clickable")) {
+	    		 		$(this).addClass("clickable");
+	    		 		$(this).click(function() {
+	    		 			removeFromGoTermFilters($(this).attr('id'));
+	    		 		});
+    		 		}
+    		 	});
     		 	hideGoSlimDetails();
     		 });
 	
@@ -1217,13 +1250,15 @@ function hideAllDescriptionsForProtein(proteinId) {
     </div>
     
     <!-- GENE ONTOLOGY -->
+    <logic:present name="goSupported">
     <div id="gene_ontology" align="center">
     
     	<div align="center" style="padding: 5; border: 1px dashed gray; background-color: #F0F8FF; margin:5 0 5 0">
     	<table cellpadding="5">
     	<tr>
     	<td valign="top" style="padding:5x;"><b>GO Slim Analysis: </b></td>
-    	<td style="padding:5x;">
+    	<td style="padding:5x;" valign="top">
+    	<nobr>
     		GO Aspect:
     		<html:select name="proteinProphetFilterForm" property="goAspect" styleId="goAspectField1">
 			<html:option
@@ -1233,23 +1268,30 @@ function hideAllDescriptionsForProtein(proteinId) {
 			<html:option
 				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
 			</html:select>
+		</nobr>
     	</td>
     	
-    	<td style="padding:5x;">
+    	<td style="padding:5x;" valign="top">
+    	<nobr>
     		GO Slim:
 			<html:select name="proteinProphetFilterForm" property="goSlimTermId" styleId="goSlimTermIdField">
 			<html:options collection="goslims" property="id" labelProperty="name"/>
 			</html:select>
+		</nobr>
+		<div align="center" style="width:100%; font-size:8pt;">
+		<a href="http://www.geneontology.org/GO.slims.shtml" target="go_window">More information on GO Slims</a>
+		</div>
     	</td>
     	
-    	<td style="padding:5x;">
-    		<a href="" onclick="javascript:goAnalysisResults();return false;"><b>Update</b></a>
+    	<td style="padding:5x;" valign="top">
+    		<a href="" onclick="javascript:goSlimAnalysisResults();return false;"><b>Update</b></a>
     	</td>
     	</tr>
     	
     	<tr>
     	<td valign="top" style="padding:5x;"><b>GO Enrichment: </b></td>
     	<td style="padding:5x;">
+    		<nobr>
     		GO Aspect:
     		<html:select name="proteinProphetFilterForm" property="goAspect" styleId="goAspectField2">
 			<html:option
@@ -1258,18 +1300,23 @@ function hideAllDescriptionsForProtein(proteinId) {
 				value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">Cellular Component</html:option>
 			<html:option
 				value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
-		</html:select>
+			</html:select>
+			</nobr>
     	</td>
     	
     	<td style="padding:5x;">
+    		<nobr>
     		P-Value: <html:text name="proteinProphetFilterForm" property="goEnrichmentPVal" styleId="goEnrichmentPValField"></html:text>
+    		</nobr>
     	</td>
 		
 		<td style="padding:5x;">
+			<nobr>
     		Species: <html:select name="proteinProphetFilterForm" property="speciesId" styleId="speciesField">
     		<html:option value="0">None</html:option>
     		<html:options collection="speciesList" property="id" labelProperty="name"/>
     		</html:select>
+    		</nobr>
     	</td>
     	
 		<td style="padding:5x;">
@@ -1293,6 +1340,7 @@ function hideAllDescriptionsForProtein(proteinId) {
     	<div style="margin-top:10px;" id="goenrichment_result"></div>
     	
     </div>
+    </logic:present>
     	
     	
 </yrcwww:contentbox>

@@ -20,7 +20,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.bio.go.GONode;
 import org.yeastrc.bio.taxonomy.Species;
-import org.yeastrc.bio.taxonomy.TaxonomyUtils;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.SORT_BY;
@@ -29,6 +28,7 @@ import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriter
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetROC;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.util.TimeUtils;
+import org.yeastrc.nrseq.CommonNameSupportUtils;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.www.go.GOSlimUtils;
@@ -202,6 +202,12 @@ public class ProteinProphetViewAction extends Action {
         				break;
         			}
         		}
+        	}
+        }
+        
+        for(Integer speciesId: speciesIds) {
+        	if(CommonNameSupportUtils.isSpeciesSupported(speciesId)) {
+        		request.setAttribute("commonNameSupported", true);
         	}
         }
         

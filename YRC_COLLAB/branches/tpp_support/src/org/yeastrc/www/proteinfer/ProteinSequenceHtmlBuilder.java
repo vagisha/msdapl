@@ -38,116 +38,50 @@ public class ProteinSequenceHtmlBuilder {
         Map<Integer, Integer> atResidues = new HashMap<Integer, Integer>();         // residues marked with a @
         Map<Integer, Integer> hashResidues = new HashMap<Integer, Integer>();       // residues marked with a #
 
+        String altSequence = sequence;
+        // Replace all 'L' with '1'
+        altSequence = altSequence.replaceAll("L", "1");
+        // Replace all "I" with "1"
+        altSequence = altSequence.replaceAll("I", "1");
+        
+        //  Add in font tags for labelling covered sequences in the parent sequence
         for( String peptideSequence : peptideSequences ) {
 
             if (peptideSequence == null) continue;          
             int pepIndex = sequence.indexOf( peptideSequence );
 
-            // skip this peptide if it's not in the parent protein sequence
-            if (pepIndex == -1)
-                throw new ProteinSequenceHtmlBuilderException("Peptide "+peptideSequence+" not found in protein!");
-
-//            if (ypep.getSequence().indexOf( "*" ) != -1 || ypep.getSequence().indexOf("@") != -1 || ypep.getSequence().indexOf("#") != -1) {
-//                char[] aas = ypep.getSequence().toCharArray();
-//                int modCount = 0;
-//                for (int k = 3; k < aas.length; k++) {
-//                    Integer residueIndex = new Integer( pepIndex + k - 3 - modCount );
-//                    Map<Integer, Integer> countMap = null;
-//
-//                    if (aas[k] == '*') {
-//                        countMap = starResidues;
-//                        modCount++;
-//                    } else if (aas[k] == '@') {                     
-//                        countMap = atResidues;
-//                        modCount++;
-//                    } else if (aas[k] == '#') {                     
-//                        countMap = hashResidues;
-//                        modCount++;
-//                    } else {
-//                        continue;
-//                    }
-//
-//                    if (!countMap.containsKey( residueIndex ))
-//                        countMap.put( residueIndex, new Integer( 1 ) );
-//                    else {
-//                        int count = ((Integer)countMap.get( residueIndex)).intValue();
-//                        countMap.remove( residueIndex );
-//                        countMap.put( residueIndex, new Integer( count + 1 ) );
-//                    }                   
-//                }
-//            }
-        }
-
-        /* 
-         * at this point, the 3 residues maps should contain a count of the number of peptides reporting the
-         * respective modifications for each reportedly modified residues.
-         * Go through and label each of those with styled <SPAN> tags for labelling
-         * 
-         */
-        for ( int index : starResidues.keySet() ) {
-            int count = starResidues.get( index );
-
-            if (count == 1)
-                residues[index] = "<span class=\"single_star_residue\">" + residues[index] + "</span>";
-            else
-                residues[index] = "<span class=\"multiple_star_residue\">" + residues[index] + "</span>";
-        }
+            // if this peptide is not in the protein sequence, replace I's and L's and check again with altSequence
+            if (pepIndex == -1) {
+            	
+            	String altPeptide = peptideSequence;
+            	altPeptide = altPeptide.replaceAll("L", "1");
+            	altPeptide = altPeptide.replaceAll("I", "1");
+            	pepIndex = altSequence.indexOf(altPeptide);
+            	// If we still don't have a match throw an exception
+            	if(pepIndex == -1)
+            		throw new ProteinSequenceHtmlBuilderException("Peptide "+peptideSequence+" not found in protein!");
+            }
 
 
-        for ( int index : atResidues.keySet() ) {
-            int count = atResidues.get( index );
-
-            if (count == 1)
-                residues[index] = "<span class=\"single_at_residue\">" + residues[index] + "</span>";
-            else
-                residues[index] = "<span class=\"multiple_at_residue\">" + residues[index] + "</span>";
-        }
-
-
-        for ( int index : hashResidues.keySet() ) {
-            int count = hashResidues.get( index );
-
-            if (count == 1)
-                residues[index] = "<span class=\"single_hash_residue\">" + residues[index] + "</span>";
-            else
-                residues[index] = "<span class=\"multiple_hash_residue\">" + residues[index] + "</span>";
-        }   
-
-        /*
-         * All modified residues in the residues array should be surrounded by appropriately classed <span> tags
-         */
-
-        // clean up
-        starResidues = null;
-        atResidues = null;
-        hashResidues = null;
-
-        /*
-         * Now add in font tags for labelling covered sequences in the parent sequence
-         */
-
-        for ( String pseq : peptideSequences ) {
-            if (pseq == null) continue;
-
-            int index = sequence.indexOf(pseq);
-            if (index == -1) continue;                  //shouldn't happen
-            if (index > residues.length - 1) continue;  //shouldn't happen
+            if (pepIndex > residues.length - 1)  { //shouldn't happen
+            	throw new ProteinSequenceHtmlBuilderException("Matching index out of bounds for peptide: "+peptideSequence);
+            }
 
             // Place a red font start at beginning of this sub sequence in main sequence
-            residues[index] = "<span class=\"covered_peptide\">" + residues[index];
+            residues[pepIndex] = "<span class=\"covered_peptide\">" + residues[pepIndex];
 
             // this means that the sub-peptide extends beyond the main peptide's sequence... shouldn't happen but check for it
-            if (index + pseq.length() > residues.length - 1) {
-
+            if (pepIndex + peptideSequence.length() > residues.length) {
+            	throw new ProteinSequenceHtmlBuilderException("Peptide ("+peptideSequence+") match extends beyond length of protein");
                 // just stop the red font at the end of the main sequence string
-                residues[residues.length - 1] = residues[residues.length - 1] + "</span>";
+                //residues[residues.length - 1] = residues[residues.length - 1] + "</span>";
             } else {
 
                 // add the font end tag after the last residue in the sub sequence
-                residues[index + pseq.length() - 1] = residues[index + pseq.length() - 1] + "</span>";
+                residues[pepIndex + peptideSequence.length() - 1] = residues[pepIndex + peptideSequence.length() - 1] + "</span>";
             }
         }
-
+        
 
         // String array should be set up appropriately with red font tags for sub peptide overlaps, format it into a displayable peptide sequence
         String retStr = "      1          11         21         31         41         51         \n";

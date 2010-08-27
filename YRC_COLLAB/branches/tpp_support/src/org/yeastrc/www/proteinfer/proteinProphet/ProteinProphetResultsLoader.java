@@ -29,6 +29,7 @@ import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinGroupDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.domain.protinfer.GOProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferIon;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
@@ -53,7 +54,9 @@ import org.yeastrc.nrseq.ProteinListingBuilder;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 import org.yeastrc.www.proteinfer.MsResultLoader;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
+import org.yeastrc.www.proteinfer.ProteinCommonNameFilter;
 import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
+import org.yeastrc.www.proteinfer.ProteinGoTermsFilter;
 import org.yeastrc.www.proteinfer.ProteinProperties;
 import org.yeastrc.www.proteinfer.ProteinPropertiesFilter;
 import org.yeastrc.www.proteinfer.ProteinPropertiesStore;
@@ -93,6 +96,13 @@ public class ProteinProphetResultsLoader {
         List<Integer> proteinIds = ppProtDao.getFilteredSortedProteinIds(pinferId, filterCriteria);
         log.info("Returned "+proteinIds.size()+" protein IDs for protein inference ID: "+pinferId);
         
+        // filter by common name, if required
+        if(filterCriteria.getCommonNameLike() != null) {
+        	log.info("Filtering by common name: "+filterCriteria.getCommonNameLike());
+        	proteinIds = ProteinCommonNameFilter.getInstance().filterForProtInferByCommonName(pinferId, proteinIds, 
+        			filterCriteria.getCommonNameLike());
+        }
+        
         // filter by accession, if required
         if(filterCriteria.getAccessionLike() != null) {
         	log.info("Filtering by accession: "+filterCriteria.getAccessionLike());
@@ -112,6 +122,17 @@ public class ProteinProphetResultsLoader {
             		filterCriteria.getDescriptionNotLike(), filterCriteria.isSearchAllDescriptions());
         }
         
+        // filter by GO terms, if required
+        if(filterCriteria.getGoFilterCriteria() != null) {
+        	GOProteinFilterCriteria goFilters = filterCriteria.getGoFilterCriteria();
+        	log.info("Filtering by GO terms: "+goFilters.toString());
+        	try {
+				proteinIds = ProteinGoTermsFilter.getInstance().filterPinferProteins(proteinIds, goFilters);
+			} catch (Exception e1) {
+				log.error("Exception filtering proteins on GO terms", e1);
+			}
+        }
+        
         // filter by molecular wt, if required
         if(filterCriteria.hasMolecularWtFilter()) {
         	log.info("Filtering by molecular wt.");
@@ -120,7 +141,6 @@ public class ProteinProphetResultsLoader {
         }
         
         // filter by pI, if required
-        
         if(filterCriteria.hasPiFilter()) {
         	log.info("Filtering by pI");
             proteinIds = ProteinPropertiesFilter.getInstance().filterForProtInferByPi(pinferId, proteinIds,

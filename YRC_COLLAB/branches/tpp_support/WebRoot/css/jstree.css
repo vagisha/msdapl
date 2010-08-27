@@ -18,7 +18,7 @@
 .jstree-default span.red {color:red;}
 .jstree-default span.green {color:green;}
 
-.jstree-search {background:#F0E68C;}
+.jstree-search {background:#F0E68C !important;}
 
 /*.jstree-default .jstree-hovered { background:#e7f4f9; border:1px solid #d8f0fa; padding:0 2px 0 1px; }
 .jstree-default .jstree-clicked { background:#beebff; border:1px solid #99defd; padding:0 2px 0 1px; }

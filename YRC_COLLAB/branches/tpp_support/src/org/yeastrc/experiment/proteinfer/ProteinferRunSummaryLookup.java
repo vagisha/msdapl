@@ -78,7 +78,7 @@ public class ProteinferRunSummaryLookup {
         
         summary = new ProteinProphetRunSummary();
         summary.setPiRunId(piRunId);
-        summary.setProphetGroupCount(proteinCount);
+        summary.setProteinCount(proteinCount);
         summary.setIndistGroupCount(iGroupCount);
         summary.setProphetGroupCount(prophetGrpCount);
         summary.setUniqPeptSeqCount(peptSeqCount);
