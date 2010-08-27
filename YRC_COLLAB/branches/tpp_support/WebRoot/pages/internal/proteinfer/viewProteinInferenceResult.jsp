@@ -53,7 +53,7 @@
   	type: 'POST',
   	//timeout: 5000,
   	dataType: 'html',
-  	error: function(xhr) {
+  	error: function(xhr, textstatus, errorthrown) {
   			
   				var statusCode = xhr.status;
 		  		// status code returned if user is not logged in
@@ -63,7 +63,7 @@
  				
  				// otherwise just display an alert
  				else {
- 					alert("Request Failed: "+statusCode+"\n"+xhr.statusText);
+ 					alert("Request Failed: "+statusCode+"\n"+xhr.statusText+"\n"+textstatus+"\n"+errorthrown);
  				}
   			}
   });
