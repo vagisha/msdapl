@@ -1043,6 +1043,11 @@
             }
             axis.min = min;
             axis.max = max;
+            
+            // add extra space for labels to axis.max if this is the y-axis.
+            if(axis.direction == "y" && options.series.peaks.show) {
+            	axis.max = axis.max + ((axis.max - axis.min) / canvasHeight ) * 20;
+            }
         }
 
         function setupTickGeneration(axis) {
@@ -1667,6 +1672,8 @@
                 ctx.fillStyle = series.color;
                 ctx.textAlign = "center";
         		ctx.font = '14px Arial';
+        		if(series.labelType == 'mz')
+        			ctx.font = '12px Arial';
         		
                 var incr = ps;
                 if(series.lines.peaks)
@@ -1754,13 +1761,22 @@
                     ctx.lineTo(myx2, axisy.p2c(y2) + yoffset);
                 	ctx.stroke();
                 	
-                	if(series.labels) {
-                		//alert(myx1+", "+myx2);
-                		var label = series.labels[l];
+                	if(series.labelType != 'none') {
+                		var label = '';
+                		if(series.labelType == 'ion') {
+		                	if(series.labels) {
+		                		//alert(myx1+", "+myx2);
+		                		label = series.labels[l];
+		                	}
+                		}
+                		else if(series.labelType == 'mz') {
+                			var label = x1.toFixed(2);
+                		}
+                		var metrics = ctx.measureText(label);
                 		ctx.save();
                 		ctx.translate(myx1, axisy.p2c(y2) + yoffset)
                 		ctx.rotate(-90 * Math.PI/180);
-                		ctx.fillText(label, 20,3);
+                		ctx.fillText(label, (metrics.width / 2)+1 ,3);
                 		ctx.restore();
                 	}
                 }
@@ -2444,6 +2460,7 @@
         }
 
         function drawOverlay() {
+        	
             redrawTimeout = null;
 
             // draw highlights

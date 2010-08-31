@@ -13,27 +13,27 @@ function Ion (t, color, charge, terminus) {
 
 // charge +1
 Ion.A_1 = new Ion("a", "#008000", 1, "n"); // green
-Ion.B_1 = new Ion("b", "#ff0000", 1, "n"); // red
-Ion.C_1 = new Ion("c", "#FF8C00", 1, "n"); // dark orange
+Ion.B_1 = new Ion("b", "#0000ff", 1, "n"); // blue
+Ion.C_1 = new Ion("c", "#008B8B", 1, "n"); // dark cyan
 Ion.X_1 = new Ion("x", "#4B0082", 1, "c"); // indigo
-Ion.Y_1 = new Ion("y", "#0000ff", 1, "c"); // blue
-Ion.Z_1 = new Ion("z", "#008B8B", 1, "c"); // dark cyan
+Ion.Y_1 = new Ion("y", "#ff0000", 1, "c"); // red
+Ion.Z_1 = new Ion("z", "#FF8C00", 1, "c"); // dark orange
 
 // charge +2
 Ion.A_2 = new Ion("a", "#2E8B57", 2, "n"); // sea green
-Ion.B_2 = new Ion("b", "#FA8072", 2, "n"); // salmon
-Ion.C_2 = new Ion("c", "#FFA500", 2, "n"); // orange
+Ion.B_2 = new Ion("b", "#4169E1", 2, "n"); // royal blue
+Ion.C_2 = new Ion("c", "#20B2AA", 2, "n"); // light sea green
 Ion.X_2 = new Ion("x", "#800080", 2, "c"); // purple
-Ion.Y_2 = new Ion("y", "#4169E1", 2, "c"); // royal blue
-Ion.Z_2 = new Ion("z", "#20B2AA", 2, "c"); // light sea green
+Ion.Y_2 = new Ion("y", "#FA8072", 2, "c"); // salmon 
+Ion.Z_2 = new Ion("z", "#FFA500", 2, "c"); // orange 
 
 // charge +3
 Ion.A_3 = new Ion("a", "#9ACD32", 3, "n"); // yellow green
-Ion.B_3 = new Ion("b", "#FFA07A", 3, "n"); // light salmon
-Ion.C_3 = new Ion("c", "#FFD700", 3, "n"); // gold
+Ion.B_3 = new Ion("b", "#00BFFF", 3, "n"); // deep sky blue
+Ion.C_3 = new Ion("c", "#66CDAA", 3, "c"); // medium aquamarine
 Ion.X_3 = new Ion("x", "#9932CC", 3, "c"); // dark orchid
-Ion.Y_3 = new Ion("y", "#00BFFF", 3, "c"); // deep sky blue
-Ion.Z_3 = new Ion("z", "#66CDAA", 3, "c"); // medium aquamarine
+Ion.Y_3 = new Ion("y", "#FFA07A", 3, "c"); // light salmon
+Ion.Z_3 = new Ion("z", "#FFD700", 3, "n"); // gold
 
 var _ions = [];
 _ions["a"] = [];

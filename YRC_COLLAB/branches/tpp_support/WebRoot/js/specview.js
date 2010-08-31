@@ -53,6 +53,7 @@
 	var massErrorChanged = false;
 	var massTypeChanged = false;
 	var peakAssignmentTypeChanged = false;
+	var peakLabelTypeChanged = false;
 	var selectedNeutralLossChanged = false;
 	
 	var plotOptions = {
@@ -60,7 +61,7 @@
             peaks: { show: true, lineWidth: 1, shadowSize: 0},
             shadowSize: 0
         },
-        selection: { mode: "x" },
+        selection: { mode: "x", color: "#F0E68C" },
         grid: { show: true, hoverable: true, clickable: false, autoHighlight: false },
         xaxis: { tickLength: 5, tickColor: "#000" },
     	yaxis: { tickLength: 5, tickColor: "#000" }
@@ -91,19 +92,29 @@
    	}
 	
 	function createPlot(datasets) {
+		
+		// If we have already created a plot, use the options for the existing plot.
+		//if(plot)
+		//	plotOptions = plot.getOptions();
+		
     	if(!zoomRange) {
     		plot = $.plot(container.find("#msmsplot"), datasets,  plotOptions);
     	}
     	else {
+    		var selectOpts = {};
+    		if(container.find("#zoom_x").is(":checked"))
+    			selectOpts.xaxis = { min: zoomRange.xaxis.from, max: zoomRange.xaxis.to };
+    		if(container.find("#zoom_y").is(":checked"))
+    			selectOpts.yaxis = { min: zoomRange.yaxis.from, max: zoomRange.yaxis.to };
+    		
     		plot = $.plot(container.find("#msmsplot"), datasets,
-                      $.extend(true, {}, plotOptions, {
-                          xaxis: { min: zoomRange.xaxis.from, max: zoomRange.xaxis.to }
-             }));
+                      $.extend(true, {}, plotOptions, selectOpts));
     	}
     	// we have re-calculated and re-drawn everything..
     	massTypeChanged = false;
     	massErrorChanged = false;
     	peakAssignmentTypeChanged = false;
+    	peakLabelTypeChanged = false;
     	selectedNeutralLossChanged = false;
     }
 	
@@ -115,8 +126,33 @@
 		// ZOOMING
 	    container.find("#msmsplot").bind("plotselected", function (event, ranges) {
 	    	
+	    	/*mz_min = ranges.xaxis.from.toFixed(1);
+	    	mz_max = ranges.xaxis.to.toFixed(1);
+	    	
+	    	max_int = 0;
+	    	for(var i = 0; i < peaks.length; i += 1) {
+	    		if(peaks[i][0] < mz_min)
+	    			continue;
+	    		if(peaks[i][0] > mz_max)
+	    			continue;
+	    		if(peaks[i][1] > max_int)
+	    			max_int = peaks[i][1];
+	    	}
+	    	if(max_int > 0) {
+	    		ranges.yaxis.from = 0;
+	    		ranges.yaxis.to = max_int;
+	    	}*/
+	    	
 	    	zoomRange = ranges;
 	    	createPlot(getDatasets());
+	    });
+	    
+	    // ZOOM AXES
+	    container.find("#zoom_x").click(function() {
+	    	resetAxisZoom();
+	    });
+	    container.find("#zoom_y").click(function() {
+	    	resetAxisZoom();
 	    });
 	    
 		// RESET ZOOM
@@ -160,7 +196,8 @@
 			$("#msmstooltip").remove();
 		});
 		
-		// SHOW / HIDE ION SERIES; UPDATE ON MASS TYPE CHANGE; PEAK ASSIGNMENT TYPE CHANGED
+		// SHOW / HIDE ION SERIES; UPDATE ON MASS TYPE CHANGE; 
+		// PEAK ASSIGNMENT TYPE CHANGED; PEAK LABEL TYPE CHANGED
 		var ionChoiceContainer = container.find("#ion_choice");
 		ionChoiceContainer.find("input").click(plotAccordingToChoices);
 		
@@ -176,6 +213,10 @@
 	    });
 	    container.find("input[name='peakAssignOpt']").click(function() {
 	    	peakAssignmentTypeChanged = true;
+	    	plotAccordingToChoices();
+	    });
+	    container.find("input[name='peakLabelOpt']").click(function() {
+	    	peakLabelTypeChanged = true;
 	    	plotAccordingToChoices();
 	    });
 	    container.find("#deselectIonsLink").click(function() {
@@ -206,6 +247,28 @@
             makeIonTable();
         }
     }
+	
+	function resetAxisZoom() {
+		
+    	var zoom_x = false;
+		var zoom_y = false;
+		if(container.find("#zoom_x").is(":checked"))
+			zoom_x = true;
+		if(container.find("#zoom_y").is(":checked"))
+			zoom_y = true;
+    	if(zoom_x && zoom_y) {
+    		plotOptions.selection.mode = "xy";
+			if(plot) plot.getOptions().selection.mode = "xy";
+    	}
+		else if(zoom_x) {
+			plotOptions.selection.mode = "x";
+			if(plot) plot.getOptions().selection.mode = "x";
+		}
+		else if(zoom_y) {
+			plotOptions.selection.mode = "y";
+			if(plot) plot.getOptions().selection.mode = "y";
+		}
+	}
 	
 	function showTooltip(x, y, contents) {
         $('<div id="msmstooltip">' + contents + '</div>').css( {
@@ -453,7 +516,10 @@
 	// MATCH THEORETICAL MASSES WITH PEAKS IN THE SCAN
 	// -----------------------------------------------
 	function recalculate() {
-		return (massErrorChanged || massTypeChanged || peakAssignmentTypeChanged || selectedNeutralLossChanged);
+		return (massErrorChanged || 
+				massTypeChanged || 
+				peakAssignmentTypeChanged || 
+				selectedNeutralLossChanged);
 	}
 
 	function getSeriesMatches(selectedIonTypes) {
@@ -461,6 +527,7 @@
 		var dataSeries = [];
 		
 		var peakAssignmentType = container.find("input[name='peakAssignOpt']:checked").val();
+		var peakLabelType = container.find("input[name='peakLabelOpt']:checked").val();
 		
 		for(var j = 0; j < selectedIonTypes.length; j += 1) {
 		
@@ -477,7 +544,7 @@
 						ionSeriesLabels.a[ion.charge] = adata[1];
 					}
 				}
-				dataSeries.push({data: ionSeriesMatch.a[ion.charge], color: ion.color, labels: ionSeriesLabels.a[ion.charge]});
+				dataSeries.push({data: ionSeriesMatch.a[ion.charge], color: ion.color, labelType: peakLabelType, labels: ionSeriesLabels.a[ion.charge]});
 			}
 			
 			if(ion.type == "b") {
@@ -490,7 +557,7 @@
 						ionSeriesLabels.b[ion.charge] = bdata[1];
 					}
 				}
-				dataSeries.push({data: ionSeriesMatch.b[ion.charge], color: ion.color, labels: ionSeriesLabels.b[ion.charge]});
+				dataSeries.push({data: ionSeriesMatch.b[ion.charge], color: ion.color, labelType: peakLabelType, labels: ionSeriesLabels.b[ion.charge]});
 			}
 			
 			if(ion.type == "c") {
@@ -503,7 +570,7 @@
 						ionSeriesLabels.c[ion.charge] = cdata[1];
 					}
 				}
-				dataSeries.push({data: ionSeriesMatch.c[ion.charge], color: ion.color, labels: ionSeriesLabels.c[ion.charge]});
+				dataSeries.push({data: ionSeriesMatch.c[ion.charge], color: ion.color, labelType: peakLabelType, labels: ionSeriesLabels.c[ion.charge]});
 			}
 			
 			if(ion.type == "x") {
@@ -516,7 +583,7 @@
 						ionSeriesLabels.x[ion.charge] = xdata[1];
 					}
 				}
-				dataSeries.push({data: ionSeriesMatch.x[ion.charge], color: ion.color, labels: ionSeriesLabels.x[ion.charge]});
+				dataSeries.push({data: ionSeriesMatch.x[ion.charge], color: ion.color, labelType: peakLabelType, labels: ionSeriesLabels.x[ion.charge]});
 			}
 			
 			if(ion.type == "y") {
@@ -529,7 +596,7 @@
 						ionSeriesLabels.y[ion.charge] = ydata[1];
 					}
 				}
-				dataSeries.push({data: ionSeriesMatch.y[ion.charge], color: ion.color, labels: ionSeriesLabels.y[ion.charge]});
+				dataSeries.push({data: ionSeriesMatch.y[ion.charge], color: ion.color, labelType: peakLabelType, labels: ionSeriesLabels.y[ion.charge]});
 			}
 			
 			if(ion.type == "z") {
@@ -542,7 +609,7 @@
 						ionSeriesLabels.z[ion.charge] = zdata[1];
 					}
 				}
-				dataSeries.push({data: ionSeriesMatch.z[ion.charge], color: ion.color, labels: ionSeriesLabels.z[ion.charge]});
+				dataSeries.push({data: ionSeriesMatch.z[ion.charge], color: ion.color, labelType: peakLabelType, labels: ionSeriesLabels.z[ion.charge]});
 			}
 		}
 		return dataSeries;
@@ -554,7 +621,7 @@
 		
 		var matchData = [];
 		matchData[0] = []; // peaks
-		matchData[1] = []; // labels;
+		matchData[1] = []; // labels -- ions;
 		
 		var neutralLosses = [];
 		container.find("#nl_choice").find("input:checked").each(function() {
@@ -971,24 +1038,26 @@
 	//---------------------------------------------------------
 	function makeViewingOptions() {
 		
-		var myTable = '';
+		var myContent = '';
 		
 		// reset zoom option
-		myTable += '<nobr> ';
-		myTable += '<span style="width:100%; font-size:8pt; margin-top:5px; color:sienna;">Click and drag in the plot to zoom</span> ';
-		myTable += '<input id="resetZoom" type="button" value="Zoom Out" /> ';
-		myTable += '</nobr> ';
+		myContent += '<nobr> ';
+		myContent += '<span style="width:100%; font-size:8pt; margin-top:5px; color:sienna;">Click and drag in the plot to zoom</span> ';
+		myContent += 'X:<input id="zoom_x" type="checkbox" value="X" checked="checked"/> ';
+		myContent += '&nbsp;Y:<input id="zoom_y" type="checkbox" value="Y" /> ';
+		myContent += '&nbsp;<input id="resetZoom" type="button" value="Zoom Out" /> ';
+		myContent += '</nobr> ';
 		
-		myTable += '&nbsp;&nbsp;';
+		myContent += '&nbsp;&nbsp;';
 		
 		// tooltip option
-		myTable += '<nobr> ';
-		myTable += '<input id="enableTooltip" type="checkbox">Enable tooltip ';
-		myTable += '</nobr> ';
+		myContent += '<nobr> ';
+		myContent += '<input id="enableTooltip" type="checkbox">Enable tooltip ';
+		myContent += '</nobr> ';
 		
-		myTable += '<br>';
+		myContent += '<br>';
 		
-		container.find("#viewOptionsDiv").append(myTable);
+		container.find("#viewOptionsDiv").append(myContent);
 		
 	}
 	
@@ -1095,6 +1164,14 @@
 		myTable+= '</div> ';
 		myTable += '</td> </tr> ';
 		
+		// peak labels
+		myTable += '<tr><td class="optionCell"> ';
+		myTable+= '<div> Peak Labels:<br/> ';
+		myTable+= '<input type="radio" name="peakLabelOpt" value="ion" checked="checked"/><b>Ion</b>';
+		myTable+= '<input type="radio" name="peakLabelOpt" value="mz"/><b>m/z</b><br/>';
+		myTable+= '<input type="radio" name="peakLabelOpt" value="none"/><b>None</b> ';
+		myTable+= '</div> ';
+		myTable += '</td> </tr> ';
 		
 		// sliders to change plot size
 		myTable += '<tr><td class="optionCell"> ';
