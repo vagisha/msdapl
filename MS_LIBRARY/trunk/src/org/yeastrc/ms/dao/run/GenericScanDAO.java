@@ -87,4 +87,11 @@ public interface GenericScanDAO <I extends MsScanIn, O extends MsScan> {
      * @return
      */
     public abstract int loadScanIdForScanNumRun(int scanNum, int runId);
+    
+    /**
+     * Returns a list of MS/MS scanIds that have the given MS1 as their parent.
+     * @param ms1ScanId
+     * @return
+     */
+    public abstract List<Integer> loadMS2ScanIdsForMS1Scan(int ms1ScanId);
 }

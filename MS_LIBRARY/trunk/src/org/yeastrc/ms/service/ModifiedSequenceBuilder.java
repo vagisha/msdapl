@@ -69,13 +69,15 @@ public class ModifiedSequenceBuilder {
         
         // map of static residue modifications
         Map<Character, List<MsResidueModification>> staticResModMap = new HashMap<Character, List<MsResidueModification>>();
-        for(MsResidueModification mod: staticResidueMods) {
-        	List<MsResidueModification> mods = staticResModMap.get(Character.valueOf(mod.getModificationSymbol()));
-            if(mods == null) {
-                mods = new ArrayList<MsResidueModification>();
-                staticResModMap.put(Character.valueOf(mod.getModifiedResidue()), mods);
-            }
-            mods.add(mod);
+        if(staticResidueMods != null) {
+        	for(MsResidueModification mod: staticResidueMods) {
+        		List<MsResidueModification> mods = staticResModMap.get(Character.valueOf(mod.getModificationSymbol()));
+        		if(mods == null) {
+        			mods = new ArrayList<MsResidueModification>();
+        			staticResModMap.put(Character.valueOf(mod.getModifiedResidue()), mods);
+        		}
+        		mods.add(mod);
+        	}
         }
         
         // dynamic terminal modifications
