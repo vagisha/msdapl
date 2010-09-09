@@ -6,13 +6,13 @@
  */
 package org.yeastrc.www.misc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TableCell {
 
-    private String data;
-    private String hyperlink;
-    private boolean absoluteHyperlink = false;
-    private boolean newWindow = false;
-    private String targetName = null;
+	private List<Data> dataList;
+	
     private String className = null;
     private String id = null;
     private String name = null;
@@ -36,18 +36,13 @@ public class TableCell {
         this.name = name;
     }
 
-    public String getTargetName() {
-        return targetName;
+    public TableCell(){
+    	dataList = new ArrayList<Data>();
     }
-
-    public void setTargetName(String targetName) {
-        this.targetName = targetName;
-    }
-
-    public TableCell(){}
     
     public TableCell(String data) {
-        this.data = data;
+    	this();
+        this.dataList.add(new Data(data));
     }
     
     /**
@@ -66,58 +61,28 @@ public class TableCell {
     }
     
     public TableCell(String data, String hyperlink, boolean absoluteLink, boolean newWindow) {
-        this.data = data;
-        this.hyperlink = hyperlink;
-        this.absoluteHyperlink = absoluteLink;
-        this.newWindow = newWindow;
+    	this();
+    	HyperlinkedData ldata = new HyperlinkedData(data);
+    	ldata.setHyperlink(hyperlink, absoluteLink, newWindow);
+    	this.dataList.add(ldata);
     }
     
-    public String getData() {
-        return data;
+    public List<Data> getDataList() {
+        return dataList;
     }
     
     public void setData(String data) {
-        this.data = data;
+    	if(this.dataList.size() > 0)
+    		this.dataList.clear();
+        this.dataList.add(new Data(data));
     }
     
-    public boolean isAbsoluteHyperlink() {
-        return this.absoluteHyperlink;
+    public void addData(String data) {
+    	this.dataList.add(new Data(data));
     }
     
-    public String getHyperlink() {
-        return hyperlink;
-    }
-    
-    /**
-     * If the full url is http://localhost:8080/viewProject.do?ID=20
-     * the value of the <code>hyperlink</code> parameter should be
-     * viewProject.do?ID=20
-     * @param hyperlink
-     */
-    public void setHyperlink(String hyperlink) {
-        this.setHyperlink(hyperlink, false, false);
-    }
-    
-    public void setAbsoluteHyperLink(String hyperlink) {
-        this.setHyperlink(hyperlink, true, false);
-    }
-    
-    public void setHyperlink(String hyperlink, boolean newWindow) {
-        setHyperlink(hyperlink, false, newWindow);
-    }
-    
-    public void setAbsoluteHyperlink(String hyperlink, boolean newWindow) {
-        setHyperlink(hyperlink, true, newWindow);
-    }
-    
-    public void setHyperlink(String hyperlink, boolean absolute, boolean newWindow) {
-        this.hyperlink = hyperlink;
-        this.newWindow = newWindow;
-        this.absoluteHyperlink = absolute;
-    }
-    
-    public boolean openLinkInNewWindow() {
-        return this.newWindow;
+    public void addData(Data data) {
+    	this.dataList.add(data);
     }
 
     public void setBackgroundColor(String color) {

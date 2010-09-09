@@ -1,7 +1,9 @@
 package org.yeastrc.www.proteinfer;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,10 +19,16 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.yeastrc.experiment.MascotResultPlus;
 import org.yeastrc.experiment.SequestResultPlus;
 import org.yeastrc.experiment.XtandemResultPlus;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
@@ -34,8 +42,13 @@ import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.xtandem.XtandemSearchDAO;
 import org.yeastrc.ms.dao.search.xtandem.XtandemSearchResultDAO;
+import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.Peak;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
@@ -53,7 +66,9 @@ import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.mascot.MascotSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.xtandem.XtandemSearchResult;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.ms.util.BaseAminoAcidUtils;
+import org.yeastrc.www.misc.HyperlinkedData;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
@@ -81,44 +96,141 @@ public class ViewSpectrumAction extends Action {
         }
 
 
+        // If we are viewing a result from a search algorithm (Sequest, Mascot, XTandem etc.) we will have either:
+        // 1. scanID and runSearchResultID
+        // OR 2. ms1scanID, precursorMz and runSearchId
+        // If we are viewing a result from a peptide validation program (Percolator, PeptideProphet etc.) we will have either:
+        // 1. scanID, runSearchResultID, runSearchAnalysisId
+        // OR ms1scanID, precursorMz, runSearchAnalysisId
+        // Case # 2 will happen when the user clicks on a precursor peak in a MS1 scan.
+        
         int scanID = 0;
         int runSearchResultID = 0;
+        int runSearchAnalysisID = 0;
+        int runSearchID = 0;
+        
+        String runSearchAnalysisIDStr = request.getParameter("runSearchAnalysisID");
+        
+        try {runSearchAnalysisID = Integer.parseInt(runSearchAnalysisIDStr);}
+    	catch(NumberFormatException e){}
+    	
+    	String runSearchIDStr = request.getParameter("runSearchID");
+        
+        try {runSearchID = Integer.parseInt(runSearchIDStr);}
+    	catch(NumberFormatException e){}
+    	
+    	if(runSearchAnalysisID > 0)
+    		request.setAttribute("runSearchAnalysisId", runSearchAnalysisID);
+    	if(runSearchID > 0)
+    		request.setAttribute("runSearchId", runSearchID);
+        
         String scanIDStr = request.getParameter("scanID");
-        String runSearchResultIDStr = request.getParameter("runSearchResultID");
+        String ms1scanIDStr = request.getParameter("ms1scanID");
         
-        try {scanID = Integer.parseInt(scanIDStr);}
-        catch(NumberFormatException e){}
+        // Case 1: We know the ID of the scan requested by the user
+        if(scanIDStr != null) {
+        	
+        	try {scanID = Integer.parseInt(scanIDStr);}
+        	catch(NumberFormatException e){}
+
+        	if(scanID == 0) {
+        		ActionErrors errors = new ActionErrors();
+        		errors.add("general", new ActionMessage("error.general.invalid.id", "scan: "+scanIDStr));
+        		saveErrors( request, errors );
+        		return mapping.findForward("Failure");
+        	}
+
+        	String runSearchResultIDStr = request.getParameter("runSearchResultID");
+        	
+        	try {runSearchResultID = Integer.parseInt(runSearchResultIDStr);}
+        	catch(NumberFormatException e){}
+        	
+        	if(runSearchResultID == 0) {
+        		ActionErrors errors = new ActionErrors();
+        		errors.add("general", new ActionMessage("error.general.invalid.id", "runSearchResult: "+runSearchResultIDStr));
+        		saveErrors( request, errors );
+        		return mapping.findForward("Failure");
+        	}
+        	
+        	if(runSearchID <= 0 && runSearchAnalysisID <= 0) {
+        		MsSearchResult res = DAOFactory.instance().getMsSearchResultDAO().load(runSearchResultID);
+        		request.setAttribute("runSearchId", res.getRunSearchId());
+        	}
+        }
         
-        try {runSearchResultID = Integer.parseInt(runSearchResultIDStr);}
-        catch(NumberFormatException e){}
+        // Case 2: The user clicked on a MS1 peak and we have to first get the scanID of the closest MS2 scan
+        else {
+        	
         
-        if(scanID == 0) {
-            ActionErrors errors = new ActionErrors();
-            errors.add("yates", new ActionMessage("error.yates.peptide.invalidid"));
-            saveErrors( request, errors );
-            return mapping.findForward("Failure");
+        	int ms1ScanID = 0;
+        	try {ms1ScanID = Integer.parseInt(ms1scanIDStr);}
+        	catch(NumberFormatException e){}
+
+
+        	if(ms1ScanID == 0) {
+        		ActionErrors errors = new ActionErrors();
+        		errors.add("general", new ActionMessage("error.general.invalid.id", "MS1 scan: "+scanIDStr));
+        		saveErrors( request, errors );
+        		return mapping.findForward("Failure");
+        	}
+
+        	String precursorMzStr = request.getParameter("precursorMz");
+        	double precursorMz = -1;
+        	try {precursorMz = Double.parseDouble(precursorMzStr);}
+        	catch(NumberFormatException e){}
+        	
+        	if(precursorMz == -1) {
+        		ActionErrors errors = new ActionErrors();
+        		errors.add("general", new ActionMessage("error.general.errorMessage", "Invalid precursor m/z: "+precursorMzStr));
+        		saveErrors( request, errors );
+        		return mapping.findForward("Failure");
+        	}
+
+        	// Now we need to get a scanID, runSearchResultID based on the given information:
+        	// MS1 scanID, m/z of a precursor peak and the runSearchAnalysisID;
+        	// 1. Get the scanID of the closest in m/z to the given precursor m/z
+        	scanID = getClosestScan(ms1ScanID, precursorMz);
+        	
+        	// 2. Now get the best result associated with this scan, given the experiment we are looking at
+        	if(runSearchID > 0) {
+        		runSearchResultID = getOneResultIdForSearch(scanID, runSearchID);
+        	}
+        	else if(runSearchAnalysisID > 0) {
+        		runSearchResultID = getOneResultIdForAnalysis(scanID, runSearchAnalysisID);
+        	}
         }
         
         if(runSearchResultID == 0) {
-            ActionErrors errors = new ActionErrors();
-            errors.add("yates", new ActionMessage("error.yates.peptide.invalidid"));
-            saveErrors( request, errors );
-            return mapping.findForward("Failure");
-        }
+			ActionErrors errors = new ActionErrors();
+    		errors.add("general", new ActionMessage("error.general.errorMessage", "No result found."));
+    		saveErrors( request, errors );
+    		return mapping.findForward("Failure");
+		}
         
-        try {
-            List<String> params = makeAppletParams(scanID, runSearchResultID, mapping, request);
-            if (params == null) {
-                // any errors have already been set. 
-                return mapping.findForward("Failure");
-            }
-            request.setAttribute("params", params);
+        boolean java = true;
+        if(request.getParameter("java") == null) {
+        	java = false;
         }
-        catch(Exception e) {
-            ActionErrors errors = new ActionErrors();
-            errors.add("spectra", new ActionMessage("error.msdata.spectra.dataerror", e.getMessage()));
-            saveErrors( request, errors );
-            return mapping.findForward("Failure");
+        if(java) {
+        	try {
+        		List<String> params = makeAppletParams(scanID, runSearchResultID, mapping, request);
+        		if (params == null) {
+        			// any errors have already been set. 
+        			return mapping.findForward("Failure");
+        		}
+        		request.setAttribute("params", params);
+        	}
+        	catch(Exception e) {
+        		ActionErrors errors = new ActionErrors();
+        		errors.add("spectra", new ActionMessage("error.msdata.spectra.dataerror", e.getMessage()));
+        		saveErrors( request, errors );
+        		return mapping.findForward("Failure");
+        	}
+        }
+        else {
+        	JSONObject json = getJSONParams(scanID, runSearchResultID, request);
+        	if(json != null) 
+        		request.setAttribute("jsonParams", json);
         }
         
         
@@ -128,13 +240,75 @@ public class ViewSpectrumAction extends Action {
         setOtherResultsForScan(scanID, runSearchResultID, request);
         
         
-        // viewSpectrum(129794, 1656821)
         return mapping.findForward("Success");
     
     }
     
     
-    private void setOtherResultsForScan(int scanId, int runSearchResultId, HttpServletRequest request) {
+	private int getOneResultIdForAnalysis(int scanID, int runSearchAnalysisID) {
+		
+		MsRunSearchAnalysisDAO rsaDao = DAOFactory.instance().getMsRunSearchAnalysisDAO();
+		MsRunSearchAnalysis rsAnalysis = rsaDao.load(runSearchAnalysisID);
+		if(rsAnalysis == null) {
+			return 0;
+		}
+		
+		MsSearchAnalysisDAO aDao = DAOFactory.instance().getMsSearchAnalysisDAO();
+		MsSearchAnalysis analysis = aDao.load(rsAnalysis.getAnalysisId());
+		
+		if(analysis.getAnalysisProgram() == Program.PERCOLATOR) {
+			PercolatorResultDAO presDao = DAOFactory.instance().getPercolatorResultDAO();
+			List<Integer> resIds = presDao.loadIdsForRunSearchAnalysisScan(runSearchAnalysisID, scanID);
+			if(resIds.size() > 0) {
+				PercolatorResult res = presDao.loadForPercolatorResultId(resIds.get(0));
+				return res.getId(); // this is the runSearchID
+			}
+		}
+		else if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
+			PeptideProphetResultDAO presDao = DAOFactory.instance().getPeptideProphetResultDAO();
+			List<Integer> resIds = presDao.loadIdsForRunSearchAnalysisScan(runSearchAnalysisID, scanID);
+			if(resIds.size() > 0) {
+				PeptideProphetResult res = presDao.loadForProphetResultId(resIds.get(0));
+				return res.getId(); // this is the runSearchID
+			}
+		}
+		// If we did not find a match return 0
+		// TODO log this
+		return 0;
+	}
+	
+	private int getOneResultIdForSearch(int scanID, int runSearchID) {
+		
+		MsSearchResultDAO resDao = DAOFactory.instance().getMsSearchResultDAO();
+		List<Integer> resIds = resDao.loadResultIdsForSearchScan(runSearchID, scanID);
+		if(resIds.size() > 0)
+			return resIds.get(0);
+		return 0;
+	}
+
+
+	private int getClosestScan(int ms1ScanID, double precursorMz) {
+		
+		MsScanDAO msScanDao = DAOFactory.instance().getMsScanDAO();
+		List<Integer> msmsScanIds = msScanDao.loadMS2ScanIdsForMS1Scan(ms1ScanID);
+		
+		int closestScanId = 0;
+		double bestDiff = Double.MAX_VALUE;
+    	if(msmsScanIds.size() > 0) {
+    		for(Integer scanId: msmsScanIds) {
+    			MsScan child = msScanDao.loadScanLite(scanId);
+    			double d = Math.abs(child.getPrecursorMz().doubleValue() - precursorMz);
+    			if(d < bestDiff) {
+    				bestDiff = d;
+    				closestScanId = scanId;
+    			}
+    		}
+    	}
+    	return closestScanId;
+	}
+
+
+	private void setOtherResultsForScan(int scanId, int runSearchResultId, HttpServletRequest request) {
         
         request.setAttribute("thisResult", runSearchResultId);
         MsSearchResultDAO resultDao = DAOFactory.instance().getMsSearchResultDAO();
@@ -306,8 +480,12 @@ public class ViewSpectrumAction extends Action {
             }
             
             String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
-            TableCell cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);
-            cell.setTargetName("SPECTRUM_WINDOW");
+            HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptidePS());
+            data.setAbsoluteHyperlink(url, true);
+            data.setTargetName("SPECTRUM_WINDOW");
+            TableCell cell = new TableCell();
+            cell.addData(data);
+            
             cell.setClassName("left_align");
             row.addCell(cell);
             
@@ -396,8 +574,13 @@ public class ViewSpectrumAction extends Action {
             row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getExpect()), null));
             
             String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
-            TableCell cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);
-            cell.setTargetName("SPECTRUM_WINDOW");
+
+            HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptidePS());
+            data.setAbsoluteHyperlink(url, true);
+            data.setTargetName("SPECTRUM_WINDOW");
+            TableCell cell = new TableCell();
+            cell.addData(data);
+            
             cell.setClassName("left_align");
             row.addCell(cell);
             
@@ -487,8 +670,12 @@ public class ViewSpectrumAction extends Action {
             row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getExpect()), null));
             
             String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
-            TableCell cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);
-            cell.setTargetName("SPECTRUM_WINDOW");
+            
+            HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptidePS());
+            data.setAbsoluteHyperlink(url, true);
+            data.setTargetName("SPECTRUM_WINDOW");
+            TableCell cell = new TableCell();
+            cell.addData(data);
             cell.setClassName("left_align");
             row.addCell(cell);
             
@@ -700,4 +887,190 @@ public class ViewSpectrumAction extends Action {
         
         return params;
     }
+    
+    private JSONObject getJSONParams(int scanID, int runSearchResultId,
+    		HttpServletRequest request) throws ModifiedSequenceBuilderException, IOException {
+		
+    	MsSearchResultDAO resultDao = DAOFactory.instance().getMsSearchResultDAO();
+        MsSearchResult result = resultDao.load(runSearchResultId);
+        
+        JSONObject json = new JSONObject();
+        
+        // peptide sequence
+        MsSearchResultPeptide resPeptide = result.getResultPeptide();
+        json.put("sequence", resPeptide.getModifiedPeptide());
+        json.put("charge", Integer.valueOf(result.getCharge()));
+        
+        
+        int runSearchId = result.getRunSearchId();
+        MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
+        MsRunSearch runSearch = runSearchDao.loadRunSearch(runSearchId);
+        
+        // filename
+        MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
+        String filename = runDao.loadFilenameForRun(runSearch.getRunId());
+        json.put("fileName", filename);
+        
+        // scanNum and precursor m/z
+        MsScanDAO msScanDao = DAOFactory.instance().getMsScanDAO();
+        MsScan scan = msScanDao.load(scanID);
+        int scanNumber = scan.getStartScanNum();
+        json.put("scanNum", Integer.valueOf(scanNumber));
+        json.put("precursorMz", Double.valueOf(scan.getPrecursorMz().doubleValue()));
+        
+        // If we have a parent MS1 scan add peaks for that scan
+        if(scan.getPrecursorScanId() != 0) {
+        	
+        	MsScan ms1scan = msScanDao.load(scan.getPrecursorScanId());
+        	request.setAttribute("ms1ScanId", ms1scan.getId());
+        	
+        	// get a list of MS/MS scan IDs for this MS1 scan
+        	List<Integer> msmsScanIds = msScanDao.loadMS2ScanIdsForMS1Scan(ms1scan.getId());
+        	List<Double> precMzList = new ArrayList<Double>(msmsScanIds.size());
+        	if(msmsScanIds.size() > 0) {
+        		for(Integer scanId: msmsScanIds) {
+        			MsScan child = msScanDao.loadScanLite(scanId);
+        			precMzList.add(child.getPrecursorMz().doubleValue());
+        		}
+        	}
+        	Collections.sort(precMzList);
+        	
+        	// set the m/z intensity pairs
+            JSONArray jsonPeaks = new JSONArray();
+            List<Peak> precPeaks = new ArrayList<Peak>();
+            List<Peak> peakList = ms1scan.getPeaks();
+            
+            int i = 0;
+            for (Peak peak: peakList) {
+//            	if(peak.getMz() < premz - 5 || peak.getMz() > premz + 5)
+//            		continue;
+            	if(peak.getIntensity() < 1)
+            		continue;
+            	
+            	JSONArray jpeak = new JSONArray();
+            	jpeak.add(Double.valueOf(peak.getMz()));
+            	jpeak.add(Float.valueOf(peak.getIntensity()));
+            	jsonPeaks.add(jpeak);
+            	
+            	// check if this peak was slected for MS/MS fragmentation
+            	// precursorMz value of MS/MS scans is not exactly the same as m/z of MS1 peaks (Why??)
+            	int x = i;
+            	for(; x < precMzList.size(); x++) {
+            		if(precMzList.get(x) - 0.5 > peak.getMz())
+            			break;
+            		
+            		// if this peak is close enough to the precursorMz of a MS/MS scan add it
+            		// Later we will keeps only the ones that are closest.
+            		if(Math.abs(peak.getMz() - precMzList.get(x)) < 0.5) {
+                		precPeaks.add(peak);
+                	}
+            	}
+            	i = x;
+            }
+            
+            JSONArray closestPrecPeaks = new JSONArray();
+            
+            for(int k = 0; k < precMzList.size(); k++) {
+            	Peak closest = null;
+            	double bestDiff = Double.MAX_VALUE;
+            	double precMz = precMzList.get(k);
+            	for(Peak peak: precPeaks) {
+            		
+            		if(peak.getMz() < precMz - 0.5)
+            			continue;
+            		
+            		if(peak.getMz() > precMz + 0.5)
+            			break;
+            		
+            		double diff = Math.abs(peak.getMz() - precMz);
+            		if(closest == null || diff < bestDiff) {
+            			closest = peak;
+            			bestDiff = diff;
+            		}
+            	}
+            	
+            	if(closest != null) {
+            		JSONArray jpeak = new JSONArray();
+                	jpeak.add(Double.valueOf(closest.getMz()));
+                	jpeak.add(Float.valueOf(closest.getIntensity()));
+                	closestPrecPeaks.add(jpeak);
+            	}
+            }
+            
+            json.put("ms1peaks", jsonPeaks);
+            json.put("ms1scan", ms1scan.getStartScanNum()+" RT: "+
+            		RoundingUtils.getInstance().roundOne(ms1scan.getRetentionTime()));
+            if(precPeaks.size() > 0)
+            	json.put("precursorPeaks", closestPrecPeaks);
+            json.put("zoomMs1", "true");
+        }
+        
+        int searchId = runSearch.getSearchId();
+        // get the search
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+        MsSearch search = searchDao.loadSearch(searchId);
+        
+        
+        // static terminal modifications
+        List<MsTerminalModification> terminalStaticMods = search.getStaticTerminalMods();
+        for(MsTerminalModification mod: terminalStaticMods) {
+            if(mod.getModifiedTerminal() == Terminal.NTERM) {
+            	json.put("ntermMod", Double.valueOf(mod.getModificationMass().doubleValue()));
+            }
+            else if(mod.getModifiedTerminal() == Terminal.CTERM) {
+            	json.put("ctermMod", Double.valueOf(mod.getModificationMass().doubleValue()));
+            }
+        }
+        
+        // result dynamic terminal modifications
+        List<MsResultTerminalMod> resultTermMods = result.getResultPeptide().getResultDynamicTerminalModifications();
+        int peptideLength = result.getResultPeptide().getSequenceLength();
+        for(MsResultTerminalMod mod: resultTermMods) {
+            if(mod.getModifiedTerminal() == Terminal.NTERM)
+               json.put("ntermVarMod", Double.valueOf(mod.getModificationMass().doubleValue()));
+            else if(mod.getModifiedTerminal() == Terminal.CTERM)
+            	json.put("ctermVarMod", Double.valueOf(mod.getModificationMass().doubleValue()));
+        }
+        
+        
+        
+        // static residue modifications
+        JSONArray staticMods = new JSONArray();
+        List<MsResidueModification> residueStaticMods = search.getStaticResidueMods();
+        for (MsResidueModification mod: residueStaticMods) {
+        	JSONObject jmod = new JSONObject();
+        	jmod.put("aminoAcid", String.valueOf(mod.getModifiedResidue()));
+        	jmod.put("modMass", Double.valueOf(mod.getModificationMass().doubleValue()));
+        	staticMods.add(jmod);
+        }
+        json.put("staticMods", staticMods);
+        
+        
+        // result dynamic residue modifications
+        JSONArray varMods = new JSONArray();
+        List<MsResultResidueMod> resultResMods = result.getResultPeptide().getResultDynamicResidueModifications();
+        for(MsResultResidueMod mod: resultResMods) {
+        	JSONObject jmod = new JSONObject();
+        	jmod.put("index", Integer.valueOf(mod.getModifiedPosition() + 1));
+        	jmod.put("modMass", Double.valueOf(mod.getModificationMass().doubleValue()));
+        	jmod.put("aminoAcid", String.valueOf(mod.getModifiedResidue()));
+        	varMods.add(jmod);
+        }
+        json.put("variableMods", varMods);
+        
+        
+        // set the m/z intensity pairs
+        JSONArray jsonPeaks = new JSONArray();
+        List<Peak> peakList = scan.getPeaks();
+        for (Peak peak: peakList) {
+        	JSONArray jpeak = new JSONArray();
+        	jpeak.add(Double.valueOf(peak.getMz()));
+        	jpeak.add(Float.valueOf(peak.getIntensity()));
+        	jsonPeaks.add(jpeak);
+        }
+        json.put("peaks", jsonPeaks);
+        
+        return json;
+	}
+
 }

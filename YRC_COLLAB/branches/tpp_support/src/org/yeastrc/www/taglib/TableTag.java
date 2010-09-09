@@ -6,6 +6,8 @@
  */
 package org.yeastrc.www.taglib;
 
+import java.io.IOException;
+
 import javax.servlet.ServletContext;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
@@ -14,6 +16,8 @@ import javax.servlet.jsp.tagext.TagSupport;
 import org.apache.log4j.Logger;
 import org.apache.struts.util.RequestUtils;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
+import org.yeastrc.www.misc.Data;
+import org.yeastrc.www.misc.HyperlinkedData;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
@@ -193,39 +197,17 @@ public class TableTag extends TagSupport {
                     }
                     writer.print(">");
                     
-                    if(cell.getHyperlink() != null) {
-                        String url = "";
-                        if(!cell.isAbsoluteHyperlink()) {
-                            url += contextPath;
-                        }
-                        url += cell.getHyperlink();
-                        if(!cell.openLinkInNewWindow())
-                            writer.print("<a href=\""+url+"\" >"); 
-                        else {
-//                            String windowName = context.getContextPath()+"_WINDOW";
-//                            int winHeight = 600;
-//                            int winWidth = 800;
-//                            String js = "javascript:window.open('"+url+"', '"+windowName+"'"+
-//                                        ", 'status=no,resizable=yes,scrollbars=yes, width="+winWidth+", height="+winHeight+"'"+
-//                                        "); return false;";
-//                            writer.print("<a href=\"\" onClick=\""+js+"\">");
-                            if(cell.getTargetName() == null) {
-                                writer.print("<a href=\""+url+"\" target='_blank' >");
-                            }
-                            else {
-                                writer.print("<a href=\""+url+"\" target='"+cell.getTargetName()+"' >");
-                            }
-                            //window.open(doc, "SPECTRUM_WINDOW", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
-                        }
-                    }
-                    if(cell.getData() != null && cell.getData().trim().length() > 0) {
-                        writer.write(cell.getData());
-                    }
-                    else {
-                        writer.write("&nbsp;");
-                    }
-                    if(cell.getHyperlink() != null) {
-                        writer.print("</a>");
+                    int idx = 0;
+                    for(Data data: cell.getDataList()) {
+                    	if(idx > 0)
+                    		writer.write("&nbsp;");
+                    	idx++;
+                    	if(data instanceof HyperlinkedData) {
+                    		writeHyperLinkedData((HyperlinkedData)data, contextPath, writer);
+                    	}
+                    	else {
+                    		writeData(data, writer);
+                    	}
                     }
                     writer.print("</td\n>");
                 }
@@ -247,7 +229,49 @@ public class TableTag extends TagSupport {
         }
     }
 
-    public int doEndTag() throws JspException {
+    private void writeHyperLinkedData(HyperlinkedData data, String contextPath, JspWriter writer) throws IOException {
+		
+    	if(data.getHyperlink() != null) {
+            String url = "";
+            if(!data.isAbsoluteHyperlink()) {
+                url += contextPath;
+            }
+            url += data.getHyperlink();
+            if(!data.openLinkInNewWindow())
+                writer.print("<a href=\""+url+"\" >"); 
+            else {
+//                            String windowName = context.getContextPath()+"_WINDOW";
+//                            int winHeight = 600;
+//                            int winWidth = 800;
+//                            String js = "javascript:window.open('"+url+"', '"+windowName+"'"+
+//                                        ", 'status=no,resizable=yes,scrollbars=yes, width="+winWidth+", height="+winHeight+"'"+
+//                                        "); return false;";
+//                            writer.print("<a href=\"\" onClick=\""+js+"\">");
+                if(data.getTargetName() == null) {
+                    writer.print("<a href=\""+url+"\" target='_blank' >");
+                }
+                else {
+                    writer.print("<a href=\""+url+"\" target='"+data.getTargetName()+"' >");
+                }
+                //window.open(doc, "SPECTRUM_WINDOW", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
+            }
+        }
+    	
+    	writeData(data, writer);
+    	
+    	if(data.getHyperlink() != null) {
+            writer.print("</a>");
+        }
+	}
+
+	private void writeData(Data data, JspWriter writer) throws IOException {
+		if(data.getData() != null && data.getData().trim().length() > 0)
+			writer.write(data.getData());
+		else
+			writer.write("&nbsp;");
+	}
+
+	public int doEndTag() throws JspException {
         return EVAL_PAGE;
     }
 

@@ -14,6 +14,7 @@ import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
+import org.yeastrc.www.misc.HyperlinkedData;
 import org.yeastrc.www.misc.Pageable;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
@@ -197,15 +198,38 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
                 row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusXtandem)result).getXtandemData().getExpect()))));
             }
             
-            String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+            
+            String modifiedSequence = null;
             try {
-                cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptide()), url, true);
+            	modifiedSequence = result.getResultPeptide().getFullModifiedPeptide();
             }
             catch (ModifiedSequenceBuilderException e) {
                 cell = new TableCell("Error building peptide sequence");
+                modifiedSequence = null;
             }
-            cell.setClassName("left_align");
+            if(modifiedSequence != null) {
+            	cell = new TableCell();
+            	// link to Java spectrum viewer
+            	HyperlinkedData javaLink = new HyperlinkedData("<span style='font-size:8pt;' title='Java Spectrum Viewer'>(J)</span>");
+            	String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId()
+            	+"&runSearchAnalysisID="+result.getRunSearchAnalysisId()
+            	+"&java=true";
+            	javaLink.setHyperlink(url, true);
+            	javaLink.setTargetName("spec_view_java");
+            	cell.addData(javaLink);
+            	
+            	// link to JavaScript spectrum viewer
+            	HyperlinkedData jsLink = new HyperlinkedData("<span style='font-size:8pt;' title='JavaScript Spectrum Viewer'>(JS)</span>");
+            	url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId()
+            	+"&runSearchAnalysisID="+result.getRunSearchAnalysisId();
+            	jsLink.setHyperlink(url, true);
+            	jsLink.setTargetName("spec_view_js");
+            	cell.addData(jsLink);
+            	
+            	cell.addData(modifiedSequence);
+            }
             row.addCell(cell);
+            
             
             String cellContents = result.getOneProteinShort();
             if(result.getProteinCount() > 1) {

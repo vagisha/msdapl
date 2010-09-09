@@ -11,11 +11,20 @@
   <head>
     <title>SpectrumViewer</title>
 	<link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='css/global.css'/>">
+	<link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='css/lorikeet.css'/>">
   </head>
   
   <body>
  
-<script src="<yrcwww:link path='js/jquery-1.3.2.min.js'/>"></script>
+ <!--  
+ <script src="<yrcwww:link path='js/jquery-1.4.2.js'/>"></script>
+<script src="<yrcwww:link path='js/ui.core.js'/>"></script>
+<script src="<yrcwww:link path='js/ui.draggable.js'/>"></script>
+<script src="<yrcwww:link path='js/ui.droppable.js'/>"></script>
+
+-->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.4/jquery-ui.min.js"></script>
 
 <script>
 // ---------------------------------------------------------------------------------------
@@ -52,9 +61,14 @@ $(document).ready(function() {
 <%@ include file="/includes/errors.jsp" %>
 
 <div style="margin:10;">
-<yrcwww:contentbox title="Peptide Spectrum" centered="true" width="95" widthRel="true" >
 
+<!--<yrcwww:contentbox centered="true" title="Peptide Spectrum" width="95" widthRel="true" scheme="content">-->
 <center>
+<div class="content_header" style="width:95%">Spectrum Viewer</div>
+<!--==================================================================== -->
+<!-- APPLET -->
+<!--==================================================================== -->
+<logic:present  name="params">
 <table border="0">
  <tr>
   <td><b>Sequence:</b></td>
@@ -62,7 +76,7 @@ $(document).ready(function() {
  </tr>
 </table>
 
-<p><table border=0 ALIGN="CENTER" width="100%">
+<table border=0 ALIGN="CENTER" width="100%">
  <TR><TD><B>Mass: <bean:write  name="firstMass"/></B></TD>
   <TD colspan="2"><B>File: <bean:write  name="filename"/></B></TD>
   <TD colspan="2"><B>Scan number: <bean:write  name="scanNumber"/></B></TD>
@@ -86,6 +100,61 @@ $(document).ready(function() {
   </TD>
  </TR>
 </table>
+</logic:present>
+
+<!--==================================================================== -->
+<!-- LORIKEET SPECTRUM VIEWER -->
+<!--==================================================================== -->
+<logic:present name="jsonParams">
+
+<script src="<yrcwww:link path='js/jquery.flot.js'/>"></script>
+<script src="<yrcwww:link path='js/jquery.flot.selection.js'/>"></script>
+
+<script src="<yrcwww:link path='js/specview.js'/>"></script>
+<script src="<yrcwww:link path='js/ion.js'/>"></script>
+<script src="<yrcwww:link path='js/peptide.js'/>"></script>
+<script src="<yrcwww:link path='js/aminoacid.js'/>"></script>
+
+<script type="text/javascript">
+$(document).ready(function () {
+
+	/* render the spectrum with the given options */
+	var params = <bean:write name="jsonParams" filter="false"/>;
+	<logic:present name="ms1ScanId">
+		params.precursorPeakClickFn = precursorPeakClicked;
+	</logic:present>
+	$("#lorikeet").specview(params);	
+
+});
+
+<logic:present name="ms1ScanId">
+
+function precursorPeakClicked(precursorMz) {
+	var ms1scan = <bean:write name="ms1ScanId" filter="false"/>;
+	
+	<logic:present name="runSearchId">
+		var runSearchId = <bean:write name="runSearchId" filter="false"/>;
+		var url = "viewSpectrum.do?ms1scanID="+ms1scan+"&runSearchID="+runSearchId+"&precursorMz="+precursorMz;
+	</logic:present>
+	
+	<logic:present name="runSearchAnalysisId">
+		var runSearchAnalysisId = <bean:write name="runSearchAnalysisId" filter="false"/>;
+		var url = "viewSpectrum.do?ms1scanID="+ms1scan+"&runSearchAnalysisID="+runSearchAnalysisId+"&precursorMz="+precursorMz;
+	</logic:present>
+	
+	window.location = url;
+	// alert(url);
+}
+
+</logic:present>
+
+</script>
+
+<!-- PLACE HOLDER DIV FOR THE SPECTRUM -->
+<div id="lorikeet"></div>
+
+</logic:present>
+
 
 <!-- OTHER RESULTS FOR THIS SCAN -->
 	<div style="background-color: #FFFFFF; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
@@ -98,7 +167,7 @@ $(document).ready(function() {
 	</div>
 
 </center>
-</yrcwww:contentbox>
+<!--</yrcwww:contentbox>-->
 
 </div>
 </body>

@@ -240,7 +240,7 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
             for(r = 0; r < rows.size(); r++) {
                 TableRow row = rows.get(r);
                 SearchFile file = files.get(j);
-                if(file.getFileName().equals(row.getCells().get(0).getData())) {
+                if(file.getFileName().equals(row.getCells().get(0).getDataList().get(0).getData())) {
                     String url = null;
                     if(action != null)
                         url = action+"?ID="+file.getId();
@@ -270,7 +270,7 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
                 }
                 AnalysisFile file = files.get(j);
                 // match the file names
-                if(file.getFileName().equals(row.getCells().get(0).getData())) {
+                if(file.getFileName().equals(row.getCells().get(0).getDataList().get(0).getData())) {
                     String url = null;
                     if(action != null)
                         url  = action + "?ID="+file.getId();
