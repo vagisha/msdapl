@@ -1076,6 +1076,12 @@ function goEnrichmentResults() {
 	
 	$("form#filterForm input[name='goAspect']").val(goAspect);
 	$("form#filterForm input[name='goEnrichmentPVal']").val(goPVal);
+	if($("#goEnrichExactAnnotField").is(":checked")) {
+		$("form#filterForm input[name='exactAnnotations']").val("true");
+	}
+	else {
+		$("form#filterForm input[name='exactAnnotations']").val("false");
+	}
 	$("form#filterForm input[name='speciesId']").val(species);
 	
 	
@@ -1473,7 +1479,14 @@ function hideAllDescriptionsForProtein(proteinId) {
     	
     	<td style="padding:5x;">
     		<nobr>
-    		P-Value: <html:text name="proteinInferFilterForm" property="goEnrichmentPVal" styleId="goEnrichmentPValField"></html:text>
+    		<span class="tooltip" style="cursor:help;" title="If checked, only direct GO annotations for a protein are used. Otherwise, annotations to descendant terms are interpreted as annotations to the parent term.
+    		"
+    		>Exact: </span> 
+    		<html:checkbox name="proteinInferFilterForm" property="exactAnnotations" styleId="goEnrichExactAnnotField"></html:checkbox>
+    		</nobr>
+    		&nbsp;
+    		<nobr>
+    		P-Value: <html:text name="proteinInferFilterForm" property="goEnrichmentPVal" styleId="goEnrichmentPValField" size="4"></html:text>
     		</nobr>
     	</td>
 		
@@ -1513,7 +1526,7 @@ function hideAllDescriptionsForProtein(proteinId) {
 	*This protein inference program is based on the IDPicker algorithm published in:<br>
  	<i>Proteomic Parsimony through Bipartite Graph Analysis Improves Accuracy and Transparency.</i>
  	&nbsp; &nbsp;
-	<br>Tabb <i>et. al.</i> <i>J Proteome Res.</i> 2007 Sep;6(9):3549-57
+	<br>Zhang <i>et. al.</i> <i>J Proteome Res.</i> 2007 Sep;6(9):3549-57
 </div>
 <br>
 <div style="font-size: 8pt;margin-top: 3px;" align="left">

@@ -16,6 +16,7 @@ public class GOEnrichmentInput {
     private final int speciesId; // NRSEQ species id
     private List<Integer> proteinIds; // NRSEQ protein ids
     private double pValCutoff = 0.01;
+    private boolean exactAnnotations = false;
     
     private int goAspect;
     
@@ -48,4 +49,12 @@ public class GOEnrichmentInput {
     public int getGoAspect() {
     	return goAspect;
     }
+
+	public boolean isExactAnnotations() {
+		return exactAnnotations;
+	}
+
+	public void setExactAnnotations(boolean exactAnnotations) {
+		this.exactAnnotations = exactAnnotations;
+	}
 }

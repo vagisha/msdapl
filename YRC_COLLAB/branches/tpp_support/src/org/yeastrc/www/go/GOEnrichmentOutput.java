@@ -28,6 +28,7 @@ public class GOEnrichmentOutput {
     									        // have at least one GO annotation.
     
     private final double pValCutoff;
+    private boolean exactAnnotations = false;
     
     private List<EnrichedGOTerm> enrichedTerms;  // enriched terms for Cellular Component
     
@@ -48,6 +49,7 @@ public class GOEnrichmentOutput {
         	goDomainName = "MolecularFunction";
         
         this.pValCutoff = input.getPValCutoff();
+        this.exactAnnotations = input.isExactAnnotations();
     }
     
     public int getSpeciesId() {
@@ -68,6 +70,10 @@ public class GOEnrichmentOutput {
         return pValCutoff;
     }
 
+    public boolean isExactAnnotations() {
+		return exactAnnotations;
+	}
+    
     public List<EnrichedGOTerm> getEnrichedTerms() {
         return enrichedTerms;
     }

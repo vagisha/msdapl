@@ -125,8 +125,16 @@ public class GOSlimStatsCalculator {
 			if(annotNodes.size() > 0)
 				spCount.incrAnnotated();
 		
-			if(annotNodes.size() == 0)
+			if(annotNodes.size() == 0) {
+//				try {
+//					if(ProteinGOAnnotationChecker.isProteinAnnotated(nrseqProteinId) != Annotation.NONE) {
+//						System.out.println("Protein NOT in slim but annotated: "+nrseqProteinId);
+//					}
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
 				this.numProteinsNotAnnotated++;
+			}
 			
 			for(GOAnnotation annot: annotNodes) {
 				GOSlimTerm slimTerm = slimTermMap.get(annot.getNode().getId());

@@ -74,7 +74,7 @@ public class GOSlimChartUrlCreator {
 		String labels = "";
 		List<GOSlimTerm> slimTerms = analysis.getTermNodesMinusRootNodes();
 		
-		
+		double maxValue = 0.0;
 		for(int i = 0; i < maxBars; i++) {
 			if(i >= slimTerms.size())
 				break;
@@ -84,6 +84,7 @@ public class GOSlimChartUrlCreator {
 			
 			data += ","+term.getProteinCountForTermPerc();
 			labels = "|"+term.getShortName()+labels;
+			maxValue = Math.max(maxValue, term.getProteinCountForTermPerc());
 		}
 		
 		if(data.length() > 0)
@@ -96,10 +97,30 @@ public class GOSlimChartUrlCreator {
 		buf.append(data);
 		buf.append(labels);
 		
-		buf.append("&chxr=1:0,100,10");
+		int maxV = (int) Math.ceil(maxValue);
+		maxV = maxV + (10 - maxV%10);
+		
+		int step = getStep(maxV);
+		
+		buf.append("&chxr=0,0,"+maxV+","+step);
+		buf.append("&chds=0,"+maxV);
 		buf.append("&chbh=12"); // width of bars
 		buf.append("&chm=N**%,000000,0,-1,11"); // labels for each bar
 		
 		return buf.toString();
+	}
+	
+	private static int getStep(int maxValue) {
+		int step = Math.min(10, maxValue / 10);
+		int[] steps = {10,5,2,1};
+		int diff = Integer.MAX_VALUE;
+		int bstep = step;
+		for(int s: steps) {
+			if(Math.abs(s - step) < diff) {
+				diff = Math.abs(s - step);
+				bstep = s;
+			}
+		}
+		return bstep;
 	}
 }

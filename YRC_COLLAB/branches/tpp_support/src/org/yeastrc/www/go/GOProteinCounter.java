@@ -36,10 +36,22 @@ public class GOProteinCounter {
      */
     public int countProteins( GONode node, int speciesId ) throws Exception {
         
-       return getPrecomputedCount(node, speciesId);
+       return getPrecomputedCount(node, speciesId, false);
     }
     
-    private int getPrecomputedCount(GONode node, int speciesId) throws Exception {
+    /**
+     * 
+     * @param node The GO term we're testing
+     * @param speciesID proteins with this speciesID are counted
+     * @param exact If true, the number of proteins annotated exactly with this term are returned.
+     * @return The number of proteins annotated with the given GO term
+     * @throws Exception
+     */
+    public int countProteins( GONode node, int speciesId, boolean exact) throws Exception {
+    	return getPrecomputedCount(node, speciesId, exact);
+    }
+    
+    private int getPrecomputedCount(GONode node, int speciesId, boolean exact) throws Exception {
         
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -47,7 +59,12 @@ public class GOProteinCounter {
         
         try {
             conn = DBConnectionManager.getConnection("go");
-            String sql = "SELECT proteinCount FROM YRC_NRSEQ_GO_COUNTS_Ref WHERE goAcc = ? and speciesID = ?";
+            String sql = "SELECT ";
+            if(exact)
+            	sql += " exactProteinCount FROM YRC_NRSEQ_GO_COUNTS_Ref WHERE goAcc = ? and speciesID = ?";
+            else
+            	sql += " proteinCount FROM YRC_NRSEQ_GO_COUNTS_Ref WHERE goAcc = ? and speciesID = ?";
+            
             stmt = conn.prepareStatement( sql );
             stmt.setString( 1, node.getAccession() );
             stmt.setInt(2, speciesId);

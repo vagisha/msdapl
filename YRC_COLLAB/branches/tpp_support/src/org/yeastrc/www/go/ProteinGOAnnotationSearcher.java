@@ -25,7 +25,7 @@ public class ProteinGOAnnotationSearcher {
 
 	private ProteinGOAnnotationSearcher() {}
 	
-	public static Set<GONode> getTermsForProtein(int nrseqProteinId, int goAspect) throws SQLException {
+	public static Set<GONode> getTermsForProtein(int nrseqProteinId, int goAspect, boolean exact) throws SQLException {
 		
 		// Get our connection to the database.
 		Connection conn = null;
@@ -40,6 +40,8 @@ public class ProteinGOAnnotationSearcher {
 							"LEFT OUTER JOIN term_definition AS d ON t.id = d.term_id "+
 							"WHERE prot.proteinID="+nrseqProteinId+" "+
 							"AND prot.termID=t.id";
+			if(exact)
+				sqlStr +=   " AND prot.exact=1";
 			
 			conn = DBConnectionManager.getConnection("go");	
 			stmt = conn.createStatement();
@@ -91,7 +93,7 @@ public class ProteinGOAnnotationSearcher {
 		return nodes;
 	}
 	
-	public static Set<GOAnnotation> getAnnotationsForProtein(int nrseqProteinId, int goAspect) throws SQLException {
+	public static Set<GOAnnotation> getAnnotationsForProtein(int nrseqProteinId, int goAspect, boolean exact) throws SQLException {
 		
 		// Get our connection to the database.
 		Connection conn = null;
@@ -106,6 +108,8 @@ public class ProteinGOAnnotationSearcher {
 							"LEFT OUTER JOIN term_definition AS d ON t.id = d.term_id "+
 							"WHERE prot.proteinID="+nrseqProteinId+" "+
 							"AND prot.termID=t.id";
+			if(exact)
+				sqlStr +=   " AND prot.exact=1";
 			
 			conn = DBConnectionManager.getConnection("go");	
 			stmt = conn.createStatement();

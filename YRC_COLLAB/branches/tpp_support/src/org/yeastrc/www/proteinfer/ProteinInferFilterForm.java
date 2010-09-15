@@ -53,9 +53,11 @@ public class ProteinInferFilterForm extends ActionForm {
     private String peptide = null;
     private boolean exactMatch = true;
     
-    private int goAspect = GOUtils.BIOLOGICAL_PROCESS;  // Used for GO enrichment only
+    // GO analysis options
+    private int goAspect = GOUtils.BIOLOGICAL_PROCESS; 
     private int goSlimTermId;
     private int speciesId;
+    private boolean exactAnnotations = true; 			// Used for GO enrichment only
     private String goEnrichmentPVal = "0.01";           // Used for GO enrichment only
     
     private boolean doDownload = false;
@@ -500,7 +502,15 @@ public class ProteinInferFilterForm extends ActionForm {
     	return Double.parseDouble(goEnrichmentPVal);
     }
 
-    public int getSpeciesId() {
+    public boolean isExactAnnotations() {
+		return exactAnnotations;
+	}
+
+	public void setExactAnnotations(boolean exactAnnotations) {
+		this.exactAnnotations = exactAnnotations;
+	}
+
+	public int getSpeciesId() {
         return speciesId;
     }
 

@@ -169,7 +169,7 @@ public class GOSlimTreeCreator {
 			
 			Set<GOAnnotation> annotNodes = null;
 			try {
-				annotNodes = ProteinGOAnnotationSearcher.getAnnotationsForProtein(nrseqProteinId, goAspect);
+				annotNodes = ProteinGOAnnotationSearcher.getAnnotationsForProtein(nrseqProteinId, goAspect, false);
 			} catch (SQLException e) {
 				throw new GOException("Error getting terms for GO annotations for protein: "+nrseqProteinId, e);
 			}

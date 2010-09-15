@@ -98,6 +98,7 @@ function removeFromGoTermFilters(goTerm, warn) {
   <html:hidden name="proteinInferFilterForm" property="goAspect" />
   <html:hidden name="proteinInferFilterForm" property="goSlimTermId" />
   <html:hidden name="proteinInferFilterForm" property="goEnrichmentPVal" />
+  <html:hidden name="proteinInferFilterForm" property="exactAnnotations" value="true"/>
   <html:hidden name="proteinInferFilterForm" property="speciesId" />
   
   

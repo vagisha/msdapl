@@ -61,7 +61,7 @@ public class GOEnrichmentCalculator {
         int speciesId = output.getSpeciesId();
         
         // Get all the GO terms for our protein set
-        Map<String, EnrichedGOTerm> goTerms = getAllGOAspectTerms(speciesId, goAspect, proteinIds);
+        Map<String, EnrichedGOTerm> goTerms = getAllGOAspectTerms(speciesId, goAspect, output.isExactAnnotations(), proteinIds);
         
         List<EnrichedGOTerm> enrichedTerms = new ArrayList<EnrichedGOTerm>(goTerms.values());
         
@@ -109,7 +109,13 @@ public class GOEnrichmentCalculator {
 	private static void calculateEnrichment(List<EnrichedGOTerm> enrichedTerms, int numProteinsInSet, int totalAnnotatedProteins) throws Exception {
         
         for(EnrichedGOTerm term: enrichedTerms) {
-            term.setPValue(StatUtils.PScore(term.getNumAnnotatedProteins(), term.getTotalAnnotatedProteins(), numProteinsInSet, totalAnnotatedProteins));
+        	try {
+        		term.setPValue(StatUtils.PScore(term.getNumAnnotatedProteins(), term.getTotalAnnotatedProteins(), numProteinsInSet, totalAnnotatedProteins));
+        	}
+        	catch(Exception e) {
+        		System.out.println(term.getGoNode().getAccession());
+        		throw e;
+        	}
         }
     }
     
@@ -118,7 +124,7 @@ public class GOEnrichmentCalculator {
     }
 
     
-    private static Map<String, EnrichedGOTerm> getAllGOAspectTerms(int speciesId, int goAspect, List<Integer> nrseqIds)
+    private static Map<String, EnrichedGOTerm> getAllGOAspectTerms(int speciesId, int goAspect, boolean exact, List<Integer> nrseqIds)
     throws Exception {
 
     	Map<String, EnrichedGOTerm> goTerms = new HashMap<String, EnrichedGOTerm>(); // unique GO terms
@@ -130,7 +136,7 @@ public class GOEnrichmentCalculator {
     		try {
     			// setting the second argument (exact) to false should get us all terms for this protein
     			// This should include all ancestors of terms directly assigned to this protein.
-    			nodes  = ProteinGOAnnotationSearcher.getTermsForProtein(nrseqId, goAspect);
+    			nodes  = ProteinGOAnnotationSearcher.getTermsForProtein(nrseqId, goAspect, exact);
     		}
     		catch (Exception e) {
     			log.error("Could not get GO annotations for proteinID: "+nrseqId, e);
@@ -142,7 +148,7 @@ public class GOEnrichmentCalculator {
     			for(GONode node: nodes) {
     				EnrichedGOTerm term = goTerms.get(node.getAccession());
     				if(term == null) {
-    					term = initEnrichedGOTerm(node, speciesId);
+    					term = initEnrichedGOTerm(node, speciesId, exact);
     					goTerms.put(node.getAccession(), term);
     				}
     				term.addProtein(nrseqId);
@@ -153,9 +159,9 @@ public class GOEnrichmentCalculator {
     	return goTerms;
     }
     
-    private static EnrichedGOTerm initEnrichedGOTerm(GONode node, int speciesId) throws Exception {
+    private static EnrichedGOTerm initEnrichedGOTerm(GONode node, int speciesId, boolean exact) throws Exception {
         int totalProteins = 0; // total proteins in the universe with this GO term
-        totalProteins = GOProteinCounter.getInstance().countProteins(node, speciesId);
+        totalProteins = GOProteinCounter.getInstance().countProteins(node, speciesId, exact);
         return new EnrichedGOTerm(node, totalProteins);
     }
     
