@@ -195,7 +195,7 @@ function validateFormForAnalysisInput() {
     <tr>
     
     <td WIDTH="20%" VALIGN="top">
-    	<span class="tooltip" title="<bean:write name="param" property="tooltip" />" style="cursor: pointer;">
+    	<span class="tooltip" title="<bean:write name="param" property="tooltip" />">
     		<bean:write name="param" property="displayName" />
     	</span>
     	<logic:present name="param" property="notes">

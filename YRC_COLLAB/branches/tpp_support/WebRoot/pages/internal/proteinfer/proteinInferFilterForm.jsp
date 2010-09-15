@@ -252,13 +252,21 @@ function removeFromGoTermFilters(goTerm, warn) {
   			</td>
   			<td valign="top" colspan="2">
   				<html:checkbox name="proteinInferFilterForm" property="matchAllGoTerms" title="Return proteins that match all terms">Match All </html:checkbox>
-  				<html:checkbox name="proteinInferFilterForm" property="exactGoAnnotation" title="Return proteins directly annotated with the GO terms">Exact </html:checkbox>
+  				<html:checkbox name="proteinInferFilterForm" property="exactGoAnnotation" title="Return proteins directly annotated with the GO terms">
+  				<span class="tooltip" title="If checked, only direct GO annotations for a protein are used. Otherwise, annotations to descendant terms are interpreted as annotations to the parent term.">Exact</span> </html:checkbox>
   				&nbsp;
   				<nobr>
   				Exclude: 
-  				<html:checkbox name="proteinInferFilterForm" property="excludeIea" title="Inferred from Electronic Annotation">IEA</html:checkbox>
-  				<html:checkbox name="proteinInferFilterForm" property="excludeNd" title="No Biological Data available">ND</html:checkbox>
-  				<html:checkbox name="proteinInferFilterForm" property="excludeCompAnalCodes" title="Computational Analysis Evidence Codes">ISS, ISO, ISA, ISM, IGC, RCA</html:checkbox>
+  				<html:checkbox name="proteinInferFilterForm" property="excludeIea"><span class="tooltip" title="Inferred from Electronic Annotation">IEA</span></html:checkbox>
+  				<html:checkbox name="proteinInferFilterForm" property="excludeNd"><span class="tooltip" title="No Biological Data available">ND</span></html:checkbox>
+  				<html:checkbox name="proteinInferFilterForm" property="excludeCompAnalCodes" title="Computational Analysis Evidence Codes">
+  				<span class="tooltip" title="Inferred from Sequence or Structural Similarity">ISS</span>,
+  				<span class="tooltip" title="Inferred from Sequence Orthology">ISO</span>, 
+  				<span class="tooltip" title="Inferred from Sequence Alignment">ISA</span>,
+  				<span class="tooltip" title="Inferred from Sequence Model">ISM</span>,
+  				<span class="tooltip" title="Inferred from Genomic Context">IGC</span>,
+  				<span class="tooltip" title="Inferred from Reviewed Computational Analysis">RCA</span>
+  				</html:checkbox>
   				</nobr>
   			</td>
   		</tr>

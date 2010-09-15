@@ -1479,7 +1479,7 @@ function hideAllDescriptionsForProtein(proteinId) {
     	
     	<td style="padding:5x;">
     		<nobr>
-    		<span class="tooltip" style="cursor:help;" title="If checked, only direct GO annotations for a protein are used. Otherwise, annotations to descendant terms are interpreted as annotations to the parent term.
+    		<span class="tooltip" title="If checked, only direct GO annotations for a protein are used. Otherwise, annotations to descendant terms are interpreted as annotations to the parent term.
     		"
     		>Exact: </span> 
     		<html:checkbox name="proteinInferFilterForm" property="exactAnnotations" styleId="goEnrichExactAnnotField"></html:checkbox>
