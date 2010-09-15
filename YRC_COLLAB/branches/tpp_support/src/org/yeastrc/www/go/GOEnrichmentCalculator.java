@@ -109,12 +109,13 @@ public class GOEnrichmentCalculator {
 	private static void calculateEnrichment(List<EnrichedGOTerm> enrichedTerms, int numProteinsInSet, int totalAnnotatedProteins) throws Exception {
         
         for(EnrichedGOTerm term: enrichedTerms) {
-        	try {
-        		term.setPValue(StatUtils.PScore(term.getNumAnnotatedProteins(), term.getTotalAnnotatedProteins(), numProteinsInSet, totalAnnotatedProteins));
+        	if(term.getNumAnnotatedProteins() > term.getTotalAnnotatedProteins()) {
+        		term.setPValue(-1.0);
+        		log.error(term.getGoNode().getAccession()+", Num annotated: "+term.getNumAnnotatedProteins()+
+        				", Total annotated: "+term.getTotalAnnotatedProteins());
         	}
-        	catch(Exception e) {
-        		System.out.println(term.getGoNode().getAccession());
-        		throw e;
+        	else {
+        		term.setPValue(StatUtils.PScore(term.getNumAnnotatedProteins(), term.getTotalAnnotatedProteins(), numProteinsInSet, totalAnnotatedProteins));
         	}
         }
     }

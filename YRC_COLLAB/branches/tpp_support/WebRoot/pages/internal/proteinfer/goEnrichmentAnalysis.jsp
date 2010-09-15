@@ -156,9 +156,17 @@ function toggleEnrichBarChart() {
 						</td>
 						
 						<td><span title="<bean:write name="term" property="goNode.definition"/>" style="cursor:help;"><bean:write name="term" property="goNode.name"/></span></td>
-						<td><bean:write name="term" property="pvalueString"/></td>
-						<td><bean:write name="term" property="numAnnotatedProteins"/></td>
-						<td><bean:write name="term" property="totalAnnotatedProteins"/></td>
+						<logic:equal name="term" property="pvalueString" value="-1.0">
+							<td style="color:red;"><bean:write name="term" property="pvalueString"/></td>
+							<td style="color:red;"><bean:write name="term" property="numAnnotatedProteins"/></td>
+							<td style="color:red;"><bean:write name="term" property="totalAnnotatedProteins"/></td>
+						</logic:equal>
+						<logic:notEqual name="term" property="pvalueString" value="-1.0">
+							<td><bean:write name="term" property="pvalueString"/></td>
+							<td><bean:write name="term" property="numAnnotatedProteins"/></td>
+							<td><bean:write name="term" property="totalAnnotatedProteins"/></td>
+						</logic:notEqual>
+						
 					</tr>
 				</logic:iterate>
 			</tbody>

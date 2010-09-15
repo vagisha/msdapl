@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.yeastrc.bio.go.GONode;
-import org.yeastrc.www.util.RoundingUtils;
 
 /**
  * 
@@ -34,7 +33,12 @@ public class EnrichedGOTerm implements Comparable<EnrichedGOTerm> {
         return pValue;
     }
 
-    public String getPvalueString() {      
+    public String getPvalueString() { 
+    	// -1 is a special value assigned if the number of proteins in the input list
+    	// annotated with this terms is more than the number of proteins in the 
+    	// reference set annotated with this protein
+    	if(this.getPValue() == -1.0)
+    		return "-1.0";
         DecimalFormat df = new DecimalFormat("0.####E0");
         return df.format(this.getPValue());       
     }
@@ -73,10 +77,15 @@ public class EnrichedGOTerm implements Comparable<EnrichedGOTerm> {
     
     @Override
     public int compareTo(EnrichedGOTerm o) {
-        try {
-            if (this.getPValue() < o.getPValue() ) return -1;
-            if (this.getPValue() > o.getPValue() ) return 1;
-        } catch (Exception e) { ; }
+    	// -1 is a special value assigned if the number of proteins in the input list
+    	// annotated with this terms is more than the number of proteins in the 
+    	// reference set annotated with this protein
+    	if(this.getPValue() == -1.0) 
+    		return 1;
+    	if(o.getPValue() == -1.0)
+    		return -1;
+    	if (this.getPValue() < o.getPValue() ) return -1;
+    	if (this.getPValue() > o.getPValue() ) return 1;
         
         return 0;
     }
