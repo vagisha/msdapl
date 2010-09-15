@@ -17,6 +17,7 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.GOProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.www.go.Annotation;
+import org.yeastrc.www.go.GOEvidenceCodeConverter;
 import org.yeastrc.www.go.ProteinGOAnnotationChecker;
 
 /**
@@ -89,18 +90,8 @@ public class ProteinGoTermsFilter {
     }
 
 	private List<EvidenceCode> getEvidenceCodes(GOProteinFilterCriteria filters) {
-		List<EvidenceCode> evidenceCodes = new ArrayList<EvidenceCode>();
-    	for(String codeStr: filters.getExcludeEvidenceCodes()) {
-    		int id = EvidenceUtils.getEvidenceCodeId(codeStr);
-    		if(id == -1) {
-    			log.error("NO EvidenceCode found for :"+codeStr);
-    		}
-    		else {
-    			EvidenceCode code = EvidenceUtils.getEvidenceCodeInstance(id);
-    			evidenceCodes.add(code);
-    		}
-    	}
-		return evidenceCodes;
+		
+		return GOEvidenceCodeConverter.convert(filters.getExcludeEvidenceCodes());
 	}
 
 	private List<GONode> getGoNodes(List<String> goAccessions) throws Exception {

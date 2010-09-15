@@ -320,6 +320,7 @@ function removeFromGoTermFilters(goTerm, warn) {
   	<html:checkbox name="proteinInferFilterForm"property="printPeptides" >Include Peptides</html:checkbox>
   	<html:checkbox name="proteinInferFilterForm"property="printDescriptions" >Include Descriptions</html:checkbox>
   	<html:checkbox name="proteinInferFilterForm"property="collapseGroups" >Collapse Protein Groups</html:checkbox>
+  	<html:checkbox name="proteinInferFilterForm"property="downloadGOAnnotations" >GO Annotations</html:checkbox>
  </div>
 
 

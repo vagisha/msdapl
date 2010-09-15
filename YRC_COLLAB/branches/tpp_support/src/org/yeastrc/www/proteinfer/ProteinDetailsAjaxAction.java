@@ -16,6 +16,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.bio.go.GOAnnotation;
 import org.yeastrc.bio.go.GOSearcher;
+import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.bio.taxonomy.TaxonomyUtils;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
@@ -117,12 +118,8 @@ public class ProteinDetailsAjaxAction extends Action {
             		request.setAttribute("proteinAbundance", "NOT AVAILABLE");
             	else {
             		if(abundances.size() == 1) {
-            			double abundance = abundances.get(0).getAbundance();
-            			if(abundance == Math.round(abundance)) {
-            				request.setAttribute("proteinAbundance", String.valueOf((int)abundance));
-            			}
-            			else
-            				request.setAttribute("proteinAbundance", String.valueOf(abundance));
+            			String abundance = abundances.get(0).getAbundanceString();
+            			request.setAttribute("proteinAbundance", abundance);
             		}
             		else {
             			String aString = "";
@@ -139,16 +136,17 @@ public class ProteinDetailsAjaxAction extends Action {
             }
             
             // Gene Ontology information
-            Map<String, Set<GOAnnotation>> goterms = GOSearcher.getInstance().getGOAnnotations(iProt.getProteinListing());
-    		
-    		if ( (goterms.get("P")).size() > 0)
-    			request.setAttribute("processes", goterms.get("P"));
+            Set<GOAnnotation> bpAnnots = GOSearcher.getInstance().getGOAnnotations(GOUtils.BIOLOGICAL_PROCESS, iProt.getProteinListing(), false);
+    		if ( bpAnnots.size() > 0)
+    			request.setAttribute("processes", bpAnnots);
 
-    		if ( (goterms.get("C")).size() > 0)
-    			request.setAttribute("components", goterms.get("C"));
+    		Set<GOAnnotation> ccAnnots = GOSearcher.getInstance().getGOAnnotations(GOUtils.CELLULAR_COMPONENT, iProt.getProteinListing(), false);
+    		if ( ccAnnots.size() > 0)
+    			request.setAttribute("components", ccAnnots);
     		
-    		if ( (goterms.get("F")).size() > 0)
-    			request.setAttribute("functions", goterms.get("F"));
+    		Set<GOAnnotation> mfAnnots = GOSearcher.getInstance().getGOAnnotations(GOUtils.MOLECULAR_FUNCTION, iProt.getProteinListing(), false);
+    		if ( mfAnnots.size() > 0)
+    			request.setAttribute("functions", mfAnnots);
 
     		
             // get other proteins in this group
@@ -210,16 +208,17 @@ public class ProteinDetailsAjaxAction extends Action {
             }
             
             // Gene Ontology information
-            Map<String, Set<GOAnnotation>> goterms = GOSearcher.getInstance().getGOAnnotations(pProt.getProteinListing());
-    		
-    		if ( (goterms.get("P")).size() > 0)
-    			request.setAttribute("processes", goterms.get("P"));
+            Set<GOAnnotation> bpAnnots = GOSearcher.getInstance().getGOAnnotations(GOUtils.BIOLOGICAL_PROCESS, pProt.getProteinListing(), false);
+    		if ( bpAnnots.size() > 0)
+    			request.setAttribute("processes", bpAnnots);
 
-    		if ( (goterms.get("C")).size() > 0)
-    			request.setAttribute("components", goterms.get("C"));
+    		Set<GOAnnotation> ccAnnots = GOSearcher.getInstance().getGOAnnotations(GOUtils.CELLULAR_COMPONENT, pProt.getProteinListing(), false);
+    		if ( ccAnnots.size() > 0)
+    			request.setAttribute("components", ccAnnots);
     		
-    		if ( (goterms.get("F")).size() > 0)
-    			request.setAttribute("functions", goterms.get("F"));
+    		Set<GOAnnotation> mfAnnots = GOSearcher.getInstance().getGOAnnotations(GOUtils.MOLECULAR_FUNCTION, pProt.getProteinListing(), false);
+    		if ( mfAnnots.size() > 0)
+    			request.setAttribute("functions", mfAnnots);
 
     		
     		

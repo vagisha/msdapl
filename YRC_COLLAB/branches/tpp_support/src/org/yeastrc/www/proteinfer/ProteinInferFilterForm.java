@@ -61,6 +61,7 @@ public class ProteinInferFilterForm extends ActionForm {
     private String goEnrichmentPVal = "0.01";           // Used for GO enrichment only
     
     private boolean doDownload = false;
+    private boolean downloadGOAnnotations = false;
     private boolean doGoSlimAnalysis = false;
     private boolean getGoSlimTree = false;
     private boolean doGoEnrichAnalysis = false;
@@ -95,8 +96,16 @@ public class ProteinInferFilterForm extends ActionForm {
 	public void setDoDownload(boolean doDownload) {
 		this.doDownload = doDownload;
 	}
-
 	
+	public boolean isDownloadGOAnnotations() {
+		return downloadGOAnnotations;
+	}
+
+	public void setDownloadGOAnnotations(boolean downloadGOAnnotations) {
+		this.downloadGOAnnotations = downloadGOAnnotations;
+	}
+
+
 	// MIN COVERAGE
     public String getMinCoverage() {
         return minCoverage;

@@ -98,7 +98,7 @@ public class ProteinInferDownloadAction extends Action {
         
         // Get the filtering criteria
         ProteinFilterCriteria filterCriteria = filterForm.getFilterCriteria(peptideDef);
-        filterCriteria.setSortBy(SORT_BY.GROUP_ID);
+        filterCriteria.setSortBy(SORT_BY.GROUP_ID); // This is important for printing groups!!
         filterCriteria.setSortOrder(SORT_ORDER.ASC);
         
         // Get the protein Ids that fulfill the criteria.
@@ -148,14 +148,27 @@ public class ProteinInferDownloadAction extends Action {
         writer.write(RoundingUtils.getInstance().roundTwo((filteredTargetHits*100.0)/(double)totalTargetHits)+"%\n");
         writer.write("\n\n");
         
-        
-        if(!filterForm.isCollapseGroups()) {
-            // print each protein
-            printIndividualProteins(writer, pinferId, peptideDef, proteinIds, filterForm.isPrintPeptides(), filterForm.isPrintDescriptions());
+        if(filterForm.isDownloadGOAnnotations()) {
+        	GOAnnotationsWriter annotWriter = new GOAnnotationsWriter();
+        	try {
+        		if(!filterForm.isCollapseGroups())
+        			annotWriter.writeIndividualProteins(writer, pinferId, proteinIds, filterCriteria.getGoFilterCriteria());
+        		else
+        			annotWriter.writeGroupProteins(writer, pinferId, proteinIds, filterCriteria.getGoFilterCriteria());
+			} catch (Exception e) {
+				log.error("Error writing GO Annotations", e);
+				writer.write("\n\nERROR!  THERE WAS AN ERROR WRITING GO ANNOTATIONS.\nError Message: "+e.getMessage());
+			}
         }
         else {
-            // user wants to see only one line for each protein group; all members of the group will be displayed comma-separated
-            printCollapsedProteinGroups(writer, pinferId, peptideDef, proteinIds, filterForm.isPrintPeptides(), filterForm.isPrintDescriptions());
+        	if(!filterForm.isCollapseGroups()) {
+        		// print each protein
+        		printIndividualProteins(writer, pinferId, peptideDef, proteinIds, filterForm.isPrintPeptides(), filterForm.isPrintDescriptions());
+        	}
+        	else {
+        		// user wants to see only one line for each protein group; all members of the group will be displayed comma-separated
+        		printCollapsedProteinGroups(writer, pinferId, peptideDef, proteinIds, filterForm.isPrintPeptides(), filterForm.isPrintDescriptions());
+        	}
         }
     }
 
