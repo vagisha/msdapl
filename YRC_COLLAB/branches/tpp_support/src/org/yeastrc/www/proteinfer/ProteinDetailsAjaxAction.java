@@ -3,7 +3,6 @@ package org.yeastrc.www.proteinfer;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -136,15 +135,15 @@ public class ProteinDetailsAjaxAction extends Action {
             }
             
             // Gene Ontology information
-            Set<GOAnnotation> bpAnnots = GOSearcher.getInstance().getGOAnnotations(GOUtils.BIOLOGICAL_PROCESS, iProt.getProteinListing(), false);
+            Set<GOAnnotation> bpAnnots = GOSearcher.getInstance().getGOAnnotations(GOUtils.BIOLOGICAL_PROCESS, iProt.getProteinListing());
     		if ( bpAnnots.size() > 0)
     			request.setAttribute("processes", bpAnnots);
 
-    		Set<GOAnnotation> ccAnnots = GOSearcher.getInstance().getGOAnnotations(GOUtils.CELLULAR_COMPONENT, iProt.getProteinListing(), false);
+    		Set<GOAnnotation> ccAnnots = GOSearcher.getInstance().getGOAnnotations(GOUtils.CELLULAR_COMPONENT, iProt.getProteinListing());
     		if ( ccAnnots.size() > 0)
     			request.setAttribute("components", ccAnnots);
     		
-    		Set<GOAnnotation> mfAnnots = GOSearcher.getInstance().getGOAnnotations(GOUtils.MOLECULAR_FUNCTION, iProt.getProteinListing(), false);
+    		Set<GOAnnotation> mfAnnots = GOSearcher.getInstance().getGOAnnotations(GOUtils.MOLECULAR_FUNCTION, iProt.getProteinListing());
     		if ( mfAnnots.size() > 0)
     			request.setAttribute("functions", mfAnnots);
 

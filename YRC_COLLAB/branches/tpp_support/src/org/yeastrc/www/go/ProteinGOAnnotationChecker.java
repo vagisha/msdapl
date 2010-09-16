@@ -145,6 +145,12 @@ public class ProteinGOAnnotationChecker {
 		}
 	}
 	
+	/**
+	 * Returns a subset of protein Ids in the given list that have a GO annotation.
+	 * @param proteinIds
+	 * @return
+	 * @throws SQLException
+	 */
 	public static List<Integer> getAnnotatedProteins (List<Integer> proteinIds) throws SQLException {
 		
 		// Get our connection to the database.
