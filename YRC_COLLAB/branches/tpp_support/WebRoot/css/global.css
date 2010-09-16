@@ -402,7 +402,7 @@ span.tooltip {
 	cursor:help;
 }
 span.tooltip:hover {
-	background-color:gold;
+	background-color:#FFE4C4;
 	font-weight:bold;	
 }
 

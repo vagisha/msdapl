@@ -4,6 +4,8 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
+<!-- <script src="<yrcwww:link path='/js/table2CSV.js'/>"></script> -->
+
 <script>
 function toggleGoEnrichmentTable() {
 	if($("#go_enrichment_table").is(':visible')) {
@@ -124,6 +126,7 @@ function toggleEnrichBarChart() {
 		
 		<div align="center" style="width:75%; font-weight:bold; font-size:8pt; margin-bottom:3px;color:#D74D2D">
 		<span class="clickable underline" onclick="toggleGoEnrichmentTable();" id="go_enrichment_table_link">Hide Table</span>
+		<!--  &nbsp;<span class="clickable underline" onclick="$('#go_enrichment_table').table2CSV({delivery:'popup'}); return false;">Save Table</span>-->
 		</div>
 		<table class="table_basic" align="center" id="go_enrichment_table">
 			<thead>
@@ -155,7 +158,7 @@ function toggleEnrichBarChart() {
         				</span>
 						</td>
 						
-						<td><span title="<bean:write name="term" property="goNode.definition"/>" style="cursor:help;"><bean:write name="term" property="goNode.name"/></span></td>
+						<td><span title="<bean:write name="term" property="goNode.definition"/>" class="tooltip"><bean:write name="term" property="goNode.name"/></span></td>
 						<logic:equal name="term" property="pvalueString" value="-1.0">
 							<td style="color:red;"><bean:write name="term" property="pvalueString"/></td>
 							<td style="color:red;"><bean:write name="term" property="numAnnotatedProteins"/></td>

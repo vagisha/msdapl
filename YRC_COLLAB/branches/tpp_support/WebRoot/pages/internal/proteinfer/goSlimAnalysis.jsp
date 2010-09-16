@@ -164,7 +164,7 @@ function toggleSlimBarChart() {
         </nobr>
         </span>
         </td>
-		<td><span title="<bean:write name="node" property="goNode.definition"/>" style="cursor:help;"><bean:write name="node" property="name"/></span></td>
+		<td><span title="<bean:write name="node" property="goNode.definition"/>" class="tooltip"><bean:write name="node" property="name"/></span></td>
 		<td><bean:write name="node" property="proteinCountForExactTerm"/></td>
 		<td><bean:write name="node" property="proteinCountForTerm"/></td>
 		<td><bean:write name="node" property="proteinCountForTermPerc"/></td>

@@ -142,6 +142,12 @@ public class ProteinListingBuilder {
 	}
 
 	public void getFastaReferences(List<Integer> fastaDatabaseIds,
+			int nrseqId, ProteinListing listing) {
+		
+		getFastaReferences(fastaDatabaseIds, nrseqId, listing, true);
+	}
+	
+	public void getFastaReferences(List<Integer> fastaDatabaseIds,
 			int nrseqId, ProteinListing listing, boolean useCurrent) {
 		
 		if(fastaDatabaseIds == null || fastaDatabaseIds.size() == 0)
