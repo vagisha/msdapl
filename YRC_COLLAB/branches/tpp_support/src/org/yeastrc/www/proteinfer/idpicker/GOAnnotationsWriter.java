@@ -121,7 +121,6 @@ public class GOAnnotationsWriter {
             if(wProt.getProtein().getGroupId() != currentGroupId) {
             	
                 if(currentGroupId != -1) {
-                    writer.write(currentGroupId+"\t");
                     
                     // Accessions(s)
                     writer.write(trimComma(fastaIds)+"\t");
