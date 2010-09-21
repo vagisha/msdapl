@@ -21,35 +21,40 @@
 		<html:hidden name="filterForm" property="usePEP" />
 		
 			<table cellspacing="0" cellpadding="2" >
+			
+				<logic:equal name="filterForm" property="peptideResults" value="false">
 				<tr>
-					<td>Min. Scan</td> <td> <html:text name="filterForm" property="minScan" size="5"/> </td>
-					<td>Max. Scan</td> <td> <html:text name="filterForm" property="maxScan" size="5" /> </td>
+					<td>Min. Scan</td> <td align="left"> <html:text name="filterForm" property="minScan" size="5"/> </td>
+					<td>Max. Scan</td> <td align="left"> <html:text name="filterForm" property="maxScan" size="5" /> </td>
 					<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-					<td>Min. Charge</td><td> <html:text name="filterForm" property="minCharge" size="5" /> </td>
-					<td>Max. Charge</td><td> <html:text name="filterForm" property="maxCharge" size="5" /> </td>
+					<td>Min. Charge</td><td align="left"> <html:text name="filterForm" property="minCharge" size="5" /> </td>
+					<td>Max. Charge</td><td align="left"> <html:text name="filterForm" property="maxCharge" size="5" /> </td>
 				</tr>
+				</logic:equal>
 				
+				<logic:equal name="filterForm" property="peptideResults" value="false">
 				<tr>
-					<td>Min. RT</td> <td> <html:text name="filterForm" property="minRT" size="5"/> </td>
-					<td>Max. RT</td> <td> <html:text name="filterForm" property="maxRT" size="5" /> </td>
+					<td>Min. RT</td> <td align="left"> <html:text name="filterForm" property="minRT" size="5"/> </td>
+					<td>Max. RT</td> <td align="left"> <html:text name="filterForm" property="maxRT" size="5" /> </td>
 					<td></td>
-					<td>Min. Obs. Mass</td><td> <html:text name="filterForm" property="minObsMass" size="5" /> </td>
-					<td>Max. Obs. Mass</td><td> <html:text name="filterForm" property="maxObsMass" size="5" /> </td>
+					<td>Min. Obs. Mass</td><td align="left"> <html:text name="filterForm" property="minObsMass" size="5" /> </td>
+					<td>Max. Obs. Mass</td><td align="left"> <html:text name="filterForm" property="maxObsMass" size="5" /> </td>
 				</tr>
+				</logic:equal>
 				
 				<tr>
-					<td>Min. q-value</td> <td> <html:text name="filterForm" property="minQValue" size="5"/> </td>
-					<td>Max. q-value</td> <td> <html:text name="filterForm" property="maxQValue" size="5" /> </td>
+					<td>Min. q-value</td> <td align="left"> <html:text name="filterForm" property="minQValue" size="5"/> </td>
+					<td>Max. q-value</td> <td align="left"> <html:text name="filterForm" property="maxQValue" size="5" /> </td>
 					<td></td>
 					
 					<logic:equal name="filterForm" property="usePEP" value="true">
-						<td>Min. PEP</td><td> <html:text name="filterForm" property="minPep" size="5" /> </td>
-						<td>Max. PEP</td><td> <html:text name="filterForm" property="maxPep" size="5" /> </td>
+						<td>Min. PEP</td><td align="left"> <html:text name="filterForm" property="minPep" size="5" /> </td>
+						<td>Max. PEP</td><td align="left"> <html:text name="filterForm" property="maxPep" size="5" /> </td>
 					</logic:equal>
 					
 					<logic:equal name="filterForm" property="usePEP" value="false">
-						<td>Min. Discriminant Score</td><td> <html:text name="filterForm" property="minDs" size="5" /> </td>
-						<td>Max. Discriminant Score</td><td> <html:text name="filterForm" property="maxDs" size="5" /> </td>
+						<td>Min. Discriminant Score</td><td align="left"> <html:text name="filterForm" property="minDs" size="5" /> </td>
+						<td>Max. Discriminant Score</td><td align="left"> <html:text name="filterForm" property="maxDs" size="5" /> </td>
 					</logic:equal>
 				</tr>
 				
@@ -65,14 +70,20 @@
 				
 				<tr>
 					<td valign="top">File(s)</td> 
-					<td colspan=6 align="left" valign="top" style="font-size:8pt;"> 
+					<td colspan="5" align="left" valign="top" style="font-size:8pt;"> 
 						<html:text name="filterForm" property="fileNameFilter" size="50" /><br>
 						Enter comma-separated file names
 					</td>
 					<!--
 					<td valign="top">Unique peptides</td><td valign="top"> <html:checkbox name="filterForm" property="peptidesView" /> </td>
 					-->
-					<td></td>
+					<td>View:</td>
+					<td colspan="2">
+						<!-- "value" is the value that is submitted if checked -->
+						<span class="tooltip"
+						title="Select 'Peptides' to view peptide-level Percolator results, if available">Peptides</span><html:radio property="filterForm" property="peptideResults" value="true" />
+						PSMs<html:radio property="filterForm" property="peptideResults" value="false" />
+					</td>
 				</tr>
 				
 				<tr>

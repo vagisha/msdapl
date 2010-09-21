@@ -22,8 +22,6 @@
 <script type="text/javascript" src="<yrcwww:link path='/js/jquery.history.js'/>"></script>
 <script type="text/javascript" src="<yrcwww:link path='/js/jquery.cookie.js'/>"></script>
 
-<script src="<yrcwww:link path='/js/tooltip.js'/>"></script>
-
 <script src="<yrcwww:link path='/js/jquery.form.js'/>"></script>
 
 <script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>

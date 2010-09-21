@@ -78,6 +78,7 @@
 	<!-- Related to Percolator  -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorParamsSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorResultSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorPeptideResultSqlMap.xml"/>
 	
 	<!-- Related to PeptideProphet -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/peptideProphet/PeptideProphetRocSqlMap.xml"/>

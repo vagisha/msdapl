@@ -18,7 +18,6 @@
 
 <script src="<yrcwww:link path='js/jquery-1.3.2.min.js' />"></script>
 <script src="<yrcwww:link path='js/jquery.blockUI.js'/>"></script>
-<script src="<yrcwww:link path='js/tooltip.js'/>"></script>
 <script type="text/javascript">
 
 // ---------------------------------------------------------------------------------------
@@ -49,8 +48,6 @@
   
   
 	$(document).ready(function(){
-		tooltip();
-		
 		$(".toggle_selection").click(function() {
 			toggleSelection($(this));
 		});

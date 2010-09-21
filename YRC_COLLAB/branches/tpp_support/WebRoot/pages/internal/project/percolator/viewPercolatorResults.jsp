@@ -19,6 +19,90 @@
 <%@ include file="/includes/errors.jsp" %>
 
 <%@ include file="/pages/internal/project/resultsTableJS.jsp" %>
+<script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
+
+<script>
+
+// ---------------------------------------------------------------------------------------
+// AJAX DEFAULTS
+// ---------------------------------------------------------------------------------------
+$.ajaxSetup({
+	type: 'POST',
+	//timeout: 5000,
+	dataType: 'html',
+	error: function(xhr, textstatus, errorthrown) {
+			
+				var statusCode = xhr.status;
+  		// status code returned if user is not logged in
+  		// reloading this page will redirect to the login page
+  		if(statusCode == 303)
+				window.location.reload();
+			
+			// otherwise just display an alert
+			else {
+				alert("Request Failed: "+statusCode+"\n"+xhr.statusText+"\n"+textstatus+"\n"+errorthrown);
+			}
+	}
+});
+
+$.blockUI.defaults.message = '<b>Loading...</b>'; 
+$.blockUI.defaults.css.padding = 20;
+$.blockUI.defaults.fadeIn = 0;
+$.blockUI.defaults.fadeOut = 0;
+//$().ajaxStart($.blockUI).ajaxStop($.unblockUI);
+$().ajaxStop($.unblockUI);
+
+function viewPsms(searchAnalysisId, peptideResultId) {
+
+	var span = $("span#psm_"+peptideResultId);
+	var row = span.parent().parent();
+	var msg = "loading results for searchAnalysisID: "+searchAnalysisId+", peptideResultId: "+peptideResultId+", class="+row.attr('class');
+	
+	if(span.is(".loaded")) {
+		if(span.is(".visible")) {
+			span.removeClass("visible");
+			span.addClass("invisible");
+			row.next().hide();
+		}
+		else {
+			span.addClass("visible");
+			span.removeClass("invisible");
+			row.next().show();
+		}
+	}
+	else {
+		span.addClass("loaded");
+		span.addClass("visible");
+		var newRow = "<tr class='"+row.attr('class')+"'><td colspan='7' style='border:1px solid gray;' id='td_"+peptideResultId+"'></td></tr>";
+		row.after(newRow);
+		
+		
+		$.blockUI();
+  				$("td#td_"+peptideResultId).load("<yrcwww:link path='viewPercolatorPeptidePsms.do'/>", 	//url
+  									{'percolatorPeptideId': peptideResultId, 		// data
+  									 'searchAnalysisId': searchAnalysisId
+  									 },
+  									 function(responseText, status, xhr) {						// callback
+  									 	$.unblockUI();
+  										$(this).show();
+  										makeSortableTable($("#psmlist_"+peptideResultId));
+  				 });
+  								   
+  		/*						   
+		$.ajax({
+		url:      "<yrcwww:link path='viewPercolatorPeptidePsms.do'/>",
+		dataType: "text",
+		data:     {'percolatorPeptideId': 	peptideResultId,
+		           'searchAnalysisId': searchAnalysisId 
+		           },
+		success:  function(data) {
+			        $("td#td_"+peptideResultId).append(data);
+		          }
+		});
+		*/
+	}
+}
+</script>
 
 <yrcwww:contentbox title="Percolator Results" centered="true" width="95" widthRel="true">
 <center>

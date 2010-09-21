@@ -100,6 +100,16 @@ public class PercolatorResultPlus implements PercolatorResult {
     }
 
     @Override
+	public Double getPvalue() {
+		return result.getQvalue();
+	}
+
+	@Override
+	public Double getPvalueRounded() {
+		return result.getQvalueRounded();
+	}
+	
+    @Override
     public int getRunSearchAnalysisId() {
         return result.getRunSearchAnalysisId();
     }
@@ -205,4 +215,5 @@ public class PercolatorResultPlus implements PercolatorResult {
     public void setResultPeptide(MsSearchResultPeptide resultPeptide) {
         throw new UnsupportedOperationException();
     }
+	
 }

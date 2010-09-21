@@ -20,6 +20,8 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 
 <script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
 <script src="<yrcwww:link path='js/msdapl.js'/>"></script>
+<script src="<yrcwww:link path='js/tooltip.js'/>"></script>
+
 <script>
 // ---------------------------------------------------------------------------------------
 // SETUP ANY BASIC TABLES
@@ -34,6 +36,7 @@ $(document).ready(function() {
    			fold($(this));
    		});
    });
+   tooltip();
 });
 </script>
 

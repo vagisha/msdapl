@@ -416,7 +416,7 @@
 	
 	<action
 	  path="/viewPercolatorResults"
-	  type="org.yeastrc.www.project.experiment.ViewAnalysisResults"
+	  type="org.yeastrc.www.project.experiment.ViewPercolatorResults"
 	  name="filterPercolatorResultsForm"
 	  validate="true"
 	  scope="request"
@@ -424,6 +424,13 @@
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	  <forward name="Success" path="/pages/internal/project/percolator/viewPercolatorResults.jsp" redirect="false"/>
 	  <forward name="Download" path="/downloadAnalysisResults.do" redirect="false"/>
+	</action>
+	
+	<action
+	  path="/viewPercolatorPeptidePsms"
+	  type="org.yeastrc.www.project.experiment.ViewPercolatorPeptidePsmAjaxAction"
+	  >
+	  <forward name="Success" path="/pages/internal/project/percolator/viewPercolatorPeptidePsms.jsp" redirect="false"/>
 	</action>
 	
 	<action

@@ -353,6 +353,10 @@ public class ViewProjectAction extends Action {
 		    ProteinferRun run = runDao.loadProteinferRun(piRunId);
 		    if(ProteinInferenceProgram.isIdPicker(run.getProgram())) { // is this a IdPicker run?
 		        ProteinferJob job = ProteinInferJobSearcher.getInstance().getJobForPiRunId(piRunId);
+		        if(job == null) {
+		        	log.warn("No job found for protein inference ID: "+piRunId);
+		        	continue;
+		        }
 		        ExperimentProteinferRun eppRun = new ExperimentProteinferRun(job);
 		        
 		        if(job.getStatus() == JobUtils.STATUS_COMPLETE) {

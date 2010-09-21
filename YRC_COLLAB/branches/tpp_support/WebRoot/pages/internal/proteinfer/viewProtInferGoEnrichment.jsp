@@ -28,8 +28,6 @@
 
 <script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
 
-<script src="<yrcwww:link path='/js/tooltip.js'/>"></script>
-
 
 <link rel="stylesheet" href="<yrcwww:link path='/css/proteinfer.css'/>" type="text/css" >
 
