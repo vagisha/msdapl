@@ -57,8 +57,6 @@ public class FileUtils {
             for(File f: files)
                 deleteFile(f);
         }
-        else {
-            file.delete();
-        }
+        file.delete();
     }
 }

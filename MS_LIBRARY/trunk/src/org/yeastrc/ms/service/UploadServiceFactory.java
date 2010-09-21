@@ -10,10 +10,12 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.pepxml.PepXmlGenericFileReader;
+import org.yeastrc.ms.parser.percolator.PercolatorXmlFileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadService;
 import org.yeastrc.ms.service.mzxml.MzXmlDataUploadService;
@@ -21,6 +23,7 @@ import org.yeastrc.ms.service.pepxml.PepXmlMascotDataUploadService;
 import org.yeastrc.ms.service.pepxml.PepXmlSequestDataUploadService;
 import org.yeastrc.ms.service.pepxml.PepXmlXtandemDataUploadService;
 import org.yeastrc.ms.service.pepxml.PepxmlAnalysisDataUploadService;
+import org.yeastrc.ms.service.percolator.PercolatorXmlDataUploadService;
 import org.yeastrc.ms.service.protxml.ProtxmlDataUploadService;
 import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.ProlucidSQTDataUploadService;
@@ -33,7 +36,7 @@ public class UploadServiceFactory {
 
     private static final UploadServiceFactory instance = new UploadServiceFactory();
     
-//    private static final Logger log = Logger.getLogger(UploadServiceFactory.class.getName());
+    private static final Logger log = Logger.getLogger(UploadServiceFactory.class.getName());
     
     private UploadServiceFactory() {}
     
@@ -258,7 +261,25 @@ public class UploadServiceFactory {
         }
         
         if(formats.size() > 1) {
-            throw new UploadServiceFactoryException("Multiple search data file formats found in directory: "+dataDirectory);
+        	// We may have .sqt and Percolator xml file in the same directory.  If so we will upload the xml file
+        	if(formats.size() == 2) {
+        		if(formats.contains(SearchFileFormat.SQT) && formats.contains(SearchFileFormat.XML)) {
+        			for(String file: filenames) {
+        				if(file.endsWith(".xml")) {
+        					if(isPercolatorXml(dataDirectory+File.separator+file)) {
+        						formats.clear();
+        						formats.add(SearchFileFormat.XML_PERC);
+        					}
+        					else {
+        						formats.remove(SearchFileFormat.XML);
+        					}
+        				}
+        			}
+        		}
+        	}
+        	
+        	if(formats.size() > 1)
+        		throw new UploadServiceFactoryException("Multiple search data file formats found in directory: "+dataDirectory);
         }
         
         SearchFileFormat format = formats.iterator().next();
@@ -275,6 +296,12 @@ public class UploadServiceFactory {
                 throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
             }
         }
+        else if(format == SearchFileFormat.XML_PERC) {
+        	AnalysisDataUploadService service = new PercolatorXmlDataUploadService();
+            service.setDirectory(dataDirectory);
+            return service;
+        }
+        
         else if(format == SearchFileFormat.PEPXML) {
             AnalysisDataUploadService service = new PepxmlAnalysisDataUploadService();
             service.setDirectory(dataDirectory);
@@ -285,7 +312,16 @@ public class UploadServiceFactory {
         }
     }
     
-    private SearchFileFormat getSqtType(String fileDirectory, Set<String> filenames) throws UploadServiceFactoryException {
+    private boolean isPercolatorXml(String filePath) {
+    	try {
+			return PercolatorXmlFileReader.isPercolatorXml(filePath);
+		} catch (DataProviderException e) {
+			log.error("Error reading XML file: "+filePath, e);
+			return false;
+		}
+	}
+
+	private SearchFileFormat getSqtType(String fileDirectory, Set<String> filenames) throws UploadServiceFactoryException {
         
         SearchFileFormat sqtType = null;
         

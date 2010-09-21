@@ -747,7 +747,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
                     for(SQTHeaderItem h: header.getHeaders()) {
                         if(h.getName().equalsIgnoreCase("percolator")) {
                             String cmdline = h.getValue();
-                            String[] tokens = cmdline.split(",");
+                            String[] tokens = cmdline.split("\\s+");
                             for(int i = 0; i < tokens.length; i++) {
                                 String val = tokens[i];
                                 if(val.startsWith("-m")) {

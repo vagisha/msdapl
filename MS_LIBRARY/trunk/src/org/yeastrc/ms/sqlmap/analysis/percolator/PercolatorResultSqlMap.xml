@@ -17,6 +17,7 @@
 		<result property="qvalue" column="qvalue" nullValue="-1.0"/>
 		<result property="posteriorErrorProbability" column="pep" nullValue="-1.0"/>
 		<result property="discriminantScore" column="discriminantScore" />
+		<result property="pvalue" column="pvalue" nullValue="-1.0"/>
 		<result property="predictedRetentionTime" column="predictedRetentionTime" />
 		<result property="proteinMatchList" 
 				select="MsResultProtein.selectResultProteins" 
@@ -29,6 +30,7 @@
 		<parameter property="qvalue" jdbcType="DOUBLE" nullValue="-1.0"/>
 		<parameter property="posteriorErrorProbability" jdbcType="DOUBLE" nullValue="-1.0"/>
 		<parameter property="discriminantScore" jdbcType="DOUBLE" />
+		<parameter property="pvalue" jdbcType="DOUBLE" nullValue="-1.0"/>
 		<parameter property="predictedRetentionTime" jdbcType="DECIMAL" />
 	</parameterMap>
 	
@@ -40,7 +42,7 @@
 		AND pres.resultID = res.id
 	</select>
 	
-	<select id="selectForRunSearchAnalysis" resultMap="percolatorResultResult" parameterClass="Integer">
+	<select id="selectForRunSearchAnalysis" resultMap="percolatorResultResult" parameterClass="java.util.Map">
 		SELECT res.id AS sresID, pres.id AS presID, res.*, pres.* 
 		FROM msRunSearchResult AS res, PercolatorResult AS pres 
 		WHERE res.id = #searchResultId#
@@ -109,8 +111,9 @@
     	qvalue,
     	pep,
     	discriminantScore,
+    	pvalue,
     	predictedRetentionTime) 
-    	VALUES (?,?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?,?)
     </insert>
     
     <insert id="insertAll" parameterClass="String">
@@ -120,6 +123,7 @@
     	qvalue,
     	pep,
     	discriminantScore,
+    	pvalue,
     	predictedRetentionTime) 
     	VALUES $values$
     </insert>

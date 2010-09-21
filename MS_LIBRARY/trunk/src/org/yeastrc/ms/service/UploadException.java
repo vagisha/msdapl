@@ -72,6 +72,7 @@ public class UploadException extends Exception {
         
         // For Percolator uploads
         NO_RUNSEARCHID_FOR_ANALYSIS_FILE  ("No runSearchID found for analysis file", WARN),
+        NO_RSANALYSISID_FOR_ANALYSIS_FILE  ("No runSearchAnalysisID found for analysis file", WARN),
         NO_PERC_ANALYSIS_UPLOADED("No Percolator analysis files were uploaded", ERROR),
         NO_MATCHING_SEARCH_RESULT("No matching search result was found for the analysis result", WARN),
         MULTI_MATCHING_SEARCH_RESULT("Multiple matching search results were found for the analysis result", WARN),
@@ -89,6 +90,9 @@ public class UploadException extends Exception {
         
         // PeptideProphet
         NO_PEPTPROPH_ANALYSIS_UPLOADED("No PeptideProphet analyses were uploaded", ERROR),
+        
+        // Percolator XML
+        PERC_XML_ERROR 			("Error reading Percolator XML", WARN),
         
         // Error disabling/enabling keys
         ERROR_SQL_DISABLE_KEYS  ("Error disabling keys", ERROR),

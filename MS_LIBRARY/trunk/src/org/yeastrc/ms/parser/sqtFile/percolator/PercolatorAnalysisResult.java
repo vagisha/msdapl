@@ -19,6 +19,7 @@ public class PercolatorAnalysisResult extends SearchResult implements Percolator
     private double pep = -1.0;
     private Double discriminantScore = null;
     private double qvalue = -1.0;
+    private double pvalue = -1.0;
     
     
     public PercolatorAnalysisResult() {
@@ -95,6 +96,15 @@ public class PercolatorAnalysisResult extends SearchResult implements Percolator
         this.qvalue = qvalue;
     }
 
+    @Override
+    public double getPvalue() {
+    	return pvalue;
+    }
+    
+    public void setPvalue(double pvalue) {
+    	this.pvalue = pvalue;
+    }
+    
     /**
      * This method returns null. Percolated SQT files do not have predicted retention time.
      */
@@ -112,7 +122,8 @@ public class PercolatorAnalysisResult extends SearchResult implements Percolator
         buf.append("\t");
         buf.append(mass);
         buf.append("\t");
-        buf.append(deltaCN.stripTrailingZeros());
+        if(deltaCN != null)
+        	buf.append(deltaCN.stripTrailingZeros());
         buf.append("\t");
         buf.append(qvalue);
         if(pep != -1.0) {
@@ -122,6 +133,10 @@ public class PercolatorAnalysisResult extends SearchResult implements Percolator
         if(discriminantScore != -1.0) {
             buf.append("\t");
             buf.append(discriminantScore);
+        }
+        if(pvalue != -1.0) {
+        	buf.append("\t");
+            buf.append(pvalue);
         }
         buf.append("\t");
         buf.append(numMatchingIons);

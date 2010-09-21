@@ -1,21 +1,28 @@
 /**
- * PercolatorResultIn.java
+ * PercolatorPeptideResultIn.java
  * @author Vagisha Sharma
- * Dec 10, 2008
- * @version 1.0
+ * Sep 16, 2010
  */
 package org.yeastrc.ms.domain.analysis.percolator;
 
-import java.math.BigDecimal;
+import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsSearchResultIn;
+import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
+import org.yeastrc.ms.parser.percolator.PercolatorXmlPsmId;
 
 /**
  * 
  */
-public interface PercolatorResultIn extends MsSearchResultIn {
+public interface PercolatorPeptideResultIn {
 
-    /**
+	/**
+	 * 
+	 * @return the peptide
+	 */
+	public abstract MsSearchResultPeptide getResultPeptide();
+	
+	/**
      * @return the qvalue
      */
     public abstract double getQvalue();
@@ -36,10 +43,17 @@ public interface PercolatorResultIn extends MsSearchResultIn {
      */
     public abstract Double getDiscriminantScore();
     
+    /**
+     * @return the proteinMatchList
+     */
+    public abstract List<MsSearchResultProteinIn> getProteinMatchList();
+    
     
     /**
-     * @return the predicted retention time or null if there is not predicted RT.
+     * 
+     * @return List of IDs of PSM's for this peptide
      */
-    public abstract BigDecimal getPredictedRetentionTime();
+    public abstract List<PercolatorXmlPsmId> getPsmIds();
     
+	
 }

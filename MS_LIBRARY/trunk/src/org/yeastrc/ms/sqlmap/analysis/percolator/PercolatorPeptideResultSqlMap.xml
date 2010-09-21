@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="PercolatorPeptideResult"> 
+
+	<typeAlias alias="PercolatorPeptideResultOut" type="org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorPeptideResultBean" />
+
+	<resultMap class="PercolatorPeptideResultOut" id="percolatorPeptideResultResult">
+		<result property="id" column="id" />
+		<result property="searchAnalysisId" column="searchAnalysisID" nullValue="0"/>
+		<result property="qvalue" column="qvalue" nullValue="-1.0"/>
+		<result property="posteriorErrorProbability" column="pep" nullValue="-1.0"/>
+		<result property="discriminantScore" column="discriminantScore" />
+		<result property="pvalue" column="pvalue" nullValue="-1.0"/>
+		<result property="psmIdList" 
+				select="PercolatorPeptideResult.selectPeptPsmIds" 
+				column="id"/>
+		<result property="psmIdList" 
+				select="PercolatorPeptideResult.selectPeptPsmIds" 
+				column="id"/>
+		<result property="psmList" 
+				select="PercolatorPeptideResult.selectPeptPsms" 
+				column="id"/>
+		<result property="resultPeptide" 
+				select="PercolatorPeptideResult.selectResultPeptide"
+				column="id"/>	
+		<result property="proteinMatchList" 
+				select="PercolatorPeptideResult.selectMatchProteins" 
+				column="id"/>	
+				
+	</resultMap>
+	
+	
+	<select id="select" resultMap="percolatorPeptideResultResult" parameterClass="Integer">
+		SELECT * 
+		FROM PercolatorPeptideResult
+		WHERE id = #id#
+	</select>
+	
+	<select id="selectPeptPsmIds" resultClass="Integer" parameterClass="Integer">
+		SELECT psmResultID
+		FROM PercolatorPeptidePsm
+		WHERE peptideResultID = #id#
+	</select>
+	
+	<select id="selectPeptPsms" resultMap="PercolatorResult.percolatorResultResult" parameterClass="Integer">
+		SELECT res.id AS sresID, pres.id AS presID, res.*, pres.* 
+		FROM msRunSearchResult AS res, PercolatorResult AS pres, PercolatorPeptidePsm AS peptPsm
+		WHERE peptPsm.peptideResultID = #id#
+		AND peptPsm.psmResultID = pres.id
+		AND pres.resultID = res.id
+	</select>
+	
+	<select id="selectResultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" parameterClass="Integer">
+		SELECT * from msRunSearchResult 
+		WHERE id = (SELECT pres.resultID 
+					FROM PercolatorResult AS pres, PercolatorPeptidePsm AS psm 
+					WHERE psm.peptideResultID=#id#
+					AND psm.psmResultID = pres.id
+					LIMIT 1)
+	</select>
+	
+	<select id="selectMatchProteins" resultMap="MsResultProtein.msResultProteinResult" parameterClass="Integer">
+		SELECT * FROM msProteinMatch
+		WHERE resultID = (SELECT pres.resultID 
+					FROM PercolatorResult AS pres, PercolatorPeptidePsm AS psm 
+					WHERE psm.peptideResultID=#id#
+					AND psm.psmResultID = pres.id
+					LIMIT 1)
+	</select>
+	
+	
+	
+	<select id="selectResultIdsForAnalysis" resultClass="Integer" parameterClass="Integer">
+		SELECT id
+		FROM PercolatorPeptideResult
+		WHERE searchAnalysisID = #id#
+	</select>
+	
+	<select id="selectResultIdsLimitedForAnalysis" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id 
+    	FROM PercolatorPeptideResult
+		WHERE searchAnalysisID = #id#
+    	ORDER BY id LIMIT #offset#, #limit#
+    </select>
+	
+	<select id="countForAnalysis" resultClass="Integer" parameterClass="Integer">
+		SELECT count(*)
+		FROM PercolatorPeptideResult
+		WHERE searchAnalysisID = #id#
+	</select>
+	
+</sqlMap>

@@ -19,6 +19,8 @@ public interface MsRunSearchAnalysisDAO {
     
     public abstract MsRunSearchAnalysis load(int runSearchAnalysisId);
     
+    public abstract MsRunSearchAnalysis load(int analysisId, int runSearchId);
+    
     public abstract List<Integer> getRunSearchAnalysisIdsForAnalysis(int analysisId);
     
     /**

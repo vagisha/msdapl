@@ -143,6 +143,9 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
             values.append(",");
             values.append(data.getDiscriminantScore());
             values.append(",");
+            double pvalue = data.getPvalue();
+            values.append(pvalue == -1.0 ? "NULL" : pvalue);
+            values.append(",");
             values.append(data.getPredictedRetentionTime());
             values.append(")");
         }
@@ -849,10 +852,16 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         if(vStatus != null)
             result.setValidationStatus(ValidationStatus.instance(vStatus.charAt(0)));
         result.setQvalue(rs.getDouble("qvalue"));
+        
         if(rs.getObject("pep") != null)
-            result.setQvalue(rs.getDouble("pep"));
+            result.setPosteriorErrorProbability(rs.getDouble("pep"));
+        
         if(rs.getObject("discriminantScore") != null)
             result.setDiscriminantScore(rs.getDouble("discriminantScore"));
+        
+        if(rs.getObject("pvalue") != null)
+            result.setPvalue(rs.getDouble("pvalue"));
+        
         result.setPredictedRetentionTime(rs.getBigDecimal("predictedRetentionTime"));
         
         SearchResultPeptideBean peptide = new SearchResultPeptideBean();

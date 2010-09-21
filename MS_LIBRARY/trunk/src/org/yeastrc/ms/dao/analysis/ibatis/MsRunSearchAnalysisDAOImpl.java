@@ -6,7 +6,9 @@
  */
 package org.yeastrc.ms.dao.analysis.ibatis;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
@@ -31,6 +33,14 @@ public class MsRunSearchAnalysisDAOImpl extends BaseSqlMapDAO implements MsRunSe
     public MsRunSearchAnalysis load(int runSearchAnalysisId) {
         return (MsRunSearchAnalysis) queryForObject(namespace+".select", runSearchAnalysisId);
     }
+    
+    @Override
+	public MsRunSearchAnalysis load(int analysisId, int runSearchId) {
+    	Map<String, Integer> map = new HashMap<String, Integer>(4);
+    	map.put("analysisId", analysisId);
+    	map.put("runSearchId", runSearchId);
+    	return (MsRunSearchAnalysis) queryForObject(namespace+".selectForAnalysisRunSearch", map);
+	}
     
     @Override
     public List<Integer> getRunSearchAnalysisIdsForAnalysis(int analysisId) {

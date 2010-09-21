@@ -1,23 +1,30 @@
 /**
- * PercolatorResult.java
+ * PercolatorPeptideResult.java
  * @author Vagisha Sharma
- * Dec 10, 2008
- * @version 1.0
+ * Sep 17, 2010
  */
 package org.yeastrc.ms.domain.analysis.percolator;
 
-import java.math.BigDecimal;
+import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.domain.search.MsSearchResultProtein;
+
 
 /**
  * 
  */
-public interface PercolatorResult extends MsSearchResult {
+public interface PercolatorPeptideResult {
 
-    public abstract int getPercolatorResultId();
+	public abstract int getId();
     
-    public abstract int getRunSearchAnalysisId();
+    public abstract int getSearchAnalysisId();
+    
+    
+    /**
+     * @return the peptideResult
+     */
+    public abstract MsSearchResultPeptide getResultPeptide();
     
     /**
      * @return the qvalue
@@ -44,13 +51,16 @@ public interface PercolatorResult extends MsSearchResult {
     /**
      * @return the pvalue or null if there was no pvalue 
      */
-    public abstract Double getPvalue();
+    public abstract double getPvalue();
     
-    public abstract Double getPvalueRounded();
+    public abstract double getPvalueRounded();
+    
+    public abstract List<PercolatorResult> getPsmList();
+    
+    public abstract List<Integer> getPsmIdList();
     
     /**
-     * @return the Predicted Retention Time
+     * @return the proteinMatchList
      */
-    public abstract BigDecimal getPredictedRetentionTime();
-    
+    public abstract List<MsSearchResultProtein> getProteinMatchList();
 }

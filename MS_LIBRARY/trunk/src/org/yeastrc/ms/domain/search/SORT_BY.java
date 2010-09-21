@@ -46,9 +46,11 @@ public enum SORT_BY {
     
     // Percolator specific
     QVAL("q-value", "qvalue"),
+    PVAL("p-value", "pvalue"),
     PEP("PEP", "pep"),
     DS("DS", "discriminantScore"),
     P_RT("Predict. RT", "predictedRetentionTime"),
+    NUM_PSM("#PSMs", "numPsms"),
 
     // PeptideProphet specific
     PEPTP_PROB("Probability", "probability");

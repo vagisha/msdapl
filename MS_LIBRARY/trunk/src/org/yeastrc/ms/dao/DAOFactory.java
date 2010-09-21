@@ -18,8 +18,10 @@ import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetAnalysisD
 import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetResultDAOImpl;
 import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetRocDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorParamsDAO;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorPeptideResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorParamsDAOImpl;
+import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorPeptideResultDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorResultDAOImpl;
 import org.yeastrc.ms.dao.general.MsEnzymeDAO;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
@@ -183,6 +185,7 @@ public class DAOFactory {
     // DAOs related to Percolator post search analysis
     private PercolatorParamsDAO percSQTHeaderDAO;
     private PercolatorResultDAO percResultDAO;
+    private PercolatorPeptideResultDAO percPeptResultDAO;
     
     // DAOs related to PeptideProphet search analysis
     private PeptideProphetAnalysisDAO ppAnalysisDAO;
@@ -248,6 +251,8 @@ public class DAOFactory {
         // Percolator post search analysis related 
         percSQTHeaderDAO = new PercolatorParamsDAOImpl(sqlMap);
         percResultDAO = new PercolatorResultDAOImpl(sqlMap, rsAnalysisDAO, runSearchDAO, modDAO);
+        percPeptResultDAO = new PercolatorPeptideResultDAOImpl(sqlMap, rsAnalysisDAO);
+			
         
         // PeptideProphet post search analysis related
         ppAnalysisDAO = new PeptideProphetAnalysisDAOImpl(sqlMap, analysisDAO);
@@ -430,6 +435,11 @@ public class DAOFactory {
     public PercolatorResultDAO getPercolatorResultDAO() {
         return percResultDAO;
     }
+    
+    public PercolatorPeptideResultDAO getPercolatorPeptideResultDAO() {
+    	return percPeptResultDAO;
+    }
+    
     //-------------------------------------------------------------------------------------------
     // PeptideProphet related
     //-------------------------------------------------------------------------------------------

@@ -66,6 +66,20 @@ public class PercolatorResultBean extends SearchResultBean implements Percolator
     }
 
     @Override
+	public Double getPvalue() {
+		return data.getPvalue();
+	}
+
+	@Override
+	public Double getPvalueRounded() {
+		return Math.round(data.getPvalue() * 1000.0) / 1000.0;
+	}
+	
+	public void setPvalue(double pvalue) {
+		data.setPvalue(pvalue);
+	}
+	
+    @Override
     public Double getDiscriminantScoreRounded() {
         Double discriminantScore = data.getDiscriminantScore();
         if(discriminantScore == null)   return null;

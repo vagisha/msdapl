@@ -174,11 +174,20 @@ public class ResultFilterCriteria {
     }
     
     public String makePeptideSql() {
+        return makePeptideSql(null);
+    }
+    
+    public String makePeptideSql(String table) {
+    	String key = "";
+    	if(table != null)
+    		key += table+".";
+    	key += "peptide";
+    	
         if(hasPeptideFilter()) {
             if(exactMatch)
-                return " (peptide = '"+peptide+"') ";
+                return " ("+key+" = '"+peptide+"') ";
             else
-                return " (peptide LIKE '%"+peptide+"%') ";
+                return " ("+key+" LIKE '%"+peptide+"%') ";
         }
         return "";
     }

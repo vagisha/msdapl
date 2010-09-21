@@ -14,6 +14,7 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.domain.general.impl.ExperimentBean;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.service.percolator.PercolatorXmlDataUploadService;
 import org.yeastrc.ms.service.sqtfile.AbstractSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
 
@@ -180,15 +181,25 @@ public class MsExperimentUploader {
     }
     
     private void doSequestResultRankCheck() {
+    	
+    	// TODO If we are reading Percolator XML outptut get this information from the XML file
         if(do_sdupload && do_adupload) {
-            if(adus instanceof PercolatorSQTDataUploadService &&
-               sdus instanceof AbstractSQTDataUploadService) {
-                
-                PercolatorSQTDataUploadService ps = (PercolatorSQTDataUploadService) adus;
-                int maxPsmRank = ps.getMaxPsmRank();
-                log.info("SEQUEST results upto xCorrRank: "+maxPsmRank+" will be uploaded");
-                ((AbstractSQTDataUploadService)sdus).setXcorrRankCutoff(maxPsmRank);
-            }
+        	
+        	int maxPsmRank = Integer.MAX_VALUE;
+        	if(sdus instanceof AbstractSQTDataUploadService) {
+        		
+        		if(adus instanceof PercolatorSQTDataUploadService) {
+        			PercolatorSQTDataUploadService ps = (PercolatorSQTDataUploadService) adus;
+        			maxPsmRank = ps.getMaxPsmRank();
+        		}
+        		
+        		else if (adus instanceof PercolatorXmlDataUploadService) {
+        			PercolatorXmlDataUploadService ps = (PercolatorXmlDataUploadService) adus;
+        			maxPsmRank = ps.getMaxPsmRank();
+        		}
+        	}
+        	log.info("SEQUEST results upto xCorrRank: "+maxPsmRank+" will be uploaded");
+            ((AbstractSQTDataUploadService)sdus).setXcorrRankCutoff(maxPsmRank);
         }
     }
     

@@ -15,8 +15,10 @@ public enum SearchFileFormat {
     //SQT_NSEQ("SQT: "+Program.EE_NORM_SEQUEST.displayName()), 
     SQT_PLUCID("SQT: "+Program.PROLUCID.displayName()), 
     SQT_PPROBE("SQT: "+Program.PEPPROBE), 
-    SQT_PERC("SQT: "+Program.PERCOLATOR.displayName()), 
+    SQT_PERC("SQT: "+Program.PERCOLATOR.displayName()),
     SQT_BIBLIO("SQT: "+Program.BIBLIOSPEC.displayName()),
+    XML("XML: GENERIC"),
+    XML_PERC("XML: "+Program.PERCOLATOR.displayName()),
     PEPXML("pepxml: GENERIC"), 
     PEPXML_SEQ("pepxml: "+Program.SEQUEST.displayName()),
     PEPXML_MASCOT("pepxml: "+Program.MASCOT.displayName()),
@@ -68,6 +70,8 @@ public enum SearchFileFormat {
         else if (extString.equalsIgnoreCase(SearchFileFormat.PROTXML.name()) ||
                 extString.equalsIgnoreCase("prot.xml"))
             return SearchFileFormat.PROTXML;
+        else if (extString.equalsIgnoreCase(SearchFileFormat.XML.name()))
+        	return SearchFileFormat.XML;
         else return SearchFileFormat.UNKNOWN;
     }
 }

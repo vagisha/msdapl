@@ -16,6 +16,8 @@ public class PercolatorResultFilterCriteria extends ResultFilterCriteria {
 
     private Double minQValue;
     private Double maxQValue;
+    private Double minPValue;
+    private Double maxPValue;
     private Double minPep;
     private Double maxPep;
     private Double minDs; // discriminant score or SVM score
@@ -58,7 +60,48 @@ public class PercolatorResultFilterCriteria extends ResultFilterCriteria {
     }
     
     public String makeQValueFilterSql() {
-        return makeFilterSql(SORT_BY.QVAL.getColumnName(), minQValue, maxQValue);
+        return makeQValueFilterSql(null);
+    }
+    
+    public String makeQValueFilterSql(String table) {
+    	if(table != null)
+    		return makeFilterSql(table+"."+SORT_BY.QVAL.getColumnName(), minQValue, maxQValue);
+    	else
+    		return makeFilterSql(SORT_BY.QVAL.getColumnName(), minQValue, maxQValue);
+    }
+    
+    //-------------------------------------------------------------
+    // PVALUE FILTER
+    //-------------------------------------------------------------
+    public Double getMinPValue() {
+        return minPValue;
+    }
+
+    public void setMinPValue(Double minPValue) {
+        this.minPValue = minPValue;
+    }
+
+    public Double getMaxPValue() {
+        return maxPValue;
+    }
+
+    public void setMaxPValue(Double maxPValue) {
+        this.maxPValue = maxPValue;
+    }
+
+    public boolean hasPValueFilter() {
+      return (minPValue != null || maxPValue != null);
+    }
+    
+    public String makePValueFilterSql() {
+    	return makePValueFilterSql(null);
+    }
+    
+    public String makePValueFilterSql(String table) {
+    	if(table != null)
+    		return makeFilterSql(table+"."+SORT_BY.PVAL.getColumnName(), minPValue, maxPValue);
+    	else
+    		return makeFilterSql(SORT_BY.PVAL.getColumnName(), minPValue, maxPValue);
     }
     
     //-------------------------------------------------------------
@@ -85,7 +128,14 @@ public class PercolatorResultFilterCriteria extends ResultFilterCriteria {
     }
     
     public String makePepFilterSql() {
-        return makeFilterSql(SORT_BY.PEP.getColumnName(), minPep, maxPep);
+        return makePepFilterSql(null);
+    }
+    
+    public String makePepFilterSql(String table) {
+    	if(table != null)
+    		return makeFilterSql(table+"."+SORT_BY.PEP.getColumnName(), minPep, maxPep);
+    	else
+    		return makeFilterSql(SORT_BY.PEP.getColumnName(), minPep, maxPep);
     }
     
     //-------------------------------------------------------------
@@ -112,6 +162,13 @@ public class PercolatorResultFilterCriteria extends ResultFilterCriteria {
     }
     
     public String makeDsFilterSql() {
-        return makeFilterSql(SORT_BY.DS.getColumnName(), minDs, maxDs);
+        return makeDsFilterSql(null);
+    }
+    
+    public String makeDsFilterSql(String table) {
+    	if(table != null)
+    		return makeFilterSql(table+"."+SORT_BY.DS.getColumnName(), minDs, maxDs);
+    	else
+    		return makeFilterSql(SORT_BY.DS.getColumnName(), minDs, maxDs);
     }
 }
