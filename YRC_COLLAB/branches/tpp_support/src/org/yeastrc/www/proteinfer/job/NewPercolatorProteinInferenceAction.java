@@ -17,8 +17,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorPeptideResultDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
+import org.yeastrc.ms.domain.protinfer.ProgramParam;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
+import org.yeastrc.ms.domain.protinfer.ProgramParam.ParamMaker;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.project.Project;
@@ -148,9 +151,22 @@ public class NewPercolatorProteinInferenceAction extends Action {
         ProteinInferInputSummary inputSummary = inputGetter.getInputAnalysisSummary(analysis);
         formForAnalysis.setInputSummary(inputSummary);
         
+        // DO we have peptide-level scores for this analysis
+        boolean havePeptideScores = false;
+        PercolatorPeptideResultDAO peptResDao = DAOFactory.instance().getPercolatorPeptideResultDAO();
+        if(peptResDao.peptideCountForAnalysis(analysis.getId()) > 0)
+        	havePeptideScores = true;
+        
         // get the percolator version
         String version = analysis.getAnalysisProgramVersion();
         ProgramParameters progParams = new ProgramParameters(ProteinInferenceProgram.PROTINFER_PERC);
+        
+        // If we don't have peptide-level scores we will not display the "use peptide scores" option.
+        if(!havePeptideScores) {
+        	ProgramParam usePeptScores = ParamMaker.makeUsePercolatorPeptideScores();
+        	progParams.removeParam(usePeptScores.getName());
+        }
+        
         try {
             float fv = Float.parseFloat(version);
             if(fv < 1.06)

@@ -1,6 +1,7 @@
 package org.yeastrc.www.proteinfer.job;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.yeastrc.ms.domain.protinfer.ProgramParam;
@@ -23,6 +24,15 @@ public class ProgramParameters {
         this.paramList = new ArrayList<Param>(program.getProgramParams().length);
         for(ProgramParam p: program.getProgramParams())
             this.addParam(new Param(p));
+    }
+    
+    public void removeParam(String paramName) {
+    	Iterator<Param> iter = paramList.iterator();
+    	while(iter.hasNext()) {
+    		Param p = iter.next();
+    		if(p.getName().equals(paramName))
+    			iter.remove();
+    	}
     }
     public String getProgramName() {
         return programName;

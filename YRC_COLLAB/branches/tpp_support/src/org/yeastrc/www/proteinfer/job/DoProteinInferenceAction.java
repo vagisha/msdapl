@@ -64,21 +64,39 @@ public class DoProteinInferenceAction extends Action {
         
         // If "remove ambiguous spectrum" was unchecked it may not be in the parameters list
         // or its value will be empty. Set it to false.
-        boolean found = false;
-        ProgramParam progParam = ParamMaker.makeRemoveAmbigSpectraParam();
+        boolean foundAmbig = false;
+        ProgramParam ambigSpecParam = ParamMaker.makeRemoveAmbigSpectraParam();
         for(Param param: params.getParamList()) {
-            if(param.getName().equals(progParam.getName())) {
+            if(param.getName().equals(ambigSpecParam.getName())) {
                 if(param.getValue() == null || param.getValue().trim().length() == 0)
                     param.setValue("false");
-                found = true;
+                foundAmbig = true;
                 break;
             }
         }
-        if(!found) {
-            Param myParam = new Param(progParam);
+        if(!foundAmbig) {
+            Param myParam = new Param(ambigSpecParam);
             myParam.setValue("false");
             params.addParam(myParam);
         }
+        
+        // If "use percolator peptide scores" is not in the parameter list set it to false
+        boolean foundUsePept = false;
+        ProgramParam usePeptParam = ParamMaker.makeUsePercolatorPeptideScores();
+        for(Param param: params.getParamList()) {
+            if(param.getName().equals(usePeptParam.getName())) {
+                if(param.getValue() == null || param.getValue().trim().length() == 0)
+                    param.setValue("false");
+                foundUsePept = true;
+                break;
+            }
+        }
+        if(!foundUsePept) {
+            Param myParam = new Param(usePeptParam);
+            myParam.setValue("false");
+            params.addParam(myParam);
+        }
+        
         
         if(prinferForm.isIndividualRuns()) {
             ProteinferJobSaver.instance().saveMultiJobToDatabase(user.getID(), inputSummary, params, 
