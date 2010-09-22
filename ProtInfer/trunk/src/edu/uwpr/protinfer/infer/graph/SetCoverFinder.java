@@ -218,7 +218,7 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
                 
                 // if there is still a tie compare the labels (this should be the
                 // concatenation of the nrseq protein ids for protein vertices
-                log.warn("Looking at vertex labels to resolve ties!!! Labels: "
+                log.info("Looking at vertex labels to resolve ties!!! Labels: "
                         +qv1.getVertex().getLabel()+" AND "+qv2.getVertex().getLabel());
                 return qv1.getVertex().getLabel().compareTo(qv2.getVertex().getLabel());
                 

@@ -23,6 +23,8 @@ public class PercolatorParams {
     private boolean hasDiscriminantScoreCutoff = false;
     private IDPickerParams idpParams = null;
     
+    private boolean usePeptideLevelScores = false;
+    
     public PercolatorParams(IDPickerParams params) {
         
         this.idpParams = params;
@@ -39,6 +41,9 @@ public class PercolatorParams {
             else if(filter.getName().equalsIgnoreCase("discriminantScore_percolator")) {
                 discriminantScore = Double.parseDouble(filter.getValue());
                 hasDiscriminantScoreCutoff = true;
+            }
+            else if(filter.getName().equalsIgnoreCase("usePeptideScores")) {
+            	usePeptideLevelScores = Boolean.parseBoolean(filter.getValue());
             }
         }
     }
@@ -70,4 +75,8 @@ public class PercolatorParams {
     public boolean hasDiscriminantScoreCutoff() {
         return hasDiscriminantScoreCutoff;
     }
+
+	public boolean isUsePeptideLevelScores() {
+		return usePeptideLevelScores;
+	}
 }

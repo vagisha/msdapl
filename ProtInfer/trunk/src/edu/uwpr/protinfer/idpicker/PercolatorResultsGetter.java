@@ -8,7 +8,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorPeptideResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
+import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorPeptideResultDAOImpl;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
@@ -210,11 +212,22 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
             log.info("Loading Percolator results for runSearchAnalysisID: "+inputId);
 
             long s = System.currentTimeMillis();
-            List<PercolatorResult> resultList = resultDao.loadTopPercolatorResultsN(inputId, 
+            
+            List<PercolatorResult> resultList = null;
+            if(!percParams.isUsePeptideLevelScores()) {
+            	log.info("Filtering on PSM scores");
+            	resultList = resultDao.loadTopPercolatorResultsN(inputId, 
                                             qvalCutoff, 
                                             pepCutoff, 
                                             dsCutoff,
                                             true); // get the dynamic residue mods
+            }
+            else {
+            	log.info("Filtering on peptide scores");
+            	PercolatorPeptideResultDAO peptResDao = DAOFactory.instance().getPercolatorPeptideResultDAO();
+            	resultList = peptResDao.loadPercolatorPsms(inputId, qvalCutoff, pepCutoff, dsCutoff);
+            }
+            
             log.info("\tTotal hits that pass score thresholds for runSearchAnalysisID "+inputId+": "+resultList.size());
             long e = System.currentTimeMillis();
 
