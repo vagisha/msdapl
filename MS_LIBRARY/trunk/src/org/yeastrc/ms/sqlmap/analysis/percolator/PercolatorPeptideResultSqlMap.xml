@@ -90,4 +90,28 @@
 		WHERE searchAnalysisID = #id#
 	</select>
 	
+	<select id="selectFilteredIdsForAnalysis" resultClass="Integer" parameterClass="java.util.Map">
+		SELECT id
+		FROM PercolatorPeptideResult
+		WHERE searchAnalysisID = #searchAnalysisID#
+		<isNotNull property="qvalue">
+			AND qvalue &lt;= #qvalue#		
+		</isNotNull>
+		<isNotNull property="pep">
+			AND pep &lt;= #pep#		
+		</isNotNull>
+		<isNotNull property="discriminantScore">
+			AND discriminantScore &lt;= #discriminantScore#		
+		</isNotNull>
+	</select>
+	
+	<select id="selectPercResIdsForPeptideAndRunSearchAnalysis" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT peptPsm.psmResultID 
+    	FROM PercolatorPeptideResult AS pept, PercolatorPeptidePsm AS peptPsm, PercolatorResult AS pres
+		WHERE pept.id = peptPsm.peptideResultID
+		AND peptPsm.psmResultID = pres.id
+		AND pres.runSearchAnalysisID=#runSearchAnalysisId#
+		AND pept.id=#petideResultId#
+    </select>
+	
 </sqlMap>

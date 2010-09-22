@@ -175,6 +175,14 @@ public final class ProgramParam {
               "true", null,
               "If checked, spectra with > 1 peptide matches, that pass through the filter criteria, will be removed from analysis.");
         }
+        
+        public static ProgramParam makeUsePercolatorPeptideScores() {
+            return new ProgramParam(TYPE.BOOLEAN, 
+              "usePeptideScores", "Percolator Peptide Scores", 
+              "true", null,
+              "If checked, Percolator's peptide-level scores will be used for filtering peptide spectrum matches.");
+        }
+        
 //        new ProgramParam(TYPE.BOOLEAN, 
 //            "parsimonyAnalysis", "Parsimony Analysis", 
 //            "true", null,

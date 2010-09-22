@@ -17,14 +17,25 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.ConnectionFactory;
-import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorPeptideResultDAO;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
+import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorPeptideResult;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultFilterCriteria;
+import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorResultBean;
+import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
+import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.ResultSortCriteria;
 import org.yeastrc.ms.domain.search.SORT_BY;
+import org.yeastrc.ms.domain.search.ValidationStatus;
+import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
+import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -38,10 +49,18 @@ public class PercolatorPeptideResultDAOImpl extends BaseSqlMapDAO implements
 	private static final String namespace = "PercolatorPeptideResult";
 	
 	private MsRunSearchAnalysisDAO runSearchAnalysisDao;
+	private MsRunSearchDAO runSearchDao;
+	private MsSearchModificationDAO modDao;
+	private PercolatorResultDAO percResDao;
 	
-	public PercolatorPeptideResultDAOImpl(SqlMapClient sqlMap, MsRunSearchAnalysisDAO rsaDao) {
+	public PercolatorPeptideResultDAOImpl(SqlMapClient sqlMap, MsRunSearchAnalysisDAO rsaDao, 
+			MsRunSearchDAO runSearchDao, MsSearchModificationDAO modDao,
+			PercolatorResultDAO percResDao) {
 		super(sqlMap);
 		this.runSearchAnalysisDao = rsaDao;
+		this.runSearchDao = runSearchDao;
+		this.modDao = modDao;
+		this.percResDao = percResDao;
 	}
 
 	@Override
@@ -360,4 +379,214 @@ public class PercolatorPeptideResultDAOImpl extends BaseSqlMapDAO implements
         }
         return ids;
     }
+
+	@Override
+	public List<PercolatorResult> loadPercolatorPsms(int runSearchAnalysisId,
+			Double qvalue, Double pep, Double discriminantScore) {
+		
+		return loadTopResultsForRunSearchNWMods(runSearchAnalysisId, qvalue, pep, discriminantScore);
+	}
+	
+	public List<Integer> getFilteredPeptideResultIds(int searchAnalysisId, Double qvalue, Double pep, 
+			Double discriminantScore) {
+		
+		Map<String, Number> map = new HashMap<String, Number>(6);
+		map.put("searchAnalysisID", searchAnalysisId);
+		map.put("qvalue", qvalue);
+		map.put("pep", pep);
+		map.put("discriminantScore", discriminantScore);
+		
+		return queryForList(namespace+".selectFilteredIdsForAnalysis", map);
+	}
+	
+	private List<Integer> getPercolatorIdsForPeptideAndRunSearchAnalysisId(
+			Integer pepResId, int runSearchAnalysisId) {
+		
+		Map<String, Integer> map = new HashMap<String, Integer>(4);
+		map.put("petideResultId", pepResId);
+		map.put("runSearchAnalysisId", runSearchAnalysisId);
+		
+		return queryForList(namespace+".selectPercResIdsForPeptideAndRunSearchAnalysis", map);
+	}
+	
+	private List<PercolatorResult> loadTopResultsForRunSearchNWMods(
+            int runSearchAnalysisId, Double qvalue, Double pep, Double discriminantScore) {
+        
+		
+		MsRunSearchAnalysis msa = runSearchAnalysisDao.load(runSearchAnalysisId);
+		if(msa == null) {
+			log.error("No runSearchAnalysis found with ID: "+runSearchAnalysisId);
+			throw new IllegalArgumentException("No run search analysis found with ID: "+runSearchAnalysisId);
+		}
+
+		List<Integer> percPeptideResultIds = getFilteredPeptideResultIds(msa.getAnalysisId(), qvalue, pep, discriminantScore);
+
+
+		List<PercolatorResult> resultList = new ArrayList<PercolatorResult>();
+
+		for(Integer pepResId: percPeptideResultIds) {
+
+			List<Integer> percResIds = getPercolatorIdsForPeptideAndRunSearchAnalysisId(pepResId, runSearchAnalysisId);
+
+			if(percResIds.size() > 0) {
+				for(Integer presId: percResIds) {
+					PercolatorResult pres = percResDao.loadForPercolatorResultId(presId);
+					resultList.add(pres);
+				}
+			}
+		}
+
+		return resultList;
+    }
+	
+
+	private List<PercolatorResult> loadTopResultsForRunSearchNWModsNotUsed(
+            int runSearchAnalysisId, Double qvalue, Double pep, Double discriminantScore) {
+        
+        // get the dynamic residue modifications for the search
+        MsRunSearchAnalysis msa = runSearchAnalysisDao.load(runSearchAnalysisId);
+        if(msa == null) {
+            log.error("No runSearchAnalysis found with ID: "+runSearchAnalysisId);
+            throw new IllegalArgumentException("No run search analysis found with ID: "+runSearchAnalysisId);
+        }
+        MsRunSearch runSearch = runSearchDao.loadRunSearch(msa.getRunSearchId());
+        if(runSearch == null) {
+            log.error("No run search found with ID: "+msa.getRunSearchId());
+            throw new IllegalArgumentException("No run search found with ID: "+msa.getRunSearchId());
+        }
+        
+        List<MsResidueModification> searchDynaMods = modDao.loadDynamicResidueModsForSearch(runSearch.getSearchId());
+        Map<Integer, MsResidueModification> dynaModMap = new HashMap<Integer, MsResidueModification>();
+        for(MsResidueModification mod: searchDynaMods) {
+            dynaModMap.put(mod.getId(), mod);
+        }
+        
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        String sql = "SELECT res.id AS sresID, pres.id AS presID, res.*, pres.*, dmod.* "+
+                     "FROM (msRunSearchResult AS res, PercolatorResult AS pres, PercolatorPeptidePsm AS peptPsm, PercolatorPeptideResult AS pept) "+
+                     "LEFT JOIN (msDynamicModResult AS dmod) ON (dmod.resultID = res.id) "+
+                     "WHERE peptPsm.psmResultID = pres.id "+
+                     "AND pres.resultID = res.id "+
+                     "AND pres.runSearchAnalysisID = ? ";
+        if(qvalue != null)
+            sql +=   " AND pept.qvalue <= "+qvalue;
+        if(pep != null && pep < 1.0) 
+            sql +=   " AND pept.pep <= "+pep;
+        if(discriminantScore != null)
+            sql +=   " AND pept.discriminantScore >= "+discriminantScore;
+
+        sql +=       " ORDER BY pres.id";
+
+        try {
+            conn = super.getConnection();
+            stmt = conn.prepareStatement( sql );
+            stmt.setInt( 1, runSearchAnalysisId );
+            rs = stmt.executeQuery();
+            
+            List<PercolatorResult> resultList = new ArrayList<PercolatorResult>();
+            
+            PercolatorResultBean lastResult = null;
+            List<MsResultResidueMod> resultDynaMods = new ArrayList<MsResultResidueMod>();
+            
+            
+            while ( rs.next() ) {
+            
+                int percResultId = rs.getInt("presID");
+                
+                if(lastResult == null || percResultId != lastResult.getId()) {
+                    
+                    if(lastResult != null) {
+                        lastResult.getResultPeptide().setDynamicResidueModifications(resultDynaMods);
+                    }
+                    
+                    PercolatorResultBean result = makePercolatorResult(rs);
+                    resultList.add(result);
+                    
+                    lastResult = result;
+                    resultDynaMods = new ArrayList<MsResultResidueMod>();
+                }
+                
+                int modId = rs.getInt("modID");
+                if(modId != 0) {
+                    ResultResidueModBean resMod = makeResultResidueMod(rs, dynaModMap.get(modId));
+                    
+                    resultDynaMods.add(resMod);
+                }
+            
+            }
+            if(lastResult != null)
+                lastResult.getResultPeptide().setDynamicResidueModifications(resultDynaMods);
+            
+            return resultList;
+          
+        }
+        catch (Exception e) {
+            log.error("Failed to execute query: "+sql, e);
+            throw new RuntimeException("Failed to execute query: "+sql, e);
+        } finally {
+            
+            if (rs != null) {
+                try { rs.close(); rs = null; } catch (Exception e) { ; }
+            }
+
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }           
+        }
+    }
+	
+	private ResultResidueModBean makeResultResidueMod(ResultSet rs, MsResidueModification searchDynaMod)
+					throws SQLException {
+		
+		ResultResidueModBean resMod = new ResultResidueModBean();
+		resMod.setModifiedPosition(rs.getInt("position"));
+		resMod.setModificationMass(searchDynaMod.getModificationMass());
+		resMod.setModificationSymbol(searchDynaMod.getModificationSymbol());
+		resMod.setModifiedResidue(searchDynaMod.getModifiedResidue());
+		return resMod;
+	}
+	
+	private PercolatorResultBean makePercolatorResult(ResultSet rs) throws SQLException {
+		PercolatorResultBean result = new PercolatorResultBean();
+		result.setId(rs.getInt("sresID"));
+		result.setPercolatorResultId(rs.getInt("presID"));
+		result.setRunSearchId(rs.getInt("runSearchID"));
+		result.setRunSearchAnalysisId(rs.getInt("runSearchAnalysisID"));
+		result.setScanId(rs.getInt("scanID"));
+		result.setCharge(rs.getInt("charge"));
+		result.setObservedMass(rs.getBigDecimal("observedMass"));
+		String vStatus = rs.getString("validationStatus");
+		if(vStatus != null)
+			result.setValidationStatus(ValidationStatus.instance(vStatus.charAt(0)));
+		result.setQvalue(rs.getDouble("qvalue"));
+
+		if(rs.getObject("pep") != null)
+			result.setPosteriorErrorProbability(rs.getDouble("pep"));
+
+		if(rs.getObject("discriminantScore") != null)
+			result.setDiscriminantScore(rs.getDouble("discriminantScore"));
+
+		if(rs.getObject("pvalue") != null)
+			result.setPvalue(rs.getDouble("pvalue"));
+
+		result.setPredictedRetentionTime(rs.getBigDecimal("predictedRetentionTime"));
+
+		SearchResultPeptideBean peptide = new SearchResultPeptideBean();
+		peptide.setPeptideSequence(rs.getString("peptide"));
+		String preRes = rs.getString("preResidue");
+		if(preRes != null)
+			peptide.setPreResidue(preRes.charAt(0));
+		String postRes = rs.getString("postResidue");
+		if(postRes != null)
+			peptide.setPostResidue(postRes.charAt(0));
+		result.setResultPeptide(peptide);
+		return result;
+	}
 }

@@ -279,8 +279,13 @@ public class PercolatorXmlDataUploadService implements
         }
     }
 
-    private void getSearchModifications(int searchId) {
+    private void getSearchModifications(int searchId) throws UploadException {
        MsSearch search = searchDao.loadSearch(searchId);
+       if(search == null) {
+    	   UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+    	   ex.setErrorMessage("No search found with ID: "+searchId);
+    	   throw ex;
+       }
        this.dynaResidueMods = search.getDynamicResidueMods();
        this.dynaTermMods = search.getDynamicTerminalMods();
     }

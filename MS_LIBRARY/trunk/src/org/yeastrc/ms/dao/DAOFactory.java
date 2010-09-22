@@ -251,7 +251,7 @@ public class DAOFactory {
         // Percolator post search analysis related 
         percSQTHeaderDAO = new PercolatorParamsDAOImpl(sqlMap);
         percResultDAO = new PercolatorResultDAOImpl(sqlMap, rsAnalysisDAO, runSearchDAO, modDAO);
-        percPeptResultDAO = new PercolatorPeptideResultDAOImpl(sqlMap, rsAnalysisDAO);
+        percPeptResultDAO = new PercolatorPeptideResultDAOImpl(sqlMap, rsAnalysisDAO, runSearchDAO, modDAO, percResultDAO);
 			
         
         // PeptideProphet post search analysis related
