@@ -1,0 +1,5 @@
+curl -i -X GET -H "Accept:application/xml" "http://localhost:8080/msdapl_queue/services/msjob/31"
+
+curl -i -X GET -H "Accept:application/json" "http://localhost:8080/msdapl_queue/services/msjob/31"
+
+curl -i -X POST -H "Accept:application/xml" "http://localhost:8080/msdapl_queue/services/msjob/add2?user=vsharma&projectId=123&dir=/my/data&pipeline=TPP&date=09/10/10&comments=here%20are%20some%20comments"

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="MacRoman" standalone="no"?>
+<jardesc>
+    <jar path="MSDaPlUploadQueue/lib/uploadqueue_dep.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/MSDaPlUploadQueue/lib/uploadqueue_dep.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=YRC\(minus_nrseq)/src&lt;org.yeastrc.data{IData.java"/>
+        <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.www.user{User.java"/>
+        <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.jobqueue{MSJob.java"/>
+        <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.www.upload{MSUploadJobSaver.java"/>
+        <javaElement handleIdentifier="=YRC\(minus_nrseq)/src&lt;org.yeastrc.db{DBConnectionManager.java"/>
+        <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.project{ProjectLiteDAO.java"/>
+        <javaElement handleIdentifier="=YRC\(minus_nrseq)/src&lt;org.yeastrc.data{InvalidIDException.java"/>
+        <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.jobqueue{MSJobFactory.java"/>
+        <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.www.user{UserUtils.java"/>
+        <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.project{Researcher.java"/>
+        <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.www.user{NoSuchUserException.java"/>
+        <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.www.upload{JobGroupIdGetter.java"/>
+        <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.jobqueue{Job.java"/>
+        <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.www.upload{Pipeline.java"/>
+    </selectedElements>
+</jardesc>
