@@ -1,5 +1,6 @@
 package org.yeastrc.jqs.queue.ws;
 
+import java.sql.SQLException;
 import java.util.Date;
 
 import javax.ws.rs.Consumes;
@@ -10,11 +11,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 
-import org.yeastrc.jobqueue.JobDeleter;
-import org.yeastrc.jobqueue.JobUtils;
-import org.yeastrc.jobqueue.MSJob;
-import org.yeastrc.jobqueue.MSJobFactory;
+import org.yeastrc.www.user.NoSuchUserException;
+import org.yeastrc.www.user.User;
+import org.yeastrc.www.user.UserUtils;
 
 import com.sun.jersey.api.NotFoundException;
 
@@ -23,8 +25,8 @@ import com.sun.jersey.api.NotFoundException;
 @Produces("text/plain")
 public class MsJobResource {
 
-	//@Context
-    //SecurityContext security;
+	@Context
+    SecurityContext security;
 	
 	@GET
 	@Path("{id}")
@@ -73,7 +75,7 @@ public class MsJobResource {
 	@POST
 	@Path("add")
 	@Produces ({"text/plain"})
-	public String add(@QueryParam("user") String user,
+	public String add(
 			@QueryParam("projectId") Integer projectId,
 			@QueryParam("dir") String dataDirectory,
 			@QueryParam("pipeline") String pipeline,
@@ -85,7 +87,6 @@ public class MsJobResource {
 			) {
 		
 		MsJob job = new MsJob();
-		job.setUserName(user);
 		job.setProjectId(projectId);
 		job.setDataDirectory(dataDirectory);
 		job.setPipeline(pipeline);
@@ -100,10 +101,13 @@ public class MsJobResource {
 
 	private int submitJob(MsJob job) {
 		
+		String username = security.getUserPrincipal().getName();
+		User user = getUser(username);
+		
 		Messenger messenger = new Messenger();
 		
-		MsJobSumitter submitter = new MsJobSumitter();
-		int jobId = submitter.submit(job, messenger);
+		MsJobSubmitter submitter = MsJobSubmitter.getInstance();
+		int jobId = submitter.submit(job, user, messenger);
 		if(jobId == -1) { // data provided by the user was incorrect or incomplete
 			String err = messenger.getMessagesString();
 			// 400 error
@@ -127,42 +131,37 @@ public class MsJobResource {
 	@Produces("text/plain")
 	public String delete(@PathParam("id") Integer jobId) {
 		
-		//String username = security.getUserPrincipal().getName();
-		//System.out.println(username);
+		String username = security.getUserPrincipal().getName();
+		User user = getUser(username);
 		
-		MSJob msJob = null;
-		try {
-			msJob = MSJobFactory.getInstance().getJob(jobId);
+		Messenger messenger = new Messenger();
+		int status = MsJobDeleter.getInstance().delete(jobId, user, messenger);
+		
+		if(status == jobId)
+			return "Job deleted. ID: "+jobId;
+		
+		else {
+			if(status == -1) // job not found
+				throw new NotFoundException(messenger.getMessagesString());
+
+			else if(status == -2) // job could not be deleted (either the user does not have authority or job is not in a deletion-friendly state
+				throw new BadRequestException(messenger.getMessagesString());
+
+			else if(status == -3) // error deleting the job
+				throw new ServerErrorException(messenger.getMessagesString());
 			
-		} catch (Exception e) {
-			throw new NotFoundException("Error getting job with ID: "+jobId+". The error message was: "+e.getMessage());
-		}
-		
-		if(msJob.getStatus() == JobUtils.STATUS_COMPLETE) {
-			// 500 error
-			String err = "Job with ID: "+jobId+" is complete. It could not be deleted.";
-			throw new ServerErrorException(err);
-		}
-		else if(msJob.getStatus() == JobUtils.STATUS_OUT_FOR_WORK) {
-			// 500 error
-			String err = "Job with ID: "+jobId+" is running. It could not be deleted.";
-			throw new ServerErrorException(err);
-		}
-		
-		try {
-			if(JobDeleter.getInstance().deleteJob(msJob)) {
-				return "Job deleted. ID: "+jobId;
-			}
-			else {
-				// 500 error
-				String err = "Job with ID: "+jobId+" is running. It could not be deleted.";
-				throw new ServerErrorException(err);
-			}
-		} catch (Exception e) {
-			// 500 error
-			String err = "Job with ID: "+jobId+" could not be deleted. The error message was: "+e.getMessage();
-			throw new ServerErrorException(err);
+			else 
+				throw new ServerErrorException(messenger.getMessagesString());
 		}
 	}
 	
+	private User getUser(String username) {
+		try {
+			return  UserUtils.getUser(username);
+		} catch (NoSuchUserException e) {
+			throw new BadRequestException("No user with username: "+username);
+		} catch (SQLException e) {
+			throw new ServerErrorException("There was an error during user lookup. The error message was: "+e.getMessage());
+		}
+	}
 }

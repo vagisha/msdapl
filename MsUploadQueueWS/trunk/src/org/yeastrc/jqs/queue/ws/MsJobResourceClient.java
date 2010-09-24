@@ -5,10 +5,8 @@
  */
 package org.yeastrc.jqs.queue.ws;
 
-import java.nio.charset.Charset;
 import java.util.Date;
 
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 
 import com.sun.jersey.api.client.Client;
@@ -16,7 +14,6 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.core.util.Base64;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 
@@ -129,7 +126,6 @@ public class MsJobResourceClient {
 		client.addFilter(authFilter);
 		
 		MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
-		queryParams.add("user", job.getUserName());
 		queryParams.add("projectId", String.valueOf(job.getProjectId()));
 		queryParams.add("dir", job.getDataDirectory());
 		queryParams.add("pipeline", job.getPipeline());
@@ -140,9 +136,9 @@ public class MsJobResourceClient {
 		WebResource webRes = client.resource(BASE_URI);
 		ClientResponse response = webRes.path("add").queryParams(queryParams).
 			type("application/xml").accept("text/plain").
-			header(HttpHeaders.AUTHORIZATION, "Basic " 
-			        + new String(Base64.encode("user:password"), 
-			        Charset.forName("ASCII"))).
+//			header(HttpHeaders.AUTHORIZATION, "Basic " 
+//			        + new String(Base64.encode("user:password"), 
+//			        Charset.forName("ASCII"))).
 			post(ClientResponse.class);
 		Status status = response.getClientResponseStatus();
 		if(status == Status.OK) {
@@ -191,7 +187,7 @@ public class MsJobResourceClient {
 		String password = "Bits2@";
 		
 		MsJob job = new MsJob();
-		job.setUserName("vsharma");
+		job.setSubmitterName("vsharma");
 		job.setProjectId(24);
 		job.setDataDirectory("/test/dir");
 		job.setPipeline("TPP");

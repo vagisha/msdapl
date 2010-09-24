@@ -11,16 +11,25 @@ import org.yeastrc.project.ProjectLiteDAO;
 import org.yeastrc.www.upload.JobGroupIdGetter;
 import org.yeastrc.www.upload.MSUploadJobSaver;
 import org.yeastrc.www.upload.Pipeline;
-import org.yeastrc.www.user.NoSuchUserException;
 import org.yeastrc.www.user.User;
-import org.yeastrc.www.user.UserUtils;
 
 /**
  * 
  */
-public class MsJobSumitter {
+public class MsJobSubmitter {
 
-	public int submit(MsJob job, Messenger messenger) {
+	private MsJobSubmitter() {}
+	
+	private static MsJobSubmitter instance = null;
+	
+	public static synchronized MsJobSubmitter getInstance() {
+		if(instance == null)
+			instance = new MsJobSubmitter();
+		
+		return instance;
+	}
+	
+	public int submit(MsJob job, User submitter, Messenger messenger) {
 		
 		if(job == null) {
 			if(messenger != null) 
@@ -28,31 +37,8 @@ public class MsJobSumitter {
 			return -1;
 		}
 		
-		User submitter = null;
-		
 		// check the required variables
 		boolean pass = true;
-		
-		
-		// get the user's login name in MSDaPl
-		if(job.getUserName() == null) {
-			if(messenger != null) {
-				messenger.addError("submitter's login name cannot be null");
-				pass = false;
-			}
-		}
-		else {
-			// find a user with this login name
-			try {
-				submitter = UserUtils.getUser(job.getUserName());
-			} catch (NoSuchUserException e) {
-				messenger.addError("No user found with login name: "+job.getUserName());
-				pass = false;
-			} catch (SQLException e) {
-				messenger.addError("There was an error during user lookup. The error message was: "+e.getMessage());
-				pass = false;
-			}
-		}
 		
 		
 		// Get the project ID
@@ -67,7 +53,7 @@ public class MsJobSumitter {
 				try {
 					if(!projDao.isResearcherProject(job.getProjectId(), submitter.getResearcher().getID())) {
 						messenger.addError("Either no project with ID: "+job.getProjectId()+
-								" exists in the database OR the researcher ("+job.getUserName()+") does not have access to the proejct.");
+								" exists in the database OR the researcher ("+job.getSubmitterName()+") does not have access to the proejct.");
 						pass = false;
 					}
 				} catch (SQLException e) {

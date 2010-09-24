@@ -20,7 +20,7 @@ public class Test {
 		
 		// Submit a upload job
 		MsJob job = new MsJob();
-		job.setUserName("vsharma");
+		job.setSubmitterName("vsharma");
 		job.setProjectId(123);
 		job.setDataDirectory("/test/dir");
 //		ErrorResponse response = webRes.path("add").type("application/xml").accept("application/xml").post(ErrorResponse.class, job);

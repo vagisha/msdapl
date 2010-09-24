@@ -16,9 +16,12 @@ public class MsJobSearcher {
 
 	private MsJobSearcher() {}
 	
-	private static MsJobSearcher instance = new MsJobSearcher();
+	private static MsJobSearcher instance = null;
 	
-	public static MsJobSearcher getInstance() {
+	public static synchronized MsJobSearcher getInstance() {
+		if(instance == null)
+			instance = new MsJobSearcher();
+		
 		return instance;
 	}
 	
@@ -38,7 +41,7 @@ public class MsJobSearcher {
 			
 			User submitter = new User();
 			submitter.load(msJob.getSubmitter());
-			myJob.setUserName(submitter.getUsername());
+			myJob.setSubmitterName(submitter.getUsername());
 			
 			myJob.setDate(msJob.getRunDate());
 			myJob.setTargetSpecies(msJob.getTargetSpecies());

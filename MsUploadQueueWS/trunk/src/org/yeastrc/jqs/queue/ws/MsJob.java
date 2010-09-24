@@ -15,11 +15,11 @@ public class MsJob {
 	
 	private Integer id;
 	
-	@XmlElement(required = true)
+	@XmlElement
 	/**
-	 * The login name in MSDaPl
+	 * The submitter's login name in MSDaPl
 	 */
-	private String userName;
+	private String submitterName;
 	
 	@XmlElement(required = true)
 	/**
@@ -46,12 +46,19 @@ public class MsJob {
 	/**
 	 * NCBI taxonomy ID
 	 */
+	@XmlElement
 	private Integer targetSpecies;
+	
 	/**
 	 * Name of the instrument. Should match one of the instruments available in MSDaPl
 	 */
+	@XmlElement
 	private String instrument;
+	
+	@XmlElement
 	private String comments;
+	
+	@XmlElement
 	private String status;
 	
 	
@@ -64,11 +71,11 @@ public class MsJob {
 		this.id = id;
 	}
 	
-	public String getUserName() {
-		return userName;
+	public String getSubmitterName() {
+		return submitterName;
 	}
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setSubmitterName(String submitterName) {
+		this.submitterName = submitterName;
 	}
 	
 	public Integer getProjectId() {
@@ -131,7 +138,7 @@ public class MsJob {
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append("ID: "+this.getId()+"\n");
-		buf.append("Submitter: "+this.getUserName()+"\n");
+		buf.append("Submitter: "+this.getSubmitterName()+"\n");
 		buf.append("ProjectID: "+this.getProjectId()+"\n");
 		buf.append("Directory: "+this.getDataDirectory()+"\n");
 		buf.append("Pipeline: "+this.getPipeline()+"\n");
