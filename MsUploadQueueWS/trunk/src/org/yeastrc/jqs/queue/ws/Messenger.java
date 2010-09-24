@@ -27,6 +27,13 @@ public class Messenger {
 		return messages;
 	}
 	
+	public String getMessagesString() {
+		StringBuilder buf = new StringBuilder();
+		for(String message: messages)
+			buf.append(message+"\n");
+		return buf.toString();
+	}
+	
 	public void addError(String message) {
 		addMessage("ERROR: "+message);
 	}

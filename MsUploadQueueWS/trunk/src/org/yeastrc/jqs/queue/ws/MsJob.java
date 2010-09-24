@@ -19,7 +19,7 @@ public class MsJob {
 	/**
 	 * The login name in MSDaPl
 	 */
-	private String submitterLoginName;
+	private String userName;
 	
 	@XmlElement(required = true)
 	/**
@@ -48,10 +48,11 @@ public class MsJob {
 	 */
 	private Integer targetSpecies;
 	/**
-	 * Name of the instrument. Should match one of the instruments availalble in MSDaPl
+	 * Name of the instrument. Should match one of the instruments available in MSDaPl
 	 */
 	private String instrument;
 	private String comments;
+	private String status;
 	
 	
 	public MsJob() {}
@@ -63,11 +64,11 @@ public class MsJob {
 		this.id = id;
 	}
 	
-	public String getSubmitterLoginName() {
-		return submitterLoginName;
+	public String getUserName() {
+		return userName;
 	}
-	public void setSubmitterLoginName(String submitterLoginName) {
-		this.submitterLoginName = submitterLoginName;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 	
 	public Integer getProjectId() {
@@ -119,14 +120,23 @@ public class MsJob {
 		this.comments = comments;
 	}
 	
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append("ID: "+this.getId()+"\n");
-		buf.append("Submitter: "+this.getSubmitterLoginName()+"\n");
+		buf.append("Submitter: "+this.getUserName()+"\n");
 		buf.append("ProjectID: "+this.getProjectId()+"\n");
 		buf.append("Directory: "+this.getDataDirectory()+"\n");
 		buf.append("Pipeline: "+this.getPipeline()+"\n");
 		buf.append("Date: "+this.getDate()+"\n");
+		buf.append("Status: "+this.getStatus()+"\n");
 		buf.append("Instrument: "+this.getInstrument()+"\n");
 		buf.append("Species: "+this.getTargetSpecies()+"\n");
 		buf.append("Comments: "+this.getComments()+"\n");

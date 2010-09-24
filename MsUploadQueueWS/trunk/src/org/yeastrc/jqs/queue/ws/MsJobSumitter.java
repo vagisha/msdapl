@@ -35,21 +35,23 @@ public class MsJobSumitter {
 		
 		
 		// get the user's login name in MSDaPl
-		if(job.getSubmitterLoginName() == null) {
+		if(job.getUserName() == null) {
 			if(messenger != null) {
 				messenger.addError("submitter's login name cannot be null");
 				pass = false;
 			}
 		}
-		// find a user with this login name
-		try {
-			submitter = UserUtils.getUser(job.getSubmitterLoginName());
-		} catch (NoSuchUserException e) {
-			messenger.addError("No user found with login name: "+job.getSubmitterLoginName());
-			pass = false;
-		} catch (SQLException e) {
-			messenger.addError("There was an error during user lookup. The error message was: "+e.getMessage());
-			pass = false;
+		else {
+			// find a user with this login name
+			try {
+				submitter = UserUtils.getUser(job.getUserName());
+			} catch (NoSuchUserException e) {
+				messenger.addError("No user found with login name: "+job.getUserName());
+				pass = false;
+			} catch (SQLException e) {
+				messenger.addError("There was an error during user lookup. The error message was: "+e.getMessage());
+				pass = false;
+			}
 		}
 		
 		
@@ -58,17 +60,21 @@ public class MsJobSumitter {
 			messenger.addError("projectID cannot be null");
 			pass = false;
 		}
-		// Make sure the project exists and the reseacher is a member
-		ProjectLiteDAO projDao = ProjectLiteDAO.instance();
-		try {
-			if(!projDao.isResearcherProject(job.getProjectId(), submitter.getResearcher().getID())) {
-				messenger.addError("Either no project with ID: "+job.getProjectId()+
-						" exists in the database OR the researcher ("+job.getSubmitterLoginName()+") does not have access to the proejct.");
-				pass = false;
+		else {
+			// Make sure the project exists and the reseacher is a member
+			if(submitter != null) {
+				ProjectLiteDAO projDao = ProjectLiteDAO.instance();
+				try {
+					if(!projDao.isResearcherProject(job.getProjectId(), submitter.getResearcher().getID())) {
+						messenger.addError("Either no project with ID: "+job.getProjectId()+
+								" exists in the database OR the researcher ("+job.getUserName()+") does not have access to the proejct.");
+						pass = false;
+					}
+				} catch (SQLException e) {
+					messenger.addError("There was an error during project lookup. The error message was: "+e.getMessage());
+					pass = false;
+				}
 			}
-		} catch (SQLException e) {
-			messenger.addError("There was an error during project lookup. The error message was: "+e.getMessage());
-			pass = false;
 		}
 		
 		
@@ -113,7 +119,8 @@ public class MsJobSumitter {
 		jobSaver.setPipeline(pipeline);
 		jobSaver.setRunDate(job.getDate());
 		
-		if(job.getTargetSpecies() > 0) {
+		Integer targetSpecies = job.getTargetSpecies();
+		if(targetSpecies != null) {
 			jobSaver.setTargetSpecies(job.getTargetSpecies());
 		}
 		
@@ -137,11 +144,10 @@ public class MsJobSumitter {
 		}
 		
 		try {
-			jobSaver.savetoDatabase();
-			return 1;
+			return jobSaver.savetoDatabase();
 		} catch (Exception e) {
 			messenger.addError("There was error submitting the job.  The error message was: "+e.getMessage());
-			return -1;
+			return -2;
 		}
 	}
 	

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="MacRoman" standalone="no"?>
 <jardesc>
-    <jar path="MSDaPlUploadQueue/lib/uploadqueue_dep.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/MSDaPlUploadQueue/lib/uploadqueue_dep.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <jar path="MsUploadQueueWS/lib/uploadqueue_dep.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/MsUploadQueueWS/lib/uploadqueue_dep.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
@@ -15,7 +15,10 @@
         <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.www.user{User.java"/>
         <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.jobqueue{MSJob.java"/>
         <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.www.upload{MSUploadJobSaver.java"/>
+        <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.jobqueue{JobDeleter.java"/>
+        <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.jobqueue{JobUtils.java"/>
         <javaElement handleIdentifier="=YRC\(minus_nrseq)/src&lt;org.yeastrc.db{DBConnectionManager.java"/>
+        <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.www.user{Groups.java"/>
         <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.project{ProjectLiteDAO.java"/>
         <javaElement handleIdentifier="=YRC\(minus_nrseq)/src&lt;org.yeastrc.data{InvalidIDException.java"/>
         <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.jobqueue{MSJobFactory.java"/>

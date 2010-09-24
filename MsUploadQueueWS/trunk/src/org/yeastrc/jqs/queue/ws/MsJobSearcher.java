@@ -14,7 +14,18 @@ import org.yeastrc.www.user.User;
  */
 public class MsJobSearcher {
 
+	private MsJobSearcher() {}
+	
+	private static MsJobSearcher instance = new MsJobSearcher();
+	
+	public static MsJobSearcher getInstance() {
+		return instance;
+	}
+	
 	public MsJob search(int jobId) {
+		
+		if (jobId == 0)
+			return null;
 		
 		try {
 			MSJob msJob = MSJobFactory.getInstance().getJob(jobId);
@@ -27,7 +38,7 @@ public class MsJobSearcher {
 			
 			User submitter = new User();
 			submitter.load(msJob.getSubmitter());
-			myJob.setSubmitterLoginName(submitter.getUsername());
+			myJob.setUserName(submitter.getUsername());
 			
 			myJob.setDate(msJob.getRunDate());
 			myJob.setTargetSpecies(msJob.getTargetSpecies());
@@ -35,6 +46,7 @@ public class MsJobSearcher {
 			String instrument = InstrumentLookup.getInstance().nameForId(msJob.getInstrumentId());
 			myJob.setInstrument(instrument);
 			
+			myJob.setStatus(msJob.getStatusDescription());
 			return myJob;
 			
 		} catch (Exception e) {
