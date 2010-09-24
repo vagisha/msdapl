@@ -116,7 +116,7 @@ public class MsJobResourceClient {
 	
 	/*
 	 * Equivalent curl commands -- 
-	 * curl -u <username> -i -X POST -H "Accept:text/plain" "http://localhost:8080/msdapl_queue/services/msjob/add?projectId=24&dir=/data/test&pipeline=MACCOSS&date=09/24/10&instrument=LTQ&Id=9606&comments=some%20comments"
+	 * curl -u <username> -i -X POST -H "Accept:text/plain" "http://localhost:8080/msdapl_queue/services/msjob/add?projectId=24&dataDirectory=/data/test&pipeline=MACCOSS&date=09/24/10&instrument=LTQ&Id=9606&comments=some%20comments"
 	 */
 	public int addJobQueryParam(MsJob job, String username, String password) {
 
@@ -127,7 +127,7 @@ public class MsJobResourceClient {
 		
 		MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
 		queryParams.add("projectId", String.valueOf(job.getProjectId()));
-		queryParams.add("dir", job.getDataDirectory());
+		queryParams.add("dataDirectory", job.getDataDirectory());
 		queryParams.add("pipeline", job.getPipeline());
 		queryParams.add("date", "09/23/2010");
 		

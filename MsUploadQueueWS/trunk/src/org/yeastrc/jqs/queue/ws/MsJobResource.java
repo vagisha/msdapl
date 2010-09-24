@@ -69,7 +69,7 @@ public class MsJobResource {
 	@Produces ({"text/plain"})
 	@Consumes ({"application/xml", "application/json"})
 	public String add(MsJob job) {
-		return String.valueOf(submitJob(job));
+		return "Queued job. ID: "+String.valueOf(submitJob(job)+"\n");
 	}
 
 	@POST
@@ -77,11 +77,11 @@ public class MsJobResource {
 	@Produces ({"text/plain"})
 	public String add(
 			@QueryParam("projectId") Integer projectId,
-			@QueryParam("dir") String dataDirectory,
+			@QueryParam("dataDirectory") String dataDirectory,
 			@QueryParam("pipeline") String pipeline,
 			@QueryParam("date") Date date,
 			@QueryParam("instrument") String instrument,
-			@QueryParam("taxId") Integer taxId,
+			@QueryParam("targetSpecies") Integer taxId,
 			@QueryParam("comments") String comments,
 			@QueryParam("group") String group
 			) {
@@ -96,7 +96,7 @@ public class MsJobResource {
 		job.setComments(comments);
 		System.out.println(job);
 		
-		return String.valueOf(submitJob(job));
+		return "Queued job. ID: "+String.valueOf(submitJob(job)+"\n");
 	}
 
 	private int submitJob(MsJob job) {
@@ -138,7 +138,7 @@ public class MsJobResource {
 		int status = MsJobDeleter.getInstance().delete(jobId, user, messenger);
 		
 		if(status == jobId)
-			return "Job deleted. ID: "+jobId;
+			return "Job deleted. ID: "+jobId+"\n";
 		
 		else {
 			if(status == -1) // job not found
