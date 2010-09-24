@@ -7,7 +7,9 @@ package org.yeastrc.jqs.queue.ws;
 
 import java.sql.SQLException;
 
-import org.yeastrc.project.ProjectLiteDAO;
+import org.yeastrc.data.InvalidIDException;
+import org.yeastrc.project.Project;
+import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.www.upload.JobGroupIdGetter;
 import org.yeastrc.www.upload.MSUploadJobSaver;
 import org.yeastrc.www.upload.Pipeline;
@@ -47,17 +49,21 @@ public class MsJobSubmitter {
 			pass = false;
 		}
 		else {
-			// Make sure the project exists and the reseacher is a member
+			// Make sure the project exists and the reseacher is a member or an administrator
 			if(submitter != null) {
-				ProjectLiteDAO projDao = ProjectLiteDAO.instance();
 				try {
-					if(!projDao.isResearcherProject(job.getProjectId(), submitter.getResearcher().getID())) {
-						messenger.addError("Either no project with ID: "+job.getProjectId()+
-								" exists in the database OR the researcher ("+job.getSubmitterName()+") does not have access to the proejct.");
+					Project project = ProjectFactory.getProject(job.getProjectId());
+					
+					if(!project.checkAccess(submitter.getResearcher())) {
+						messenger.addError("Researcher ("+submitter.getUsername()+") does not have access to the project with ID: "+job.getProjectId());
 						pass = false;
 					}
-				} catch (SQLException e) {
-					messenger.addError("There was an error during project lookup. The error message was: "+e.getMessage());
+					
+				} catch (SQLException e1) {
+					messenger.addError("There was an error during project lookup. The error message was: "+e1.getMessage());
+					pass = false;
+				} catch (InvalidIDException e1) {
+					messenger.addError("No project found with ID: "+job.getProjectId());
 					pass = false;
 				}
 			}
