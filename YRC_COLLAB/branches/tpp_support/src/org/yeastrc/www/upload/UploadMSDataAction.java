@@ -19,7 +19,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
-import org.yeastrc.project.Projects;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -86,25 +85,9 @@ public class UploadMSDataAction extends Action {
 		
 		MSUploadJobSaver jobSaver = new MSUploadJobSaver();
         
-		boolean maccoss = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.MACCOSS);
-        boolean yates = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.YATES);
-        boolean goodlett = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.GOODLETT);
-        boolean bruce = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.BRUCE);
-        boolean villen = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.VILLEN);
-        // NOTE: The groupID values come from org.yeastrc.jqs.queue.MSJobUtils of the JOB_QUEUE project
-        if (yates)
-            jobSaver.setGroupID(0);
-        else if (maccoss)
-            jobSaver.setGroupID(1);
-        else if( goodlett )
-            jobSaver.setGroupID(2);
-        else if( bruce )
-            jobSaver.setGroupID(3);
-        else if( villen )
-        	jobSaver.setGroupID(4);
-        else
-        	jobSaver.setGroupID(1000); // unknown group; needs to be a positive number
-		
+		int jobGroupId = JobGroupIdGetter.get(user);
+        jobSaver.setGroupID(jobGroupId);
+        
 		
 		jobSaver.setProjectID( projectID );
 		jobSaver.setRunDate( runDate );

@@ -12,7 +12,7 @@ import org.yeastrc.db.DBConnectionManager;
 public class MSUploadJobSaver {
 
 	
-	public void savetoDatabase() throws Exception {
+	public int savetoDatabase() throws Exception {
 		
 		Connection conn = null;
 		Statement stmt = null;
@@ -61,9 +61,7 @@ public class MSUploadJobSaver {
 			
 			rs.insertRow();
 			
-			rs.close(); rs = null;
-			stmt.close(); stmt = null;
-			conn.close(); conn = null;
+			return id;
 			
 		} finally {
 			

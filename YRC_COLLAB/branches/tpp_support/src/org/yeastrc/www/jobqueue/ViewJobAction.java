@@ -15,7 +15,6 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.bio.taxonomy.Species;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
-import org.yeastrc.project.Projects;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
