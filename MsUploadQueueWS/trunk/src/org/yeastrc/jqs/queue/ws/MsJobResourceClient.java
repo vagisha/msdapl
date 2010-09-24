@@ -89,7 +89,7 @@ public class MsJobResourceClient {
 	
 	/*
 	 * Equivalent curl commands -- 
-	 * JSON INPUT: curl -u <username> -i -X POST -H "Accept:text/plain" -H 'Content-Type: application/json' -d '{"projectId":"24", "dataDirectory":"/test/data", "pipeline":"MACOSS", "date":"2010-03-29"}' "http://localhost:8080/msdapl_queue/services/msjob/add"
+	 * JSON INPUT: curl -u <username> -i -X POST -H "Accept:text/plain" -H 'Content-Type: application/json' -d '{"projectId":"24", "dataDirectory":"/test/data", "pipeline":"MACCOSS", "date":"2010-03-29"}' "http://localhost:8080/msdapl_queue/services/msjob/add"
 	 */
 	public int addJob(MsJob job, String username, String password) {
 		
@@ -116,7 +116,7 @@ public class MsJobResourceClient {
 	
 	/*
 	 * Equivalent curl commands -- 
-	 * curl -u <username> -i -X POST -H "Accept:text/plain" "http://localhost:8080/msdapl_queue/services/msjob/add?projectId=24&dir=/data/test&pipeline=MACOSS&date=09/24/10&instrument=LTQ&Id=9606&comments=some%20comments"
+	 * curl -u <username> -i -X POST -H "Accept:text/plain" "http://localhost:8080/msdapl_queue/services/msjob/add?projectId=24&dir=/data/test&pipeline=MACCOSS&date=09/24/10&instrument=LTQ&Id=9606&comments=some%20comments"
 	 */
 	public int addJobQueryParam(MsJob job, String username, String password) {
 
@@ -187,7 +187,6 @@ public class MsJobResourceClient {
 		String password = "user";
 		
 		MsJob job = new MsJob();
-//		job.setSubmitterName("vsharma");
 		job.setProjectId(24);
 		job.setDataDirectory("/test/dir");
 		job.setPipeline("TPP");

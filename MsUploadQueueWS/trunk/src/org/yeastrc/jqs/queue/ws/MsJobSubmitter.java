@@ -82,6 +82,9 @@ public class MsJobSubmitter {
 			pass = false;
 		}
 		// Has to be a valid pipeline
+		// TODO -- hack.  Fix Pipeline
+		if(job.getPipeline().equals("MACCOSS"))
+			job.setPipeline(Pipeline.MACOSS.name());
 		Pipeline pipeline = Pipeline.forName(job.getPipeline());
 		if(pipeline == null) {
 			messenger.addError("Not a valid pipeline: "+job.getPipeline());
