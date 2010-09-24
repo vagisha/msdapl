@@ -5,12 +5,19 @@
  */
 package org.yeastrc.jqs.queue.ws;
 
+import java.nio.charset.Charset;
 import java.util.Date;
+
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedMap;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.ClientResponse.Status;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.core.util.Base64;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 
 
@@ -21,7 +28,19 @@ public class MsJobResourceClient {
 
 	private static MsJobResourceClient instance = new MsJobResourceClient();
 	
-	private MsJobResourceClient() {}
+	//private final ClientConfig config;
+	
+	private MsJobResourceClient() {
+			
+//		config = new DefaultClientConfig();
+//		try {
+//			config.getProperties().put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, new HTTPSProperties());
+//		} catch (NoSuchAlgorithmException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+			   
+	}
 	
 	private String BASE_URI = "http://localhost:8080/msdapl_queue/services/msjob";
 	
@@ -38,6 +57,7 @@ public class MsJobResourceClient {
 	public void getJob(Integer jobId) {
 		
 		Client client = Client.create();
+		
 		WebResource webRes = client.resource(BASE_URI);
 		ClientResponse response = webRes.path(String.valueOf(jobId)).accept("application/json").get(ClientResponse.class);
 		Status status = response.getClientResponseStatus();
@@ -72,11 +92,15 @@ public class MsJobResourceClient {
 	
 	/*
 	 * Equivalent curl commands -- 
-	 * JSON INPUT: curl -i -X POST -H "Accept:text/plain" -H 'Content-Type: application/json' -d '{"userName":"vsharma", "projectId":"24", "dataDirectory":"/test/data", "pipeline":"MACOSS", "date":"2010-03-29T00:00:00-07:00"}' "http://localhost:8080/msdapl_queue/services/msjob/add"
+	 * JSON INPUT: curl -u <username> -i -X POST -H "Accept:text/plain" -H 'Content-Type: application/json' -d '{"userName":"vsharma", "projectId":"24", "dataDirectory":"/test/data", "pipeline":"MACOSS", "date":"2010-03-29"}' "http://localhost:8080/msdapl_queue/services/msjob/add"
 	 */
-	public int addJob(MsJob job) {
+	public int addJob(MsJob job, String username, String password) {
 		
 		Client client = Client.create();
+		
+		HTTPBasicAuthFilter authFilter = new HTTPBasicAuthFilter(username, password);
+		client.addFilter(authFilter);
+		
 		WebResource webRes = client.resource(BASE_URI);
 		ClientResponse response = webRes.path("add").type("application/xml").accept("text/plain").post(ClientResponse.class, job);
 		Status status = response.getClientResponseStatus();
@@ -95,19 +119,31 @@ public class MsJobResourceClient {
 	
 	/*
 	 * Equivalent curl commands -- 
-	 * curl -i -X POST -H "Accept:text/plain" "http://localhost:8080/msdapl_queue/services/msjob/add?user=vsharma&projectId=24&dir=/data/test&pipeline=MACOSS&date=09/24/10&instrument=LTQ&Id=9606&comments=some%20comments"
+	 * curl -u <username> -i -X POST -H "Accept:text/plain" "http://localhost:8080/msdapl_queue/services/msjob/add?user=vsharma&projectId=24&dir=/data/test&pipeline=MACOSS&date=09/24/10&instrument=LTQ&Id=9606&comments=some%20comments"
 	 */
-	public int addJobQueryParam(MsJob job) {
+	public int addJobQueryParam(MsJob job, String username, String password) {
 
 		Client client = Client.create();
+		
+		HTTPBasicAuthFilter authFilter = new HTTPBasicAuthFilter(username, password);
+		client.addFilter(authFilter);
+		
+		MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
+		queryParams.add("user", job.getUserName());
+		queryParams.add("projectId", String.valueOf(job.getProjectId()));
+		queryParams.add("dir", job.getDataDirectory());
+		queryParams.add("pipeline", job.getPipeline());
+		queryParams.add("date", "09/23/2010");
+		
+		//HttpHeaders.AUTHORIZATION
+		
 		WebResource webRes = client.resource(BASE_URI);
-		ClientResponse response = webRes.path("add").
-		queryParam("user", job.getUserName()).
-		queryParam("projectId", String.valueOf(job.getProjectId())).
-		queryParam("dir", job.getDataDirectory()).
-		queryParam("pipeline", job.getPipeline()).
-		queryParam("date", "09/23/2010").
-		type("application/xml").accept("text/plain").post(ClientResponse.class);
+		ClientResponse response = webRes.path("add").queryParams(queryParams).
+			type("application/xml").accept("text/plain").
+			header(HttpHeaders.AUTHORIZATION, "Basic " 
+			        + new String(Base64.encode("user:password"), 
+			        Charset.forName("ASCII"))).
+			post(ClientResponse.class);
 		Status status = response.getClientResponseStatus();
 		if(status == Status.OK) {
 			String jobId = response.getEntity(String.class);
@@ -124,13 +160,17 @@ public class MsJobResourceClient {
 	
 	/*
 	 * Equivalent curl command -- 
-	 * curl -i -X DELETE "http://localhost:8080/msdapl_queue/services/msjob/delete/<jobId>"
+	 * curl -u <username> -i -X DELETE "http://localhost:8080/msdapl_queue/services/msjob/delete/<jobId>"
 	 */
-	public void delete(int jobId) {
+	public void delete(int jobId, String username, String password) {
 
 		Client client = Client.create();
+		
+		HTTPBasicAuthFilter authFilter = new HTTPBasicAuthFilter(username, password);
+		client.addFilter(authFilter);
+		
 		WebResource webRes = client.resource(BASE_URI);
-		ClientResponse response = webRes.path("delete").delete(ClientResponse.class);
+		ClientResponse response = webRes.path("delete/"+String.valueOf(jobId)).delete(ClientResponse.class);
 		Status status = response.getClientResponseStatus();
 		if(status == Status.OK) {
 			String resp = response.getEntity(String.class);
@@ -147,18 +187,22 @@ public class MsJobResourceClient {
 		
 		MsJobResourceClient client = MsJobResourceClient.getInstance();
 		
+		String username = "vsharma";
+		String password = "Bits2@";
+		
 		MsJob job = new MsJob();
 		job.setUserName("vsharma");
 		job.setProjectId(24);
 		job.setDataDirectory("/test/dir");
 		job.setPipeline("TPP");
 		job.setDate(new Date());
-		client.addJob(job);
+		int jobId = client.addJob(job, username, password);
 		
-//		int jobId = 31;
-//		client.getJob(jobId);
-//		
-//		client.getJobStatus(jobId);
+		client.getJob(jobId);
+		
+		client.getJobStatus(jobId);
+		
+		client.delete(jobId, username, password);
 	}
 
 }

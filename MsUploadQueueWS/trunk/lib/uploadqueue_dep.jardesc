@@ -14,6 +14,7 @@
         <javaElement handleIdentifier="=YRC\(minus_nrseq)/src&lt;org.yeastrc.data{IData.java"/>
         <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.www.user{User.java"/>
         <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.jobqueue{MSJob.java"/>
+        <javaElement handleIdentifier="=YRC\(minus_nrseq)/src&lt;com.Ostermiller.util"/>
         <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.www.upload{MSUploadJobSaver.java"/>
         <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.jobqueue{JobDeleter.java"/>
         <javaElement handleIdentifier="=YRC_COLLAB\(tpp_support)/src&lt;org.yeastrc.jobqueue{JobUtils.java"/>

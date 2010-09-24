@@ -20,15 +20,15 @@ public class Test {
 		
 		// Submit a upload job
 		MsJob job = new MsJob();
-		job.setSubmitterLoginName("vsharma");
+		job.setUserName("vsharma");
 		job.setProjectId(123);
 		job.setDataDirectory("/test/dir");
-		Response response = webRes.path("add").type("application/xml").accept("application/xml").post(Response.class, job);
+//		ErrorResponse response = webRes.path("add").type("application/xml").accept("application/xml").post(ErrorResponse.class, job);
 //		String responseXml = response.getEntity(String.class);
 //		JAXBContext ctx = JAXBContext.newInstance(Response.class);
 //		Unmarshaller um = ctx.createUnmarshaller();
 //		Response resp = (Response)(um.unmarshal(new StreamSource(new StringReader(responseXml))));
-		System.out.println(response.toString());
+//		System.out.println(response.toString());
 		
 		job.setPipeline("TPP");
 		job.setDate(new Date());
@@ -41,8 +41,8 @@ public class Test {
 		queryParams.add("dir", "/mydata/dir");
 		queryParams.add("pipeline", "MACCOSS");
 		queryParams.add("date", new Date().toString());
-		response = webRes.path("add2").queryParams(queryParams).accept("application/xml").post(Response.class);
-		System.out.println(response.toString());
+//		response = webRes.path("add2").queryParams(queryParams).accept("application/xml").post(ErrorResponse.class);
+//		System.out.println(response.toString());
 		
 		
 		// GET job by ID

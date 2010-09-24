@@ -10,9 +10,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.yeastrc.jobqueue.JobDeleter;
 import org.yeastrc.jobqueue.JobUtils;
@@ -26,6 +23,9 @@ import com.sun.jersey.api.NotFoundException;
 @Produces("text/plain")
 public class MsJobResource {
 
+	//@Context
+    //SecurityContext security;
+	
 	@GET
 	@Path("{id}")
 	public String getJobAsText(@PathParam("id") int jobId) {
@@ -126,6 +126,9 @@ public class MsJobResource {
 	@Path("delete/{id}")
 	@Produces("text/plain")
 	public String delete(@PathParam("id") Integer jobId) {
+		
+		//String username = security.getUserPrincipal().getName();
+		//System.out.println(username);
 		
 		MSJob msJob = null;
 		try {
