@@ -83,12 +83,13 @@ public class MsJobResource {
 			@QueryParam("instrument") String instrument,
 			@QueryParam("targetSpecies") Integer taxId,
 			@QueryParam("comments") String comments,
-			@QueryParam("group") String group
+			@QueryParam("remoteServer") String remoteServer
 			) {
 		
 		MsJob job = new MsJob();
 		job.setProjectId(projectId);
 		job.setDataDirectory(dataDirectory);
+		job.setRemoteServer(remoteServer);
 		job.setPipeline(pipeline);
 		job.setDate(date);
 		job.setInstrument(instrument);

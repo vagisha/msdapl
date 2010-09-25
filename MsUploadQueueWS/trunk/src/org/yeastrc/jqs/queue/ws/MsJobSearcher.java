@@ -37,7 +37,13 @@ public class MsJobSearcher {
 			myJob.setId(msJob.getId());
 			myJob.setProjectId(msJob.getProjectID());
 			myJob.setPipeline(msJob.getPipeline().name());
-			myJob.setDataDirectory(msJob.getServerDirectory());
+			String dataDir = msJob.getServerDirectory();
+			int idx = dataDir.indexOf(":");
+			String server = dataDir.substring(0, idx);
+			String dir = dataDir.substring(idx+1, dataDir.length());
+			if(!server.equals("local"))
+				myJob.setRemoteServer(server);
+			myJob.setDataDirectory(dir);
 			
 			User submitter = new User();
 			submitter.load(msJob.getSubmitter());

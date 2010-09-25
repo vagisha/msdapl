@@ -108,7 +108,10 @@ public class MsJobSubmitter {
 		MSUploadJobSaver jobSaver = new MSUploadJobSaver();
 		jobSaver.setSubmitter(submitter.getResearcher().getID());
 		jobSaver.setProjectID(job.getProjectId());
-		jobSaver.setServerDirectory(job.getDataDirectory());
+		if(job.getRemoteServer() == null)
+			jobSaver.setServerDirectory("local:"+job.getDataDirectory());
+		else
+			jobSaver.setServerDirectory(job.getRemoteServer()+":"+job.getDataDirectory());
 		int jobGroupId = JobGroupIdGetter.get(submitter);
 		jobSaver.setGroupID(jobGroupId);
 		jobSaver.setPipeline(pipeline);

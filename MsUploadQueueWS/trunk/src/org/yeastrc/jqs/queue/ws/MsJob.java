@@ -61,6 +61,9 @@ public class MsJob {
 	@XmlElement
 	private String status;
 	
+	@XmlElement
+	private String remoteServer;
+	
 	
 	public MsJob() {}
 	
@@ -135,12 +138,22 @@ public class MsJob {
 		this.status = status;
 	}
 
+	public String getRemoteServer() {
+		return remoteServer;
+	}
+
+	public void setRemoteServer(String remoteServer) {
+		this.remoteServer = remoteServer;
+	}
+
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append("ID: "+this.getId()+"\n");
 		buf.append("Submitter: "+this.getSubmitterName()+"\n");
 		buf.append("ProjectID: "+this.getProjectId()+"\n");
 		buf.append("Directory: "+this.getDataDirectory()+"\n");
+		if(this.getRemoteServer() != null)
+			buf.append("Remote Server: "+this.getRemoteServer()+"\n");
 		buf.append("Pipeline: "+this.getPipeline()+"\n");
 		buf.append("Date: "+this.getDate()+"\n");
 		buf.append("Status: "+this.getStatus()+"\n");

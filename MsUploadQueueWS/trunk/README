@@ -19,7 +19,7 @@ The service provides the following REST methods:
 	Examples using cURL:
 		TEXT FORMAT: curl http://<server_path>/msdapl_queue/services/msjob/<jobId>
 	 	XML FORMAT : curl -H "Accept:application/xml" http://<server_path>/msdapl_queue/services/msjob/<jobId>
-	 	JSON FORMAT: curl -H "Accept:text/json" http://<server_path>/msdapl_queue/services/msjob/<jobId>
+	 	JSON FORMAT: curl -H "Accept:application/json" http://<server_path>/msdapl_queue/services/msjob/<jobId>
 
 
 
@@ -61,13 +61,14 @@ The service provides the following REST methods:
 	HTTP METHOD:     POST
 	AUTHENTICATION:  required
 	QUERY PRAMETERs: 
-		projectId     -- Required.  ID of the parent project.
-		dataDirectory -- Required.  path to the data directory
-		pipeline      -- Required.  Either TPP or MACCOSS
-		date          -- Required.  Date the data was generated (Accepted format example: 09/24/10)
-		instrument    -- Optional.  Name of the instrument use to acquire data. This should match the instruments available in MSDaPl. 
-		targetSpecies -- Optional.  Taxonomy ID of the target species
-		comments      -- Optional.
+		projectId      -- Required.  ID of the parent project.
+		dataDirectory  -- Required.  path to the data directory
+		remoteServer   -- Optional.  ID of remote server
+		pipeline       -- Required.  Either TPP or MACCOSS
+		date           -- Required.  Date the data was generated (Accepted format example: 09/24/10)
+		instrument     -- Optional.  Name of the instrument use to acquire data. This should match the instruments available in MSDaPl. 
+		targetSpecies  -- Optional.  Taxonomy ID of the target species
+		comments       -- Optional.
 	
 	
 	Examples using cURL:
@@ -85,7 +86,7 @@ The service provides the following REST methods:
 	INPUT FORMATS:   text, xml, json
 	
 	Examples using cURL:
-		JSON INPUT: curl -u <username> -X POST  -H 'Content-Type: application/json' -d '{"projectId":"24", "dataDirectory":"/test/data", "pipeline":"MACCOSS", "date":"2010-03-29", "comments":"jason upload test"}' http://localhost:8080/msdapl_queue/services/msjob/add
+		JSON INPUT: curl -u <username> -X POST  -H 'Content-Type: application/json' -d '{"projectId":"24", "dataDirectory":"/test/data", "pipeline":"MACCOSS", "date":"2010-03-29", "comments":"upload test"}' http://localhost:8080/msdapl_queue/services/msjob/add
 	
 
  
