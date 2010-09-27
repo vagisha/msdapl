@@ -30,6 +30,7 @@ import org.yeastrc.nrseq.ProteinReference;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 import org.yeastrc.www.protein.ProteinAbundanceDao;
 import org.yeastrc.www.protein.ProteinAbundanceDao.YeastOrfAbundance;
+import org.yeastrc.www.proteinfer.ProteinInferPhiliusResultChecker;
 import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
 import org.yeastrc.www.util.RoundingUtils;
 
@@ -196,9 +197,11 @@ public class ProteinInferDownloadAction extends Action {
         ProteinAbundanceDao adundanceDao = ProteinAbundanceDao.getInstance();
         
         List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
+        boolean getPhiliusResults = ProteinInferPhiliusResultChecker.getInstance().hasPhiliusResults(pinferId);
+        
         for(int i = 0; i < proteinIds.size(); i++) {
             int proteinId = proteinIds.get(i);
-            WIdPickerProtein wProt = IdPickerResultsLoader.getIdPickerProtein(proteinId, peptideDef, fastaDatabaseIds);
+            WIdPickerProtein wProt = IdPickerResultsLoader.getIdPickerProtein(proteinId, peptideDef, fastaDatabaseIds, getPhiliusResults);
             writer.write(wProt.getProtein().getGroupId()+"\t");
             if(wProt.getProtein().getIsParsimonious())
                 writer.write("P\t");
@@ -314,10 +317,11 @@ public class ProteinInferDownloadAction extends Action {
         int numUniqPept = 0;
         
         List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
+        boolean getPhiliusResults = ProteinInferPhiliusResultChecker.getInstance().hasPhiliusResults(pinferId);
         
         for(int i = 0; i < proteinIds.size();  i++) {
             int proteinId = proteinIds.get(i);
-            WIdPickerProtein wProt = IdPickerResultsLoader.getIdPickerProtein(proteinId, peptideDef, fastaDatabaseIds);
+            WIdPickerProtein wProt = IdPickerResultsLoader.getIdPickerProtein(proteinId, peptideDef, fastaDatabaseIds, getPhiliusResults);
             if(wProt.getProtein().getGroupId() != currentGroupId) {
                 if(currentGroupId != -1) {
                     writer.write(currentGroupId+"\t");

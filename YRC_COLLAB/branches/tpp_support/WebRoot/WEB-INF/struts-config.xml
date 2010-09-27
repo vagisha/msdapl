@@ -687,6 +687,7 @@
 	  path="/submitPhiliusJob"
 	  type="org.yeastrc.www.philiusws.PhiliusSubmitJobAjaxAction"
 	  validate="false">
+	  <forward name="Success" path="/pages/internal/philius/philiusResults.jsp" redirect="false" />
 	</action>
 	
 	<action

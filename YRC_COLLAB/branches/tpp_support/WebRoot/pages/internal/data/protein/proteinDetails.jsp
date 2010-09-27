@@ -22,7 +22,7 @@ function philiusAnnotations(nrseqProteinId) {
 
 	var button = $("#philiusbutton_"+nrseqProteinId);
 	
-	if(button.text() == "[Get Predictions]") {
+	if(button.text() == "[Get Annotations]") {
 		// submit a Philius job, get a job token and display a status message.
 		//alert("Submitting Philius job...");
 		button.text("[Processing...]");
@@ -107,7 +107,7 @@ function philiusAnnotations(nrseqProteinId) {
 		button.text("[Hide Annotations]");
 	}
 	else if (button.text() == "[Failed...]") {
-		button.text("[Get Predictions]");
+		button.text("[Get Annotations]");
 		$("#philius_status_"+nrseqProteinId).hide();
 	}
 }
@@ -304,7 +304,7 @@ function philiusAnnotations(nrseqProteinId) {
 	<br/>
 	<span style="text-decoration: underline; cursor: pointer;"
       onclick="philiusAnnotations(<bean:write name="protein" property="id" />)"
-      id="philiusbutton_<bean:write name="protein" property="protein.id"/>">[Get Predictions]</span>
+      id="philiusbutton_<bean:write name="protein" property="protein.id"/>">[Get Annotations]</span>
     </font>
 	</td>
 	<td align="left" valign="top">

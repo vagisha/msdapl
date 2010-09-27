@@ -243,7 +243,7 @@ function philiusAnnotations(pinferProteinId, nrseqProteinId) {
 
 	var button = $("#philiusbutton_"+pinferProteinId);
 	
-	if(button.text() == "[Get Predictions]") {
+	if(button.text() == "[Get Annotations]") {
 		// submit a Philius job, get a job token and display a status message.
 		//alert("Submitting Philius job...");
 		button.text("[Processing...]");
@@ -256,23 +256,35 @@ function philiusAnnotations(pinferProteinId, nrseqProteinId) {
 		statusText += "<span id=\"philius_refresher\" style=\"text-decoration: underline; cursor: pointer;\" ";
 		
 		$.post("<yrcwww:link path='submitPhiliusJob.do'/>",
-   					{'nrseqId': nrseqProteinId},
+   					{'nrseqId': nrseqProteinId, 'pinferProteinId': pinferProteinId},
    					function(data) {
    						token = data;
    						if(token.substr(0,6) == "FAILED") {
    							statusText = "Philius Job Submission failed!<br>"+token;
    							button.text("[Failed...]");
-   						}
-   						else {
-   							//alert("Returned token is: "+token);
-   							statusText += " onclick=philiusAnnotations("+pinferProteinId+","+nrseqProteinId+") >";
-   							statusText += "<b>REFRESH</b></span>.";
-   							button.attr('name', token);
-						}
-						// show the status text with a link for fetching the results with the returned token.
+   							// show the status text with a link for fetching the results with the returned token.
 						// OR the failure message.
 						$("#philius_status_"+pinferProteinId).html(statusText);
 						$("#philius_status_"+pinferProteinId).show();
+   						}
+   						// If the result was not already available in the database a request is submitted to the Philius server
+   						else if(token.substr(0,9) == "SUMBITTED") {
+   							//alert("Returned token is: "+token);
+   							token = token.substr(10);
+   							statusText += " onclick=philiusAnnotations("+pinferProteinId+","+nrseqProteinId+") >";
+   							statusText += "<b>REFRESH</b></span>.";
+   							button.attr('name', token);
+   							// show the status text with a link for fetching the results with the returned token.
+							// OR the failure message.
+							$("#philius_status_"+pinferProteinId).html(statusText);
+							$("#philius_status_"+pinferProteinId).show();
+						}
+						else {
+							$("#protsequence_"+pinferProteinId).hide();
+							$("#philiusannot_"+pinferProteinId).html(data);
+							$("#philiusannot_"+pinferProteinId).show();
+							button.text("[Hide Annotations]");
+						}
    					}
     		);
 	}
@@ -328,7 +340,7 @@ function philiusAnnotations(pinferProteinId, nrseqProteinId) {
 		button.text("[Hide Annotations]");
 	}
 	else if (button.text() == "[Failed...]") {
-		button.text("[Get Predictions]");
+		button.text("[Get Annotations]");
 		$("#philius_status_"+pinferProteinId).hide();
 	}
 }

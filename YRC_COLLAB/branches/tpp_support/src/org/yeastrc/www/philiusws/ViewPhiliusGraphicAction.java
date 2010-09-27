@@ -24,10 +24,10 @@ public class ViewPhiliusGraphicAction extends Action {
 			return null;
 		}
 		
-		PhiliusResult result = (PhiliusResult)request.getSession().getAttribute( "philiusResult" );
-		int length = result.getAnnotation().getSequence().length();
+		PhiliusResultPlus result = (PhiliusResultPlus)request.getSession().getAttribute( "philiusResult" );
+		int length = result.getSequence().length();
 		
-		PhiliusPanel panel = PhiliusPanel.getInstance(result.getAnnotation(), result.getCoveredSequences());
+		PhiliusPanel panel = PhiliusPanel.getInstance(result);
 		panel.setSize( panel.getPreferredSize() );				// force it to be painted
 
 		BufferedImage bi = null;

@@ -63,6 +63,18 @@
 	</td>
 </tr>
 
+<logic:present name="philiusAnnotation">
+<tr>
+	<td valign="top" align="left"><b>Philius Annotation:</b>
+	<br/>
+    <span class="small_font"><a href="http://www.ncbi.nlm.nih.gov/sites/entrez?cmd=Search&db=pubmed&term=18989393">Reynolds <I>et al.</I></a></span><br>
+	</td>
+	<td valign="top" align="left">
+    	<bean:write name="philiusAnnotation" />
+	</td>
+</tr>
+</logic:present>
+
 <logic:present name="proteinAbundance">
 <tr>
 	<td valign="top" align="left"><b>Abundance:</b><br/>(copies / cell)
@@ -196,7 +208,7 @@
 	<br/>
 	<span style="text-decoration: underline; cursor: pointer;"
       onclick="philiusAnnotations(<bean:write name="protein" property="protein.id" />,<bean:write name="protein" property="protein.nrseqProteinId" />)"
-      id="philiusbutton_<bean:write name="protein" property="protein.id"/>">[Get Predictions]</span>
+      id="philiusbutton_<bean:write name="protein" property="protein.id"/>">[Get Annotations]</span>
     </font>
 	</td>
 	<td align="left" valign="top">

@@ -8,6 +8,7 @@ package org.yeastrc.www.philiusws;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,11 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.bio.philius.PhiliusUtils;
+import org.yeastrc.philius.domain.PhiliusResult;
+import org.yeastrc.philius.domain.PhiliusSegment;
+import org.yeastrc.philius.domain.PhiliusSegmentType;
+import org.yeastrc.philius.domain.PhiliusSpSegment;
 import org.yeastrc.www.proteinfer.ProteinSequenceHtmlBuilder;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -78,12 +84,13 @@ public class PhiliusResultsAjaxAction extends Action {
             }
             
             
-            PhiliusSequenceAnnotationWS result = getResult(philiusToken);
+            PhiliusResultPlus result = getResult(philiusToken);
+            result.setCoveredSequences(peptideSequences);
 
             request.setAttribute("philiusAnnotation", result);
             String html = "";
-            if(!(result.getSegments() == null || result.getSegments().size() == 0)) {
-            	html = PhiliusSequenceHtmlFormatter.getInstance().format(result, peptideSequences);
+            if(!(result.getResult().getSegments() == null || result.getResult().getSegments().size() == 0)) {
+            	html = PhiliusSequenceHtmlFormatter.getInstance().format(result.getResult(), result.getSequence(), peptideSequences);
             	request.setAttribute("sequenceHtml", html);
             }
             else {
@@ -91,14 +98,11 @@ public class PhiliusResultsAjaxAction extends Action {
             }
             request.setAttribute("sequenceHtml", html);
         	
-        	request.setAttribute( "philiusmap", PhiliusImageMapMaker.getInstance().getImageMap(result));
+        	request.setAttribute( "philiusmap", PhiliusImageMapMaker.getInstance().getImageMap(result.getResult(), result.getSequence()));
         	
     		// set the result in the session for future use.  Will be needed for building the 
     		// Philius graphic
-        	PhiliusResult pres = new PhiliusResult();
-            pres.setAnnotation(result);
-            pres.setCoveredSequences(new ArrayList<String>(peptideSequences));
-    		request.getSession().setAttribute( "philiusResult", pres);
+    		request.getSession().setAttribute( "philiusResult", result);
     		
     		// hack to prevent caching of philius image
     		request.setAttribute("philiusToken", philiusToken);
@@ -114,13 +118,54 @@ public class PhiliusResultsAjaxAction extends Action {
     	return port.isJobDone(philiusToken);
     }
     
-    private PhiliusSequenceAnnotationWS getResult(int philiusToken) throws PhiliusWSException_Exception {
+    private PhiliusResultPlus getResult(int philiusToken) throws PhiliusWSException_Exception {
         
         PhiliusSequenceAnnotationWS psa = null;
         PhiliusPredictorService service = new PhiliusPredictorService();
         PhiliusPredictorDelegate port = service.getPhiliusPredictorPort();
         psa = port.getResults(philiusToken);
 
-        return psa;
+        PhiliusResult result = new PhiliusResult();
+        result.setTransMembrane(psa.isHasTm());
+        result.setSignalPeptide(psa.isHasSp());
+        result.setSpProbabilitySum(psa.getSpProbabilitySum());
+        result.setTmProbabilitySum(psa.getTmProbabilitySum());
+        result.setTopologyConfidenceScore(psa.getTopologyConfidence());
+        result.setTypeScore(psa.getTypeScore());
+        result.setAnnotation(psa.getTypeString());
+        
+        List<PhiliusSegment> segments = new ArrayList<PhiliusSegment>();
+        for(PhiliusSegmentWS wsSegment: psa.getSegments()) {
+        	PhiliusSegment segment = new PhiliusSegment();
+        	segment.setStart(wsSegment.getStart());
+        	segment.setEnd(wsSegment.getEnd());
+        	PhiliusSegmentType type = PhiliusSegmentType.forLongName(PhiliusUtils.proteinTypeStrings[wsSegment.getType()]);
+        	segment.setType(type);
+        	segment.setConfidence(wsSegment.getTypeConfidence());
+        	
+        	if(wsSegment.getSpSegments() != null) {
+        		
+        		List<PhiliusSpSegment> spSegments = new ArrayList<PhiliusSpSegment>();
+        		
+        		for(PhiliusSPSegmentWS wsSpSegment: wsSegment.getSpSegments()) {
+        			
+        			PhiliusSpSegment spSegment = new PhiliusSpSegment();
+        			spSegment.setStart(wsSpSegment.getStart());
+        			spSegment.setEnd(wsSpSegment.getEnd());
+        			PhiliusSegmentType segmentType = PhiliusSegmentType.forLongName(PhiliusUtils.proteinTypeStrings[wsSpSegment.getSpSegmentType()]);
+        			spSegment.setSegmentType(segmentType);
+        			spSegments.add(spSegment);
+        			
+        		}
+        		segment.setSpSegments(spSegments);
+        	}
+        	segments.add(segment);
+        }
+        
+        
+        PhiliusResultPlus resPlus = new PhiliusResultPlus();
+        resPlus.setResult(result);
+        resPlus.setSequence(psa.getSequence());
+        return resPlus;
     }
 }

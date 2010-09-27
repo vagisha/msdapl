@@ -31,6 +31,7 @@ import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.www.go.GOSlimUtils;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.GOSupportUtils;
+import org.yeastrc.www.proteinfer.ProteinInferPhiliusResultChecker;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 import org.yeastrc.www.proteinfer.ProteinInferToProjectMapper;
 import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
@@ -129,6 +130,9 @@ public class ProteinInferViewAction extends Action {
         	request.setAttribute("yeastAbundances", true);
         }
         
+        if(ProteinInferPhiliusResultChecker.getInstance().hasPhiliusResults(pinferId)) {
+        	request.setAttribute("philiusResults", true);
+        }
         
         // get the list of page numbers to display
         int pageCount = ResultsPager.instance().getPageCount(proteinIds.size());

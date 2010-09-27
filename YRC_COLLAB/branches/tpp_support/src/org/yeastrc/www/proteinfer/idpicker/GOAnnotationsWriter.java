@@ -116,7 +116,8 @@ public class GOAnnotationsWriter {
             int proteinId = proteinIds.get(i);
             WIdPickerProtein wProt = IdPickerResultsLoader.getIdPickerProtein(proteinId, 
             		new PeptideDefinition(), // add a dummy PeptideDefinition. We are only interested in protein groups and GO annotations
-            		fastaDatabaseIds);
+            		fastaDatabaseIds,
+            		false); // we don't want Philius annotations
             
             if(wProt.getProtein().getGroupId() != currentGroupId) {
             	

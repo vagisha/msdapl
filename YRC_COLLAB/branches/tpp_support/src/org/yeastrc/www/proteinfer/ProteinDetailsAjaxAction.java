@@ -26,6 +26,8 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerPeptideBase;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptide;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
+import org.yeastrc.philius.dao.PhiliusDAOFactory;
+import org.yeastrc.philius.domain.PhiliusResult;
 import org.yeastrc.www.protein.ProteinAbundanceDao;
 import org.yeastrc.www.protein.ProteinAbundanceDao.YeastOrfAbundance;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
@@ -134,6 +136,15 @@ public class ProteinDetailsAjaxAction extends Action {
             	}
             }
             
+            // Philius information
+            boolean hasPhiliusResult = ProteinInferPhiliusResultChecker.getInstance().hasPhiliusResults(run.getId());
+            if(hasPhiliusResult) {
+            	PhiliusResult result = PhiliusDAOFactory.getInstance().getPhiliusResultDAO().loadForSequence(iProt.getProteinListing().getSequenceId());
+            	if(result != null) {
+            		request.setAttribute("philiusAnnotation", result.getAnnotation());
+            	}
+            }
+            
             // Gene Ontology information
             Set<GOAnnotation> bpAnnots = GOSearcher.getInstance().getGOAnnotations(GOUtils.BIOLOGICAL_PROCESS, iProt.getProteinListing());
     		if ( bpAnnots.size() > 0)
@@ -203,6 +214,15 @@ public class ProteinDetailsAjaxAction extends Action {
             			aString = aString.substring(1);
             			request.setAttribute("proteinAbundance", aString);
             		}
+            	}
+            }
+            
+            // Philius information
+            boolean hasPhiliusResult = ProteinInferPhiliusResultChecker.getInstance().hasPhiliusResults(run.getId());
+            if(hasPhiliusResult) {
+            	PhiliusResult result = PhiliusDAOFactory.getInstance().getPhiliusResultDAO().loadForSequence(pProt.getProteinListing().getSequenceId());
+            	if(result != null) {
+            		request.setAttribute("philiusAnnotation", result.getAnnotation());
             	}
             }
             

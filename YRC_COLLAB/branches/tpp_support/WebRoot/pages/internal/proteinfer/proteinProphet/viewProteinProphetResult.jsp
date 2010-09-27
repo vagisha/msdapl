@@ -229,7 +229,7 @@ function philiusAnnotations(pinferProteinId, nrseqProteinId) {
 
 	var button = $("#philiusbutton_"+pinferProteinId);
 	
-	if(button.text() == "[Get Predictions]") {
+	if(button.text() == "[Get Annotations]") {
 		// submit a Philius job, get a job token and display a status message.
 		//alert("Submitting Philius job...");
 		button.text("[Processing...]");
@@ -314,7 +314,7 @@ function philiusAnnotations(pinferProteinId, nrseqProteinId) {
 		button.text("[Hide Annotations]");
 	}
 	else if (button.text() == "[Failed...]") {
-		button.text("[Get Predictions]");
+		button.text("[Get Annotations]");
 		$("#philius_status_"+pinferProteinId).hide();
 	}
 }

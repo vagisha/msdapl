@@ -5,6 +5,9 @@
  */
 package org.yeastrc.www.philiusws;
 
+import org.yeastrc.philius.domain.PhiliusResult;
+import org.yeastrc.philius.domain.PhiliusSegment;
+
 
 
 /**
@@ -32,17 +35,17 @@ public class PhiliusImageMapMaker {
 	 * @return
 	 * @throws Exception
 	 */
-	public String getImageMap( PhiliusSequenceAnnotationWS anno ) throws Exception {
+	public String getImageMap( PhiliusResult anno, String sequence ) throws Exception {
 		StringBuffer mapstr = new StringBuffer( "<map name=\"philiusMap\">\n" );
 		
 		// loop through the segments
-		for ( PhiliusSegmentWS segment : anno.getSegments() ) {
+		for ( PhiliusSegment segment : anno.getSegments() ) {
 			int x1, y1, x2, y2 = 0;
 			
 			mapstr.append( "<area shape=\"rect\" nohref ");
 			
 			// get normalizer
-			int length = anno.getSequence().length();
+			int length = sequence.length();
 			float normalizer = (float)1.0;
 			if (length > 760) {
 				normalizer = (float)760.0 / (float)length;
@@ -67,8 +70,8 @@ public class PhiliusImageMapMaker {
 			mapstr.append( "coords=\"" + x1 + "," + y1 + "," + x2 + "," + y2 + "\" ");
 			
 			// add in call to tool tip javascript here
-			StringBuffer tooltip = new StringBuffer( "Segment Type: " + segment.getTypeString() + "<br>" );
-			tooltip.append( "Type Confidence: " + segment.getTypeConfidence() + "<br>" );
+			StringBuffer tooltip = new StringBuffer( "Segment Type: " + segment.getType().getLongName() + "<br>" );
+			tooltip.append( "Type Confidence: " + segment.getConfidence() + "<br>" );
 			tooltip.append( "Residues: " + segment.getStart() + " - " + segment.getEnd() );
 			mapstr.append( "onMouseOver=\"ddrivetip('" + tooltip.toString() + "')\" onMouseOut=\"hideddrivetip()\"" );
 			

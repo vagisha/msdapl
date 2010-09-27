@@ -184,7 +184,7 @@
 	<br/>
 	<span style="text-decoration: underline; cursor: pointer;"
       onclick="philiusAnnotations(<bean:write name="protein" property="protein.id" />,<bean:write name="protein" property="protein.nrseqProteinId" />)"
-      id="philiusbutton_<bean:write name="protein" property="protein.id"/>">[Get Predictions]</span>
+      id="philiusbutton_<bean:write name="protein" property="protein.id"/>">[Get Annotations]</span>
     </font>
 	</td>
 	<td align="left" valign="top">

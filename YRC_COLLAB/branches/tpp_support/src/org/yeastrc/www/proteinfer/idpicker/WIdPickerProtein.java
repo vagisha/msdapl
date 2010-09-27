@@ -22,6 +22,8 @@ public class WIdPickerProtein {
     private float molecularWeight = -1.0f;
     private float pi = -1.0f;
     private List<YeastOrfAbundance> yeastOrfAbundances;
+    private boolean transMembrane = false;
+    private boolean signalPeptide = false;
     
 	public WIdPickerProtein(IdPickerProteinBase prot) {
         this.idpProtein = prot;
@@ -105,4 +107,21 @@ public class WIdPickerProtein {
 	public void setYeastProteinAbundance(List<YeastOrfAbundance> abundances) {
 		this.yeastOrfAbundances = abundances;
 	}
+
+	public boolean isTransMembrane() {
+		return transMembrane;
+	}
+
+	public void setTransMembrane(boolean transMembrane) {
+		this.transMembrane = transMembrane;
+	}
+
+	public boolean isSignalPeptide() {
+		return signalPeptide;
+	}
+
+	public void setSignalPeptide(boolean signalPeptide) {
+		this.signalPeptide = signalPeptide;
+	}
+	
 }

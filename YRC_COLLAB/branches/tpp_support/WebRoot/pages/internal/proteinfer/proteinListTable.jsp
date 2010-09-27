@@ -49,10 +49,15 @@
  else sortedClass = "sorted-desc";
  %>
 
-<bean:define id="myColspan" value="11"/>
-<logic:present name="yeastAbundances">
-	<bean:define id="myColspan" value="12"/>
-</logic:present>
+<%
+int columnSpan = 11;
+if(request.getAttribute("yeastAbundances") != null)
+	columnSpan++;
+if(request.getAttribute("philiusResults") != null)
+	columnSpan+=2;
+ %>
+<bean:define id="myColspan" value="<%=String.valueOf(columnSpan) %>"/>
+
 
 <table cellpadding="0" cellspacing="0" align="center" width="99%"  id="protlisttable" class="table_pinfer" style="margin-top:10;">
 
@@ -109,6 +114,15 @@
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.PI.name()%>">
 			<b><font size="2pt">pI</font></b>
 		</th>
+		
+		<logic:present name="philiusResults">
+			<th width="1%" title="Trans Membrane" class="tooltip">
+				<b><font size="2pt">TM</font></b>
+			</th>
+			<th width="1%" title="Signal Peptide" class="tooltip">
+				<b><font size="2pt">SP</font></b>
+			</th>
+		</logic:present>
 		
 		<% colSortedClass = "";
 		 if(sortBy == SORT_BY.COVERAGE) colSortedClass = sortedClass;
@@ -281,6 +295,23 @@
 			
 			<td><bean:write name="protein" property="molecularWeight"/></td>
 			<td><bean:write name="protein" property="pi"/></td>
+			
+			<logic:present name="philiusResults">
+				<logic:equal name="protein" property="transMembrane" value="false">
+					<td>&nbsp;</td>
+				</logic:equal>
+				<logic:equal name="protein" property="transMembrane" value="true">
+					<td style="vertical-align:middle; text-align:center;"><span style="width:10px;height:10px;background-color:yellow;border:1px solid gray;display:block;">&nbsp;</span></td>
+				</logic:equal>
+				
+				<logic:equal name="protein" property="signalPeptide" value="false">
+					<td>&nbsp;</td>
+				</logic:equal>
+				<logic:equal name="protein" property="signalPeptide" value="true">
+					<td style="vertical-align:middle; text-align:center;"><span style="width:10px;height:10px;background-color:red;border:1px solid gray;display:block;">&nbsp;</span></td>
+				</logic:equal>
+			</logic:present>
+			
 			<td><bean:write name="protein" property="protein.coverage"/></td>
 			<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
 		
@@ -451,6 +482,23 @@
 		
 		<td><bean:write name="protein" property="molecularWeight"/></td>
 		<td><bean:write name="protein" property="pi"/></td>
+		
+		<logic:present name="philiusResults">
+				<logic:equal name="protein" property="transMembrane" value="false">
+					<td>&nbsp;</td>
+				</logic:equal>
+				<logic:equal name="protein" property="transMembrane" value="true">
+					<td style="vertical-align:middle; text-align:center;"><span style="width:10px;height:10px;background-color:yellow;border:1px solid gray;display:block;">&nbsp;</span></td>
+				</logic:equal>
+				
+				<logic:equal name="protein" property="signalPeptide" value="false">
+					<td>&nbsp;</td>
+				</logic:equal>
+				<logic:equal name="protein" property="signalPeptide" value="true">
+					<td style="vertical-align:middle; text-align:center;"><span style="width:10px;height:10px;background-color:red;border:1px solid gray;display:block;">&nbsp;</span></td>
+				</logic:equal>
+		</logic:present>
+			
 		<td><bean:write name="protein" property="protein.coverage"/></td>
 		<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
 		

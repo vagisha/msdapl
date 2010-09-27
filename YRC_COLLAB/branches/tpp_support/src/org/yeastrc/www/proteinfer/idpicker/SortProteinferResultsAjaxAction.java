@@ -22,6 +22,7 @@ import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
+import org.yeastrc.www.proteinfer.ProteinInferPhiliusResultChecker;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
 import org.yeastrc.www.user.User;
@@ -178,6 +179,10 @@ public class SortProteinferResultsAjaxAction extends Action{
 
         if(ProteinInferToSpeciesMapper.isSpeciesYeast(pinferId)) {
         	request.setAttribute("yeastAbundances", true);
+        }
+        
+        if(ProteinInferPhiliusResultChecker.getInstance().hasPhiliusResults(pinferId)) {
+        	request.setAttribute("philiusResults", true);
         }
 
         // get the list of page numbers to display

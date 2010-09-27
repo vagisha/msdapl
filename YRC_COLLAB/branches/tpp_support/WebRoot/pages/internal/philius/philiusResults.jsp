@@ -102,22 +102,25 @@ function hidePredictedSegments() {
 
 
 <style type="text/css">
-
 	SPAN.philius_sp {
 		background-color: #B90000;
 		color: #FFFFFF;
+		padding-bottom:4px;
 	}
 	SPAN.philius_nc {
 		background-color: #009B00;
 		color: #FFFFFF;
+		padding-bottom:4px;
 	}
 	SPAN.philius_c {
 		background-color: #0000B9;
 		color: #FFFFFF;
+		padding-bottom:4px;
 	}
 	SPAN.philius_tm {
 		background-color: #FFFF00;
 		color: #000000;
+		padding-bottom:4px;
 	}
 	DIV.philius_box {
 		background-color:#F8F8FF;
@@ -129,15 +132,15 @@ function hidePredictedSegments() {
 
 <!--  PREDICTION -->
 <table align="center" style="border: 1px solid #E5E5E5; border-spacing: 2px;background-color:#F8F8FF;">
-<tr><td><b>Philius Prediction:</b></td><td><bean:write name="philiusAnnotation" property="typeString" /></td></tr>
-<tr><td><b>Confidence:</b></td><td><bean:write name="philiusAnnotation" property="typeScore" /></td></tr>
+<tr><td><b>Philius Prediction:</b></td><td><bean:write name="philiusAnnotation" property="result.annotation" /></td></tr>
+<tr><td><b>Confidence:</b></td><td><bean:write name="philiusAnnotation" property="result.typeScore" /></td></tr>
 </table>
 <br/>
 <!-- SEQUENCE -->
 <pre><bean:write name="sequenceHtml" filter="false"/></pre>
 <br/>
 
-<bean:size id="segmentCount" name="philiusAnnotation" property="segments" />
+<bean:size id="segmentCount" name="philiusAnnotation" property="result.segments" />
 
 <!-- LEGEND -->
 <logic:greaterThan name="segmentCount" value="0">
@@ -182,12 +185,12 @@ function hidePredictedSegments() {
 <table style="border:1px dotted #CCCCCC;">
 <thead><tr><th>Type</th><th>Start</th><th>End</th><th>Confidence</th></tr></tr></thead>
 <tbody>
-<logic:iterate name="philiusAnnotation" property="segments" id="segment">
+<logic:iterate name="philiusAnnotation" property="result.segments" id="segment">
 	<tr>
-	<td style="border:1px dotted #CCCCCC;"><bean:write name="segment" property="typeString"/></td>
+	<td style="border:1px dotted #CCCCCC;"><bean:write name="segment" property="type.longName"/></td>
 	<td style="border:1px dotted #CCCCCC;"><bean:write name="segment" property="start"/></td>
 	<td style="border:1px dotted #CCCCCC;"><bean:write name="segment" property="end"/></td>
-	<td style="border:1px dotted #CCCCCC;"><bean:write name="segment" property="typeConfidence"/></td>
+	<td style="border:1px dotted #CCCCCC;"><bean:write name="segment" property="confidence"/></td>
 	</tr>
 </logic:iterate>
 </tbody>

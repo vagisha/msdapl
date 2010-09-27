@@ -52,6 +52,9 @@ import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.nrseq.ProteinListingBuilder;
+import org.yeastrc.philius.dao.PhiliusDAOFactory;
+import org.yeastrc.philius.dao.PhiliusResultDAO;
+import org.yeastrc.philius.domain.PhiliusResult;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 import org.yeastrc.www.protein.ProteinAbundanceDao;
 import org.yeastrc.www.proteinfer.MsResultLoader;
@@ -59,6 +62,7 @@ import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
 import org.yeastrc.www.proteinfer.ProteinCommonNameFilter;
 import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
 import org.yeastrc.www.proteinfer.ProteinGoTermsFilter;
+import org.yeastrc.www.proteinfer.ProteinInferPhiliusResultChecker;
 import org.yeastrc.www.proteinfer.ProteinInferToSpeciesMapper;
 import org.yeastrc.www.proteinfer.ProteinProperties;
 import org.yeastrc.www.proteinfer.ProteinPropertiesFilter;
@@ -86,6 +90,8 @@ public class IdPickerResultsLoader {
     private static final IdPickerInputDAO inputDao = pinferDaoFactory.getIdPickerInputDao();
     private static final IdPickerRunDAO idpRunDao = pinferDaoFactory.getIdPickerRunDao();
     private static final ProteinferRunDAO piRunDao = pinferDaoFactory.getProteinferRunDao();
+    
+    private static final PhiliusResultDAO philiusDao = PhiliusDAOFactory.getInstance().getPhiliusResultDAO();
     
     private static final Logger log = Logger.getLogger(IdPickerResultsLoader.class);
     
@@ -265,27 +271,31 @@ public class IdPickerResultsLoader {
         long s = System.currentTimeMillis();
         List<WIdPickerProtein> proteins = new ArrayList<WIdPickerProtein>(proteinIds.size());
         List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
+        boolean getPhiliusResults = ProteinInferPhiliusResultChecker.getInstance().hasPhiliusResults(pinferId);
+        
         for(int id: proteinIds) 
-            proteins.add(getIdPickerProtein(id, peptideDef, fastaDatabaseIds));
+            proteins.add(getIdPickerProtein(id, peptideDef, fastaDatabaseIds, getPhiliusResults));
         long e = System.currentTimeMillis();
         log.info("Time to get WIdPickerProteins: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         return proteins;
     }
     
     public static WIdPickerProtein getIdPickerProtein(int pinferProteinId, 
-            PeptideDefinition peptideDef, List<Integer> databaseIds) {
+            PeptideDefinition peptideDef, List<Integer> databaseIds, boolean getPhiliusResults) {
         IdPickerProteinBase protein = idpProtBaseDao.loadProtein(pinferProteinId);
         protein.setPeptideDefinition(peptideDef);
-        return getWIdPickerProtein(protein, databaseIds);
+        return getWIdPickerProtein(protein, databaseIds, getPhiliusResults);
     }
     
     public static WIdPickerProtein getIdPickerProtein(int pinferId, int pinferProteinId, 
             PeptideDefinition peptideDef) {
         List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
-       return getIdPickerProtein(pinferProteinId, peptideDef, fastaDatabaseIds);
+        
+        boolean getPhiliusResults = ProteinInferPhiliusResultChecker.getInstance().hasPhiliusResults(pinferId);
+        return getIdPickerProtein(pinferProteinId, peptideDef, fastaDatabaseIds, getPhiliusResults);
     }
     
-    private static WIdPickerProtein getWIdPickerProtein(IdPickerProteinBase protein, List<Integer> databaseIds) {
+    private static WIdPickerProtein getWIdPickerProtein(IdPickerProteinBase protein, List<Integer> databaseIds, boolean getPhiliusResults) {
         WIdPickerProtein wProt = new WIdPickerProtein(protein);
         // set the accession and description for the proteins.  
         // This requires querying the NRSEQ database
@@ -293,6 +303,15 @@ public class IdPickerResultsLoader {
         
         // get the molecular weight for the protein
         assignProteinProperties(wProt);
+        
+        if(getPhiliusResults) {
+        	int sequenceId = wProt.getProteinListing().getSequenceId();
+        	PhiliusResult res = philiusDao.loadForSequence(sequenceId);
+        	if(res != null) {
+        		wProt.setTransMembrane(res.isTransMembrane());
+        		wProt.setSignalPeptide(res.isSignalPeptide());
+        	}
+        }
         
         return wProt;
     }
@@ -309,10 +328,11 @@ public class IdPickerResultsLoader {
         
         List<WIdPickerProtein> proteins = new ArrayList<WIdPickerProtein>(groupProteins.size());
         List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
+        boolean getPhiliusResults = ProteinInferPhiliusResultChecker.getInstance().hasPhiliusResults(pinferId);
         
         for(IdPickerProteinBase prot: groupProteins) {
             prot.setPeptideDefinition(peptideDef);
-            proteins.add(getWIdPickerProtein(prot, fastaDatabaseIds));
+            proteins.add(getWIdPickerProtein(prot, fastaDatabaseIds, getPhiliusResults));
         }
         
         long e = System.currentTimeMillis();
@@ -448,6 +468,8 @@ public class IdPickerResultsLoader {
         	}
         }
         long e = System.currentTimeMillis();
+        
+        
         log.info("Time to get WIdPickerProteinsGroups: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
         return groups;

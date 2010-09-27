@@ -234,6 +234,7 @@
 								<tbody>
 									<tr><td style="font-size:8pt;font-weight:bold;">projectId</td><td style="font-size:8pt;">Required.  ID of the parent project</td></tr>
 									<tr><td style="font-size:8pt;font-weight:bold;">dataDirectory</td><td style="font-size:8pt;">Required.  path to the data directory</td></tr>
+									<tr><td style="font-size:8pt;font-weight:bold;">remoteServer</td><td style="font-size:8pt;">Optional.  ID of remote server</td></tr>
 									<tr><td style="font-size:8pt;font-weight:bold;">pipeline</td><td style="font-size:8pt;">Required.  Either TPP or MACCOSS</td></tr>
 									<tr><td style="font-size:8pt;font-weight:bold;">date</td><td style="font-size:8pt;">Required.  Date the data was generated (Accepted format example: 09/24/10)</td></tr>
 									<tr><td style="font-size:8pt;font-weight:bold;">instrument</td><td style="font-size:8pt;">Optional.  Name of the instrument use to acquire data. This should match the instruments available in MSDaPl</td></tr>

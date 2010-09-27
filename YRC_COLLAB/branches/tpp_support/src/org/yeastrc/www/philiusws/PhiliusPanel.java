@@ -14,9 +14,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.util.List;
+import java.util.Set;
 
 import javax.swing.JPanel;
+
+import org.yeastrc.philius.domain.PhiliusSegment;
 
 
 /**
@@ -40,16 +42,9 @@ public class PhiliusPanel extends JPanel {
 	 * get an instance of PhiliusPanel
 	 * @return an instance of PhiliusPanel
 	 */
-	public static PhiliusPanel getInstance( PhiliusSequenceAnnotationWS anno ) {
+	public static PhiliusPanel getInstance( PhiliusResultPlus anno ) {
 		PhiliusPanel panel = new PhiliusPanel();
 		panel.setSequenceAnnotation( anno );
-		return panel;
-	}
-	
-	public static PhiliusPanel getInstance(PhiliusSequenceAnnotationWS anno, List<String> peptides) {
-		PhiliusPanel panel = new PhiliusPanel();
-		panel.setSequenceAnnotation(anno);
-		panel.coveredSequences = peptides;
 		return panel;
 	}
 	
@@ -87,9 +82,9 @@ public class PhiliusPanel extends JPanel {
 		try {
 			
 			// draw lines first
-			for ( PhiliusSegmentWS segment : this.sequenceAnnotation.getSegments() ) {
+			for ( PhiliusSegment segment : this.sequenceAnnotation.getResult().getSegments() ) {
 				
-				int intensity = Math.round( (float)255.0 * (float)Math.pow( segment.getTypeConfidence().floatValue() , 3.0 ) );
+				int intensity = Math.round( (float)255.0 * (float)Math.pow( segment.getConfidence().floatValue() , 3.0 ) );
 				
 				if (segment.isTransMembraneHelix() || segment.isSp()) {
 					continue;
@@ -113,7 +108,7 @@ public class PhiliusPanel extends JPanel {
 				
 			}
 			
-			for ( PhiliusSegmentWS segment : this.sequenceAnnotation.getSegments() ) {
+			for ( PhiliusSegment segment : this.sequenceAnnotation.getResult().getSegments() ) {
 				if (!segment.isTransMembraneHelix()  && !segment.isSp())
 					continue;
 				
@@ -122,7 +117,7 @@ public class PhiliusPanel extends JPanel {
 				Rectangle r = new Rectangle( INDENT + Math.round( segment.getStart() * normalizer ), 28, Math.round( (segment.getEnd() - segment.getStart()) * normalizer ), 40 );
 			    GradientPaint gp = null;
 			    
-			    int intensity = Math.round( (float)255.0 * (float)Math.pow( segment.getTypeConfidence().floatValue() , 3.0) );
+			    int intensity = Math.round( (float)255.0 * (float)Math.pow( segment.getConfidence().floatValue() , 3.0) );
 			    
 			    if (segment.isTransMembraneHelix()) {
 			    	gp = new GradientPaint( INDENT + Math.round( segment.getStart() * normalizer ), 28, new Color ( intensity, intensity, 0),
@@ -144,7 +139,7 @@ public class PhiliusPanel extends JPanel {
 			
 			// draw position markers
 			boolean drawUp = false;
-			for ( PhiliusSegmentWS segment : this.sequenceAnnotation.getSegments() ) {
+			for ( PhiliusSegment segment : this.sequenceAnnotation.getResult().getSegments() ) {
 
 				Font f = new Font("Times", Font.PLAIN, 9);
 				g2.setFont( f );
@@ -173,7 +168,7 @@ public class PhiliusPanel extends JPanel {
 			}
 			
 			// Draw the sequence coverage if we have the information
-			if(this.coveredSequences != null)
+			if(this.sequenceAnnotation.getCoveredSequences() != null)
 				drawSequenceCoverage(g2, normalizer);
 			
 		} catch ( Exception e ) {
@@ -185,7 +180,7 @@ public class PhiliusPanel extends JPanel {
 	private void drawSequenceCoverage(Graphics2D g2, float normalizer) {
 		
 		// draw the main sequence first
-		for ( PhiliusSegmentWS segment : this.sequenceAnnotation.getSegments() ) {
+		for ( PhiliusSegment segment : this.sequenceAnnotation.getResult().getSegments() ) {
 
 			Font f = new Font("Times", Font.PLAIN, 9);
 			g2.setFont( f );
@@ -211,6 +206,7 @@ public class PhiliusPanel extends JPanel {
 		// draw the peptide coverage
 		g2.setColor(Color.black);
 		g2.setStroke(new BasicStroke(3));
+		Set<String> coveredSequences = this.sequenceAnnotation.getCoveredSequences();
 		for(String peptide: coveredSequences) {
 			int start = this.sequenceAnnotation.getSequence().indexOf(peptide);
 			if(start > -1) {
@@ -221,21 +217,20 @@ public class PhiliusPanel extends JPanel {
 		}
 	}
 	
-	private PhiliusSequenceAnnotationWS sequenceAnnotation;
+	private PhiliusResultPlus sequenceAnnotation;
 	
-	private List<String> coveredSequences = null;
 	
 	/**
 	 * @return the sequenceAnnotation
 	 */
-	public PhiliusSequenceAnnotationWS getSequenceAnnotation() {
+	public PhiliusResultPlus getSequenceAnnotation() {
 		return sequenceAnnotation;
 	}
 
 	/**
 	 * @param sequenceAnnotation the sequenceAnnotation to set
 	 */
-	public void setSequenceAnnotation(PhiliusSequenceAnnotationWS sequenceAnnotation) {
+	public void setSequenceAnnotation(PhiliusResultPlus sequenceAnnotation) {
 		this.sequenceAnnotation = sequenceAnnotation;
 	}
 	
