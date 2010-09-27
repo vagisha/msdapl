@@ -34,6 +34,8 @@ import org.yeastrc.nrseq.NrsProtein;
 import org.yeastrc.nrseq.ProteinListing;
 import org.yeastrc.nrseq.ProteinListingBuilder;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
+import org.yeastrc.philius.dao.PhiliusDAOFactory;
+import org.yeastrc.philius.domain.PhiliusResult;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 import org.yeastrc.www.protein.ProteinAbundanceDao.YeastOrfAbundance;
 import org.yeastrc.www.proteinfer.ProteinDetailsAjaxAction;
@@ -170,6 +172,12 @@ private static final Logger log = Logger.getLogger(ProteinDetailsAjaxAction.clas
         			request.setAttribute("proteinAbundance", aString);
         		}
         	}
+        }
+        
+        // Philius information, if it is already available
+        PhiliusResult result = PhiliusDAOFactory.getInstance().getPhiliusResultDAO().loadForSequence(protein.getProteinListing().getSequenceId());
+        if(result != null) {
+        	request.setAttribute("philiusAnnotation", result.getAnnotation());
         }
         
         

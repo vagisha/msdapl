@@ -41,17 +41,29 @@ function philiusAnnotations(nrseqProteinId) {
    						if(token.substr(0,6) == "FAILED") {
    							statusText = "Philius Job Submission failed!<br>"+token;
    							button.text("[Failed...]");
+   							// show the status text with a link for fetching the results with the returned token.
+							// OR the failure message.
+							$("#philius_status_"+nrseqProteinId).html(statusText);
+							$("#philius_status_"+nrseqProteinId).show();
    						}
-   						else {
+   						// If the result was not already available in the database a request is submitted to the Philius server
+   						else if(token.substr(0,9) == "SUMBITTED") {
    							//alert("Returned token is: "+token);
+   							token = token.substr(10);
    							statusText += " onclick=philiusAnnotations("+nrseqProteinId+") >";
    							statusText += "<b>REFRESH</b></span>.";
    							button.attr('name', token);
+   							// show the status text with a link for fetching the results with the returned token.
+							// OR the failure message.
+							$("#philius_status_"+nrseqProteinId).html(statusText);
+							$("#philius_status_"+nrseqProteinId).show();
 						}
-						// show the status text with a link for fetching the results with the returned token.
-						// OR the failure message.
-						$("#philius_status_"+nrseqProteinId).html(statusText);
-						$("#philius_status_"+nrseqProteinId).show();
+						else {
+							$("#protsequence_"+nrseqProteinId).hide();
+							$("#philiusannot_"+nrseqProteinId).html(data);
+							$("#philiusannot_"+nrseqProteinId).show();
+							button.text("[Hide Annotations]");
+						}
    					}
     		);
 	}
@@ -173,6 +185,18 @@ function philiusAnnotations(nrseqProteinId) {
     	<bean:write name="protein" property="pi" />
 	</td>
 </tr>
+
+<logic:present name="philiusAnnotation">
+<tr>
+	<td valign="top" align="left"><b>Philius Annotation:</b>
+	<br/>
+    <span class="small_font"><a href="http://www.ncbi.nlm.nih.gov/sites/entrez?cmd=Search&db=pubmed&term=18989393">Reynolds <I>et al.</I></a></span><br>
+	</td>
+	<td valign="top" align="left">
+    	<bean:write name="philiusAnnotation" />
+	</td>
+</tr>
+</logic:present>
 
 <logic:present name="proteinAbundance">
 <tr>
