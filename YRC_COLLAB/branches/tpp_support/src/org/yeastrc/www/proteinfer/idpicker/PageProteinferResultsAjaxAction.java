@@ -143,6 +143,10 @@ public class PageProteinferResultsAjaxAction extends Action {
         request.setAttribute("sortBy", filterCriteria_session.getSortBy());
         request.setAttribute("sortOrder", filterCriteria_session.getSortOrder());
         
+        DisplayColumns displayColumnPrefs = (DisplayColumns) request.getSession().getAttribute("protinferDisplayColumns");
+        request.setAttribute("displayColumns", displayColumnPrefs);
+        
+        
         long e = System.currentTimeMillis();
         log.info("Total time (PageProteinInferenceResultAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));
         

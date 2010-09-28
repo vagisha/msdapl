@@ -206,7 +206,7 @@
 			<b>Example using cURL</b>
 			<br/>
 			<ul>
-				<li>JSON INPUT: <span style="color:#D74D2D;">curl -u &lt;username&gt;:&lt;password&gt; -X POST  -H 'Content-Type: application/json' -d '{"projectId":"24", "dataDirectory":"/test/data", "pipeline":"MACCOSS", "date":"2010-03-29", "comments":"upload test"}' http://localhost:8080/msdapl_queue/services/msjob/add</span></li>
+				<li>JSON INPUT: <span style="color:#D74D2D;">curl -u &lt;username&gt;:&lt;password&gt; -X POST  -H 'Content-Type: application/json' -d '{"projectId":"24", "dataDirectory":"/test/data", "pipeline":"MACCOSS", "date":"2010-03-29", "comments":"upload test"}' http://&lt;server_path&gt;/msdapl_queue/services/msjob/add</span></li>
 			</ul>
 		
 		</li>

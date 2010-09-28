@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -60,6 +61,7 @@ public class ProteinInferViewAction extends Action {
 
         // form for filtering and display options
         IdPickerFilterForm filterForm = (IdPickerFilterForm)form;
+        
         request.setAttribute("proteinInferFilterForm", filterForm);
         
         // look for the protein inference run id in the form first
@@ -126,13 +128,24 @@ public class ProteinInferViewAction extends Action {
         
         request.setAttribute("proteinGroups", proteinGroups);
         
+        DisplayColumns displayColumns = getDisplayColumns(request.getCookies());
         if(ProteinInferToSpeciesMapper.isSpeciesYeast(pinferId)) {
         	request.setAttribute("yeastAbundances", true);
+        	displayColumns.setSelected(DisplayColumns.yeastAbundance);
         }
+        else
+        	displayColumns.setDisabled(DisplayColumns.yeastAbundance);
         
         if(ProteinInferPhiliusResultChecker.getInstance().hasPhiliusResults(pinferId)) {
         	request.setAttribute("philiusResults", true);
+        	displayColumns.setSelected(DisplayColumns.philiusAnnot);
         }
+        else
+        	displayColumns.setDisabled(DisplayColumns.philiusAnnot);
+        
+        filterForm.setDisplayColumnList(displayColumns.getColumnList());
+        request.setAttribute("displayColumns", filterForm.getDisplayColumns());
+        
         
         // get the list of page numbers to display
         int pageCount = ResultsPager.instance().getPageCount(proteinIds.size());
@@ -242,5 +255,23 @@ public class ProteinInferViewAction extends Action {
 			}
 		}
 		return speciesList;
+	}
+	
+	private DisplayColumns getDisplayColumns(Cookie[] cookies) {
+		
+		DisplayColumns displayColumns = new DisplayColumns();
+		displayColumns.setAllSelected();
+		for(Cookie cookie: cookies) {
+			if(cookie.getName().equals("noDispCols_protinfer")) {
+				String val = cookie.getValue();
+				if(val != null) {
+					String[] tokens = val.split("_");
+					for(String tok: tokens) {
+						displayColumns.setNotSelected(tok.charAt(0));
+					}
+				}
+			}
+		}
+		return displayColumns;
 	}
 }

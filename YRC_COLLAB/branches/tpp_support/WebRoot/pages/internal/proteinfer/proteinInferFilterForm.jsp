@@ -1,6 +1,7 @@
 
 <%@page import="org.yeastrc.ms.domain.protinfer.ProteinUserValidation"%>
 <%@page import="org.yeastrc.bio.go.GOUtils"%>
+<%@page import="org.yeastrc.www.proteinfer.idpicker.DisplayColumns"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -86,6 +87,26 @@ function removeFromGoTermFilters(goTerm, warn) {
 	$(".go_filter_add[id='"+goTerm+"']").show();
 	$(".go_filter_remove[id='"+goTerm+"']").hide();
 }
+
+function saveDisplayColumnsCookie() {
+	//alert("saving cookie");
+	var cookieVal = "";
+	$(".colChooser").each(function() {
+		if($(this).is(":checked")) {}
+		else {cookieVal += "_"+$(this).next("span").attr('id')};
+	});
+	
+	if(cookieVal.length > 0) {
+		cookieVal = cookieVal.substring(1);
+		//alert(cookieVal);
+		var COOKIE_NAME = 'noDispCols_protinfer';
+		var options = { path: '/', expires: 100 };
+    	$.cookie(COOKIE_NAME, cookieVal, options);
+    }
+	
+	return false;
+}
+
 </script>
 
   <html:form action="/proteinInferGateway" method="post" styleId="filterForm" >
@@ -323,13 +344,49 @@ function removeFromGoTermFilters(goTerm, warn) {
  </TABLE>
  
 
-<div align="center" style="margin:10 0 5 0;">
+	<!-- DISPLAY COLUMN CHOOSER -->
+	<div style="background-color:#F2F2F2;width:100%; margin:5 0 0 0; padding:1 0 1 0; color:black; border: 1px solid gray; font-size:8pt;" align="left">
+	<span style="margin-left:5;" 
+	  class="foldable fold-close" id="protinfer_display_opts_fold">&nbsp;&nbsp;&nbsp;&nbsp; </span>
+	<b>Display Options</b>
+	</div>
+	
+	<div id="protinfer_display_opts_fold_target" class="small_font" align="center" 
+		 style="padding: 5 0 5 0; border: 1px solid gray; width:100%; display:none;">
+	
+		<div style="width:30%;" align="left">
+		<logic:iterate name="proteinInferFilterForm" property="displayColumnList" id="displayColumn" >
+			<logic:equal name="displayColumn" property="disabled" value="false">
+				<html:checkbox name="displayColumn" property="selected" indexed="true" styleClass="colChooser">
+					<bean:write name="displayColumn" property="columnName"/>
+				</html:checkbox>
+			</logic:equal>
+			
+			<logic:equal name="displayColumn" property="disabled" value="true">
+				<html:checkbox name="displayColumn" property="selected" indexed="true" disabled="true" styleClass="colChooser" >
+					<bean:write name="displayColumn" property="columnName"/>
+				</html:checkbox>
+			</logic:equal>
+			<span id="<bean:write name="displayColumn" property="columnCode"/>"></span>
+			<html:hidden name="displayColumn" property="columnName" indexed="true"/>
+			<html:hidden name="displayColumn" property="columnCode" indexed="true"/>
+			<html:hidden name="displayColumn" property="disabled" indexed="true"/>
+			<br/>
+		</logic:iterate>
+		<br/><br/>
+		<input type="button" value="Save Settings"  onclick="saveDisplayColumnsCookie();"/>
+		</div>
+	</div> <!-- END OF DISPLAY OPTIONS -->
+
+
+ <!-- Download Options -->
+ <div align="center" style="margin:10 0 5 0;">
   	<a href="" onclick="javascript:downloadResults();return false;" ><b>Download Results</b></a> &nbsp; 
   	<html:checkbox name="proteinInferFilterForm"property="printPeptides" >Include Peptides</html:checkbox>
   	<html:checkbox name="proteinInferFilterForm"property="printDescriptions" >Include Descriptions</html:checkbox>
   	<html:checkbox name="proteinInferFilterForm"property="collapseGroups" >Collapse Protein Groups</html:checkbox>
   	<html:checkbox name="proteinInferFilterForm"property="downloadGOAnnotations" >GO Annotations</html:checkbox>
  </div>
-
-
+ 
+ 
 </html:form>

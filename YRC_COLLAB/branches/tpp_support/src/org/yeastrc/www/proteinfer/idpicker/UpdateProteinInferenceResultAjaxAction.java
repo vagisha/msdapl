@@ -198,7 +198,8 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         request.setAttribute("parsimProteinGrpCount", summary.getFilteredParsimoniousProteinGroupCount());
         
         
-        
+        request.setAttribute("displayColumns", filterForm.getDisplayColumns());
+        request.getSession().setAttribute("protinferDisplayColumns", filterForm.getDisplayColumns());
         
         long e = System.currentTimeMillis();
         log.info("Total time (UpdateProteinInferenceResultAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));

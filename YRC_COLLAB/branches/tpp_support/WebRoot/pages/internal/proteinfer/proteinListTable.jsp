@@ -68,10 +68,14 @@ if(request.getAttribute("philiusResults") != null)
 		<% String colSortedClass = "";
 			 if(sortBy == SORT_BY.GROUP_ID) colSortedClass = sortedClass;
 		%>
+		<logic:equal name="displayColumns" property="showGroupId" value="true">
 		<th class="sortable def_sort_asc <%=colSortedClass %>" width="1%" id="<%=SORT_BY.GROUP_ID.name()%>">
 			<b><font size="2pt">Grp</font></b>
 		</th>
+		</logic:equal>
 		
+		
+		<logic:equal name="displayColumns" property="showValidation" value="true">
 		<!-- Make protein annotation sortable only if indistinguishable proteins are NOT grouped together -->
 		<logic:equal name="groupProteins" value="true">
 			<th width="1%"><b><font size="2pt">S</font></b></th>
@@ -82,8 +86,10 @@ if(request.getAttribute("philiusResults") != null)
 			%>
 			<th width="1%" class="sortable def_sort_asc <%=colSortedClass %>" id="<%=SORT_BY.VALIDATION_STATUS.name()%>"><b><font size="2pt">S</font></b></th>
 		</logic:equal>
+		</logic:equal>
 		
 		
+		<logic:equal name="displayColumns" property="showFastaId" value="true">
 		<!-- Make FastaID sortable only if indistinguishable proteins are NOT grouped together -->
 		<logic:equal name="groupProteins" value="true">
 			<th width="5%"><b><font size="2pt">Fasta ID</font></b></th>
@@ -94,80 +100,114 @@ if(request.getAttribute("philiusResults") != null)
 			%>
 			<th width="5%" class="sortable def_sort_asc <%=colSortedClass %>" id="<%=SORT_BY.ACCESSION.name()%>"><b><font size="2pt">Fasta ID</font></b></th>
 		</logic:equal>
+		</logic:equal>
 		
 		
+		<logic:equal name="displayColumns" property="showCommonName" value="true">
 		<th width="5%"><b><font size="2pt">Common<br>Name</font></b></th>
+		</logic:equal>
 		
+		
+		<logic:equal name="displayColumns" property="showDescription" value="true">
 		<th><b><font size="2pt">Description</font></b></th>
+		</logic:equal>
 		
 		
+		<logic:equal name="displayColumns" property="showMolWt" value="true">
 		<% colSortedClass = "";
 		 if(sortBy == SORT_BY.MOL_WT) colSortedClass = sortedClass;
 		%>
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.MOL_WT.name()%>">
 			<b><font size="2pt">Mol.Wt.</font></b>
 		</th>
+		</logic:equal>
 		
+		
+		<logic:equal name="displayColumns" property="showPi" value="true">
 		<% colSortedClass = "";
 		 if(sortBy == SORT_BY.PI) colSortedClass = sortedClass;
 		%>
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.PI.name()%>">
 			<b><font size="2pt">pI</font></b>
 		</th>
+		</logic:equal>
 		
-		<logic:present name="philiusResults">
+		
+		<logic:equal name="displayColumns" property="showPhiliusAnnotations" value="true">
 			<th width="1%" title="Trans Membrane" class="tooltip">
 				<b><font size="2pt">TM</font></b>
 			</th>
 			<th width="1%" title="Signal Peptide" class="tooltip">
 				<b><font size="2pt">SP</font></b>
 			</th>
-		</logic:present>
+		</logic:equal>
 		
+		
+		<logic:equal name="displayColumns" property="showCoverage" value="true">
 		<% colSortedClass = "";
 		 if(sortBy == SORT_BY.COVERAGE) colSortedClass = sortedClass;
 		%>
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.COVERAGE.name()%>">
 			<b><font size="2pt">Cov.<br/>(%)</font></b>
 		</th>
+		</logic:equal>
 		
+		
+		
+		<logic:equal name="displayColumns" property="showNsaf" value="true">
 		<% colSortedClass = "";
 		 if(sortBy == SORT_BY.NSAF) colSortedClass = sortedClass;
 		%>
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.NSAF.name()%>">
 			<b><font size="2pt">NSAF**</font></b>
 		</th>
+		</logic:equal>
 		
-		<logic:present name="yeastAbundances">
+		
+		<logic:equal name="displayColumns" property="showYeastCopiesPerCell" value="true">
 			<th width="5%">
 				<b><font size="2pt">Copies /<br>cell***</font></b>
 			</th>
-		</logic:present>
-			
+		</logic:equal>
+		
+		
+		<logic:equal name="displayColumns" property="showNumPept" value="true">
 		<% colSortedClass = "";
 			 if(sortBy == SORT_BY.NUM_PEPT) colSortedClass = sortedClass;
 		%>
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="1%" id="<%=SORT_BY.NUM_PEPT.name()%>">
 			<b><font size="2pt"># Pept.</font></b>
 		</th>
+		</logic:equal>
 		
+		
+		<logic:equal name="displayColumns" property="showNumUniqPept" value="true">
 		<% colSortedClass = "";
 			 if(sortBy == SORT_BY.NUM_UNIQ_PEPT) colSortedClass = sortedClass;
 		%>
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="1%" id="<%=SORT_BY.NUM_UNIQ_PEPT.name()%>">
 			<b><font size="2pt"># Uniq. Pept.</font></b></th>
+		</logic:equal>
 		
+		
+		
+		<logic:equal name="displayColumns" property="showNumSpectra" value="true">
 		<% colSortedClass = "";
 			 if(sortBy == SORT_BY.NUM_SPECTRA) colSortedClass = sortedClass;
 		%>
 		<th class="sortable def_sort_desc <%=colSortedClass %>" width="1%" id="<%=SORT_BY.NUM_SPECTRA.name()%>">
 			<b><font size="2pt"># Spectra</font></b></th>
+		</logic:equal>
 		
+		
+		<logic:equal name="displayColumns" property="showClusterId" value="true">
 		<% colSortedClass = "";
 			 if(sortBy == SORT_BY.CLUSTER_ID) colSortedClass = sortedClass;
 		%>
 		<th class="sortable def_sort_asc <%=colSortedClass %>" width="1%" id="<%=SORT_BY.CLUSTER_ID.name()%>">
 			<b><font size="2pt">Clust.</font></b></th>
+		</logic:equal>
+		
 			
 		</tr>
 		</thead>
@@ -185,10 +225,16 @@ if(request.getAttribute("philiusResults") != null)
 		<logic:iterate name="proteinGroup" property="proteins" id="protein">
 		
 		<tr class="protgrp_row sorting_row">
-			<td rowspan="<bean:write name="rowspan" />" valign="middle">
-				<bean:write name="proteinGroup" property="groupId" />
-			</td>
 		
+			<logic:equal name="displayColumns" property="showGroupId" value="true">
+				<td rowspan="<bean:write name="rowspan" />" valign="middle">
+					<bean:write name="proteinGroup" property="groupId" />
+				</td>
+			</logic:equal>
+		
+		
+		
+			<logic:equal name="displayColumns" property="showValidation" value="true">
 			<td>
 			<span id="<bean:write name="protein" property="protein.id" />"
 				title="<bean:write name="protein" property="accessionsCommaSeparated" />" 
@@ -216,9 +262,12 @@ if(request.getAttribute("philiusResults") != null)
 					
 			</span>
 			</td>
+			</logic:equal>
+			
 			
 			
 			<!-- Protein accession -->
+			<logic:equal name="displayColumns" property="showFastaId" value="true">
 			<td> 
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
@@ -242,9 +291,12 @@ if(request.getAttribute("philiusResults") != null)
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"></b></logic:equal>
 			
 			</td>
+			</logic:equal>
+			
 			
 			
 			<!-- Protein common name -->
+			<logic:equal name="displayColumns" property="showCommonName" value="true">
 			<td> 
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
@@ -258,8 +310,12 @@ if(request.getAttribute("philiusResults") != null)
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"></font></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"></b></logic:equal>
 			</td>
+			</logic:equal>
+			
+			
 			
 			<!-- Protein description -->
+			<logic:equal name="displayColumns" property="showDescription" value="true">
 			<bean:size name="protein" property="proteinListing.descriptionReferences" id="refCount"/>
 			
 			<td style="font-size: 8pt;">
@@ -292,11 +348,21 @@ if(request.getAttribute("philiusResults") != null)
 			</logic:greaterThan>
 			</span>
 			</td>
+			</logic:equal>
 			
-			<td><bean:write name="protein" property="molecularWeight"/></td>
-			<td><bean:write name="protein" property="pi"/></td>
 			
-			<logic:present name="philiusResults">
+			<!-- Moleculat Wt. -->
+			<logic:equal name="displayColumns" property="showMolWt" value="true">
+				<td><bean:write name="protein" property="molecularWeight"/></td>
+			</logic:equal>
+			
+			<!-- pI -->
+			<logic:equal name="displayColumns" property="showPi" value="true">
+				<td><bean:write name="protein" property="pi"/></td>
+			</logic:equal>
+			
+			<!-- Philius Annotations -->
+			<logic:equal name="displayColumns" property="showPhiliusAnnotations" value="true">
 				<logic:equal name="protein" property="transMembrane" value="false">
 					<td>&nbsp;</td>
 				</logic:equal>
@@ -310,31 +376,59 @@ if(request.getAttribute("philiusResults") != null)
 				<logic:equal name="protein" property="signalPeptide" value="true">
 					<td style="vertical-align:middle; text-align:center;"><span style="width:10px;height:10px;background-color:red;border:1px solid gray;display:block;">&nbsp;</span></td>
 				</logic:equal>
-			</logic:present>
+			</logic:equal>
 			
-			<td><bean:write name="protein" property="protein.coverage"/></td>
-			<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
+			
+			<!-- Coverage -->
+			<logic:equal name="displayColumns" property="showCoverage" value="true">
+				<td><bean:write name="protein" property="protein.coverage"/></td>
+			</logic:equal>
+			
+			<!-- NSAF -->
+			<logic:equal name="displayColumns" property="showNsaf" value="true">
+				<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
+			</logic:equal>
 		
-			<logic:present name="yeastAbundances">
+			<!-- YEAST abundance (copies / cell) -->
+			<logic:equal name="displayColumns" property="showYeastCopiesPerCell" value="true">
 				<td><bean:write name="protein" property="yeastProteinAbundanceString" filter="false"/></td>
-			</logic:present>
+			</logic:equal>
 		
 		
+			<!-- # Peptides -->
+			<logic:equal name="displayColumns" property="showNumPept" value="true">
 			<td rowspan="<bean:write name="rowspan" />" valign="middle">
 				<bean:write name="proteinGroup" property="matchingPeptideCount"/>
 			</td>
+			</logic:equal>
+			
+			
+			<!-- # Unique Peptides -->
+			<logic:equal name="displayColumns" property="showNumUniqPept" value="true">
 			<td rowspan="<bean:write name="rowspan" />" valign="middle">
 				<bean:write name="proteinGroup" property="uniqMatchingPeptideCount"/>
 			</td>
-				<td rowspan="<bean:write name="rowspan" />" valign="middle">
+			</logic:equal>
+			
+			
+			<!-- # Spectra -->
+			<logic:equal name="displayColumns" property="showNumSpectra" value="true">
+			<td rowspan="<bean:write name="rowspan" />" valign="middle">
 			<bean:write name="proteinGroup" property="spectrumCount"/>
 			</td>
+			</logic:equal>
+			
+			
+			<!-- Cluster ID -->
+			<logic:equal name="displayColumns" property="showClusterId" value="true">
 			<td rowspan="<bean:write name="rowspan" />" valign="middle">
 				<span id="protgrpslink" style="cursor:pointer;text-decoration:underline" 
 				  onclick="showProteinCluster(<bean:write name="protein" property="protein.clusterId"/>)">
 				<bean:write name="protein" property="protein.clusterId"/>
 				</span>
 			</td>
+			</logic:equal>
+			
 		</tr>
 		
 		<!-- Display the View Peptides link for each protein in the group -->
@@ -367,13 +461,20 @@ if(request.getAttribute("philiusResults") != null)
 		
 		<%if(first) { %>
 		<tr class="protgrp_row sorting_row">
+		
+		<!-- Group ID -->
+		<logic:equal name="displayColumns" property="showGroupId" value="true">
 		<td rowspan="<bean:write name="rowspan" />" valign="middle">
 			<bean:write name="proteinGroup" property="groupId" />
 		</td>
+		</logic:equal>
+		
 		<%} else {%>
 			<tr class="protgrp_row linked_row">
 		<%} %>
 		
+		<!-- Validation Status -->
+		<logic:equal name="displayColumns" property="showValidation" value="true">
 		<td>
 		<span id="<bean:write name="protein" property="protein.id" />"
 				title="<bean:write name="protein" property="accessionsCommaSeparated" />" 
@@ -402,9 +503,11 @@ if(request.getAttribute("philiusResults") != null)
 					
 		</span>
 		</td>
+		</logic:equal>
 		
 			
 		<!-- Protein accession -->
+		<logic:equal name="displayColumns" property="showFastaId" value="true">
 		<td>
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
@@ -428,8 +531,11 @@ if(request.getAttribute("philiusResults") != null)
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"></b></logic:equal>
 			
 		</td>
+		</logic:equal>
+		
 		
 		<!-- Protein common name -->
+		<logic:equal name="displayColumns" property="showCommonName" value="true">
 			<td> 
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
@@ -445,8 +551,11 @@ if(request.getAttribute("philiusResults") != null)
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"></font></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"></b></logic:equal>
 			</td>
+		</logic:equal>
+		
 		
 		<!-- Protein Description -->
+		<logic:equal name="displayColumns" property="showDescription" value="true">
 		<bean:size name="protein" property="proteinListing.descriptionReferences" id="refCount"/>
 			
 			<td style="font-size: 8pt;">
@@ -479,11 +588,22 @@ if(request.getAttribute("philiusResults") != null)
 			</logic:greaterThan>
 			</span>
 			</td>
+		</logic:equal>
 		
-		<td><bean:write name="protein" property="molecularWeight"/></td>
-		<td><bean:write name="protein" property="pi"/></td>
 		
-		<logic:present name="philiusResults">
+		<!-- Moleculat Wt. -->
+		<logic:equal name="displayColumns" property="showMolWt" value="true">
+			<td><bean:write name="protein" property="molecularWeight"/></td>
+		</logic:equal>
+		
+		<!-- pI -->
+		<logic:equal name="displayColumns" property="showPi" value="true">
+			<td><bean:write name="protein" property="pi"/></td>
+		</logic:equal>
+		
+		
+		<!-- Philius Annotations -->
+		<logic:equal name="displayColumns" property="showPhiliusAnnotations" value="true">
 				<logic:equal name="protein" property="transMembrane" value="false">
 					<td>&nbsp;</td>
 				</logic:equal>
@@ -497,32 +617,60 @@ if(request.getAttribute("philiusResults") != null)
 				<logic:equal name="protein" property="signalPeptide" value="true">
 					<td style="vertical-align:middle; text-align:center;"><span style="width:10px;height:10px;background-color:red;border:1px solid gray;display:block;">&nbsp;</span></td>
 				</logic:equal>
-		</logic:present>
-			
-		<td><bean:write name="protein" property="protein.coverage"/></td>
-		<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
+		</logic:equal>
 		
-		<logic:present name="yeastAbundances">
+		<!-- Coverage -->
+		<logic:equal name="displayColumns" property="showCoverage" value="true">
+			<td><bean:write name="protein" property="protein.coverage"/></td>
+		</logic:equal>
+		
+		
+		<!-- NSAF -->
+		<logic:equal name="displayColumns" property="showNsaf" value="true">
+			<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
+		</logic:equal>
+		
+		
+		<!-- YEAST Abundance (# copies / cell) -->
+		<logic:equal name="displayColumns" property="showYeastCopiesPerCell" value="true">
 			<td><bean:write name="protein" property="yeastProteinAbundanceString" filter="false" /></td>
-		</logic:present>
+		</logic:equal>
 			
 		
 		<%if(first) { first = false;%>
+		
+		<!-- # Peptides -->
+		<logic:equal name="displayColumns" property="showNumPept" value="true">
 		<td rowspan="<bean:write name="rowspan" />" valign="middle">
 			<bean:write name="proteinGroup" property="matchingPeptideCount"/>
 		</td>
+		</logic:equal>
+		
+		<!-- # Unique Peptides -->
+		<logic:equal name="displayColumns" property="showNumUniqPept" value="true">
 		<td rowspan="<bean:write name="rowspan" />" valign="middle">
 			<bean:write name="proteinGroup" property="uniqMatchingPeptideCount"/>
 		</td>
+		</logic:equal>
+		
+		<!-- # Spectra -->
+		<logic:equal name="displayColumns" property="showNumSpectra" value="true">
 		<td rowspan="<bean:write name="rowspan" />" valign="middle">
 			<bean:write name="proteinGroup" property="spectrumCount"/>
 		</td>
+		</logic:equal>
+		
+		
+		<!-- Cluster ID -->
+		<logic:equal name="displayColumns" property="showClusterId" value="true">
 		<td rowspan="<bean:write name="rowspan" />" valign="middle">
 			<span id="protgrpslink" style="cursor:pointer;text-decoration:underline" 
 				  onclick="showProteinCluster(<bean:write name="protein" property="protein.clusterId"/>)">
 				<bean:write name="protein" property="protein.clusterId"/>
 			</span>
 		</td>
+		</logic:equal>
+		
 		<%} %>
 		
 		</tr>

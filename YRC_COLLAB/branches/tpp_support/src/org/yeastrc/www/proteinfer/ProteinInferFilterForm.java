@@ -14,6 +14,8 @@ import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.ms.domain.protinfer.GOProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
+import org.yeastrc.www.proteinfer.idpicker.DisplayColumn;
+import org.yeastrc.www.proteinfer.idpicker.DisplayColumns;
 
 public class ProteinInferFilterForm extends ActionForm {
 
@@ -66,7 +68,12 @@ public class ProteinInferFilterForm extends ActionForm {
     private boolean getGoSlimTree = false;
     private boolean doGoEnrichAnalysis = false;
     
-	public ProteinInferFilterForm () {}
+    
+    private List<DisplayColumn> displayColumnList;
+    
+	public ProteinInferFilterForm () {
+		displayColumnList = new ArrayList<DisplayColumn>();
+	}
     
 
 	/**
@@ -622,5 +629,27 @@ public class ProteinInferFilterForm extends ActionForm {
         }
         
         return filterCriteria;
+    }
+    
+    public void setDisplayColumnList(List<DisplayColumn> list) {
+    	this.displayColumnList = list;
+    }
+    
+    public List<DisplayColumn> getDisplayColumnList() {
+    	return this.displayColumnList;
+    }
+    
+    public DisplayColumns getDisplayColumns() {
+    	if(this.displayColumnList != null)
+    		return DisplayColumns.initDisplayColumns(displayColumnList);
+    	else
+    		return new DisplayColumns();
+    }
+    
+    
+    public DisplayColumn getDisplayColumn(int index) {// indexed properties
+    	while(index >= displayColumnList.size())
+    		displayColumnList.add(new DisplayColumn());
+        return displayColumnList.get(index);
     }
 }
