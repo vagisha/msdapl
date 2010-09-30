@@ -17,9 +17,11 @@ import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetAnalysisDAOImpl;
 import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetResultDAOImpl;
 import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetRocDAOImpl;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorFilteredPsmResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorParamsDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorPeptideResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
+import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorFilteredPsmResultDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorParamsDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorPeptideResultDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorResultDAOImpl;
@@ -186,6 +188,7 @@ public class DAOFactory {
     private PercolatorParamsDAO percSQTHeaderDAO;
     private PercolatorResultDAO percResultDAO;
     private PercolatorPeptideResultDAO percPeptResultDAO;
+    private PercolatorFilteredPsmResultDAO percFiltersPsmDAO;
     
     // DAOs related to PeptideProphet search analysis
     private PeptideProphetAnalysisDAO ppAnalysisDAO;
@@ -252,6 +255,7 @@ public class DAOFactory {
         percSQTHeaderDAO = new PercolatorParamsDAOImpl(sqlMap);
         percResultDAO = new PercolatorResultDAOImpl(sqlMap, rsAnalysisDAO, runSearchDAO, modDAO);
         percPeptResultDAO = new PercolatorPeptideResultDAOImpl(sqlMap, rsAnalysisDAO, runSearchDAO, modDAO, percResultDAO);
+        percFiltersPsmDAO = new PercolatorFilteredPsmResultDAOImpl(sqlMap);
 			
         
         // PeptideProphet post search analysis related
@@ -438,6 +442,10 @@ public class DAOFactory {
     
     public PercolatorPeptideResultDAO getPercolatorPeptideResultDAO() {
     	return percPeptResultDAO;
+    }
+    
+    public PercolatorFilteredPsmResultDAO getPrecolatorFilteredPsmResultDAO() {
+    	return percFiltersPsmDAO;
     }
     
     //-------------------------------------------------------------------------------------------
