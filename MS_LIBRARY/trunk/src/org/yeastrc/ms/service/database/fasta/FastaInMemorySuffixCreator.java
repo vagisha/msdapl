@@ -44,25 +44,26 @@ public class FastaInMemorySuffixCreator {
         for(int dbProteinId: dbProteinIds) {
             NrDbProteinFull protein = NrSeqLookupUtil.getDbProteinFull(dbProteinId);
             
-            if(seenSequenceIds.contains(protein.getSequenceId()))
-                continue;
-            else
-                seenSequenceIds.add(protein.getSequenceId());
+//            if(seenSequenceIds.contains(protein.getSequenceId()))
+//                continue;
+//            else
+            seenSequenceIds.add(protein.getSequenceId());
             
             String sequence = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(dbProteinId);
             
             cnt++;
-            if(cnt % 1000 == 0) {
-                log.info("# sequences seen: "+ cnt);
+            if(seenSequenceIds.size() % 1000 == 0) {
+                log.info("# sequences seen: "+ seenSequenceIds.size()+"; Number of db proteins seen: "+cnt);
             }
             createSuffixes(sequence, protein.getSequenceId(), dbProteinId);
             
         }
+        log.info("# sequences seen: "+ seenSequenceIds.size()+"; Number of db proteins seen: "+cnt);
         
         long e = System.currentTimeMillis();
         
         log.info("Created suffix map with "+suffixMap.size()+" entries");
-        log.info("Total time to create 5-mer suffix map for databaseID: "+databaseId+" was "
+        log.info("Total time to create "+FastaDatabaseSuffixCreator.SUFFIX_LENGTH+"-mer suffix map for databaseID: "+databaseId+" was "
                 +TimeUtils.timeElapsedSeconds(s, e)+"\n\n");
         
         return suffixMap;
