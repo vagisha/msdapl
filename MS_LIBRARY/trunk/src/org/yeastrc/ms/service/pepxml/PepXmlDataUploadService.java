@@ -454,7 +454,10 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                         	}
                         }
 
+                        List<DbLocus> newLoci = new ArrayList<DbLocus>();
+                        
                         for(PeptideProteinMatch match: matches) {
+                        	
                             boolean haveAlready = false;
                             for(MsSearchResultProteinIn prot: protList) {
                                 if(match.getProtein().getAccessionString().equals(prot.getAccession())) { // this one we have already
@@ -475,13 +478,13 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                                 	}
                                 }
                                 // What if the protein names in pepXML are truncated.
-                                else if(match.getProtein().getAccessionString().startsWith(prot.getAccession())) {
-                                	// update the accession so that we don't have trouble matching it with 
-                            		// entries in YRC_NRSEQ later
-                            		prot.setAccession(match.getProtein().getAccessionString());
-                            		haveAlready = true;
-                            		break;
-                                }
+//                                else if(match.getProtein().getAccessionString().startsWith(prot.getAccession())) {
+//                                	// update the accession so that we don't have trouble matching it with 
+//                            		// entries in YRC_NRSEQ later
+//                            		prot.setAccession(match.getProtein().getAccessionString());
+//                            		haveAlready = true;
+//                            		break;
+//                                }
                             }
                             
                             if(haveAlready)
@@ -490,7 +493,11 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                             locus.setNtermResidue(match.getPreResidue());
                             locus.setCtermResidue(match.getPostResidue());
                             locus.setNumEnzymaticTermini(match.getNumEnzymaticTermini());
-                            sres.addMatchingProteinMatch(locus);
+                            newLoci.add(locus);
+                        }
+                        
+                        for(DbLocus locus: newLoci) {
+                        	sres.addMatchingProteinMatch(locus);
                         }
                     }
                     

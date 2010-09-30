@@ -139,6 +139,8 @@ public class UploadServiceFactory {
             String ext = null;
             if(fileName.toLowerCase().endsWith("pep.xml"))
                 ext = "pep.xml";
+            else if(fileName.toLowerCase().endsWith(".xml")) // Ignore all other XML files
+            	continue;
             else {
                 int idx = fileName.lastIndexOf(".");
                 if(idx == -1)   continue;
@@ -159,7 +161,12 @@ public class UploadServiceFactory {
         }
         
         if(formats.size() > 1) {
-            throw new UploadServiceFactoryException("Multiple search data file formats found in directory: "+dataDirectory);
+        	String formatsFound = "";
+        	for(SearchFileFormat format: formats)
+        		formatsFound += ", "+format.name();
+        	if(formatsFound.length() > 0)
+        		formatsFound = formatsFound.substring(1);
+            throw new UploadServiceFactoryException("Multiple search data file formats found in directory: "+dataDirectory+"; Found: "+formatsFound);
         }
         
         SearchFileFormat format = formats.iterator().next();
@@ -241,6 +248,8 @@ public class UploadServiceFactory {
             String ext = null;
             if(fileName.toLowerCase().endsWith("pep.xml"))
                 ext = "pep.xml";
+            else if(fileName.toLowerCase().endsWith("prot.xml")) // Ignore prot XML files
+            	continue;
             else {
                 int idx = fileName.lastIndexOf(".");
                 if(idx == -1)   continue;
@@ -257,7 +266,7 @@ public class UploadServiceFactory {
         }
         
         if(formats.size() == 0) {
-            throw new UploadServiceFactoryException("No valid search data file format found in directory: "+dataDirectory);
+            throw new UploadServiceFactoryException("No valid search analysis data file format found in directory: "+dataDirectory);
         }
         
         if(formats.size() > 1) {
@@ -279,7 +288,7 @@ public class UploadServiceFactory {
         	}
         	
         	if(formats.size() > 1)
-        		throw new UploadServiceFactoryException("Multiple search data file formats found in directory: "+dataDirectory);
+        		throw new UploadServiceFactoryException("Multiple search analysis data file formats found in directory: "+dataDirectory);
         }
         
         SearchFileFormat format = formats.iterator().next();
@@ -430,6 +439,8 @@ public class UploadServiceFactory {
             String ext = null;
             if(fileName.toLowerCase().endsWith("prot.xml"))
                 ext = "prot.xml";
+            else if(fileName.toLowerCase().endsWith(".xml")) // Ignore all other XML files
+            	continue;
             else {
                 int idx = fileName.lastIndexOf(".");
                 if(idx == -1)   continue;

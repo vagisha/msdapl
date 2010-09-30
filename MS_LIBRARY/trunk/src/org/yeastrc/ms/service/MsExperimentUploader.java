@@ -197,9 +197,10 @@ public class MsExperimentUploader {
         			PercolatorXmlDataUploadService ps = (PercolatorXmlDataUploadService) adus;
         			maxPsmRank = ps.getMaxPsmRank();
         		}
+        		
+        		log.info("SEQUEST results upto xCorrRank: "+maxPsmRank+" will be uploaded");
+                ((AbstractSQTDataUploadService)sdus).setXcorrRankCutoff(maxPsmRank);
         	}
-        	log.info("SEQUEST results upto xCorrRank: "+maxPsmRank+" will be uploaded");
-            ((AbstractSQTDataUploadService)sdus).setXcorrRankCutoff(maxPsmRank);
         }
     }
     
