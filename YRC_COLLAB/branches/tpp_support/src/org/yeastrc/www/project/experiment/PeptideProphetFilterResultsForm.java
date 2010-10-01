@@ -1,5 +1,8 @@
 package org.yeastrc.www.project.experiment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionErrors;
@@ -79,6 +82,19 @@ public class PeptideProphetFilterResultsForm extends AnalysisFilterResultsForm {
         
         criteria.setShowOnlyModified(isShowModified() && !isShowUnmodified());
         criteria.setShowOnlyUnmodified(isShowUnmodified() && !isShowModified());
+        List<SelectableModificationBean> modList = this.getModificationList();
+        if(modList != null && modList.size() > 0) {
+        	List<Integer> modIdFilters = new ArrayList<Integer>();
+        	boolean allSelected = true;
+        	for(SelectableModificationBean modBean: modList) {
+        		if(modBean.isSelected())
+        			modIdFilters.add(modBean.getId());
+        		else
+        			allSelected = false;
+        	}
+        	if(modIdFilters.size() > 0 && !allSelected)
+        		criteria.setModificationIdFilters(modIdFilters);
+        }
         
         criteria.setMinProbability(getMinProbabilityDouble());
         criteria.setMaxProbability(getMaxProbabilityDouble());

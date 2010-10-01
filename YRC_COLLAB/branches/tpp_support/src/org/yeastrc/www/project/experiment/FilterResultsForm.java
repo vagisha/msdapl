@@ -6,6 +6,9 @@
  */
 package org.yeastrc.www.project.experiment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionErrors;
@@ -16,6 +19,7 @@ import org.apache.struts.action.ActionMessages;
 import org.yeastrc.ms.domain.search.ResultSortCriteria;
 import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
+import org.yeastrc.ms.domain.search.impl.ResidueModificationBean;
 
 
 /**
@@ -43,6 +47,7 @@ public class FilterResultsForm extends ActionForm {
     
     private boolean showModified = true;
     private boolean showUnmodified = true;
+    private List<SelectableModificationBean> modificationList;
     
     private SORT_BY sortBy;
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
@@ -283,6 +288,20 @@ public class FilterResultsForm extends ActionForm {
     }
     public void setShowUnmodified(boolean showUnmodified) {
         this.showUnmodified = showUnmodified;
+    }
+    public void setModificationList(List<SelectableModificationBean> modificationList) {
+    	this.modificationList = modificationList;
+    }
+    public List<SelectableModificationBean> getModificationList() {
+    	return this.modificationList;
+    }
+    public SelectableModificationBean getModification(int index) {
+    	if(modificationList == null)
+    		modificationList = new ArrayList<SelectableModificationBean>();
+    	while(index >= modificationList.size()) {
+    		modificationList.add(new SelectableModificationBean());
+    	}
+    	return modificationList.get(index);
     }
     
     public ResultSortCriteria getSortCriteria() {

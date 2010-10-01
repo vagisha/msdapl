@@ -3,6 +3,22 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
+<script type="text/javascript">
+$(document).ready(function() {
+	$("input[name='showModified']").click(function() {
+		if($("input[name='showModified']:checked").length > 0) {
+			
+			$("input:checkbox.mod_residue").attr('checked', true);
+		}
+		else {
+			$("input:checkbox.mod_residue").attr('checked', false);
+		}
+	});
+});
+
+</script>
+
+
 <div style="padding:7 7 0 7; margin-bottom:30;">
 
 		<html:form action="viewPeptideProphetResults" method="POST">
@@ -50,8 +66,24 @@
 						<html:text name="filterForm" property="peptide" size="25" /><br>
 						Exact: <html:checkbox name="filterForm" property="exactPeptideMatch"  />
 					</td>
-					<td valign="top">Modified peptides</td><td valign="top"> <html:checkbox name="filterForm" property="showModified" /> </td>
-					<td valign="top">Unmodified peptides</td><td valign="top"> <html:checkbox name="filterForm" property="showUnmodified" /> </td>
+					<td valign="top" colspan="2">
+						Modified peptides <html:checkbox name="filterForm" property="showModified" />
+						<logic:notEmpty name="filterForm" property="modificationList">
+							<div class="small_font">
+							Select Modifications:
+							<br/>
+							<logic:iterate 	name="filterForm" property="modificationList" id="modification">
+								<html:checkbox name="modification" property="selected" indexed="true" styleClass="mod_residue"></html:checkbox>
+								<bean:write name="modification" property="modifiedResidue"/> (<bean:write name="modification" property="modificationMass"/>)
+								<html:hidden name="modification" property="id" indexed="true" />
+								<html:hidden name="modification" property="modifiedResidue" indexed="true" />
+								<html:hidden name="modification" property="modificationMass" indexed="true" />
+								<br/>
+							</logic:iterate>
+							</div>
+						</logic:notEmpty>
+					</td>
+					<td valign="top" colspan="2">Unmodified peptides <html:checkbox name="filterForm" property="showUnmodified" /> </td>
 				</tr>
 				
 				<tr>
