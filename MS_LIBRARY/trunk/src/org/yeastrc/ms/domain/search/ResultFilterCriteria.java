@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.domain.search;
 
+import java.util.List;
+
 
 /**
  * 
@@ -32,6 +34,7 @@ public class ResultFilterCriteria {
     
     private boolean showOnlyModified;
     private boolean showOnlyUnmodified;
+    private List<Integer> dynamicModificationIds;
     
     
     public boolean hasFilters() {
@@ -225,14 +228,40 @@ public class ResultFilterCriteria {
         this.showOnlyUnmodified = showOnlyUnmodified;
     }
     public boolean hasMofificationFilter() {
-        return showOnlyModified != showOnlyUnmodified;
+        return showOnlyModified != showOnlyUnmodified || 
+        		(dynamicModificationIds != null && dynamicModificationIds.size() > 0);
+    }
+    public void setModificationIdFilters(List<Integer> modIdFilters) {
+    	this.dynamicModificationIds = modIdFilters;
+    }
+    public List<Integer> getModificationIdFilters() {
+    	return this.dynamicModificationIds;
     }
     public String makeModificationFilter() {
         if(hasMofificationFilter()) {
-            if(showOnlyModified)
-                return " (modID != 0) ";
-            if(showOnlyUnmodified)
+        	
+        	if(showOnlyUnmodified)
                 return " (modID IS NULL) ";
+        	
+        	String modIdStr = "";
+        	if(this.dynamicModificationIds != null && this.dynamicModificationIds.size() > 0) {
+        		for(Integer modId: dynamicModificationIds)
+        			modIdStr += ","+modId;
+        		if(modIdStr.length() > 0)
+        			modIdStr = modIdStr.substring(1); // remove first comma
+        	}
+        	
+        	
+            if(showOnlyModified) {
+            	if(modIdStr.length() > 0)
+            		return " (modID IN ("+modIdStr+") ) ";
+            	else
+            		return " (modID != 0) ";
+            }
+            // show both modified and unmodified but limit to certain modifications
+            else {
+            	return " (modID IS NULL OR modID IN ("+modIdStr+") ) ";
+            }
         }
         return "";
     }
