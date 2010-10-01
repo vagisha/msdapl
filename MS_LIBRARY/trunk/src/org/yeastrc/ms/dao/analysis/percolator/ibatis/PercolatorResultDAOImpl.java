@@ -189,7 +189,10 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         }
         
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT pres.id FROM ( ");
+        if(!useModsTable)
+        	sql.append("SELECT pres.id FROM ( ");
+        else 
+        	sql.append("SELECT DISTINCT pres.id FROM ( ");
         sql.append("msRunSearchAnalysis AS rsa, PercolatorResult AS pres");
         
         
