@@ -62,21 +62,29 @@ public class MsDataUploader {
     }
 
     public void setSpectrumDataDirectory(String rawDataDirectory) {
-        this.spectrumDataDirectory = rawDataDirectory;
+    	if(rawDataDirectory == null)
+    		return;
+        this.spectrumDataDirectory = rawDataDirectory.trim();
     }
 
     public void setRemoteSpectrumDataDirectory(String remoteRawDataDirectory) {
-        this.remoteSpectrumDataDirectory = remoteRawDataDirectory;
+    	if(remoteRawDataDirectory == null)
+    		return;
+        this.remoteSpectrumDataDirectory = remoteRawDataDirectory.trim();
     }
 
     public void setSearchDirectory(String searchDirectory) {
-        this.searchDirectory = searchDirectory;
+    	if(searchDirectory == null)
+    		return;
+        this.searchDirectory = searchDirectory.trim();
         if(searchDirectory != null)
             this.uploadSearch = true;
     }
 
     public void setRemoteSearchDataDirectory(String remoteSearchDataDirectory) {
-        this.remoteSearchDataDirectory = remoteSearchDataDirectory;
+    	if(remoteSearchDataDirectory == null)
+    		return;
+        this.remoteSearchDataDirectory = remoteSearchDataDirectory.trim();
     }
 
     public void setSearchDate(java.util.Date searchDate) {
@@ -84,13 +92,17 @@ public class MsDataUploader {
     }
 
     public void setAnalysisDirectory(String analysisDirectory) {
-        this.analysisDirectory = analysisDirectory;
+    	if(analysisDirectory == null)
+    		return;
+        this.analysisDirectory = analysisDirectory.trim();
         if(analysisDirectory != null)
             this.uploadAnalysis = true;
     }
     
     public void setProtinferDirectory(String protinferDirectory) {
-        this.protinferDirectory = protinferDirectory;
+    	if(protinferDirectory == null)
+    		return;
+        this.protinferDirectory = protinferDirectory.trim();
         if(protinferDirectory != null)
             this.uploadProtinfer = true;
     }
