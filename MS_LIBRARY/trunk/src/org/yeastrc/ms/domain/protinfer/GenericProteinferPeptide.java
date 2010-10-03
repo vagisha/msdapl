@@ -12,6 +12,7 @@ public abstract class GenericProteinferPeptide <S extends ProteinferSpectrumMatc
     private String sequence;
     private boolean uniqueToProtein;
     private List<T> ionList;
+    private int spectrumCount;
 
     public GenericProteinferPeptide() {
         ionList = new ArrayList<T>();
@@ -61,12 +62,12 @@ public abstract class GenericProteinferPeptide <S extends ProteinferSpectrumMatc
         this.uniqueToProtein = unique;
     }
 
-    public int getSpectrumCount() {
-        int count = 0;
-        for(T ion: ionList) {
-            count += ion.getSpectrumCount();
-        }
-        return count;
+    public void setSpectrumCount(int spectrumCount) {
+		this.spectrumCount = spectrumCount;
+	}
+
+	public int getSpectrumCount() {
+        return this.spectrumCount;
     }
     
     public S getBestSpectrumMatch() {
@@ -81,6 +82,7 @@ public abstract class GenericProteinferPeptide <S extends ProteinferSpectrumMatc
         }
         return best;
     }
+    
     /**
      * Returns the number of distinct ions this peptide represents based on the 
      * given PeptideDefinition. 
@@ -117,78 +119,6 @@ public abstract class GenericProteinferPeptide <S extends ProteinferSpectrumMatc
         // this should never happen
         return 0;
     }
-    
-    /**
-     * Returns the number of distinct ions this peptide represents based on the 
-     * given PeptideDefinition. 
-     * @param peptideDef
-     * @return
-     */
-//    public List<GenericProteinferPeptide<S,T>> getDistinctPeptides(PeptideDefinition peptideDef) {
-//        
-//        // peptide uniquely defined by sequence
-//        if(!peptideDef.isUseCharge() && !peptideDef.isUseMods()) {
-//           List<GenericProteinferPeptide<S,T>> list = new ArrayList<GenericProteinferPeptide<S,T>>(1);
-//           list.add(this);
-//           return list;
-//        }
-//        
-//        // peptide uniquely defined by sequence and charge
-//        if(peptideDef.isUseCharge() && !peptideDef.isUseMods()) {
-//            Map<Integer, GenericProteinferPeptide<S,T>> peptMap = new HashMap<Integer, GenericProteinferPeptide<S,T>>();
-//            for(T ion: ionList) {
-//                GenericProteinferPeptide<S,T> peptide = peptMap.get(ion.getCharge());
-//                if(peptide == null) {
-//                    peptide = newPeptide();
-//                    peptide.setId(this.id);
-//                    peptide.setUniqueToProtein(this.uniqueToProtein);
-//                    peptide.setProteinferId(this.pinferId);
-//                    peptide.setSequence(ion.getSequence());
-//                    peptMap.put(ion.getCharge(), peptide);
-//                }
-//                peptide.addIon(ion);
-//            }
-//            List<GenericProteinferPeptide<S,T>> list = new ArrayList<GenericProteinferPeptide<S,T>>(ionList.size());
-//            list.addAll(peptMap.values());
-//            return list;
-//        }
-//        // peptide uniquely defined by sequence and modification state
-//        if(!peptideDef.isUseCharge() && peptideDef.isUseMods()) {
-//            Map<Integer, GenericProteinferPeptide<S,T>> peptMap = new HashMap<Integer, GenericProteinferPeptide<S,T>>();
-//            for(T ion: ionList) {
-//                GenericProteinferPeptide<S,T> peptide = peptMap.get(ion.getModificationStateId());
-//                if(peptide == null) {
-//                    peptide = newPeptide();
-//                    peptide.setId(this.id);
-//                    peptide.setUniqueToProtein(this.uniqueToProtein);
-//                    peptide.setProteinferId(this.pinferId);
-//                    peptide.setSequence(ion.getSequence());
-//                    peptMap.put(ion.getModificationStateId(), peptide);
-//                }
-//                peptide.addIon(ion);
-//            }
-//            List<GenericProteinferPeptide<S,T>> list = new ArrayList<GenericProteinferPeptide<S,T>>(ionList.size());
-//            list.addAll(peptMap.values());
-//            return list;
-//        }
-//        // peptide uniquely defined by sequence, charge and modification state
-//        if(peptideDef.isUseCharge() && peptideDef.isUseMods()) {
-//            List<GenericProteinferPeptide<S,T>> list = new ArrayList<GenericProteinferPeptide<S,T>>(ionList.size());
-//            for(T ion: ionList) {
-//                GenericProteinferPeptide<S,T> peptide = newPeptide();
-//                peptide.setId(this.id);
-//                peptide.addIon(ion);
-//                peptide.setUniqueToProtein(this.uniqueToProtein);
-//                peptide.setProteinferId(this.pinferId);
-//                peptide.setSequence(ion.getSequence());
-//                list.add(peptide);
-//            }
-//            return list;
-//        }
-//        
-//        // this should never happen
-//        return null;
-//    }
     
     protected abstract GenericProteinferPeptide<S,T>  newPeptide();
     

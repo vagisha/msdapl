@@ -35,6 +35,7 @@ import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinGroupDAO
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinIonDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRocDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunSummaryDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetSubsumedProteinDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
@@ -52,6 +53,7 @@ import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPepti
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetROC;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRunSummary;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
@@ -274,11 +276,52 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         log.info("Uploaded file: "+protxmlFile+"; ID: "+uploadedPinferId+"; #protein groups: "+numProteinGroups+
                 "; Time: "+TimeUtils.timeElapsedSeconds(s, e));
         
+        
+        // save stats for quick lookup
+        try {
+        	saveStats(uploadedPinferId);
+        }
+        catch(Exception ex) {
+        	log.warn("Error saving status for runID: "+uploadedPinferId,ex);
+        }
+        
         uploadMsg.append("\n\tProtein inferenceID: "+uploadedPinferId);
         uploadMsg.append("; #Protein groups in file: "+protxmlFile+": "+numProteinGroups);
     }
 
+    private void saveStats(int piRunId) {
+    	
+    	// Extract information from the protein inference tables
+		ProteinProphetProteinDAO prophetProtDao = ProteinferDAOFactory.instance().getProteinProphetProteinDao();
+        ProteinferPeptideDAO peptDao = ProteinferDAOFactory.instance().getProteinferPeptideDao();
+        ProteinferSpectrumMatchDAO specDao = ProteinferDAOFactory.instance().getProteinferSpectrumMatchDao();
+        
+        int proteinCount = prophetProtDao.getProteinferProteinIds(piRunId, true).size();
+        int iGroupCount = prophetProtDao.getIndistinguishableGroupCount(piRunId, true);
+        int prophetGrpCount = prophetProtDao.getProteinProphetGroupCount(piRunId, true);
+        int peptSeqCount = peptDao.getUniquePeptideSequenceCountForRun(piRunId);
+        int ionCount = peptDao.getUniqueIonCountForRun(piRunId);
+        int spectrumCount = specDao.getSpectrumCountForPinferRun(piRunId);
+        int minSpectrumCount = specDao.getMinSpectrumCountForPinferRunProtein(piRunId);
+        int maxSpectrumCount = specDao.getMaxSpectrumCountForPinferRunProtein(piRunId);
+        
+        ProteinProphetRunSummary summary = new ProteinProphetRunSummary();
+        summary.setPiRunId(piRunId);
+        summary.setProteinCount(proteinCount);
+        summary.setIndistGroupCount(iGroupCount);
+        summary.setProphetGroupCount(prophetGrpCount);
+        summary.setUniqPeptSeqCount(peptSeqCount);
+        summary.setUniqIonCount(ionCount);
+        summary.setSpectrumCount(spectrumCount);
+        summary.setMinSpectrumCount(minSpectrumCount);
+        summary.setMaxSpectrumCount(maxSpectrumCount);
 
+		// Save in the summary table
+        ProteinProphetRunSummaryDAO summDao = ProteinferDAOFactory.instance().getProteinProphetRunSummaryDao();
+        summDao.save(summary);
+    }
+    
+    
     private void saveProteinProphetGroup(ProteinProphetGroup proteinGroup,
             int pinferId) throws UploadException {
         
@@ -590,6 +633,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
                 numFound++;
                 ProteinferSpectrumMatch psm = new ProteinferSpectrumMatch();
                 psm.setResultId(result.getPeptideProphetResultId());
+                psm.setScanId(result.getScanId());
                 psm.setProteinferIonId(ion.getId());
                 psm.setRank(rank); 
                 psmDao.saveSpectrumMatch(psm);

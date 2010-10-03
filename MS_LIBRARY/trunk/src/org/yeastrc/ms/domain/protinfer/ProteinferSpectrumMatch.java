@@ -6,6 +6,7 @@ public class ProteinferSpectrumMatch {
     private int pinferIonId;
     private int resultId;
 //    private int searchResultId;
+    private int scanId;
     private int rank; // rank of this spectrum match for the peptide (not the ion).
     
 
@@ -57,4 +58,11 @@ public class ProteinferSpectrumMatch {
         this.rank = rank;
     }
 
+	public int getScanId() {
+		return scanId;
+	}
+
+	public void setScanId(int scanId) {
+		this.scanId = scanId;
+	}
 }

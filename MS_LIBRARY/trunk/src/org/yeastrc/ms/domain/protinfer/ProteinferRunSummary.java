@@ -16,6 +16,10 @@ public final class ProteinferRunSummary {
 	private int parsimProteinCount;
 	private int uniqPeptSeqCount;
 	private int uniqIonCount;
+	private int spectrumCount;
+	private int minSpectrumCount;
+	private int maxSpectrumCount;
+	
 	public int getPiRunId() {
 		return piRunId;
 	}
@@ -45,5 +49,23 @@ public final class ProteinferRunSummary {
 	}
 	public void setUniqIonCount(int uniqIonCount) {
 		this.uniqIonCount = uniqIonCount;
+	}
+	public int getSpectrumCount() {
+		return spectrumCount;
+	}
+	public void setSpectrumCount(int spectrumCount) {
+		this.spectrumCount = spectrumCount;
+	}
+	public int getMinSpectrumCount() {
+		return minSpectrumCount;
+	}
+	public void setMinSpectrumCount(int minSpectrumCount) {
+		this.minSpectrumCount = minSpectrumCount;
+	}
+	public int getMaxSpectrumCount() {
+		return maxSpectrumCount;
+	}
+	public void setMaxSpectrumCount(int maxSpectrumCount) {
+		this.maxSpectrumCount = maxSpectrumCount;
 	}
 }

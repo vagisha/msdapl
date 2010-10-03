@@ -14,6 +14,7 @@
 		<result property="proteinferId" column="piRunID" nullValue="0"/>
 		<result property="nrseqProteinId" column="nrseqProteinID" nullValue="0"/>
 		<result property="coverage" column="coverage" nullValue="0"/>
+		<result property="spectrumCount" select="ProteinferSpectrumMatch.selectSpectrumCountForProtein" column="id" />
 		<result property="userAnnotation" column="userAnnotation"/>
 		<result property="userValidation" column="userValidation"
 				typeHandler="UserValidationTypeHandler"/>

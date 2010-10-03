@@ -12,6 +12,9 @@
 		<result property="proteinCount" column="proteinCount" />
 		<result property="uniqPeptSeqCount" column="peptSeqCount" />
 		<result property="uniqIonCount" column="ionCount" />
+		<result property="spectrumCount" column="spectrumCount" />
+		<result property="minSpectrumCount" column="minSpectrumCount" />
+		<result property="maxSpectrumCount" column="maxSpectrumCount" />
 	</resultMap>
 		
 	
@@ -22,6 +25,9 @@
 		<parameter property="proteinCount" jdbcType="INTEGER" />
 		<parameter property="uniqPeptSeqCount" jdbcType="INTEGER" />
 		<parameter property="uniqIonCount" jdbcType="INTEGER" />
+		<parameter property="spectrumCount" jdbcType="INTEGER" />
+		<parameter property="minSpectrumCount" jdbcType="INTEGER" />
+		<parameter property="maxSpectrumCount" jdbcType="INTEGER" />
 	</parameterMap>
 	
 	<select id="select" resultMap="prophetRunSummaryResult" parameterClass="Integer">
@@ -35,8 +41,11 @@
     	groupCount,
     	proteinCount,
     	peptSeqCount,
-    	ionCount)
-    	VALUES(?,?,?,?,?,?)
+    	ionCount,
+    	spectrumCount,
+    	minSpectrumCount,
+    	maxSpectrumCount)
+    	VALUES(?,?,?,?,?,?,?,?,?)
     </insert>
     
     <delete id="delete" parameterClass="Integer">

@@ -14,11 +14,9 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 public class ProteinferSpectrumMatchDAO extends BaseSqlMapDAO implements GenericProteinferSpectrumMatchDAO<ProteinferSpectrumMatch> {
 
     private static final String sqlMapNameSpace = "ProteinferSpectrumMatch";
-    private final GenericProteinferRunDAO<?,?> runDao;
 
-    public ProteinferSpectrumMatchDAO(SqlMapClient sqlMap, GenericProteinferRunDAO<?,?> runDao) {
+    public ProteinferSpectrumMatchDAO(SqlMapClient sqlMap) {
         super(sqlMap);
-        this.runDao = runDao;
     }
 
     public int saveSpectrumMatch(ProteinferSpectrumMatch spectrumMatch) {
@@ -48,7 +46,7 @@ public class ProteinferSpectrumMatchDAO extends BaseSqlMapDAO implements Generic
     }
     
     public int getSpectrumCountForPinferRun(int pinferId) {
-        Integer count = (Integer)queryForObject(sqlMapNameSpace+".selectMatchCountForPinferId", pinferId);
+        Integer count = (Integer)queryForObject(sqlMapNameSpace+".selectSpectrumCountForPinferId", pinferId);
         if(count != null)   return count;
         return 0;
     }
@@ -57,7 +55,7 @@ public class ProteinferSpectrumMatchDAO extends BaseSqlMapDAO implements Generic
         Map<String, Integer> map = new HashMap<String, Integer>(4);
         map.put("pinferId", pinferId);
         map.put("max", 1);
-        Integer count = (Integer)queryForObject(sqlMapNameSpace+".selectMatchCountForPinferIdProtein", map);
+        Integer count = (Integer)queryForObject(sqlMapNameSpace+".selectSpectrumCountForPinferIdProtein", map);
         if(count != null)   return count;
         return 0;
     }
@@ -65,29 +63,11 @@ public class ProteinferSpectrumMatchDAO extends BaseSqlMapDAO implements Generic
     public int getMinSpectrumCountForPinferRunProtein(int pinferId) {
         Map<String, Integer> map = new HashMap<String, Integer>(4);
         map.put("pinferId", pinferId);
-        Integer count = (Integer)queryForObject(sqlMapNameSpace+".selectMatchCountForPinferIdProtein", map);
+        Integer count = (Integer)queryForObject(sqlMapNameSpace+".selectSpectrumCountForPinferIdProtein", map);
         if(count != null)   return count;
         return 0;
     }
     
-//    public List<Integer> getSpectrumMatchIdsForPinferRunInput(int pinferId, int inputId) {
-//        
-//        // first determine if the inputID is a runSearchID or a runSearchAnalysisID
-//        GenericProteinferRun<?> pinferRun = runDao.loadProteinferRun(pinferId);
-//        Program inputGenerator = pinferRun.getInputGenerator();
-//        Map<String, Integer> map = new HashMap<String, Integer>(2);
-//        map.put("pinferId", pinferId);
-//        map.put("inputId", inputId);
-//        if(Program.isSearchProgram(inputGenerator)) {
-//            return super.queryForList(sqlMapNameSpace+".selectMatchIdsForPinferSearchInput", map);
-//        }
-//        else if(Program.isAnalysisProgram(inputGenerator)) {
-//            return super.queryForList(sqlMapNameSpace+".selectMatchIdsForPinferAnalysisInput", map);
-//        }
-//        else
-//            return null;
-//    }
-
     public int update(ProteinferSpectrumMatch psm) {
        return update(sqlMapNameSpace+".update", psm);
     }

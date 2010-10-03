@@ -303,7 +303,7 @@
     </select>
 
     <select id="filterBySpecCount" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT prot.id, count(*) AS cnt 
+    	SELECT prot.id, count(DISTINCT psm.scanID) AS cnt 
     	FROM msProteinInferProtein AS prot, 
     		 IDPickerProtein as idpProt,
     	     msProteinInferProteinPeptideMatch AS m, 
@@ -318,7 +318,7 @@
     	AND prot.piRunID = #pinferId# 
     	GROUP BY prot.id HAVING cnt BETWEEN #minSpectra# AND #maxSpectra#
     	<isPropertyAvailable property="sort">
-    		ORDER BY cnt
+    		ORDER BY cnt	
 			<isPropertyAvailable property="groupProteins">
 				, idpProt.groupID
 			</isPropertyAvailable>
@@ -327,7 +327,7 @@
     </select>
     
     <select id="filterNrseqIdsBySpecCount" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT prot.nrseqProteinID, prot.id, count(*) AS cnt 
+    	SELECT prot.nrseqProteinID, prot.id, count(DISTINCT psm.scanID) AS cnt 
     	FROM msProteinInferProtein AS prot, 
     		 IDPickerProtein as idpProt,
     	     msProteinInferProteinPeptideMatch AS m, 

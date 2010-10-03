@@ -22,6 +22,7 @@ public class GenericProteinferProtein <T extends GenericProteinferPeptide<?,?>>{
     private ProteinUserValidation userValidation;
     
     private List<T> peptideList;
+    private int spectrumCount;
     
     private PeptideDefinition peptideDefinition;
     
@@ -165,9 +166,10 @@ public class GenericProteinferProtein <T extends GenericProteinferPeptide<?,?>>{
     }
     
     public int getSpectrumCount() {
-        int cnt = 0;
-        for(T peptide: peptideList)
-            cnt += peptide.getSpectrumCount();
-        return cnt;
+        return this.spectrumCount;
+    }
+    
+    public void setSpectrumCount(int spectrumCount) {
+    	this.spectrumCount = spectrumCount;
     }
 }

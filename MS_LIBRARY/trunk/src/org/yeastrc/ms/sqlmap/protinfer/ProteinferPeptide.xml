@@ -11,6 +11,7 @@
 		<result property="proteinferId" column="piRunID" nullValue="0"/>
 		<result property="sequence" column="sequence" />
 		<result property="uniqueToProtein" column="uniqueToProtein"/>
+		<result property="spectrumCount" select="ProteinferSpectrumMatch.selectSpectrumCountForPeptide" column="id" />
 	</resultMap>
 	
 	<resultMap class="ProteinferPeptide" id="pinferPeptideResult" extends="ProteinferPeptide.pinferPeptideBaseResult">

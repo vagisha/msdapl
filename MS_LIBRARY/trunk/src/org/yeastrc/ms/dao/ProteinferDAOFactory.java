@@ -103,7 +103,7 @@ public class ProteinferDAOFactory {
        pinferRunDao = new ProteinferRunDAO(sqlMap);
        pinferParamDao = new IdPickerParamDAO(sqlMap);
        pinferInputDao = new ProteinferInputDAO(sqlMap);
-       spectrumMatchDao = new ProteinferSpectrumMatchDAO(sqlMap, pinferRunDao);
+       spectrumMatchDao = new ProteinferSpectrumMatchDAO(sqlMap);
        ionDao = new ProteinferIonDAO(sqlMap);
        peptideDao = new ProteinferPeptideDAO(sqlMap);
        proteinDao = new ProteinferProteinDAO(sqlMap);
