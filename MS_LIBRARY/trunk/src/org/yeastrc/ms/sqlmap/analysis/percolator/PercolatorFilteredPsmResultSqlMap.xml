@@ -47,6 +47,12 @@
     	</selectKey>
 	</insert>
 	
+	<insert id="insertBinnedResult" parameterClass="PercolatorBinnedPsmResult">
+		INSERT INTO PercolatorFilteredBinnedPsmResult
+		(percPsmResultID, binStart, binEnd, total, filtered)
+		VALUES (#percolatorFilteredPsmId# , #binStart# , #binEnd#, #total#, #filtered#)
+	</insert>
+	
 	<delete id="delete" parameterClass="Integer">
 		DELETE FROM PercolatorFilteredPsmResult WHERE id=#id#
 	</delete>

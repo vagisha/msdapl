@@ -98,7 +98,6 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorParamsSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorResultSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorPeptideResultSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorFilteredPsmResultSqlMap.xml"/>
 	
 	<!-- Related to PeptideProphet -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/peptideProphet/PeptideProphetRocSqlMap.xml"/>
@@ -136,5 +135,8 @@
 	<!-- Maps for summary tables -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/ProteinferRunSummary.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetRunSummary.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorFilteredPsmResultSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorFilteredSpectraResultSqlMap.xml"/>
+	
 	
 </sqlMapConfig>	

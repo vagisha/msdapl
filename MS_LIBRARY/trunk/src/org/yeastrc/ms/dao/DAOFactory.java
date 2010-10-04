@@ -18,10 +18,12 @@ import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetAnalysisD
 import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetResultDAOImpl;
 import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetRocDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorFilteredPsmResultDAO;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorFilteredSpectraResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorParamsDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorPeptideResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorFilteredPsmResultDAOImpl;
+import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorFilteredSpectraResultDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorParamsDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorPeptideResultDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorResultDAOImpl;
@@ -189,6 +191,7 @@ public class DAOFactory {
     private PercolatorResultDAO percResultDAO;
     private PercolatorPeptideResultDAO percPeptResultDAO;
     private PercolatorFilteredPsmResultDAO percFiltersPsmDAO;
+    private PercolatorFilteredSpectraResultDAO percFiltersSpectraDAO;
     
     // DAOs related to PeptideProphet search analysis
     private PeptideProphetAnalysisDAO ppAnalysisDAO;
@@ -255,8 +258,8 @@ public class DAOFactory {
         percSQTHeaderDAO = new PercolatorParamsDAOImpl(sqlMap);
         percResultDAO = new PercolatorResultDAOImpl(sqlMap, rsAnalysisDAO, runSearchDAO, modDAO);
         percPeptResultDAO = new PercolatorPeptideResultDAOImpl(sqlMap, rsAnalysisDAO, runSearchDAO, modDAO, percResultDAO);
-        percFiltersPsmDAO = new PercolatorFilteredPsmResultDAOImpl(sqlMap);
-			
+        percFiltersPsmDAO = new PercolatorFilteredPsmResultDAOImpl(sqlMap, rsAnalysisDAO);
+		percFiltersSpectraDAO = new PercolatorFilteredSpectraResultDAOImpl(sqlMap, rsAnalysisDAO);
         
         // PeptideProphet post search analysis related
         ppAnalysisDAO = new PeptideProphetAnalysisDAOImpl(sqlMap, analysisDAO);
@@ -446,6 +449,10 @@ public class DAOFactory {
     
     public PercolatorFilteredPsmResultDAO getPrecolatorFilteredPsmResultDAO() {
     	return percFiltersPsmDAO;
+    }
+    
+    public PercolatorFilteredSpectraResultDAO getPrecolatorFilteredSpectraResultDAO() {
+    	return percFiltersSpectraDAO;
     }
     
     //-------------------------------------------------------------------------------------------

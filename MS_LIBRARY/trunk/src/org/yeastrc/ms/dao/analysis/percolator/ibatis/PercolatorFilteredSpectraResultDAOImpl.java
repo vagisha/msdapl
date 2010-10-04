@@ -1,7 +1,7 @@
 /**
- * PercolatorPsmFilteredResultDAOImpl.java
+ * PercolatorFilteredSpectraResultsDAOImpl.java
  * @author Vagisha Sharma
- * Sep 29, 2010
+ * Oct 3, 2010
  */
 package org.yeastrc.ms.dao.analysis.percolator.ibatis;
 
@@ -9,23 +9,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
-import org.yeastrc.ms.dao.analysis.percolator.PercolatorFilteredPsmResultDAO;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorFilteredSpectraResultDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorBinnedPsmResult;
-import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorFilteredPsmResult;
+import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorBinnedSpectraResult;
+import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorFilteredSpectraResult;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class PercolatorFilteredPsmResultDAOImpl extends BaseSqlMapDAO implements
-		PercolatorFilteredPsmResultDAO {
+public class PercolatorFilteredSpectraResultDAOImpl extends BaseSqlMapDAO implements
+	PercolatorFilteredSpectraResultDAO {
 
-	private static final String namespace = "PercolatorFilteredPsmResult";
+	private static final String namespace = "PercolatorFilteredSpectraResult";
 	private final MsRunSearchAnalysisDAO rsaDao;
 	
-	public PercolatorFilteredPsmResultDAOImpl(SqlMapClient sqlMap, MsRunSearchAnalysisDAO rsaDao) {
+	public PercolatorFilteredSpectraResultDAOImpl(SqlMapClient sqlMap, MsRunSearchAnalysisDAO rsaDao) {
 		super(sqlMap);
 		this.rsaDao = rsaDao;
 	}
@@ -58,12 +58,12 @@ public class PercolatorFilteredPsmResultDAOImpl extends BaseSqlMapDAO implements
 	}
 
 	@Override
-	public List<PercolatorFilteredPsmResult> loadForAnalysis(int searchAnalysisId) {
+	public List<PercolatorFilteredSpectraResult> loadForAnalysis(int searchAnalysisId) {
 		
 		List<Integer> runSearchAnalysisIds = rsaDao.getRunSearchAnalysisIdsForAnalysis(searchAnalysisId);
-		List<PercolatorFilteredPsmResult> list = new ArrayList<PercolatorFilteredPsmResult>(runSearchAnalysisIds.size());
+		List<PercolatorFilteredSpectraResult> list = new ArrayList<PercolatorFilteredSpectraResult>(runSearchAnalysisIds.size());
 		for(Integer runSearchAnalysisId: runSearchAnalysisIds) {
-			PercolatorFilteredPsmResult res = this.load(runSearchAnalysisId);
+			PercolatorFilteredSpectraResult res = this.load(runSearchAnalysisId);
 			if(res != null)
 				list.add(res);
 		}
@@ -72,25 +72,25 @@ public class PercolatorFilteredPsmResultDAOImpl extends BaseSqlMapDAO implements
 	}
 	
 	@Override
-	public PercolatorFilteredPsmResult load(int runSearchAnalysisId) {
+	public PercolatorFilteredSpectraResult load(int runSearchAnalysisId) {
 		
-		return (PercolatorFilteredPsmResult) queryForObject(namespace+".select", runSearchAnalysisId);
+		return (PercolatorFilteredSpectraResult) queryForObject(namespace+".select", runSearchAnalysisId);
 	}
 
 	@Override
-	public void save(PercolatorFilteredPsmResult result) {
+	public void save(PercolatorFilteredSpectraResult result) {
 		
-		int percPsmResultId = 0;
+		int percSpectraResultId = 0;
 		try {
-			percPsmResultId = saveAndReturnId(namespace+".insert",result);
+			percSpectraResultId = saveAndReturnId(namespace+".insert",result);
 		
-			for(PercolatorBinnedPsmResult binnedResult: result.getBinnedResults()) {
-				binnedResult.setPercolatorFilteredPsmId(percPsmResultId);
+			for(PercolatorBinnedSpectraResult binnedResult: result.getBinnedResults()) {
+				binnedResult.setPercolatorFilteredSpectraId(percSpectraResultId);
 				save(namespace+".insertBinnedResult",binnedResult);
 			}
 		}
 		catch(RuntimeException e) {
-			delete(percPsmResultId);
+			delete(percSpectraResultId);
 			throw e;
 		}
 	}
