@@ -491,6 +491,7 @@ public class IdPickerResultSaver {
         ProteinferSpectrumMatch idpPsm = new ProteinferSpectrumMatch();
         idpPsm.setProteinferIonId(ionId);
         idpPsm.setResultId(psm.getResultId());
+        idpPsm.setScanId(psm.getScanId());
         idpPsm.setRank(psm.getRank());
         psmDao.saveSpectrumMatch(idpPsm);
     }
@@ -503,6 +504,7 @@ public class IdPickerResultSaver {
         IdPickerSpectrumMatch idpPsm = new IdPickerSpectrumMatch();
         idpPsm.setProteinferIonId(ionId);
         idpPsm.setResultId(psm.getResultId());
+        idpPsm.setScanId(psm.getScanId());
         idpPsm.setFdr(((SpectrumMatchIDP)psm).getFdr());
         idpPsm.setRank(psm.getRank());
         idpPsmDao.saveSpectrumMatch(idpPsm);

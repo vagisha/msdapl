@@ -136,6 +136,15 @@ public class IdPickerExecutorNoFDR {
         
         // FINALLY save the results
         IdPickerResultSaver.instance().saveResults(idpRun, proteins);
+        
+        // Save the stats for quick lookup
+        try {
+        	log.info("Saving stats for runID: "+idpRun.getId());
+        	IdPickerStatsSaver.getInstance().saveStats(idpRun.getId());
+        }
+        catch (Exception e){
+        	log.warn("Error saving status for runID: "+idpRun.getId(),e);
+        }
     }
    
 }
