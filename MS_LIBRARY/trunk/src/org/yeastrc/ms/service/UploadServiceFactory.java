@@ -337,6 +337,10 @@ public class UploadServiceFactory {
         
         // make sure all files are of the same type
         for (String file: filenames) {
+        	
+        	if(!file.toLowerCase().endsWith(".sqt"))
+        		continue;
+        	
             String sqtFile = fileDirectory+File.separator+file;
             // first make sure the file exists
             if (!(new File(sqtFile).exists()))
