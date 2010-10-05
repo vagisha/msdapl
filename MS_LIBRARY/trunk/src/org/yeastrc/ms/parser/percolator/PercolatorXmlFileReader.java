@@ -85,6 +85,7 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
     			if(evtType == XMLStreamReader.START_ELEMENT) {
     				if(reader.getLocalName().equalsIgnoreCase("percolator_output")) {
     					percXml = true;
+    					break;
     				}
     				else
     					percXml = false;
