@@ -135,13 +135,19 @@ public class PercolatorFilteredSpectraDistributionCalculator {
                     continue;
                 lastScan = scanId;
                 
-                double rt = rs.getBigDecimal("retentionTime").doubleValue();
                 boolean filtered = false;
                 if(rs.getObject("qvalue") != null) {
                 	filtered = rs.getDouble("qvalue") <= scoreCutoff;
                 }
                 
-                putScanInBin(rt, filtered);
+                // If we don't have retention time for a scan skip the whole runSearchAnalysis
+        		if(rs.getObject("retentionTime") == null) {
+        			log.error("!!!RETENTION TIME NOT FOUND for runSearchAnalysisID: "+runSearchAnalysisId+". Will not be binned....");
+        		}
+        		else {
+        			double rt = rs.getBigDecimal("retentionTime").doubleValue();
+        			putScanInBin(rt, filtered);
+        		}
                 
                 scanCnt++;
                 if(filtered)

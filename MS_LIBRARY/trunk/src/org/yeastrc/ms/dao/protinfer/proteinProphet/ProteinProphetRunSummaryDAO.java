@@ -30,6 +30,10 @@ public class ProteinProphetRunSummaryDAO extends BaseSqlMapDAO {
         return (ProteinProphetRunSummary) super.queryForObject(sqlMapNameSpace+".select", proteinferId);
     }
     
+    public void update(ProteinProphetRunSummary summary) {
+    	super.update(sqlMapNameSpace+".update", summary);
+    }
+    
     public void delete(int pinferId) {
         super.delete(sqlMapNameSpace+".delete", pinferId);
     }

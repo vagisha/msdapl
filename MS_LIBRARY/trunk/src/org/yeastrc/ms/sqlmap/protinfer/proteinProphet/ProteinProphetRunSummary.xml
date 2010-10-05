@@ -48,6 +48,20 @@
     	VALUES(?,?,?,?,?,?,?,?,?)
     </insert>
     
+    <update id="update" parameterClass="ProteinProphetRunSummary">
+    	UPDATE proteinProphetRunSummary 
+    	SET 
+    	prophetGroupCount=#prophetGroupCount#,
+    	groupCount=#indistGroupCount#,
+    	proteinCount=#proteinCount#,
+    	peptSeqCount=#uniqPeptSeqCount#,
+    	ionCount=#uniqIonCount#,
+    	spectrumCount=#spectrumCount#,
+    	minSpectrumCount=#minSpectrumCount#,
+    	maxSpectrumCount=#maxSpectrumCount#
+    	WHERE piRunID = #piRunId#
+    </update>
+    
     <delete id="delete" parameterClass="Integer">
 		DELETE FROM proteinProphetRunSummary WHERE piRunID=#id#		    
     </delete>

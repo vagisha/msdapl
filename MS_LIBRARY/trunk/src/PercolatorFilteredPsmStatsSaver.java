@@ -26,23 +26,12 @@ public class PercolatorFilteredPsmStatsSaver {
 
 		List<Integer> searchAnalysisIds = getSearchAnalysisIds();
 		
-		DAOFactory fact = DAOFactory.instance();
-		PercolatorFilteredPsmResultDAO filtPsmDao = fact.getPrecolatorFilteredPsmResultDAO();
+		org.yeastrc.ms.service.percolator.stats.PercolatorFilteredPsmStatsSaver saver = 
+			org.yeastrc.ms.service.percolator.stats.PercolatorFilteredPsmStatsSaver.getInstance();
 		
 		for(Integer saId: searchAnalysisIds) {
-
-			System.out.println("Saving results for searchAnalysisID: "+saId);
-			PercolatorFilteredPsmDistributionCalculator calc = new PercolatorFilteredPsmDistributionCalculator(saId, 0.01);
-			calc.calculate();
-			List<PercolatorFilteredPsmResult> filteredResults = calc.getFilteredResults();
-			if(filteredResults == null || filteredResults.size() == 0) {
-				System.out.println("No results for searchAnalysisID: "+saId+". Skipping....");
-				continue;
-			}
-			for(PercolatorFilteredPsmResult res: filteredResults) {
-				System.out.println("\tSaving for: "+res.getRunSearchAnalysisId());
-				filtPsmDao.save(res);
-			}
+			
+			saver.save(saId, 0.01);
 		}
 	}
 	

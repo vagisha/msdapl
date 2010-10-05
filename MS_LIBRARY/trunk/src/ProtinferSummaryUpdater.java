@@ -36,7 +36,6 @@ public class ProtinferSummaryUpdater {
 		ProteinferDAOFactory pinferFactory = ProteinferDAOFactory.instance();
 		ProteinferRunDAO runDao = pinferFactory.getProteinferRunDao();
 
-
 		List<Integer> pinferIds = getProteinInferRunIds();
 
 		for(Integer pinferId: pinferIds) {
@@ -58,13 +57,6 @@ public class ProtinferSummaryUpdater {
 
 		ProteinferRunSummaryDAO summDao = ProteinferDAOFactory.instance().getProteinferRunSummaryDao();
 
-		// First look up in the summary table
-		ProteinferRunSummary summary = summDao.load(piRunId);
-		if(summary != null) {
-			return;
-		}
-
-
 
 		// Extract information from the protein inference tables
 		IdPickerProteinDAO proteinDao = ProteinferDAOFactory.instance().getIdPickerProteinDao();
@@ -80,19 +72,47 @@ public class ProtinferSummaryUpdater {
 		int maxSpectrumCount = specDao.getMaxSpectrumCountForPinferRunProtein(piRunId);
 
 
-		summary = new ProteinferRunSummary();
-		summary.setPiRunId(piRunId);
-		summary.setParsimIndistGroupCount(parsimProteinGroupCount);
-		summary.setParsimProteinCount(parsimProteinCount);
-		summary.setUniqPeptSeqCount(peptSeqCount);
-		summary.setUniqIonCount(ionCount);
-		summary.setSpectrumCount(spectrumCount);
-		summary.setMinSpectrumCount(minSpectrumCount);
-		summary.setMaxSpectrumCount(maxSpectrumCount);
-
-		// Save in the summary table
-		summDao.save(summary);
-
+		// First look up in the summary table
+		ProteinferRunSummary summary = summDao.load(piRunId);
+		if(summary != null) {
+			// check what we already have in the database with what we are about to save
+			boolean mismatch = false;
+			if(summary.getParsimIndistGroupCount() != parsimProteinGroupCount)
+				mismatch = true;
+			if(summary.getParsimProteinCount() != parsimProteinCount)
+				mismatch = true;
+			if(summary.getUniqPeptSeqCount() != peptSeqCount)
+				mismatch = true;
+			if(summary.getUniqIonCount() != ionCount)
+				mismatch = true;
+			
+			if(mismatch) {
+				System.out.println("Mismatch found for protein inference ID: "+piRunId);
+				System.out.println("Calculated: groupCount:"+parsimProteinGroupCount+
+						"; proteinCount:"+parsimProteinCount+"; peptCount:"+peptSeqCount+"; ionCount:"+ionCount);
+				System.exit(2);
+			}
+			
+			summary.setSpectrumCount(spectrumCount);
+			summary.setMinSpectrumCount(minSpectrumCount);
+			summary.setMaxSpectrumCount(maxSpectrumCount);
+			
+			summDao.update(summary);
+		}
+		else {
+			summary = new ProteinferRunSummary();
+			summary.setPiRunId(piRunId);
+			summary.setParsimIndistGroupCount(parsimProteinGroupCount);
+			summary.setParsimProteinCount(parsimProteinCount);
+			summary.setUniqPeptSeqCount(peptSeqCount);
+			summary.setUniqIonCount(ionCount);
+			summary.setSpectrumCount(spectrumCount);
+			summary.setMinSpectrumCount(minSpectrumCount);
+			summary.setMaxSpectrumCount(maxSpectrumCount);
+			// Save in the summary table
+			summDao.save(summary);
+		}
+		
 		return;
 	}
 
@@ -100,10 +120,6 @@ public class ProtinferSummaryUpdater {
 
 		ProteinProphetRunSummaryDAO summDao = ProteinferDAOFactory.instance().getProteinProphetRunSummaryDao();
 
-		// First look up in the summary table
-		ProteinProphetRunSummary summary = summDao.load(piRunId);
-		if(summary != null)
-			return;
 
 		// Extract information from the protein inference tables
 		ProteinProphetProteinDAO prophetProtDao = ProteinferDAOFactory.instance().getProteinProphetProteinDao();
@@ -119,19 +135,52 @@ public class ProtinferSummaryUpdater {
 		int minSpectrumCount = specDao.getMinSpectrumCountForPinferRunProtein(piRunId);
 		int maxSpectrumCount = specDao.getMaxSpectrumCountForPinferRunProtein(piRunId);
 
-		summary = new ProteinProphetRunSummary();
-		summary.setPiRunId(piRunId);
-		summary.setProteinCount(proteinCount);
-		summary.setIndistGroupCount(iGroupCount);
-		summary.setProphetGroupCount(prophetGrpCount);
-		summary.setUniqPeptSeqCount(peptSeqCount);
-		summary.setUniqIonCount(ionCount);
-		summary.setSpectrumCount(spectrumCount);
-		summary.setMinSpectrumCount(minSpectrumCount);
-		summary.setMaxSpectrumCount(maxSpectrumCount);
+		// First look up in the summary table
+		ProteinProphetRunSummary summary = summDao.load(piRunId);
+		if(summary != null) {
+			
+			// check what we already have in the database with what we are about to save
+			boolean mismatch = false;
+			if(summary.getProphetGroupCount() != prophetGrpCount)
+				mismatch = true;
+			if(summary.getIndistGroupCount() != iGroupCount)
+				mismatch = true;
+			if(summary.getProteinCount() != proteinCount)
+				mismatch = true;
+			if(summary.getUniqPeptSeqCount() != peptSeqCount)
+				mismatch = true;
+			if(summary.getUniqIonCount() != ionCount)
+				mismatch = true;
+			
+			if(mismatch) {
+				System.out.println("Mismatch found for ProteinProphet inference ID: "+piRunId);
+				System.out.println("Calculated: prophetGrpCount:"+prophetGrpCount+
+						"; indistGrpCount:"+iGroupCount+
+						"; proteinCount:"+proteinCount+"; peptCount:"+peptSeqCount+"; ionCount:"+ionCount);
+				System.exit(2);
+			}
+			
+			summary.setSpectrumCount(spectrumCount);
+			summary.setMinSpectrumCount(minSpectrumCount);
+			summary.setMaxSpectrumCount(maxSpectrumCount);
+			
+			summDao.update(summary);
+		}
+		else {
+			summary = new ProteinProphetRunSummary();
+			summary.setPiRunId(piRunId);
+			summary.setProteinCount(proteinCount);
+			summary.setIndistGroupCount(iGroupCount);
+			summary.setProphetGroupCount(prophetGrpCount);
+			summary.setUniqPeptSeqCount(peptSeqCount);
+			summary.setUniqIonCount(ionCount);
+			summary.setSpectrumCount(spectrumCount);
+			summary.setMinSpectrumCount(minSpectrumCount);
+			summary.setMaxSpectrumCount(maxSpectrumCount);
 
-		// Save in the summary table
-		summDao.save(summary);
+			// Save in the summary table
+			summDao.save(summary);
+		}
 
 		return;
 	}

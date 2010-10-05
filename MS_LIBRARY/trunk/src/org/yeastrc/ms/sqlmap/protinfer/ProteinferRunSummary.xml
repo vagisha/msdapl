@@ -45,6 +45,18 @@
     	VALUES(?,?,?,?,?,?,?,?)
     </insert>
     
+    <update id="update" parameterClass="ProteinferRunSummary">
+    	UPDATE proteinInferRunSummary 
+    	SET groupCount=#parsimIndistGroupCount#,
+    	proteinCount=#parsimProteinCount#,
+    	peptSeqCount=#uniqPeptSeqCount#,
+    	ionCount=#uniqIonCount#,
+    	spectrumCount=#spectrumCount#,
+    	minSpectrumCount=#minSpectrumCount#,
+    	maxSpectrumCount=#maxSpectrumCount#
+    	WHERE piRunID = #piRunId#
+    </update>
+    
     <delete id="delete" parameterClass="Integer">
 		DELETE FROM proteinInferRunSummary WHERE piRunID=#id#		    
     </delete>

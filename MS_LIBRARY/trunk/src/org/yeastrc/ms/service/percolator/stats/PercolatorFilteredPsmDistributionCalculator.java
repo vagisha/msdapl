@@ -106,15 +106,21 @@ public class PercolatorFilteredPsmDistributionCalculator {
             	int goodPsmCnt = 0;
             	
             	while(rs.next()) {
-
-            		double rt = rs.getBigDecimal("retentionTime").doubleValue();
+            		
             		double qvalue = rs.getDouble("qvalue");
             		
             		psmCnt++;
             		if(qvalue <= scoreCutoff)
             			goodPsmCnt++;
 
-            		putInBin(rt, qvalue, scoreCutoff);
+            		// If we don't have retention time for a scan skip the whole runSearchAnalysis
+            		if(rs.getObject("retentionTime") == null) {
+            			log.error("!!!RETENTION TIME NOT FOUND for runSearchAnalysisID: "+runSearchAnalysisId+". Will not be binned....");
+            		}
+            		else {
+            			double rt = rs.getBigDecimal("retentionTime").doubleValue();
+            			putInBin(rt, qvalue, scoreCutoff);
+            		}
             	}
 
             	// add to list
