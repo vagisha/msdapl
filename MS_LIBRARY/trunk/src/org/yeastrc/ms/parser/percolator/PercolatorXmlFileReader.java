@@ -4,8 +4,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,10 +71,11 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
         }
     }
 
-	public static boolean isPercolatorXml(String filePath) throws DataProviderException {
+	public static boolean isSupportedPercolatorXml(String filePath) throws DataProviderException {
 		
 		XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 		XMLStreamReader reader = null;
+		boolean percXml = false;
         try {
         	InputStream inputStr = new FileInputStream(filePath);
         	reader = inputFactory.createXMLStreamReader(inputStr);
@@ -80,10 +84,10 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
     			int evtType = reader.next();
     			if(evtType == XMLStreamReader.START_ELEMENT) {
     				if(reader.getLocalName().equalsIgnoreCase("percolator_output")) {
-    					return true;
+    					percXml = true;
     				}
     				else
-    					return false;
+    					percXml = false;
     			}
         	}
         }
@@ -96,7 +100,19 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
         finally {
         	try {reader.close();} catch (XMLStreamException e) {}
         }
-        return false;
+        
+        if(percXml) {
+        	PercolatorXmlFileReader percReader = new PercolatorXmlFileReader();
+        	percReader.open(filePath);
+        	String percVersion = percReader.getPercolatorVersion();
+        	percReader.close();
+        	if(percVersion.equals("UNOFFICIAL") || Double.parseDouble(percVersion) > 1.14)
+        		return true;
+        	else
+        		return false;
+        }
+        else
+        	return false;
 	}
 	
 	private void initialize() throws XMLStreamException {
@@ -132,6 +148,12 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
             if(matcher.matches()) {
                this.percolatorVersion = matcher.group(1);
                return;
+            }
+            else {
+            	if(version.equals("Percolator version UNOFFICIAL")) {
+            		this.percolatorVersion = "UNOFFICIAL";
+            		return;
+            	}
             }
         }
 	}
@@ -263,7 +285,12 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 						String name = reader.getElementText();
 						result.addMatchingLocus(name, null);
 					}
-					else if(reader.getLocalName().equalsIgnoreCase("peptide")) {
+					else if(reader.getLocalName().equalsIgnoreCase("exp_mass")) {
+						String exptMass = reader.getElementText();
+						result.setObservedMass(new BigDecimal(exptMass));
+					}
+					else if(reader.getLocalName().equalsIgnoreCase("peptide") ||
+							reader.getLocalName().equalsIgnoreCase("peptide_seq")) {
 						
 						seq = reader.getAttributeValue(null, "seq");
 						if(seq == null || seq.length() == 0) 
@@ -390,6 +417,8 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 		
 		
 		try {
+			Set<String> uniqPsmIds = new HashSet<String>();
+			
 			while (reader.hasNext()) {
 				int evtType = reader.next();
 				
@@ -414,18 +443,22 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 						String score = reader.getElementText();
 						result.setPvalue(Double.parseDouble(score));
 					}
+					else if(reader.getLocalName().equalsIgnoreCase("exp_mass")) {
+						String exptMass = reader.getElementText();
+						result.setObservedMass(new BigDecimal(exptMass));
+					}
 					else if(reader.getLocalName().equalsIgnoreCase("protein_id")) {
 						String name = reader.getElementText();
 						result.addMatchingLocus(name, null);
 					}
 					
-					else if(reader.getLocalName().equalsIgnoreCase("psms")) {
+					else if(reader.getLocalName().equalsIgnoreCase("psm_ids")) {
 						
 						while(reader.hasNext()) {
 							
 							evtType = reader.next();
 							
-							if(evtType == XMLStreamReader.END_ELEMENT && reader.getLocalName().equalsIgnoreCase("psms"))
+							if(evtType == XMLStreamReader.END_ELEMENT && reader.getLocalName().equalsIgnoreCase("psm_ids"))
 								break;
 							
 							if(evtType == XMLStreamReader.START_ELEMENT && reader.getLocalName().equalsIgnoreCase("psm_id")) {
@@ -433,15 +466,19 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 								if(psmid == null || psmid.trim().length() == 0) {
 									throw new DataProviderException("No id found for psm for peptide: "+sequence);
 								}
-								try {
-									result.addMatchingPsmId(psmid);
-								}
-								catch(IllegalArgumentException e) {
-									throw new DataProviderException("Could not parse psm_id attribute: "+psmid+" for peptide: "+
-											result.getResultPeptide().getPeptideSequence());
-								}
+								uniqPsmIds.add(psmid);
 							}
 						}
+					}
+				}
+				
+				for(String psmid: uniqPsmIds) {
+					try {
+						result.addMatchingPsmId(psmid);
+					}
+					catch(IllegalArgumentException e) {
+						throw new DataProviderException("Could not parse psm_id attribute: "+psmid+" for peptide: "+
+								result.getResultPeptide().getPeptideSequence());
 					}
 				}
 			}

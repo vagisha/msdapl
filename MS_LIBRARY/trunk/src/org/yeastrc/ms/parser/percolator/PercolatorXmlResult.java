@@ -26,6 +26,7 @@ public class PercolatorXmlResult implements PercolatorResultIn {
     private Double discriminantScore = null;
     private double qvalue = -1.0;
     private double pvalue = -1.0;
+    private BigDecimal observedMass;
     private BigDecimal predictedRT;
     
     private PercolatorXmlPsmId psmId;
@@ -49,6 +50,7 @@ public class PercolatorXmlResult implements PercolatorResultIn {
 	
 	public boolean isComplete() {
 		return (id != null && pep != -1.0 && qvalue != 1.0 
+				&& observedMass != null
 				&& resultPeptide != null &&
 				matchingLoci.size() > 0);
 	}
@@ -79,6 +81,8 @@ public class PercolatorXmlResult implements PercolatorResultIn {
 		buf.append("pvalue: "+pvalue);
 		buf.append("\n");
 		buf.append("predictedRT: "+predictedRT);
+		buf.append("\n");
+		buf.append("observedMass: "+observedMass);
 		buf.append("\n");
 		if(matchingLoci.size() == 0)
 			buf.append("NO MATCHING PROTEINS");
@@ -167,6 +171,18 @@ public class PercolatorXmlResult implements PercolatorResultIn {
 		this.psmId.setCharge(charge);
 	}
 
+	@Override
+	public BigDecimal getObservedMass() {
+		//throw new UnsupportedOperationException("Observed Mass not read from Percolator XML outout");
+		return this.observedMass;
+	}
+	
+	@Override
+	public void setObservedMass(BigDecimal mass) {
+		//throw new UnsupportedOperationException("Observed Mass not read from Percolator XML outout");
+		this.observedMass = mass;
+	}
+	
 	public void addMatchingLocus(String accession, String description) {
         DbLocus locus = new DbLocus(accession, description);
         addMatchingProteinMatch(locus);
@@ -195,16 +211,5 @@ public class PercolatorXmlResult implements PercolatorResultIn {
 	@Override
 	public ValidationStatus getValidationStatus() {
 		throw new UnsupportedOperationException("Validation status not read from Percolator XML outout");
-	}
-
-	
-	@Override
-	public BigDecimal getObservedMass() {
-		throw new UnsupportedOperationException("Observed Mass not read from Percolator XML outout");
-	}
-	
-	@Override
-	public void setObservedMass(BigDecimal mass) {
-		throw new UnsupportedOperationException("Observed Mass not read from Percolator XML outout");
 	}
 }

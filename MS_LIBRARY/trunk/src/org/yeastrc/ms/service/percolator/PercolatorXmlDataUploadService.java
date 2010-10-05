@@ -50,6 +50,8 @@ import org.yeastrc.ms.parser.percolator.PercolatorXmlResult;
 import org.yeastrc.ms.service.AnalysisDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.service.percolator.stats.PercolatorFilteredPsmStatsSaver;
+import org.yeastrc.ms.service.percolator.stats.PercolatorFilteredSpectraStatsSaver;
 import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
 
 /**
@@ -237,6 +239,17 @@ public class PercolatorXmlDataUploadService implements
         
         
         reader.close();
+        
+        // Finally, save the filtered results stats
+        try {
+        	PercolatorFilteredPsmStatsSaver psmStatsSaver = PercolatorFilteredPsmStatsSaver.getInstance();
+        	psmStatsSaver.save(analysisId, 0.01);
+        	PercolatorFilteredSpectraStatsSaver spectraStatsSaver = PercolatorFilteredSpectraStatsSaver.getInstance();
+        	spectraStatsSaver.save(analysisId, 0.01);
+        }
+        catch(Exception e) {
+        	log.error("Error saving filtered stats for analysisID: "+analysisId, e);
+        }
     }
     
     public List<Integer> getUploadedAnalysisIds() {
@@ -376,7 +389,7 @@ public class PercolatorXmlDataUploadService implements
                 }
                 
         		int runSearchResultId = getMatchingSearchResultId(runSearchId, result.getScanNumber(), 
-        				result.getCharge(), result.getResultPeptide());
+        				result.getCharge(), result.getObservedMass().doubleValue(), result.getResultPeptide());
         		// upload the Percolator specific information for this result.
                 uploadPercolatorResultData(result, runSearchAnalysisId, runSearchResultId);
 
@@ -414,11 +427,11 @@ public class PercolatorXmlDataUploadService implements
 				peptRes.setPosteriorErrorProbability(peptide.getPosteriorErrorProbability());
 				peptRes.setPvalue(peptide.getPvalue());
 				peptRes.setDiscriminantScore(peptide.getDiscriminantScore());
-				List<Integer> psmIds = new ArrayList<Integer>(peptide.getPsmIds().size());
+				Set<Integer> psmIds = new HashSet<Integer>(peptide.getPsmIds().size());
 				
-				for(PercolatorXmlPsmId psmIdO: peptide.getPsmIds()) {
+				for(PercolatorXmlPsmId psmId: peptide.getPsmIds()) {
 					// get a PercolatorResult ID for this psm;
-					String sourceFileName = psmIdO.getFileName();
+					String sourceFileName = psmId.getFileName();
 	        		Integer runSearchId = runSearchIdMap.get(sourceFileName);
 
 	        		if (runSearchId == null) {
@@ -428,9 +441,26 @@ public class PercolatorXmlDataUploadService implements
 	        			numAnalysisUploaded = 0;
 	        			throw ex;
 	        		}
-					int runSearchResultId = this.getMatchingSearchResultId(runSearchId, psmIdO.getScanNumber(), 
-							psmIdO.getCharge(), peptide.getResultPeptide());
 					
+	        		List<Integer> runSearchResultIds = null;
+					try {
+						// We may have multiple matching results for the same scan, charge and peptide sequence
+						// due to Bullseye.  Add them all
+						runSearchResultIds = this.getMatchingSearchResultId(runSearchId, psmId.getScanNumber(), 
+								psmId.getCharge(),peptide.getResultPeptide());
+					}
+					catch(UploadException e) {
+						// TODO -- This is probably because this PSM had XCorrRank > 1 in the sequenst results
+						// We only upload XCorrRank = 1 results. Chances are there is no matching Percolator PSM
+						// (in the <psms></psms> list) either.  Ignore it for now.
+						if(e.getErrorCode() == ERROR_CODE.NO_MATCHING_SEARCH_RESULT) {
+							log.warn(e.getErrorMessage());
+							continue;
+						}
+						else
+							throw e;
+					}
+							
 					// get the PercolatorResult ID for this runSearchResultId;
 					Integer runSearchAnalysisId = runSearchAnalysisIdMap.get(sourceFileName);
 					if(runSearchAnalysisId == null) {
@@ -441,10 +471,12 @@ public class PercolatorXmlDataUploadService implements
 	        			throw ex;
 					}
 					
-					PercolatorResult percolatorResult = percResultDao.loadForRunSearchAnalysis(runSearchResultId, runSearchAnalysisId);
-					psmIds.add(percolatorResult.getPercolatorResultId());
+					for(Integer runSearchResultId: runSearchResultIds) {
+						PercolatorResult percolatorResult = percResultDao.loadForRunSearchAnalysis(runSearchResultId, runSearchAnalysisId);
+						psmIds.add(percolatorResult.getPercolatorResultId());
+					}
 				}
-				peptRes.setPsmIdList(psmIds);
+				peptRes.setPsmIdList(new ArrayList<Integer>(psmIds));
 				uploadPercolatorPeptideResult(peptRes);
 			}
 			
@@ -465,7 +497,8 @@ public class PercolatorXmlDataUploadService implements
 
 	
     // get a matching runSearchResultId
-    private int getMatchingSearchResultId(int runSearchId, int scanNumber, int charge, MsSearchResultPeptide peptide) 
+    private int getMatchingSearchResultId(int runSearchId, int scanNumber, int charge, 
+    		double observedMass, MsSearchResultPeptide peptide) 
     	throws UploadException {
         
     	Integer runId = runIdMap.get(runSearchId);
@@ -478,48 +511,108 @@ public class PercolatorXmlDataUploadService implements
         int scanId = getScanId(runId, scanNumber);
            
         try {
-     	List<Integer> resForScanIds = resultDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, charge);
         	
-            List<MsSearchResult> matchingResults = new ArrayList<MsSearchResult>(resForScanIds.size());
-            
-            for(int resultId: resForScanIds) {
-            	MsSearchResult res = resultDao.load(resultId);
-            	if(res.getResultPeptide().getPeptideSequence().equals(peptide.getPeptideSequence()))
-            		matchingResults.add(res);
-            }
-//        	List<MsSearchResult> matchingResults = resultDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, 
-//                        charge, 
-//                        peptide.getPeptideSequence());
-            
-            
-            if(matchingResults.size() == 1) {
-                return matchingResults.get(0).getId();
-            }
-            
-            // no matches were found
-            else if(matchingResults.size() == 0) {
+        	List<MsSearchResult> matchingResults = resultDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, 
+                    charge, 
+                    peptide.getPeptideSequence());
+        	
+        	// no matches were found
+            if(matchingResults.size() == 0) {
             	UploadException ex = new UploadException(ERROR_CODE.NO_MATCHING_SEARCH_RESULT);
                 ex.setErrorMessage("No matching search result was found for runSearchId: "+runSearchId+
-                		" scanId: "+scanId+"; charge: "+charge+// "; mass: "+result.getObservedMass()+
+                		" scanId: "+scanId+"; charge: "+charge+"; mass: "+observedMass+
                 		"; peptide: "+peptide.getPeptideSequence()+
                 		"; modified peptide: "+peptide.getModifiedPeptidePS());
                 throw ex;
                 //log.warn(ex.getErrorMessage());
             }
             
-            
-            else {
-            	// If we have multiple matches
-            	UploadException ex = new UploadException(ERROR_CODE.MULTI_MATCHING_SEARCH_RESULT);
-            	ex.setErrorMessage("Multiple matching search results were found for runSearchId: "+runSearchId+
-            			" scanId: "+scanId+"; charge: "+charge+// "; mass: "+result.getObservedMass()+
-                		"; peptide: "+peptide.getPeptideSequence()+
-                		"; modified peptide: "+peptide.getModifiedPeptidePS());
-            	throw ex;
-            }
+            else if(matchingResults.size() == 1) 
+                return matchingResults.get(0).getId();
+        	
+        	// matchingResults.size() > 1
+        	else { // this can happen if 
+        		   // a scan searched with same charge but different M+H (due to Bullseye) results in same peptide match
+        		
+        		// Get the match with the smallest mass difference
+        		double bestDiff = Double.MAX_VALUE;
+        		MsSearchResult bestRes = null;
+        		for(MsSearchResult res: matchingResults) {
+        			double diff = Math.abs(observedMass - res.getObservedMass().doubleValue());
+        			if(diff < bestDiff) {
+        				bestDiff = diff;
+        				bestRes = res;
+        			}
+        		}
+        		
+        		if(bestDiff > 0.05) {
+        			log.warn("Mass difference of best match is > 0.05. It is: "+bestDiff);
+        			bestRes = null;
+        		}
+
+        		// If we still don't have a definite match
+        		if(bestRes == null) {
+        			UploadException ex = new UploadException(ERROR_CODE.MULTI_MATCHING_SEARCH_RESULT);
+        			ex.setErrorMessage("Multiple matching search results were found for runSearchId: "+runSearchId+
+        					" scanId: "+scanId+"; charge: "+charge+"; mass: "+observedMass+
+        					"; peptide: "+peptide.getPeptideSequence()+
+        					"; modified peptide: "+peptide.getModifiedPeptidePS());
+        			throw ex;
+        		}
+        		else
+        			return bestRes.getId();
+        	}
+        	
         }
         catch(RuntimeException e) {
-            UploadException ex = new UploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e);
+            UploadException ex = new UploadException(ERROR_CODE.RUNTIME_ERROR, e);
+            ex.setErrorMessage(e.getMessage());
+            throw ex;
+        }
+    }
+    
+    
+    private List<Integer> getMatchingSearchResultId(int runSearchId, int scanNumber, int charge, 
+    		MsSearchResultPeptide peptide) 
+    	throws UploadException {
+        
+    	Integer runId = runIdMap.get(runSearchId);
+    	if(runId == null) { // by now we should already have a matching runID, but just in case
+    		UploadException ex = new UploadException(ERROR_CODE.NO_RUNID_FOR_SEARCH_FILE);
+            ex.setErrorMessage("No runID found for runSearchID: "+runSearchId);
+            throw ex;
+    	}
+    	
+        int scanId = getScanId(runId, scanNumber);
+           
+        try {
+        	
+        	List<Integer> matchingResultIds = new ArrayList<Integer>();
+        	
+        	List<MsSearchResult> matchingResults = resultDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, 
+                    charge, 
+                    peptide.getPeptideSequence());
+        	
+        	// no matches were found
+            if(matchingResults.size() == 0) {
+            	UploadException ex = new UploadException(ERROR_CODE.NO_MATCHING_SEARCH_RESULT);
+                ex.setErrorMessage("No matching search result was found for runSearchId: "+runSearchId+
+                		" scanId: "+scanId+"; charge: "+charge+//"; mass: "+observedMass+
+                		"; peptide: "+peptide.getPeptideSequence()+
+                		"; modified peptide: "+peptide.getModifiedPeptidePS());
+                throw ex;
+                //log.warn(ex.getErrorMessage());
+            }
+            
+            else if(matchingResults.size() == 1) 
+            	for(MsSearchResult mRes: matchingResults)
+            		matchingResultIds.add(mRes.getId());
+        	
+        	return matchingResultIds;
+        	
+        }
+        catch(RuntimeException e) {
+            UploadException ex = new UploadException(ERROR_CODE.RUNTIME_ERROR, e);
             ex.setErrorMessage(e.getMessage());
             throw ex;
         }

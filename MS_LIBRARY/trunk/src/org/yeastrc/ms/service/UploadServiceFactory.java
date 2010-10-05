@@ -271,6 +271,7 @@ public class UploadServiceFactory {
         
         if(formats.size() > 1) {
         	// We may have .sqt and Percolator xml file in the same directory.  If so we will upload the xml file
+        	// ONLY if the version is "UNOFFICIAL" or > 1.14
         	if(formats.size() == 2) {
         		if(formats.contains(SearchFileFormat.SQT) && formats.contains(SearchFileFormat.XML)) {
         			for(String file: filenames) {
@@ -323,7 +324,7 @@ public class UploadServiceFactory {
     
     private boolean isPercolatorXml(String filePath) {
     	try {
-			return PercolatorXmlFileReader.isPercolatorXml(filePath);
+			return PercolatorXmlFileReader.isSupportedPercolatorXml(filePath);
 		} catch (DataProviderException e) {
 			log.error("Error reading XML file: "+filePath, e);
 			return false;

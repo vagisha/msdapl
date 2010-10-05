@@ -16,9 +16,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
+import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorBinnedSpectraResult;
 import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorFilteredSpectraResult;
+import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.util.TimeUtils;
 
@@ -85,8 +89,8 @@ public class PercolatorFilteredSpectraDistributionCalculator {
             	
             	log.info("Getting data for runSearchAnalysis: "+runSearchAnalysisId+"; runId: "+runId);
                 
-            	// binUsingMsLib(scoreCutoff, runSearchId);
-            	binUsingJDBC(scoreCutoff, runSearchAnalysisId, runId);
+            	binUsingMsLib(scoreCutoff, runSearchAnalysisId, runId);
+            	//binUsingJDBC(scoreCutoff, runSearchAnalysisId, runId);
             	
             	log.info("Calculated results for runSearchAnalysisID: "+runSearchAnalysisId);
             }
@@ -99,6 +103,77 @@ public class PercolatorFilteredSpectraDistributionCalculator {
         }
     }
 
+    
+    private void binUsingMsLib(double scoreCutoff, int runSearchAnalysisId, int runId) {
+    	
+        long s = System.currentTimeMillis();
+        
+        allSpectraCounts = new int[numBins];
+        filteredSpectraCounts = new int[numBins];
+        
+        int scanCnt = 0;
+        int goodScanCnt = 0;
+        
+        DAOFactory daoFactory = DAOFactory.instance();
+        MsScanDAO scanDao = daoFactory.getMsScanDAO();
+        PercolatorResultDAO percResDao = daoFactory.getPercolatorResultDAO();
+        
+            
+        List<Integer> scanIds = scanDao.loadScanIdsForRun(runId);
+
+        for(Integer scanId: scanIds) {
+
+        	MsScan scan = scanDao.loadScanLite(scanId);
+        	scanCnt++;
+
+        	boolean filtered = false;
+        	List<Integer> percResultIds = percResDao.loadIdsForRunSearchAnalysisScan(runSearchAnalysisId, scanId);
+        	if(percResultIds != null && percResultIds.size() > 0) {
+
+        		for(Integer percResultId: percResultIds) {
+        			PercolatorResult pres = percResDao.loadForPercolatorResultId(percResultId);
+        			if(pres.getQvalue() <= scoreCutoff) {
+        				filtered = true;
+        				goodScanCnt++;
+        				break;
+        			}
+        		}
+        	}
+
+        	// If we don't have retention time for a scan skip the whole runSearchAnalysis
+    		if(scan.getRetentionTime() == null) {
+    			log.error("!!!RETENTION TIME NOT FOUND for runSearchAnalysisID: "+runSearchAnalysisId+". Will not be binned....");
+    		}
+    		else {
+    			double rt = scan.getRetentionTime().doubleValue();
+    			putScanInBin(rt, filtered);
+    		}
+
+        }
+        
+        
+        // add to list
+    	PercolatorFilteredSpectraResult stat = new PercolatorFilteredSpectraResult();
+    	stat.setRunSearchAnalysisId(runSearchAnalysisId);
+    	stat.setTotal(scanCnt);
+    	stat.setFiltered(goodScanCnt);
+    	stat.setQvalue(scoreCutoff);
+    	List<PercolatorBinnedSpectraResult> binnedResults = new ArrayList<PercolatorBinnedSpectraResult>();
+    	for(int i = 0; i < numBins; i++) {
+    		PercolatorBinnedSpectraResult bin = new PercolatorBinnedSpectraResult();
+    		bin.setBinStart(i*BIN_SIZE);
+    		bin.setBinEnd(bin.getBinStart() + BIN_SIZE);
+    		bin.setTotal(allSpectraCounts[i]);
+    		bin.setFiltered(filteredSpectraCounts[i]);
+    		binnedResults.add(bin);
+    	}
+    	stat.setBinnedResults(binnedResults);
+    	filteredResults.add(stat);
+    	
+        long e = System.currentTimeMillis();
+        log.info("Binned data in: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+    }
+    
     private void binUsingJDBC(double scoreCutoff, int runSearchAnalysisId, int runId) {
         
         long s = System.currentTimeMillis();

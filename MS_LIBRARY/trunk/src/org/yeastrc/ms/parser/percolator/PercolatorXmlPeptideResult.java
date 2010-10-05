@@ -5,6 +5,7 @@
  */
 package org.yeastrc.ms.parser.percolator;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class PercolatorXmlPeptideResult implements PercolatorPeptideResultIn {
     private Double discriminantScore = null;
     private double qvalue = -1.0;
     private double pvalue = -1.0;
+    private BigDecimal observedMass;
 	
 	private List<MsSearchResultProteinIn> matchingLoci;
     private List<PercolatorXmlPsmId> matchingPsmIds;
@@ -35,6 +37,7 @@ public class PercolatorXmlPeptideResult implements PercolatorPeptideResultIn {
     
     public boolean isComplete() {
 		return (resultPeptide != null && pep != -1.0 && qvalue != 1.0 &&
+				observedMass != null &&
 				matchingPsmIds.size() > 0 &&
 				matchingLoci.size() > 0);
 	}
@@ -104,7 +107,16 @@ public class PercolatorXmlPeptideResult implements PercolatorPeptideResultIn {
         this.pep = pep;
     }
     
-    @Override
+    
+    public BigDecimal getObservedMass() {
+		return observedMass;
+	}
+
+	public void setObservedMass(BigDecimal observedMass) {
+		this.observedMass = observedMass;
+	}
+
+	@Override
     public Double getDiscriminantScore() {
         return discriminantScore;
     }

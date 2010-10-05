@@ -48,6 +48,8 @@ import org.yeastrc.ms.parser.sqtFile.percolator.PercolatorSQTFileReader;
 import org.yeastrc.ms.service.AnalysisDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.service.percolator.stats.PercolatorFilteredPsmStatsSaver;
+import org.yeastrc.ms.service.percolator.stats.PercolatorFilteredSpectraStatsSaver;
 
 /**
  * 
@@ -238,6 +240,17 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             deleteAnalysis(analysisId);
             numAnalysisUploaded = 0;
             throw e;
+        }
+        
+        // Finally, save the filtered results stats
+        try {
+        	PercolatorFilteredPsmStatsSaver psmStatsSaver = PercolatorFilteredPsmStatsSaver.getInstance();
+        	psmStatsSaver.save(analysisId, 0.01);
+        	PercolatorFilteredSpectraStatsSaver spectraStatsSaver = PercolatorFilteredSpectraStatsSaver.getInstance();
+        	spectraStatsSaver.save(analysisId, 0.01);
+        }
+        catch(Exception e) {
+        	log.error("Error saving filtered stats for analysisID: "+analysisId, e);
         }
     }
     
