@@ -382,11 +382,13 @@ function toggleHitsForIon (pinferIonId) {
 // ---------------------------------------------------------------------------------------
 // SHOW SPECTRUM
 // ---------------------------------------------------------------------------------------  
-function viewSpectrum (scanId, hitId) {
+function viewSpectrum (scanId, hitId, java) {
 	//alert("View spectrum for "+scanId+"; hit: "+hitId);
 	var winHeight = 500
 	var winWidth = 970;
 	var doc = "<yrcwww:link path='/viewSpectrum.do'/>?scanID="+scanId+"&runSearchResultID="+hitId;
+	if(java == 'java')
+		doc += "&java=true";
 	//alert(doc);
 	window.open(doc, "SPECTRUM_WINDOW", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
 }

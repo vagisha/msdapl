@@ -6,6 +6,8 @@
  */
 package org.yeastrc.www.project.experiment.stats;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,8 +22,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.stats.DistributionPlotter;
 import org.yeastrc.experiment.stats.FileStats;
-import org.yeastrc.experiment.stats.RetTimePSMDistributionCalculator;
-import org.yeastrc.experiment.stats.RetTimeSpectraDistributionCalculator;
+import org.yeastrc.experiment.stats.PercolatorPsmRetTimeDistribution;
+import org.yeastrc.experiment.stats.PercolatorPsmRetTimeDistributionGetter;
+import org.yeastrc.experiment.stats.PercolatorSpectraRetTimeDistribution;
+import org.yeastrc.experiment.stats.PercolatorSpectraRetTimeDistributionGetter;
 import org.yeastrc.www.taglib.HistoryTag;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -82,10 +86,17 @@ public class UpdateAnalysisStats extends Action {
         List<FileStats> psmFileStats = cache.getPsmRtFileStats(analysisId, myForm.getQvalue());
         int totalCount = 0; int goodCount = 0; double goodPerc = 0;
         if(psmDistrUrl == null) {
-            RetTimePSMDistributionCalculator dg = new RetTimePSMDistributionCalculator(analysisId, myForm.getQvalue());
-            dg.calculate();
-            psmFileStats = dg.getFileStats();
-            psmDistrUrl = plotter.plotGoogleChartForPSM_RTDistribution(dg);
+        	
+        	PercolatorPsmRetTimeDistributionGetter distrGetter = new PercolatorPsmRetTimeDistributionGetter(analysisId, myForm.getQvalue());
+        	PercolatorPsmRetTimeDistribution result = distrGetter.getDistribution();
+            psmFileStats = result.getFileStatsList();
+            Collections.sort(psmFileStats, new Comparator<FileStats>() {
+				@Override
+				public int compare(FileStats o1, FileStats o2) {
+					return o1.getFileName().compareTo(o2.getFileName());
+				}
+			});
+            psmDistrUrl = plotter.plotGoogleChartForPSM_RTDistribution(result);
             cache.addPsmRtPlotUrl(analysisId, myForm.getQvalue(), psmDistrUrl, psmFileStats);
         }
         
@@ -107,10 +118,16 @@ public class UpdateAnalysisStats extends Action {
         List<FileStats> spectraFileStats = cache.getSpectraRtFileStats(analysisId, myForm.getQvalue());
         int totalSpectraCount = 0; int goodSpectraCount = 0; double goodSpectraPerc = 0;
         if(spectraDistrUrl == null) {
-            RetTimeSpectraDistributionCalculator dg = new RetTimeSpectraDistributionCalculator(analysisId, myForm.getQvalue());
-            dg.calculate();
-            spectraFileStats = dg.getFileStats();
-            spectraDistrUrl = plotter.plotGoogleChartForScan_RTDistribution(dg);
+        	PercolatorSpectraRetTimeDistributionGetter distrGetter = new PercolatorSpectraRetTimeDistributionGetter(analysisId, myForm.getQvalue());
+        	PercolatorSpectraRetTimeDistribution result = distrGetter.getDistribution();
+            spectraFileStats = result.getFileStatsList();
+            Collections.sort(spectraFileStats, new Comparator<FileStats>() {
+				@Override
+				public int compare(FileStats o1, FileStats o2) {
+					return o1.getFileName().compareTo(o2.getFileName());
+				}
+			});
+            spectraDistrUrl = plotter.plotGoogleChartForScan_RTDistribution(result);
             PlotUrlCache.getInstance().addSpectraRtPlotUrl(analysisId, myForm.getQvalue(), spectraDistrUrl, spectraFileStats);
         }
         

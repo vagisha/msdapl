@@ -19,7 +19,6 @@ import org.apache.struts.action.ActionMessages;
 import org.yeastrc.ms.domain.search.ResultSortCriteria;
 import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
-import org.yeastrc.ms.domain.search.impl.ResidueModificationBean;
 
 
 /**

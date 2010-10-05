@@ -126,6 +126,7 @@ public class DoComparisonAction extends Action {
         // Get the datasets we will be comparing
         List<FilterableDataset> datasets = new ArrayList<FilterableDataset>(allRunIds.size());
         
+        long s = System.currentTimeMillis();
         for(int piRunId: allRunIds) {
             
             FilterableDataset dataset = DatasetBuilder.instance().buildFilterableDataset(piRunId);
@@ -145,15 +146,16 @@ public class DoComparisonAction extends Action {
             }
             datasets.add(dataset);
         }
-        
+        long e = System.currentTimeMillis();
+        log.info("Built comparison datasets in "+TimeUtils.timeElapsedMinutes(s, e)+" seconds");
         
         // Do the comparison
         log.info("Starting comparison");
-        long s = System.currentTimeMillis();
+        s = System.currentTimeMillis();
         long start = s;
         ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, 
         		PARSIM.getForValue(myForm.getParsimoniousParam()));
-        long e = System.currentTimeMillis();
+        e = System.currentTimeMillis();
         log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
         

@@ -33,8 +33,6 @@ public class ProteinferRunSummaryLookup {
 			return summary;
 		}
 		
-		
-		
 		// Extract information from the protein inference tables
         IdPickerProteinDAO proteinDao = ProteinferDAOFactory.instance().getIdPickerProteinDao();
         ProteinferPeptideDAO peptDao = ProteinferDAOFactory.instance().getProteinferPeptideDao();
@@ -44,6 +42,7 @@ public class ProteinferRunSummaryLookup {
         int peptSeqCount = peptDao.getUniquePeptideSequenceCountForRun(piRunId);
         int ionCount = peptDao.getUniqueIonCountForRun(piRunId);
         
+        
         summary = new ProteinferRunSummary();
         summary.setPiRunId(piRunId);
         summary.setParsimIndistGroupCount(parsimProteinGroupCount);
@@ -51,9 +50,6 @@ public class ProteinferRunSummaryLookup {
         summary.setUniqPeptSeqCount(peptSeqCount);
         summary.setUniqIonCount(ionCount);
 
-		// Save in the summary table
-        summDao.save(summary);
-        
         return summary;
 	}
 	
@@ -84,9 +80,6 @@ public class ProteinferRunSummaryLookup {
         summary.setUniqPeptSeqCount(peptSeqCount);
         summary.setUniqIonCount(ionCount);
 
-		// Save in the summary table
-        summDao.save(summary);
-        
         return summary;
 	}
 }

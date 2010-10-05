@@ -8,8 +8,12 @@ package org.yeastrc.www.compare.dataset;
 
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunSummaryDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferSpectrumMatchDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunSummaryDAO;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
+import org.yeastrc.ms.domain.protinfer.ProteinferRunSummary;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRunSummary;
 
 
 /**
@@ -22,12 +26,16 @@ public class DatasetBuilder {
     private ProteinferDAOFactory fact;
     private ProteinferRunDAO runDao;
     private ProteinferSpectrumMatchDAO specDao;
+    private ProteinferRunSummaryDAO piRunSummaryDao;
+    private ProteinProphetRunSummaryDAO prophetRunSummaryDao;
     
     
     private DatasetBuilder() {
         fact = ProteinferDAOFactory.instance();
         runDao = fact.getProteinferRunDao();
         specDao = fact.getProteinferSpectrumMatchDao();
+        piRunSummaryDao = fact.getProteinferRunSummaryDao();
+        prophetRunSummaryDao = fact.getProteinProphetRunSummaryDao();
     }
     
     public static DatasetBuilder instance() {
@@ -49,6 +57,27 @@ public class DatasetBuilder {
     }
     
     private void initDataset(Dataset dataset) {
+    	
+    	if(dataset.getSource() == DatasetSource.PROTINFER) {
+    		ProteinferRunSummary summary = piRunSummaryDao.load(dataset.getDatasetId());
+    		if(summary != null) {
+    			dataset.setSpectrumCount(summary.getSpectrumCount());
+    			dataset.setMaxProteinSpectrumCount(summary.getMaxSpectrumCount());
+    			dataset.setMinProteinSpectrumCount(summary.getMinSpectrumCount());
+    			return;
+    		}
+    	}
+    	else if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
+    		ProteinProphetRunSummary summary = prophetRunSummaryDao.load(dataset.getDatasetId());
+    		if(summary != null) {
+    			dataset.setSpectrumCount(summary.getSpectrumCount());
+    			dataset.setMaxProteinSpectrumCount(summary.getMaxSpectrumCount());
+    			dataset.setMinProteinSpectrumCount(summary.getMinSpectrumCount());
+    			return;
+    		}
+    	}
+    	// Either we did not find a summary entry for this protein inference or we don't save summary 
+    	// information for this protein inference program.
         dataset.setSpectrumCount(specDao.getSpectrumCountForPinferRun(dataset.getDatasetId()));
         dataset.setMaxProteinSpectrumCount(specDao.getMaxSpectrumCountForPinferRunProtein(dataset.getDatasetId()));
         dataset.setMinProteinSpectrumCount(specDao.getMinSpectrumCountForPinferRunProtein(dataset.getDatasetId()));

@@ -16,24 +16,24 @@ public class DistributionPlotter {
     
     public String plotGoogleChartForPSM_RTDistribution(int analysisId, double qValCutoff) {
         
-        RetTimePSMDistributionCalculator dg = new RetTimePSMDistributionCalculator(analysisId, qValCutoff);
-        dg.calculate();
-        return plotGoogleChartForPSM_RTDistribution(dg);
+        PercolatorPsmRetTimeDistributionGetter dg = new PercolatorPsmRetTimeDistributionGetter(analysisId, qValCutoff);
+        PercolatorPsmRetTimeDistribution distr = dg.getDistribution();
+        return plotGoogleChartForPSM_RTDistribution(distr);
     }
     
-    public String plotGoogleChartForPSM_RTDistribution(RetTimePSMDistributionCalculator dg) {
+    public String plotGoogleChartForPSM_RTDistribution(PercolatorPsmRetTimeDistribution result) {
         
-        int[] distr = dg.getFilteredPsmDistribution();
-        int[] allDistr = dg.getAllPsmDistribution();
+        int[] distr = result.getFilteredPsmDistribution();
+        int[] allDistr = result.getAllPsmDistribution();
         
-        double maxRT = dg.getMaxRT();
-        int maxPsmCount = dg.getMaxPsmCount();
+        double maxRT = result.getMaxRT();
+        int maxPsmCount = result.getMaxPsmCount();
         
         String url = "http://chart.apis.google.com/chart?";
         url += "cht=bvs";                        // vertical stacked bar chart
         url += "&chbh=a";                        // adjust bar widths to fit in chart
         url += "&chs=500x325";                  // chart size
-        url += "&chdl="+"PSMs with qvalue<="+dg.getScoreCutoff()+"|All Percolator PSMs"; // legend
+        url += "&chdl="+"PSMs with qvalue<="+result.getScoreCutoff()+"|All Percolator PSMs"; // legend
         url += "&chdlp=t";  // place the legent at the top
         url += "&chg=10,10"; // grid; x-axis and y-axis step size = 10
         url += "&chf=c,s,EFEFEF"; // fill chart area; solid fill gray
@@ -73,24 +73,24 @@ public class DistributionPlotter {
     
     public String plotGoogleChartForScan_RTDistribution(int analysisId, double qValCutoff) {
         
-        RetTimeSpectraDistributionCalculator dg = new RetTimeSpectraDistributionCalculator(analysisId, qValCutoff);
-        dg.calculate();
-        return plotGoogleChartForScan_RTDistribution(dg);
+    	PercolatorSpectraRetTimeDistributionGetter dg = new PercolatorSpectraRetTimeDistributionGetter(analysisId, qValCutoff);
+        PercolatorSpectraRetTimeDistribution distr = dg.getDistribution();
+        return plotGoogleChartForScan_RTDistribution(distr);
     }
     
-    public String plotGoogleChartForScan_RTDistribution(RetTimeSpectraDistributionCalculator dg) {
+    public String plotGoogleChartForScan_RTDistribution(PercolatorSpectraRetTimeDistribution result) {
         
-        int[] distr = dg.getFilteredSpectraDistribution();
-        int[] allDistr = dg.getAllSpectraDistribution();
+        int[] distr = result.getFilteredSpectraDistribution();
+        int[] allDistr = result.getAllSpectraDistribution();
         
-        double maxRT = dg.getMaxRT();
-        int maxSpectraCount = dg.getMaxSpectraCount();
+        double maxRT = result.getMaxRT();
+        int maxSpectraCount = result.getMaxSpectraCount();
         
         String url = "http://chart.apis.google.com/chart?";
         url += "cht=bvs";                        // vertical stacked bar chart
         url += "&chbh=a";                        // adjust bar widths to fit in chart
         url += "&chs=500x325";                  // chart size
-        url += "&chdl="+"MS/MS scans with good results (qvalue<="+dg.getScoreCutoff()+")|All MS/MS Scans"; // legend
+        url += "&chdl="+"MS/MS scans with good results (qvalue<="+result.getScoreCutoff()+")|All MS/MS Scans"; // legend
         url += "&chdlp=t";  // place the legent at the top
         url += "&chg=10,10"; // grid; x-axis and y-axis step size = 10
         url += "&chf=c,s,EFEFEF"; // fill chart area; solid fill gray

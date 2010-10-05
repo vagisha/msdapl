@@ -364,10 +364,16 @@
      			<bean:define name="ion" property="bestSpectrumMatch" id="psm_seq" type="org.yeastrc.ms.domain.search.sequest.SequestSearchResult"/>
      			<td><bean:write name="psm_seq" property="sequestResultData.deltaCN" /></td>
      			<td><bean:write name="psm_seq" property="sequestResultData.xCorr" /></td>
+     			
      			<td>
-	     		<span style="text-decoration: underline; cursor: pointer;" 
+     			<span class="clickable underline" title="Java Spectrum Viewer"
+				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="ion" property="bestSpectrumMatch.id" />, 'java')" >
+				J
+				</span>
+				&nbsp;
+	     		<span class="clickable underline" title="JavaScript Spectrum Viewer"
 				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="ion" property="bestSpectrumMatch.id" />)" >
-				View
+				JS
 				</span>
 				</td>
      			
@@ -377,12 +383,19 @@
      		 	<bean:define name="ion" property="bestSpectrumMatch" id="psm_plc" type="org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult"/>
      		 	<td><bean:write name="psm_plc" property="prolucidResultData.primaryScore" /></td>
 				<td><bean:write name="psm_plc" property="prolucidResultData.deltaCN" /></td>
+				
 				<td>
-	     		<span style="text-decoration: underline; cursor: pointer;" 
+     			<span class="clickable underline" title="Java Spectrum Viewer"
+				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="ion" property="bestSpectrumMatch.id" />, 'java')" >
+				J
+				</span>
+				&nbsp;
+	     		<span class="clickable underline" title="JavaScript Spectrum Viewer"
 				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="ion" property="bestSpectrumMatch.id" />)" >
-				View
+				JS
 				</span>
 				</td>
+				
      		</logic:equal>
      		 
      		<logic:equal name="inputGenerator" value="<%=Program.PERCOLATOR.name() %>">
@@ -390,9 +403,14 @@
      		 	<td><bean:write name="psm_perc" property="qvalueRounded" /></td>
      			<td><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
      			<td>
-	     		<span style="text-decoration: underline; cursor: pointer;" 
+     			<span class="clickable underline" title="Java Spectrum Viewer"
+				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_perc" property="id" />, 'java')" >
+				J
+				</span>
+				&nbsp;
+	     		<span class="clickable underline" title="JavaScript Spectrum Viewer"
 				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_perc" property="id" />)" >
-				View
+				JS
 				</span>
 				</td>
      		</logic:equal>
@@ -411,12 +429,19 @@
 	     		<td><bean:write name="psm_peptProphet" property="numMissedCleavages" /></td>
 	     		<td><bean:write name="psm_peptProphet" property="massDifferenceRounded" /></td>
 	     		<td><bean:write name="psm_peptProphet" property="fValRounded" /></td>
+	     		
 	     		<td>
-	     		<span style="text-decoration: underline; cursor: pointer;" 
+     			<span class="clickable underline" title="Java Spectrum Viewer"
+				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_peptProphet" property="id" />, 'java')" >
+				J
+				</span>
+				&nbsp;
+	     		<span class="clickable underline" title="JavaScript Spectrum Viewer"
 				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_peptProphet" property="id" />)" >
-				View
+				JS
 				</span>
 				</td>
+				
      		</logic:equal>
      		
             </tr>

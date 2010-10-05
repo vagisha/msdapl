@@ -5,6 +5,7 @@
  */
 package org.yeastrc.www.project.experiment;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +40,7 @@ import org.yeastrc.ms.domain.analysis.percolator.PercolatorPeptideResult;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
+import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
@@ -49,6 +51,7 @@ import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.misc.Tabular;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
+import org.yeastrc.www.util.RoundingUtils;
 
 /**
  * 
@@ -109,6 +112,24 @@ public class ViewPercolatorResults extends Action {
             myForm.setMaxQValue("0.01");
             myForm.setSortBy(SORT_BY.QVAL);
             myForm.setSortOrder(SORT_ORDER.ASC);
+            
+            List<Integer> searchIds = DAOFactory.instance().getMsSearchAnalysisDAO().getSearchIdsForAnalysis(searchAnalysisId);
+            // We should only have one searchID
+            if(searchIds.size() == 1) {
+            	List<MsResidueModification> mods = DAOFactory.instance().getMsSearchModDAO().loadDynamicResidueModsForSearch(searchIds.get(0));
+            	List<SelectableModificationBean> modBeans = new ArrayList<SelectableModificationBean>(mods.size());
+            	for(MsResidueModification mod: mods) {
+            		SelectableModificationBean modBean = new SelectableModificationBean();
+            		modBean.setId(mod.getId());
+            		BigDecimal mass = new BigDecimal(RoundingUtils.getInstance().roundOne(mod.getModificationMass()));
+            		modBean.setModificationMass(mass);
+            		modBean.setModificationSymbol(mod.getModificationSymbol());
+            		modBean.setModifiedResidue(mod.getModifiedResidue());
+            		modBean.setSelected(true);
+            		modBeans.add(modBean);
+            	}
+            	myForm.setModificationList(modBeans);
+            }
             
             // If we have peptide-level results for this analysis we will display them
             PercolatorPeptideResultDAO peptResDao = DAOFactory.instance().getPercolatorPeptideResultDAO();
