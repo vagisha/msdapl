@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.protinfer.GenericProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.GenericProteinferSpectrumMatchDAO;
 import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
 

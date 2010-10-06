@@ -14,13 +14,14 @@ import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorFilteredPsmResul
  */
 public interface PercolatorFilteredPsmResultDAO {
 
-	public double getAverageFilteredPercent();
+	public double getPopulationAvgFilteredPercent();
 	
-	public double getStdevFilteredPercent();
+	public double getPopulationStdDevFilteredPercent();
 	
-	public double getAverageFilteredPercentForInstrument(int instrumentId);
+	public double getPopulationMin();
 	
-	public double getStdevFilteredPercentForInstrument(int instrumentId);
+	public double getPopulationMax();
+	
 	
 	public PercolatorFilteredPsmResult load(int runSearchAnalysisId);
 	

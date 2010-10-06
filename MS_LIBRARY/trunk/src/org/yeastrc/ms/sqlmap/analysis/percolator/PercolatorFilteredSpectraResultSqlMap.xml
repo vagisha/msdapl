@@ -57,5 +57,21 @@
 		DELETE FROM PercolatorFilteredSpectraResult WHERE id=#id#
 	</delete>
 	
+	<select id="selectPopulationAvgPerc" resultClass="Double" >
+		select AVG((filtered/total)*100) FROM PercolatorFilteredSpectraResult
+	</select>
+	
+	<select id="selectPopulationStdDevPerc" resultClass="Double" >
+		select STDDEV((filtered/total)*100) FROM PercolatorFilteredSpectraResult
+	</select>
+	
+	<select id="selectPopulationMax" resultClass="Double" >
+		select MAX((filtered/total)*100) FROM PercolatorFilteredSpectraResult
+	</select>
+	
+	<select id="selectPopulationMin" resultClass="Double" >
+		select MIN((filtered/total)*100) FROM PercolatorFilteredSpectraResult
+	</select>
+	
 	
 </sqlMap>

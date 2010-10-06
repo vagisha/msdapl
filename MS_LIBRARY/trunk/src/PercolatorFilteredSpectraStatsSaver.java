@@ -6,9 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.analysis.percolator.PercolatorFilteredSpectraResultDAO;
-import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorFilteredSpectraResult;
-import org.yeastrc.ms.service.percolator.stats.PercolatorFilteredSpectraDistributionCalculator;
 
 /**
  * PercolatorFilteredSpectraStatsSaver.java

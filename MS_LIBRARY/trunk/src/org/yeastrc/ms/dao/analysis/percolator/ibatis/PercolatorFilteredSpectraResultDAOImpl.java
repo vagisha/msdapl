@@ -30,32 +30,6 @@ public class PercolatorFilteredSpectraResultDAOImpl extends BaseSqlMapDAO implem
 		this.rsaDao = rsaDao;
 	}
 
-	
-	@Override
-	public double getAverageFilteredPercent() {
-		Double avg = (Double)queryForObject(namespace+".averagePercentFiltered", null);
-		if(avg == null)
-			return 0;
-		return avg;
-	}
-
-	@Override
-	public double getAverageFilteredPercentForInstrument(int instrumentId) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public double getStdevFilteredPercent() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public double getStdevFilteredPercentForInstrument(int instrumentId) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	@Override
 	public List<PercolatorFilteredSpectraResult> loadForAnalysis(int searchAnalysisId) {
@@ -98,6 +72,38 @@ public class PercolatorFilteredSpectraResultDAOImpl extends BaseSqlMapDAO implem
 	@Override
 	public void delete(int runSearchAnalysisId) {
 		delete(namespace+".delete",runSearchAnalysisId);
+	}
+	
+	@Override
+	public double getPopulationAvgFilteredPercent() {
+		Double d = (Double)queryForObject(namespace+".selectPopulationAvgPerc", null);
+		if(d != null)
+			return d;
+		return 0;
+	}
+
+	@Override
+	public double getPopulationMax() {
+		Double d = (Double)queryForObject(namespace+".selectPopulationMax", null);
+		if(d != null)
+			return d;
+		return 0;
+	}
+
+	@Override
+	public double getPopulationMin() {
+		Double d = (Double)queryForObject(namespace+".selectPopulationMin", null);
+		if(d != null)
+			return d;
+		return 0;
+	}
+
+	@Override
+	public double getPopulationStdDevFilteredPercent() {
+		Double d = (Double)queryForObject(namespace+".selectPopulationStdDevPerc", null);
+		if(d != null)
+			return d;
+		return 0;
 	}
 
 }
