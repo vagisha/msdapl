@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.experiment.stats.FileStats;
+import org.yeastrc.experiment.stats.PercolatorPsmDeltaMassDistribution;
 
 /**
  * 
@@ -19,6 +20,7 @@ public class PlotUrlCache {
 
     private LinkedHashMap<Key, Value> psmRtPlotUrlStore;
     private LinkedHashMap<Key, Value> spectraRtPlotUrlStore;
+    private LinkedHashMap<Key, PercolatorPsmDeltaMassDistribution> psmDeltaMassPlotUrlStore;
     private final int size = 20;
     
     private static PlotUrlCache instance = null;
@@ -38,6 +40,14 @@ public class PlotUrlCache {
             protected boolean removeEldestEntry (Map.Entry<Key, Value> eldest) {
                 // This method is invoked by put and putAll after inserting a new entry into the map.
                 return spectraRtPlotUrlStore.size() > size;  
+            }
+        };
+        
+        psmDeltaMassPlotUrlStore = new LinkedHashMap<Key, PercolatorPsmDeltaMassDistribution>(capacity, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry (Map.Entry<Key, PercolatorPsmDeltaMassDistribution> eldest) {
+                // This method is invoked by put and putAll after inserting a new entry into the map.
+                return psmDeltaMassPlotUrlStore.size() > size;  
             }
         };
     }
@@ -85,6 +95,20 @@ public class PlotUrlCache {
         Key key = new Key(analysisId, qvalue);
         Value value = new Value(url, fileStats);
         spectraRtPlotUrlStore.put(key, value);
+    }
+    
+    
+    public PercolatorPsmDeltaMassDistribution getPsmDeltaMassResult(int analysisId, double qvalue) {
+    	PercolatorPsmDeltaMassDistribution value = psmDeltaMassPlotUrlStore.get(new Key(analysisId, qvalue));
+        if(value != null)
+            return value;
+        else
+            return null;
+    }
+    
+    public void setPsmDeltaMassResult(int analysisId, double qvalue, PercolatorPsmDeltaMassDistribution result) {
+        Key key = new Key(analysisId, qvalue);
+        psmDeltaMassPlotUrlStore.put(key, result);
     }
     
     public static PlotUrlCache getInstance() {

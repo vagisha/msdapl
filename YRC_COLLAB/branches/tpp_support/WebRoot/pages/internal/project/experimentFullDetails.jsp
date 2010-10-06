@@ -101,7 +101,7 @@
 				</td>
 				<td width="25%">
 					<b><a href="<yrcwww:link path='viewQCPlots.do?'/>analysisId=<bean:write name='analysis' property='id' />&experimentId=<bean:write name='experiment' property='id'/>"> 
-					[QC Plots]</a></b>
+					[Statistics]</a></b>
 				</td>
 				<td width="25%">
 					<b><a href="<yrcwww:link path='newPercolatorProteinInference.do?'/>searchAnalysisId=<bean:write name='analysis' property='id' />&projectId=<bean:write name='experiment' property='projectId'/>"> 

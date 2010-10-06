@@ -498,6 +498,28 @@
 	</action>
 	
 	<action
+	  path="/viewPsmVsRetTimeResults"
+	  type="org.yeastrc.www.project.experiment.stats.PsmVsRetTimeStatsAjaxAction"
+	  >
+	  <forward name="Success" path="/pages/internal/project/stats/psmVsRetTimePlots.jsp" redirect="false"/>
+	</action>
+	
+	<action
+	  path="/viewSpectraVsRetTimeResults"
+	  type="org.yeastrc.www.project.experiment.stats.SpectraVsRetTimeStatsAjaxAction"
+	  >
+	  <forward name="Success" path="/pages/internal/project/stats/spectraVsRetTimePlots.jsp" redirect="false"/>
+	</action>
+	
+	<action
+	  path="/viewPsmDeltaMassResults"
+	  type="org.yeastrc.www.project.experiment.stats.PsmDeltaMassStatsAjaxAction"
+	  >
+	  <forward name="Success" path="/pages/internal/project/stats/psmDeltaMassPlot.jsp" redirect="false"/>
+	</action>
+	
+	
+	<action
 	  path="/updateQCPlots"
 	  type="org.yeastrc.www.project.experiment.stats.UpdateAnalysisStats"
 	  name="qcPlotsFilterForm"

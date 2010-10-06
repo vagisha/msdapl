@@ -17,6 +17,7 @@ import org.yeastrc.ms.dao.analysis.percolator.PercolatorFilteredSpectraResultDAO
 import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorBinnedSpectraResult;
 import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorFilteredSpectraResult;
 import org.yeastrc.ms.service.percolator.stats.PercolatorFilteredSpectraDistributionCalculator;
+import org.yeastrc.www.util.RoundingUtils;
 
 /**
  * 
@@ -35,14 +36,18 @@ public class PercolatorSpectraRetTimeDistributionGetter {
 	
 	public PercolatorSpectraRetTimeDistribution getDistribution() {
 		
+		List<PercolatorFilteredSpectraResult> filteredResults = null;
 		// Look in the database first for pre-calculated results
-		PercolatorFilteredSpectraResultDAO dao = DAOFactory.instance().getPrecolatorFilteredSpectraResultDAO();
-		List<PercolatorFilteredSpectraResult> filteredResults = dao.loadForAnalysis(analysisId);
+		if(scoreCutoff == 0.01) {
+			PercolatorFilteredSpectraResultDAO dao = DAOFactory.instance().getPrecolatorFilteredSpectraResultDAO();
+			filteredResults = dao.loadForAnalysis(analysisId);
+		}
 		
 		if(filteredResults == null || filteredResults.size() == 0) {
 			
 			// Results were not found in the database; calculate now
 			PercolatorFilteredSpectraDistributionCalculator calc = new PercolatorFilteredSpectraDistributionCalculator(analysisId, scoreCutoff);
+			calc.calculate();
 			filteredResults = calc.getFilteredResults();
 		}
 		
@@ -50,6 +55,13 @@ public class PercolatorSpectraRetTimeDistributionGetter {
 			log.error("No results for searchAnalysisID: "+analysisId);
 			return null;
 		}
+		
+		PercolatorFilteredSpectraResultDAO statsDao = DAOFactory.instance().getPrecolatorFilteredSpectraResultDAO();
+		double populationMax = RoundingUtils.getInstance().roundOne(statsDao.getPopulationMax());
+		double populationMin = RoundingUtils.getInstance().roundOne(statsDao.getPopulationMin());
+		double populationMean = RoundingUtils.getInstance().roundOne(statsDao.getPopulationAvgFilteredPercent());
+		double populationStddev = RoundingUtils.getInstance().roundOne(statsDao.getPopulationStdDevFilteredPercent());
+		
 		
 		int[] allSpectraCounts = null;
 	    int[] filteredSpectraCounts = null;
@@ -71,7 +83,13 @@ public class PercolatorSpectraRetTimeDistributionGetter {
 			FileStats stats = new FileStats(res.getRunSearchAnalysisId(), filename);
 			stats.setGoodCount(res.getFiltered());
 			stats.setTotalCount(res.getTotal());
-			fileStats.add(stats);
+			if(scoreCutoff == 0.01) {
+				stats.setPopulationMean(populationMean);
+				stats.setPopulationStandardDeviation(populationStddev);
+				stats.setPopulationMin(populationMin);
+				stats.setPopulationMax(populationMax);
+				fileStats.add(stats);
+			}
 			
 			List<PercolatorBinnedSpectraResult> binnedResults = res.getBinnedResults();
 			Collections.sort(binnedResults, new Comparator<PercolatorBinnedSpectraResult>() {

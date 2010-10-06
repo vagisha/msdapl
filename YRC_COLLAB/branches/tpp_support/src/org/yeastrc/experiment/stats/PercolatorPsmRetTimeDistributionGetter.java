@@ -17,6 +17,7 @@ import org.yeastrc.ms.dao.analysis.percolator.PercolatorFilteredPsmResultDAO;
 import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorBinnedPsmResult;
 import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorFilteredPsmResult;
 import org.yeastrc.ms.service.percolator.stats.PercolatorFilteredPsmDistributionCalculator;
+import org.yeastrc.www.util.RoundingUtils;
 
 /**
  * 
@@ -36,14 +37,18 @@ public class PercolatorPsmRetTimeDistributionGetter {
 	
 	public PercolatorPsmRetTimeDistribution getDistribution() {
 		
-		// Look in the database first for pre-calculated results
-		PercolatorFilteredPsmResultDAO dao = DAOFactory.instance().getPrecolatorFilteredPsmResultDAO();
-		List<PercolatorFilteredPsmResult> filteredResults = dao.loadForAnalysis(analysisId);
+		List<PercolatorFilteredPsmResult> filteredResults = null;
+		if(scoreCutoff == 0.01) {
+			// Look in the database first for pre-calculated results
+			PercolatorFilteredPsmResultDAO dao = DAOFactory.instance().getPrecolatorFilteredPsmResultDAO();
+			filteredResults = dao.loadForAnalysis(analysisId);
+		}
 		
 		if(filteredResults == null || filteredResults.size() == 0) {
 			
 			// Results were not found in the database; calculate now
 			PercolatorFilteredPsmDistributionCalculator calc = new PercolatorFilteredPsmDistributionCalculator(analysisId, scoreCutoff);
+			calc.calculate();
 			filteredResults = calc.getFilteredResults();
 		}
 		
@@ -51,6 +56,12 @@ public class PercolatorPsmRetTimeDistributionGetter {
 			log.error("No results for searchAnalysisID: "+analysisId);
 			return null;
 		}
+		
+		PercolatorFilteredPsmResultDAO statsDao = DAOFactory.instance().getPrecolatorFilteredPsmResultDAO();
+		double populationMax = RoundingUtils.getInstance().roundOne(statsDao.getPopulationMax());
+		double populationMin = RoundingUtils.getInstance().roundOne(statsDao.getPopulationMin());
+		double populationMean = RoundingUtils.getInstance().roundOne(statsDao.getPopulationAvgFilteredPercent());
+		double populationStddev = RoundingUtils.getInstance().roundOne(statsDao.getPopulationStdDevFilteredPercent());
 		
 		int[] allPsmCounts = null;
 	    int[] filteredPsmCounts = null;
@@ -72,6 +83,13 @@ public class PercolatorPsmRetTimeDistributionGetter {
 			FileStats stats = new FileStats(res.getRunSearchAnalysisId(), filename);
 			stats.setGoodCount(res.getFiltered());
 			stats.setTotalCount(res.getTotal());
+			if(scoreCutoff == 0.01) {
+				stats.setPopulationMean(populationMean);
+				stats.setPopulationStandardDeviation(populationStddev);
+				stats.setPopulationMin(populationMin);
+				stats.setPopulationMax(populationMax);
+			}
+			
 			fileStats.add(stats);
 			
 			List<PercolatorBinnedPsmResult> binnedResults = res.getBinnedResults();

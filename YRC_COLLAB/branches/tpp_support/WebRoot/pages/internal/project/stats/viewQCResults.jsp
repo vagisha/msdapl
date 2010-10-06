@@ -7,116 +7,138 @@
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>
 
-<logic:empty name="filterForm">
-	<logic:forward name="viewQCPlots"/>
-</logic:empty>
 
 <%@ include file="/includes/header.jsp" %>
 
 <%@ include file="/includes/errors.jsp" %>
 
+<script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
+<script>
 
-<yrcwww:contentbox title="QC Results" centered="true" width="95" widthRel="true">
+// ---------------------------------------------------------------------------------------
+// AJAX DEFAULTS
+// ---------------------------------------------------------------------------------------
+$.ajaxSetup({
+	type: 'POST',
+	//timeout: 5000,
+	dataType: 'html',
+	error: function(xhr, textstatus, errorthrown) {
+			
+				var statusCode = xhr.status;
+  		// status code returned if user is not logged in
+  		// reloading this page will redirect to the login page
+  		if(statusCode == 303)
+				window.location.reload();
+			
+			// otherwise just display an alert
+			else {
+				alert("Request Failed: "+statusCode+"\n"+xhr.statusText+"\n"+textstatus+"\n"+errorthrown);
+			}
+	}
+});
+
+$.blockUI.defaults.message = '<b>Loading...</b>'; 
+$.blockUI.defaults.css.padding = 20;
+$.blockUI.defaults.fadeIn = 0;
+$.blockUI.defaults.fadeOut = 0;
+//$().ajaxStart($.blockUI).ajaxStop($.unblockUI);
+$().ajaxStop($.unblockUI);
+
+
+function updatePsmRetTimeResults() {
+
+	var qval = $("#psmrt_qval_input").val();
+	var analysisId = <bean:write name="analysisId"/>
+	$.blockUI();
+	$("#psmrtplot").load("<yrcwww:link path='viewPsmVsRetTimeResults.do'/>", 	//url
+						{'analysisId': analysisId, 		// data
+						 'qvalue': qval
+						 },
+						 function(responseText, status, xhr) {						// callback
+						 	$.unblockUI();
+							
+	 });
+}
+
+function updateSpectraRetTimeResults() {
+
+	var qval = $("#spectrart_qval_input").val();
+	var analysisId = <bean:write name="analysisId"/>
+	
+	$.blockUI();
+	$("#spectrartplot").load("<yrcwww:link path='viewSpectraVsRetTimeResults.do'/>", 	//url
+						{'analysisId': analysisId, 		// data
+						 'qvalue': qval
+						 },
+						 function(responseText, status, xhr) {						// callback
+						 	$.unblockUI();
+							
+	 });
+}
+
+function getPsmDeltaMassResults() {
+	
+	qval = 0.01;
+	var analysisId = <bean:write name="analysisId"/>
+	$.blockUI();
+	$("#deltaMassPlot").load("<yrcwww:link path='viewPsmDeltaMassResults.do'/>", 	//url
+						{'analysisId': analysisId, 		// data
+						 'qvalue': qval
+						 },
+						 function(responseText, status, xhr) {						// callback
+						 	$.unblockUI();
+						 	//$("#rt_psm_fold").click();
+						 	//$("#rt_spectra_fold").click();
+							
+	 });
+}
+
+function updatePsmDeltaMassResults() {
+
+	var qval = $("#psm_delta_mass_qval_input").val();
+	var analysisId = <bean:write name="analysisId"/>
+	$.blockUI();
+	$("#deltaMassPlot").load("<yrcwww:link path='viewPsmDeltaMassResults.do'/>", 	//url
+						{'analysisId': analysisId, 		// data
+						 'qvalue': qval
+						 },
+						 function(responseText, status, xhr) {						// callback
+						 	$.unblockUI();
+						 	//$("#rt_psm_fold").click();
+						 	//$("#rt_spectra_fold").click();
+							
+	 });
+}
+
+</script>
+<yrcwww:contentbox title="Statistics" centered="true" width="95" widthRel="true">
 <center>
 
 	<div style="padding:10 7 10 7; margin-bottom:5; border: 1px dashed gray;background-color: #F0F0F0;">
-	<html:form action="updateQCPlots">
-		<html:hidden property="experimentId"/>
-		<html:hidden property="analysisId"/>
-		qvalue: <html:text property="qvalue"/>
-		<html:submit>Update</html:submit>
-	</html:form>
+		<a href="#psm_vs_rt">Retention Time vs Peptide Spectrum Matches</a>
+		<br/><br/>
+		<a href="#spectra_vs_rt">Retention Time vs MS/MS Spectra</a>
+		<br/><br/>
+		<span class="underline clickable" onclick="getPsmDeltaMassResults();return false;">Delta precursor mass historgram</span>
+		<br/>
 	</div>
 	
+	
 	<!-- #PSM vs RT plot -->
-	<div style="padding:10 7 10 7; margin-bottom:5; border: 1px dashed gray;background-color: #F0F0F0;">
-		<logic:present name="psmRTDistributionChart">
-		<table>
-			<tr>
-			<td colspan="2" align="center" style="padding-bottom: 7px;">
-				<b>
-				Total PSMs: <bean:write name="totalPsmCount"/>
-				<br>
-				Filtered PSMs: <bean:write name="goodPsmCount"/> &nbsp; (<bean:write name="goodPsmPerc" />%)
-				</b>
-				<br>
-			</td>
-			</tr>
-			<tr>
-			<td valign="top" align=>
-				<img src="<bean:write name="psmRTDistributionChart"/>" align="top" alt="#PSM-RT Plot" style="padding-right:20px;"></img>
-			</td>
-			<td valign="top">
-				<table class="table_basic stripe_table" width="100%">
-				<thead>
-				<tr>
-				<th>File</th>
-				<th>Total</th>
-				<th>Filtered</th>
-				<th>% Filtered</th>
-				</tr>
-				</thead>
-				<tbody>
-				<logic:iterate name="psmRtFileStats" id="file">
-					<tr>
-						<td><bean:write name="file" property="fileName"/></td>
-						<td><bean:write name="file" property="totalCount"/></td>
-						<td><bean:write name="file" property="goodCount"/></td>
-						<td><bean:write name="file" property="percentGoodCount"/>%</td>
-					</tr>
-				</logic:iterate>
-				</tbody>
-				</table>
-			</td>
-			</tr>
-		</table>
-		</logic:present>
+	<a name="psm_vs_rt"></a>
+	<div id="psmrtplot">
+	<%@ include file="psmVsRetTimePlots.jsp" %>
 	</div>
 	
 	<!-- #Spectra vs RT plot -->
-	<div style="padding:10 7 10 7; margin-bottom:5; border: 1px dashed gray;background-color: #F0F0F0;">
-		<logic:present name="spectraRTDistributionChart">
-		<table>
-			<tr>
-			<td colspan="2" align="center" style="padding-bottom: 7px;">
-				<b>
-				Total MS/MS Spectra: <bean:write name="totalSpectraCount"/>
-				<br>
-				Filtered Spectra: <bean:write name="goodSpectraCount"/> &nbsp; (<bean:write name="goodSpectraPerc" />%)
-				</b>
-				<br>
-			</td>
-			</tr>
-			<tr>
-			<td valign="top" align=>
-				<img src="<bean:write name="spectraRTDistributionChart"/>" align="top" alt="#Spectra-RT Plot" style="padding-right:20px;"></img>
-			</td>
-			<td valign="top">
-				<table class="table_basic stripe_table" width="100%">
-				<thead>
-				<tr>
-				<th>File</th>
-				<th>Total</th>
-				<th>Filtered</th>
-				<th>% Filtered</th>
-				</tr>
-				</thead>
-				<tbody>
-				<logic:iterate name="spectraRtFileStats" id="file">
-					<tr>
-						<td><bean:write name="file" property="fileName"/></td>
-						<td><bean:write name="file" property="totalCount"/></td>
-						<td><bean:write name="file" property="goodCount"/></td>
-						<td><bean:write name="file" property="percentGoodCount"/>%</td>
-					</tr>
-				</logic:iterate>
-				</tbody>
-				</table>
-			</td>
-			</tr>
-		</table>
-		</logic:present>
+	<a name="spectra_vs_rt"></a>
+	<div id="spectrartplot">
+	<%@ include file="spectraVsRetTimePlots.jsp" %>
 	</div>
+	
+	<!-- PSM Delta mass histogram -->
+	<a name="psm_delta_mass"></a>
+	<div id="deltaMassPlot"></div>
 	
 </center>	
 </yrcwww:contentbox>

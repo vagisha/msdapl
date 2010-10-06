@@ -28,14 +28,13 @@ import org.yeastrc.experiment.stats.PercolatorSpectraRetTimeDistribution;
 import org.yeastrc.experiment.stats.PercolatorSpectraRetTimeDistributionGetter;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-import org.yeastrc.www.util.RoundingUtils;
 
 /**
  * 
  */
 public class ViewAnalysisStats extends Action {
 
-    private static final Logger log = Logger.getLogger(ViewAnalysisStats.class.getName());
+    private static final Logger log = Logger.getLogger(ViewAnalysisStats.class);
 
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
@@ -74,6 +73,8 @@ public class ViewAnalysisStats extends Action {
             saveErrors( request, errors );
             return mapping.findForward("Failure");
         }
+        request.setAttribute("analysisId", analysisId);
+        request.setAttribute("qvalue", 0.01);
         
         int experimentId = 0;
         try {
@@ -104,7 +105,7 @@ public class ViewAnalysisStats extends Action {
         myForm.setExperimentId(experimentId);
         myForm.setAnalysisId(analysisId);
         myForm.setQvalue(0.01);
-        request.setAttribute("filterForm", myForm);
+        //request.setAttribute("filterForm", myForm);
         
         
         DistributionPlotter plotter = new DistributionPlotter();
@@ -116,7 +117,7 @@ public class ViewAnalysisStats extends Action {
         // -----------------------------------------------------------------------------
         String psmDistrUrl = cache.getPsmRtPlotUrl(analysisId, myForm.getQvalue());
         List<FileStats> psmFileStats = cache.getPsmRtFileStats(analysisId, myForm.getQvalue());
-        int totalCount = 0; int goodCount = 0; double goodPerc = 0;
+        int totalCount = 0; int goodCount = 0;
         if(psmDistrUrl == null) {
         	PercolatorPsmRetTimeDistributionGetter distrGetter = new PercolatorPsmRetTimeDistributionGetter(analysisId, myForm.getQvalue());
         	PercolatorPsmRetTimeDistribution result = distrGetter.getDistribution();
@@ -134,12 +135,22 @@ public class ViewAnalysisStats extends Action {
         log.info("#PSM-RT Plot URL: "+psmDistrUrl);
         
         for(FileStats stat: psmFileStats) { totalCount += stat.getTotalCount(); goodCount += stat.getGoodCount();}
-        goodPerc = RoundingUtils.getInstance().roundOne(((double)goodCount/(double)totalCount) * 100.0);
         request.setAttribute("psmRTDistributionChart", psmDistrUrl);
         request.setAttribute("psmRtFileStats", psmFileStats);
-        request.setAttribute("totalPsmCount", totalCount);
-        request.setAttribute("goodPsmCount", goodCount);
-        request.setAttribute("goodPsmPerc", goodPerc);
+        
+        FileStats psmAnalysisStats = new FileStats(analysisId, "none");
+    	psmAnalysisStats.setTotalCount(totalCount);
+    	psmAnalysisStats.setGoodCount(goodCount);
+    	
+        if(psmFileStats.get(0).getHasPopulationStats()) {
+        	FileStats st = psmFileStats.get(0);
+        	psmAnalysisStats.setPopulationMin(st.getPopulationMin());
+        	psmAnalysisStats.setPopulationMax(st.getPopulationMax());
+        	psmAnalysisStats.setPopulationMean(st.getPopulationMean());
+        	psmAnalysisStats.setPopulationStandardDeviation(st.getPopulationStandardDeviation());
+        }
+        
+        request.setAttribute("psmAnalysisStats", psmAnalysisStats);
         
         
         // -----------------------------------------------------------------------------
@@ -147,7 +158,7 @@ public class ViewAnalysisStats extends Action {
         // -----------------------------------------------------------------------------
         String spectraDistrUrl = cache.getSpectraRtPlotUrl(analysisId, myForm.getQvalue());
         List<FileStats> spectraFileStats = cache.getSpectraRtFileStats(analysisId, myForm.getQvalue());
-        int totalSpectraCount = 0; int goodSpectraCount = 0; double goodSpectraPerc = 0;
+        int totalSpectraCount = 0; int goodSpectraCount = 0;
         if(spectraDistrUrl == null) {
         	PercolatorSpectraRetTimeDistributionGetter distrGetter = new PercolatorSpectraRetTimeDistributionGetter(analysisId, myForm.getQvalue());
         	PercolatorSpectraRetTimeDistribution result = distrGetter.getDistribution();
@@ -164,12 +175,22 @@ public class ViewAnalysisStats extends Action {
         
         log.info("#Spectra-RT Plot URL: "+spectraDistrUrl);
         for(FileStats stat: spectraFileStats) { totalSpectraCount += stat.getTotalCount(); goodSpectraCount += stat.getGoodCount();}
-        goodSpectraPerc = RoundingUtils.getInstance().roundOne(((double)goodSpectraCount/(double)totalSpectraCount) * 100.0);
         request.setAttribute("spectraRTDistributionChart", spectraDistrUrl);
         request.setAttribute("spectraRtFileStats", spectraFileStats);
-        request.setAttribute("totalSpectraCount", totalSpectraCount);
-        request.setAttribute("goodSpectraCount", goodSpectraCount);
-        request.setAttribute("goodSpectraPerc", goodSpectraPerc);
+        
+        FileStats spectraAnalysisStats = new FileStats(analysisId, "none");
+        spectraAnalysisStats.setTotalCount(totalSpectraCount);
+        spectraAnalysisStats.setGoodCount(goodSpectraCount);
+    	
+        if(spectraFileStats.get(0).getHasPopulationStats()) {
+        	FileStats st = spectraFileStats.get(0);
+        	spectraAnalysisStats.setPopulationMin(st.getPopulationMin());
+        	spectraAnalysisStats.setPopulationMax(st.getPopulationMax());
+        	spectraAnalysisStats.setPopulationMean(st.getPopulationMean());
+        	spectraAnalysisStats.setPopulationStandardDeviation(st.getPopulationStandardDeviation());
+        }
+        
+        request.setAttribute("spectraAnalysisStats", spectraAnalysisStats);
         
 //        request.setAttribute("spectraRTDistributionChart", "http://chart.apis.google.com/chart?cht=bvs&chbh=a&chs=500x325&chdl=MS/MS%20scans%20with%20good%20results%20(qvalue%3C=0.01)|All%20MS/MS%20Scans&chdlp=t&chg=10,10&chf=c,s,EFEFEF&chxt=x,y,x,y&chxl=2:|Retention%20Time|3:|Scans|&chxp=2,50|3,50&chxr=0,0,119.96055,11|1,0,1491,149&chds=0,1501,0,1501&chco=008000,800080&chd=t:87,26,27,47,24,28,90,232,381,398,407,360,475,503,577,532,537,533,546,447,504,513,477,497,477,422,501,440,426,406,468,443,496,502,437,470,449,448,427,461,446,443,429,444,463,421,373,327,156,7|669,427,672,699,487,402,451,774,1066,1045,1078,1115,1015,988,914,950,944,946,936,1024,965,939,979,959,979,1028,940,994,1009,1020,958,979,928,914,962,928,948,940,951,916,925,918,905,874,860,903,912,824,371,31");
         
