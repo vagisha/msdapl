@@ -19,7 +19,8 @@ public enum ComparisonCommand {
 	GO_SLIM(3, "GO Slim Analysis"),
 	GO_SLIM_TREE(5, "GO Slim Tree"),
 	GO_ENRICH(4, "GO Enrichment Analysis"),
-	GO_ENRICH_TREE(6, "Enriched Terms Tree");
+	GO_ENRICH_TREE(6, "Enriched Terms Tree")
+	;
 	
 	private ComparisonCommand(int id, String displayName) {
 		this.id = id;
@@ -47,8 +48,8 @@ public enum ComparisonCommand {
 		List<ComparisonCommand> commands = new ArrayList<ComparisonCommand>();
 		commands.add(FILTER);
 		commands.add(CLUSTER);
-		commands.add(GO_SLIM);
-		commands.add(GO_ENRICH);
+		//commands.add(GO_SLIM);
+		//commands.add(GO_ENRICH);
 		return commands;
 	}
 	
