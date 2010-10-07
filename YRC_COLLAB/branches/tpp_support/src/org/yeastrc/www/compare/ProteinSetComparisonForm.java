@@ -84,6 +84,7 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
 			showNumUniqIons = false;
 			showSpectrumCount = false;
 			showNsaf = false;
+			scaleRows = false;
 		}
 		request.setAttribute("comparisonFormReset", true);
     }

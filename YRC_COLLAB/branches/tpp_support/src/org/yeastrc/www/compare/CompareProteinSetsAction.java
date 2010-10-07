@@ -23,7 +23,6 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.bio.go.GONode;
 import org.yeastrc.www.compare.dataset.DatasetBuilder;
 import org.yeastrc.www.compare.dataset.DatasetSource;
-import org.yeastrc.www.compare.dataset.FilterableDataset;
 import org.yeastrc.www.compare.dataset.SelectableDataset;
 import org.yeastrc.www.go.GOSlimUtils;
 import org.yeastrc.www.user.User;
@@ -97,6 +96,7 @@ public class CompareProteinSetsAction extends Action {
         ProteinSetComparisonForm myForm = (ProteinSetComparisonForm)form;
         myForm.setGroupIndistinguishableProteins(groupProteins);
         myForm.setKeepProteinGroups(true);
+        myForm.setScaleRows(true);
        
         
         // ANY AND, OR, NOT, XOR filters

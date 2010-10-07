@@ -70,7 +70,7 @@
 	MSDaPl provides REST-based web services to submit upload requests without having to use the upload form in the web interface.
 	<br/>
 	 <br/>
-	In the examples below replace &lt;server_path&gt; with repoman.gs.washington.edu for MSDaPl deployed on repoman.  
+	In the examples below replace &lt;server&gt; with repoman.gs.washington.edu for MSDaPl deployed on repoman.  
 	Use flint.gs.washington.edu for the application deployed on flint.
 
 	<br/><br/>
@@ -85,7 +85,7 @@
 				<tbody>
 					<tr>
 						<td style="border:1px dotted; gray;">URL</td>
-						<td style="border:1px dotted; gray;">http://&lt;server_path&gt;/msdapl_queue/services/msjob/&lt;jobId&gt;</td>
+						<td style="border:1px dotted; gray;">http://&lt;server&gt;/msdapl_queue/services/msjob/&lt;jobId&gt;</td>
 					</tr>
 					<tr>
 						<td style="border:1px dotted; gray;">HTTP METHOD</td>
@@ -109,9 +109,9 @@
 			<b>Examples using cURL</b>
 			<br/>
 			<ul>
-				<li>TEXT OUTPUT: <span style="color:#D74D2D;">curl http://&lt;server_path&gt;/msdapl_queue/services/msjob/&lt;jobId&gt;</span></li>
-				<li>XML OUTPUT : <span style="color:#D74D2D;">curl -H "Accept:application/xml" http://&lt;server_path&gt;/msdapl_queue/services/msjob/&lt;jobId&gt;</span></li>
-	 			<li>JSON OUTPUT: <span style="color:#D74D2D;">curl -H "Accept:application/json" http://&lt;server_path&gt;/msdapl_queue/services/msjob/&lt;jobId&gt;</span></li>
+				<li>TEXT OUTPUT: <span style="color:#D74D2D;">curl http://&lt;server&gt;/msdapl_queue/services/msjob/&lt;jobId&gt;</span></li>
+				<li>XML OUTPUT : <span style="color:#D74D2D;">curl -H "Accept:application/xml" http://&lt;server&gt;/msdapl_queue/services/msjob/&lt;jobId&gt;</span></li>
+	 			<li>JSON OUTPUT: <span style="color:#D74D2D;">curl -H "Accept:application/json" http://&lt;server&gt;/msdapl_queue/services/msjob/&lt;jobId&gt;</span></li>
 			</ul>
 			
 		</li>
@@ -123,7 +123,7 @@
 				<tbody>
 					<tr>
 						<td style="border:1px dotted; gray;">URL</td>
-						<td style="border:1px dotted; gray;">http://&lt;server_path&gt;/msdapl_queue/services/msjob/status/&lt;jobId&gt;</td>
+						<td style="border:1px dotted; gray;">http://&lt;server&gt;/msdapl_queue/services/msjob/status/&lt;jobId&gt;</td>
 					</tr>
 					<tr>
 						<td style="border:1px dotted; gray;">HTTP METHOD</td>
@@ -142,7 +142,7 @@
 			<b>Example using cURL</b>
 			<br/>
 			<ul>
-				<li>TEXT OUTPUT: <span style="color:#D74D2D;">curl http://&lt;server_path&gt;/msdapl_queue/services/msjob/status/&lt;jobId&gt;</span></li>
+				<li>TEXT OUTPUT: <span style="color:#D74D2D;">curl http://&lt;server&gt;/msdapl_queue/services/msjob/status/&lt;jobId&gt;</span></li>
 			</ul>
 		</li>
 		
@@ -153,7 +153,7 @@
 				<tbody>
 					<tr>
 						<td style="border:1px dotted; gray;">URL</td>
-						<td style="border:1px dotted; gray;">http://&lt;server_path&gt;/msdapl_queue/services/msjob/delete/&lt;jobId&gt;</td>
+						<td style="border:1px dotted; gray;">http://&lt;server&gt;/msdapl_queue/services/msjob/delete/&lt;jobId&gt;</td>
 					</tr>
 					<tr>
 						<td style="border:1px dotted; gray;">HTTP METHOD</td>
@@ -172,7 +172,7 @@
 			<b>Example using cURL</b>
 			<br/>
 			<ul>
-				<li><span style="color:#D74D2D;">curl -u &lt;username&gt;:&lt;password&gt;  -X DELETE http://&lt;server_path&gt;/msdapl_queue/services/msjob/delete/&lt;jobId&gt;</span></li>
+				<li><span style="color:#D74D2D;">curl -u &lt;username&gt;:&lt;password&gt;  -X DELETE http://&lt;server&gt;/msdapl_queue/services/msjob/delete/&lt;jobId&gt;</span></li>
 			</ul>
 		</li>
 		
@@ -183,7 +183,7 @@
 				<tbody>
 					<tr>
 						<td style="border:1px dotted; gray;">URL</td>
-						<td style="border:1px dotted; gray;">http://&lt;server_path&gt;/msdapl_queue/services/msjob/add</td>
+						<td style="border:1px dotted; gray;">http://&lt;server&gt;/msdapl_queue/services/msjob/add</td>
 					</tr>
 					<tr>
 						<td style="border:1px dotted; gray;">HTTP METHOD</td>
@@ -206,7 +206,7 @@
 			<b>Example using cURL</b>
 			<br/>
 			<ul>
-				<li>JSON INPUT: <span style="color:#D74D2D;">curl -u &lt;username&gt;:&lt;password&gt; -X POST  -H 'Content-Type: application/json' -d '{"projectId":"24", "dataDirectory":"/test/data", "pipeline":"MACCOSS", "date":"2010-03-29", "comments":"upload test"}' http://&lt;server_path&gt;/msdapl_queue/services/msjob/add</span></li>
+				<li>JSON INPUT: <span style="color:#D74D2D;">curl -u &lt;username&gt;:&lt;password&gt; -X POST  -H 'Content-Type: application/json' -d '{"projectId":"24", "dataDirectory":"/test/data", "pipeline":"MACCOSS", "date":"2010-03-29", "comments":"upload test"}' http://&lt;server&gt;/msdapl_queue/services/msjob/add</span></li>
 			</ul>
 		
 		</li>
@@ -217,7 +217,7 @@
 				<tbody>
 					<tr>
 						<td style="border:1px dotted; gray;">URL</td>
-						<td style="border:1px dotted; gray;">http://&lt;server_path&gt;/msdapl_queue/services/msjob/add</td>
+						<td style="border:1px dotted; gray;">http://&lt;server&gt;/msdapl_queue/services/msjob/add</td>
 					</tr>
 					<tr>
 						<td style="border:1px dotted; gray;">HTTP METHOD</td>
@@ -253,7 +253,7 @@
 			<b>Example using cURL</b>
 			<br/>
 			<ul>
-				<li><span style="color:#D74D2D;">curl -u &lt;username&gt;:&lt;password&gt;  -X POST "http://&lt;server_path&gt;/msdapl_queue/services/msjob/add?projectId=24&amp;dataDirectory=/data/test&amp;pipeline=MACCOSS&amp;date=09/24/10&amp;instrument=LTQ&amp;taxId=9606&amp;comments=some%20comments"</span></li>
+				<li><span style="color:#D74D2D;">curl -u &lt;username&gt;:&lt;password&gt;  -X POST "http://&lt;server&gt;/msdapl_queue/services/msjob/add?projectId=24&amp;dataDirectory=/data/test&amp;pipeline=MACCOSS&amp;date=09/24/10&amp;instrument=LTQ&amp;taxId=9606&amp;comments=some%20comments"</span></li>
 			</ul>
 		
 		</li>

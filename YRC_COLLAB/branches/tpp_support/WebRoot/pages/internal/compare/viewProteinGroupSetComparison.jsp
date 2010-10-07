@@ -285,6 +285,18 @@ Total Protein Groups (Total Proteins): <bean:write name="comparison" property="t
 </tbody>
 </table>
 
+<center>
+<div class="small_font" style="margin-top:5px; width:80%;" align="left">
+<b>NOTE:</b> The number of proteins and protein groups reported in the table above are the result of the comparison analysis.  
+Specifically, the number of protein groups for a dataset is the number of groups in the comparison analysis that contain 
+one or more proteins from that dataset.
+These numbers may be more than the number of proteins in the protein inference views of the individual datasets. 
+More information can be found in the documentation. 
+<a href="" onclick="openInformationPopup('<yrcwww:link path='pages/internal/docs/comparison.jsp#comparison_FAQ'/>'); return false;">
+   					<img src="<yrcwww:link path='images/info_16.png'/>" align="bottom" border="0"/></a>
+</div>
+</center>
+
 <logic:present name="dtasWarning">
 <p style="color:red; font-weight: bold;" align="center">
 WARNING:  Comparison with DTASelect results is not yet fully supported. 

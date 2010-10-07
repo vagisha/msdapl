@@ -269,9 +269,19 @@ function showActionOptions() {
 	<tr>
 		<td valign="top" style="padding-bottom: 10px;">Include Proteins:</td>
 		<td valign="top" colspan="3" style="padding-bottom: 10px;">
-			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="0"><b>All</b></html:radio>
-			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="1"><b>Parsimonious in >= 1 Dataset</b></html:radio>
-			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="2"><b>Parsimonious in ALL Datasets</b></html:radio>
+			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="0">
+				<span class="tooltip" title="All proteins from each dataset are included in the analysis"><b>All</b></span>
+			</html:radio>
+			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="1">
+			<span class="tooltip" title="Proteins not parsimonious in a dataset but parsimonious in at least one other dataset are included, in addition to all parsimonious proteins in the dataset.">
+				<b>Parsimonious in &gt;= 1 Dataset</b>
+			</span>
+			</html:radio>
+			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="2">
+			<span class="tooltip" title="Only parsimonious proteins from each dataset are included in the analysis">
+			<b>Parsimonious ONLY</b>
+			</span>
+			</html:radio>
 			<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
 			<br>
 			<span style="font-size:8pt;">
