@@ -466,12 +466,15 @@ function showActionOptions() {
 	</html:select>
 	&nbsp;
 	
-	<html:checkbox name="proteinSetComparisonForm" property="scaleRows"><nobr>Scale Rows</nobr></html:checkbox>
+	<html:checkbox name="proteinSetComparisonForm" property="scaleRows"><nobr>
+	<span class="tooltip" title="If checked the spectrum count values for each protein(row) are standardized so that the mean is 0 and standard deviation is 1.">Standardize Rows</span>
+	</nobr></html:checkbox>
 	&nbsp;
 	
-	<html:checkbox name="proteinSetComparisonForm" property="clusterColumns"><nobr>Cluster Columns</nobr></html:checkbox>
+	<html:checkbox name="proteinSetComparisonForm" property="clusterColumns"><nobr>Cluster Samples</nobr></html:checkbox>
 	&nbsp;
 	
+	<!-- 
 	<html:checkbox name="proteinSetComparisonForm" property="useLogScale">Log Scale</html:checkbox>
 	&nbsp;
 	
@@ -487,6 +490,7 @@ function showActionOptions() {
 	<html:text name="proteinSetComparisonForm" property="replaceMissingWithValue" size="3"></html:text>
 	&nbsp; 
 	</yrcwww:member>
+	-->
 	<br/>
 	<span class="small_font"><b>Note: </b>Normalized spectrum counts are used</span>
 	</div> <!-- END OF CLUSTERING OPTIONS -->	
