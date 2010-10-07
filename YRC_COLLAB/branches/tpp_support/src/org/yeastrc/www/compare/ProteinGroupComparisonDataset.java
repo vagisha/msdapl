@@ -635,10 +635,23 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         				cell.setData(dpi.getSpectrumCount()+"("+dpi.getNormalizedSpectrumCountRounded()+")");
         				cell.setTextColor("#FFFFFF");
         				float scaledCount = getScaledSpectrumCount(dpi.getNormalizedSpectrumCount());
-        				if(this.spectrumCountColors == null)
-        					cell.setBackgroundColor(getScaledColor(scaledCount));
-        				else
-        					cell.setBackgroundColor(getHeatMapColor(dpi.getHeatMapSpectrumCount()));
+        				
+        				String bgColor = null;
+        				if(this.spectrumCountColors == null) {
+        					bgColor = getScaledColor(scaledCount);
+        					cell.setBackgroundColor(bgColor);
+        				}
+        				else {
+        					bgColor = getHeatMapColor(dpi.getHeatMapSpectrumCount());
+        					cell.setBackgroundColor(bgColor);
+        					if((bgColor.charAt(1) == 'F' || bgColor.charAt(1) == 'E') &&
+        						(bgColor.charAt(3) == 'F' || bgColor.charAt(3) == 'E')) {
+        						cell.setTextColor("#000000");
+        					}
+        				}
+        				if(bgColor != null) {
+        					
+        				}
         				cell.setRowSpan(groupMemberCount.get(currentGroupId));
         				row.addCell(cell);
         			}
