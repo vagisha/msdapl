@@ -6,12 +6,13 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
   <head>
     <title>SpectrumViewer</title>
 	<link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='css/global.css'/>">
 	<link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='css/lorikeet.css'/>">
+	
   </head>
   
   <body>
@@ -107,13 +108,14 @@ $(document).ready(function() {
 <!--==================================================================== -->
 <logic:present name="jsonParams">
 
+<!--[if IE]><script language="javascript" type="text/javascript" src="<yrcwww:link path='js/excanvas.min.js'/>"></script><![endif]-->
 <script src="<yrcwww:link path='js/jquery.flot.js'/>"></script>
 <script src="<yrcwww:link path='js/jquery.flot.selection.js'/>"></script>
 
 <script src="<yrcwww:link path='js/specview.js'/>"></script>
-<script src="<yrcwww:link path='js/ion.js'/>"></script>
 <script src="<yrcwww:link path='js/peptide.js'/>"></script>
 <script src="<yrcwww:link path='js/aminoacid.js'/>"></script>
+<script src="<yrcwww:link path='js/ion.js'/>"></script>
 
 <script type="text/javascript">
 $(document).ready(function () {
