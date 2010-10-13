@@ -429,6 +429,7 @@ public class PercolatorXmlDataUploadService implements
 				peptRes.setDiscriminantScore(peptide.getDiscriminantScore());
 				Set<Integer> psmIds = new HashSet<Integer>(peptide.getPsmIds().size());
 				
+				
 				for(PercolatorXmlPsmId psmId: peptide.getPsmIds()) {
 					// get a PercolatorResult ID for this psm;
 					String sourceFileName = psmId.getFileName();
@@ -446,7 +447,7 @@ public class PercolatorXmlDataUploadService implements
 					try {
 						// We may have multiple matching results for the same scan, charge and peptide sequence
 						// due to Bullseye.  Add them all
-						runSearchResultIds = this.getMatchingSearchResultId(runSearchId, psmId.getScanNumber(), 
+						runSearchResultIds = this.getMatchingSearchResultIds(runSearchId, psmId.getScanNumber(), 
 								psmId.getCharge(),peptide.getResultPeptide());
 					}
 					catch(UploadException e) {
@@ -535,21 +536,13 @@ public class PercolatorXmlDataUploadService implements
         		   // a scan searched with same charge but different M+H (due to Bullseye) results in same peptide match
         		
         		// Get the match with the smallest mass difference
-        		double bestDiff = Double.MAX_VALUE;
         		MsSearchResult bestRes = null;
         		for(MsSearchResult res: matchingResults) {
-        			double diff = Math.abs(observedMass - res.getObservedMass().doubleValue());
-        			if(diff < bestDiff) {
-        				bestDiff = diff;
+        			if(res.getObservedMass().doubleValue() == observedMass) {
         				bestRes = res;
         			}
         		}
         		
-        		if(bestDiff > 0.05) {
-        			log.warn("Mass difference of best match is > 0.05. It is: "+bestDiff);
-        			bestRes = null;
-        		}
-
         		// If we still don't have a definite match
         		if(bestRes == null) {
         			UploadException ex = new UploadException(ERROR_CODE.MULTI_MATCHING_SEARCH_RESULT);
@@ -572,7 +565,7 @@ public class PercolatorXmlDataUploadService implements
     }
     
     
-    private List<Integer> getMatchingSearchResultId(int runSearchId, int scanNumber, int charge, 
+    private List<Integer> getMatchingSearchResultIds(int runSearchId, int scanNumber, int charge, 
     		MsSearchResultPeptide peptide) 
     	throws UploadException {
         
@@ -604,9 +597,8 @@ public class PercolatorXmlDataUploadService implements
                 //log.warn(ex.getErrorMessage());
             }
             
-            else if(matchingResults.size() == 1) 
-            	for(MsSearchResult mRes: matchingResults)
-            		matchingResultIds.add(mRes.getId());
+            for(MsSearchResult mRes: matchingResults)
+            	matchingResultIds.add(mRes.getId());
         	
         	return matchingResultIds;
         	

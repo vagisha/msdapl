@@ -113,5 +113,23 @@
 		AND pres.runSearchAnalysisID=#runSearchAnalysisId#
 		AND pept.id=#petideResultId#
     </select>
+    
+    <select id="selectFilteredPercResIdsForPeptideAndRunSearchAnalysis" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT peptPsm.psmResultID 
+    	FROM PercolatorPeptideResult AS pept, PercolatorPeptidePsm AS peptPsm, PercolatorResult AS pres
+		WHERE pept.id = peptPsm.peptideResultID
+		AND peptPsm.psmResultID = pres.id
+		AND pres.runSearchAnalysisID=#runSearchAnalysisId#
+		AND pept.id=#petideResultId#
+		<isNotNull property="qvalue">
+			AND pres.qvalue &lt;= #qvalue#		
+		</isNotNull>
+		<isNotNull property="pep">
+			AND pres.pep &lt;= #pep#		
+		</isNotNull>
+		<isNotNull property="discriminantScore">
+			AND pres.discriminantScore &lt;= #discriminantScore#		
+		</isNotNull>
+    </select>
 	
 </sqlMap>

@@ -472,15 +472,15 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 						}
 					}
 				}
-				
-				for(String psmid: uniqPsmIds) {
-					try {
-						result.addMatchingPsmId(psmid);
-					}
-					catch(IllegalArgumentException e) {
-						throw new DataProviderException("Could not parse psm_id attribute: "+psmid+" for peptide: "+
-								result.getResultPeptide().getPeptideSequence());
-					}
+			}
+			
+			for(String psmid: uniqPsmIds) {
+				try {
+					result.addMatchingPsmId(psmid);
+				}
+				catch(IllegalArgumentException e) {
+					throw new DataProviderException("Could not parse psm_id attribute: "+psmid+" for peptide: "+
+							result.getResultPeptide().getPeptideSequence());
 				}
 			}
 		}

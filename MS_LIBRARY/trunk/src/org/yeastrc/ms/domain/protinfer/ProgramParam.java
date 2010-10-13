@@ -175,19 +175,6 @@ public final class ProgramParam {
               "true", null,
               "If checked, spectra with > 1 peptide matches, that pass through the filter criteria, will be removed from analysis.");
         }
-        
-        public static ProgramParam makeUsePercolatorPeptideScores() {
-            return new ProgramParam(TYPE.BOOLEAN, 
-              "usePeptideScores", "Percolator Peptide Scores", 
-              "true", null,
-              "If checked, Percolator's peptide-level scores will be used for filtering peptide spectrum matches.");
-        }
-        
-//        new ProgramParam(TYPE.BOOLEAN, 
-//            "parsimonyAnalysis", "Parsimony Analysis", 
-//            "true", null,
-//            "This parameter controls whether the final protein list is filtered by the minimum covering set, i.e. the minimum set of proteins that is necessary to describe all identified peptides")
-
     }
     
     public static abstract class ParamValidator {

@@ -19,6 +19,7 @@ public class ProteinInferenceProgram {
     public static final ProteinInferenceProgram PROTINFER_SEQ = new PISequestProgram();
     public static final ProteinInferenceProgram PROTINFER_PLCID = new PIProlucidProgram();
     public static final ProteinInferenceProgram PROTINFER_PERC = new PIPercolatorProgram();
+    public static final ProteinInferenceProgram PROTINFER_PERC_PEPT = new PIPercolatorPeptProgram();
     public static final ProteinInferenceProgram PROTINFER_PERC_OLD = new PIPercolatorProgramOld();
     public static final ProteinInferenceProgram PROTEIN_PROPHET = new ProteinProphetProgram();
     public static final ProteinInferenceProgram DTA_SELECT = new DtaSelectProgram();
@@ -62,6 +63,7 @@ public class ProteinInferenceProgram {
     
     public static boolean isSupported(ProteinInferenceProgram program) {
         return (program == PROTINFER_PERC ||
+        		program == PROTINFER_PERC_PEPT ||
                 program == PROTINFER_PERC_OLD ||
                 program == PROTINFER_SEQ || 
                 program == PROTINFER_PLCID);
@@ -78,6 +80,8 @@ public class ProteinInferenceProgram {
             return PROTINFER_PLCID;
         else if ("PROTINFER_PERC".equalsIgnoreCase(name))
             return PROTINFER_PERC;
+        else if("PROTINFER_PERC_PEPT".equals(name))
+        	return PROTINFER_PERC_PEPT;
         else if ("PROTINFER_PERC_OLD".equalsIgnoreCase(name))
             return PROTINFER_PERC_OLD;
         else if("ProteinProphet".equalsIgnoreCase(name))
@@ -161,11 +165,62 @@ public class ProteinInferenceProgram {
                     "1.0", null,
                     "Posterior Error Probability threshold for filtering search hits");
                 pepParam.setValidator(validator);
+                
             
             this.setProgramParams(new ProgramParam[]{
                     qvalParam,
                     pepParam,
-                    ParamMaker.makeUsePercolatorPeptideScores(),
+//                    ParamMaker.makeUsePercolatorPeptideScores(),
+                    ParamMaker.makeMinPeptParam(),
+                    ParamMaker.makeMinUniqPeptParam(),
+                    ParamMaker.makePeptideDefParam(),
+                    ParamMaker.makeMinCoverageParam(),
+                    ParamMaker.makeMinPeptLengthParam(),
+                    ParamMaker.makeRemoveAmbigSpectraParam()
+            });
+        }
+    }
+    
+    
+    static class PIPercolatorPeptProgram extends ProteinInferenceProgram {
+        private PIPercolatorPeptProgram() {
+            super("PROTINFER_PERC_PEPT", "ProtInfer", protInferVersion);
+            this.setDescription("This protein inference program is based on the IDPicker program developed in David Tabb's lab.");
+            
+            DoubleValidator validator = new DoubleValidator();
+            validator.setMinVal(0.0);
+            validator.setMaxVal(1.0);
+            
+            ProgramParam qvalParam = new ProgramParam(TYPE.DOUBLE, 
+                    "qval_percolator", "Max. q-value (PSM)", 
+                    "1.0", null,
+                    "PSM-level Qvalue cutoff");
+            qvalParam.setValidator(validator);
+            
+            ProgramParam peptideQvalParam = new ProgramParam(TYPE.DOUBLE, 
+                    "peptide_qval_percolator", "Max. q-value (Peptide)", 
+                    "0.01", null,
+                    "Peptide-level Qvalue cutoff");
+            peptideQvalParam.setValidator(validator);
+            
+            ProgramParam pepParam = new ProgramParam(TYPE.DOUBLE, 
+                    "pep_percolator", "Max. PEP (PSM)", 
+                    "1.0", null,
+                    "PSM-level Posterior Error Probability cutoff");
+                pepParam.setValidator(validator);
+                
+            ProgramParam peptidePepParam = new ProgramParam(TYPE.DOUBLE, 
+            		"peptide_pep_percolator", "Max. PEP (Peptide)", 
+            		"1.0", null,
+            		"Peptide-level Posterior Error Probability cutoff");
+            		peptidePepParam.setValidator(validator);
+            
+            this.setProgramParams(new ProgramParam[]{
+            		peptideQvalParam,
+            		peptidePepParam,
+                    qvalParam,
+                    pepParam,
+//                    ParamMaker.makeUsePercolatorPeptideScores(),
                     ParamMaker.makeMinPeptParam(),
                     ParamMaker.makeMinUniqPeptParam(),
                     ParamMaker.makePeptideDefParam(),

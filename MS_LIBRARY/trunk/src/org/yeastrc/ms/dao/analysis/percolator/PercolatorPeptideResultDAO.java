@@ -26,6 +26,10 @@ public interface PercolatorPeptideResultDAO {
     public abstract List<PercolatorResult> loadPercolatorPsms(int runSearchAnalysisId, 
             Double qvalue, Double pep, Double discriminantScore);
     
+    public abstract List<PercolatorResult> loadPercolatorPsms(int runSearchAnalysisId, 
+            Double peptideQvalue, Double peptidePep, Double peptideDiscriminantScore,
+            Double psmQvalue, Double psmPep, Double psmDiscriminantScore);
+    
     public abstract void saveAllPercolatorPeptideResults(List<PercolatorPeptideResult> peptideResultList);
     
     public abstract int peptideCountForAnalysis(int searchAnalysisId);
