@@ -15,15 +15,23 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerParam;
  */
 public class PercolatorParams {
     
-    private double qvalue;
-    private boolean hasQvalueCutoff = false;
-    private double pep;
-    private boolean hasPepCutoff = false;
-    private double discriminantScore;
-    private boolean hasDiscriminantScoreCutoff = false;
-    private IDPickerParams idpParams = null;
+    private double psmQvalue;
+    private double peptideQvalue;
+    private boolean hasPsmQvalueCutoff = false;
+    private boolean hasPeptideQvalueCutoff = false;
     
-    private boolean usePeptideLevelScores = false;
+    private double psmPep;
+    private double peptidePep;
+    private boolean hasPsmPepCutoff = false;
+    private boolean hasPeptidePepCutoff = false;
+    
+    private double psmDiscriminantScore;
+    private double peptideDiscriminantScore;
+    private boolean hasPsmDiscriminantScoreCutoff = false;
+    private boolean hasPeptideDiscriminantScoreCutoff = false;
+    
+    
+    private IDPickerParams idpParams = null;
     
     public PercolatorParams(IDPickerParams params) {
         
@@ -31,52 +39,91 @@ public class PercolatorParams {
         List<IdPickerParam> moreFilters = params.getMoreFilters();
         for(IdPickerParam filter: moreFilters) {
             if(filter.getName().equalsIgnoreCase("qval_percolator")) {
-                qvalue = Double.parseDouble(filter.getValue());
-                hasQvalueCutoff = true;
+                psmQvalue = Double.parseDouble(filter.getValue());
+                hasPsmQvalueCutoff = true;
+            }
+            if(filter.getName().equalsIgnoreCase("peptide_qval_percolator")) {
+                peptideQvalue = Double.parseDouble(filter.getValue());
+                if(peptideQvalue < 1.0)
+                	hasPeptideQvalueCutoff = true;
             }
             else if(filter.getName().equalsIgnoreCase("pep_percolator")) {
-                pep = Double.parseDouble(filter.getValue());
-                hasPepCutoff = true;
+                psmPep = Double.parseDouble(filter.getValue());
+                hasPsmPepCutoff = true;
+            }
+            else if(filter.getName().equalsIgnoreCase("peptide_pep_percolator")) {
+                peptidePep = Double.parseDouble(filter.getValue());
+                if(peptidePep < 1.0)
+                	hasPeptidePepCutoff = true;
             }
             else if(filter.getName().equalsIgnoreCase("discriminantScore_percolator")) {
-                discriminantScore = Double.parseDouble(filter.getValue());
-                hasDiscriminantScoreCutoff = true;
+                psmDiscriminantScore = Double.parseDouble(filter.getValue());
+                hasPsmDiscriminantScoreCutoff = true;
             }
-            else if(filter.getName().equalsIgnoreCase("usePeptideScores")) {
-            	usePeptideLevelScores = Boolean.parseBoolean(filter.getValue());
+            else if(filter.getName().equalsIgnoreCase("peptide_discriminantScore_percolator")) {
+                peptideDiscriminantScore = Double.parseDouble(filter.getValue());
+                hasPeptideDiscriminantScoreCutoff = true;
             }
         }
     }
     
-    public double getQvalueCutoff() {
-        return qvalue;
+    public double getPsmQvalueCutoff() {
+        return psmQvalue;
     }
     
-    public double getPEPCutoff() {
-        return pep;
+    public double getPeptideQvalueCutoff() {
+    	return peptideQvalue;
     }
     
-    public double getDiscriminantScoreCutoff() {
-        return discriminantScore;
+    public double getPsmPEPCutoff() {
+        return psmPep;
+    }
+    
+    public double getPeptidePEPCutoff() {
+        return peptidePep;
+    }
+    
+    public double getPsmDiscriminantScoreCutoff() {
+        return psmDiscriminantScore;
+    }
+    
+    public double getPeptideDiscriminantScoreCutoff() {
+        return peptideDiscriminantScore;
     }
     
     public IDPickerParams getIdPickerParams() {
         return idpParams;
     }
 
-    public boolean hasQvalueCutoff() {
-        return hasQvalueCutoff;
+    public boolean hasPsmQvalueCutoff() {
+        return hasPsmQvalueCutoff;
+    }
+    
+    public boolean hasPeptideQvalueCutoff() {
+        return hasPeptideQvalueCutoff;
     }
 
-    public boolean hasPepCutoff() {
-        return hasPepCutoff;
+    public boolean hasPsmPepCutoff() {
+        return hasPsmPepCutoff;
+    }
+    
+    public boolean hasPeptidePepCutoff() {
+        return hasPeptidePepCutoff;
     }
 
-    public boolean hasDiscriminantScoreCutoff() {
-        return hasDiscriminantScoreCutoff;
+    public boolean hasPsmDiscriminantScoreCutoff() {
+        return hasPsmDiscriminantScoreCutoff;
+    }
+    
+    public boolean hasPeptideDiscriminantScoreCutoff() {
+        return hasPeptideDiscriminantScoreCutoff;
     }
 
 	public boolean isUsePeptideLevelScores() {
-		return usePeptideLevelScores;
+		return this.hasPeptideQvalueCutoff || hasPeptidePepCutoff || hasPeptideDiscriminantScoreCutoff;
+	}
+	
+	public boolean isUsePsmLevelScores() {
+		return this.hasPsmQvalueCutoff || hasPsmPepCutoff || hasPsmDiscriminantScoreCutoff;
 	}
 }

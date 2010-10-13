@@ -198,7 +198,7 @@ public class IdPickerResultSaver {
             PercolatorResultsRanker ranker = PercolatorResultsRanker.instance();
             PercolatorParams percParams = new PercolatorParams(params);
             Map<Integer, Integer> resultRankMap = ranker.rankResultsByPeptide(percResults, 
-                    percParams.hasQvalueCutoff(), percParams.hasPepCutoff(), percParams.hasDiscriminantScoreCutoff());
+                    percParams.hasPsmQvalueCutoff(), percParams.hasPsmPepCutoff(), percParams.hasPsmDiscriminantScoreCutoff());
             
             
             // set the new rank and update the results

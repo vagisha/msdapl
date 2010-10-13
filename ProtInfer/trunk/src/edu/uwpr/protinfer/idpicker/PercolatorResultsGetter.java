@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorPeptideResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
-import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorPeptideResultDAOImpl;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
@@ -198,11 +197,17 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         
         List<PercolatorResult> allResults = new ArrayList<PercolatorResult>();
         
-        Double qvalCutoff = percParams.hasQvalueCutoff() ? percParams.getQvalueCutoff() : null;
-        Double pepCutoff = percParams.hasPepCutoff() ? percParams.getPEPCutoff() : null;
-        Double dsCutoff = percParams.hasDiscriminantScoreCutoff() ? percParams.getDiscriminantScoreCutoff() : null;
+        Double psmQvalCutoff = percParams.hasPsmQvalueCutoff() ? percParams.getPsmQvalueCutoff() : null;
+        Double peptideQvalCutoff = percParams.hasPeptideQvalueCutoff() ? percParams.getPeptideQvalueCutoff() : null;
+        Double psmPepCutoff = percParams.hasPsmPepCutoff() ? percParams.getPsmPEPCutoff() : null;
+        Double peptidePepCutoff = percParams.hasPeptidePepCutoff() ? percParams.getPeptidePEPCutoff() : null;
+        Double psmDsCutoff = percParams.hasPsmDiscriminantScoreCutoff() ? percParams.getPsmDiscriminantScoreCutoff() : null;
+        Double peptideDsCutoff = percParams.hasPeptideDiscriminantScoreCutoff() ? percParams.getPeptideDiscriminantScoreCutoff() : null;
         
-        log.info("Thresholds -- qvalue: "+qvalCutoff+"; pep: "+pepCutoff+" ds: "+dsCutoff);
+        if(percParams.isUsePeptideLevelScores()) {
+            log.info("Thresholds -- PEPTIDE qvalue: "+peptideQvalCutoff+"; pep: "+peptidePepCutoff+" ds: "+peptideDsCutoff);
+        }
+        log.info("Thresholds -- PSM qvalue: "+psmQvalCutoff+"; pep: "+psmPepCutoff+" ds: "+psmDsCutoff);
         
         // first get all the results; remove all hits to small peptides; results will be filtered by relevant scores.
         for(IdPickerInput input: inputList) {
@@ -217,15 +222,20 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
             if(!percParams.isUsePeptideLevelScores()) {
             	log.info("Filtering on PSM scores");
             	resultList = resultDao.loadTopPercolatorResultsN(inputId, 
-                                            qvalCutoff, 
-                                            pepCutoff, 
-                                            dsCutoff,
+                                            psmQvalCutoff, 
+                                            psmPepCutoff, 
+                                            psmDsCutoff,
                                             true); // get the dynamic residue mods
             }
             else {
             	log.info("Filtering on peptide scores");
             	PercolatorPeptideResultDAO peptResDao = DAOFactory.instance().getPercolatorPeptideResultDAO();
-            	resultList = peptResDao.loadPercolatorPsms(inputId, qvalCutoff, pepCutoff, dsCutoff);
+            	if(percParams.isUsePsmLevelScores())
+            		resultList = peptResDao.loadPercolatorPsms(inputId, 
+            				peptideQvalCutoff, peptidePepCutoff, peptideDsCutoff, 
+            				psmQvalCutoff, psmPepCutoff, psmDsCutoff);
+            	else
+            		resultList = peptResDao.loadPercolatorPsms(inputId, peptideQvalCutoff, peptidePepCutoff, peptideDsCutoff);
             }
             
             log.info("\tTotal hits that pass score thresholds for runSearchAnalysisID "+inputId+": "+resultList.size());
@@ -280,11 +290,11 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
      * @param percParams
      * @return
      */
-    private Map<Integer, Integer> rankResults(List<PercolatorResult> resultList, PercolatorParams percParams) {
+	private Map<Integer, Integer> rankResults(List<PercolatorResult> resultList, PercolatorParams percParams) {
         
         PercolatorResultsRanker resultRanker = PercolatorResultsRanker.instance();
-        return resultRanker.rankResultsByPeptide(resultList, percParams.hasQvalueCutoff(),
-                percParams.hasPepCutoff(), percParams.hasDiscriminantScoreCutoff());
+        return resultRanker.rankResultsByPeptide(resultList, percParams.hasPsmQvalueCutoff(),
+                percParams.hasPsmPepCutoff(), percParams.hasPsmDiscriminantScoreCutoff());
     }
     
 }
