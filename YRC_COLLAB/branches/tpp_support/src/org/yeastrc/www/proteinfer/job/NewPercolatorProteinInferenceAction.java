@@ -19,9 +19,7 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorPeptideResultDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
-import org.yeastrc.ms.domain.protinfer.ProgramParam;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
-import org.yeastrc.ms.domain.protinfer.ProgramParam.ParamMaker;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.project.Project;
@@ -161,10 +159,11 @@ public class NewPercolatorProteinInferenceAction extends Action {
         String version = analysis.getAnalysisProgramVersion();
         ProgramParameters progParams = new ProgramParameters(ProteinInferenceProgram.PROTINFER_PERC);
         
-        // If we don't have peptide-level scores we will not display the "use peptide scores" option.
-        if(!havePeptideScores) {
-        	ProgramParam usePeptScores = ParamMaker.makeUsePercolatorPeptideScores();
-        	progParams.removeParam(usePeptScores.getName());
+        // If we don't have peptide-level scores we will not display the peptide related scores options.
+        if(havePeptideScores) {
+        	progParams = new ProgramParameters(ProteinInferenceProgram.PROTINFER_PERC_PEPT);
+//        	progParams.removeParam("peptide_qval_percolator");
+//        	progParams.removeParam("peptide_pep_percolator");
         }
         
         try {

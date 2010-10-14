@@ -617,6 +617,7 @@ public class IdPickerResultsLoader {
             }
         }
         else if (pinferProgram == ProteinInferenceProgram.PROTINFER_PERC ||
+        		 pinferProgram == ProteinInferenceProgram.PROTINFER_PERC_PEPT ||
                 pinferProgram == ProteinInferenceProgram.PROTINFER_PERC_OLD) {
             List<IdPickerPeptideBase> peptides = idpPeptBaseDao.loadPeptidesForProteinferProtein(proteinId);
             for(IdPickerPeptideBase peptide: peptides) {
@@ -707,6 +708,7 @@ public class IdPickerResultsLoader {
             }
         }
         else if (pinferProgram == ProteinInferenceProgram.PROTINFER_PERC ||
+        		 pinferProgram == ProteinInferenceProgram.PROTINFER_PERC_PEPT || 
                  pinferProgram == ProteinInferenceProgram.PROTINFER_PERC_OLD) {
             List<IdPickerPeptideBase> peptides = idpPeptBaseDao.loadPeptidesForProteinferProtein(proteinId);
             for(IdPickerPeptideBase peptide: peptides) {
@@ -784,6 +786,7 @@ public class IdPickerResultsLoader {
             psmList = idpPsmDao.loadSpectrumMatchesForIon(pinferIonId);
         }
         else if (pinferProgram == ProteinInferenceProgram.PROTINFER_PERC ||
+        		 pinferProgram == ProteinInferenceProgram.PROTINFER_PERC_PEPT || 
                  pinferProgram == ProteinInferenceProgram.PROTINFER_PERC_OLD) {
             psmList = psmDao.loadSpectrumMatchesForIon(pinferIonId);
         }

@@ -25,12 +25,12 @@ public class GOSlimChartUrlCreator {
 		String legend= "";
 		List<GOSlimTerm> slimTerms = analysis.getTermNodesMinusRootNodes();
 		
-		double totalPerc = 0.0;
+		int totalAnnotCount = 0;
 		for(int i = 0; i < maxSlices; i++) {
 			if(i >= slimTerms.size())
 				break;
 			GOSlimTerm term = slimTerms.get(i);
-			totalPerc += term.getProteinCountForTermPerc();
+			totalAnnotCount += term.getProteinCountForTerm();
 		}
 		
 		for(int i = 0; i < maxSlices; i++) {
@@ -40,9 +40,9 @@ public class GOSlimChartUrlCreator {
 			if(term.getProteinCountForTerm() == 0)
 				continue;
 			
-			int frac = (int)Math.round((term.getProteinCountForTermPerc() * 100.0) / totalPerc);
+			int frac = (int)Math.round((term.getProteinCountForTerm() * 100.0) / totalAnnotCount);
 			data += ","+frac;
-			labels += "|"+term.getProteinCountForTerm()+" ("+term.getProteinCountForTermPerc()+"%)";
+			labels += "|"+term.getProteinCountForTerm()+" ("+frac+"%)";
 			legend += "|"+term.getProteinCountForTerm()+" ("+term.getShortName()+")";
 		}
 		

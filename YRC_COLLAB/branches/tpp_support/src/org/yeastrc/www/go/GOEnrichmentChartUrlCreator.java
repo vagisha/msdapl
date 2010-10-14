@@ -27,12 +27,12 @@ public class GOEnrichmentChartUrlCreator {
 		String legend= "";
 		List<EnrichedGOTerm> enrichedTerms = output.getEnrichedTerms();
 		
-		double totalPerc = 0.0;
+		int totalAnnot = 0;
 		for(int i = 0; i < maxSlices; i++) {
 			if(i >= enrichedTerms.size())
 				break;
 			EnrichedGOTerm term = enrichedTerms.get(i);
-			totalPerc += getPercent((double)term.getNumAnnotatedProteins(), (double)output.getNumInputAnnotatedProteins());
+			totalAnnot += term.getNumAnnotatedProteins();
 		}
 		
 		for(int i = 0; i < maxSlices; i++) {
@@ -42,9 +42,9 @@ public class GOEnrichmentChartUrlCreator {
 			if(term.getNumAnnotatedProteins() == 0)
 				continue;
 			
-			int frac = (int)Math.round((getPercent((double)term.getNumAnnotatedProteins(), (double)output.getNumInputAnnotatedProteins()) * 100.0) / totalPerc);
+			int frac = (int)Math.round((term.getNumAnnotatedProteins() * 100.0) / totalAnnot);
 			data += ","+frac;
-			labels += "|"+term.getNumAnnotatedProteins()+" ("+getPercent((double)term.getNumAnnotatedProteins(), (double)output.getNumInputAnnotatedProteins())+"%)";
+			labels += "|"+term.getNumAnnotatedProteins()+" ("+frac+"%)";
 			legend += "|"+term.getNumAnnotatedProteins()+" ("+term.getShortName()+")";
 		}
 		

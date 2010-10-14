@@ -80,23 +80,6 @@ public class DoProteinInferenceAction extends Action {
             params.addParam(myParam);
         }
         
-        // If "use percolator peptide scores" is not in the parameter list set it to false
-        boolean foundUsePept = false;
-        ProgramParam usePeptParam = ParamMaker.makeUsePercolatorPeptideScores();
-        for(Param param: params.getParamList()) {
-            if(param.getName().equals(usePeptParam.getName())) {
-                if(param.getValue() == null || param.getValue().trim().length() == 0)
-                    param.setValue("false");
-                foundUsePept = true;
-                break;
-            }
-        }
-        if(!foundUsePept) {
-            Param myParam = new Param(usePeptParam);
-            myParam.setValue("false");
-            params.addParam(myParam);
-        }
-        
         
         if(prinferForm.isIndividualRuns()) {
             ProteinferJobSaver.instance().saveMultiJobToDatabase(user.getID(), inputSummary, params, 
