@@ -64,6 +64,11 @@ public class PercolatorPeptideResultDAOImpl extends BaseSqlMapDAO implements
 	}
 	
 	@Override
+	public PercolatorPeptideResult loadForPercolatorResult(int percolatorResultId) {
+		return (PercolatorPeptideResult) queryForObject(namespace+".selectForPercolatorResult", percolatorResultId);
+	}
+	
+	@Override
 	public List<Integer> loadIdsForAnalysis(int analysisId) {
 		return queryForList(namespace+".selectResultIdsForAnalysis", analysisId);
 	}

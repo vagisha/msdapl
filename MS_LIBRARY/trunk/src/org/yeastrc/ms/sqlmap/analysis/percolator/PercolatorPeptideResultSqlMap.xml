@@ -30,11 +30,17 @@
 				
 	</resultMap>
 	
-	
 	<select id="select" resultMap="percolatorPeptideResultResult" parameterClass="Integer">
 		SELECT * 
 		FROM PercolatorPeptideResult
 		WHERE id = #id#
+	</select>
+	
+	<select id="selectForPercolatorResult" resultMap="percolatorPeptideResultResult" parameterClass="Integer">
+		SELECT peptRes.* 
+		FROM PercolatorPeptideResult AS peptRes, PercolatorPeptidePsm AS peptPsm
+		WHERE peptPsm.psmResultID = #id#
+		AND peptPsm.peptideResultID = peptRes.id
 	</select>
 	
 	<select id="selectPeptPsmIds" resultClass="Integer" parameterClass="Integer">

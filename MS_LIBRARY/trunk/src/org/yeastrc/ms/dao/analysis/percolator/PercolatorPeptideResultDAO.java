@@ -18,6 +18,8 @@ import org.yeastrc.ms.domain.search.ResultSortCriteria;
 public interface PercolatorPeptideResultDAO {
 
 	public abstract PercolatorPeptideResult load(int id);
+	
+	public abstract PercolatorPeptideResult loadForPercolatorResult(int percolatorResultId);
     
     public abstract List<Integer> loadIdsForAnalysis(int searchAnalysisId);
     

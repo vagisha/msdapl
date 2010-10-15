@@ -45,9 +45,11 @@ public enum SORT_BY {
     XTANDEM_RANK("Rank", "rank"),
     
     // Percolator specific
-    QVAL("q-value", "qvalue"),
-    PVAL("p-value", "pvalue"),
+    QVAL("qvalue", "qvalue"),
+    PVAL("pvalue", "pvalue"),
     PEP("PEP", "pep"),
+    QVAL_PEPT("qvalue(P)", "qvalue"),
+    PEP_PEPT("PEP(P)", "pep"),
     DS("DS", "discriminantScore"),
     P_RT("Predict. RT", "predictedRetentionTime"),
     NUM_PSM("#PSMs", "numPsms"),

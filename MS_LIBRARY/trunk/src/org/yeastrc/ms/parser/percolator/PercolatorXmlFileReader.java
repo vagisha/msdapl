@@ -39,6 +39,8 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
     private List<? extends MsResidueModificationIn> searchDynamicResidueMods;
     private Program searchProgram;
     
+    private static final String namespace = "http://github.com/percolator/percolator/raw/master/src/xml/percolator_out";
+    
     public PercolatorXmlFileReader() {
     	searchDynamicResidueMods = new ArrayList<MsResidueModificationIn>();
     }
@@ -99,7 +101,7 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
             throw new DataProviderException("Error reading file: "+filePath, e);
         }
         finally {
-        	try {reader.close();} catch (XMLStreamException e) {}
+        	if(reader != null) try {reader.close();} catch (XMLStreamException e) {}
         }
         
         if(percXml) {
@@ -131,7 +133,8 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
             	else if(reader.getLocalName().equalsIgnoreCase("process_info")) {
             		readPercolatorParams();
             	}
-            	else if(reader.getLocalName().equalsIgnoreCase("psms")) {
+            	else if(reader.getLocalName().equalsIgnoreCase("psms") ||
+            			reader.getLocalName().equalsIgnoreCase("psm")) { // older XML's don't have a <psms> element.
             		break;
             	}
             }
@@ -140,7 +143,9 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 	
 	private void readPercolatorVersion() throws XMLStreamException {
 		
-		String version = reader.getAttributeValue(null,"percolator_version");
+		String version = reader.getAttributeValue(namespace,"percolator_version");
+		if(version == null)
+			version = reader.getAttributeValue(null,"percolator_version");
         if(version != null) {
         	version = version.trim();
         	// Example: Percolator version 1.14
@@ -167,7 +172,7 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 
 			if(evtType == XMLStreamReader.START_ELEMENT) {
 
-				if(reader.getLocalName().equalsIgnoreCase("command_line")) {
+				if(reader.getLocalName().equalsIgnoreCase("other_command_line")) {
 					String value = reader.getElementText();
 					PercolatorParamBean param = new PercolatorParamBean();
 					param.setParamName("command_line");
@@ -242,7 +247,7 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 		
 		// We are at the <psm> element; First read the psm_id attribute
 		PercolatorXmlResult result = new PercolatorXmlResult();
-		String id = reader.getAttributeValue(null, "psm_id");
+		String id = reader.getAttributeValue(namespace, "psm_id");
 		if(id == null) 
 			throw new DataProviderException("psm_id attribute is required for parsing result");
 		
@@ -391,7 +396,7 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 		
 		// We are at the <peptide> element; First read the peptide_id attribute
 		PercolatorXmlPeptideResult result = new PercolatorXmlPeptideResult();
-		String sequence = reader.getAttributeValue(null, "peptide_id");
+		String sequence = reader.getAttributeValue(namespace, "peptide_id");
 		if(sequence == null) 
 			throw new DataProviderException("peptide_id attribute is required for parsing <peptide> result");
 		
