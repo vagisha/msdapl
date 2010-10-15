@@ -9,6 +9,7 @@ package org.yeastrc.experiment;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorPeptideResult;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
@@ -23,6 +24,7 @@ import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 public class PercolatorResultPlus implements PercolatorResult {
 
     private final PercolatorResult result;
+    private PercolatorPeptideResult peptideResult;
     private SequestResultData sequestData;
     private final int scanNumber;
     private final BigDecimal retentionTime;
@@ -38,6 +40,10 @@ public class PercolatorResultPlus implements PercolatorResult {
             MS2Scan scan2 = (MS2Scan) scan;
             area = scan2.getBullsEyeArea();
         }
+    }
+    
+    public void setPeptideResult(PercolatorPeptideResult peptideResult) {
+    	this.peptideResult = peptideResult;
     }
     
     public String getFilename() {
@@ -62,6 +68,20 @@ public class PercolatorResultPlus implements PercolatorResult {
     
     public double getArea() {
         return area;
+    }
+    
+    public double getPeptideQvalue() {
+    	if(this.peptideResult != null)
+    		return peptideResult.getQvalueRounded();
+    	else
+    		return -1.0;
+    }
+    
+    public double getPeptidePosteriorErrorProbability() {
+    	if(this.peptideResult != null)
+    		return peptideResult.getPosteriorErrorProbabilityRounded();
+    	else
+    		return -1.0;
     }
     
     @Override

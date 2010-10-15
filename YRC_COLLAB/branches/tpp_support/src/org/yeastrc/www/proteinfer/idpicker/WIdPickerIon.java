@@ -2,6 +2,10 @@ package org.yeastrc.www.proteinfer.idpicker;
 
 import java.math.BigDecimal;
 
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorPeptideResultDAO;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorPeptideResult;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferIon;
 import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
 import org.yeastrc.ms.domain.run.MsScan;
@@ -99,5 +103,15 @@ public class WIdPickerIon {
         f = f == -1 ? 0 : f+1;
         l = l == -1 ? peptide.length() : l;
         return peptide.substring(f, l);
+    }
+    
+    public PercolatorPeptideResult getPercolatorPeptideResult() {
+    	if(this.bestSpectrumMatch instanceof PercolatorResult) {
+    		PercolatorResult pres = (PercolatorResult)bestSpectrumMatch;
+    		
+    		PercolatorPeptideResultDAO percPeptDao = DAOFactory.instance().getPercolatorPeptideResultDAO();
+    		return percPeptDao.loadForPercolatorResult(pres.getPercolatorResultId());
+    	}
+    	return null;
     }
 }

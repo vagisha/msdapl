@@ -74,7 +74,7 @@ $(document).ready(function() {
 							<br/>
 							<logic:iterate 	name="filterForm" property="modificationList" id="modification">
 								<html:checkbox name="modification" property="selected" indexed="true" styleClass="mod_residue"></html:checkbox>
-								<bean:write name="modification" property="modifiedResidue"/> (<bean:write name="modification" property="modificationMass"/>)
+								<bean:write name="modification" property="modifiedResidue"/> (<bean:write name="modification" property="modificationMassString"/>)
 								<html:hidden name="modification" property="id" indexed="true" />
 								<html:hidden name="modification" property="modifiedResidue" indexed="true" />
 								<html:hidden name="modification" property="modificationMass" indexed="true" />

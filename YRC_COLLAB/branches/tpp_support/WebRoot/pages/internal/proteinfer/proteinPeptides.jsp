@@ -47,13 +47,17 @@
      	<logic:equal name="hasPrecursorArea" value="true">
      		<th class="sort-alpha" align="left">Area</th>
      	</logic:equal>
-     	<th class="sort-float" align="left">qValue</th>
+     	<th class="sort-float" align="left">qvalue</th>
      	<logic:notPresent name="oldPercolator">
      		<th class="sort-float" align="left">PEP</th>
      	</logic:notPresent>
      	<logic:present name="oldPercolator">
      		<th class="sort-float" align="left">DS</th>
      	</logic:present>
+     	<logic:equal name="hasPeptideScores" value="true">
+     		<th class="sort-float" align="left"><span class="tooltip" title="Peptide-level qvalue">qvalue(P)</span></th>
+     		<th class="sort-float" align="left"><span class="tooltip" title="Peptide-level PEP">PEP(P)</span></th>
+     	</logic:equal>
      </logic:equal>
      <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTEIN_PROPHET.name()%>">
      	<th class="sort-float" align="left">nsp</th>
@@ -142,6 +146,10 @@
 	     		<logic:present name="oldPercolator">
 	     			<td><bean:write name="psm_perc" property="discriminantScoreRounded" /></td>
 	     		</logic:present>
+	     		<logic:equal name="hasPeptideScores" value="true">
+	     			<td><bean:write name="ion" property="percolatorPeptideResult.qvalueRounded"/></td>
+	     			<td><bean:write name="ion" property="percolatorPeptideResult.posteriorErrorProbabilityRounded"/></td>
+	     		</logic:equal>
 	     		<td>
 	     		<span class="clickable underline" title="Java Spectrum Viewer"
 				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_perc" property="id" />, 'java')" >

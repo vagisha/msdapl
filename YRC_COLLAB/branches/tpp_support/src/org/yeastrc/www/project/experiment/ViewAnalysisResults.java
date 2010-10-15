@@ -341,8 +341,8 @@ public class ViewAnalysisResults extends Action {
             log.error("Cannot determine if this version of Percolator prints PEP. Version: "+version);
         }
 
-        
-        TabularPercolatorResults tabResults = new TabularPercolatorResults(results, hasPEP, hasBullsEyeArea);
+        // TODO Remove this method. ViewPercolatorResults is a separate action.
+        TabularPercolatorResults tabResults = new TabularPercolatorResults(results, hasPEP, hasBullsEyeArea, false);
         tabResults.setSortedColumn(myForm.getSortBy());
         tabResults.setSortOrder(myForm.getSortOrder());
         

@@ -5,7 +5,6 @@
  */
 package org.yeastrc.www.project.experiment;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +50,6 @@ import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.misc.Tabular;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-import org.yeastrc.www.util.RoundingUtils;
 
 /**
  * 
@@ -121,20 +119,13 @@ public class ViewPercolatorResults extends Action {
             	for(MsResidueModification mod: mods) {
             		SelectableModificationBean modBean = new SelectableModificationBean();
             		modBean.setId(mod.getId());
-            		BigDecimal mass = new BigDecimal(RoundingUtils.getInstance().roundOne(mod.getModificationMass()));
-            		modBean.setModificationMass(mass);
+            		modBean.setModificationMass(mod.getModificationMass());
             		modBean.setModificationSymbol(mod.getModificationSymbol());
             		modBean.setModifiedResidue(mod.getModifiedResidue());
             		modBean.setSelected(true);
             		modBeans.add(modBean);
             	}
             	myForm.setModificationList(modBeans);
-            }
-            
-            // If we have peptide-level results for this analysis we will display them
-            PercolatorPeptideResultDAO peptResDao = DAOFactory.instance().getPercolatorPeptideResultDAO();
-            if(peptResDao.peptideCountForAnalysis(searchAnalysisId) > 0) {
-            	myForm.setPeptideResults(true);
             }
         }
 
@@ -350,7 +341,14 @@ public class ViewPercolatorResults extends Action {
             }
         }
         
+        PercolatorPeptideResultDAO peptResDao = DAOFactory.instance().getPercolatorPeptideResultDAO();
+        boolean hasPeptideResults = false;
+        if(peptResDao.peptideCountForAnalysis(myForm.getSearchAnalysisId()) > 0) {
+      	  hasPeptideResults = true;
+        }
+        
         PercolatorResultDAO presDao = DAOFactory.instance().getPercolatorResultDAO();
+        PercolatorPeptideResultDAO peptideResDao = DAOFactory.instance().getPercolatorPeptideResultDAO();
         MS2ScanDAO ms2ScanDao = DAOFactory.instance().getMS2FileScanDAO();
         List<PercolatorResultPlus> results = new ArrayList<PercolatorResultPlus>(numResultsPerPage);
         for(Integer percResultId: forPage) {
@@ -366,11 +364,15 @@ public class ViewPercolatorResults extends Action {
                 resPlus = new PercolatorResultPlus(result, scan);
             }
             
+            if(hasPeptideResults) {
+            	resPlus.setPeptideResult(peptideResDao.loadForPercolatorResult(result.getPercolatorResultId()));
+            }
+            
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
             resPlus.setSequestData(seqResDao.load(result.getId()).getSequestResultData());
             results.add(resPlus);
         }
-
+        
         // Which version of Percolator are we using
         String version = analysis.getAnalysisProgramVersion();
         boolean hasPEP = true;
@@ -383,7 +385,8 @@ public class ViewPercolatorResults extends Action {
         }
 
         
-        TabularPercolatorResults tabResults = new TabularPercolatorResults(results, hasPEP, hasBullsEyeArea);
+        
+        TabularPercolatorResults tabResults = new TabularPercolatorResults(results, hasPEP, hasBullsEyeArea, hasPeptideResults);
         tabResults.setSortedColumn(myForm.getSortBy());
         tabResults.setSortOrder(myForm.getSortOrder());
         

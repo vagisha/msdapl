@@ -85,10 +85,19 @@ public class ProteinPeptidesAjaxAction extends Action {
             for(WIdPickerIon ion: ionList) {
                 if(ion.hasPrecursorArea()) {
                     hasPrecursorArea = true;
-                    break;
                 }
+                break;
             }
             request.setAttribute("hasPrecursorArea", hasPrecursorArea);
+            
+            boolean hasPeptideScores = false;
+            for(WIdPickerIon ion: ionList) {
+            	if(ion.getPercolatorPeptideResult() != null) {
+            		hasPeptideScores = true;
+            	}
+            	break;
+            }
+            request.setAttribute("hasPeptideScores", hasPeptideScores);
             return mapping.findForward("Success");
         }
         else if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {

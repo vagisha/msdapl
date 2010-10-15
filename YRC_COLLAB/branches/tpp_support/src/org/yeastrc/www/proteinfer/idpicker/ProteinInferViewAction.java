@@ -145,6 +145,7 @@ public class ProteinInferViewAction extends Action {
         
         filterForm.setDisplayColumnList(displayColumns.getColumnList());
         request.setAttribute("displayColumns", filterForm.getDisplayColumns());
+        request.getSession().setAttribute("protinferDisplayColumns", filterForm.getDisplayColumns());
         
         
         // get the list of page numbers to display

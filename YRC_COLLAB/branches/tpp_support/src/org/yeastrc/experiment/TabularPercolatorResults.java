@@ -32,6 +32,7 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     
     private List<PercolatorResultPlus> results;
     private boolean hasBullsEyeArea = false;
+    private boolean hasPeptideResults = false;
     
     private int currentPage;
     private int numPerPage;
@@ -40,13 +41,15 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     
     private RoundingUtils rounder;
     
-    public TabularPercolatorResults(List<PercolatorResultPlus> results, boolean hasPEP, boolean hasBullsEyeArea) {
+    public TabularPercolatorResults(List<PercolatorResultPlus> results, boolean hasPEP, boolean hasBullsEyeArea,
+    		boolean hasPeptideResults) {
         this.results = results;
         displayPageNumbers = new ArrayList<Integer>();
         displayPageNumbers.add(currentPage);
         
         this.hasPEP = hasPEP;
         this.hasBullsEyeArea = hasBullsEyeArea;
+        this.hasPeptideResults = hasPeptideResults;
         
         columns.add(SORT_BY.FILE_ANALYSIS);
         columns.add(SORT_BY.SCAN);
@@ -61,6 +64,11 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         	columns.add(SORT_BY.PEP);
         else
         	columns.add(SORT_BY.DS); // Report Percolator Discriminant Score instead of PEP
+        
+        if(this.hasPeptideResults) {
+        	columns.add(SORT_BY.QVAL_PEPT);
+        	columns.add(SORT_BY.PEP_PEPT);
+        }
         columns.add(SORT_BY.XCORR_RANK);
         columns.add(SORT_BY.XCORR);
         columns.add(SORT_BY.PEPTIDE);
@@ -98,6 +106,8 @@ public class TabularPercolatorResults implements Tabular, Pageable {
             
             if(col == SORT_BY.XCORR_RANK || col == SORT_BY.XCORR || col == SORT_BY.DELTACN)
                 header.setSortable(false);
+            if(col == SORT_BY.QVAL_PEPT || col == SORT_BY.PEP_PEPT)
+            	header.setSortable(false);
             if(col == SORT_BY.PROTEIN || col == SORT_BY.AREA)
                 header.setSortable(false);
             
@@ -143,6 +153,10 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         else
             row.addCell(new TableCell(String.valueOf(result.getDiscriminantScoreRounded())));
         
+        if(hasPeptideResults) {
+        	row.addCell(new TableCell(String.valueOf(result.getPeptideQvalue())));
+        	row.addCell(new TableCell(String.valueOf(result.getPeptidePosteriorErrorProbability())));
+        }
         // Sequest data
         row.addCell(new TableCell(String.valueOf(result.getSequestData().getxCorrRank())));
         row.addCell(new TableCell(String.valueOf(rounder.roundTwo(result.getSequestData().getxCorr()))));
