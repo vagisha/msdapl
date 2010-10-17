@@ -73,6 +73,27 @@ public class MsJobResource {
 	}
 
 	@POST
+	@Path("hermie/add")
+	@Produces ({"text/plain"})
+	@Consumes ({"application/json"})
+	/*
+	 * This method is only to be used by the hermie pipeline.
+	 * cURL example:
+	 * curl -u hermie:<hermie_password> -X POST  -H 'Content-Type: application/json' -d '{"projectId":"24", "dataDirectory":"/test/data", "targetSpecies":"6239", "instrument":"LTQ", "comments":"upload test", "submitterName":"vsharma"}' http://localhost:8080/msdapl_queue/services/msjob/hermie/add
+	 */
+	public String addHermieJob(MsJob job) {
+		job.setPipeline("MACCOSS");
+		job.setDate(new Date());
+		
+		// If a submitterName is not part of the request, the submitter will be set to "hermie". 
+		// We will not do project access check in this case.
+		if(job.getSubmitterName() == null)
+			return "Queued job. ID: "+String.valueOf(submitJob(job, false)+"\n");
+		else
+			return "Queued job. ID: "+String.valueOf(submitJob(job, true)+"\n");
+	}
+	
+	@POST
 	@Path("add")
 	@Produces ({"text/plain"})
 	public String add(
@@ -101,14 +122,21 @@ public class MsJobResource {
 	}
 
 	private int submitJob(MsJob job) {
+		return submitJob(job, true);
+	}
+	
+	private int submitJob(MsJob job, boolean checkAccess) {
 		
-		String username = security.getUserPrincipal().getName();
+		String username = job.getSubmitterName();
+		if(username == null)
+			username = security.getUserPrincipal().getName();
+		
 		User user = getUser(username);
 		
 		Messenger messenger = new Messenger();
 		
 		MsJobSubmitter submitter = MsJobSubmitter.getInstance();
-		int jobId = submitter.submit(job, user, messenger);
+		int jobId = submitter.submit(job, user, messenger, checkAccess);
 		if(jobId == -1) { // data provided by the user was incorrect or incomplete
 			String err = messenger.getMessagesString();
 			// 400 error

@@ -31,7 +31,7 @@ public class MsJobSubmitter {
 		return instance;
 	}
 	
-	public int submit(MsJob job, User submitter, Messenger messenger) {
+	public int submit(MsJob job, User submitter, Messenger messenger, boolean checkAccess) {
 		
 		if(job == null) {
 			if(messenger != null) 
@@ -54,7 +54,7 @@ public class MsJobSubmitter {
 				try {
 					Project project = ProjectFactory.getProject(job.getProjectId());
 					
-					if(!project.checkAccess(submitter.getResearcher())) {
+					if(checkAccess && !project.checkAccess(submitter.getResearcher())) {
 						messenger.addError("Researcher ("+submitter.getUsername()+") does not have access to the project with ID: "+job.getProjectId());
 						pass = false;
 					}

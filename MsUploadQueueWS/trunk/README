@@ -1,7 +1,7 @@
 This is a REST-based web service to queue MS data upload requests to MSDaPl's upload queue
 
 
-In the examples below replace <server_path> with repoman.gs.washington.edu for MSDaPl deployed on repoman.  
+In the examples below replace <server> with repoman.gs.washington.edu for MSDaPl deployed on repoman.  
 Use flint.gs.washington.edu for the application deployed on flint.
 
 
@@ -9,7 +9,7 @@ The service provides the following REST methods:
 
 1. Get the details of a job already in the queue
 
-	URL: http://<server_path>/msdapl_queue/services/msjob/<jobId>
+	URL: http://<server>/msdapl_queue/services/msjob/<jobId>
     
 	OUTPUT formats: text, xml, json
 	HTTP METHOD:  	GET
@@ -17,15 +17,15 @@ The service provides the following REST methods:
 	PATH PRAMETER:  jobId
 	
 	Examples using cURL:
-		TEXT FORMAT: curl http://<server_path>/msdapl_queue/services/msjob/<jobId>
-	 	XML FORMAT : curl -H "Accept:application/xml" http://<server_path>/msdapl_queue/services/msjob/<jobId>
-	 	JSON FORMAT: curl -H "Accept:application/json" http://<server_path>/msdapl_queue/services/msjob/<jobId>
+		TEXT FORMAT: curl http://<server>/msdapl_queue/services/msjob/<jobId>
+	 	XML FORMAT : curl -H "Accept:application/xml" http://<server>/msdapl_queue/services/msjob/<jobId>
+	 	JSON FORMAT: curl -H "Accept:application/json" http://<server>/msdapl_queue/services/msjob/<jobId>
 
 
 
 2. Get the status of a job already in the queue
 
-	URL: http://<server_path>/msdapl_queue/services/msjob/status/<jobId>
+	URL: http://<server>/msdapl_queue/services/msjob/status/<jobId>
     
 	OUTPUT FORMATS:  text
 	HTTP METHOD:     GET
@@ -33,28 +33,28 @@ The service provides the following REST methods:
 	PATH PRAMETER:   jobId
 	
 	Example using cURL:
-		TEXT FORMAT: curl http://<server_path>/msdapl_queue/services/msjob/status/<jobId>
+		TEXT FORMAT: curl http://<server>/msdapl_queue/services/msjob/status/<jobId>
 
 
 
 
 3. Delete a job already in the database
 
-	URL: http://<server_path>/msdapl_queue/services/msjob/delete/<jobId>
+	URL: http://<server>/msdapl_queue/services/msjob/delete/<jobId>
     
 	HTTP METHOD:     DELETE
 	AUTHENTICATION:  required
 	PATH PRAMETER:   jobId
 	
 	Example using cURL (<username> and <password> are your login credentials for MSDaPl):
-		curl -u <username>  -X DELETE http://<server_path>/msdapl_queue/services/msjob/delete/<jobId>
+		curl -u <username>  -X DELETE http://<server>/msdapl_queue/services/msjob/delete/<jobId>
 		OR
-		curl -u <username>:<password>  -X DELETE http://<server_path>/msdapl_queue/services/msjob/delete/<jobId>
+		curl -u <username>:<password>  -X DELETE http://<server>/msdapl_queue/services/msjob/delete/<jobId>
 		
 		
 4. Submit a job to the queue (using query parameters)
 
-	URL: http://<server_path>/msdapl_queue/services/msjob/add
+	URL: http://<server>/msdapl_queue/services/msjob/add
     
 	OUTPUT formats:  text
 	                 Returns the database ID of the newly queued job.
@@ -72,21 +72,19 @@ The service provides the following REST methods:
 	
 	
 	Examples using cURL:
-		curl -u <username> -X POST "http://<server_path>/msdapl_queue/services/msjob/add?projectId=24&dataDirectory=/data/test&pipeline=MACCOSS&date=09/24/10&instrument=LTQ&taxId=9606&comments=some%20comments"
+		curl -u <username> -X POST "http://<server>/msdapl_queue/services/msjob/add?projectId=24&dataDirectory=/data/test&pipeline=MACCOSS&date=09/24/10&instrument=LTQ&taxId=9606&comments=some%20comments"
 
 
 5. Submit a job to the queue (without query parameters)
 	
-	URL: http://<server_path>/msdapl_queue/services/msjob/add
+	URL: http://<server>/msdapl_queue/services/msjob/add
     
 	OUTPUT formats:  text
 	                 Returns the database ID of the newly queued job.
 	HTTP METHOD:     POST
 	AUTHENTICATION:  required
-	INPUT FORMATS:   text, xml, json
+	INPUT FORMATS:   xml, json
 	
 	Examples using cURL:
 		JSON INPUT: curl -u <username> -X POST  -H 'Content-Type: application/json' -d '{"projectId":"24", "dataDirectory":"/test/data", "pipeline":"MACCOSS", "date":"2010-03-29", "comments":"upload test"}' http://localhost:8080/msdapl_queue/services/msjob/add
 	
-
- 
