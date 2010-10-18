@@ -38,6 +38,15 @@ public class PercolatorResultBean extends SearchResultBean implements Percolator
     }
 
     @Override
+	public int getPeptideResultId() {
+		return data.getPeptideResultId();
+	}
+    
+    public void setPeptideResultId(int peptideResultId) {
+    	this.data.setPeptideResultId(peptideResultId);
+    }
+    
+    @Override
     public double getPosteriorErrorProbability() {
         return data.getPosteriorErrorProbability();
     }

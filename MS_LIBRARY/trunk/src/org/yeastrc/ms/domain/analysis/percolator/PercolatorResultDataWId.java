@@ -14,6 +14,12 @@ public interface PercolatorResultDataWId {
     public abstract int getSearchResultId();
     
     /**
+     * Returns the ID of the peptide-level result, if present. Returns 0 otherwise.
+     * @return
+     */
+    public abstract int getPeptideResultId();
+    
+    /**
      * @return the qvalue
      */
     public abstract double getQvalue();

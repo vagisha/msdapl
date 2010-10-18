@@ -19,6 +19,8 @@ public interface PercolatorResult extends MsSearchResult {
     
     public abstract int getRunSearchAnalysisId();
     
+    public abstract int getPeptideResultId();
+    
     /**
      * @return the qvalue
      */

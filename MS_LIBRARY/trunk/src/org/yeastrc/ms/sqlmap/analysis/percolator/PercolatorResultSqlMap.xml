@@ -19,6 +19,7 @@
 		<result property="discriminantScore" column="discriminantScore" />
 		<result property="pvalue" column="pvalue" nullValue="-1.0"/>
 		<result property="predictedRetentionTime" column="predictedRetentionTime" />
+		<result property="peptideResultId" column="peptideResultID" nullValue="0" />
 		<result property="proteinMatchList" 
 				select="MsResultProtein.selectResultProteins" 
 				column="sresID"/>
@@ -32,6 +33,7 @@
 		<parameter property="discriminantScore" jdbcType="DOUBLE" />
 		<parameter property="pvalue" jdbcType="DOUBLE" nullValue="-1.0"/>
 		<parameter property="predictedRetentionTime" jdbcType="DECIMAL" />
+		<parameter property="peptideResultId" jdbcType="INTEGER" nullValue="0"/>
 	</parameterMap>
 	
 	

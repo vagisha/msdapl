@@ -12,6 +12,7 @@ public class PercolatorResultDataBean implements PercolatorResultDataWId {
     private Double discriminantScore = null;
     private double pep = -1.0;
     private double pvalue = -1.0;
+    private int peptideResultId;
     
     private BigDecimal predictedRT = null;
     
@@ -25,6 +26,11 @@ public class PercolatorResultDataBean implements PercolatorResultDataWId {
         return runSearchAnalysisId;
     }
 
+    @Override
+	public int getPeptideResultId() {
+		return peptideResultId;
+	}
+    
     @Override
     public double getPosteriorErrorProbability() {
         return pep;
@@ -69,6 +75,10 @@ public class PercolatorResultDataBean implements PercolatorResultDataWId {
         this.runSearchAnalysisId = analysisId;
     }
     
+    public void setPeptideResultId(int peptideResultId) {
+    	this.peptideResultId = peptideResultId;
+    }
+    
     @Override
     public BigDecimal getPredictedRetentionTime() {
         return predictedRT;
@@ -77,4 +87,5 @@ public class PercolatorResultDataBean implements PercolatorResultDataWId {
     public void setPredictedRetentionTime(BigDecimal predictedRT) {
         this.predictedRT = predictedRT;
     }
+	
 }
