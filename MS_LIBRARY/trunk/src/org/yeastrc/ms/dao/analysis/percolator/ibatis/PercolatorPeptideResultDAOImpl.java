@@ -168,15 +168,15 @@ public class PercolatorPeptideResultDAOImpl extends BaseSqlMapDAO implements
         }
 
         
-        // now insert the peptide psm matches for these results
-        insertPeptidePsmMatches(generatedKeys, peptideResultList);
+        // now update the PSM results with the peptide resultIds
+        updatePeptidePsmMatches(generatedKeys, peptideResultList);
 	}
 	
-	private void insertPeptidePsmMatches(List<Integer> generatedKeys, List<PercolatorPeptideResult> peptideResultList) {
+	private void updatePeptidePsmMatches(List<Integer> generatedKeys, List<PercolatorPeptideResult> peptideResultList) {
 		
-		String sql = "INSERT INTO PercolatorPeptidePsm ";
-        sql +=       "( peptideResultId, psmResultId )";
-        sql +=       " VALUES (?,?)";
+		String sql = "UPDATE PercolatorResult SET peptideResultID = ? WHERE id = ?";
+        //sql +=       "( peptideResultId, psmResultId )";
+        //sql +=       " VALUES (?,?)";
         
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -201,11 +201,11 @@ public class PercolatorPeptideResultDAOImpl extends BaseSqlMapDAO implements
             int[] counts = stmt.executeBatch();
             conn.commit();
             
-            int numInserted = 0;
-            for(int cnt: counts)    numInserted += cnt;
+            int numUpdated = 0;
+            for(int cnt: counts)    numUpdated += cnt;
             
-            if(numInserted != numPeptidePsmMatches)
-                throw new RuntimeException("Number of PercolatorPeptidePsm results inserted ("+numInserted+
+            if(numUpdated != numPeptidePsmMatches)
+                throw new RuntimeException("Number of PercolatorResults updated ("+numUpdated+
                         ") does not equal number input ("+numPeptidePsmMatches+")");
                 
         }
@@ -259,7 +259,7 @@ public class PercolatorPeptideResultDAOImpl extends BaseSqlMapDAO implements
         sql.append("PercolatorPeptideResult as pept ");
         
         if(useResultsTable)
-            sql.append(", PercolatorPeptidePsm AS peptPsm, PercolatorResult AS psm, msRunSearchResult AS res ");
+            sql.append(", PercolatorResult AS psm, msRunSearchResult AS res ");
         
         sql.append(" ) ");
         
@@ -278,8 +278,7 @@ public class PercolatorPeptideResultDAOImpl extends BaseSqlMapDAO implements
         }
         
         if(useResultsTable) {
-        	sql.append("AND pept.id = peptPsm.peptideResultID ");
-        	sql.append("AND psm.id = peptPsm.psmResultID ");
+        	sql.append("AND pept.id = psm.peptideResultID ");
         	sql.append("AND psm.resultID = res.id ");
         }
         // peptide filter

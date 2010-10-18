@@ -246,7 +246,7 @@ CREATE TABLE SQTSpectrumData (
    lowestSp DECIMAL(10,5),
    sequenceMatches INT UNSIGNED
 );
-ALTER TABLE SQTSpectrumData ADD INDEX(scanID, runSearchID, charge, observedMass);
+ALTER TABLE SQTSpectrumData ADD INDEX(scanID, runSearchID);
 ALTER TABLE SQTSpectrumData ADD INDEX (runSearchID);
 # ALTER TABLE SQTSpectrumData ADD INDEX (charge);
 
@@ -433,13 +433,37 @@ CREATE TABLE PercolatorResult (
 		qvalue DOUBLE UNSIGNED NOT NULL,
 		pep DOUBLE UNSIGNED,
 		discriminantScore DOUBLE,
-		predictedRetentionTime DECIMAL(10,5)
+		pvalue DOUBLE UNSIGNED,
+		predictedRetentionTime DECIMAL(10,5),
+		peptideResultID IN UNSIGNED NOT NULL
 );
 ALTER TABLE PercolatorResult ADD INDEX(runSearchAnalysisID);
 ALTER TABLE PercolatorResult ADD INDEX(resultID);
 ALTER TABLE PercolatorResult ADD INDEX(qvalue);
 ALTER TABLE PercolatorResult ADD INDEX(pep);
-ALTER TABLE PercolatorResult ADD INDEX(discriminantScore);
+ALTER TABLE PercolatorResult ADD INDEX(peptideResultID);
+
+CREATE TABLE PercolatorPeptideResult (
+		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		searchAnalysisID INT UNSIGNED NOT NULL,
+		peptide VARCHAR(500) NOT NULL,
+		qvalue DOUBLE UNSIGNED NOT NULL,
+		pep DOUBLE UNSIGNED,
+		discriminantScore DOUBLE,
+		pvalue DOUBLE UNSIGNED
+);
+ALTER TABLE PercolatorPeptideResult ADD INDEX(searchAnalysisID);
+ALTER TABLE PercolatorPeptideResult ADD INDEX(qvalue);
+ALTER TABLE PercolatorPeptideResult ADD INDEX(pep);
+ALTER TABLE PercolatorPeptideResult ADD UNIQUE INDEX (searchAnalysisID, peptide);
+
+CREATE TABLE PercolatorPeptidePsm (
+		peptideResultId INT UNSIGNED NOT NULL,
+		psmResultId INT UNSIGNED NOT NULL
+);
+ALTER TABLE PercolatorPeptidePsm ADD INDEX(peptideResultId, psmResultId);
+ALTER TABLE PercolatorPeptidePsm ADD INDEX(psmResultId, peptideResultId);
+
 
 #####################################################################
 # PeptideProphet tables
@@ -513,7 +537,7 @@ CREATE TABLE msProteinInferProtein (
 );
 ALTER TABLE  msProteinInferProtein ADD INDEX (piRunID);
 ALTER TABLE  msProteinInferProtein ADD INDEX (nrseqProteinID);
-ALTER TABLE msProteinInferProtein add index (nrseqProteinID, piRunID);
+ALTER TABLE msProteinInferProtein add index (piRunID, nrseqProteinID);
 
 
 CREATE TABLE msProteinInferPeptide (
@@ -522,7 +546,7 @@ CREATE TABLE msProteinInferPeptide (
 	sequence VARCHAR(255) NOT NULL,
 	uniqueToProtein TINYINT NOT NULL DEFAULT 0
 );
-ALTER TABLE  msProteinInferPeptide ADD INDEX (piRunID);
+ALTER TABLE  msProteinInferPeptide ADD UNIQUE INDEX (piRunID, sequence);
 
 
 CREATE TABLE msProteinInferIon(
@@ -549,10 +573,11 @@ CREATE TABLE msProteinInferSpectrumMatch (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	piIonID INT UNSIGNED NOT NULL,
     resultID INT UNSIGNED NOT NULL,
+    scanID INT UNSIGNED NOT NULL,
     rankForPeptide INT UNSIGNED
 );
 ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (resultID);
-ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (piIonID);
+ALTER TABLE  msProteinInferSpectrumMatch ADD UNIQUE INDEX (piIonID, resultID);
 
 
 #####################################################################
@@ -771,6 +796,7 @@ CREATE TRIGGER msSearchAnalysis_bdelete BEFORE DELETE ON msSearchAnalysis
    	DELETE FROM PercolatorParams WHERE searchAnalysisID = OLD.id;
    	DELETE FROM PeptideProphetAnalysis WHERE searchAnalysisID = OLD.id;
    	DELETE FROM PeptideProphetROC WHERE searchAnalysisID = OLD.id;
+   	DELETE FROM PercolatorPeptideResult WHERE searchAnalysisID = OLD.id;
 	DELETE FROM msRunSearchAnalysis WHERE searchAnalysisID = OLD.id;
  END;
 |
@@ -782,6 +808,24 @@ CREATE TRIGGER msRunSearchAnalysis_bdelete BEFORE DELETE ON msRunSearchAnalysis
  BEGIN
  	DELETE FROM PercolatorResult WHERE runSearchAnalysisID = OLD.id;
  	DELETE FROM PeptideProphetResult WHERE runSearchAnalysisID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER PercolatorPeptideResult_bdelete BEFORE DELETE ON PercolatorPeptideResult
+ FOR EACH ROW
+ BEGIN
+ 	DELETE FROM PercolatorResult WHERE peptideResultId = OLD.id;
+ END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER PercolatorResult_bdelete BEFORE DELETE ON PercolatorResult
+ FOR EACH ROW
+ BEGIN
+ 	DELETE FROM PercolatorPeptidePsm WHERE psmResultId = OLD.id;
  END;
 |
 DELIMITER ;
