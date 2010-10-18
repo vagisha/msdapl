@@ -365,7 +365,7 @@ public class ViewPercolatorResults extends Action {
             }
             
             if(hasPeptideResults) {
-            	resPlus.setPeptideResult(peptideResDao.loadForPercolatorResult(result.getPercolatorResultId()));
+            	resPlus.setPeptideResult(peptideResDao.load(result.getPeptideResultId()));
             }
             
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));

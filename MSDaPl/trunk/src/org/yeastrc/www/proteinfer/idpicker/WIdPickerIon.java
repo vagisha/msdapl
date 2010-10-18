@@ -110,7 +110,7 @@ public class WIdPickerIon {
     		PercolatorResult pres = (PercolatorResult)bestSpectrumMatch;
     		
     		PercolatorPeptideResultDAO percPeptDao = DAOFactory.instance().getPercolatorPeptideResultDAO();
-    		return percPeptDao.loadForPercolatorResult(pres.getPercolatorResultId());
+    		return percPeptDao.load(pres.getPeptideResultId());
     	}
     	return null;
     }

@@ -129,6 +129,11 @@ public class PercolatorResultPlus implements PercolatorResult {
 		return result.getQvalueRounded();
 	}
 	
+	@Override
+	public int getPeptideResultId() {
+		return result.getPeptideResultId();
+	}
+	
     @Override
     public int getRunSearchAnalysisId() {
         return result.getRunSearchAnalysisId();
