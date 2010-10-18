@@ -36,15 +36,6 @@
 		WHERE id = #id#
 	</select>
 	
-	<!--  
-	<select id="selectForPercolatorResult" resultMap="percolatorPeptideResultResult" parameterClass="Integer">
-		SELECT peptRes.* 
-		FROM PercolatorPeptideResult AS peptRes, PercolatorPeptidePsm AS peptPsm
-		WHERE peptPsm.psmResultID = #id#
-		AND peptPsm.peptideResultID = peptRes.id
-	</select>
-	-->
-	
 	<select id="selectForPercolatorResult" resultMap="percolatorPeptideResultResult" parameterClass="Integer">
 		SELECT peptRes.* 
 		FROM PercolatorPeptideResult AS peptRes, PercolatorResult AS pres
@@ -52,28 +43,13 @@
 		AND pres.peptideResultID = peptRes.id
 	</select>
 	
-	<!--
-	<select id="selectPeptPsmIds" resultClass="Integer" parameterClass="Integer">
-		SELECT psmResultID
-		FROM PercolatorPeptidePsm
-		WHERE peptideResultID = #id#
-	</select>
-	-->
 	<select id="selectPeptPsmIds" resultClass="Integer" parameterClass="Integer">
 		SELECT id
 		FROM PercolatorResult
 		WHERE peptideResultID = #id#
 	</select>
 	
-	<!--
-	<select id="selectPeptPsms" resultMap="PercolatorResult.percolatorResultResult" parameterClass="Integer">
-		SELECT res.id AS sresID, pres.id AS presID, res.*, pres.* 
-		FROM msRunSearchResult AS res, PercolatorResult AS pres, PercolatorPeptidePsm AS peptPsm
-		WHERE peptPsm.peptideResultID = #id#
-		AND peptPsm.psmResultID = pres.id
-		AND pres.resultID = res.id
-	</select>
-	-->
+	
 	<select id="selectPeptPsms" resultMap="PercolatorResult.percolatorResultResult" parameterClass="Integer">
 		SELECT res.id AS sresID, pres.id AS presID, res.*, pres.* 
 		FROM msRunSearchResult AS res, PercolatorResult AS pres
@@ -81,16 +57,6 @@
 		AND pres.resultID = res.id
 	</select>
 	
-	<!--
-	<select id="selectResultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" parameterClass="Integer">
-		SELECT * from msRunSearchResult 
-		WHERE id = (SELECT pres.resultID 
-					FROM PercolatorResult AS pres, PercolatorPeptidePsm AS psm 
-					WHERE psm.peptideResultID=#id#
-					AND psm.psmResultID = pres.id
-					LIMIT 1)
-	</select>
-	-->
 	<select id="selectResultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" parameterClass="Integer">
 		SELECT * from msRunSearchResult 
 		WHERE id = (SELECT pres.resultID 
@@ -99,16 +65,6 @@
 					LIMIT 1)
 	</select>
 	
-	<!--
-	<select id="selectMatchProteins" resultMap="MsResultProtein.msResultProteinResult" parameterClass="Integer">
-		SELECT * FROM msProteinMatch
-		WHERE resultID = (SELECT pres.resultID 
-					FROM PercolatorResult AS pres, PercolatorPeptidePsm AS psm 
-					WHERE psm.peptideResultID=#id#
-					AND psm.psmResultID = pres.id
-					LIMIT 1)
-	</select>
-	-->
 	<select id="selectMatchProteins" resultMap="MsResultProtein.msResultProteinResult" parameterClass="Integer">
 		SELECT * FROM msProteinMatch
 		WHERE resultID = (SELECT pres.resultID 
@@ -152,16 +108,6 @@
 		</isNotNull>
 	</select>
 	
-	<!--
-	<select id="selectPercResIdsForPeptideAndRunSearchAnalysis" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT peptPsm.psmResultID 
-    	FROM PercolatorPeptideResult AS pept, PercolatorPeptidePsm AS peptPsm, PercolatorResult AS pres
-		WHERE pept.id = peptPsm.peptideResultID
-		AND peptPsm.psmResultID = pres.id
-		AND pres.runSearchAnalysisID=#runSearchAnalysisId#
-		AND pept.id=#petideResultId#
-    </select>
-    -->
     <select id="selectPercResIdsForPeptideAndRunSearchAnalysis" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT pres.id 
     	FROM PercolatorPeptideResult AS pept, PercolatorResult AS pres
@@ -170,25 +116,6 @@
 		AND pept.id=#petideResultId#
     </select>
     
-    <!--
-    <select id="selectFilteredPercResIdsForPeptideAndRunSearchAnalysis" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT peptPsm.psmResultID 
-    	FROM PercolatorPeptideResult AS pept, PercolatorPeptidePsm AS peptPsm, PercolatorResult AS pres
-		WHERE pept.id = peptPsm.peptideResultID
-		AND peptPsm.psmResultID = pres.id
-		AND pres.runSearchAnalysisID=#runSearchAnalysisId#
-		AND pept.id=#petideResultId#
-		<isNotNull property="qvalue">
-			AND pres.qvalue &lt;= #qvalue#		
-		</isNotNull>
-		<isNotNull property="pep">
-			AND pres.pep &lt;= #pep#		
-		</isNotNull>
-		<isNotNull property="discriminantScore">
-			AND pres.discriminantScore &lt;= #discriminantScore#		
-		</isNotNull>
-    </select>
-	-->
 	<select id="selectFilteredPercResIdsForPeptideAndRunSearchAnalysis" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT pres.id 
     	FROM PercolatorPeptideResult AS pept, PercolatorResult AS pres

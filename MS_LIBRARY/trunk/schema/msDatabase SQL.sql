@@ -457,14 +457,6 @@ ALTER TABLE PercolatorPeptideResult ADD INDEX(qvalue);
 ALTER TABLE PercolatorPeptideResult ADD INDEX(pep);
 ALTER TABLE PercolatorPeptideResult ADD UNIQUE INDEX (searchAnalysisID, peptide);
 
-CREATE TABLE PercolatorPeptidePsm (
-		peptideResultId INT UNSIGNED NOT NULL,
-		psmResultId INT UNSIGNED NOT NULL
-);
-ALTER TABLE PercolatorPeptidePsm ADD INDEX(peptideResultId, psmResultId);
-ALTER TABLE PercolatorPeptidePsm ADD INDEX(psmResultId, peptideResultId);
-
-
 #####################################################################
 # PeptideProphet tables
 #####################################################################
@@ -817,15 +809,6 @@ CREATE TRIGGER PercolatorPeptideResult_bdelete BEFORE DELETE ON PercolatorPeptid
  FOR EACH ROW
  BEGIN
  	DELETE FROM PercolatorResult WHERE peptideResultId = OLD.id;
- END;
-|
-DELIMITER ;
-
-DELIMITER |
-CREATE TRIGGER PercolatorResult_bdelete BEFORE DELETE ON PercolatorResult
- FOR EACH ROW
- BEGIN
- 	DELETE FROM PercolatorPeptidePsm WHERE psmResultId = OLD.id;
  END;
 |
 DELIMITER ;
