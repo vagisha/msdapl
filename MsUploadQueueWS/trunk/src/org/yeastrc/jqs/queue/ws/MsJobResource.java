@@ -88,9 +88,9 @@ public class MsJobResource {
 		// If a submitterName is not part of the request, the submitter will be set to "hermie". 
 		// We will not do project access check in this case.
 		if(job.getSubmitterName() == null)
-			return "Queued job. ID: "+String.valueOf(submitJob(job, false)+"\n");
+			return "Queued job. ID: "+String.valueOf(submitJob(job, false, false)+"\n");
 		else
-			return "Queued job. ID: "+String.valueOf(submitJob(job, true)+"\n");
+			return "Queued job. ID: "+String.valueOf(submitJob(job, true, true)+"\n");
 	}
 	
 	@POST
@@ -122,10 +122,10 @@ public class MsJobResource {
 	}
 
 	private int submitJob(MsJob job) {
-		return submitJob(job, true);
+		return submitJob(job, true, false);
 	}
 	
-	private int submitJob(MsJob job, boolean checkAccess) {
+	private int submitJob(MsJob job, boolean checkAccess, boolean sendEmailOnSuccess) {
 		
 		String username = job.getSubmitterName();
 		if(username == null)
@@ -150,6 +150,11 @@ public class MsJobResource {
 		}
 		
 		// all went well, return the database ID of the newly created job.
+		// But, first, send an email
+		if(sendEmailOnSuccess) {
+			Emailer emailer = Emailer.getInstance();
+			emailer.emailJobQueued(job, user);
+		}
 		return jobId;
 	}
 	
