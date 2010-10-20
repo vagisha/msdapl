@@ -9,6 +9,7 @@ public class GenericIdPickerProtein <T extends GenericIdPickerPeptide<?,?>> exte
     private int clusterId = -1;
     private int groupId = -1;
     private boolean isParsimonious;
+    private boolean isSubset;
     private double nsaf = -1.0; // normalized spectrum abundance factor
     private static final DecimalFormat df = new DecimalFormat("0.000000");
     
@@ -46,7 +47,14 @@ public class GenericIdPickerProtein <T extends GenericIdPickerPeptide<?,?>> exte
         this.isParsimonious = isParsimonious;
     }
     
-    public boolean matchesPeptideGroup(int peptideGrpId) {
+    public boolean getIsSubset() {
+		return isSubset;
+	}
+	public void setIsSubset(boolean isSubset) {
+		this.isSubset = isSubset;
+	}
+	
+	public boolean matchesPeptideGroup(int peptideGrpId) {
         for(GenericIdPickerPeptide<?,?> pept: this.getPeptides()) {
             if(pept.getGroupId() == peptideGrpId)
                 return true;

@@ -599,7 +599,8 @@ CREATE TABLE IDPickerProtein (
 	clusterID INT UNSIGNED NOT NULL,
     groupID INT UNSIGNED NOT NULL,
     nsaf DOUBLE UNSIGNED,
-    isParsimonious TINYINT NOT NULL DEFAULT 0
+    isParsimonious TINYINT NOT NULL DEFAULT 0,
+    isSubset TINYINT NOT NULL DEFAULT = 0
 );
 ALTER TABLE IDPickerProtein ADD INDEX(clusterID);
 ALTER TABLE IDPickerProtein ADD INDEX(groupID);

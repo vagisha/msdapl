@@ -9,6 +9,7 @@
 	<resultMap class="IdPickerProteinBase" id="baseResult" extends="ProteinferProtein.pinferBaseProteinResult">
 		<result property="clusterId" column="clusterID" nullValue="0"/>
 		<result property="isParsimonious" column="isParsimonious" />
+		<result property="isSubset" column="isSubset" />
 		<result property="groupId" column="groupID" nullValue="0"/>
 		<result property="nsaf" column="nsaf" nullValue="-1.0"/>
 	</resultMap>
@@ -28,6 +29,7 @@
 	<parameterMap class="IdPickerProteinBase" id="idpickerProteinParam">
 		<parameter property="id" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="isParsimonious" jdbcType="TINYINT" />
+		<parameter property="isSubset" jdbcType="TINYINT" />
 		<parameter property="clusterId" jdbcType="INTEGER" />
 		<parameter property="groupId" jdbcType="INTEGER" />
 		<parameter property="nsaf" jdbcType="DOUBLE" nullValue="-1.0"/>
@@ -460,10 +462,11 @@
     	INSERT INTO IDPickerProtein (
     	piProteinID,
     	isParsimonious,
+    	isSubset,
     	clusterID,
     	groupID,
     	nsaf) 
-    	VALUES (?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?)
     </insert>
     
     <update id="updateIdPickerProtein" parameterClass="IdPickerProteinBase">
@@ -471,6 +474,7 @@
     	SET clusterID=#clusterId#,
     	groupID=#groupId#,
     	isParsimonious=#isParsimonious#,
+    	isSubset=#isSubset#,
     	nsaf=#nsaf#
     	WHERE piProteinID=#id#
     </update>
