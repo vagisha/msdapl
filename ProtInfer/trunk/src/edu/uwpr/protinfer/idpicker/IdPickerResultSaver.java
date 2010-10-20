@@ -112,6 +112,7 @@ public class IdPickerResultSaver {
             oldProt.setCoverage(protein.getPercentCoverage());
             oldProt.setGroupId(protein.getProteinGroupId());
             oldProt.setIsParsimonious(protein.getIsAccepted());
+            oldProt.setIsSubset(protein.getProtein().isSubset());
             oldProt.setNsaf(protein.getNSAF());
             
             protDao.updateIdPickerProtein(oldProt);
@@ -520,6 +521,7 @@ public class IdPickerResultSaver {
         idpProt.setClusterId(protein.getProteinClusterId());
         idpProt.setGroupId(protein.getProteinGroupId());
         idpProt.setIsParsimonious(protein.getIsAccepted());
+        idpProt.setIsSubset(protein.getProtein().isSubset());
         idpProt.setCoverage(protein.getPercentCoverage());
         idpProt.setNsaf(protein.getNSAF());
         int pinferProteinId = protDao.saveIdPickerProtein(idpProt);

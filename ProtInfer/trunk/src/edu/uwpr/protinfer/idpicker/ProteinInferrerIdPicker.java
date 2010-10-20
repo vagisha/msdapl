@@ -1,8 +1,10 @@
 package edu.uwpr.protinfer.idpicker;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -128,6 +130,28 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
         log.info("Inferred proteins in: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds \nAll: "+
                 allProteins.size()+" Parsimonious Groups: "+cover.size()+"; Parsimonious Proteins: "+parsimCount);
 
+        
+        // Mark subset proteins
+        s = System.currentTimeMillis();
+        
+        SubsetProteinFinder subsetFinder = new SubsetProteinFinder();
+        subsetFinder.markSubsetProteins(allProteins);
+        int subsetCount = 0;
+        int subsetGrpCount = 0;
+        Set<Integer> grpIdSeen = new HashSet<Integer>();
+        for(InferredProtein<S> prot: allProteins) {
+        	if(prot.getProtein().isSubset())
+        		subsetCount++;
+        	if(grpIdSeen.contains(prot.getProteinGroupId()))
+        		continue;
+        	grpIdSeen.add(prot.getProteinGroupId());
+        	if(prot.getProtein().isSubset())
+        		subsetGrpCount++;
+        }
+        log.info("Marked subset proteins in: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds \nAll: "+
+                allProteins.size()+" Subset Groups: "+subsetGrpCount+"; Subset Proteins: "+subsetCount);
+        e = System.currentTimeMillis();
+        
         return allProteins;
     }
 

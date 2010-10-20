@@ -7,6 +7,7 @@ public class Protein {
     private int id; // could be a database id
     private boolean isDecoy = false;
     private boolean isAccepted = false;
+    private boolean isSubset = false;
     private int proteinClusterId;
     private int proteinGroupId;
     
@@ -51,7 +52,15 @@ public class Protein {
         this.isAccepted = isAccepted;
     }
     
-    public void setProteinClusterId(int proteinClusterId) {
+    public boolean isSubset() {
+		return isSubset;
+	}
+
+	public void setSubset(boolean isSubset) {
+		this.isSubset = isSubset;
+	}
+
+	public void setProteinClusterId(int proteinClusterId) {
         this.proteinClusterId = proteinClusterId;
     }
 
