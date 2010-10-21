@@ -90,7 +90,9 @@ public class MsJobSubmitter {
 			messenger.addError("Not a valid pipeline: "+job.getPipeline());
 			pass = false;
 		}
-		
+		// TODO -- hack. Set it back
+		if(job.getPipeline().equals(Pipeline.MACOSS.name()))
+			job.setPipeline("MACCOSS");
 		
 		// Date the data was generated
 		if(job.getDate() == null) {
@@ -127,9 +129,12 @@ public class MsJobSubmitter {
 			int instrumentId;
 			try {
 				instrumentId = lookup.forName(job.getInstrument());
-				if(instrumentId > 0)
+				if(instrumentId > 0) {
 					jobSaver.setInstrumentId(instrumentId);
+					job.setInstrument(lookup.nameForId(instrumentId));
+				}
 				else {
+					job.setInstrument(null);
 					messenger.addWarning("Instrument: "+job.getInstrument()+" was not found in the database");
 				}
 			} catch (SQLException e) {
@@ -142,7 +147,9 @@ public class MsJobSubmitter {
 		}
 		
 		try {
-			return jobSaver.savetoDatabase();
+			int jobId = jobSaver.savetoDatabase();
+			job.setId(jobId);
+			return jobId;
 		} catch (Exception e) {
 			messenger.addError("There was error submitting the job.  The error message was: "+e.getMessage());
 			return -2;

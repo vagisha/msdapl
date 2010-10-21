@@ -156,10 +156,18 @@ public class MsJob {
 			buf.append("Remote Server: "+this.getRemoteServer()+"\n");
 		buf.append("Pipeline: "+this.getPipeline()+"\n");
 		buf.append("Date: "+this.getDate()+"\n");
-		buf.append("Status: "+this.getStatus()+"\n");
-		buf.append("Instrument: "+this.getInstrument()+"\n");
-		buf.append("Species: "+this.getTargetSpecies()+"\n");
-		buf.append("Comments: "+this.getComments()+"\n");
+		if(this.getStatus() != null)
+			buf.append("Status: "+this.getStatus()+"\n");
+		if(this.getInstrument() == null)
+			buf.append("Instrument: UNKNOWN\n");
+		else
+			buf.append("Instrument: "+this.getInstrument()+"\n");
+		if(this.getTargetSpecies() == null)
+			buf.append("Species: UNKNOWN\n");
+		else
+			buf.append("Species: "+this.getTargetSpecies()+"\n");
+		if(this.getComments() != null)
+			buf.append("Comments: "+this.getComments()+"\n");
 		return buf.toString();
 	}
 	

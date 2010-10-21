@@ -71,7 +71,7 @@ public class Emailer {
 	private String getEmailBody(MsJob job) {
 		
 		StringBuilder buf = new StringBuilder();
-		buf.append("A MS/MS data upload request has been submitted for you via hermie.\n");
+		buf.append("A MSDaPl data upload request has been submitted for you from hermie.\n");
 		buf.append("If you did not make this request please contact the MSDaPl team.\n\n");
 		
 		buf.append("Job Details:\n");
@@ -83,6 +83,6 @@ public class Emailer {
 	}
 
 	private String getEmailSubject(MsJob job) {
-		return "MS/MS data upload submitted via hermie. Job ID: "+job.getId();
+		return "MSDaPl data upload submitted from hermie. Job ID: "+job.getId();
 	}
 }
