@@ -19,6 +19,10 @@
   	<load-on-startup>1</load-on-startup>
   </servlet>
   
+  <listener>
+   <listener-class>org.yeastrc.jqs.queue.ws.ApplicationPropertiesInitializer</listener-class>
+  </listener>
+  
   <servlet-mapping>
   	<servlet-name>JAX-RS REST Servlet</servlet-name>
   	<url-pattern>/services/*</url-pattern>

@@ -14,7 +14,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.jqs.queue.ResearcherEmailLookup;
 import org.yeastrc.www.user.User;
 
 /**
@@ -52,7 +51,7 @@ public class Emailer {
             message.setFrom(fromAddress);
 
             // set the to address
-            Address[] toAddress = InternetAddress.parse( ResearcherEmailLookup.getInstance().getEmail(user.getResearcher().getID()) );
+            Address[] toAddress = InternetAddress.parse( user.getResearcher().getEmail() );
             message.setRecipients(Message.RecipientType.TO, toAddress);
 
             // set the subject
@@ -75,6 +74,7 @@ public class Emailer {
 		buf.append("A MS/MS data upload request has been submitted for you via hermie.\n");
 		buf.append("If you did not make this request please contact the MSDaPl team.\n\n");
 		
+		buf.append("Job Details:\n");
 		buf.append(job.toString()+"\n\n");
 
 		buf.append("Thank you,\nMSDaPl Team\n");

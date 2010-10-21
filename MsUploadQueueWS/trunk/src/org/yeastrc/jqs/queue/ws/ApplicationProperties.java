@@ -6,9 +6,8 @@
  */
 package org.yeastrc.jqs.queue.ws;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -21,22 +20,19 @@ public class ApplicationProperties {
     private final static Logger log = Logger.getLogger(ApplicationProperties.class);
     private static String noreplySender = "";
     
-    public static void load() {
+    public static void load(InputStream propsFileStream) {
         
-        String propsFile = "application.properties";
-        System.out.println("LOADING PROPERTIES FROM: "+propsFile);
         Properties props = new Properties();
         try {
-            props.load(new FileInputStream(propsFile));
+            props.load(propsFileStream);
             noreplySender = props.getProperty("noreply.sender");
         }
-        catch (FileNotFoundException e) {
-            log.error("Properties file: "+propsFile+" not found!", e);
+        catch (IOException e) {
+            log.error("Error reading properties file: "+propsFileStream, e);
             e.printStackTrace();
         }
-        catch (IOException e) {
-            log.error("Error reading properties file: "+propsFile, e);
-            e.printStackTrace();
+        finally {
+        	if(propsFileStream != null) try {propsFileStream.close();} catch(IOException e){}
         }
     }
 
