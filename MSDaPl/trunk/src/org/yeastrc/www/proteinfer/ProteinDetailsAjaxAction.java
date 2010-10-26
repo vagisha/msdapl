@@ -125,10 +125,8 @@ public class ProteinDetailsAjaxAction extends Action {
             		else {
             			String aString = "";
             			for(YeastOrfAbundance a: abundances) {
-            				double abundance = a.getAbundance();
-            				aString += ", "+a.getOrfName()+": ";
-            				if(abundance == Math.round(abundance)) aString += String.valueOf((int)abundance);
-            				else aString +=  String.valueOf(abundance);
+            				String abundance = a.getAbundanceAndOrfNameString();
+            				aString += ", "+abundance;
             			}
             			aString = aString.substring(1);
             			request.setAttribute("proteinAbundance", aString);
