@@ -314,14 +314,14 @@ public class MsDataUploader {
 //        log.info("Disabling keys on msProteinMatch table");
 //        DAOFactory.instance().getMsProteinMatchDAO().disableKeys();
         
-        log.info("Disabled keys");
+//        log.info("Disabled keys");
     }
     
     private void enableSearchTableKeys() throws SQLException {
         
         // enable keys on msRunSearchResult table
-        log.info("Enabling keys on msRunSearchResult table");
-        DAOFactory.instance().getMsSearchResultDAO().enableKeys();
+//        log.info("Enabling keys on msRunSearchResult table");
+//        DAOFactory.instance().getMsSearchResultDAO().enableKeys();
         
 //        // enable keys on SQTSearchResult
 //        log.info("Enabling keys on SQTSearchResult table");
@@ -335,7 +335,7 @@ public class MsDataUploader {
 //        log.info("Enabling keys on msProteinMatch table");
 //        DAOFactory.instance().getMsProteinMatchDAO().enableKeys();
         
-        log.info("Enabled keys");
+//        log.info("Enabled keys");
     }
     
     
@@ -345,16 +345,16 @@ public class MsDataUploader {
 //        log.info("Disabling keys on PercolatorResult table");
 //        DAOFactory.instance().getPercolatorResultDAO().disableKeys();
         
-        log.info("Disabled keys");
+//        log.info("Disabled keys");
     }
     
     private void enableAnalysisTableKeys() throws SQLException {
         
         // enable keys on msRunSearchResult table
-        log.info("Enabling keys on PercolatorResult table");
-        DAOFactory.instance().getPercolatorResultDAO().enableKeys();
+//        log.info("Enabling keys on PercolatorResult table");
+//        DAOFactory.instance().getPercolatorResultDAO().enableKeys();
         
-        log.info("Enabled keys");
+//        log.info("Enabled keys");
     }
 
     private MsExperimentUploader initializeExperimentUploader() throws UploadException  {
