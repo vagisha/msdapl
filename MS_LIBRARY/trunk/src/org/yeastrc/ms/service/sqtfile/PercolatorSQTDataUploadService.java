@@ -83,7 +83,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     private String programVersion = "uninit";
 
     private Map<String, String> params;
-    private int analysisId;
+    private int analysisId = 0;
     
     private int numResultsNotFound = 0;
     
@@ -178,7 +178,8 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         
         // create a new entry in the msSearchAnalysis table
         try {
-            analysisId = saveTopLevelAnalysis();
+        	if(analysisId == 0)
+        		analysisId = saveTopLevelAnalysis();
         }
         catch (UploadException e) {
             e.appendErrorMessage("\n\t!!!PERCOLATOR ANALYSIS WILL NOT BE UPLOADED\n");
@@ -258,6 +259,10 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         List<Integer> analysisIds = new ArrayList<Integer>();
         analysisIds.add(analysisId);
         return analysisIds;
+    }
+    
+    public void setAnalysisId(int analysisId) {
+    	this.analysisId = analysisId;
     }
     
     

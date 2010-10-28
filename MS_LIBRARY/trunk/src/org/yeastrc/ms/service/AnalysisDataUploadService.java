@@ -26,4 +26,6 @@ public interface AnalysisDataUploadService extends UploadService {
     
     public List<Integer> getUploadedAnalysisIds();
     
+    public void deleteAnalysis(int analysisId);
+    
 }

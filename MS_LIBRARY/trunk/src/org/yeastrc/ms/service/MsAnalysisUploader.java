@@ -16,6 +16,8 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.service.percolator.PercolatorXmlDataUploadService;
+import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
 
 /**
  * MsAnalysisUploader.java
@@ -34,6 +36,7 @@ public class MsAnalysisUploader {
 
 	private int searchId = 0; // uploaded searchId
 	private int experimentId = 0; // uploaded experimentId
+	private int searchAnalysisId = 0;
 
 	private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
 
@@ -48,6 +51,14 @@ public class MsAnalysisUploader {
 		this.analysisDirectory = analysisDirectory.trim();
 	}
 
+	public int getSearchAnalysisId() {
+		return this.searchAnalysisId;
+	}
+	
+	public void setSearchAnalysisId(int searchAnalysisId) {
+		this.searchAnalysisId = searchAnalysisId;
+	}
+	
 	public void uploadData() {
 
 
@@ -59,6 +70,7 @@ public class MsAnalysisUploader {
 			ex.appendErrorMessage("Experiment ID: "+experimentId+" does not exist in the database.");
 			ex.appendErrorMessage("!!!ANALYSIS WILL NOT BE UPLOADED!!!");
 			uploadExceptionList.add(ex);
+			deleteAnalysis(this.searchAnalysisId);
 			log.error(ex.getMessage(), ex);
 			return;
 		}
@@ -75,6 +87,7 @@ public class MsAnalysisUploader {
 			ex.appendErrorMessage(e.getMessage());
 			ex.appendErrorMessage("Analysis will not be uploaded\n");
 			uploadExceptionList.add(ex);
+			deleteAnalysis(this.searchAnalysisId);
 			log.error(ex.getMessage());
 			log.error("ABORTING ANALYSIS UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
 			return;
@@ -84,6 +97,7 @@ public class MsAnalysisUploader {
 			ex.appendErrorMessage("No search ID found for experiment "+experimentId);
 			ex.appendErrorMessage("Analysis will not be uploaded\n");
 			uploadExceptionList.add(ex);
+			deleteAnalysis(this.searchAnalysisId);
 			log.error(ex.getMessage());
 			log.error("ABORTING ANALYSIS UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
 			return;
@@ -99,6 +113,7 @@ public class MsAnalysisUploader {
 		}
 		catch (UploadException e) {
 			uploadExceptionList.add(e);
+			deleteAnalysis(this.searchAnalysisId);
 			log.error(e.getMessage(), e);
 			return;
 		}
@@ -109,6 +124,7 @@ public class MsAnalysisUploader {
 			UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
 			ex.appendErrorMessage(adus.getPreUploadCheckMsg());
 			uploadExceptionList.add(ex);
+			deleteAnalysis(this.searchAnalysisId);
 			log.error(ex.getMessage(), ex);
 			return;
 		}
@@ -131,6 +147,7 @@ public class MsAnalysisUploader {
 		catch (SQLException e) {
 			UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
 			uploadExceptionList.add(ex);
+			deleteAnalysis(this.searchAnalysisId);
 			log.error(ex.getMessage(), ex);
 			log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
 			return;
@@ -139,9 +156,11 @@ public class MsAnalysisUploader {
 		log.info("BEGINNING upload of analysis results");
 		try {
 			adus.upload();
+			this.searchAnalysisId = adus.getUploadedAnalysisIds().get(0);
 		}
 		catch (UploadException ex) {
 			uploadExceptionList.add(ex);
+			deleteAnalysis(this.searchAnalysisId);
 			log.error(ex.getMessage(), ex);
 			log.error("ABORTING ANALYSIS UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
 
@@ -161,6 +180,7 @@ public class MsAnalysisUploader {
 		catch (SQLException e) {
 			UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
 			uploadExceptionList.add(ex);
+			deleteAnalysis(this.searchAnalysisId);
 			log.error(ex.getMessage(), ex);
 			log.error("ABORTING ANALYSIS UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
 			return;
@@ -168,6 +188,11 @@ public class MsAnalysisUploader {
 
 		long end = System.currentTimeMillis();
 		logEndUpload(start, end);
+	}
+
+	private void deleteAnalysis(int searchAnalysisId) {
+		if(adus != null)
+			adus.deleteAnalysis(searchAnalysisId);
 	}
 
 	private void initializeUploader() throws UploadException  {
@@ -182,6 +207,15 @@ public class MsAnalysisUploader {
 			adus.setSearchProgram(search.getSearchProgram());
 			List<String> searchFileNames = getSearchFileNames(searchId);
 			adus.setSearchDataFileNames(searchFileNames);
+			
+			if(this.searchAnalysisId != 0) {
+				if(adus instanceof PercolatorSQTDataUploadService) {
+					((PercolatorSQTDataUploadService)adus).setAnalysisId(searchAnalysisId);
+				}
+				else if(adus instanceof PercolatorXmlDataUploadService) {
+					((PercolatorXmlDataUploadService)adus).setAnalysisId(searchAnalysisId);
+				}
+			}
 		}
 		catch (UploadServiceFactoryException e1) {
 			UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
@@ -218,7 +252,7 @@ public class MsAnalysisUploader {
 		List<Integer> runSearchIds = rsDao.loadRunSearchIdsForSearch(searchId);
 		List<String> searchFileNames = new ArrayList<String>(runSearchIds.size());
 		for(Integer runSearchId: runSearchIds)
-			searchFileNames.add(rsDao.loadFilenameForRunSearch(runSearchId));
+			searchFileNames.add(rsDao.loadFilenameForRunSearch(runSearchId)+".sqt");
 		return searchFileNames;
 	}
 
@@ -279,5 +313,16 @@ public class MsAnalysisUploader {
 
 		//        log.info("Enabled keys");
 	}
-
+	
+	public List<UploadException> getUploadExceptionList() {
+        return this.uploadExceptionList;
+    }
+    
+    public String getUploadWarnings() {
+        StringBuilder buf = new StringBuilder();
+        for (UploadException e: uploadExceptionList) {
+            buf.append(e.getMessage()+"\n");
+        }
+        return buf.toString();
+    }
 }

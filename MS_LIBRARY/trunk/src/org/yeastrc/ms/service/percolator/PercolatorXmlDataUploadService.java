@@ -189,7 +189,10 @@ public class PercolatorXmlDataUploadService implements
         
         // create a new entry in the msSearchAnalysis table
         try {
-            analysisId = saveTopLevelAnalysis(reader.getPercolatorVersion());
+        	if(analysisId == 0)
+        		analysisId = saveTopLevelAnalysis(reader.getPercolatorVersion());
+        	else
+        		updateProgramVersion(analysisId, reader.getPercolatorVersion());
         }
         catch (UploadException e) {
             e.appendErrorMessage("\n\t!!!PERCOLATOR ANALYSIS WILL NOT BE UPLOADED\n");
@@ -258,6 +261,10 @@ public class PercolatorXmlDataUploadService implements
         return analysisIds;
     }
     
+    public void setAnalysisId(int analysisId) {
+    	this.analysisId = analysisId;
+    }
+    
     
     private Map<String, Integer> createRunSearchIdMap() throws UploadException {
         
@@ -316,6 +323,15 @@ public class PercolatorXmlDataUploadService implements
             UploadException ex = new UploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e);
             ex.setErrorMessage(e.getMessage());
             throw ex;
+        }
+    }
+    
+    private void updateProgramVersion(int analysisId, String programVersion) {
+        try {
+            analysisDao.updateAnalysisProgramVersion(analysisId, programVersion);
+        }
+        catch(RuntimeException e) {
+            log.warn("Error updating program version for analysisID: "+analysisId, e);
         }
     }
     
