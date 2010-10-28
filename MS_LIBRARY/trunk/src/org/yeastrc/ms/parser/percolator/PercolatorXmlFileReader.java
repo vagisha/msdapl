@@ -39,7 +39,9 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
     private List<? extends MsResidueModificationIn> searchDynamicResidueMods;
     private Program searchProgram;
     
-    private static final String namespace = "http://github.com/percolator/percolator/raw/master/src/xml/percolator_out";
+    //private static final String namespace = "http://github.com/percolator/percolator/raw/master/src/xml/percolator_out";
+    //public static final String namespace = "http://per-colator.com/percolator_out/11";
+    public String namespace = null;
     
     public PercolatorXmlFileReader() {
     	searchDynamicResidueMods = new ArrayList<MsResidueModificationIn>();
@@ -143,6 +145,7 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 	
 	private void readPercolatorVersion() throws XMLStreamException {
 		
+		namespace = reader.getNamespaceURI("p");
 		String version = reader.getAttributeValue(namespace,"percolator_version");
 		if(version == null)
 			version = reader.getAttributeValue(null,"percolator_version");
@@ -248,6 +251,8 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 		// We are at the <psm> element; First read the psm_id attribute
 		PercolatorXmlResult result = new PercolatorXmlResult();
 		String id = reader.getAttributeValue(namespace, "psm_id");
+		if(id == null)
+			id = reader.getAttributeValue(null, "psm_id");
 		if(id == null) 
 			throw new DataProviderException("psm_id attribute is required for parsing result");
 		

@@ -49,7 +49,7 @@ public class PercolatorXmlResult implements PercolatorResultIn {
 	}
 	
 	public boolean isComplete() {
-		return (id != null && pep != -1.0 && qvalue != 1.0 
+		return (id != null && pep != -1.0 && qvalue != -1.0 
 				&& observedMass != null
 				&& resultPeptide != null &&
 				matchingLoci.size() > 0);

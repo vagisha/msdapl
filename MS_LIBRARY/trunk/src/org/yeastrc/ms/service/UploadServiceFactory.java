@@ -257,10 +257,16 @@ public class UploadServiceFactory {
                 ext = fileName.substring(idx);
             }
             
-            SearchFileFormat format = SearchFileFormat.forFileExtension(ext);
-            if(format == SearchFileFormat.UNKNOWN) 
-                continue;
+            SearchFileFormat format = SearchFileFormat.UNKNOWN;
             
+            if(fileName.equals(PercolatorXmlDataUploadService.PERC_XML)) {
+            	format = SearchFileFormat.XML_PERC;
+            }
+            else {
+            	format = SearchFileFormat.forFileExtension(ext);
+            }
+            if(format == SearchFileFormat.UNKNOWN) 
+        		continue;
             filenames.add(fileName);
             formats.add(format);
         }
@@ -270,20 +276,26 @@ public class UploadServiceFactory {
         }
         
         if(formats.size() > 1) {
+        	if(formats.contains(SearchFileFormat.XML_PERC) && formats.contains(SearchFileFormat.XML)) {
+        		formats.remove(SearchFileFormat.XML);
+        	}
+        	if(formats.contains(SearchFileFormat.SQT) && formats.contains(SearchFileFormat.XML)) {
+        		formats.remove(SearchFileFormat.XML);
+        	}
         	// We may have .sqt and Percolator xml file in the same directory.  If so we will upload the xml file
         	// ONLY if the version is "UNOFFICIAL" or > 1.14
-        	if(formats.size() == 2) {
-        		if(formats.contains(SearchFileFormat.SQT) && formats.contains(SearchFileFormat.XML)) {
-        			for(String file: filenames) {
-        				if(file.endsWith(".xml")) {
-        					if(isPercolatorXml(dataDirectory+File.separator+file)) {
-        						formats.clear();
-        						formats.add(SearchFileFormat.XML_PERC);
-        					}
-        					else {
-        						formats.remove(SearchFileFormat.XML);
-        					}
+        	if(formats.contains(SearchFileFormat.SQT) && formats.contains(SearchFileFormat.XML_PERC)) {
+        		for(String file: filenames) {
+        			if(file.equals(PercolatorXmlDataUploadService.PERC_XML)) {
+        				if(isPercolatorXml(dataDirectory+File.separator+file)) {
+        					formats.clear();
+        					formats.add(SearchFileFormat.XML_PERC);
         				}
+        				else {
+        					formats.clear();
+        					formats.add(SearchFileFormat.SQT);
+        				}
+        				break;
         			}
         		}
         	}
