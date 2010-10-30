@@ -95,8 +95,8 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
     public void updateComments(int experimentId, String comments) {
         MsExperiment experiment = loadExperiment(experimentId);
         if(experiment == null) {
-            log.error("Failed to update comments. No experiment found with ID: "+experiment.getId());
-            throw new RuntimeException("Failed to update comments. No experiment found with ID: "+experiment.getId());
+            log.error("Failed to update comments. No experiment found with ID: "+experimentId);
+            throw new RuntimeException("Failed to update comments. No experiment found with ID: "+experimentId);
         }
         else {
             experiment.setComments(comments);

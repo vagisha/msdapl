@@ -88,6 +88,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
     private Set<String> checkedPeptideProteinMatches; // TODO this should be removed soon
     private boolean checkPeptideProteinMatches = false;
     
+    private String comments;
     
     //private static final Pattern fileNamePattern = Pattern.compile("interact\\S*.pep.xml");
     
@@ -377,6 +378,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         analysis.setAnalysisProgram(Program.PEPTIDE_PROPHET);
         analysis.setAnalysisProgramVersion(parser.getPeptideProphetVersion());
         analysis.setFileName(pepxmlFile);
+        analysis.setComments(comments);
         int analysisId;
         try {
             analysisId = ppAnalysisDao.save(analysis);
@@ -724,6 +726,10 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
     @Override
     public void setSearchId(int searchId) {
         this.searchId = searchId;
+    }
+    
+    public void setComments(String comments) {
+    	this.comments = comments;
     }
 
     @Override

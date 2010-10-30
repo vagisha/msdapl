@@ -12,6 +12,7 @@ public class SearchAnalysisBean implements MsSearchAnalysis {
     private Date uploadDate;
     private Program analysisProgram;
     private String analysisProgramVersion;
+    private String comments;
     
     /**
      * @return the id
@@ -26,15 +27,17 @@ public class SearchAnalysisBean implements MsSearchAnalysis {
         this.id = id;
     }
     
-//    public int getSearchId() {
-//        return this.searchId;
-//    }
-//    
-//    public void setSearchId(int searchId) {
-//        this.searchId = searchId;
-//    }
+    @Override
+    public String getComments() {
+		return comments;
+	}
     
-    public Program getAnalysisProgram() {
+    @Override
+	public void setComments(String comments) {
+		this.comments = comments;
+	}
+    
+	public Program getAnalysisProgram() {
         return analysisProgram;
     }
     
@@ -58,4 +61,6 @@ public class SearchAnalysisBean implements MsSearchAnalysis {
     public Date getUploadDate() {
         return uploadDate;
     }
+    
+    
 }

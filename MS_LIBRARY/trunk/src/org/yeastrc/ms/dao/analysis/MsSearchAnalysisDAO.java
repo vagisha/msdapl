@@ -19,6 +19,8 @@ public interface MsSearchAnalysisDAO {
     
     public abstract int updateAnalysisProgram(int analysisId, Program program);
     
+    public abstract void updateComments(int experimentId, String comments);
+    
     public void delete(int analysisId);
     
 }

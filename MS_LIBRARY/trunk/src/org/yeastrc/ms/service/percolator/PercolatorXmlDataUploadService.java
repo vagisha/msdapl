@@ -88,6 +88,7 @@ public class PercolatorXmlDataUploadService implements
     private int numAnalysisUploaded = 0;
     
     private int analysisId;
+    private String comments;
     private Map<String,Integer> runSearchIdMap; // key = filename; value = runSearchId
     private Map<String, Integer> runSearchAnalysisIdMap; // key = filename; value runSearchAnalysisId
     Map<Integer, Integer> runIdMap = new HashMap<Integer, Integer>(); // key = runSearchId; value = runId
@@ -265,6 +266,10 @@ public class PercolatorXmlDataUploadService implements
     	this.analysisId = analysisId;
     }
     
+    public void setComments(String comments) {
+    	this.comments = comments;
+    }
+    
     
     private Map<String, Integer> createRunSearchIdMap() throws UploadException {
         
@@ -316,6 +321,7 @@ public class PercolatorXmlDataUploadService implements
 //        analysis.setSearchId(searchId);
         analysis.setAnalysisProgram(Program.PERCOLATOR);
         analysis.setAnalysisProgramVersion(version);
+        analysis.setComments(comments);
         try {
             return analysisDao.save(analysis);
         }
@@ -467,18 +473,18 @@ public class PercolatorXmlDataUploadService implements
 								psmId.getCharge(),peptide.getResultPeptide());
 					}
 					catch(UploadException e) {
-						// TODO -- This is probably because this PSM had XCorrRank > 1 in the sequenst results
+						// TODO -- This is probably because this PSM had XCorrRank > 1 in the sequest results
 						// We only upload XCorrRank = 1 results. Chances are there is no matching Percolator PSM
 						// (in the <psms></psms> list) either.  Ignore it for now.
 						if(e.getErrorCode() == ERROR_CODE.NO_MATCHING_SEARCH_RESULT) {
 							log.warn(e.getErrorMessage());
+							log.error("runSearchId: "+runSearchId+"; scan number: "+psmId.getScanNumber()+"; charge: "+psmId.getCharge()+"; peptide: "+peptide.getResultPeptide().getPeptideSequence());
 							continue;
 						}
 						else
 							throw e;
 					}
 							
-					// get the PercolatorResult ID for this runSearchResultId;
 					Integer runSearchAnalysisId = runSearchAnalysisIdMap.get(sourceFileName);
 					if(runSearchAnalysisId == null) {
 						UploadException ex = new UploadException(ERROR_CODE.NO_RSANALYSISID_FOR_ANALYSIS_FILE);
@@ -488,8 +494,20 @@ public class PercolatorXmlDataUploadService implements
 	        			throw ex;
 					}
 					
+					// get the PercolatorResult ID for this runSearchResultId;
 					for(Integer runSearchResultId: runSearchResultIds) {
 						PercolatorResult percolatorResult = percResultDao.loadForRunSearchAnalysis(runSearchResultId, runSearchAnalysisId);
+						if(percolatorResult == null) {
+							UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+							ex.appendErrorMessage("NO MATCHING PERCOLATOR RESULT FOUND FOR runSearchResultId: "+runSearchResultId+" and runSearchAnalysisId: "+runSearchAnalysisId);
+							ex.appendErrorMessage("scan number: "+psmId.getScanNumber()+"; charge: "+psmId.getCharge()+"; peptide: "+peptide.getResultPeptide().getPeptideSequence());
+		        			//ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
+		        			//deleteAnalysis(analysisId);
+		        			//numAnalysisUploaded = 0;
+		        			//throw ex;
+		        			log.error(ex.getMessage());
+		        			continue;
+						}
 						psmIds.add(percolatorResult.getPercolatorResultId());
 					}
 				}

@@ -15,11 +15,13 @@
 				typeHandler="ProgramTypeHandler"/>
 		<result property="analysisProgramVersion" column="programVersion" />
 		<result property="uploadDate" column="uploadDate" />
+		<result property="comments" column="comments" />
 	</resultMap>
 	
 	<parameterMap class="MsSearchAnalysisIn" id="msAnalysisParam">
 		<parameter property="analysisProgram" typeHandler="ProgramTypeHandler"/>
 		<parameter property="analysisProgramVersion"/>
+		<parameter property="comments" jdbcType="TEXT" />
 	</parameterMap>
 	
 	
@@ -44,8 +46,9 @@
     <insert id="insert" parameterMap="msAnalysisParam">
     	INSERT INTO msSearchAnalysis (
     	programName,
-    	programVersion)
-    	VALUES (?,?)
+    	programVersion,
+    	comments)
+    	VALUES (?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
@@ -67,6 +70,12 @@
     	UPDATE msSearchAnalysis
     	SET programName=?
     	WHERE id=?
+    </update>
+    
+    <update id="updateComments" parameterClass="java.util.Map">
+    	UPDATE msSearchAnalysis
+    	SET comments=#comments#
+    	WHERE id=#analysisId#
     </update>
     
     <delete id="delete" parameterClass="Integer">

@@ -24,6 +24,8 @@ public interface AnalysisDataUploadService extends UploadService {
     
     public void setSearchDataFileNames(List<String> searchDataFileNames);
     
+    public void setComments(String comments);
+    
     public List<Integer> getUploadedAnalysisIds();
     
     public void deleteAnalysis(int analysisId);

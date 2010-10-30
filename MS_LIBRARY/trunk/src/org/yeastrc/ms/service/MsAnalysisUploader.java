@@ -37,7 +37,8 @@ public class MsAnalysisUploader {
 	private int searchId = 0; // uploaded searchId
 	private int experimentId = 0; // uploaded experimentId
 	private int searchAnalysisId = 0;
-
+	private String comments;
+	
 	private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
 
 
@@ -57,6 +58,10 @@ public class MsAnalysisUploader {
 	
 	public void setSearchAnalysisId(int searchAnalysisId) {
 		this.searchAnalysisId = searchAnalysisId;
+	}
+	
+	public void setComments(String comments) {
+		this.comments = comments;
 	}
 	
 	public void uploadData() {
@@ -207,6 +212,7 @@ public class MsAnalysisUploader {
 			adus.setSearchProgram(search.getSearchProgram());
 			List<String> searchFileNames = getSearchFileNames(searchId);
 			adus.setSearchDataFileNames(searchFileNames);
+			adus.setComments(comments);
 			
 			if(this.searchAnalysisId != 0) {
 				if(adus instanceof PercolatorSQTDataUploadService) {

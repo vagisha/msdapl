@@ -84,6 +84,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
 
     private Map<String, String> params;
     private int analysisId = 0;
+    private String comments;
     
     private int numResultsNotFound = 0;
     
@@ -265,6 +266,10 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     	this.analysisId = analysisId;
     }
     
+    public void setComments(String comments) {
+    	this.comments = comments;
+    }
+    
     
     private Map<String, Integer> createRunSearchIdMap() throws UploadException {
         
@@ -314,6 +319,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         SearchAnalysisBean analysis = new SearchAnalysisBean();
 //        analysis.setSearchId(searchId);
         analysis.setAnalysisProgram(Program.PERCOLATOR);
+        analysis.setComments(comments);
         try {
             return analysisDao.save(analysis);
         }

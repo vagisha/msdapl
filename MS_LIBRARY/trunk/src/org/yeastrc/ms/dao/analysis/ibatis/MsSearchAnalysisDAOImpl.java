@@ -57,6 +57,15 @@ public class MsSearchAnalysisDAOImpl extends BaseSqlMapDAO implements MsSearchAn
     }
     
     @Override
+    public void updateComments(int analysisId, String comments) {
+    	
+    	Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put("analysisId", analysisId);
+        map.put("comments", comments);
+        update(namespace+".updateComments", map);
+    }
+    
+    @Override
     public void delete(int analysisId) {
         delete(namespace+".delete", analysisId);
     }

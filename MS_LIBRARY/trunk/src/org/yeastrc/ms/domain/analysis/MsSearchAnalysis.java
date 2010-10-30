@@ -44,4 +44,8 @@ public interface MsSearchAnalysis {
      */
     public abstract String getAnalysisProgramVersion();
     
+    public abstract String getComments();
+    
+    public abstract void setComments(String comments);
+    
 }
