@@ -94,7 +94,7 @@ public class DeleteExperimentAction extends Action {
         // Make sure this experimentID is not currently being uploaded
         MSJob job = null;
         try {
-            job = MSJobFactory.getInstance().getJobForProjectExperiment(projectId, experimentId);
+            job = MSJobFactory.getInstance().getMsJobForProjectExperiment(projectId, experimentId);
             int status = job.getStatus();
             if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK) {
               

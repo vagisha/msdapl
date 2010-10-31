@@ -44,7 +44,7 @@ public class SpeciesChecker {
 					if(notYeastExpts.contains(search.getExperimentId())) // if we have already seen this and it is not yeast go on looking
 						continue;
 
-					MSJob job = MSJobFactory.getInstance().getJobForExperiment(search.getExperimentId());
+					MSJob job = MSJobFactory.getInstance().getMsJobForExperiment(search.getExperimentId());
 
 					if(job.getTargetSpecies() == 4932) {
 						return true;

@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 import org.yeastrc.db.DBConnectionManager;
+import org.yeastrc.jobqueue.JobUtils;
 
 public class MSUploadJobSaver {
 
@@ -28,7 +29,7 @@ public class MSUploadJobSaver {
 			rs.moveToInsertRow();
 			
 			rs.updateInt( "submitter", this.submitter );
-			rs.updateInt( "type", 0 );
+			rs.updateInt( "type", JobUtils.TYPE_MASS_SPEC_UPLOAD );
 			rs.updateDate( "submitDate", new java.sql.Date( (new java.util.Date()).getTime() ) );
 			rs.updateInt( "status", 0 );
 			rs.updateInt( "attempts", 0 );

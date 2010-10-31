@@ -38,6 +38,7 @@ import org.yeastrc.experiment.proteinfer.ProteinferRunSummaryLookup;
 import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
+import org.yeastrc.jobqueue.MsAnalysisUploadJob;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
@@ -245,7 +246,7 @@ public class ViewProjectAction extends Action {
             MSJob job = null;
             int status = 0;
             try {
-                job = MSJobFactory.getInstance().getJobForProjectExperiment(projectId, experimentId);
+                job = MSJobFactory.getInstance().getMsJobForProjectExperiment(projectId, experimentId);
                 status = job.getStatus();
                 if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK)
                     continue;
@@ -290,27 +291,29 @@ public class ViewProjectAction extends Action {
             List<Integer> analysisIdsList = new ArrayList<Integer>(analysisIds);
             Collections.sort(analysisIdsList);
             for(int analysisId: analysisIdsList) {
-                analyses.add(getSearchAnalysis(analysisId));
+            	SearchAnalysis a = getSearchAnalysis(analysisId, projectId);
+            	if(a != null)
+            		analyses.add(a);
             }
             pExpt.setAnalyses(analyses);
             
             
-            // load protein prophet results, if any
-            List<Integer> piRunIds = ProteinInferJobSearcher.getInstance().getProteinferIdsForMsExperiment(experimentId);
-            Collections.sort(piRunIds);
-            
-            // loop over and see if any are ProteinProphet runs
-            List<ExperimentProteinProphetRun> prophetRunList = getProteinProphetRuns(piRunIds);
-            pExpt.setProteinProphetRun(prophetRunList);
-            
-            
-            // load the protein inference jobs, if any
-            List<ExperimentProteinferRun> piRuns = getProteinInferRuns(piRunIds);
-            pExpt.setProtInferRuns(piRuns);
-            
-            
-            // If any of the protein inferences have been bookmarked, mark them now.
-            getBookmarkedProteinInferences(pExpt);
+//            // load protein prophet results, if any
+//            List<Integer> piRunIds = ProteinInferJobSearcher.getInstance().getProteinferIdsForMsExperiment(experimentId);
+//            Collections.sort(piRunIds);
+//            
+//            // loop over and see if any are ProteinProphet runs
+//            List<ExperimentProteinProphetRun> prophetRunList = getProteinProphetRuns(piRunIds);
+//            pExpt.setProteinProphetRun(prophetRunList);
+//            
+//            
+//            // load the protein inference jobs, if any
+//            List<ExperimentProteinferRun> piRuns = getProteinInferRuns(piRunIds);
+//            pExpt.setProtInferRuns(piRuns);
+//            
+//            
+//            // If any of the protein inferences have been bookmarked, mark them now.
+//            getBookmarkedProteinInferences(pExpt);
         }
         
         
@@ -393,6 +396,26 @@ public class ViewProjectAction extends Action {
     			run.setBookmarked(false);
     	}
 	}
+    
+    private void getBookmarkedProteinInferences(SearchAnalysis sAnalysis, int projectId) throws SQLException {
+    	
+    	List<Integer> bookmarked = ProjectProteinInferBookmarkDAO.getInstance().getBookmarkedProteinInferenceIds(projectId);
+    	Collections.sort(bookmarked);
+    	
+    	for(ExperimentProteinferRun run: sAnalysis.getProtInferRuns()) {
+    		if(Collections.binarySearch(bookmarked, run.getJob().getPinferId()) >= 0)
+    			run.setBookmarked(true);
+    		else
+    			run.setBookmarked(false);
+    	}
+    	
+    	for(ExperimentProteinProphetRun run: sAnalysis.getProteinProphetRuns()) {
+    		if(Collections.binarySearch(bookmarked, run.getProteinProphetRun().getId()) >= 0)
+    			run.setBookmarked(true);
+    		else
+    			run.setBookmarked(false);
+    	}
+	}
 
 
 	private ExperimentSearch getExperimentSearch(int searchId) {
@@ -402,7 +425,7 @@ public class ViewProjectAction extends Action {
         return eSearch;
     }
     
-    private SearchAnalysis getSearchAnalysis(int searchAnalysisId) {
+    private SearchAnalysis getSearchAnalysis(int searchAnalysisId, int projectId) throws SQLException {
         
         MsSearchAnalysis analysis = daoFactory.getMsSearchAnalysisDAO().load(searchAnalysisId);
         SearchAnalysis sAnalysis = new SearchAnalysis(analysis);
@@ -411,6 +434,30 @@ public class ViewProjectAction extends Action {
            if(prophetAnalysis != null)
                sAnalysis.setAnalysisName(prophetAnalysis.getFileName());
         }
+        
+        try {
+			MsAnalysisUploadJob job = MSJobFactory.getInstance().getJobForAnalysis(searchAnalysisId);
+			sAnalysis.setJob(job);
+		} catch (Exception e) {
+			// Analyses uploaded as part of full experiment upload will not have a separate job entry in the tblMsAnalysisUploadJobs table
+			log.error("No job found for searchAnalysisID: "+searchAnalysisId, e);
+		}
+		
+		// associate any protein inferences with this analysis
+        List<Integer> piRunIds = ProteinInferJobSearcher.getInstance().getProteinferIdsForMsSearchAnalysis(searchAnalysisId);
+        Collections.sort(piRunIds);
+        
+        // loop over and see if any are ProteinProphet runs
+        List<ExperimentProteinProphetRun> prophetRunList = getProteinProphetRuns(piRunIds);
+        sAnalysis.setProteinProphetRun(prophetRunList);
+        
+        // load the protein inference jobs, if any
+        List<ExperimentProteinferRun> piRuns = getProteinInferRuns(piRunIds);
+        sAnalysis.setProtInferRuns(piRuns);
+        
+        // If any of the protein inferences have been bookmarked, mark them now.
+        getBookmarkedProteinInferences(sAnalysis, projectId);
+        
         return sAnalysis;
     }
     

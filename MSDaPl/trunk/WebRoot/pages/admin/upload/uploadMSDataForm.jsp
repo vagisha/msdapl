@@ -8,6 +8,10 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
+<logic:notPresent name="uploadMSDataForm" scope="request">
+	<logic:forward name="uploadMSDataForm" />
+</logic:notPresent>
+
 <script language="javascript">
 
 // keep track of the form field we're finding a project for
@@ -31,7 +35,6 @@ function onCancel(projectId) {
 	else {
 		document.location = "<yrcwww:link path='viewProject.do?ID=' />"+projectId;
 	}
-		
 }
 </script>
 

@@ -32,7 +32,7 @@ public class MsJobSearcher {
 		try {
 			
 			String sql = "SELECT COUNT(*) FROM tblJobs";
-			sql += " WHERE type="+JobUtils.TYPE_MASS_SPEC_DOWNLOAD;
+			sql += " WHERE (type="+JobUtils.TYPE_MASS_SPEC_UPLOAD+" OR type="+JobUtils.TYPE_ANALYSIS_UPLOAD+")";
 			if (this.status != null && this.status.size() > 0) {
 				sql += " AND status IN (";
 				int cnt = 0;
@@ -82,8 +82,8 @@ public class MsJobSearcher {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<MSJob> getJobs() throws Exception {
-		List<MSJob> jobs = new ArrayList<MSJob>();
+	public List<Job> getJobs() throws Exception {
+		List<Job> jobs = new ArrayList<Job>();
 		
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -91,7 +91,8 @@ public class MsJobSearcher {
 		
 		try {
 			
-			String sql = "SELECT id FROM tblJobs WHERE type="+JobUtils.TYPE_MASS_SPEC_DOWNLOAD;
+			String sql = "SELECT id FROM tblJobs ";
+			sql += " WHERE (type="+JobUtils.TYPE_MASS_SPEC_UPLOAD+" OR type="+JobUtils.TYPE_ANALYSIS_UPLOAD+")";
 			if (this.status != null && this.status.size() > 0) {
 				sql += " AND status IN (";
 				int cnt = 0;

@@ -12,9 +12,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.jobqueue.Job;
 import org.yeastrc.jobqueue.JobResetter;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
+import org.yeastrc.jobqueue.MsAnalysisUploadJob;
 import org.yeastrc.project.Project;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
@@ -51,9 +53,28 @@ public class ResetJobAction extends Action {
 			}
 			
 			try {
-				MSJob job = MSJobFactory.getInstance().getJob( Integer.parseInt( request.getParameter( "id" ) ) );
+				Job job = MSJobFactory.getInstance().getJob( Integer.parseInt( request.getParameter( "id" ) ) );
 			
-				Project project = job.getProject();
+				if (job == null) {
+					ActionErrors errors = new ActionErrors();
+					errors.add("general", new ActionMessage("error.general.errorMessage","No job found with ID "+request.getParameter( "id" )));
+					saveErrors( request, errors );
+					return mapping.findForward( "Failure" );
+				}
+				
+				Project project = null;
+				if(job instanceof MSJob)
+					project = ((MSJob)job).getProject();
+				else if(job instanceof MsAnalysisUploadJob)
+					project = ((MsAnalysisUploadJob)job).getProject();
+				
+				if(project == null) {
+					ActionErrors errors = new ActionErrors();
+					errors.add("general", new ActionMessage("error.general.errorMessage","No project found for job ID "+request.getParameter( "id" )));
+					saveErrors( request, errors );
+					return mapping.findForward("Failure");
+				}
+				
 	            if(!project.checkAccess(user.getResearcher())) {
 	                 ActionErrors errors = new ActionErrors();
 	                 errors.add("username", new ActionMessage("error.general.errorMessage", 
@@ -62,9 +83,6 @@ public class ResetJobAction extends Action {
 	                 return mapping.findForward( "Failure" );
 	            }
 	            
-				if (job == null)
-					return mapping.findForward( "Failure" );
-
 				JobResetter.getInstance().resetJob( job );
 				request.setAttribute( "job", job );
 				

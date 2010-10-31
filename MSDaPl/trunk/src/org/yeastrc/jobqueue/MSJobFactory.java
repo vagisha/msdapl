@@ -35,12 +35,11 @@ public class MSJobFactory {
 	 * @return
 	 * @throws Exception
 	 */
-	public MSJob getJob( int jobID ) throws Exception {
+	public Job getJob( int jobID ) throws Exception {
 		
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		MSJob job = null;
 		
 		try {
 			
@@ -51,45 +50,17 @@ public class MSJobFactory {
 			rs = stmt.executeQuery();
 			
 			if ( !rs.next() )
-				throw new Exception( "Invalid job ID on MSJob.getJob().  Job ID: " + jobID );
+				throw new Exception( "Invalid Job ID: " + jobID );
 			
-			job = new MSJob();
-			job.setId( jobID );
-			job.setSubmitter( rs.getInt( "submitter" ) );
-			job.setType( rs.getInt( "type" ) );
-			job.setSubmitDate( rs.getDate( "submitDate" ) );
-			job.setLastUpdate( rs.getDate( "lastUpdate" ) );
-			job.setStatus( rs.getInt( "status" ) );
-			job.setAttempts( rs.getInt( "attempts" ) );
-			job.setLog( rs.getString( "log" ) );
+			if(rs.getInt("type") == JobUtils.TYPE_MASS_SPEC_UPLOAD) {
+				return getMSJob(jobID, conn, stmt, rs);
+			}
+			else if(rs.getInt("type") == JobUtils.TYPE_ANALYSIS_UPLOAD) {
+				return getMsAnalysisUploadJob(jobID, conn, stmt, rs);
+			}
+			else
+				return null;
 			
-			rs.close(); rs = null;
-			stmt.close(); stmt = null;
-			
-			sql = "SELECT * FROM tblMSJobs WHERE jobID = ?";
-			stmt = conn.prepareStatement( sql );
-			stmt.setInt( 1, jobID );
-			rs = stmt.executeQuery();
-			
-			if (!rs.next())
-				throw new Exception( "Invalid job ID on MSJob.getJob().  Job ID: " + jobID );
-			
-			job.setProjectID( rs.getInt( "projectID" ) );
-			job.setServerDirectory( rs.getString( "serverDirectory" ) );
-			job.setRunDate( rs.getDate( "runDate" ) );
-			job.setBaitProtein( rs.getInt( "baitProtein" ) );
-			job.setBaitProteinDescription( rs.getString( "baitDescription" ) );
-			job.setTargetSpecies( rs.getInt( "targetSpecies" ) );
-			job.setComments( rs.getString( "comments" ) );
-			job.setRunID( rs.getInt( "runID" ) );
-			job.setExperimentID( rs.getInt( "experimentID" ) );
-			job.setGroup( rs.getInt( "groupID" ) );
-			job.setPipeline(rs.getString("pipeline"));
-			job.setInstrumentId(rs.getInt("instrumentID"));
-			
-			rs.close(); rs = null;
-			stmt.close(); stmt = null;
-			conn.close(); conn = null;
 			
 		} finally {
 			
@@ -105,7 +76,79 @@ public class MSJobFactory {
 				try { conn.close(); conn = null; } catch (Exception e) { ; }
 			}			
 		}
+	}
+
+	private MSJob getMSJob(int jobID, Connection conn, PreparedStatement stmt, ResultSet rs) throws Exception {
 		
+		MSJob job;
+		job = new MSJob();
+		job.setId( jobID );
+		job.setSubmitter( rs.getInt( "submitter" ) );
+		job.setType( rs.getInt( "type" ) );
+		job.setSubmitDate( rs.getDate( "submitDate" ) );
+		job.setLastUpdate( rs.getDate( "lastUpdate" ) );
+		job.setStatus( rs.getInt( "status" ) );
+		job.setAttempts( rs.getInt( "attempts" ) );
+		job.setLog( rs.getString( "log" ) );
+		
+		
+		rs.close(); rs = null;
+		stmt.close(); stmt = null;
+		
+		String sql = "SELECT * FROM tblMSJobs WHERE jobID = ?";
+		stmt = conn.prepareStatement( sql );
+		stmt.setInt( 1, jobID );
+		rs = stmt.executeQuery();
+
+		if (!rs.next())
+			throw new Exception( "Invalid job ID on MSJob.getJob().  Job ID: " + jobID );
+
+		job.setProjectID( rs.getInt( "projectID" ) );
+		job.setServerDirectory( rs.getString( "serverDirectory" ) );
+		job.setRunDate( rs.getDate( "runDate" ) );
+		job.setBaitProtein( rs.getInt( "baitProtein" ) );
+		job.setBaitProteinDescription( rs.getString( "baitDescription" ) );
+		job.setTargetSpecies( rs.getInt( "targetSpecies" ) );
+		job.setComments( rs.getString( "comments" ) );
+		job.setRunID( rs.getInt( "runID" ) );
+		job.setExperimentID( rs.getInt( "experimentID" ) );
+		job.setGroup( rs.getInt( "groupID" ) );
+		job.setPipeline(rs.getString("pipeline"));
+		job.setInstrumentId(rs.getInt("instrumentID"));
+		
+		return job;
+	}
+	
+	private MsAnalysisUploadJob getMsAnalysisUploadJob(int jobID, Connection conn, PreparedStatement stmt, ResultSet rs) throws Exception {
+	
+		MsAnalysisUploadJob job;
+		job = new MsAnalysisUploadJob();
+		job.setId( jobID );
+		job.setSubmitter( rs.getInt( "submitter" ) );
+		job.setType( rs.getInt( "type" ) );
+		job.setSubmitDate( rs.getDate( "submitDate" ) );
+		job.setLastUpdate( rs.getDate( "lastUpdate" ) );
+		job.setStatus( rs.getInt( "status" ) );
+		job.setAttempts( rs.getInt( "attempts" ) );
+		job.setLog( rs.getString( "log" ) );
+		
+		
+		rs.close(); rs = null;
+		stmt.close(); stmt = null;
+		
+		String sql = "SELECT * FROM tblMSAnalysisUploadJobs WHERE jobID = ?";
+		stmt = conn.prepareStatement( sql );
+		stmt.setInt( 1, jobID );
+		rs = stmt.executeQuery();
+
+		if (!rs.next())
+			throw new Exception( "Invalid job ID on MSJob.getJob().  Job ID: " + jobID );
+
+		job.setProjectId( rs.getInt( "projectID" ) );
+		job.setExperimentId( rs.getInt( "experimentID" ) );
+		job.setSearchAnalysisId( rs.getInt( "searchAnalysisID" ) );
+		job.setServerDirectory( rs.getString( "serverDirectory" ) );
+		job.setComments( rs.getString( "comments" ) );
 		
 		return job;
 	}
@@ -116,7 +159,7 @@ public class MSJobFactory {
      * @return
      * @throws Exception
      */
-    public MSJob getJobForProjectExperiment( int projectId, int experimentId ) throws Exception {
+    public MSJob getMsJobForProjectExperiment( int projectId, int experimentId ) throws Exception {
         
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -176,13 +219,74 @@ public class MSJobFactory {
         return job;
     }
     
+    
+    /**
+     * Get the MsAnalysisUploadJob from the database for the given and searchAnalysisId
+     * @param searchAnalysisId
+     * @return
+     * @throws Exception
+     */
+    public MsAnalysisUploadJob getJobForAnalysis( int searchAnalysisId ) throws Exception {
+        
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        MsAnalysisUploadJob job = null;
+        
+        try {
+            
+            conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
+            String sql = "SELECT * from tblJobs AS j, tblMSAnalysisUploadJobs AS mj WHERE mj.searchAnalysisID=? AND j.id = mj.jobID";
+            stmt = conn.prepareStatement( sql );
+            stmt.setInt( 1, searchAnalysisId );
+            rs = stmt.executeQuery();
+            
+            if ( !rs.next() )
+                throw new Exception( "No MsAnalysisUploadJobs found for searchAnalysisID: " + searchAnalysisId );
+            
+            job = new MsAnalysisUploadJob();
+            job.setId(rs.getInt("id"));
+            job.setSubmitter( rs.getInt( "submitter" ) );
+            job.setType( rs.getInt( "type" ) );
+            job.setSubmitDate( rs.getDate( "submitDate" ) );
+            job.setLastUpdate( rs.getDate( "lastUpdate" ) );
+            job.setStatus( rs.getInt( "status" ) );
+            job.setAttempts( rs.getInt( "attempts" ) );
+            job.setLog( rs.getString( "log" ) );
+            
+            job.setProjectId( rs.getInt( "projectID" ) );
+            job.setExperimentId( rs.getInt( "experimentID" ) );
+            job.setSearchAnalysisId( rs.getInt( "searchAnalysisID" ) );
+            job.setServerDirectory( rs.getString( "serverDirectory" ) );
+            job.setComments( rs.getString( "comments" ) );
+            
+            
+        } finally {
+            
+            if (rs != null) {
+                try { rs.close(); rs = null; } catch (Exception e) { ; }
+            }
+
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }           
+        }
+        
+        return job;
+    }
+    
+    
     /**
      * Get the MSJob from the database for the given experimentId
      * @param experimentId
      * @return
      * @throws Exception
      */
-    public MSJob getJobForExperiment( int experimentId ) throws Exception {
+    public MSJob getMsJobForExperiment( int experimentId ) throws Exception {
         
         Connection conn = null;
         PreparedStatement stmt = null;

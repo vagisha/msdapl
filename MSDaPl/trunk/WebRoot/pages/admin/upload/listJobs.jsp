@@ -13,6 +13,17 @@
   <logic:forward name="listUploadJobs" />
 </logic:notPresent>
 
+
+<logic:equal name="queued" value="true" scope="request">
+ <center>
+ <hr width="50%">
+  <B><font color="red">The data upload request has been successfully added to the queue.<BR>
+  The ID for the request is <bean:write name="jobId"/>.<br/>
+  You will be notified by email when it is completed.</font></B>
+ <hr width="50%">
+ </center>
+</logic:equal>
+
 <logic:empty name="jobs" scope="request">
 
 	<logic:equal name="status" scope="request" value="pending">
@@ -57,8 +68,10 @@
 	
 		<thead>
 		<tr>
-			<th width="8%">&nbsp;</th>
+			<th width="1%">ID</th>
+			<th width="1%">&nbsp;</th>
 			<th width="8%">Status</th>
+			<th width="1%">Type</th>
 			<th width="8%">Submitter</th>
 			<th width="8%">Sub. Date</th>
 			<th width="8%">Directory</th>
@@ -71,8 +84,14 @@
 		<tbody>
 		<logic:iterate name="jobs" scope="request" id="job">
 			<tr>
-				<td align="left" valign="top" style="width:8%;font-size:8pt;"><a href="<yrcwww:link path='viewUploadJob.do?'/>id=<bean:write name="job" property="id" />">View Job</td>
-
+				<td align="left" valign="top" style="width:1%;">
+					<bean:write name="job" property="id" /> 
+				</td>
+				
+				<td align="left" valign="top" style="width:1%;">
+					<a href="<yrcwww:link path='viewUploadJob.do?'/>id=<bean:write name="job" property="id" />"><span class="small_font">View</span>
+				</td>
+				
 				<td align="left" valign="top" style="width:8%;font-size:8pt;">
 
 					<logic:equal name="job" property="status" value="4">
@@ -82,7 +101,11 @@
 						<bean:write name="job" property="statusDescription" />
 					</logic:notEqual>
 				</td>
-
+				
+				<td align="left" valign="top" style="width:1%;">
+					<span class="tooltip" title='<bean:write name="job" property="typeDescription" />'><bean:write name="job" property="typeDescriptionChar" /></span> 
+				</td>
+				
 				<td align="left" valign="top" style="width:10%;font-size:8pt;">
 					<div style="width:100%;height:auto;overflow:auto;">
 						<a href="<yrcwww:link path='viewResearcher.do?'/>id=<bean:write name="job" property="submitter" />">

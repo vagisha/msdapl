@@ -100,9 +100,10 @@ public class UploadMSDataAction extends Action {
 
 		jobSaver.setSubmitter( user.getID() );
 
+		int jobId;
 		try {
 		    // Save data to the queue database
-		    jobSaver.savetoDatabase();
+		    jobId = jobSaver.savetoDatabase();
 
 		} catch (Exception e) {
 		    ActionErrors errors = new ActionErrors();
@@ -111,9 +112,7 @@ public class UploadMSDataAction extends Action {
 		    return mapping.findForward("Failure");
 		}
 			
-		request.setAttribute( "queued", new Boolean( true ) );
-		
-		// Kick it to the view page
-		return mapping.findForward( "Success" );
+		ActionForward fwd = mapping.findForward( "Success" );
+		return new ActionForward(fwd.getPath()+"?queued="+jobId, fwd.getRedirect());
 	}
 }

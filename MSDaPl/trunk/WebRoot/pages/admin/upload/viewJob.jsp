@@ -60,9 +60,10 @@
 						
 					<logic:notEqual name="job" property="status" value="0"><!-- not waiting to run -->
 					
-					
+						<!-- Retry is available only for full experiment uploads -->
+						<logic:present name="experimentUploadJob">
 						[<a style="color:red;" href="<yrcwww:link path='resetJob.do?'/>id=<bean:write name="job" property="id" scope="request"/>">Retry</a>]
-						
+						</logic:present>
 					
 					</logic:notEqual>
 					</logic:notEqual>
@@ -86,6 +87,8 @@
 	<br><br>
 	<table border="0" width="85%" style="margin-top:10px;" align="center" class="table_basic">
 
+		<!-- Experiment Upload Job -->
+		<logic:present name="experimentUploadJob">
 		<thead>
 		<tr >
 			<th width="100%" colspan="2" align="center"><span style="margin-bottom:20px;font-size:10pt;font-weight:bold;">Experiment Details</span></th>
@@ -101,6 +104,13 @@
 			</td>
 		</tr>
 
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Job Type:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<bean:write name="job" property="typeDescription" />
+			</td>
+		</tr>
+		
 		<tr >
 			<td width="20%" align="left" valign="top" class="left_align">Directory:</td>
 			<td width="80%" align="left" valign="top" class="left_align">
@@ -163,7 +173,63 @@
 			</td>
 		</tr>
 		</tbody>
-	
+		</logic:present>
+		
+		
+		<!-- Analysis Upload Job -->
+		<logic:present name="analysisUploadJob">
+		<thead>
+		<tr >
+			<th width="100%" colspan="2" align="center"><span style="margin-bottom:20px;font-size:10pt;font-weight:bold;">Upload Details</span></th>
+		</tr>
+		</thead>
+		
+		<tbody>
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Project:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<a href="<yrcwww:link path='viewProject.do?'/>ID=<bean:write name="job" property="projectId" />">
+					<bean:write name="job" property="project.title" /></a>
+			</td>
+		</tr>
+
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Job Type:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<bean:write name="job" property="typeDescription" />
+			</td>
+		</tr>
+		
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Directory:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<bean:write name="job" property="serverDirectory" />
+			</td>
+		</tr>
+		
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Experiment ID:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<bean:write name="job" property="experimentId" />
+			</td>
+		</tr>
+		
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Analysis ID:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<bean:write name="job" property="searchAnalysisId" />
+			</td>
+		</tr>
+
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Comments:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<bean:write name="job" property="comments" />
+			</td>
+		</tr>
+		</tbody>
+		</logic:present>
+		
 	</table>
 	</center>
 	<br><br>

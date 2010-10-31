@@ -82,9 +82,14 @@ public class ProteinInferJobSearcher {
         return new ArrayList<Integer>(pinferRunIds);
     }
 
-    public List<ProteinferJob> getProteinferJobsForMsSearch(int msSearchId) {
+    public List<ProteinferJob> getProteinferJobsForMsSearchAnalysis(int msSearchAnalysisId) {
         
-        List<Integer> pinferRunIds = getPinferRunIdsForSearch(msSearchId);
+    	MsSearchAnalysis analysis = analysisDao.load(msSearchAnalysisId);
+        List<Integer> piRunIds = runDao.loadProteinferIdsForInputIds(
+                getRunSearchAnalysisIdsForAnalysis(msSearchAnalysisId), analysis.getAnalysisProgram());
+        
+        Set<Integer> pinferRunIds = new HashSet<Integer>();
+        pinferRunIds.addAll(piRunIds);
         
         if(pinferRunIds == null || pinferRunIds.size() == 0)
             return new ArrayList<ProteinferJob>(0);
@@ -105,6 +110,18 @@ public class ProteinInferJobSearcher {
                 return Integer.valueOf(o1.getPinferId()).compareTo(o2.getPinferId());
             }});
         return jobs;
+    }
+    
+    public List<Integer> getProteinferIdsForMsSearchAnalysis(int msSearchAnalysisId) {
+        
+    	MsSearchAnalysis analysis = analysisDao.load(msSearchAnalysisId);
+        List<Integer> piRunIds = runDao.loadProteinferIdsForInputIds(
+                getRunSearchAnalysisIdsForAnalysis(msSearchAnalysisId), analysis.getAnalysisProgram());
+        
+        Set<Integer> pinferRunIds = new HashSet<Integer>();
+        pinferRunIds.addAll(piRunIds);
+        
+        return new ArrayList<Integer>(pinferRunIds);
     }
 
 

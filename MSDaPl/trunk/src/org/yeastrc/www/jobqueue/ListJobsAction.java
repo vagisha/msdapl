@@ -97,7 +97,11 @@ public class ListJobsAction extends Action {
 			return mapping.findForward( "Failure" );
 		}
 		
-		
+		if(request.getParameter("queued") != null) {
+			request.setAttribute( "queued", Boolean.TRUE );
+			int jobId = Integer.parseInt(request.getParameter("queued"));
+			request.setAttribute("jobId", jobId);
+		}
 		return mapping.findForward( "Success" );
 	}
 }

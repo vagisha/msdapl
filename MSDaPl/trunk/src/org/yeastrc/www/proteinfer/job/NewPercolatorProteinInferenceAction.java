@@ -59,15 +59,15 @@ public class NewPercolatorProteinInferenceAction extends Action {
         }
 
         // Restrict access to members
-        Groups groupMan = Groups.getInstance();
-        if (!groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS) &&
-          !groupMan.isMember( user.getResearcher().getID(), Projects.YATES) &&
-          !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
-            ActionErrors errors = new ActionErrors();
-            errors.add("access", new ActionMessage("error.access.invalidgroup"));
-            saveErrors( request, errors );
-            return mapping.findForward( "Failure" );
-        }
+//        Groups groupMan = Groups.getInstance();
+//        if (!groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS) &&
+//          !groupMan.isMember( user.getResearcher().getID(), Projects.YATES) &&
+//          !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
+//            ActionErrors errors = new ActionErrors();
+//            errors.add("access", new ActionMessage("error.access.invalidgroup"));
+//            saveErrors( request, errors );
+//            return mapping.findForward( "Failure" );
+//        }
         
         int searchAnalysisId = -1;
         if (request.getParameter("searchAnalysisId") != null) {
@@ -120,7 +120,7 @@ public class NewPercolatorProteinInferenceAction extends Action {
         if(!project.checkAccess(user.getResearcher())) {
              ActionErrors errors = new ActionErrors();
              errors.add("username", new ActionMessage("error.general.errorMessage", 
-                     "You may run protein inference only for projects to which you are affiliated"));
+                     "You may run protein inference only for your projects."));
              saveErrors( request, errors );
              return mapping.findForward( "Failure" );
         }

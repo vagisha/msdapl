@@ -186,7 +186,7 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 		 MSJob job = null;
 		 int status = 0;
 		 try {
-			 job = MSJobFactory.getInstance().getJobForProjectExperiment(projectId, experimentId);
+			 job = MSJobFactory.getInstance().getMsJobForProjectExperiment(projectId, experimentId);
 			 status = job.getStatus();
 			 if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK)
 				 return null;

@@ -158,4 +158,27 @@ public class Job {
 		this.type = type;
 	}
 	
+	public String getTypeDescriptionChar() {
+		if(this.type == JobUtils.TYPE_MASS_SPEC_UPLOAD)
+			return "E";
+		else if(this.type == JobUtils.TYPE_ANALYSIS_UPLOAD)
+			return "A";
+		else if(this.type == JobUtils.TYPE_PROTEINFER_RUN)
+			return "I";
+		else
+			return "U";
+	}
+	
+	public String getTypeDescription() {
+		
+		if(this.type == JobUtils.TYPE_MASS_SPEC_UPLOAD)
+			return "Experiment Upload (spectra, search results, analysis etc.)";
+		else if(this.type == JobUtils.TYPE_ANALYSIS_UPLOAD)
+			return "Analysis Results Upload (e.g. Percolator results)";
+		else if(this.type == JobUtils.TYPE_PROTEINFER_RUN)
+			return "Protein Inference";
+		else
+			return "Unknown";
+	}
+	
 }

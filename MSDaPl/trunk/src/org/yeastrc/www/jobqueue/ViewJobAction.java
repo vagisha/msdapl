@@ -13,8 +13,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.bio.taxonomy.Species;
+import org.yeastrc.jobqueue.Job;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
+import org.yeastrc.jobqueue.MsAnalysisUploadJob;
+import org.yeastrc.project.Project;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -50,14 +53,25 @@ public class ViewJobAction extends Action {
 		}
 		
 		try {
-			MSJob job = MSJobFactory.getInstance().getJob( Integer.parseInt( request.getParameter( "id" ) ) );
-			if (job == null)
+			Job job = MSJobFactory.getInstance().getJob( Integer.parseInt( request.getParameter( "id" ) ) );
+			
+			if (job == null) {
+				ActionErrors errors = new ActionErrors();
+				errors.add("general", new ActionMessage("error.general.errorMessage","No job found with ID "+request.getParameter( "id" )));
+				saveErrors( request, errors );
 				return mapping.findForward( "Failure" );
+			}
 			
 			request.setAttribute( "job", job );
-			int speciesId = job.getTargetSpecies();
-			Species species = Species.getInstance(speciesId);
-			request.setAttribute("species", species);
+			if(job instanceof MSJob) {
+				int speciesId = ((MSJob)job).getTargetSpecies();
+				Species species = Species.getInstance(speciesId);
+				request.setAttribute("species", species);
+				request.setAttribute("experimentUploadJob",true);
+			}
+			else if(job instanceof MsAnalysisUploadJob) {
+				request.setAttribute("analysisUploadJob",true);
+			}
 			
 		} catch (Exception e) {
 			return mapping.findForward( "Failure" );

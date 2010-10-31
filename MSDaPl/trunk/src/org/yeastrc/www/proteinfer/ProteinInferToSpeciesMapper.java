@@ -26,7 +26,7 @@ public class ProteinInferToSpeciesMapper {
             int speciesId = 0;
             
             try {
-                MSJob job = MSJobFactory.getInstance().getJobForExperiment(experimentId);
+                MSJob job = MSJobFactory.getInstance().getMsJobForExperiment(experimentId);
                 speciesId = job.getTargetSpecies();
             }
             catch(Exception e) {

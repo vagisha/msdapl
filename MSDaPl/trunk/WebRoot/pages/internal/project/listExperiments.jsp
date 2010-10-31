@@ -38,6 +38,12 @@ function makeCommentEditable() {
 	$(".cancelPiRunComments").each(function() {
 		setupCancelPiRunComments(this);
 	});
+	$(".saveAnalysisComments").each(function() {
+		setupSaveAnalysisComments(this);
+	});
+	$(".cancelAnalysisComments").each(function() {
+		setupCancelAnalysisComments(this);
+	});
 }
 function setupEditableComment(editable) {
 	//alert("making comment editable "+editable);
@@ -53,9 +59,7 @@ function setupSaveExptComments(editable) {
 	
 	$(editable).click(function() {
 		var id = $(this).attr('id');
-		// can also use $(my_element).text().replace(/(^\s*)|(\s*$)/g, '');
-		var comments = $.trim($("#experiment_"+id+"_edit .edit_text").val());
-		saveExptComments(id, comments);
+		saveExptComments(id);
 	});
 }
 function setupCancelExptComments(editable) {
@@ -71,8 +75,7 @@ function setupSavePiRunComments(editable) {
 	
 	$(editable).click(function() {
 		var id = $(this).attr('id');
-		var comments = $.trim($("#experiment_"+id+"_edit .edit_text").val());
-		savePiRunComments(id, comments);
+		savePiRunComments(id);
 	});
 }
 function setupCancelPiRunComments(editable) {
@@ -84,15 +87,36 @@ function setupCancelPiRunComments(editable) {
 	});
 }
 
-function saveExptComments(exptId, comments) {
-	saveComments("<yrcwww:link path='saveExperimentComments.do'/>", 'experiment', exptId, comments);
+function setupSaveAnalysisComments(editable) {
+	
+	$(editable).click(function() {
+		var id = $(this).attr('id');
+		saveAnalysisComments(id);
+	});
+}
+function setupCancelAnalysisComments(editable) {
+	$(editable).click(function() {
+		var id = $(this).attr('id');
+		$("#analysis_"+id+"_text").show();
+		$("#analysis_"+id+"_edit .edit_text").text("");
+		$("#analysis_"+id+"_edit").hide();
+	});
 }
 
-function savePiRunComments(piRunId, comments) {
-	saveComments("<yrcwww:link path='saveProtInferComments.do'/>", 'piRun', piRunId, comments);
+function saveExptComments(exptId) {
+	saveComments("<yrcwww:link path='saveExperimentComments.do'/>", 'experiment', exptId);
 }
 
-function saveComments(url, idName, id, comments) {
+function savePiRunComments(piRunId) {
+	saveComments("<yrcwww:link path='saveProtInferComments.do'/>", 'piRun', piRunId);
+}
+
+function saveAnalysisComments(analysisId) {
+	saveComments("<yrcwww:link path='saveAnalysisComments.do'/>", 'analysis', analysisId);
+	$("#analysis_"+analysisId).text("[Edit]");
+}
+
+function saveComments(url, idName, id) {
 	var oldComments = $.trim($("#"+idName+"_"+id+"_text").text());
 	var newComments = $.trim($("#"+idName+"_"+id+"_edit .edit_text").val());
 	
@@ -360,6 +384,10 @@ function confirmDeleteExperiment(experimentId) {
     }
  }
  
+function viewPercolatorUploadForm(experimentId) {
+	document.location.href="<yrcwww:link path='percolatorUploadForm.do?experimentId='/>"+experimentId+"&projectId="+<bean:write name='project' property='ID'/>;
+}
+ 
  function goToExperiment(exptId) {
  
 	showExperimentDetails(exptId);
@@ -391,6 +419,12 @@ function confirmDeleteExperiment(experimentId) {
 								  						});
 								  						$(".cancelPiRunComments[title='"+title+"']").each(function() {
 								  							setupCancelPiRunComments($(this));
+								  						});
+								  						$(".saveAnalysisComments[title='"+title+"']").each(function() {
+								  							setupSaveAnalysisComments($(this));
+								  						});
+								  						$(".cancelAnalysisComments[title='"+title+"']").each(function() {
+								  							setupCancelAnalysisComments($(this));
 								  						});
 														
 								  					});

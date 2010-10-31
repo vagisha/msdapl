@@ -444,7 +444,7 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 				for(int searchId: searchIds) {
 
 					MsSearch search = searchDao.loadSearch(searchId);
-					MSJob job = MSJobFactory.getInstance().getJobForExperiment(search.getExperimentId());
+					MSJob job = MSJobFactory.getInstance().getMsJobForExperiment(search.getExperimentId());
 					species.add(job.getTargetSpecies());
 				}
 			}

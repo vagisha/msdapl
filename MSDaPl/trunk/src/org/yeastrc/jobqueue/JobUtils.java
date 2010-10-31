@@ -10,8 +10,9 @@ package org.yeastrc.jobqueue;
 public class JobUtils {
 
 	// job types:
-	public static final int TYPE_MASS_SPEC_DOWNLOAD = 0;
+	public static final int TYPE_MASS_SPEC_UPLOAD = 0;
 	public static final int TYPE_PROTEINFER_RUN = 1;
+	public static final int TYPE_ANALYSIS_UPLOAD = 2;
 	
 	// job statuses:
 	public static final int STATUS_QUEUED = 0;
