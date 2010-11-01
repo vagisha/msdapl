@@ -188,7 +188,7 @@
 		<tr >
 			<td width="20%" align="left" valign="top" class="left_align">Project:</td>
 			<td width="80%" align="left" valign="top" class="left_align">
-				<a href="<yrcwww:link path='viewProject.do?'/>ID=<bean:write name="job" property="projectId" />">
+				<a href="<yrcwww:link path='viewProject.do?'/>ID=<bean:write name="job" property="projectID" />">
 					<bean:write name="job" property="project.title" /></a>
 			</td>
 		</tr>
@@ -210,7 +210,7 @@
 		<tr >
 			<td width="20%" align="left" valign="top" class="left_align">Experiment ID:</td>
 			<td width="80%" align="left" valign="top" class="left_align">
-				<bean:write name="job" property="experimentId" />
+				<bean:write name="job" property="experimentID" />
 			</td>
 		</tr>
 		

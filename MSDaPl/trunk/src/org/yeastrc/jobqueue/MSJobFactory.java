@@ -144,8 +144,8 @@ public class MSJobFactory {
 		if (!rs.next())
 			throw new Exception( "Invalid job ID on MSJob.getJob().  Job ID: " + jobID );
 
-		job.setProjectId( rs.getInt( "projectID" ) );
-		job.setExperimentId( rs.getInt( "experimentID" ) );
+		job.setProjectID( rs.getInt( "projectID" ) );
+		job.setExperimentID( rs.getInt( "experimentID" ) );
 		job.setSearchAnalysisId( rs.getInt( "searchAnalysisID" ) );
 		job.setServerDirectory( rs.getString( "serverDirectory" ) );
 		job.setComments( rs.getString( "comments" ) );
@@ -254,8 +254,8 @@ public class MSJobFactory {
             job.setAttempts( rs.getInt( "attempts" ) );
             job.setLog( rs.getString( "log" ) );
             
-            job.setProjectId( rs.getInt( "projectID" ) );
-            job.setExperimentId( rs.getInt( "experimentID" ) );
+            job.setProjectID( rs.getInt( "projectID" ) );
+            job.setExperimentID( rs.getInt( "experimentID" ) );
             job.setSearchAnalysisId( rs.getInt( "searchAnalysisID" ) );
             job.setServerDirectory( rs.getString( "serverDirectory" ) );
             job.setComments( rs.getString( "comments" ) );

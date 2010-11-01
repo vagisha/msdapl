@@ -17,7 +17,6 @@ import org.yeastrc.jobqueue.Job;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
 import org.yeastrc.jobqueue.MsAnalysisUploadJob;
-import org.yeastrc.project.Project;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;

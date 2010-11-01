@@ -19,8 +19,8 @@ public class MsAnalysisUploadJob extends Job {
 		super();
 	}
 	
-	private int projectId;
-	private int experimentId;
+	private int projectID;
+	private int experimentID;
 	private int searchAnalysisId;
 	private String serverDirectory;
 	private String comments;
@@ -31,7 +31,7 @@ public class MsAnalysisUploadJob extends Job {
 		if (this.project == null) {
 			
 			try {
-				this.project = ProjectFactory.getProject( this.projectId );
+				this.project = ProjectFactory.getProject( this.projectID );
 			} catch (Exception e) { ; }
 		}
 		
@@ -70,22 +70,22 @@ public class MsAnalysisUploadJob extends Job {
 	/**
 	 * @return the projectID
 	 */
-	public int getProjectId() {
-		return projectId;
+	public int getProjectID() {
+		return projectID;
 	}
 	/**
 	 * @param projectID the projectID to set
 	 */
-	public void setProjectId(int projectId) {
-		this.projectId = projectId;
+	public void setProjectID(int projectID) {
+		this.projectID = projectID;
 	}
 	
-	public int getExperimentId() {
-		return experimentId;
+	public int getExperimentID() {
+		return experimentID;
 	}
 
-	public void setExperimentId(int experimentId) {
-		this.experimentId = experimentId;
+	public void setExperimentID(int experimentID) {
+		this.experimentID = experimentID;
 	}
 
 	/**
