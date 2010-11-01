@@ -122,7 +122,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     
     void reset() {
 
-        analysisId = 0;
+        //analysisId = 0;
         
         numAnalysisUploaded = 0;
 

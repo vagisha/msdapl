@@ -196,8 +196,11 @@ public class MsAnalysisUploader {
 	}
 
 	private void deleteAnalysis(int searchAnalysisId) {
+		log.info("DELETING analysisID: "+searchAnalysisId);
 		if(adus != null)
 			adus.deleteAnalysis(searchAnalysisId);
+		else 
+			DAOFactory.instance().getMsSearchAnalysisDAO().delete(searchAnalysisId);
 	}
 
 	private void initializeUploader() throws UploadException  {

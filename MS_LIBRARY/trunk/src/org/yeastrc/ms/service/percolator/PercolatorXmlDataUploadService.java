@@ -130,7 +130,7 @@ public class PercolatorXmlDataUploadService implements
     
     void reset() {
 
-        analysisId = 0;
+        //analysisId = 0;
         if(runSearchIdMap != null)
         	runSearchIdMap.clear();
         
