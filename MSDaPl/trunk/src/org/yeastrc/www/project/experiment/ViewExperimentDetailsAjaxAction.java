@@ -338,7 +338,7 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 			 sAnalysis.setJob(job);
 		 } catch (Exception e) {
 			 // Analyses uploaded as part of full experiment upload will not have a separate job entry in the tblMsAnalysisUploadJobs table
-			 log.error("No job found for searchAnalysisID: "+searchAnalysisId, e);
+			 log.error("No job found for searchAnalysisID: "+searchAnalysisId);
 		 }
 
 		 // associate any protein inferences with this analysis
