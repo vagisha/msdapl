@@ -37,13 +37,6 @@
 					<td style="padding-left:10">
 						<bean:write name="experiment" property="uploadDate"/> &nbsp; &nbsp;
 						<span class="clickable underline" style="color:red; font-weight:bold;" onClick="confirmDeleteExperiment('<bean:write name="experiment" property="id"/>')">[Delete Experiment]</span>
-						
-						<logic:notEmpty name="experiment" property="analyses">
-						<logic:equal name="experiment" property="analysisProgramName" value="<%=Program.PERCOLATOR.displayName() %>">
-							&nbsp;&nbsp;
-							<span class="clickable underline" style="color:red; font-weight:bold;" onClick="viewPercolatorUploadForm('<bean:write name="experiment" property="id"/>')">[Add Percolator Results]</span>
-						</logic:equal>
-						</logic:notEmpty>
 					</td>
 				</tr>
 				<tr>

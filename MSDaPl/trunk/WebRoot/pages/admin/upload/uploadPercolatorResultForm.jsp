@@ -44,15 +44,15 @@ function onCancel(projectId, experimentId) {
    
     <tr>
     <td valign="top"><b>Data directory:</b></td>
-    <td valign="top"><html:text property="directory" size="40" maxlength="255"/>
+    <td valign="top"><html:text property="directory" size="50" maxlength="255"/>
     <br/>
-    <span class="small_font">This should be the path to the directory that contains Percolator generated .sqt or .xml files.</span></td>
+    <span class="small_font">This should be the path to the directory that contains Percolator generated .sqt files or combined-results.xml.</span></td>
     </td>
    </tr>
    
    <tr>
     <td valign="top"><b>Comments:</b></td>
-    <td><html:textarea property="comments" cols="40" rows="5"/></td>
+    <td><html:textarea property="comments" cols="50" rows="5"/></td>
    </tr>
 
   </table> 

@@ -7,6 +7,7 @@
 package org.yeastrc.experiment;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -108,7 +109,10 @@ public class SearchAnalysis implements MsSearchAnalysis {
     }
     
     public List<ExperimentProteinferRun> getProtInferRuns() {
-        return protInferRuns;
+    	if(protInferRuns == null)
+    		return new ArrayList<ExperimentProteinferRun>();
+    	else
+    		return protInferRuns;
     }
 
     public void setProtInferRuns(List<ExperimentProteinferRun> protInferRuns) {
@@ -130,7 +134,10 @@ public class SearchAnalysis implements MsSearchAnalysis {
     }
 
     public List<ExperimentProteinProphetRun> getProteinProphetRuns() {
-        return prophetRuns;
+    	if(prophetRuns == null)
+    		return new ArrayList<ExperimentProteinProphetRun>();
+    	else
+    		return prophetRuns;
     }
     
     public void setProteinProphetRun(List<ExperimentProteinProphetRun> runs) {

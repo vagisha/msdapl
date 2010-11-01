@@ -298,22 +298,22 @@ public class ViewProjectAction extends Action {
             pExpt.setAnalyses(analyses);
             
             
-//            // load protein prophet results, if any
-//            List<Integer> piRunIds = ProteinInferJobSearcher.getInstance().getProteinferIdsForMsExperiment(experimentId);
-//            Collections.sort(piRunIds);
-//            
-//            // loop over and see if any are ProteinProphet runs
-//            List<ExperimentProteinProphetRun> prophetRunList = getProteinProphetRuns(piRunIds);
-//            pExpt.setProteinProphetRun(prophetRunList);
-//            
-//            
+            // load protein prophet results, if any
+            List<Integer> piRunIds = ProteinInferJobSearcher.getInstance().getProteinferIdsForMsExperiment(experimentId);
+            Collections.sort(piRunIds);
+            
+            // loop over and see if any are ProteinProphet runs
+            List<ExperimentProteinProphetRun> prophetRunList = getProteinProphetRuns(piRunIds);
+            pExpt.setProteinProphetRun(prophetRunList);
+            
+            
 //            // load the protein inference jobs, if any
 //            List<ExperimentProteinferRun> piRuns = getProteinInferRuns(piRunIds);
 //            pExpt.setProtInferRuns(piRuns);
 //            
 //            
-//            // If any of the protein inferences have been bookmarked, mark them now.
-//            getBookmarkedProteinInferences(pExpt);
+            // If any of the protein inferences have been bookmarked, mark them now.
+            getBookmarkedProteinInferences(pExpt);
         }
         
         
@@ -446,10 +446,6 @@ public class ViewProjectAction extends Action {
 		// associate any protein inferences with this analysis
         List<Integer> piRunIds = ProteinInferJobSearcher.getInstance().getProteinferIdsForMsSearchAnalysis(searchAnalysisId);
         Collections.sort(piRunIds);
-        
-        // loop over and see if any are ProteinProphet runs
-        List<ExperimentProteinProphetRun> prophetRunList = getProteinProphetRuns(piRunIds);
-        sAnalysis.setProteinProphetRun(prophetRunList);
         
         // load the protein inference jobs, if any
         List<ExperimentProteinferRun> piRuns = getProteinInferRuns(piRunIds);

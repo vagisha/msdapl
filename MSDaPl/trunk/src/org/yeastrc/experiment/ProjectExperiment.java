@@ -165,7 +165,10 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     }
 
     public List<ExperimentProteinProphetRun> getProteinProphetRuns() {
-        return prophetRuns;
+    	if(prophetRuns == null)
+    		return new ArrayList<ExperimentProteinProphetRun>();
+    	else
+    		return prophetRuns;
     }
     
     public void setProteinProphetRun(List<ExperimentProteinProphetRun> runs) {
@@ -347,6 +350,7 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
             if(analysis.getAnalysisName() != null && analysis.getAnalysisName().length() > 0) {
                 text += "<br><NOBR>"+analysis.getAnalysisName()+"</NOBR></br>";
             }
+            text += " "+analysis.getId();
             header = new TableHeader(text);
             header.setSortClass(SORT_CLASS.SORT_INT);
             headers.add(header);
@@ -355,7 +359,10 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     }
 
     public List<ExperimentProteinferRun> getProtInferRuns() {
-        return protInferRuns;
+    	if(protInferRuns == null)
+    		return new ArrayList<ExperimentProteinferRun>();
+    	else
+    		return protInferRuns;
     }
 
     public void setProtInferRuns(List<ExperimentProteinferRun> protInferRuns) {

@@ -7,6 +7,7 @@
 package org.yeastrc.www.project.experiment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -149,7 +150,9 @@ public class ViewExperimentFilesAjaxAction extends Action {
             analysisIds.addAll(aIds);
         }
         List<SearchAnalysis> analyses = new ArrayList<SearchAnalysis>(analysisIds.size());
-        for(int analysisId: analysisIds) {
+        List<Integer> analysisIdsList = new ArrayList<Integer>(analysisIds);
+        Collections.sort(analysisIdsList);
+        for(int analysisId: analysisIdsList) {
             analyses.add(getSearchAnalysis(analysisId));
         }
         pExpt.setAnalyses(analyses);

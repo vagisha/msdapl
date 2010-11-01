@@ -31,28 +31,28 @@ import org.yeastrc.experiment.ExperimentSearch;
 import org.yeastrc.experiment.ProjectExperiment;
 import org.yeastrc.experiment.ProjectProteinInferBookmarkDAO;
 import org.yeastrc.experiment.SearchAnalysis;
+import org.yeastrc.experiment.proteinfer.ProteinferRunSummaryLookup;
 import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
+import org.yeastrc.jobqueue.MsAnalysisUploadJob;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
-import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferPeptideDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
-import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinDAO;
-import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
+import org.yeastrc.ms.domain.protinfer.ProteinferRunSummary;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRunSummary;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
-import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.job.ProteinInferJobSearcher;
 import org.yeastrc.www.proteinfer.job.ProteinferJob;
 import org.yeastrc.www.user.User;
@@ -218,8 +218,10 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 			 analysisIds.addAll(aIds);
 		 }
 		 List<SearchAnalysis> analyses = new ArrayList<SearchAnalysis>(analysisIds.size());
-		 for(int analysisId: analysisIds) {
-			 analyses.add(getSearchAnalysis(analysisId));
+		 List<Integer> analysisIdsList = new ArrayList<Integer>(analysisIds);
+         Collections.sort(analysisIdsList);
+         for(int analysisId: analysisIdsList) {
+			 analyses.add(getSearchAnalysis(analysisId, projectId));
 		 }
 		 pExpt.setAnalyses(analyses);
 	            
@@ -229,18 +231,20 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 		 // loop over and see if any are ProteinProphet runs
 		 ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
 		 ProteinProphetRunDAO pRunDao = ProteinferDAOFactory.instance().getProteinProphetRunDao();
-		 ProteinProphetProteinDAO prophetProtDao = ProteinferDAOFactory.instance().getProteinProphetProteinDao();
-		 ProteinferPeptideDAO peptDao = ProteinferDAOFactory.instance().getProteinferPeptideDao();
 
 		 List<ExperimentProteinProphetRun> prophetRunList = new ArrayList<ExperimentProteinProphetRun>();
 		 for(int piRunId: piRunIds) {
 			 ProteinferRun run = runDao.loadProteinferRun(piRunId);
 			 if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {
+				 
+				 ProteinProphetRunSummary summary = ProteinferRunSummaryLookup.getProteinProphetSummary(piRunId);
 				 ProteinProphetRun ppRun = pRunDao.loadProteinferRun(piRunId);
 				 ExperimentProteinProphetRun eppRun = new ExperimentProteinProphetRun(ppRun);
-				 eppRun.setNumParsimoniousProteins(prophetProtDao.getProteinferProteinIds(piRunId, true).size());
-				 eppRun.setNumParsimoniousProteinGroups(prophetProtDao.getIndistinguishableGroupCount(piRunId, true));
-				 eppRun.setUniqPeptideSequenceCount(peptDao.getUniquePeptideSequenceCountForRun(piRunId));
+				 eppRun.setNumParsimoniousProteins(summary.getProteinCount());
+				 eppRun.setNumParsimoniousProteinGroups(summary.getIndistGroupCount());
+				 eppRun.setNumParsimoniousProteinProphetGroups(summary.getProphetGroupCount());
+				 eppRun.setUniqPeptideSequenceCount(summary.getUniqPeptSeqCount());
+				 eppRun.setUniqIonCount(summary.getUniqIonCount());
 
 				 prophetRunList.add(eppRun);
 			 }
@@ -248,19 +252,20 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 		 pExpt.setProteinProphetRun(prophetRunList);
 	            
 	            
-		 // load the protein inference jobs, if any
-		 List<ProteinferJob> piJobs = ProteinInferJobSearcher.getInstance().getProteinferJobsForMsExperiment(experimentId);
-		 List<ExperimentProteinferRun> piRuns = new ArrayList<ExperimentProteinferRun>(piJobs.size());
-		 IdPickerProteinDAO protDao = ProteinferDAOFactory.instance().getIdPickerProteinDao();
-		 for(ProteinferJob piJob: piJobs) {
-			 ExperimentProteinferRun piRun = new ExperimentProteinferRun(piJob);
-			 piRun.setNumParsimoniousProteins(protDao.getIdPickerProteinIds(piJob.getPinferId(), true).size());
-			 piRun.setNumParsimoniousProteinGroups(protDao.getIdPickerGroupCount(piJob.getPinferId(), true));
-			 piRun.setUniqPeptideSequenceCount(peptDao.getUniquePeptideSequenceCountForRun(piJob.getPinferId()));
-			 piRun.setUniqIonCount(peptDao.getUniqueIonCountForRun(piJob.getPinferId()));
-			 piRuns.add(piRun);
-		 }
-		 pExpt.setProtInferRuns(piRuns);
+//		 // load the protein inference jobs, if any
+//		 List<ProteinferJob> piJobs = ProteinInferJobSearcher.getInstance().getProteinferJobsForMsExperiment(experimentId);
+//		 List<ExperimentProteinferRun> piRuns = new ArrayList<ExperimentProteinferRun>(piJobs.size());
+//		 for(ProteinferJob piJob: piJobs) {
+//			 
+//			 ProteinferRunSummary summary = ProteinferRunSummaryLookup.getIdPickerRunSummary(piJob.getPinferId());
+//			 ExperimentProteinferRun piRun = new ExperimentProteinferRun(piJob);
+//			 piRun.setNumParsimoniousProteins(summary.getParsimProteinCount());
+//			 piRun.setNumParsimoniousProteinGroups(summary.getParsimIndistGroupCount());
+//			 piRun.setUniqPeptideSequenceCount(summary.getUniqPeptSeqCount());
+//			 piRun.setUniqIonCount(summary.getUniqIonCount());
+//			 piRuns.add(piRun);
+//		 }
+//		 pExpt.setProtInferRuns(piRuns);
 	     
 		 return pExpt;
 	 }
@@ -285,6 +290,26 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 				 run.setBookmarked(false);
 		 }
 	 }
+	 
+	 private void getBookmarkedProteinInferences(SearchAnalysis sAnalysis, int projectId) throws SQLException {
+	    	
+	    	List<Integer> bookmarked = ProjectProteinInferBookmarkDAO.getInstance().getBookmarkedProteinInferenceIds(projectId);
+	    	Collections.sort(bookmarked);
+	    	
+	    	for(ExperimentProteinferRun run: sAnalysis.getProtInferRuns()) {
+	    		if(Collections.binarySearch(bookmarked, run.getJob().getPinferId()) >= 0)
+	    			run.setBookmarked(true);
+	    		else
+	    			run.setBookmarked(false);
+	    	}
+	    	
+	    	for(ExperimentProteinProphetRun run: sAnalysis.getProteinProphetRuns()) {
+	    		if(Collections.binarySearch(bookmarked, run.getProteinProphetRun().getId()) >= 0)
+	    			run.setBookmarked(true);
+	    		else
+	    			run.setBookmarked(false);
+	    	}
+		}
 	    
 	 private ExperimentSearch getExperimentSearch(int searchId) {
 
@@ -293,19 +318,69 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 		 return eSearch;
 	 }
 
-	 private SearchAnalysis getSearchAnalysis(int searchAnalysisId) {
-
+	 private SearchAnalysis getSearchAnalysis(int searchAnalysisId, int projectId) throws SQLException {
+		 
 		 MsSearchAnalysis analysis = daoFactory.getMsSearchAnalysisDAO().load(searchAnalysisId);
 		 SearchAnalysis sAnalysis = new SearchAnalysis(analysis);
 		 if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
-			 //System.out.println(analysis.getId());
 			 PeptideProphetAnalysis prophetAnalysis = daoFactory.getPeptideProphetAnalysisDAO().load(analysis.getId());
 			 if(prophetAnalysis != null)
 				 sAnalysis.setAnalysisName(prophetAnalysis.getFileName());
 		 }
+
+		 try {
+			 MsAnalysisUploadJob job = MSJobFactory.getInstance().getJobForAnalysis(searchAnalysisId);
+			 sAnalysis.setJob(job);
+		 } catch (Exception e) {
+			 // Analyses uploaded as part of full experiment upload will not have a separate job entry in the tblMsAnalysisUploadJobs table
+			 log.error("No job found for searchAnalysisID: "+searchAnalysisId, e);
+		 }
+
+		 // associate any protein inferences with this analysis
+		 List<Integer> piRunIds = ProteinInferJobSearcher.getInstance().getProteinferIdsForMsSearchAnalysis(searchAnalysisId);
+		 Collections.sort(piRunIds);
+
+		 // load the protein inference jobs, if any
+		 List<ExperimentProteinferRun> piRuns = getProteinInferRuns(piRunIds);
+		 sAnalysis.setProtInferRuns(piRuns);
+
+		 // If any of the protein inferences have been bookmarked, mark them now.
+		 getBookmarkedProteinInferences(sAnalysis, projectId);
+
 		 return sAnalysis;
+			 
 	 }
 	    
+	 private List<ExperimentProteinferRun> getProteinInferRuns(List<Integer> piRunIds) {
+			
+	        ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
+	        
+			List<ExperimentProteinferRun> idPickerRunList = new ArrayList<ExperimentProteinferRun>();
+			for(int piRunId: piRunIds) {
+				//log.info("Looking at pinfer runID: "+piRunId);
+			    ProteinferRun run = runDao.loadProteinferRun(piRunId);
+			    if(ProteinInferenceProgram.isIdPicker(run.getProgram())) { // is this a IdPicker run?
+			        ProteinferJob job = ProteinInferJobSearcher.getInstance().getJobForPiRunId(piRunId);
+			        if(job == null) {
+			        	log.warn("No job found for protein inference ID: "+piRunId);
+			        	continue;
+			        }
+			        ExperimentProteinferRun eppRun = new ExperimentProteinferRun(job);
+			        
+			        if(job.getStatus() == JobUtils.STATUS_COMPLETE) {
+				        ProteinferRunSummary summary = ProteinferRunSummaryLookup.getIdPickerRunSummary(piRunId);
+				        
+				        eppRun.setNumParsimoniousProteins(summary.getParsimProteinCount());
+				        eppRun.setNumParsimoniousProteinGroups(summary.getParsimIndistGroupCount());
+				        eppRun.setUniqPeptideSequenceCount(summary.getUniqPeptSeqCount());
+				        eppRun.setUniqIonCount(summary.getUniqIonCount());
+			        }
+			        idPickerRunList.add(eppRun);
+			    }
+			}
+			return idPickerRunList;
+		}
+	 
 	 private void linkExperimentAndDtaSelect(ProjectExperiment experiment, List<YatesRun> yatesRuns) throws SQLException {
 
 		 // We will get the searchIds from the tblYatesRun* tables

@@ -5,6 +5,7 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
+						
 <!-- SEARCHES FOR THE EXPERIMENT -->
 <logic:notEmpty name="experiment" property="searches">
 	<logic:iterate name="experiment" property="searches" id="search">
@@ -88,10 +89,17 @@
 <!-- SEARCH ANALYSES FOR THE EXPERIMENT -->
 <logic:notEmpty name="experiment" property="analyses">
 	
+<div>
+<logic:equal name="experiment" property="analysisProgramName" value="<%=Program.PERCOLATOR.displayName() %>">
+	&nbsp;&nbsp;
+	<span class="clickable underline" style="color:red; font-weight:bold;" onClick="viewPercolatorUploadForm('<bean:write name="experiment" property="id"/>')">[Add Percolator Results]</span>
+</logic:equal>
+</div>
+
 	<!-- !!!!!! PERCOLATOR !!!!!! -->
 	<logic:equal name="experiment" property="analysisProgramName" value="<%=Program.PERCOLATOR.displayName() %>">
 		
-			<logic:iterate name="experiment" property="analyses" id="analysis">
+			<logic:iterate name="experiment" property="analyses" id="analysis" indexId="analysis_idx">
 			<div style="background-color: #F0FFF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
 			<table width="100%">
 			<tbody>
@@ -101,12 +109,14 @@
 				<td valign="middle">
 					<span id="analysis_<bean:write name='analysis' property='id'/>_text"><bean:write name="analysis" property="comments"/></span>
 					<logic:notEmpty name="analysis" property="comments">
-						<span class="underlink clickable small_font editableComment" style="color:red;"
-						id="analysis_<bean:write name='analysis' property='id'/>">[Edit]</span>
+						<span class="underline clickable small_font editableComment" style="color:red;"
+						id="analysis_<bean:write name='analysis' property='id'/>"
+						title="expt_<bean:write name='experiment' property='id'/>" >[Edit]</span>
 					</logic:notEmpty>
 					<logic:empty name="analysis" property="comments">
-						<span class="underlink clickable small_font editableComment" style="color:red;"
-						id="analysis_<bean:write name='analysis' property='id'/>">[Add Comments]</span>
+						<span class="underline clickable small_font editableComment" style="color:red;"
+						id="analysis_<bean:write name='analysis' property='id'/>"
+						title="expt_<bean:write name='experiment' property='id'/>" >[Add Comments]</span>
 					</logic:empty>
 				</td>
 				<logic:equal name="analysis" property="complete" value="true">
@@ -150,10 +160,12 @@
 			     style="display:none;">
 			     <textarea rows="5" cols="60" class="edit_text"></textarea>
 			     <br>
-			     <button class="saveAnalysisComments" title="analysis_<bean:write name='analysis' property='id'/>" 
-			     		id="<bean:write name='analysis' property='id'/>">Save</button>
-			     <button class="cancelAnalysisComments" title="analysis_<bean:write name='analysis' property='id'/>" 
-			     		id="<bean:write name='analysis' property='id'/>">Cancel</button>
+			     <button class="saveAnalysisComments"
+			     		id="<bean:write name='analysis' property='id'/>"
+			     		title="expt_<bean:write name='experiment' property='id'/>">Save</button>
+			     <button class="cancelAnalysisComments"
+			     		id="<bean:write name='analysis' property='id'/>"
+			     		title="expt_<bean:write name='experiment' property='id'/>">Cancel</button>
 				</div>
 				</td>
 			</tr>
@@ -161,6 +173,32 @@
 			</tbody>
 		</table>
 		</div>
+		
+		
+		<!-- DTASELECT RUN -- only for the first Percolator run -->
+		<logic:equal name="analysis_idx" value="0">
+		<logic:equal name="experiment" property="hasProtInferResults" value="true" >
+			<logic:present name="experiment" property="dtaSelect">
+				<div style="background-color: #FFFFF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
+	
+				<table width="90%">
+				<tr>
+					<td width="33%"><b>Program: </b>&nbsp;
+					<b>DTASelect</b>
+					&nbsp;</td>
+					<td width="33%">
+						<b><html:link action="viewYatesRun.do" paramId="id" paramName="experiment" paramProperty="dtaSelect.id">[View Results]</html:link></b>
+					</td>
+					<td width="33%">&nbsp;
+					</td>
+				</tr>
+				</table>
+			</div>
+		</logic:present>
+		</logic:equal>
+		</logic:equal>
+
+		<!-- PROTEIN INFERENCE RUNS FOR THIS ANALYSIS -->
 		<logic:notEmpty name="analysis" property="protInferRuns">
 			<%@ include file="protInferDetails.jsp" %>
 		</logic:notEmpty>
@@ -204,23 +242,6 @@
 
 <!-- PROTEIN INFERENCE RESULTS FOR THE EXPERIMENT -->
 <logic:equal name="experiment" property="hasProtInferResults" value="true" >
-<logic:present name="experiment" property="dtaSelect">
-	<div style="background-color: #FFFFF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
-	
-		<table width="90%">
-		<tr>
-			<td width="33%"><b>Program: </b>&nbsp;
-			<b>DTASelect</b>
-			&nbsp;</td>
-			<td width="33%">
-				<b><html:link action="viewYatesRun.do" paramId="id" paramName="experiment" paramProperty="dtaSelect.id">[View Results]</html:link></b>
-			</td>
-			<td width="33%">&nbsp;
-			</td>
-		</tr>
-		</table>
-	</div>
-</logic:present>
 
 <logic:notEmpty name="experiment" property="proteinProphetRuns">
 	<%@ include file="proteinProphetDetails.jsp" %>
