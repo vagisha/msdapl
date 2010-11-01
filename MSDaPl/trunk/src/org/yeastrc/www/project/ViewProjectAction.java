@@ -302,6 +302,9 @@ public class ViewProjectAction extends Action {
             List<Integer> piRunIds = ProteinInferJobSearcher.getInstance().getProteinferIdsForMsExperiment(experimentId);
             Collections.sort(piRunIds);
             
+            if(piRunIds.size() > 0)
+            	pExpt.setHasProtinferRuns(true);
+            
             // loop over and see if any are ProteinProphet runs
             List<ExperimentProteinProphetRun> prophetRunList = getProteinProphetRuns(piRunIds);
             pExpt.setProteinProphetRun(prophetRunList);
@@ -488,6 +491,7 @@ public class ViewProjectAction extends Action {
                     if(idx >= 0) {
                         ProjectExperiment pe = experiments.get(idx);
                         pe.setDtaSelect(run);
+                        pe.setHasProtinferRuns(true);
                     }
                     else {
                     	log.error("Could not link DTASelect run to experiment. Yates runID: "

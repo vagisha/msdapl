@@ -41,6 +41,7 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     private List<ExperimentProteinferRun> protInferRuns;
     
     private boolean hasFullInformation = false;
+    private boolean hasProtinferRuns = false;
     
     private List<TableRow> rows;
     
@@ -370,12 +371,14 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     }
     
     public boolean getHasProtInferResults() {
-        return dtaSelect != null || 
-        (protInferRuns != null && protInferRuns.size() > 0) ||
-        (prophetRuns != null && prophetRuns.size() > 0);
+        return this.hasProtinferRuns;
     }
 
-    @Override
+    public void setHasProtinferRuns(boolean hasProtinferRuns) {
+		this.hasProtinferRuns = hasProtinferRuns;
+	}
+
+	@Override
     public void setComments(String comments) {
         throw new UnsupportedOperationException();
     }
