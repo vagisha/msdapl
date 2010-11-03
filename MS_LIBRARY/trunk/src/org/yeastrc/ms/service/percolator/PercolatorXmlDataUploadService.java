@@ -568,14 +568,36 @@ public class PercolatorXmlDataUploadService implements
         	// matchingResults.size() > 1
         	else { // this can happen if 
         		   // a scan searched with same charge but different M+H (due to Bullseye) results in same peptide match
+        		   // OR results with same peptide sequence but different modifications
         		
-        		// Get the match with the smallest mass difference
         		MsSearchResult bestRes = null;
+        		
+        		// Get the match where the observed mass is the same
+        		List<MsSearchResult> matchingResults2 = new ArrayList<MsSearchResult>();
+        		
         		for(MsSearchResult res: matchingResults) {
         			if(res.getObservedMass().doubleValue() == observedMass) {
-        				bestRes = res;
+        				matchingResults2.add(res);
         			}
         		}
+        		
+        		if(matchingResults2.size() == 1)
+        			bestRes = matchingResults2.get(0);
+        		else {
+        		
+        			String modifiedPeptideSeq = peptide.getModifiedPeptidePS();
+        			// check for exact modified sequence
+        			List<MsSearchResult> matchingResults3 = new ArrayList<MsSearchResult>();
+        			for(MsSearchResult res: matchingResults2) {
+        				if(res.getResultPeptide().getModifiedPeptidePS().equals(modifiedPeptideSeq)) {
+        					matchingResults3.add(res);
+        				}
+        			}
+        			
+        			if(matchingResults3.size() == 1)
+            			bestRes = matchingResults3.get(0);
+        		}
+        		
         		
         		// If we still don't have a definite match
         		if(bestRes == null) {
@@ -595,7 +617,7 @@ public class PercolatorXmlDataUploadService implements
             UploadException ex = new UploadException(ERROR_CODE.RUNTIME_ERROR, e);
             ex.setErrorMessage(e.getMessage());
             throw ex;
-        }
+        } 
     }
     
     
@@ -610,9 +632,11 @@ public class PercolatorXmlDataUploadService implements
             throw ex;
     	}
     	
-        int scanId = getScanId(runId, scanNumber);
+    	int scanId = getScanId(runId, scanNumber);
            
         try {
+        	
+        	String modifiedPeptideSeq = peptide.getModifiedPeptidePS();
         	
         	List<Integer> matchingResultIds = new ArrayList<Integer>();
         	
@@ -631,8 +655,11 @@ public class PercolatorXmlDataUploadService implements
                 //log.warn(ex.getErrorMessage());
             }
             
-            for(MsSearchResult mRes: matchingResults)
-            	matchingResultIds.add(mRes.getId());
+            for(MsSearchResult mRes: matchingResults) {
+            	// make sure the modified sequence is the same
+            	if(mRes.getResultPeptide().getModifiedPeptidePS().equals(modifiedPeptideSeq))
+            		matchingResultIds.add(mRes.getId());
+            }
         	
         	return matchingResultIds;
         	
