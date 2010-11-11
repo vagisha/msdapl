@@ -92,6 +92,10 @@ public class IdPickerParamsMaker {
             else if(param.getName().equals("removeAmbigSpectra")) {
                 idpParams.setRemoveAmbiguousSpectra(Boolean.parseBoolean(param.getValue()));
             }
+            // Refresh Peptide Protein Matches
+            else if(param.getName().equals("refreshPeptideProteinMatches")) {
+            	idpParams.setRefreshPeptideProteinMatches(Boolean.parseBoolean(param.getValue()));
+            }
             else {
                 moreFilters.add(param);
             }

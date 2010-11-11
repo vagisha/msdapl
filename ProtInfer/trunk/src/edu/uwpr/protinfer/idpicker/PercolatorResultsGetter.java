@@ -1,23 +1,34 @@
 package edu.uwpr.protinfer.idpicker;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorPeptideResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
+import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerInput;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
+import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
+import org.yeastrc.ms.service.database.fasta.PeptideProteinMatch;
+import org.yeastrc.ms.service.database.fasta.PeptideProteinMatchingService;
 
 import edu.uwpr.protinfer.PeptideKeyCalculator;
 import edu.uwpr.protinfer.infer.Peptide;
@@ -54,11 +65,11 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
      * and for min peptide length and 
      * ranked by relevant score(s) for each peptide (as defined in the PeptideDefinition). 
      * Ambiguous spectra are filtered.
-     * @throws ModifiedSequenceBuilderException 
+     * @throws ResultGetterException 
      */
     @Override
     public  List<PeptideSpectrumMatchNoFDR> getResultsNoFdr(IdPickerRun run, IDPickerParams params) 
-        throws ModifiedSequenceBuilderException {
+        throws ResultGetterException {
         
         return getResultsNoFdr(run.getInputList(), run.getInputGenerator(), params);
     }
@@ -66,7 +77,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
     
     @Override
     public List<PeptideSpectrumMatchNoFDR> getResultsNoFdr(List<IdPickerInput> inputList, Program inputGenerator,
-            IDPickerParams params) throws ModifiedSequenceBuilderException {
+            IDPickerParams params) throws ResultGetterException {
         
         long start = System.currentTimeMillis();
 
@@ -78,10 +89,21 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
 
         // 2. Convert list of PercolatorResult to PeptideSpectrumMatchNoFDR
         //    Rank the results for each peptide.
-        List<PeptideSpectrumMatchNoFDR> psmList = rankAndConvertResults(params, percParams, allResults);
+        List<PeptideSpectrumMatchNoFDR> psmList;
+		try {
+			psmList = rankAndConvertResults(params, percParams, allResults);
+		} catch (ModifiedSequenceBuilderException e) {
+			throw new ResultGetterException("Error while converting and ranking Percolator results", e);
+		}
         
         // 3. Get all the matching proteins
-        assignMatchingProteins(psmList);
+        if(params.isRefreshPeptideProteinMatches()) {
+        	log.info("Refreshing peptide protein matches");
+        	assignMatchingProteinsFromFasta(psmList, inputList.get(0).getProteinferId());
+        }
+        else {
+        	assignMatchingProteins(psmList);
+        }
         
         
         long end = System.currentTimeMillis();
@@ -122,6 +144,112 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         long e = System.currentTimeMillis();
         log.info("\tTime to get matching proteins: "+TimeUtils.timeElapsedSeconds(s,e)+" seconds.");
     }
+    
+    // Assign matching proteins to each peptide
+    private void assignMatchingProteinsFromFasta(List<PeptideSpectrumMatchNoFDR> psmList, int pinferId) throws ResultGetterException{
+        
+        
+        long s = System.currentTimeMillis();
+        
+        PeptideProteinMatchingService matchService = initializePeptideProteinMatchingService(pinferId);
+        
+        // map of protein accession and protein
+        Map<String, Protein> proteinMap = new HashMap<String, Protein>();
+        
+        for(PeptideSpectrumMatchNoFDR psm: psmList) {
+            
+        	String peptide = psm.getPeptideSequence();
+        	
+        	List<PeptideProteinMatch> matches = matchService.getMatchingProteins(peptide);
+        	
+            for (PeptideProteinMatch protein: matches) {
+            
+            	String accession = protein.getProtein().getAccessionString();
+                Protein prot = proteinMap.get(accession);
+                // If we have not already seen this protein create a new entry
+                if(prot == null) {
+                    prot = new Protein(accession, -1);
+                    proteinMap.put(accession, prot);
+                }
+                psm.getPeptideHit().addProtein(prot);
+            }
+        }
+        
+        long e = System.currentTimeMillis();
+        log.info("\tTime to get matching proteins: "+TimeUtils.timeElapsedSeconds(s,e)+" seconds.");
+    }
+    
+    private PeptideProteinMatchingService initializePeptideProteinMatchingService(int pinferId) throws ResultGetterException{
+
+    	// Get the database ID of the fasta file used for the search
+        List<Integer> fastaDatabaseIds = getDatabaseIdsForProteinInference(pinferId);
+        if(fastaDatabaseIds.size() != 1) {
+        	log.error("Expected 1 fasta databaseID found: "+fastaDatabaseIds.size());
+        	if(fastaDatabaseIds.size() == 0)
+        		throw new ResultGetterException("No fasta database found for protein inference input. Protein inference ID: "+pinferId);
+        	else
+        		throw new ResultGetterException("Multiple fasta databases found for protein inference input. Protein inference ID: "+pinferId);
+        }
+
+    	ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
+    	MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+
+    	List<Integer> searchIds = runDao.loadSearchIdsForProteinferRun(pinferId);
+    	if(searchIds.size() == 0) {
+    		log.error("No search Ids found for protein inference ID: "+pinferId);
+    		throw new ResultGetterException("No search Ids found for protein inference ID: "+pinferId);
+    	}
+    	else if(searchIds.size() > 1) {
+    		log.warn("Multiple search Ids found for protein inference ID: "+pinferId);
+    	}
+         
+    	// TODO If we have multiple searches for this protein inference make sure they all have the 
+    	// same enzyme and numEnzymaticTermini
+        // get the search
+        MsSearch msSearch = searchDao.loadSearch(searchIds.get(0));
+        List<MsEnzyme> enzymes = msSearch.getEnzymeList();
+        
+        int numEnzymaticTermini = 0; 
+        if(msSearch.getSearchProgram() == Program.SEQUEST) {
+        	numEnzymaticTermini = DAOFactory.instance().getSequestSearchDAO().getNumEnzymaticTermini(msSearch.getId());
+        }
+        else if(msSearch.getSearchProgram() == Program.MASCOT)
+        	numEnzymaticTermini = DAOFactory.instance().getMascotSearchDAO().getNumEnzymaticTermini(msSearch.getId());
+
+        
+        // Initialize the peptide protein matching service
+        PeptideProteinMatchingService matchService = null;
+        try {
+			matchService = new PeptideProteinMatchingService(fastaDatabaseIds.get(0));
+		} catch (SQLException e1) {
+			throw new ResultGetterException("Error initializing PeptideProteinMatchingService", e1);
+		}
+
+        matchService.setNumEnzymaticTermini(numEnzymaticTermini);
+        matchService.setEnzymes(enzymes);
+        return matchService;
+    }
+    
+    private List<Integer> getDatabaseIdsForProteinInference(int pinferId) {
+        
+        ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+        
+        List<Integer> searchIds = runDao.loadSearchIdsForProteinferRun(pinferId);
+        if(searchIds.size() == 0) {
+            log.error("No search Ids found for protein inference ID: "+pinferId);
+        }
+        
+        Set<Integer> databaseIds = new HashSet<Integer>();
+        for(int searchId: searchIds) {
+            MsSearch search = searchDao.loadSearch(searchId);
+            for(MsSearchDatabase db: search.getSearchDatabases()) {
+                databaseIds.add(db.getSequenceDatabaseId());
+            }
+        }
+        return new ArrayList<Integer>(databaseIds);
+    }
+    
 
     // Convert the list of PercolatorResult to a list of PeptideSpectrumMatchNoFDR 
     // Results are ranked for each peptide. 

@@ -27,6 +27,7 @@ public class IDPickerParams {
 //    private int minPeptideSpectra = 1;
     private int minPeptideLength = 1;
     private boolean removeAmbiguousSpectra = true;
+    private boolean refreshPeptideProteinMatches = false;
     
     List<IdPickerParam> moreFilters = new ArrayList<IdPickerParam>();
     
@@ -47,6 +48,7 @@ public class IDPickerParams {
         buf.append("Min Peptide Length: "+minPeptideLength+"\n");
 //        buf.append("Min Spectra / Peptide: "+minPeptideSpectra+"\n");
         buf.append("Remove Ambiguous Spectra: "+removeAmbiguousSpectra+"\n");
+        buf.append("Refresh Protein Matches: "+refreshPeptideProteinMatches+"\n");
         buf.append("MORE PARAMS: \n");
         for(IdPickerParam param: moreFilters) {
             buf.append(param.toString()+"\n");
@@ -149,10 +151,15 @@ public class IDPickerParams {
             boolean removeSpectraWithMultiplePeptides) {
         this.removeAmbiguousSpectra = removeSpectraWithMultiplePeptides;
     }
+    public boolean isRefreshPeptideProteinMatches() {
+    	return this.refreshPeptideProteinMatches;
+    }
+    public void setRefreshPeptideProteinMatches(boolean refreshPeptideProteinMatches) {
+    	this.refreshPeptideProteinMatches = refreshPeptideProteinMatches;
+    }
     public boolean isUseIdPickerFDRFormula() {
         return useIdPickerFDRFormula;
     }
-
     public SCORE getScoreForFDR() {
         return scoreForFDR;
     }

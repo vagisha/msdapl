@@ -19,11 +19,11 @@ import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 public interface ResultsGetter {
     
     public abstract List<PeptideSpectrumMatchNoFDR> getResultsNoFdr(IdPickerRun idpRun, IDPickerParams params) 
-        throws ModifiedSequenceBuilderException;
+        throws ResultGetterException;
     
     public abstract List<PeptideSpectrumMatchNoFDR> getResultsNoFdr(List<IdPickerInput> inputList,
                                 Program inputGenerator,
-                                IDPickerParams params) throws ModifiedSequenceBuilderException;
+                                IDPickerParams params) throws ResultGetterException;
 
     public abstract List<PeptideSpectrumMatchIDP> getResults(IdPickerRun idpRun, IDPickerParams params) 
         throws ModifiedSequenceBuilderException;

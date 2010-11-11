@@ -180,6 +180,13 @@ public final class ProgramParam {
 //            "true", null,
 //            "This parameter controls whether the final protein list is filtered by the minimum covering set, i.e. the minimum set of proteins that is necessary to describe all identified peptides")
 
+        public static ProgramParam makeRefreshPeptideProteinMatchParam() {
+            return new ProgramParam(TYPE.BOOLEAN, 
+              "refreshPeptideProteinMatches", "Refresh Protein Matches", 
+              "false", null,
+              "If checked, peptide protein matches will be re-calculated. Otherwise matches reported in SQT files will be used.");
+        }
+    
     }
     
     public static abstract class ParamValidator {
