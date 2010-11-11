@@ -18,7 +18,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.domain.protinfer.ProgramParam;
 import org.yeastrc.ms.domain.protinfer.ProgramParam.ParamMaker;
-import org.yeastrc.project.Projects;
 import org.yeastrc.www.proteinfer.ProteinInferInputSummary;
 import org.yeastrc.www.proteinfer.job.ProgramParameters.Param;
 import org.yeastrc.www.user.Groups;
@@ -48,10 +47,9 @@ public class DoProteinInferenceAction extends Action {
             return mapping.findForward("authenticate");
         }
 
-        // Restrict access to MacCoss lab members
+        // Restrict access to members who are part of a group
         Groups groupMan = Groups.getInstance();
-        if (!groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS) &&
-          !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
+        if (!groupMan.isInAGroup(user.getResearcher().getID())) {
             ActionErrors errors = new ActionErrors();
             errors.add("access", new ActionMessage("error.access.invalidgroup"));
             saveErrors( request, errors );
@@ -80,6 +78,23 @@ public class DoProteinInferenceAction extends Action {
             params.addParam(myParam);
         }
         
+        // If "refresh peptide protein mathces" was unchecked it may not be in the parameters list
+        // or its value will be empty. Set it to false.
+        boolean refreshProteinMatches = false;
+        ProgramParam refreshProteinMatchesParam = ParamMaker.makeRefreshPeptideProteinMatchParam();
+        for(Param param: params.getParamList()) {
+            if(param.getName().equals(refreshProteinMatchesParam.getName())) {
+                if(param.getValue() == null || param.getValue().trim().length() == 0)
+                    param.setValue("false");
+                refreshProteinMatches = true;
+                break;
+            }
+        }
+        if(!refreshProteinMatches) {
+            Param myParam = new Param(refreshProteinMatchesParam);
+            myParam.setValue("false");
+            params.addParam(myParam);
+        }
         
         if(prinferForm.isIndividualRuns()) {
             ProteinferJobSaver.instance().saveMultiJobToDatabase(user.getID(), inputSummary, params, 
