@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.domain.protinfer;
 
+
 /**
  * 
  */
@@ -174,6 +175,13 @@ public final class ProgramParam {
               "removeAmbigSpectra", "Remove Ambiguous Spectra", 
               "true", null,
               "If checked, spectra with > 1 peptide matches, that pass through the filter criteria, will be removed from analysis.");
+        }
+        
+        public static ProgramParam makeRefreshPeptideProteinMatchParam() {
+            return new ProgramParam(TYPE.BOOLEAN, 
+              "refreshPeptideProteinMatches", "Refresh Peptide Protein Matches", 
+              "false", null,
+              "If checked, peptide protein matches will be re-calculated. Otherwise matches reported in SQT files will be used.");
         }
     }
     

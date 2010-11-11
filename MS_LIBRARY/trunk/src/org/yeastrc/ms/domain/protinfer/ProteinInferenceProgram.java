@@ -14,7 +14,7 @@ public class ProteinInferenceProgram {
     private String description;
     private ProgramParam[] params;
     
-    public static final String protInferVersion = "0.1.3";
+    public static final String protInferVersion = "0.1.4";
     
     public static final ProteinInferenceProgram PROTINFER_SEQ = new PISequestProgram();
     public static final ProteinInferenceProgram PROTINFER_PLCID = new PIProlucidProgram();
@@ -176,7 +176,8 @@ public class ProteinInferenceProgram {
                     ParamMaker.makePeptideDefParam(),
                     ParamMaker.makeMinCoverageParam(),
                     ParamMaker.makeMinPeptLengthParam(),
-                    ParamMaker.makeRemoveAmbigSpectraParam()
+                    ParamMaker.makeRemoveAmbigSpectraParam(),
+                    ParamMaker.makeRefreshPeptideProteinMatchParam()
             });
         }
     }
@@ -226,7 +227,8 @@ public class ProteinInferenceProgram {
                     ParamMaker.makePeptideDefParam(),
                     ParamMaker.makeMinCoverageParam(),
                     ParamMaker.makeMinPeptLengthParam(),
-                    ParamMaker.makeRemoveAmbigSpectraParam()
+                    ParamMaker.makeRemoveAmbigSpectraParam(),
+                    ParamMaker.makeRefreshPeptideProteinMatchParam()
             });
         }
     }
