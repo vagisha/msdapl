@@ -296,13 +296,21 @@ public class IdPickerResultsLoader {
     }
     
     private static WIdPickerProtein getWIdPickerProtein(IdPickerProteinBase protein, List<Integer> databaseIds, boolean getPhiliusResults) {
+        return getWIdPickerProtein(protein, databaseIds, true, getPhiliusResults);
+    }
+    
+    private static WIdPickerProtein getWIdPickerProtein(IdPickerProteinBase protein, List<Integer> databaseIds, 
+    		boolean assignProteinProperties,
+    		boolean getPhiliusResults) {
+    	
         WIdPickerProtein wProt = new WIdPickerProtein(protein);
         // set the accession and description for the proteins.  
         // This requires querying the NRSEQ database
         assignProteinListing(wProt, databaseIds);
         
         // get the molecular weight for the protein
-        assignProteinProperties(wProt);
+        if(assignProteinProperties)
+        	assignProteinProperties(wProt);
         
         if(getPhiliusResults) {
         	int sequenceId = wProt.getProteinListing().getSequenceId();
@@ -317,18 +325,65 @@ public class IdPickerResultsLoader {
     }
     
     //---------------------------------------------------------------------------------------------------
+    // Get all proteins that the given protein is a subset of
+    //---------------------------------------------------------------------------------------------------
+    public static List<WIdPickerProtein> getSuperProteins(IdPickerProteinBase protein, int pinferId) {
+        
+    	long s = System.currentTimeMillis();
+        
+    	List<WIdPickerProtein> proteins = getWIdPickerProteins(protein.getSuperProteinIds(), pinferId);
+    	
+        long e = System.currentTimeMillis();
+        log.info("Time to get SUPER proteins for piProtenID: "+protein.getId()+" was "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        
+        return proteins;
+    }
+    
+    //---------------------------------------------------------------------------------------------------
+    // Get all proteins that are a subset of this protien
+    //---------------------------------------------------------------------------------------------------
+    public static List<WIdPickerProtein> getSubsetProteins(IdPickerProteinBase protein, int pinferId) {
+        
+    	long s = System.currentTimeMillis();
+
+    	List<WIdPickerProtein> proteins = getWIdPickerProteins(protein.getSubsetProteinIds(), pinferId);
+        
+        long e = System.currentTimeMillis();
+        log.info("Time to get SUBSET proteins for piProtenID: "+protein.getId()+" was "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        
+        return proteins;
+    }
+    
+    private static List<WIdPickerProtein> getWIdPickerProteins(List<Integer> piProteinIds, int pinferId) {
+    	
+    	if(piProteinIds.size() == 0)
+    		return new ArrayList<WIdPickerProtein>(0);
+    	
+    	 List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
+         
+         List<WIdPickerProtein> proteins = new ArrayList<WIdPickerProtein>(piProteinIds.size());
+         for(int id: piProteinIds) {
+         	IdPickerProteinBase prot = idpProtBaseDao.loadProtein(id);
+         	prot.setPeptideDefinition(new PeptideDefinition());
+             proteins.add(getWIdPickerProtein(prot, fastaDatabaseIds, false, false));
+         }
+         
+         return proteins;
+    }
+    
+    //---------------------------------------------------------------------------------------------------
     // Get all the proteins in a group
     //---------------------------------------------------------------------------------------------------
-    public static List<WIdPickerProtein> getGroupProteins(int pinferId, int groupId, 
+    public static List<WIdPickerProtein> getGroupProteins(int pinferId, int groupLabel, 
             PeptideDefinition peptideDef) {
         
         long s = System.currentTimeMillis();
         
-        List<IdPickerProteinBase> groupProteins = idpProtBaseDao.loadIdPickerGroupProteins(pinferId, groupId);
+        List<IdPickerProteinBase> groupProteins = idpProtBaseDao.loadIdPickerGroupProteins(pinferId, groupLabel);
         
         List<WIdPickerProtein> proteins = new ArrayList<WIdPickerProtein>(groupProteins.size());
         List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
-        boolean getPhiliusResults = ProteinInferPhiliusResultChecker.getInstance().hasPhiliusResults(pinferId);
+        boolean getPhiliusResults = false;
         
         for(IdPickerProteinBase prot: groupProteins) {
             prot.setPeptideDefinition(peptideDef);
@@ -381,11 +436,11 @@ public class IdPickerResultsLoader {
     		throw new IllegalArgumentException("startIndex >= list size in getStartIndexToCompleteFirstGroup");
     	}
     	IdPickerProteinBase protein = idpProtBaseDao.loadProtein(allProteinIds.get(startIndex));
-    	int groupId = protein.getGroupId();
+    	int groupLabel = protein.getProteinGroupLabel();
     	int idx = startIndex - 1;
     	while(idx >= 0) {
     		protein = idpProtBaseDao.loadProtein(allProteinIds.get(idx));
-    		if(protein.getGroupId() != groupId) {
+    		if(protein.getProteinGroupLabel() != groupLabel) {
     			idx = idx+1;
     			break;
     		}
@@ -407,11 +462,11 @@ public class IdPickerResultsLoader {
     		throw new IllegalArgumentException("endInded < 0 in getEndIndexToCompleteFirstGroup");
     	}
     	IdPickerProteinBase protein = idpProtBaseDao.loadProtein(allProteinIds.get(endIndex));
-    	int groupId = protein.getGroupId();
+    	int groupLabel = protein.getProteinGroupLabel();
     	int idx = endIndex + 1;
     	while(idx < allProteinIds.size()) {
     		protein = idpProtBaseDao.loadProtein(allProteinIds.get(idx));
-    		if(protein.getGroupId() != groupId) {
+    		if(protein.getProteinGroupLabel() != groupLabel) {
     			idx = idx-1;
     			break;
     		}
@@ -433,16 +488,16 @@ public class IdPickerResultsLoader {
         if(proteins.size() == 0)
             return new ArrayList<WIdPickerProteinGroup>(0);
         
-        int currGrpId = -1;
+        int currGrpLabel = -1;
         List<WIdPickerProtein> grpProteins = null;
         List<WIdPickerProteinGroup> groups = new ArrayList<WIdPickerProteinGroup>();
         for(WIdPickerProtein prot: proteins) {
-            if(prot.getProtein().getGroupId() != currGrpId) {
+            if(prot.getProtein().getProteinGroupLabel() != currGrpLabel) {
                 if(grpProteins != null && grpProteins.size() > 0) {
                     WIdPickerProteinGroup grp = new WIdPickerProteinGroup(grpProteins);
                     groups.add(grp);
                 }
-                currGrpId = prot.getProtein().getGroupId();
+                currGrpLabel = prot.getProtein().getProteinGroupLabel();
                 grpProteins = new ArrayList<WIdPickerProtein>();
             }
             grpProteins.add(prot);
@@ -541,32 +596,61 @@ public class IdPickerResultsLoader {
         long s = System.currentTimeMillis();
         
         WIdPickerResultSummary summary = new WIdPickerResultSummary();
-//        IdPickerRun run = idpRunDao.loadProteinferRun(pinferId);
-//        summary.setUnfilteredProteinCount(run.getNumUnfilteredProteins());
-        summary.setFilteredProteinCount(proteinIds.size());
+        
+        // TODO remove this later
+        if(pinferId > 256)
+        	summary.setHasSubsetInformation(true);
+        
+        // protein counts before filtering
+        summary.setAllProteinCount(idpProtBaseDao.getProteinCount(pinferId));
         // parsimonious protein IDs
-        List<Integer> parsimProteinIds = idpProtBaseDao.getIdPickerProteinIds(pinferId, true);
-        Map<Integer, Integer> protGroupMap = idpProtBaseDao.getProteinGroupIds(pinferId, false);
+        List<Integer> parsimProteinIds = idpProtBaseDao.getIdPickerParsimoniousProteinIds(pinferId);
+        // non-subset protein IDs
+        List<Integer> nonSubsetProteinIds = idpProtBaseDao.getIdPickerNonSubsetProteinIds(pinferId);
         
+        summary.setAllParsimoniousProteinCount(parsimProteinIds.size());
+        summary.setAllNonSubsetProteinCount(nonSubsetProteinIds.size());
         
-        Set<Integer> groupIds = new HashSet<Integer>((int) (proteinIds.size() * 1.5));
+        summary.setAllProteinGroupCount(idpProtBaseDao.getIdPickerGroupCount(pinferId));
+        summary.setAllParsimoniousProteinGroupCount(idpProtBaseDao.getIdPickerParsimoniousGroupCount(pinferId));
+        summary.setAllNonSubsetProteinGroupCount(idpProtBaseDao.getIdPickerNonSubsetGroupCount(pinferId));
+        
+        // protein counts after filtering
+        summary.setFilteredProteinCount(proteinIds.size());
+        
+        Map<Integer, Integer> protGroupMap = idpProtBaseDao.getProteinGroupLabels(pinferId);
+        // group labels for filtered proteins
+        Set<Integer> groupLabels = new HashSet<Integer>((int) (proteinIds.size() * 1.5));
         for(int id: proteinIds) {
-            groupIds.add(protGroupMap.get(id));
+            groupLabels.add(protGroupMap.get(id));
         }
-        summary.setFilteredProteinGroupCount(groupIds.size());
+        summary.setFilteredProteinGroupCount(groupLabels.size());
         
-        groupIds.clear();
-        int parsimCount = 0;
+        // filtered parsimonious protein and protein group count
+        groupLabels.clear();
+        int filteredProteinCount = 0;
         Set<Integer> myIds = new HashSet<Integer>((int) (proteinIds.size() * 1.5));
         myIds.addAll(proteinIds);
         for(int id: parsimProteinIds) {
             if(myIds.contains(id))  {
-                parsimCount++;
-                groupIds.add(protGroupMap.get(id));
+                filteredProteinCount++;
+                groupLabels.add(protGroupMap.get(id));
             }
         }
-        summary.setFilteredParsimoniousProteinCount(parsimCount);
-        summary.setFilteredParsimoniousProteinGroupCount(groupIds.size());
+        summary.setFilteredParsimoniousProteinCount(filteredProteinCount);
+        summary.setFilteredParsimoniousProteinGroupCount(groupLabels.size());
+        
+        // filtered non-subset protein and protein group count
+        groupLabels.clear();
+        filteredProteinCount = 0;
+        for(int id: nonSubsetProteinIds) {
+            if(myIds.contains(id))  {
+                filteredProteinCount++;
+                groupLabels.add(protGroupMap.get(id));
+            }
+        }
+        summary.setFilteredNonSubsetProteinCount(filteredProteinCount);
+        summary.setFilteredNonSubsetProteinGroupCount(groupLabels.size());
         
         long e = System.currentTimeMillis();
         log.info("Time to get WIdPickerResultSummary: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
@@ -576,8 +660,8 @@ public class IdPickerResultsLoader {
     //---------------------------------------------------------------------------------------------------
     // Cluster Ids in the given protein inference run
     //---------------------------------------------------------------------------------------------------
-    public static List<Integer> getClusterIds(int pinferId) {
-        return idpProtBaseDao.getClusterIds(pinferId);
+    public static List<Integer> getClusterLabels(int pinferId) {
+        return idpProtBaseDao.getClusterLabels(pinferId);
     }
 
     
@@ -585,14 +669,14 @@ public class IdPickerResultsLoader {
     // Peptide ions for a indistinguishable protein group 
     // (sorted by sequence, modification state and charge)
     //---------------------------------------------------------------------------------------------------
-    public static List<WIdPickerIon> getPeptideIonsForProteinGroup(int pinferId, int pinferProteinGroupId) {
+    public static List<WIdPickerIon> getPeptideIonsForProteinGroup(int pinferId, int pinferProteinGroupLabel) {
         
         long s = System.currentTimeMillis();
         
         List<WIdPickerIon> ionList = new ArrayList<WIdPickerIon>();
         
         // get the id of one of the proteins in the group. All proteins in a group match the same peptides
-        int proteinId = idpProtBaseDao.getIdPickerGroupProteinIds(pinferId, pinferProteinGroupId).get(0);
+        int proteinId = idpProtBaseDao.getIdPickerGroupProteinIds(pinferId, pinferProteinGroupLabel).get(0);
         
         IdPickerRun run = idpRunDao.loadProteinferRun(pinferId);
         
@@ -636,7 +720,7 @@ public class IdPickerResultsLoader {
         
         long e = System.currentTimeMillis();
         log.info("Time to get peptide ions for pinferID: "+pinferId+
-                ", proteinGroupID: "+pinferProteinGroupId+
+                ", proteinGroupLabel: "+pinferProteinGroupLabel+
                 " -- "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
         return ionList;
@@ -818,47 +902,47 @@ public class IdPickerResultsLoader {
     //---------------------------------------------------------------------------------------------------
     // Protein and Peptide groups for a cluster
     //--------------------------------------------------------------------------------------------------- 
-    public static WIdPickerCluster getIdPickerCluster(int pinferId, int clusterId, 
+    public static WIdPickerCluster getIdPickerCluster(int pinferId, int clusterLabel, 
             PeptideDefinition peptideDef) {
        
-        List<Integer> protGroupIds = idpProtBaseDao.getGroupIdsForCluster(pinferId, clusterId);
+        List<Integer> protGroupLabels = idpProtBaseDao.getGroupLabelsForCluster(pinferId, clusterLabel);
         
-        Map<Integer, WIdPickerProteinGroup> proteinGroups = new HashMap<Integer, WIdPickerProteinGroup>(protGroupIds.size()*2);
+        Map<Integer, WIdPickerProteinGroup> proteinGroups = new HashMap<Integer, WIdPickerProteinGroup>(protGroupLabels.size()*2);
         
-        // map of peptide groupID and peptide group
+        // map of peptide groupLabel and peptide group
         Map<Integer, WIdPickerPeptideGroup> peptideGroups = new HashMap<Integer, WIdPickerPeptideGroup>();
         
         // get a list of protein groups
-        for(int protGrpId: protGroupIds) {
-            List<WIdPickerProtein> grpProteins = getGroupProteins(pinferId, protGrpId, peptideDef);
+        for(int protGrpLabel: protGroupLabels) {
+            List<WIdPickerProtein> grpProteins = getGroupProteins(pinferId, protGrpLabel, peptideDef);
             WIdPickerProteinGroup grp = new WIdPickerProteinGroup(grpProteins);
-            proteinGroups.put(protGrpId, grp);
+            proteinGroups.put(protGrpLabel, grp);
             
-            List<Integer> peptideGroupIds =  idpPeptBaseDao.getMatchingPeptGroupIds(pinferId, protGrpId);
+            List<Integer> peptideGroupLabels =  idpPeptBaseDao.getMatchingPeptGroupLabels(pinferId, protGrpLabel);
             
-            for(int peptGrpId: peptideGroupIds) {
-                WIdPickerPeptideGroup peptGrp = peptideGroups.get(peptGrpId);
+            for(int peptGrpLabel: peptideGroupLabels) {
+                WIdPickerPeptideGroup peptGrp = peptideGroups.get(peptGrpLabel);
                 if(peptGrp == null) {
-                    List<IdPickerPeptideBase> groupPeptides = idpPeptBaseDao.loadIdPickerGroupPeptides(pinferId, peptGrpId);
+                    List<IdPickerPeptideBase> groupPeptides = idpPeptBaseDao.loadIdPickerGroupPeptides(pinferId, peptGrpLabel);
                     peptGrp = new WIdPickerPeptideGroup(groupPeptides);
-                    peptideGroups.put(peptGrpId, peptGrp);
+                    peptideGroups.put(peptGrpLabel, peptGrp);
                 }
-                peptGrp.addMatchingProteinGroupId(protGrpId);
+                peptGrp.addMatchingProteinGroupLabel(protGrpLabel);
             }
         }
         
         for(WIdPickerPeptideGroup peptGrp: peptideGroups.values()) {
-            List<Integer> protGrpIds = peptGrp.getMatchingProteinGroupIds();
-            if(protGrpIds.size() == 1) {
-                proteinGroups.get(protGrpIds.get(0)).addUniqPeptideGrpId(peptGrp.getGroupId());
+            List<Integer> protGrpLabels = peptGrp.getMatchingProteinGroupLabels();
+            if(protGrpLabels.size() == 1) {
+                proteinGroups.get(protGrpLabels.get(0)).addUniqPeptideGrpLabel(peptGrp.getPeptideGroupLabel());
             }
             else {
-                for(int protGrpId: protGrpIds)
-                    proteinGroups.get(protGrpId).addNonUniqPeptideGrpId(peptGrp.getGroupId());
+                for(int protGrpLabel: protGrpLabels)
+                    proteinGroups.get(protGrpLabel).addNonUniqPeptideGrpLabel(peptGrp.getPeptideGroupLabel());
             }
         }
         
-        WIdPickerCluster wCluster = new WIdPickerCluster(pinferId, clusterId);
+        WIdPickerCluster wCluster = new WIdPickerCluster(pinferId, clusterLabel);
         wCluster.setProteinGroups(new ArrayList<WIdPickerProteinGroup>(proteinGroups.values()));
         wCluster.setPeptideGroups(new ArrayList<WIdPickerPeptideGroup>(peptideGroups.values()));
         

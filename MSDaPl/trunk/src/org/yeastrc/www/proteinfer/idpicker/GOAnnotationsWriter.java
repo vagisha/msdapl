@@ -96,7 +96,7 @@ public class GOAnnotationsWriter {
 		
 		List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
         
-        int currentGroupId = -1;
+        int currentGroupLabel = -1;
         String fastaIds = "";
         String commonNames = "";
         Set<String> bpNodeAccessions = new HashSet<String>();
@@ -119,9 +119,9 @@ public class GOAnnotationsWriter {
             		fastaDatabaseIds,
             		false); // we don't want Philius annotations
             
-            if(wProt.getProtein().getGroupId() != currentGroupId) {
+            if(wProt.getProtein().getProteinGroupLabel() != currentGroupLabel) {
             	
-                if(currentGroupId != -1) {
+                if(currentGroupLabel != -1) {
                     
                     // Accessions(s)
                     writer.write(trimComma(fastaIds)+"\t");
@@ -147,7 +147,7 @@ public class GOAnnotationsWriter {
                 mfNodeAccessions.clear();
                 mfNodeAccessions = new HashSet<String>();
                 
-                currentGroupId = wProt.getProtein().getGroupId();
+                currentGroupLabel = wProt.getProtein().getProteinGroupLabel();
             }
             try {
 				fastaIds += ";"+wProt.getAccessionsCommaSeparated();

@@ -1,5 +1,4 @@
-
-<%@page import="org.yeastrc.www.proteinfer.ProteinInferenceForm"%>
+<%@page import="org.yeastrc.www.proteinfer.job.ProteinInferenceForm"%>
 <%@page import="org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram"%>
 <%@page import="org.yeastrc.ms.domain.protinfer.ProgramParam"%>
 <%@page import="org.yeastrc.ms.domain.protinfer.ProgramParam.TYPE"%>

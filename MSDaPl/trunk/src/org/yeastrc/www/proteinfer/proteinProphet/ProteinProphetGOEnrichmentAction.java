@@ -17,7 +17,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.bio.taxonomy.Species;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
@@ -116,7 +115,10 @@ public class ProteinProphetGOEnrichmentAction extends Action {
         }
         
         
-        GOEnrichmentOutput enrichment = doGoEnrichmentAnalysis(nrseqIds, speciesId, goAspect, filterForm.getGoEnrichmentPValDouble());
+        GOEnrichmentOutput enrichment = doGoEnrichmentAnalysis(nrseqIds, speciesId, goAspect, 
+        		filterForm.getGoEnrichmentPValDouble(),
+        		filterForm.isApplyMultiTestCorrection(),
+        		filterForm.isExactAnnotations());
         request.setAttribute("goEnrichment", enrichment);
         
         if(enrichment.getEnrichedTermCount() > 0) {
@@ -132,7 +134,9 @@ public class ProteinProphetGOEnrichmentAction extends Action {
         return mapping.findForward("Success");
     }
     
-    private GOEnrichmentOutput doGoEnrichmentAnalysis(List<Integer> nrseqIds, int speciesId, int goAspect, double pVal) throws Exception {
+    private GOEnrichmentOutput doGoEnrichmentAnalysis(List<Integer> nrseqIds, int speciesId, int goAspect, double pVal,
+    		boolean doMultiTestCorrection,
+    		boolean exactAnnotations) throws Exception {
         
         log.info(nrseqIds.size()+" proteins for GO enrichment analysis");
         

@@ -47,39 +47,45 @@ public class ProteinSequenceHtmlBuilder {
         //  Add in font tags for labelling covered sequences in the parent sequence
         for( String peptideSequence : peptideSequences ) {
 
-            if (peptideSequence == null) continue;          
-            int pepIndex = sequence.indexOf( peptideSequence );
+            if (peptideSequence == null || peptideSequence.length() == 0) continue;   
+            
+            String altPeptide = peptideSequence;
+        	altPeptide = altPeptide.replaceAll("L", "1");
+        	altPeptide = altPeptide.replaceAll("I", "1");
+        	
+        	int lastMatchIndex = 0;
+        	
+        	while(lastMatchIndex <= sequence.length() - peptideSequence.length()) {
+        		
+        		int pepIndex = altSequence.indexOf(altPeptide, lastMatchIndex);
+        		
+        		if(lastMatchIndex == 0 && pepIndex == -1) 
+        			throw new ProteinSequenceHtmlBuilderException("Peptide "+peptideSequence+" not found in protein!");
+        		
+        		if(pepIndex == -1)
+        			break;
+        		
+        		lastMatchIndex = pepIndex + altPeptide.length();
+            
 
-            // if this peptide is not in the protein sequence, replace I's and L's and check again with altSequence
-            if (pepIndex == -1) {
-            	
-            	String altPeptide = peptideSequence;
-            	altPeptide = altPeptide.replaceAll("L", "1");
-            	altPeptide = altPeptide.replaceAll("I", "1");
-            	pepIndex = altSequence.indexOf(altPeptide);
-            	// If we still don't have a match throw an exception
-            	if(pepIndex == -1)
-            		throw new ProteinSequenceHtmlBuilderException("Peptide "+peptideSequence+" not found in protein!");
-            }
+        		if (pepIndex > residues.length - 1)  { //shouldn't happen
+        			throw new ProteinSequenceHtmlBuilderException("Matching index out of bounds for peptide: "+peptideSequence);
+        		}
 
+        		// Place a red font start at beginning of this sub sequence in main sequence
+        		residues[pepIndex] = "<span class=\"covered_peptide\">" + residues[pepIndex];
 
-            if (pepIndex > residues.length - 1)  { //shouldn't happen
-            	throw new ProteinSequenceHtmlBuilderException("Matching index out of bounds for peptide: "+peptideSequence);
-            }
+        		// this means that the sub-peptide extends beyond the main peptide's sequence... shouldn't happen but check for it
+        		if (pepIndex + peptideSequence.length() > residues.length) {
+        			throw new ProteinSequenceHtmlBuilderException("Peptide ("+peptideSequence+") match extends beyond length of protein");
+        			// just stop the red font at the end of the main sequence string
+        			//residues[residues.length - 1] = residues[residues.length - 1] + "</span>";
+        		} else {
 
-            // Place a red font start at beginning of this sub sequence in main sequence
-            residues[pepIndex] = "<span class=\"covered_peptide\">" + residues[pepIndex];
-
-            // this means that the sub-peptide extends beyond the main peptide's sequence... shouldn't happen but check for it
-            if (pepIndex + peptideSequence.length() > residues.length) {
-            	throw new ProteinSequenceHtmlBuilderException("Peptide ("+peptideSequence+") match extends beyond length of protein");
-                // just stop the red font at the end of the main sequence string
-                //residues[residues.length - 1] = residues[residues.length - 1] + "</span>";
-            } else {
-
-                // add the font end tag after the last residue in the sub sequence
-                residues[pepIndex + peptideSequence.length() - 1] = residues[pepIndex + peptideSequence.length() - 1] + "</span>";
-            }
+        			// add the font end tag after the last residue in the sub sequence
+        			residues[pepIndex + peptideSequence.length() - 1] = residues[pepIndex + peptideSequence.length() - 1] + "</span>";
+        		}
+        	}
         }
         
 

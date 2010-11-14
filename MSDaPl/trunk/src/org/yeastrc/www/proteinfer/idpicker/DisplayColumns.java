@@ -32,7 +32,7 @@ public class DisplayColumns {
 	public static final char numPept 		= 'P';
 	public static final char numUniqPept	= 'U';
 	public static final char numSpectra 	= 'S';
-	public static final char clusterId 		= 'L';
+	public static final char clusterLabel 	= 'L';
 	
 	private DisplayColumn showGroupId = new DisplayColumn(groupId, "Group ID", false, false);
 	private DisplayColumn showValidation = new DisplayColumn(validation, "Validation Status", false, false);
@@ -48,7 +48,7 @@ public class DisplayColumns {
 	private DisplayColumn showNumPept = new DisplayColumn(numPept, "# Peptides", false, false);
 	private DisplayColumn showNumUniqPept = new DisplayColumn(numUniqPept, "# Unique Peptides", false, false);
 	private DisplayColumn showNumSpectra = new DisplayColumn(numSpectra, "# Spectra", false, false);
-	private DisplayColumn showClusterId = new DisplayColumn(clusterId, "Cluster ID", false, false);
+	private DisplayColumn showClusterLabel = new DisplayColumn(clusterLabel, "Cluster ID", false, false);
 	
 	
 	private Map<Character, DisplayColumn> map;
@@ -70,7 +70,7 @@ public class DisplayColumns {
 		map.put(numPept, showNumPept);
 		map.put(numUniqPept, showNumUniqPept);
 		map.put(numSpectra, showNumSpectra);
-		map.put(clusterId, showClusterId);
+		map.put(clusterLabel, showClusterLabel);
 	}
 	
 	public List<DisplayColumn> getColumnList() {
@@ -90,7 +90,7 @@ public class DisplayColumns {
 		list.add(showNumPept);
 		list.add(showNumUniqPept);
 		list.add(showNumSpectra);
-		list.add(showClusterId);
+		list.add(showClusterLabel);
 		return list;
 	}
 	
@@ -194,7 +194,7 @@ public class DisplayColumns {
 	}
 
 	public Boolean getShowClusterId() {
-		return showClusterId.isSelected();
+		return showClusterLabel.isSelected();
 	}
 
 }

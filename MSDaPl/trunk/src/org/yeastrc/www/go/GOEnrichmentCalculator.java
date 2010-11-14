@@ -84,15 +84,22 @@ public class GOEnrichmentCalculator {
 
         calculateEnrichment(enrichedTerms, output.getNumInputAnnotatedProteins(), output.getNumAllAnnotatedSpeciesProteins());
         
+        if(output.isApplyMultiTestCorrection()) {
+        	log.info("Applying Benjamini Horchberg correction");
+        	// Apply Benjamini-Hochberg correction to control FDR rate
+        	applyBenjaminiHochbergCorrection(enrichedTerms);
+        }
+        
         // returns a list of GO terms enriched above the given cutoff
         iter = enrichedTerms.iterator();
         while(iter.hasNext()) {
             
             EnrichedGOTerm term = iter.next();
-            if(term.getPValue() > pValCutoff) {
+            if(term.getCorrectedPvalue() > pValCutoff) {
                 iter.remove();
                 continue;
             }
+            //log.info("original: "+term.getPValue()+"; corrected: "+term.getCorrectedPvalue());
         }
         
         // sort by p-value
@@ -101,7 +108,25 @@ public class GOEnrichmentCalculator {
         output.setEnrichedTerms(enrichedTerms);
     }
     
-    private static int totalAnnotatedInputProteinCount(List<Integer> proteinIds) throws SQLException {
+    private static void applyBenjaminiHochbergCorrection(
+			List<EnrichedGOTerm> enrichedTerms) {
+		
+    	// sort the terms by hypergeometric p-value (ascending)
+    	Collections.sort(enrichedTerms);
+    	
+    	int n = enrichedTerms.size();
+    	
+    	for (int i = 0; i < enrichedTerms.size(); i++) {
+    		
+    		EnrichedGOTerm term = enrichedTerms.get(i);
+    		
+    		double corrected = term.getPValue() * (n/(i+1)); // pvalue * (n/(rank_in_list)))
+    		//log.info("original: "+term.getPValue()+" corrected: "+corrected);
+    		term.setCorrectedPvalue(corrected);
+    	}
+	}
+
+	private static int totalAnnotatedInputProteinCount(List<Integer> proteinIds) throws SQLException {
 		
     	return ProteinGOAnnotationChecker.getAnnotatedProteins(proteinIds).size();
 	}
@@ -116,6 +141,7 @@ public class GOEnrichmentCalculator {
         	}
         	else {
         		term.setPValue(StatUtils.PScore(term.getNumAnnotatedProteins(), term.getTotalAnnotatedProteins(), numProteinsInSet, totalAnnotatedProteins));
+        		term.setCorrectedPvalue(term.getPValue());
         	}
         }
     }

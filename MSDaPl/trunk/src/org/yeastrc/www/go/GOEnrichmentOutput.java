@@ -28,6 +28,7 @@ public class GOEnrichmentOutput {
     									        // have at least one GO annotation.
     
     private final double pValCutoff;
+    private boolean applyMultiTestCorrection = true;
     private boolean exactAnnotations = false;
     
     private List<EnrichedGOTerm> enrichedTerms;  // enriched terms for Cellular Component
@@ -49,6 +50,7 @@ public class GOEnrichmentOutput {
         	goDomainName = "MolecularFunction";
         
         this.pValCutoff = input.getPValCutoff();
+        this.applyMultiTestCorrection = input.isApplyMultiTestCorrection();
         this.exactAnnotations = input.isExactAnnotations();
     }
     
@@ -70,7 +72,11 @@ public class GOEnrichmentOutput {
         return pValCutoff;
     }
 
-    public boolean isExactAnnotations() {
+    public boolean isApplyMultiTestCorrection() {
+		return applyMultiTestCorrection;
+	}
+
+	public boolean isExactAnnotations() {
 		return exactAnnotations;
 	}
     

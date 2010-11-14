@@ -120,6 +120,7 @@ function saveDisplayColumnsCookie() {
   <html:hidden name="proteinInferFilterForm" property="goSlimTermId" />
   <html:hidden name="proteinInferFilterForm" property="goEnrichmentPVal" />
   <html:hidden name="proteinInferFilterForm" property="exactAnnotations" value="true"/>
+  <html:hidden name="proteinInferFilterForm" property="applyMultiTestCorrection" value="true"/>
   <html:hidden name="proteinInferFilterForm" property="speciesId" />
   
   
@@ -192,13 +193,11 @@ function saveDisplayColumnsCookie() {
   
   <logic:notPresent name="goView">
   <tr>
-  	<td colspan="2">Group Indistinguishable Proteins: </td>
+  	<td colspan="3">Group Indistinguishable Proteins: </td>
   	<td>
   		<nobr>
   		<html:radio name="proteinInferFilterForm" property="joinGroupProteins" value="true">Yes</html:radio>
   		</nobr>
-  	</td>
-  	<td>
   		<nobr>
   		<html:radio name="proteinInferFilterForm" property="joinGroupProteins" value="false">No</html:radio>
   		</nobr>
@@ -207,22 +206,35 @@ function saveDisplayColumnsCookie() {
   </logic:notPresent>
   
   <tr>
-  	<td colspan="2">Show Proteins: </td>
+  	<td colspan="2">Exlcude: </td>
   	<td>
   		<nobr>
-  		<html:radio name="proteinInferFilterForm" property="showAllProteins" value="true">All</html:radio>
+  		<html:checkbox name="proteinInferFilterForm" property="excludeParsimoniousProteins">Parsimonious</html:checkbox>
   		</nobr>
   	</td>
   	<td>
   		<nobr>
-  		<html:radio name="proteinInferFilterForm" property="showAllProteins" value="false">Parsimonious</html:radio>
+  		<html:checkbox name="proteinInferFilterForm" property="excludeNonParsimoniousProteins">Non-Parsimonious</html:checkbox>
+  		</nobr>
+  	</td>
+  </tr>
+  <tr>
+  	<td colspan="2"></td>
+  	<td>
+  		<nobr>
+  		<html:checkbox name="proteinInferFilterForm" property="excludeNonSubsetProteins" >Non-Subset</html:checkbox>
+  		</nobr>
+  	</td>
+  	<td>
+  		<nobr>
+  		<html:checkbox name="proteinInferFilterForm" property="excludeSubsetProteins" >Subset</html:checkbox>
   		</nobr>
   	</td>
   </tr>
   <tr>
   	<td colspan="4">Exclude Indistinguishable Groups: <html:checkbox name="proteinInferFilterForm" property="excludeIndistinProteinGroups" value="true"/></td>
   </tr>
-  </table></td>
+  </table></td></tr>
   
   <tr>
   	<td colspan="2">

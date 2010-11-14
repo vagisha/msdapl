@@ -66,6 +66,9 @@ public class ViewProteinInferenceResultAction extends Action {
         filterForm.setMinUniquePeptides(String.valueOf(idpParams.getMinUniquePeptides()));
         filterForm.setMinCoverage(String.valueOf(idpParams.getMinCoverage()));
         
+        // Some of the checkbox need to be set to true here
+        filterForm.setExactPeptideMatch(true);
+        
         request.setAttribute("newRequest", true);
         // Go!
         return mapping.findForward("Success");

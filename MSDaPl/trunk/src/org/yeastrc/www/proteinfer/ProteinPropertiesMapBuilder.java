@@ -109,7 +109,7 @@ public class ProteinPropertiesMapBuilder {
 			s = System.currentTimeMillis();
 			for(IdPickerProtein protein: proteins) {
 				ProteinProperties props = propsBuilder.build(pinferId, protein);
-				props.setProteinGroupId(protein.getGroupId());
+				props.setProteinGroupId(protein.getProteinGroupLabel());
 				map.put(protein.getId(), props);
 			}
 			e = System.currentTimeMillis();

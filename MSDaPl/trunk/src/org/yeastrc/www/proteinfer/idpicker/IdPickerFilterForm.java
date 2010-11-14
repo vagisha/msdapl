@@ -17,7 +17,10 @@ import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
 public class IdPickerFilterForm extends ProteinInferFilterForm {
 
 	private boolean joinGroupProteins = true;
-    private boolean showAllProteins = true;
+	private boolean excludeSubsetProteins = false;
+	private boolean excludeNonSubsetProteins = false;
+	private boolean excludeParsimoniousProteins = false;
+	private boolean excludeNonParsimoniousProteins = false;
     private boolean collapseGroups = false; // Used for downloads only
     private boolean printPeptides = false; // Used for downloads only
     private boolean printDescription = false; // used for downloads only
@@ -27,19 +30,44 @@ public class IdPickerFilterForm extends ProteinInferFilterForm {
         return joinGroupProteins;
     }
 
-    public void setJoinGroupProteins(boolean joinGroupProteins) {
+	public void setJoinGroupProteins(boolean joinGroupProteins) {
         this.joinGroupProteins = joinGroupProteins;
     }
     
-    public boolean isShowAllProteins() {
-        return showAllProteins;
-    }
+	public boolean isExcludeSubsetProteins() {
+		return excludeSubsetProteins;
+	}
 
-    public void setShowAllProteins(boolean showAllProteins) {
-        this.showAllProteins = showAllProteins;
-    }
-    
-    public boolean isCollapseGroups() {
+	public void setExcludeSubsetProteins(boolean excludeSubsetProteins) {
+		this.excludeSubsetProteins = excludeSubsetProteins;
+	}
+
+	public boolean isExcludeNonSubsetProteins() {
+		return excludeNonSubsetProteins;
+	}
+
+	public void setExcludeNonSubsetProteins(boolean excludeNonSubsetProteins) {
+		this.excludeNonSubsetProteins = excludeNonSubsetProteins;
+	}
+
+	public boolean isExcludeParsimoniousProteins() {
+		return excludeParsimoniousProteins;
+	}
+
+	public void setExcludeParsimoniousProteins(boolean excludeParsimoniousProteins) {
+		this.excludeParsimoniousProteins = excludeParsimoniousProteins;
+	}
+
+	public boolean isExcludeNonParsimoniousProteins() {
+		return excludeNonParsimoniousProteins;
+	}
+
+	public void setExcludeNonParsimoniousProteins(
+			boolean excludeNonParsimoniousProteins) {
+		this.excludeNonParsimoniousProteins = excludeNonParsimoniousProteins;
+	}
+
+	public boolean isCollapseGroups() {
         return collapseGroups;
     }
 
@@ -68,9 +96,11 @@ public class IdPickerFilterForm extends ProteinInferFilterForm {
     	ProteinFilterCriteria filterCriteria = super.getFilterCriteria(peptideDef);
     	
     	filterCriteria.setGroupProteins(isJoinGroupProteins());
-    	 if(!isShowAllProteins())
-             filterCriteria.setParsimoniousOnly();
-    	 
+    	filterCriteria.setParsimonious(!excludeParsimoniousProteins);
+    	filterCriteria.setNonParsimonious(!excludeNonParsimoniousProteins);
+    	filterCriteria.setNonSubset(!excludeNonSubsetProteins);
+    	filterCriteria.setSubset(!excludeSubsetProteins);
+    		
         if(isCollapseGroups()) 
             filterCriteria.setSortBy(SORT_BY.GROUP_ID);
         else

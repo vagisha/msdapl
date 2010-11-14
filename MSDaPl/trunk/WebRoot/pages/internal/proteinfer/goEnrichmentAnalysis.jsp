@@ -134,6 +134,7 @@ function toggleEnrichBarChart() {
 				<th class="sort-alpha">GO ID</th>
 				<th class="sort-alpha">Name</th>
 				<th class="sort-float">P-Value</th>
+				<th class="sort-float"><span class="tooltip" title="P-Value after applying multiple test correction">P-Value</span><br/>(Adjusted)</th>
 				<th class="sort-int">#Annotated (input)</th>
 				<th class="sort-int">#Annotated (reference)</th>
 				</tr>
@@ -166,6 +167,7 @@ function toggleEnrichBarChart() {
 						</logic:equal>
 						<logic:notEqual name="term" property="pvalueString" value="-1.0">
 							<td><bean:write name="term" property="pvalueString"/></td>
+							<td><bean:write name="term" property="correctedPvalueString"/></td>
 							<td><bean:write name="term" property="numAnnotatedProteins"/></td>
 							<td><bean:write name="term" property="totalAnnotatedProteins"/></td>
 						</logic:notEqual>

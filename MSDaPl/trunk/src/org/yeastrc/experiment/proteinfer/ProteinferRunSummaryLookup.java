@@ -37,8 +37,8 @@ public class ProteinferRunSummaryLookup {
         IdPickerProteinDAO proteinDao = ProteinferDAOFactory.instance().getIdPickerProteinDao();
         ProteinferPeptideDAO peptDao = ProteinferDAOFactory.instance().getProteinferPeptideDao();
         
-        int parsimProteinCount = proteinDao.getIdPickerProteinIds(piRunId, true).size();
-        int parsimProteinGroupCount = proteinDao.getIdPickerGroupCount(piRunId, true);
+        int parsimProteinCount = proteinDao.getIdPickerParsimoniousProteinIds(piRunId).size();
+        int parsimProteinGroupCount = proteinDao.getIdPickerParsimoniousGroupCount(piRunId);
         int peptSeqCount = peptDao.getUniquePeptideSequenceCountForRun(piRunId);
         int ionCount = peptDao.getUniqueIonCountForRun(piRunId);
         

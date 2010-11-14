@@ -82,7 +82,10 @@ public class ProteinInferDownloadAction extends Action {
         writer.write("Max. Molecular Wt.: "+filterForm.getMaxMolecularWt()+"\n");
         writer.write("Min. pI: "+filterForm.getMinPi()+"\n");
         writer.write("Max. pI: "+filterForm.getMaxPi()+"\n");
-        writer.write("Show Non-parsimonious Proteins: "+filterForm.isShowAllProteins()+"\n");
+        writer.write("Exclude Parsimonious Proteins: "+filterForm.isExcludeParsimoniousProteins()+"\n");
+        writer.write("Exclude Non-parsimonious Proteins: "+filterForm.isExcludeNonParsimoniousProteins()+"\n");
+        writer.write("Exclude Non-Subset Proteins: "+filterForm.isExcludeNonSubsetProteins()+"\n");
+        writer.write("Exclude Subset Proteins: "+filterForm.isExcludeSubsetProteins()+"\n");
         writer.write("Exclude Indistinguishable Groups: "+filterForm.isExcludeIndistinProteinGroups()+"\n");
         writer.write("Validation Status: "+filterForm.getValidationStatusString()+"\n");
         writer.write("Include proteins with peptide charge states: "+filterForm.getChargeStatesString()+"\n");
@@ -230,7 +233,7 @@ public class ProteinInferDownloadAction extends Action {
             WIdPickerProtein wProt = IdPickerResultsLoader.getIdPickerProtein(proteinId, peptideDef, fastaDatabaseIds, getPhiliusResults);
             
             if(displayColumns.getShowGroupId())
-            	writer.write(wProt.getProtein().getGroupId()+"\t");
+            	writer.write(wProt.getProtein().getProteinGroupLabel()+"\t");
             
             if(displayColumns.getShowFastaId() || displayColumns.getShowCommonName()) {
             	if(wProt.getProtein().getIsParsimonious())
@@ -398,7 +401,7 @@ public class ProteinInferDownloadAction extends Action {
             writer.write("Description\t");
         writer.write("\n");
         
-        int currentGroupId = -1;
+        int currentGroupLabel = -1;
         boolean parsimonious = false;
         String fastaIds = "";
         String commonNames = "";
@@ -427,11 +430,11 @@ public class ProteinInferDownloadAction extends Action {
             int proteinId = proteinIds.get(i);
             WIdPickerProtein wProt = IdPickerResultsLoader.getIdPickerProtein(proteinId, peptideDef, fastaDatabaseIds, getPhiliusResults);
             
-            if(wProt.getProtein().getGroupId() != currentGroupId) {
-                if(currentGroupId != -1) {
+            if(wProt.getProtein().getProteinGroupLabel() != currentGroupLabel) {
+                if(currentGroupLabel != -1) {
                 	
                 	if(displayColumns.getShowGroupId())
-                		writer.write(currentGroupId+"\t");
+                		writer.write(currentGroupLabel+"\t");
                 	
                 	if(displayColumns.getShowFastaId() || displayColumns.getShowCommonName()) {
                 		if(parsimonious)
@@ -535,7 +538,7 @@ public class ProteinInferDownloadAction extends Action {
                 tmStr = "";
                 spStr = "";
                 yeastAbundanceStr = "";
-                currentGroupId = wProt.getProtein().getGroupId();
+                currentGroupLabel = wProt.getProtein().getProteinGroupLabel();
                 parsimonious = wProt.getProtein().getIsParsimonious();
                 spectrumCount = wProt.getProtein().getSpectrumCount();
                 numPept = wProt.getProtein().getPeptideCount();
@@ -641,7 +644,7 @@ public class ProteinInferDownloadAction extends Action {
         
         // write the last one
         if(displayColumns.getShowGroupId())
-    		writer.write(currentGroupId+"\t");
+    		writer.write(currentGroupLabel+"\t");
     	
     	if(displayColumns.getShowFastaId() || displayColumns.getShowCommonName()) {
     		if(parsimonious)

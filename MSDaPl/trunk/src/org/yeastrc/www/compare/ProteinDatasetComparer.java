@@ -206,7 +206,7 @@ public class ProteinDatasetComparer {
     private List<Integer> getAllNonParsimoniousProteinIdsForDataset(Dataset dataset) {
         
         if(dataset.getSource() == DatasetSource.PROTINFER) {
-            return protDao.getNrseqProteinIds(dataset.getDatasetId(), false, true); // non-parsimonious only
+            return protDao.getNonParsimoniousNrseqProteinIds(dataset.getDatasetId()); // non-parsimonious only
         }
         else if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
             return ppProtDao.getNrseqProteinIds(dataset.getDatasetId(), false, true); // non-parsimonious only

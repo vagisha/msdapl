@@ -16,6 +16,7 @@ public class GOEnrichmentInput {
     private final int speciesId; // NRSEQ species id
     private List<Integer> proteinIds; // NRSEQ protein ids
     private double pValCutoff = 0.01;
+    private boolean applyMultiTestCorrection = true;
     private boolean exactAnnotations = false;
     
     private int goAspect;
@@ -42,7 +43,15 @@ public class GOEnrichmentInput {
         pValCutoff = valCutoff;
     }
 
-    public void setGoAspect(int goAspect) {
+    public boolean isApplyMultiTestCorrection() {
+		return applyMultiTestCorrection;
+	}
+
+	public void setApplyMultiTestCorrection(boolean applyMultiTestCorrection) {
+		this.applyMultiTestCorrection = applyMultiTestCorrection;
+	}
+
+	public void setGoAspect(int goAspect) {
     	this.goAspect = goAspect;
     }
     

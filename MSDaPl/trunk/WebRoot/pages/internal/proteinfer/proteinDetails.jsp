@@ -233,17 +233,24 @@
 
 <table align="center" cellpadding="2" style="border: 1px solid gray; border-spacing: 2px">
 <tr class="pinfer_A">
-	<td>Coverage(%)</td>
-	<td># Peptides</td>
-	<td># Uniq.Peptides</td>
-	<td># Spectra </td>
+	<td style="border: 1px #CCCCCC dotted;" align="center">Coverage(%)</td>
+	<td style="border: 1px #CCCCCC dotted;" align="center"># Peptides</td>
+	<td style="border: 1px #CCCCCC dotted;" align="center"># Uniq.Peptides</td>
+	<td style="border: 1px #CCCCCC dotted;" align="center"># Spectra </td>
 	<logic:equal name="isIdPicker" value="true">
-		<td>NSAF** </td>
+		<td style="border: 1px #CCCCCC dotted;" align="center">NSAF** </td>
 	</logic:equal>
-	<td>Parsimonious</td>
-	<td>Other Proteins in Group</td>
+	<td style="border: 1px #CCCCCC dotted;" align="center">Parsimonious</td>
+	<td style="border: 1px #CCCCCC dotted;" align="center">Subset</td>
+	<logic:present name="superProteins" >
+		<td style="border: 1px #CCCCCC dotted;" align="center">Subset Of </td>
+	</logic:present>
+	<logic:present name="subsetProteins" >
+		<td style="border: 1px #CCCCCC dotted;" align="center">Subset Proteins </td>
+	</logic:present>
+	<td style="border: 1px #CCCCCC dotted;" align="center">Other Proteins in Group</td>
 	<logic:equal name="isIdPicker" value="true">
-		<td>Protein Cluster</td>
+		<td style="border: 1px #CCCCCC dotted;" align="center">Protein Cluster</td>
 	</logic:equal>
 </tr>
 <tr>
@@ -258,25 +265,63 @@
 		<logic:equal name="protein" property="protein.isParsimonious" value="true">Yes</logic:equal>
 		<logic:equal name="protein" property="protein.isParsimonious" value="false">No</logic:equal>
 	</td>
-	<td style="border: 1px #CCCCCC dotted; text-align: left;" align="center">
-	<logic:empty name="groupProteins">--</logic:empty>
-	<logic:iterate name="groupProteins" id="prot">
-		<span onclick="showProteinDetails(<bean:write name="prot" property="protein.id" />)" 
+	<td style="border: 1px #CCCCCC dotted;" align="center">
+		<logic:equal name="protein" property="protein.isSubset" value="true">Yes</logic:equal>
+		<logic:equal name="protein" property="protein.isSubset" value="false">No</logic:equal>
+	</td>
+	<logic:present name="superProteins" >
+		<td style="border: 1px #CCCCCC dotted;" align="center">
+			<logic:iterate name="superProteins" id="prot">
+			<li>
+			<span onclick="showProteinDetails(<bean:write name="prot" property="protein.id" />)" 
 						style="text-decoration: underline; cursor: pointer">
-		<li>
 			<logic:iterate name="prot" property="proteinListing.fastaReferences" id="reference" indexId="index">
 				<logic:greaterThan name="index" value="0">,</logic:greaterThan>
 				<bean:write name="reference" property="shortAccession"/>
 			</logic:iterate>
+			</span>
+			</li>
+			</logic:iterate>
+		</td>
+	</logic:present>
+	<logic:present name="subsetProteins">
+		<td style="border: 1px #CCCCCC dotted;" align="center">
+			<logic:iterate name="subsetProteins" id="prot">
+			<li>
+			<span onclick="showProteinDetails(<bean:write name="prot" property="protein.id" />)" 
+						style="text-decoration: underline; cursor: pointer">
+			<logic:iterate name="prot" property="proteinListing.fastaReferences" id="reference" indexId="index">
+				<logic:greaterThan name="index" value="0">,</logic:greaterThan>
+				<bean:write name="reference" property="shortAccession"/>
+			</logic:iterate>
+			</span>
+			</li>
+			</logic:iterate>
+		</td>
+	</logic:present>
+	<td style="border: 1px #CCCCCC dotted; text-align: left;" align="center">
+	<logic:empty name="groupProteins">--</logic:empty>
+	<logic:notEmpty name="groupProteins">
+	 <ul>
+	<logic:iterate name="groupProteins" id="prot">
+		<li>
+		<span onclick="showProteinDetails(<bean:write name="prot" property="protein.id" />)" 
+						style="text-decoration: underline; cursor: pointer">
+			<logic:iterate name="prot" property="proteinListing.fastaReferences" id="reference" indexId="index">
+				<logic:greaterThan name="index" value="0">,</logic:greaterThan>
+				<bean:write name="reference" property="shortAccession"/>
+			</logic:iterate>
+		</span>
 		</li>
-		</span><br>
 	</logic:iterate>
+		</ul>
+	</logic:notEmpty>
 	</td>
 	<logic:equal name="isIdPicker" value="true">
 		<td style="border: 1px #CCCCCC dotted;" align="center">
 			<span style="cursor:pointer;text-decoration:underline" 
-			  onclick="showProteinCluster(<bean:write name="protein" property="protein.clusterId"/>)">
-			<bean:write name="protein" property="protein.clusterId"/>
+			  onclick="showProteinCluster(<bean:write name="protein" property="protein.clusterLabel"/>)">
+			<bean:write name="protein" property="protein.clusterLabel"/>
 			</span>
 		</td>
 	</logic:equal>

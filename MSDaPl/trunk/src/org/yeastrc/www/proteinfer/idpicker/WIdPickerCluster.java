@@ -5,13 +5,13 @@ import java.util.List;
 public class WIdPickerCluster {
 
     private int pinferId;
-    private int clusterId;
+    private int clusterLabel;
     private List<WIdPickerProteinGroup> proteinGroups;
     private List<WIdPickerPeptideGroup> peptideGroups;
     
-    public WIdPickerCluster(int pinferId, int clusterId) {
+    public WIdPickerCluster(int pinferId, int clusterLabel) {
         this.pinferId = pinferId;
-        this.clusterId = clusterId;
+        this.clusterLabel = clusterLabel;
     }
     
     public void setProteinGroups(List<WIdPickerProteinGroup> proteinGroups) {
@@ -30,12 +30,12 @@ public class WIdPickerCluster {
         this.pinferId = pinferId;
     }
 
-    public int getClusterId() {
-        return clusterId;
+    public int getClusterLabel() {
+        return clusterLabel;
     }
 
-    public void setClusterId(int clusterId) {
-        this.clusterId = clusterId;
+    public void setClusterLabel(int clusterLabel) {
+        this.clusterLabel = clusterLabel;
     }
 
     public List<WIdPickerProteinGroup> getProteinGroups() {
@@ -46,10 +46,10 @@ public class WIdPickerCluster {
         return peptideGroups;
     }
     
-    public boolean proteinAndPeptideGroupsMatch(int protGrpId, int peptGrpId) {
+    public boolean proteinAndPeptideGroupsMatch(int proteinGroupLabel, int peptideGroupLabel) {
         for(WIdPickerPeptideGroup peptGrp: peptideGroups) {
-            if(peptGrp.getGroupId() == peptGrpId) {
-                return peptGrp.matchesProteinGroup(protGrpId);
+            if(peptGrp.getPeptideGroupLabel() == peptideGroupLabel) {
+                return peptGrp.matchesProteinGroup(proteinGroupLabel);
             }
         }
         return false;

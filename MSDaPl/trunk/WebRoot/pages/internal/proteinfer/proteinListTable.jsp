@@ -50,7 +50,7 @@
  %>
 
 <%
-int columnSpan = 11;
+int columnSpan = 12;
 if(request.getAttribute("yeastAbundances") != null)
 	columnSpan++;
 if(request.getAttribute("philiusResults") != null)
@@ -78,21 +78,23 @@ if(request.getAttribute("philiusResults") != null)
 		<logic:equal name="displayColumns" property="showValidation" value="true">
 		<!-- Make protein annotation sortable only if indistinguishable proteins are NOT grouped together -->
 		<logic:equal name="groupProteins" value="true">
-			<th width="1%"><b><font size="2pt">S</font></b></th>
+			<th width="1%"><b><span class="tooltip" title="User Validation">V</span></b></th>
 		</logic:equal>
 		<logic:equal name="groupProteins" value="false">
 			<% colSortedClass = "";
 			 if(sortBy == SORT_BY.VALIDATION_STATUS) colSortedClass = sortedClass;
 			%>
-			<th width="1%" class="sortable def_sort_asc <%=colSortedClass %>" id="<%=SORT_BY.VALIDATION_STATUS.name()%>"><b><font size="2pt">S</font></b></th>
+			<th width="1%" class="sortable def_sort_asc <%=colSortedClass %>" id="<%=SORT_BY.VALIDATION_STATUS.name()%>" ><b><font size="2pt">
+				<span class="tooltip" title="User Validation">V</span></font></b></th>
 		</logic:equal>
 		</logic:equal>
 		
 		
 		<logic:equal name="displayColumns" property="showFastaId" value="true">
+		<th><span class="tooltip" title="Subset / Not Subset">S</span></th> <!-- column header for subset protein -->
 		<!-- Make FastaID sortable only if indistinguishable proteins are NOT grouped together -->
 		<logic:equal name="groupProteins" value="true">
-			<th width="5%"><b><font size="2pt">Fasta ID</font></b></th>
+			<th width="5%">Fasta ID</th>
 		</logic:equal>
 		<logic:equal name="groupProteins" value="false">
 			<% colSortedClass = "";
@@ -228,7 +230,7 @@ if(request.getAttribute("philiusResults") != null)
 		
 			<logic:equal name="displayColumns" property="showGroupId" value="true">
 				<td rowspan="<bean:write name="rowspan" />" valign="middle">
-					<bean:write name="proteinGroup" property="groupId" />
+					<bean:write name="proteinGroup" property="proteinGroupLabel" />
 				</td>
 			</logic:equal>
 		
@@ -268,7 +270,16 @@ if(request.getAttribute("philiusResults") != null)
 			
 			<!-- Protein accession -->
 			<logic:equal name="displayColumns" property="showFastaId" value="true">
+			
+			<logic:equal name="protein" property="protein.isSubset" value="true">
+				<td style="background-color:#FFA07A;"></td>
+			</logic:equal>
+			<logic:equal name="protein" property="protein.isSubset" value="false">
+				<td></td>
+			</logic:equal>
+			
 			<td> 
+			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
@@ -423,8 +434,8 @@ if(request.getAttribute("philiusResults") != null)
 			<logic:equal name="displayColumns" property="showClusterId" value="true">
 			<td rowspan="<bean:write name="rowspan" />" valign="middle">
 				<span id="protgrpslink" style="cursor:pointer;text-decoration:underline" 
-				  onclick="showProteinCluster(<bean:write name="protein" property="protein.clusterId"/>)">
-				<bean:write name="protein" property="protein.clusterId"/>
+				  onclick="showProteinCluster(<bean:write name="protein" property="protein.clusterLabel"/>)">
+				<bean:write name="protein" property="protein.clusterLabel"/>
 				</span>
 			</td>
 			</logic:equal>
@@ -437,11 +448,11 @@ if(request.getAttribute("philiusResults") != null)
 			<span class="showpeptForProt" 
 				  style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #000000;" 
 				  id="<bean:write name="protein" property="protein.id" />"
-				  title="<bean:write name="proteinGroup" property="groupId" />"
+				  title="<bean:write name="proteinGroup" property="proteinGroupLabel" />"
 				  >Show Peptides</span></nobr></td>
 		<td colspan='<bean:write name="myColspan"/>' class="pinfer_filler">
 			<!--  peptides table will go here: proteinPeptides.jsp -->
-			<div id="peptforprot_<bean:write name="protein" property="protein.id" />_<bean:write name="proteinGroup" property="groupId" />"></div>
+			<div id="peptforprot_<bean:write name="protein" property="protein.id" />_<bean:write name="proteinGroup" property="proteinGroupLabel" />"></div>
 		</td>
 		</tr>
 			
@@ -465,7 +476,7 @@ if(request.getAttribute("philiusResults") != null)
 		<!-- Group ID -->
 		<logic:equal name="displayColumns" property="showGroupId" value="true">
 		<td rowspan="<bean:write name="rowspan" />" valign="middle">
-			<bean:write name="proteinGroup" property="groupId" />
+			<bean:write name="proteinGroup" property="proteinGroupLabel" />
 		</td>
 		</logic:equal>
 		
@@ -508,6 +519,13 @@ if(request.getAttribute("philiusResults") != null)
 			
 		<!-- Protein accession -->
 		<logic:equal name="displayColumns" property="showFastaId" value="true">
+		<logic:equal name="protein" property="protein.isSubset" value="true">
+			<td style="background-color:#FFA07A;"></td>
+		</logic:equal>
+		<logic:equal name="protein" property="protein.isSubset" value="false">
+			<td></td>
+		</logic:equal>
+			
 		<td>
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
@@ -665,8 +683,8 @@ if(request.getAttribute("philiusResults") != null)
 		<logic:equal name="displayColumns" property="showClusterId" value="true">
 		<td rowspan="<bean:write name="rowspan" />" valign="middle">
 			<span id="protgrpslink" style="cursor:pointer;text-decoration:underline" 
-				  onclick="showProteinCluster(<bean:write name="protein" property="protein.clusterId"/>)">
-				<bean:write name="protein" property="protein.clusterId"/>
+				  onclick="showProteinCluster(<bean:write name="protein" property="protein.clusterLabel"/>)">
+				<bean:write name="protein" property="protein.clusterLabel"/>
 			</span>
 		</td>
 		</logic:equal>
@@ -682,11 +700,11 @@ if(request.getAttribute("philiusResults") != null)
 			<td valign="top" colspan="2" class="pinfer_filler"><nobr>
 				<span class="showpeptForProtGrp" 
 					  style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #000000;" 
-					  id="<bean:write name="proteinGroup" property="groupId" />"
+					  id="<bean:write name="proteinGroup" property="proteinGroupLabel" />"
 					  >Show Peptides</span></nobr></td>
 			<td colspan="<bean:write name="myColspan"/>" class="pinfer_filler">
 				<!--  peptides table will go here: proteinPeptides.jsp -->
-				<div id="peptforprot_<bean:write name="proteinGroup" property="groupId" />"></div>
+				<div id="peptforprot_<bean:write name="proteinGroup" property="proteinGroupLabel" />"></div>
 			</td>
 		</tr>
 		</logic:equal>

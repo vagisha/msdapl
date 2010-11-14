@@ -43,13 +43,13 @@ public class ProteinClusterAjaxAction extends Action{
         }
         
 
-        int clusterId = 0;
-        try {clusterId = Integer.parseInt(request.getParameter("clusterId"));}
+        int clusterLabel = 0;
+        try {clusterLabel = Integer.parseInt(request.getParameter("clusterLabel"));}
         catch(NumberFormatException e) {}
 
-        if(clusterId == 0) {
+        if(clusterLabel == 0) {
             response.setContentType("text/html");
-            response.getWriter().write("<b>Invalid Protein Cluster ID: "+clusterId+"</b>");
+            response.getWriter().write("<b>Invalid Protein Cluster Label: "+clusterLabel+"</b>");
             return null;
         }
 
@@ -58,13 +58,13 @@ public class ProteinClusterAjaxAction extends Action{
         if(filterCriteria == null)  filterCriteria = new ProteinFilterCriteria();
         PeptideDefinition peptideDef = filterCriteria.getPeptideDefinition();
         
-        log.info("Got request for clusterId: "+clusterId+" of protein inference run: "+pinferId);
+        log.info("Got request for clusterLabel: "+clusterLabel+" of protein inference run: "+pinferId);
 
         request.setAttribute("pinferId", pinferId);
-        request.setAttribute("clusterId", clusterId);
+        request.setAttribute("clusterLabel", clusterLabel);
         
         
-        WIdPickerCluster cluster = IdPickerResultsLoader.getIdPickerCluster(pinferId, clusterId, peptideDef);
+        WIdPickerCluster cluster = IdPickerResultsLoader.getIdPickerCluster(pinferId, clusterLabel, peptideDef);
         request.setAttribute("cluster", cluster);
         
         return mapping.findForward("Success");

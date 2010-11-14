@@ -185,11 +185,7 @@ public class ProteinInferViewAction extends Action {
         
         // Results summary
         WIdPickerResultSummary summary = IdPickerResultsLoader.getIdPickerResultSummary(pinferId, proteinIds);
-//        request.setAttribute("unfilteredProteinCount", summary.getUnfilteredProteinCount());
-        request.setAttribute("filteredProteinCount", summary.getFilteredProteinCount());
-        request.setAttribute("parsimProteinCount", summary.getFilteredParsimoniousProteinCount());
-        request.setAttribute("filteredProteinGrpCount", summary.getFilteredProteinGroupCount());
-        request.setAttribute("parsimProteinGrpCount", summary.getFilteredParsimoniousProteinGroupCount());
+        request.setAttribute("resultSummary", summary);
         
         
         request.setAttribute("sortBy", filterCriteria.getSortBy());

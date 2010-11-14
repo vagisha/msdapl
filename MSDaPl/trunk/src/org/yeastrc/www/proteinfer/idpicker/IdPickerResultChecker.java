@@ -135,19 +135,19 @@ public class IdPickerResultChecker {
 
 	private void checkIdPickerClusters(Integer piRunId) {
 		IdPickerProteinDAO iprotDao = ProteinferDAOFactory.instance().getIdPickerProteinDao();
-		List<Integer> clusterIds = iprotDao.getClusterIds(piRunId);
+		List<Integer> clusterLabels = iprotDao.getClusterLabels(piRunId);
 		
-		for(Integer clusterId: clusterIds) {
+		for(Integer clusterLabel: clusterLabels) {
 			
-			List<Integer> groupIds = iprotDao.getGroupIdsForCluster(piRunId, clusterId);
+			List<Integer> groupLabels = iprotDao.getGroupLabelsForCluster(piRunId, clusterLabel);
 			//System.out.println("Cluster has # groups: "+groupIds.size());
 			
 			Set<Integer> proteinIds = new HashSet<Integer>();
 			Map<String, IdPickerPeptide> peptides = new HashMap<String, IdPickerPeptide>();
 			
-			for(Integer groupId: groupIds) {
+			for(Integer groupLabel: groupLabels) {
 				
-				List<IdPickerProtein> proteins = iprotDao.loadIdPickerGroupProteins(piRunId, groupId);
+				List<IdPickerProtein> proteins = iprotDao.loadIdPickerGroupProteins(piRunId, groupLabel);
 				
 				for(IdPickerProtein protein: proteins) {
 					proteinIds.add(protein.getId());
@@ -175,24 +175,24 @@ public class IdPickerResultChecker {
 	
 	private void checkIdPickerGroups(Integer piRunId) {
 		IdPickerProteinDAO iprotDao = ProteinferDAOFactory.instance().getIdPickerProteinDao();
-		List<Integer> clusterIds = iprotDao.getClusterIds(piRunId);
-		int groupCount = iprotDao.getIdPickerGroupCount(piRunId, false);
+		List<Integer> clusterLabels = iprotDao.getClusterLabels(piRunId);
+		int groupCount = iprotDao.getIdPickerGroupCount(piRunId);
 		int count = 0;
-		Set<Integer> seenGroupIds = new HashSet<Integer>(groupCount);
-		for(Integer clusterId: clusterIds) {
+		Set<Integer> seenGroupLabels = new HashSet<Integer>(groupCount);
+		for(Integer clusterLabel: clusterLabels) {
 			
-			List<Integer> groupIds = iprotDao.getGroupIdsForCluster(piRunId, clusterId);
+			List<Integer> groupLabels = iprotDao.getGroupLabelsForCluster(piRunId, clusterLabel);
 			//System.out.println("Cluster has # groups: "+groupIds.size());
 			
-			for(Integer groupId: groupIds) {
+			for(Integer groupLabel: groupLabels) {
 				
 				count++;
-				if(seenGroupIds.contains(groupId)) {
-					System.out.println("ERROR: Already seen this groupId: "+groupId+"; cluster: "+clusterId);
+				if(seenGroupLabels.contains(groupLabel)) {
+					System.out.println("ERROR: Already seen this groupLabel: "+groupLabel+"; cluster: "+clusterLabel);
 					// System.exit(1);
 				}
-				seenGroupIds.add(groupId);
-				List<IdPickerProtein> proteins = iprotDao.loadIdPickerGroupProteins(piRunId, groupId);
+				seenGroupLabels.add(groupLabel);
+				List<IdPickerProtein> proteins = iprotDao.loadIdPickerGroupProteins(piRunId, groupLabel);
 				//System.out.println("Group has # proteins: "+proteins.size());
 				
 				// Make sure all proteins in the group match exactly the same peptides
@@ -211,12 +211,12 @@ public class IdPickerResultChecker {
 					else {
 						if(protein.getPeptideCount() != peptides.size()) {
 							System.out.println("ERROR: Num peptides for protein: "+protein.getPeptideCount()+"; previously seen: "+peptides.size());
-							System.out.println("ERROR: GroupId: "+groupId+"; proteinId: "+protein.getId());
+							System.out.println("ERROR: GroupLabel: "+groupLabel+"; proteinId: "+protein.getId());
 							// System.exit(1);
 						}
 						for(IdPickerPeptide peptide: protein.getPeptides()) {
 							if(!peptides.contains(peptide.getSequence())) {
-								System.out.println("ERROR: GroupId: "+groupId+"; proteinId: "+protein.getId());
+								System.out.println("ERROR: GroupLabel: "+groupLabel+"; proteinId: "+protein.getId());
 								System.out.println("ERROR: Peptide not seen: "+peptide.getSequence());
 								// System.exit(1);
 							}

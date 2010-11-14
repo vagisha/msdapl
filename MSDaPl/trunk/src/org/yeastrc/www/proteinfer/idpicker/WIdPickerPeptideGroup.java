@@ -19,29 +19,29 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerPeptideBase;
 public class WIdPickerPeptideGroup {
 
     private final int pinferId;
-    private final int groupId;
+    private final int peptideGroupLabel;
     private List<? extends IdPickerPeptideBase> peptides;
-    private Set<Integer> matchingProteinGroupIds;
+    private Set<Integer> matchingProteinGroupLabels;
     
     public WIdPickerPeptideGroup(List<? extends IdPickerPeptideBase> groupPeptides) {
         if(groupPeptides.size() > 0) {
             this.pinferId = groupPeptides.get(0).getProteinferId();
-            this.groupId = groupPeptides.get(0).getGroupId();
+            this.peptideGroupLabel = groupPeptides.get(0).getPeptideGroupLabel();
         }
         else {
             pinferId = 0;
-            groupId = 0;
+            peptideGroupLabel = 0;
         }
         this.peptides = groupPeptides;
-        matchingProteinGroupIds = new HashSet<Integer>();
+        matchingProteinGroupLabels = new HashSet<Integer>();
     }
     
     public int getProteinferId() {
         return pinferId;
     }
     
-    public int getGroupId() {
-        return groupId;
+    public int getPeptideGroupLabel() {
+        return peptideGroupLabel;
     }
     
     public List<? extends IdPickerPeptideBase> getPeptides() {
@@ -52,19 +52,19 @@ public class WIdPickerPeptideGroup {
         return peptides.size();
     }
     
-    public List<Integer> getMatchingProteinGroupIds() {
-        return new ArrayList<Integer>(matchingProteinGroupIds);
+    public List<Integer> getMatchingProteinGroupLabels() {
+        return new ArrayList<Integer>(matchingProteinGroupLabels);
     }
     
-    public void addMatchingProteinGroupId(int protGrpId) {
-        this.matchingProteinGroupIds.add(protGrpId);
+    public void addMatchingProteinGroupLabel(int proteinGroupLabel) {
+        this.matchingProteinGroupLabels.add(proteinGroupLabel);
     }
     
-    public boolean matchesProteinGroup(int protGrpId) {
-        return matchingProteinGroupIds.contains(protGrpId);
+    public boolean matchesProteinGroup(int proteinGroupLabel) {
+        return matchingProteinGroupLabels.contains(proteinGroupLabel);
     }
     
     public boolean isUniqueToProteinGroup() {
-        return matchingProteinGroupIds.size() == 1;
+        return matchingProteinGroupLabels.size() == 1;
     }
 }

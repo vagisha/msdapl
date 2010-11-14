@@ -159,12 +159,12 @@ $(document).ready(function() {
 	if(cookie) {
 		var cookievals = cookie.split('_');
 		var pinferId = cookievals[0];
-		var clusterId = cookievals[1];
+		var clusterLabel = cookievals[1];
 		// make sure the protein inference ID saved in the cookie is the same as the results we are displaying
 		if(pinferId == <%=pinferId%>) {
 			var block = selected == 1;
 			// alert("cluster details "+block);
-			showProteinCluster(clusterId, false, block);
+			showProteinCluster(clusterLabel, false, block);
 		}
 	}	
 });
@@ -434,66 +434,66 @@ function saveProtDetailCookie(pinferId, proteinId) {
 // ---------------------------------------------------------------------------------------
 // SHOW PROTEIN CLUSTER
 // --------------------------------------------------------------------------------------- 
-function showProteinCluster(proteinClusterIdx, display, block) {
+function showProteinCluster(proteinClusterLabel, display, block) {
 
 	if(display == undefined) display = true;
 	var showDiv = location.hash != "#protclusters" && display;
 	
-	//$("#clusterlist")[0].selectedIndex = proteinClusterIdx - 1;
-	selectProteinCluster(proteinClusterIdx, block, showDiv);
+	//$("#clusterlist")[0].selectedIndex = proteinClusterLabel - 1;
+	selectProteinCluster(proteinClusterLabel, block, showDiv);
 	
 	return false;
 }
   
-function selectProteinCluster(clusterId, block, showDiv) {
+function selectProteinCluster(clusterLabel, block, showDiv) {
 
-	//var clusterId = $("#clusterlist")[0].selectedIndex + 1;
+	//var clusterLabel = $("#clusterlist")[0].selectedIndex + 1;
 	
 	// get data from the server and put it in the appropriate div
 	if(block == undefined)   block = true;
 	if(block)	$.blockUI();
 	$("#protcluster_div").load("<yrcwww:link path='proteinCluster.do'/>",   								// url
-								  	  {'pinferId': <%=pinferId%>, 'clusterId': clusterId}, 	// data
+								  	  {'pinferId': <%=pinferId%>, 'clusterLabel': clusterLabel}, 	// data
 								      function(responseText, status, request) {				// callback
  								  		
  								  		if(block) $.unblockUI();
  								  		
- 								  		if($("#assoctable_"+clusterId).length) { // make sure the DOM element exists
- 								  			dragtable.makeDraggable($("#assoctable_"+clusterId).get(0));
+ 								  		if($("#assoctable_"+clusterLabel).length) { // make sure the DOM element exists
+ 								  			dragtable.makeDraggable($("#assoctable_"+clusterLabel).get(0));
  								  		}
  								  		
- 								  		$("#assoctable_"+clusterId).addClass("table_pinfer_small");
- 								  		$("#assoctable_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
- 										$("#assoctable_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
-								  		$("#assoctable_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px');
+ 								  		$("#assoctable_"+clusterLabel).addClass("table_pinfer_small");
+ 								  		$("#assoctable_"+clusterLabel).css('border', '1px dashed gray').css('border-spacing', '2px');
+ 										$("#assoctable_"+clusterLabel+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
+								  		$("#assoctable_"+clusterLabel+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px');
 								  	
-								  		$("#prot_grp_table_"+clusterId).addClass("table_pinfer_small");
-								  		$("#prot_grp_table_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
-								  		$("#prot_grp_table_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
-								  		$("#prot_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px');
+								  		$("#prot_grp_table_"+clusterLabel).addClass("table_pinfer_small");
+								  		$("#prot_grp_table_"+clusterLabel).css('border', '1px dashed gray').css('border-spacing', '2px');
+								  		$("#prot_grp_table_"+clusterLabel+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
+								  		$("#prot_grp_table_"+clusterLabel+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px');
 								  	
-								  		$("#pept_grp_table_"+clusterId).addClass("table_pinfer_small");
-								  		$("#pept_grp_table_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
-								  		$("#pept_grp_table_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
-								  		$("#pept_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px');
+								  		$("#pept_grp_table_"+clusterLabel).addClass("table_pinfer_small");
+								  		$("#pept_grp_table_"+clusterLabel).css('border', '1px dashed gray').css('border-spacing', '2px');
+								  		$("#pept_grp_table_"+clusterLabel+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
+								  		$("#pept_grp_table_"+clusterLabel+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px');
  										
  										$(".protgrplist").click(function(){
- 											if($("#prot_grp_table_"+clusterId).is(':visible'))
- 												$("#prot_grp_table_"+clusterId).hide();
+ 											if($("#prot_grp_table_"+clusterLabel).is(':visible'))
+ 												$("#prot_grp_table_"+clusterLabel).hide();
  											else
- 												$("#prot_grp_table_"+clusterId).show();
+ 												$("#prot_grp_table_"+clusterLabel).show();
  										});
  										
  										$(".peptgrplist").click(function(){
- 											if($("#pept_grp_table_"+clusterId).is(':visible'))
- 												$("#pept_grp_table_"+clusterId).hide();
+ 											if($("#pept_grp_table_"+clusterLabel).is(':visible'))
+ 												$("#pept_grp_table_"+clusterLabel).hide();
  											else
- 												$("#pept_grp_table_"+clusterId).show();
+ 												$("#pept_grp_table_"+clusterLabel).show();
  										});
  										
  										$(this).show();
  										// save a cookie
-										saveClusterDetailCookie(<%=pinferId%>, clusterId);
+										saveClusterDetailCookie(<%=pinferId%>, clusterLabel);
 										
 										if(showDiv) {
 											$("#protclusterslink").click();
@@ -503,11 +503,11 @@ function selectProteinCluster(clusterId, block, showDiv) {
 								  });	
 }
 
-function saveClusterDetailCookie(pinferId, clusterId) {
+function saveClusterDetailCookie(pinferId, clusterLabel) {
 	var COOKIE_NAME = 'clusterdetails';
     var date = new Date();
     date.setTime(date.getTime() + (2 * 60 * 60 * 1000)); // expire in two hours
-    $.cookie(COOKIE_NAME, pinferId+"_"+clusterId, { path: '/', expires: date });
+    $.cookie(COOKIE_NAME, pinferId+"_"+clusterLabel, { path: '/', expires: date });
 }
   
 // ---------------------------------------------------------------------------------------
@@ -1088,12 +1088,21 @@ function goEnrichmentResults() {
 	
 	$("form#filterForm input[name='goAspect']").val(goAspect);
 	$("form#filterForm input[name='goEnrichmentPVal']").val(goPVal);
+	
 	if($("#goEnrichExactAnnotField").is(":checked")) {
 		$("form#filterForm input[name='exactAnnotations']").val("true");
 	}
 	else {
 		$("form#filterForm input[name='exactAnnotations']").val("false");
 	}
+	
+	if($("#applyMultiTestCorrectionField").is(":checked")) {
+		$("form#filterForm input[name='applyMultiTestCorrection']").val("true");
+	}
+	else {
+		$("form#filterForm input[name='applyMultiTestCorrection']").val("false");
+	}
+	
 	$("form#filterForm input[name='speciesId']").val(species);
 	
 	
@@ -1499,6 +1508,11 @@ function hideAllDescriptionsForProtein(proteinId) {
     		&nbsp;
     		<nobr>
     		P-Value: <html:text name="proteinInferFilterForm" property="goEnrichmentPVal" styleId="goEnrichmentPValField" size="4"></html:text>
+    		</nobr>
+    		&nbsp;
+    		<nobr>
+    		<span class="tooltip" title="Apply multiple test correction (Benjamini-Hochberg)">Adjust:</span> 
+    		<html:checkbox name="proteinInferFilterForm" property="applyMultiTestCorrection" styleId="applyMultiTestCorrectionField"></html:checkbox>
     		</nobr>
     	</td>
 		

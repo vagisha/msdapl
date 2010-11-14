@@ -111,6 +111,7 @@ public class ProteinDetailsAjaxAction extends Action {
             WIdPickerProtein iProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, pinferProtId, peptideDef);
             request.setAttribute("protein", iProt);
             
+            
             // Abundance information. Only for yeaset
             // Ghaemmaghami, et al., Nature 425, 737-741 (2003)
             if(iProt.getProteinListing().getSpeciesId() == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
@@ -159,7 +160,7 @@ public class ProteinDetailsAjaxAction extends Action {
     		
             // get other proteins in this group
             List<WIdPickerProtein> groupProteins = IdPickerResultsLoader.getGroupProteins(pinferId, 
-                    iProt.getProtein().getGroupId(), 
+                    iProt.getProtein().getProteinGroupLabel(), 
                     peptideDef);
             if(groupProteins.size() == 1)
                 groupProteins.clear();
@@ -174,6 +175,19 @@ public class ProteinDetailsAjaxAction extends Action {
                 }
             }
             request.setAttribute("groupProteins", groupProteins);
+            
+            // is this protein a subset protein
+            if(iProt.getProtein().getIsSubset()) {
+            	List<WIdPickerProtein> superProteins = IdPickerResultsLoader.getSuperProteins(iProt.getProtein(), pinferId);
+            	System.out.println("Found "+superProteins.size()+" super proteins");
+            	request.setAttribute("superProteins", superProteins);
+            }
+            
+            // If this protein has any subset proteins get them
+            List<WIdPickerProtein> subsetProteins = IdPickerResultsLoader.getSubsetProteins(iProt.getProtein(), pinferId);
+            if(subsetProteins.size() > 0) {
+            	request.setAttribute("subsetProteins", subsetProteins);
+            }
 
             // We will return the best filtered search hit for each peptide ion (along with terminal residues in the protein).
             List<WIdPickerIonForProtein> ionsWAllSpectra = IdPickerResultsLoader.getPeptideIonsForProtein(pinferId, pinferProtId);

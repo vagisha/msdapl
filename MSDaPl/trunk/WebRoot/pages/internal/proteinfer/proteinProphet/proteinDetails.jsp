@@ -294,8 +294,8 @@
 	<logic:equal name="isIdPicker" value="true">
 		<td style="border: 1px #CCCCCC dotted;" align="center">
 			<span style="cursor:pointer;text-decoration:underline" 
-			  onclick="showProteinCluster(<bean:write name="protein" property="protein.clusterId"/>)">
-			<bean:write name="protein" property="protein.clusterId"/>
+			  onclick="showProteinCluster(<bean:write name="protein" property="protein.clusterLabel"/>)">
+			<bean:write name="protein" property="protein.clusterLabel"/>
 			</span>
 		</td>
 	</logic:equal>

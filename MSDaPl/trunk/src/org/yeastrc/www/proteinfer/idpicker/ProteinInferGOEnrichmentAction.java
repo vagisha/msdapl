@@ -118,7 +118,9 @@ public class ProteinInferGOEnrichmentAction extends Action {
             nrseqIds.add(protein.getNrseqProteinId());
         }
         
-        GOEnrichmentOutput enrichment = doGoEnrichmentAnalysis(nrseqIds, speciesId, goAspect, filterForm.getGoEnrichmentPValDouble(),
+        GOEnrichmentOutput enrichment = doGoEnrichmentAnalysis(nrseqIds, speciesId, goAspect,
+        		filterForm.getGoEnrichmentPValDouble(),
+        		filterForm.isApplyMultiTestCorrection(),
         		filterForm.isExactAnnotations());
         request.setAttribute("goEnrichment", enrichment);
         
@@ -135,13 +137,16 @@ public class ProteinInferGOEnrichmentAction extends Action {
         return mapping.findForward("Success");
     }
     
-    private GOEnrichmentOutput doGoEnrichmentAnalysis(List<Integer> nrseqIds, int speciesId, int goAspect, double pVal, boolean exactAnnotations) throws Exception {
+    private GOEnrichmentOutput doGoEnrichmentAnalysis(List<Integer> nrseqIds, int speciesId, int goAspect, double pVal,
+    		boolean doMultiTestCorrection,
+    		boolean exactAnnotations) throws Exception {
         
         log.info(nrseqIds.size()+" proteins for GO enrichment analysis");
         
         GOEnrichmentInput input = new GOEnrichmentInput(speciesId);
         input.setProteinIds(nrseqIds);
         input.setPValCutoff(pVal);
+        input.setApplyMultiTestCorrection(doMultiTestCorrection);
         input.setGoAspect(goAspect);
         input.setExactAnnotations(exactAnnotations);
         

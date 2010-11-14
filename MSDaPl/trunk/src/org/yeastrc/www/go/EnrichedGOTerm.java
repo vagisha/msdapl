@@ -20,6 +20,7 @@ public class EnrichedGOTerm implements Comparable<EnrichedGOTerm> {
 
     private final GONode goNode;
     private double pValue = 1.0;
+    private double correctedPValue = 1.0;
     private Set<Integer> nrseqProteinIds;
     private final int totalProteins; // number of proteins in the "universe" annotated with this term
     
@@ -32,6 +33,10 @@ public class EnrichedGOTerm implements Comparable<EnrichedGOTerm> {
     public double getPValue() {
         return pValue;
     }
+    
+    public double getCorrectedPvalue() {
+    	return correctedPValue;
+    }
 
     public String getPvalueString() { 
     	// -1 is a special value assigned if the number of proteins in the input list
@@ -43,8 +48,22 @@ public class EnrichedGOTerm implements Comparable<EnrichedGOTerm> {
         return df.format(this.getPValue());       
     }
     
+    public String getCorrectedPvalueString() { 
+    	// -1 is a special value assigned if the number of proteins in the input list
+    	// annotated with this terms is more than the number of proteins in the 
+    	// reference set annotated with this protein
+    	if(this.getCorrectedPvalue() == -1.0)
+    		return "-1.0";
+        DecimalFormat df = new DecimalFormat("0.####E0");
+        return df.format(this.getCorrectedPvalue());       
+    }
+    
     public void setPValue(double value) {
         pValue = value;
+    }
+    
+    public void setCorrectedPvalue(double value) {
+        correctedPValue = value;
     }
 
     public GONode getGoNode() {
@@ -84,8 +103,8 @@ public class EnrichedGOTerm implements Comparable<EnrichedGOTerm> {
     		return 1;
     	if(o.getPValue() == -1.0)
     		return -1;
-    	if (this.getPValue() < o.getPValue() ) return -1;
-    	if (this.getPValue() > o.getPValue() ) return 1;
+    	if (this.getCorrectedPvalue() < o.getCorrectedPvalue() ) return -1;
+    	if (this.getCorrectedPvalue() > o.getCorrectedPvalue() ) return 1;
         
         return 0;
     }

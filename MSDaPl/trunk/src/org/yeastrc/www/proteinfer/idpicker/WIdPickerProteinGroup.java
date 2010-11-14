@@ -9,14 +9,14 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
 
 public class WIdPickerProteinGroup {
 
-    private int groupId;
-    private int clusterId;
+    private int proteinGroupLabel;
+    private int clusterLabel;
     private List<WIdPickerProtein> proteins;
     private int matchingPeptideCount;
     private int uniqMatchingPeptideCount;
     private int spectrumCount;
-    private Set<Integer> nonUniqPeptGrpIds;
-    private Set<Integer> uniqPeptGrpIds;
+    private Set<Integer> nonUniqPeptGrpLabels;
+    private Set<Integer> uniqPeptGrpLabels;
     
 //    private String nonUniqMatchingPeptideGroupIdsString = "NONE";
 //    private String uniqMatchingPeptideGroupIdsString = "NONE";
@@ -28,49 +28,49 @@ public class WIdPickerProteinGroup {
            groupProteins = new ArrayList<WIdPickerProtein>(0);
        if(groupProteins.size() > 0) {
            IdPickerProteinBase prot = groupProteins.get(0).getProtein();
-           this.groupId = prot.getGroupId();
-           this.clusterId = prot.getClusterId();
+           this.proteinGroupLabel = prot.getProteinGroupLabel();
+           this.clusterLabel = prot.getClusterLabel();
            this.spectrumCount = prot.getSpectrumCount();
            this.matchingPeptideCount = prot.getPeptideCount();
            this.uniqMatchingPeptideCount = prot.getUniquePeptideCount();
        }
-       nonUniqPeptGrpIds = new HashSet<Integer>();
-       uniqPeptGrpIds = new HashSet<Integer>();
+       nonUniqPeptGrpLabels = new HashSet<Integer>();
+       uniqPeptGrpLabels = new HashSet<Integer>();
     }
     
-    public String getNonUniqMatchingPeptideGroupIdsString() {
+    public String getNonUniqMatchingPeptideGroupLabelsString() {
         StringBuilder buf = new StringBuilder();
-        for(Integer grpId: nonUniqPeptGrpIds) {
+        for(Integer grpLabel: nonUniqPeptGrpLabels) {
 //            if(!uniqPeptideGroupIds.contains(grpId))
-            buf.append(","+grpId);
+            buf.append(","+grpLabel);
         }
         if(buf.length() > 0)    buf.deleteCharAt(0);
         return buf.toString();
     }
 
-    public String getUniqMatchingPeptideGroupIdsString() {
+    public String getUniqMatchingPeptideGroupLabelsString() {
         StringBuilder buf = new StringBuilder();
-        for(Integer grpId: uniqPeptGrpIds) {
-            buf.append(","+grpId);
+        for(Integer grpLabel: uniqPeptGrpLabels) {
+            buf.append(","+grpLabel);
         }
         if(buf.length() > 0)    buf.deleteCharAt(0);
         return buf.toString();
     }
     
-    public void addNonUniqPeptideGrpId(int id) {
-        nonUniqPeptGrpIds.add(id);
+    public void addNonUniqPeptideGrpLabel(int id) {
+        nonUniqPeptGrpLabels.add(id);
     }
     
-    public void addUniqPeptideGrpId(int id) {
-        uniqPeptGrpIds.add(id);
+    public void addUniqPeptideGrpLabel(int id) {
+        uniqPeptGrpLabels.add(id);
     }
     
-    public int getGroupId() {
-        return groupId;
+    public int getProteinGroupLabel() {
+        return proteinGroupLabel;
     }
     
-    public int getClusterId() {
-        return clusterId;
+    public int getClusterLabel() {
+        return clusterLabel;
     }
     
     public int getProteinCount() {
@@ -92,4 +92,10 @@ public class WIdPickerProteinGroup {
     public List<WIdPickerProtein> getProteins() {
         return proteins;
     }
+    public boolean getIsParsimonious() {
+		return this.getProteins().get(0).getProtein().getIsParsimonious();
+	}
+	public boolean getIsSubset() {
+		return this.getProteins().get(0).getProtein().getIsSubset();
+	}
 }

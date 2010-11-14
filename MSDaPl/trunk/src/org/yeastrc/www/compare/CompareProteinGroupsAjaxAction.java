@@ -109,7 +109,7 @@ public class CompareProteinGroupsAjaxAction extends Action{
 
                 // get all the proteins in the group
                 List<IdPickerProteinBase> groupProteins = protDao.loadIdPickerGroupProteins(dataset.getDatasetId(), 
-                        idpProtein.getGroupId());
+                        idpProtein.getProteinGroupLabel());
 
                 for(IdPickerProteinBase gprot: groupProteins) {
                     groupNrseqIds.add(gprot.getNrseqProteinId());
