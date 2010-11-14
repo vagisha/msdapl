@@ -32,8 +32,8 @@ public class IdPickerStatsSaver {
         ProteinferPeptideDAO peptDao = ProteinferDAOFactory.instance().getProteinferPeptideDao();
         ProteinferSpectrumMatchDAO specDao = ProteinferDAOFactory.instance().getProteinferSpectrumMatchDao();
         
-        int parsimProteinCount = proteinDao.getIdPickerProteinIds(piRunId, true).size();
-        int parsimProteinGroupCount = proteinDao.getIdPickerGroupCount(piRunId, true);
+        int parsimProteinCount = proteinDao.getIdPickerParsimoniousProteinIds(piRunId).size();
+        int parsimProteinGroupCount = proteinDao.getIdPickerParsimoniousGroupCount(piRunId);
         int peptSeqCount = peptDao.getUniquePeptideSequenceCountForRun(piRunId);
         int ionCount = peptDao.getUniqueIonCountForRun(piRunId);
         int spectrumCount = specDao.getSpectrumCountForPinferRun(piRunId);

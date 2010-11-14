@@ -48,7 +48,7 @@ public class ProteinVertex extends Vertex<ProteinVertex> {
     public void setComponentIndex(int index) {
         super.setComponentIndex(index);
         for(Protein prot: proteins)
-            prot.setProteinClusterId(index);
+            prot.setProteinClusterLabel(index);
     }
     
     @Override

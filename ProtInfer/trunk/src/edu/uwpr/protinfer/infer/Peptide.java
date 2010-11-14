@@ -11,7 +11,7 @@ public class Peptide {
                                        // If peptide definition == sequence+mods+charge; peptideKey = modifiedSequence_charge
     
     private int id;
-    private int peptideGroupId;
+    private int peptideGroupLabel;
     
     private boolean isUnique = false;
     
@@ -49,17 +49,17 @@ public class Peptide {
         this.id = id;
     }
     
-    public int getPeptideGroupId() {
-        return peptideGroupId;
+    public int getPeptideGroupLabel() {
+        return peptideGroupLabel;
     }
 
-    public void setPeptideGroupId(int peptideGroupId) {
-        this.peptideGroupId = peptideGroupId;
+    public void setPeptideGroupLabel(int peptideGroupLabel) {
+        this.peptideGroupLabel = peptideGroupLabel;
     }
     
     public String toString() {
        StringBuilder buf = new StringBuilder();
-       buf.append("ID: "+id+"\tGroupID: "+peptideGroupId+"\tSequence: "+sequence+"\tKey: "+peptideKey);
+       buf.append("ID: "+id+"\tGroupLabel: "+peptideGroupLabel+"\tSequence: "+sequence+"\tKey: "+peptideKey);
        return buf.toString();
     }
 }

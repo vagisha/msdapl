@@ -1,5 +1,8 @@
 package edu.uwpr.protinfer.infer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Protein {
 
     private String accession;
@@ -8,8 +11,9 @@ public class Protein {
     private boolean isDecoy = false;
     private boolean isAccepted = false;
     private boolean isSubset = false;
-    private int proteinClusterId;
-    private int proteinGroupId;
+    private int proteinClusterLabel;
+    private int proteinGroupLabel;
+    private List<Integer> superProteinGroupLabels;
     
     /**
      * @param accession
@@ -18,6 +22,7 @@ public class Protein {
     public Protein(String accession, int id) {
         this.accession = accession;
         this.id = id;
+        this.superProteinGroupLabels = new ArrayList<Integer>();
     }
     
     public String getAccession() {
@@ -60,20 +65,28 @@ public class Protein {
 		this.isSubset = isSubset;
 	}
 
-	public void setProteinClusterId(int proteinClusterId) {
-        this.proteinClusterId = proteinClusterId;
+	public List<Integer> getSuperProteinGroupLabels() {
+		return superProteinGroupLabels;
+	}
+
+	public void setSuperProteinGroupLabels(List<Integer> superProteinGroupLabels) {
+		this.superProteinGroupLabels = superProteinGroupLabels;
+	}
+
+	public void setProteinClusterLabel(int proteinClusterId) {
+        this.proteinClusterLabel = proteinClusterId;
     }
 
-    public int getProteinClusterId() {
-        return proteinClusterId;
+    public int getProteinClusterLabel() {
+        return proteinClusterLabel;
     }
     
-    public int getProteinGroupId() {
-        return proteinGroupId;
+    public int getProteinGroupLabel() {
+        return proteinGroupLabel;
     }
 
-    public void setProteinGroupId(int proteinGroupId) {
-        this.proteinGroupId = proteinGroupId;
+    public void setProteinGroupLabel(int proteinGroupLabel) {
+        this.proteinGroupLabel = proteinGroupLabel;
     }
     
     public String toString() {

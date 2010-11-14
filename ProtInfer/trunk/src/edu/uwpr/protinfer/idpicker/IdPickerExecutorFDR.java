@@ -80,7 +80,7 @@ public class IdPickerExecutorFDR {
         rankPeptideSpectrumMatches(proteins);
         
         // FINALLY save the results
-        IdPickerResultSaver.instance().saveResults(idpRun, proteins);
+        new IdPickerResultSaver().saveResults(idpRun, proteins);
         
         // Save the stats for quick lookup
         try {

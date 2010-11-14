@@ -54,13 +54,7 @@ public class IdPickerResultSaver {
     private static final MsSearchResultDAO resDao = DAOFactory.instance().getMsSearchResultDAO();
     
     
-    private static final IdPickerResultSaver instance = new IdPickerResultSaver();
-    
-    private IdPickerResultSaver() {}
-    
-    public static final IdPickerResultSaver instance() {
-        return instance;
-    }
+    private Map<Integer, Integer> nrseqIdToPinferProteinIdMap = new HashMap<Integer, Integer>();
     
     public <T extends SpectrumMatch> void saveResults(IdPickerRun idpRun, List<InferredProtein<T>> proteins) {
         
@@ -75,6 +69,7 @@ public class IdPickerResultSaver {
         // save the inferred proteins, associated peptides and spectrum matches
         saveInferredProteins(idpRun.getId(), proteins);
         
+        saveSubsetProteinInformation(idpRun.getId(), proteins);
         
         long e = System.currentTimeMillis();
         log.info("SAVED IDPickerResults in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes.");
@@ -108,9 +103,9 @@ public class IdPickerResultSaver {
             //load the existing protein
             int pinferProteinId = Integer.parseInt(protein.getAccession());
             IdPickerProteinBase oldProt = protDao.loadProtein(pinferProteinId);
-            oldProt.setClusterId(protein.getProteinClusterId());
+            oldProt.setClusterLabel(protein.getProteinClusterLabel());
             oldProt.setCoverage(protein.getPercentCoverage());
-            oldProt.setGroupId(protein.getProteinGroupId());
+            oldProt.setProteinGroupLabel(protein.getProteinGroupLabel());
             oldProt.setIsParsimonious(protein.getIsAccepted());
             oldProt.setIsSubset(protein.getProtein().isSubset());
             oldProt.setNsaf(protein.getNSAF());
@@ -142,15 +137,15 @@ public class IdPickerResultSaver {
                         idpPeptideIds.add(pinferPeptideId);
                         
                         IdPickerPeptideBase oldPept = peptDao.load(pinferPeptideId);
-                        oldPept.setGroupId(pev.getPeptide().getPeptideGroupId());
+                        oldPept.setPeptideGroupLabel(pev.getPeptide().getPeptideGroupLabel());
                         oldPept.setUniqueToProtein(pev.getPeptide().isUniqueToProtein());
                         if(peptDao.updateIdPickerPeptide(oldPept) != 1)
                             throw new IllegalArgumentException("Could not update peptide: "+oldPept.getId());
                         rerankSpectra(oldPept, inputGenerator, params);
                         
                         // make the group association if it does not already exist
-                        protDao.saveProteinPeptideGroupAssociation(pinferId, protein.getProteinGroupId(),
-                                peptide.getPeptideGroupId());
+                        protDao.saveProteinPeptideGroupAssociation(pinferId, protein.getProteinGroupLabel(),
+                                peptide.getPeptideGroupLabel());
                     }
                 }
             }
@@ -276,7 +271,6 @@ public class IdPickerResultSaver {
             // save the protein
             int pinferProteinId = saveProtein(pinferId, protein);
             
-            
             // If the user ran protein inference with a peptide definition being more
             // than just the peptide sequence, we will group all peptide evidence 
             // that reprensent the same peptide sequence (w/o mods). This is because
@@ -296,8 +290,8 @@ public class IdPickerResultSaver {
                 // link the protein and peptide
                 protDao.saveProteinferProteinPeptideMatch(pinferProteinId, pinferPeptideId);
                 // make the group association if it does not already exist
-                protDao.saveProteinPeptideGroupAssociation(pinferId, protein.getProteinGroupId(), 
-                        peptide.getPeptideGroupId());
+                protDao.saveProteinPeptideGroupAssociation(pinferId, protein.getProteinGroupLabel(), 
+                        peptide.getPeptideGroupLabel());
             }
         }
     }
@@ -456,6 +450,32 @@ public class IdPickerResultSaver {
             }
         }
     }
+    
+    private <T extends SpectrumMatch> void saveSubsetProteinInformation(int pinferId, List<InferredProtein<T>> proteins) {
+        
+        
+        for(InferredProtein<T> protein: proteins) {
+            
+            if(protein.getIsSubset()) {
+            	
+            	int pinferProteinId = nrseqIdToPinferProteinIdMap.get(protein.getProteinId());
+            	
+            	for(Integer proteinGroupLabel: protein.getProtein().getSuperProteinGroupLabels()) {
+            		
+            		// get a list of proteinIds for this proteinGroupLabel
+            		List<Integer> superProteinIds = protDao.getIdPickerGroupProteinIds(pinferId, proteinGroupLabel);
+            		// save an entry in the IDPickerSubsetProtein table
+            		for(Integer superProteinId: superProteinIds) {
+            			// The super-protein might be a subset protein itself. Don't save in that case
+            			IdPickerProteinBase protBase = protDao.loadProtein(superProteinId);
+            			if(protBase.getIsSubset())
+            				continue;
+            			protDao.saveSubsetProtein(pinferProteinId, superProteinId);
+            		}
+            	}
+            }
+        }
+    }
 
     // ----------------------------------------------------------------------------------------------
     // Group peptide evidence by sequence, ignore any peptide definition used to do protein inference.
@@ -518,13 +538,14 @@ public class IdPickerResultSaver {
         IdPickerProteinBase idpProt = new IdPickerProteinBase();
         idpProt.setProteinferId(pinferId);
         idpProt.setNrseqProteinId(protein.getProteinId());
-        idpProt.setClusterId(protein.getProteinClusterId());
-        idpProt.setGroupId(protein.getProteinGroupId());
+        idpProt.setClusterLabel(protein.getProteinClusterLabel());
+        idpProt.setProteinGroupLabel(protein.getProteinGroupLabel());
         idpProt.setIsParsimonious(protein.getIsAccepted());
         idpProt.setIsSubset(protein.getProtein().isSubset());
         idpProt.setCoverage(protein.getPercentCoverage());
         idpProt.setNsaf(protein.getNSAF());
         int pinferProteinId = protDao.saveIdPickerProtein(idpProt);
+        nrseqIdToPinferProteinIdMap.put(protein.getProteinId(), pinferProteinId);
         return pinferProteinId;
     }
     
@@ -534,7 +555,7 @@ public class IdPickerResultSaver {
     private <T extends SpectrumMatch> int savePeptide(PeptideEvidence<T> pev, int pinferId) {
         Peptide peptide = pev.getPeptide();
         IdPickerPeptideBase idpPept = new IdPickerPeptideBase();
-        idpPept.setGroupId(peptide.getPeptideGroupId());
+        idpPept.setPeptideGroupLabel(peptide.getPeptideGroupLabel());
         idpPept.setSequence(peptide.getPeptideSequence());
         idpPept.setUniqueToProtein(peptide.isUniqueToProtein());
         idpPept.setProteinferId(pinferId);

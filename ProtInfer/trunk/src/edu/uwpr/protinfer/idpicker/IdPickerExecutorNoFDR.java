@@ -66,7 +66,7 @@ public class IdPickerExecutorNoFDR {
                 log.info("Inferred ALL proteins for sublist");
                 
                 // save the results
-                IdPickerResultSaver.instance().saveAndUpdateResults(idpRun.getId(), list, proteins);
+                new IdPickerResultSaver().saveAndUpdateResults(idpRun.getId(), list, proteins);
                 
                 allPsms.clear();
                 allPsms = null;
@@ -115,7 +115,7 @@ public class IdPickerExecutorNoFDR {
             NSAFCalculator.instance().calculateNSAF(iProteins);
             
             
-            IdPickerResultSaver.instance().updateResults(idpRun.getId(), iProteins, idpRun.getInputGenerator(), params);
+            new IdPickerResultSaver().updateResults(idpRun.getId(), iProteins, idpRun.getInputGenerator(), params);
         }
     }
     
@@ -135,7 +135,7 @@ public class IdPickerExecutorNoFDR {
         List<InferredProtein<SpectrumMatch>> proteins = IDPickerExecutor.inferProteins(allPsms, params);
         
         // FINALLY save the results
-        IdPickerResultSaver.instance().saveResults(idpRun, proteins);
+        new IdPickerResultSaver().saveResults(idpRun, proteins);
         
         // Save the stats for quick lookup
         try {

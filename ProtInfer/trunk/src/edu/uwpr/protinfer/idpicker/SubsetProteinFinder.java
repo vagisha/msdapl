@@ -32,8 +32,7 @@ public class SubsetProteinFinder {
 		
 		// Make a copy of the list; we will be sorting this list
 		List<InferredProtein<? extends SpectrumMatch>> proteinList = new ArrayList<InferredProtein<? extends SpectrumMatch>>(inputProteinList.size());
-		for(InferredProtein<? extends SpectrumMatch> protein: inputProteinList)
-			proteinList.add(protein);
+		proteinList.addAll(inputProteinList);
 				
 		Set<String> peptides = new HashSet<String>();
 		
@@ -41,37 +40,42 @@ public class SubsetProteinFinder {
 		Collections.sort(proteinList, new Comparator<InferredProtein<? extends SpectrumMatch>>() {
 			@Override
 			public int compare(InferredProtein<? extends SpectrumMatch> o1, InferredProtein<? extends SpectrumMatch> o2) {
-				return Integer.valueOf(o1.getProteinClusterId()).compareTo(o2.getProteinClusterId());
+				return Integer.valueOf(o1.getProteinClusterLabel()).compareTo(o2.getProteinClusterLabel());
 			}
 		});
 		
 		
-		int clusterId = -1;
+		int clusterLabel = -1;
 		
 		List<InferredProtein<? extends SpectrumMatch>> clusterProteins = new ArrayList<InferredProtein<? extends SpectrumMatch>>();
 		Set<String> clusterPeptides = new HashSet<String>();
 		
-		Set<Integer> subsetProteinGroupIds = new HashSet<Integer>();
+		Map<Integer, Set<Integer>> subsetSuperProteinGroupIdMap = new HashMap<Integer, Set<Integer>>();
+		
 		for(InferredProtein<? extends SpectrumMatch> iProtein: proteinList) {
-			if(iProtein.getProteinClusterId() != clusterId) {
+			if(iProtein.getProteinClusterLabel() != clusterLabel) {
 				
-				if(clusterId != -1) {
+				if(clusterLabel != -1) {
 					
 					// make sure that the peptides in this cluster were unique to this cluster
 					for(String peptide: clusterPeptides) {
 						if(peptides.contains(peptide)) {
-							log.error("Petide "+peptide+" in cluster "+clusterId+" also found in another cluster");
+							log.error("Petide "+peptide+" in cluster "+clusterLabel+" also found in another cluster");
 						}
 						peptides.add(peptide);
 					}
-					Set<Integer> subsetGrpIds = getSubsetProteinGroupIds(clusterProteins);
-					subsetProteinGroupIds.addAll(subsetGrpIds);
+					Map<Integer, Set<Integer>> mapForCluster = getSubsetSuperProteinGroupIdMap(clusterProteins);
+					for(Integer subsetGroupId: mapForCluster.keySet()) {
+						if(subsetSuperProteinGroupIdMap.containsKey(subsetGroupId))
+							log.error("Group ID: "+subsetGroupId+" seen multiple times");
+						subsetSuperProteinGroupIdMap.put(subsetGroupId, mapForCluster.get(subsetGroupId));
+					}
 				}
 				clusterProteins.clear();
 				clusterPeptides.clear();
 				clusterProteins = new ArrayList<InferredProtein<? extends SpectrumMatch>>();
 				clusterPeptides = new HashSet<String>();
-				clusterId = iProtein.getProteinClusterId();
+				clusterLabel = iProtein.getProteinClusterLabel();
 			}
 			clusterProteins.add(iProtein);
 
@@ -84,53 +88,56 @@ public class SubsetProteinFinder {
 		// make sure that the peptides in this cluster were unique to this cluster
 		for(String peptide: clusterPeptides) {
 			if(peptides.contains(peptide)) {
-				log.error("Petide "+peptide+" in cluster "+clusterId+" also found in another cluster");
+				log.error("Petide "+peptide+" in cluster "+clusterLabel+" also found in another cluster");
 			}
 			peptides.add(peptide);
 		}
-		Set<Integer> subsetGrpIds = getSubsetProteinGroupIds(clusterProteins);
-		subsetProteinGroupIds.addAll(subsetGrpIds);
+		Map<Integer, Set<Integer>> mapForCluster = getSubsetSuperProteinGroupIdMap(clusterProteins);
+		for(Integer subsetGroupId: mapForCluster.keySet()) {
+			if(subsetSuperProteinGroupIdMap.containsKey(subsetGroupId))
+				log.error("Group ID: "+subsetGroupId+" seen multiple times");
+			subsetSuperProteinGroupIdMap.put(subsetGroupId, mapForCluster.get(subsetGroupId));
+		}
 		
 		// mark the subset proteins
 		for(InferredProtein<? extends SpectrumMatch> protein: inputProteinList) {
-			if(subsetProteinGroupIds.contains(protein.getProteinGroupId()))
+			Set<Integer> superProteinGroupLabels = subsetSuperProteinGroupIdMap.get(protein.getProteinGroupLabel());
+			if(superProteinGroupLabels != null && superProteinGroupLabels.size() > 0) {
 				protein.getProtein().setSubset(true);
+				protein.getProtein().setSuperProteinGroupLabels(new ArrayList<Integer>(superProteinGroupLabels));
+			}
 		}
 	}
 
-	private Set<Integer> getSubsetProteinGroupIds(List<InferredProtein<? extends SpectrumMatch>> clusterProteins) {
+	/*
+	 * Keys in the returned Map are group IDs of subset proteins; the values are group IDs or corresponding 
+	 * super proteins. 
+	 * @param clusterProteins
+	 * @return
+	 */
+	private Map<Integer, Set<Integer>> getSubsetSuperProteinGroupIdMap(List<InferredProtein<? extends SpectrumMatch>> clusterProteins) {
 		
 		
-		// get one representative from each indistinguishable protein groups
+		// get one representative from each indistinguishable protein group
 		List<InferredProtein<? extends SpectrumMatch>> sparseClusterProteins = new ArrayList<InferredProtein<? extends SpectrumMatch>>();
+		
+		
 		Set<Integer> groupIds = new HashSet<Integer>();
-		Map<String, Set<Integer>> peptideProteinMap = new HashMap<String, Set<Integer>>();
 		for(InferredProtein<? extends SpectrumMatch> iProtein: clusterProteins) {
 			
-			if(groupIds.contains(iProtein.getProteinGroupId()))
+			if(groupIds.contains(iProtein.getProteinGroupLabel()))
 				continue;
 			
-			groupIds.add(iProtein.getProteinGroupId());
+			groupIds.add(iProtein.getProteinGroupLabel());
 			sparseClusterProteins.add(iProtein);
-		}
-		
-		// Create a map of peptides and matching proteins.
-		for(InferredProtein<? extends SpectrumMatch> iProtein: sparseClusterProteins) {
-			
-			for(PeptideEvidence<? extends SpectrumMatch> pev: iProtein.getPeptides()) {
-				
-				Set<Integer> matchingProteins = peptideProteinMap.get(pev.getPeptide().getPeptideSequence());
-				if(matchingProteins == null) {
-					matchingProteins = new HashSet<Integer>();
-					peptideProteinMap.put(pev.getPeptide().getPeptideSequence(), matchingProteins);
-				}
-				matchingProteins.add(iProtein.getProtein().getId());
-			}
 		}
 		
 		
 		// Look for proteins whose peptides are a subset of peptides of another protein
-		Set<Integer> subsetGroupIds = new HashSet<Integer>();
+		
+		// key in subsetSuperGroupIdMap is the group label of a subset protein
+		// values are a set of group labels of the super proteins.
+		Map<Integer, Set<Integer>> subsetSuperGroupIdMap = new HashMap<Integer, Set<Integer>>();
 		for(int i = 0; i < sparseClusterProteins.size(); i++) {
 			
 			for(int j = 0; j < sparseClusterProteins.size(); j++) {
@@ -141,15 +148,21 @@ public class SubsetProteinFinder {
 				InferredProtein<? extends SpectrumMatch> protein_i = sparseClusterProteins.get(i);
 				InferredProtein<? extends SpectrumMatch> protein_j = sparseClusterProteins.get(j);
 				
+				// If protein_i is a subset of protein_j
 				if(isSubset(protein_i, protein_j)) {
-					subsetGroupIds.add(protein_i.getProteinGroupId());
-					break;
+					Set<Integer> superProteinGroupIds = subsetSuperGroupIdMap.get(protein_i.getProteinGroupLabel());
+					if(superProteinGroupIds == null) {
+						superProteinGroupIds = new HashSet<Integer>();
+						subsetSuperGroupIdMap.put(protein_i.getProteinGroupLabel(), superProteinGroupIds);
+					}
+					superProteinGroupIds.add(protein_j.getProteinGroupLabel());
 				}
-			}
+			}		
 		}
-		return subsetGroupIds;
+		return subsetSuperGroupIdMap;
 	}
 
+	// Returns true if protein_i is a subset protein of protein_j
 	private boolean isSubset(InferredProtein<? extends SpectrumMatch> protein_i,
 			InferredProtein<? extends SpectrumMatch> protein_j) {
 		
@@ -163,8 +176,14 @@ public class SubsetProteinFinder {
 			peptides_j.add(pev.getPeptide().getPeptideSequence());
 		}
 		
-		if(peptides_j.containsAll(peptides_i))
+		if(peptides_j.containsAll(peptides_i)) {
+			if(peptides_j.size() == peptides_i.size()) {
+				log.error("Same set of peptides found for protein_i ("+protein_i.getProteinId()+","+protein_i.getAccession()+") and protein_j ("+
+						+protein_j.getProteinId()+","+protein_j.getAccession()+")");
+				log.error("Peptides are: "+org.yeastrc.ms.util.StringUtils.makeCommaSeparated(peptides_i));
+			}
 			return true;
+		}
 		else
 			return false;
 	}

@@ -61,9 +61,9 @@ public class IDPickerExecutorTest2 extends TestCase {
         int minCluster = Integer.MAX_VALUE;
         int maxCluster = 0;
         for (InferredProtein<SpectrumMatchIDP> prot: proteins) {
-            minCluster = Math.min(minCluster, prot.getProteinClusterId());
-            maxCluster = Math.max(maxCluster, prot.getProteinClusterId());
-            System.out.println(prot.getAccession()+"; cluster: "+prot.getProteinClusterId()+"; group: "+prot.getProteinGroupId());
+            minCluster = Math.min(minCluster, prot.getProteinClusterLabel());
+            maxCluster = Math.max(maxCluster, prot.getProteinClusterLabel());
+            System.out.println(prot.getAccession()+"; cluster: "+prot.getProteinClusterLabel()+"; group: "+prot.getProteinGroupLabel());
         }
         
         // create a map for the proteins
@@ -74,24 +74,24 @@ public class IDPickerExecutorTest2 extends TestCase {
         
         // CHECK THE CLUSTERS
         // proteins 1, 2, and 3 should be in the same cluster
-        int clusterId1 = map.get("protein_1").getProteinClusterId();
+        int clusterId1 = map.get("protein_1").getProteinClusterLabel();
         assertTrue(clusterId1 > 0);
-        assertEquals(clusterId1, map.get("protein_2").getProteinClusterId());
-        assertEquals(clusterId1, map.get("protein_3").getProteinClusterId());
+        assertEquals(clusterId1, map.get("protein_2").getProteinClusterLabel());
+        assertEquals(clusterId1, map.get("protein_3").getProteinClusterLabel());
 
 
         // CHECK THE PROTEIN GROUPS
         // protein_1
-        int groupId1 = map.get("protein_1").getProteinGroupId();
+        int groupId1 = map.get("protein_1").getProteinGroupLabel();
         assertTrue(groupId1 > 0);
         
         // protein_2
-        int groupId2 = map.get("protein_2").getProteinGroupId();
+        int groupId2 = map.get("protein_2").getProteinGroupLabel();
         assertTrue(groupId2 > 0);
         assertNotSame(groupId2, groupId1);
         
         // protein_5
-        int groupId3 = map.get("protein_3").getProteinGroupId();
+        int groupId3 = map.get("protein_3").getProteinGroupLabel();
         assertTrue(groupId3 > 0);
         assertNotSame(groupId3, groupId1);
         assertNotSame(groupId3, groupId2);

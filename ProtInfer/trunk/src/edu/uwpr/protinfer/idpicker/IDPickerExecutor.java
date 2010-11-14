@@ -452,7 +452,7 @@ public class IDPickerExecutor {
 //        filterDao.saveIdPickerParam(filter);
 
 //        int piRunId = Integer.parseInt(args[0]);
-        int piRunId = 36; 
+        int piRunId = 248; 
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
         IdPickerRun run = runDao.loadProteinferRun(piRunId);
         System.out.println("Number of files: "+run.getInputList().size());

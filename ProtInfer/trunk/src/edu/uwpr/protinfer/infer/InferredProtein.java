@@ -70,6 +70,10 @@ public class InferredProtein <T extends SpectrumMatch> {
     public boolean getIsAccepted() {
         return protein.isAccepted();
     }
+    
+    public boolean getIsSubset() {
+    	return protein.isSubset();
+    }
 
     public double getNSAF() {
         return nsaf;
@@ -79,12 +83,12 @@ public class InferredProtein <T extends SpectrumMatch> {
         this.nsaf = nsaf;
     }
 
-    public int getProteinGroupId() {
-        return protein.getProteinGroupId();
+    public int getProteinGroupLabel() {
+        return protein.getProteinGroupLabel();
     }
     
-    public int getProteinClusterId() {
-        return protein.getProteinClusterId();
+    public int getProteinClusterLabel() {
+        return protein.getProteinClusterLabel();
     }
     
     public float getPercentCoverage() {

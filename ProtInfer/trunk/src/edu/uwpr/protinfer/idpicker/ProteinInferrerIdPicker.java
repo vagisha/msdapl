@@ -99,14 +99,14 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
         int groupId = 1;
         for(ProteinVertex vertex: graph.getLeftVertices()) {
             for(Protein prot: vertex.getProteins()) {
-                prot.setProteinGroupId(groupId);
+                prot.setProteinGroupLabel(groupId);
             }
             groupId++;
         }
         groupId = 1;
         for(PeptideVertex vertex: graph.getRightVertices()) {
             for(Peptide pept: vertex.getPeptides()) {
-                pept.setPeptideGroupId(groupId);
+                pept.setPeptideGroupLabel(groupId);
             }
             groupId++;
         }
@@ -140,11 +140,18 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
         int subsetGrpCount = 0;
         Set<Integer> grpIdSeen = new HashSet<Integer>();
         for(InferredProtein<S> prot: allProteins) {
-        	if(prot.getProtein().isSubset())
+        	if(prot.getProtein().isSubset()) {
+        		if(prot.getProtein().isAccepted()) {
+        			log.error("Protein cannot be both parsimonious and subset!. "+prot.getAccession());
+        		}
         		subsetCount++;
-        	if(grpIdSeen.contains(prot.getProteinGroupId()))
+        	}
+        	else if(!prot.getProtein().isAccepted()) {
+        		log.info("NOT parsimonious AND NOT subset: "+prot.getAccession());
+        	}
+        	if(grpIdSeen.contains(prot.getProteinGroupLabel()))
         		continue;
-        	grpIdSeen.add(prot.getProteinGroupId());
+        	grpIdSeen.add(prot.getProteinGroupLabel());
         	if(prot.getProtein().isSubset())
         		subsetGrpCount++;
         }
