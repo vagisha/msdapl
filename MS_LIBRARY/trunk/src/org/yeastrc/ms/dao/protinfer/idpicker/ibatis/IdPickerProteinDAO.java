@@ -25,19 +25,19 @@ public class IdPickerProteinDAO extends AbstractIdPickerProteinDAO<IdPickerProte
         return queryForList(sqlMapNameSpace+".selectProteinsForProteinferRun", proteinferId);
     }
     
-    public List<IdPickerProtein> loadIdPickerClusterProteins(int pinferId,int clusterId) {
+    public List<IdPickerProtein> loadIdPickerClusterProteins(int pinferId,int clusterLabel) {
         
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("pinferId", pinferId);
-        map.put("clusterId", clusterId);
+        map.put("clusterLabel", clusterLabel);
         return queryForList(sqlMapNameSpace+".selectProteinsForCluster", map);
     }
     
-    public List<IdPickerProtein> loadIdPickerGroupProteins(int pinferId,int groupId) {
+    public List<IdPickerProtein> loadIdPickerGroupProteins(int pinferId,int proteinGroupLabel) {
         
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("pinferId", pinferId);
-        map.put("groupId", groupId);
+        map.put("proteinGroupLabel", proteinGroupLabel);
         return queryForList(sqlMapNameSpace+".selectProteinsForGroup", map);
     }
     

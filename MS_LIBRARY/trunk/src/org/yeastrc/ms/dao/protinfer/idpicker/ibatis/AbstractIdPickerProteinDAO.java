@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.protinfer.ibatis.ProteinAndGroupId;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinAndGroupLabel;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.ProteinGroupCoverageSorter.ProteinGroupCoverage;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.ProteinGroupNSAFSorter.ProteinGroupNsaf;
@@ -64,42 +64,43 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         return proteinId;
     }
     
-    public boolean proteinPeptideGrpAssociationExists(int pinferId, int proteinGrpId, int peptideGrpId) {
+    public boolean proteinPeptideGrpAssociationExists(int pinferId, int proteinGrpLabel, int peptideGrpLabel) {
         Map<String, Integer> map = new HashMap<String, Integer>(3);
         map.put("pinferId", pinferId);
-        map.put("protGrpId", proteinGrpId);
-        map.put("peptGrpId", peptideGrpId);
+        map.put("proteinGroupLabel", proteinGrpLabel);
+        map.put("peptideGroupLabel", peptideGrpLabel);
         int count = (Integer)queryForObject(sqlMapNameSpace+".checkGroupAssociation", map);
         return count > 0;
     }
     
-    public void saveProteinPeptideGroupAssociation(int pinferId, int proteinGrpId, int peptideGrpId) {
+    public void saveProteinPeptideGroupAssociation(int pinferId, int proteinGrpLabel, int peptideGrpLabel) {
         
-        if(proteinPeptideGrpAssociationExists(pinferId, proteinGrpId, peptideGrpId))
+        if(proteinPeptideGrpAssociationExists(pinferId, proteinGrpLabel, peptideGrpLabel))
             return;
         Map<String, Integer> map = new HashMap<String, Integer>(3);
         map.put("pinferId", pinferId);
-        map.put("protGrpId", proteinGrpId);
-        map.put("peptGrpId", peptideGrpId);
+        map.put("proteinGroupLabel", proteinGrpLabel);
+        map.put("peptideGroupLabel", peptideGrpLabel);
         save(sqlMapNameSpace+".insertGroupAssociation", map);
     }
     
-    private List<Integer> getMatchingPeptGroupIds(int pinferId, int groupId) {
-        Map<String, Integer> map = new HashMap<String, Integer>(2);
-        map.put("pinferId", pinferId);
-        map.put("groupId", groupId);
-        return super.queryForList(sqlMapNameSpace+".selectPeptGrpIdsForProtGrpId", map);
+    public void saveSubsetProtein(int subsetProteinId, int superProteinId) {
+        
+        Map<String, Integer> map = new HashMap<String, Integer>(6);
+        map.put("subsetProteinId", subsetProteinId);
+        map.put("superProteinId", superProteinId);
+        save(sqlMapNameSpace+".insertSubsetSuperProtein", map);
     }
     
-    public List<Integer> getGroupIdsForCluster(int pinferId, int clusterId) {
+    public List<Integer> getGroupLabelsForCluster(int pinferId, int clusterLabel) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("pinferId", pinferId);
-        map.put("clusterId", clusterId);
-        return super.queryForList(sqlMapNameSpace+".selectProtGrpIdsForClusterId", map);
+        map.put("clusterLabel", clusterLabel);
+        return super.queryForList(sqlMapNameSpace+".selectProtGrpLabelsForCluster", map);
     }
     
-    public List<Integer> getClusterIds(int pinferId) {
-       return queryForList(sqlMapNameSpace+".selectClusterIdsForPinfer", pinferId); 
+    public List<Integer> getClusterLabels(int pinferId) {
+       return queryForList(sqlMapNameSpace+".selectClusterLabelsForPinfer", pinferId); 
     }
     
     @Override
@@ -107,10 +108,6 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         return protDao.loadProtein(proteinferId, nrseqProteinId);
     }
     
-//    @Override
-//    public List<ProteinferProtein> loadProteinsN(int pinferId) {
-//        return protDao.loadProteinsN(pinferId);
-//    }
     
     public List<Integer> getProteinIdsForNrseqIds(int proteinferId, ArrayList<Integer> nrseqIds) {
         return protDao.getProteinIdsForNrseqIds(proteinferId, nrseqIds);
@@ -140,10 +137,10 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         return protDao.getNrseqIdsForRun(proteinferId);
     }
     
-    public List<Integer> getIdPickerGroupProteinIds(int pinferId, int groupId) {
+    public List<Integer> getIdPickerGroupProteinIds(int pinferId, int proteinGroupLabel) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("pinferId", pinferId);
-        map.put("groupId", groupId);
+        map.put("proteinGroupLabel", proteinGroupLabel);
         return queryForList(sqlMapNameSpace+".selectProteinIdsForGroup", map);
     }
     
@@ -178,11 +175,29 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
        protDao.saveProteinferProteinPeptideMatch(pinferProteinId, pinferPeptideId);
     }
     
-    public int getIdPickerGroupCount(int pinferId, boolean parsimonious) {
+    public int getIdPickerGroupCount(int pinferId) {
+    	
+       return getIdPickerGroupCount(pinferId, false, false);
+    }
+    
+    public int getIdPickerParsimoniousGroupCount(int pinferId) {
+
+    	return getIdPickerGroupCount(pinferId, true, false);
+    }
+    
+    public int getIdPickerNonSubsetGroupCount(int pinferId) {
+
+    	return getIdPickerGroupCount(pinferId, false, true);
+    }
+    
+    private int getIdPickerGroupCount(int pinferId, boolean parsimonious, boolean isNotSubset) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("pinferId", pinferId);
         if(parsimonious) {
             map.put("isParsimonious", 1);
+        }
+        if(isNotSubset) {
+            map.put("isSubset", 0);
         }
         return (Integer)queryForObject(sqlMapNameSpace+".selectGroupCount", map);
     }
@@ -210,7 +225,7 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
             return queryForList(sqlMapNameSpace+".filterByCoverage", map);
         }
         else { // group proteins and sort
-            // List of protein IDs along with their groupID and coverage (sorted by group, then coverage).
+            // List of protein IDs along with their groupLabel and coverage (sorted by group, then coverage).
             List<ProteinGroupCoverage> prGrC = queryForList(sqlMapNameSpace+".filterProteinGroupCoverage", map);
             
             ProteinGroupCoverageSorter.getInstance().sort(prGrC, sortOrder);
@@ -259,7 +274,7 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
             return queryForList(sqlMapNameSpace+".filterByNsaf", map);
         }
         else { // group proteins and sort
-            // List of protein IDs along with their groupID and NSAF (sorted by group, then NSAF).
+            // List of protein IDs along with their groupLabel and NSAF (sorted by group, then NSAF).
             List<ProteinGroupNsaf> prGrN = queryForList(sqlMapNameSpace+".filterProteinGroupNSAF", map);
             ProteinGroupNSAFSorter.getInstance().sort(prGrN, sortOrder);
             
@@ -339,7 +354,7 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         // If we are NOT filtering anything AND NOT sorting on spectrum count just return all the protein Ids
         // for this protein inference run
         if(minSpecCount <= 1 && maxSpecCount == Integer.MAX_VALUE && !sort) {
-            return getIdPickerProteinIds(pinferId, false);
+            return protDao.getProteinferProteinIds(pinferId);
         }
         
         Map<String, Number> map = new HashMap<String, Number>(10);
@@ -376,70 +391,92 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     // PEPTIDE COUNT
     // -----------------------------------------------------------------------------------
     public List<Integer> sortProteinIdsByPeptideCount(int pinferId, PeptideDefinition peptideDef, boolean groupProteins) {
-        return proteinIdsByPeptideCount(pinferId, 1, Integer.MAX_VALUE, peptideDef, true, groupProteins, false, false);
+        return proteinIdsByPeptideCount(pinferId, 1, Integer.MAX_VALUE, peptideDef, true, groupProteins, 
+        		true,true, // get both parsimoniious and non-parsimonious
+        		true,true, // get both subset and non-subset
+        		false);
     }
     
     public List<Integer> sortProteinIdsByUniquePeptideCount(int pinferId, PeptideDefinition peptideDef, boolean groupProteins) {
-        return proteinIdsByPeptideCount(pinferId, 0, Integer.MAX_VALUE, peptideDef, true, groupProteins, false, true);
+        return proteinIdsByPeptideCount(pinferId, 0, Integer.MAX_VALUE, peptideDef, true, groupProteins, 
+        		true,true, // get both parsimoniious and non-parsimonious
+        		true,true, // get both subset and non-subset 
+        		true);
     }
     
     private List<Integer> proteinIdsByUniquePeptideCount(int pinferId, 
             int minUniqPeptideCount, int maxUniqPeptideCount, 
             PeptideDefinition peptDef,
-            boolean sort, boolean groupProteins, boolean isParsimonious) {
+            boolean sort, boolean groupProteins, 
+            boolean parsimonious, boolean nonParsimonious, 
+            boolean subset, boolean nonSubset) {
         return proteinIdsByPeptideCount(pinferId, 
                 minUniqPeptideCount, maxUniqPeptideCount, 
-                peptDef, sort, groupProteins, isParsimonious, true);
+                peptDef, sort, groupProteins, parsimonious, nonParsimonious, subset, nonSubset, true);
     }
     
     private List<Integer> proteinIdsByAllPeptideCount(int pinferId, 
             int minUniqPeptideCount, int maxUniqPeptideCount,
             PeptideDefinition peptDef,
-            boolean sort, boolean groupProteins, boolean isParsimonious) {
+            boolean sort, boolean groupProteins, 
+            boolean parsimonious, boolean nonParsimonious, 
+            boolean subset, boolean nonSubset) {
         return proteinIdsByPeptideCount(pinferId, 
                 minUniqPeptideCount, maxUniqPeptideCount,
-                peptDef, sort, groupProteins, isParsimonious, false);
+                peptDef, sort, groupProteins, parsimonious, nonParsimonious, subset, nonSubset, false);
     }
     
     private List<Integer> nrseqIdsByUniquePeptideCount(int pinferId, 
             int minUniqPeptideCount, int maxUniqPeptideCount, 
-            PeptideDefinition peptDef, boolean isParsimonious) {
+            PeptideDefinition peptDef, 
+            boolean isParsimonious, boolean isNotSubset) {
         return nrseqIdsByPeptideCount(pinferId, 
                 minUniqPeptideCount, maxUniqPeptideCount, 
-                peptDef, isParsimonious, true);
+                peptDef, isParsimonious, isNotSubset, true);
     }
     
     private List<Integer> nrseqIdsByAllPeptideCount(int pinferId, 
             int minUniqPeptideCount, int maxUniqPeptideCount,
-            PeptideDefinition peptDef, boolean isParsimonious) {
+            PeptideDefinition peptDef, boolean isParsimonious, boolean isNotSubset) {
         return nrseqIdsByPeptideCount(pinferId, 
                 minUniqPeptideCount, maxUniqPeptideCount,
-                peptDef, isParsimonious, false);
+                peptDef, isParsimonious, isNotSubset, false);
     }
     
     private List<Integer> proteinIdsByPeptideCount(int pinferId, int minPeptideCount, int maxPeptideCount,
             PeptideDefinition peptDef,
-            boolean sort, boolean groupProteins, boolean isParsimonious, boolean uniqueToProtein) {
+            boolean sort, boolean groupProteins, 
+            boolean parsimonious, boolean nonParsimonious, 
+            boolean subset, boolean nonSubset, 
+            boolean uniqueToProtein) {
         
+    	
+    	if((!parsimonious && !nonParsimonious) || (!subset && !nonSubset))
+    		return new ArrayList<Integer>(0);
+    	
         // If we are NOT filtering anything AND NOT sorting on peptide count just return all the protein Ids
         // for this protein inference run
         if(!uniqueToProtein) {
             if(minPeptideCount <= 1 && maxPeptideCount == Integer.MAX_VALUE && !sort) {
-                return getIdPickerProteinIds(pinferId, isParsimonious);
+                return getIdPickerProteinIds(pinferId, parsimonious, nonParsimonious, subset, nonSubset);
             }
         }
         else {
             if(minPeptideCount <= 0 && maxPeptideCount == Integer.MAX_VALUE && !sort) {
-                return getIdPickerProteinIds(pinferId, isParsimonious);
+            	return getIdPickerProteinIds(pinferId, parsimonious, nonParsimonious, subset, nonSubset);
             }
         }
+        
+        boolean isParsimonious = parsimonious && !nonParsimonious;
+        boolean isNotSubset = !subset && nonSubset;
         
         Map<String, Number> map = new HashMap<String, Number>(12);
         map.put("pinferId", pinferId);
         map.put("minPeptides", minPeptideCount);
         map.put("maxPeptides", maxPeptideCount);
         if(uniqueToProtein) map.put("uniqueToProtein", 1);
-        if(isParsimonious)          map.put("isParsimonious", 1);
+        if(isParsimonious)  map.put("isParsimonious", 1);
+        if(isNotSubset)		map.put("isSubset", 0);
         if(sort)                    map.put("sort", 1);
         if(sort && groupProteins)   map.put("groupProteins", 1);
         
@@ -455,46 +492,31 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         // peptide uniquely defined by sequence and charge
         if(peptDef.isUseCharge() && !peptDef.isUseMods()) {
             proteinIds = peptideIdsByPeptideCount_SM_OR_SC(pinferId, minPeptideCount, maxPeptideCount,
-                    sort, groupProteins, isParsimonious, uniqueToProtein, "charge");
+                    sort, groupProteins, isParsimonious, isNotSubset, uniqueToProtein, "charge");
         }
         // peptide uniquely defined by sequence and mods
         if(peptDef.isUseMods() && !peptDef.isUseCharge()) {
             proteinIds = peptideIdsByPeptideCount_SM_OR_SC(pinferId, minPeptideCount, maxPeptideCount,
-                    sort, groupProteins, isParsimonious, uniqueToProtein, "modificationStateID");
+                    sort, groupProteins, isParsimonious, isNotSubset, uniqueToProtein, "modificationStateID");
         }
         
-        // If we are looking for unique peptides the query will only return proteins with >= 1 unique peptides.
-        // If our unique peptide count is 0 we need to add back the missing peptides to the end of the list
-//        if(uniqueToProtein && minPeptideCount == 0) {
-//            System.out.println("Adding more peptides");
-//            List<Integer> allPeptideIds = this.getIdPickerProteinIds(pinferId, isParsimonious, groupProteins);
-//            Set<Integer> found = new HashSet<Integer>((int) (allPeptideIds.size() * 1.5));
-//            found.addAll(peptideIds);
-//            int added = 0;
-//            for(int id: allPeptideIds) {
-//                if(!found.contains(id)) { 
-//                    added++;
-//                    peptideIds.add(0,id);
-//                }
-//            }
-//            System.out.println("Added: "+added);
-//        }
         return proteinIds;
     }
     
     private List<Integer> nrseqIdsByPeptideCount(int pinferId, int minPeptideCount, int maxPeptideCount,
-            PeptideDefinition peptDef, boolean isParsimonious, boolean uniqueToProtein) {
+            PeptideDefinition peptDef, boolean isParsimonious, boolean isNotSubset,
+            boolean uniqueToProtein) {
         
         // If we are NOT filtering anything just return all the nrseq protein Ids
         // for this protein inference run
         if(!uniqueToProtein) {
             if(minPeptideCount <= 1 && maxPeptideCount == Integer.MAX_VALUE) {
-                return getNrseqProteinIds(pinferId, isParsimonious);
+                return getNrseqProteinIds(pinferId, isParsimonious, !isParsimonious, isNotSubset);
             }
         }
         else {
             if(minPeptideCount <= 0 && maxPeptideCount == Integer.MAX_VALUE) {
-                return getNrseqProteinIds(pinferId, isParsimonious);
+                return getNrseqProteinIds(pinferId, isParsimonious, !isParsimonious, isNotSubset);
             }
         }
         
@@ -504,6 +526,7 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         map.put("maxPeptides", maxPeptideCount);
         if(uniqueToProtein) map.put("uniqueToProtein", 1);
         if(isParsimonious)          map.put("isParsimonious", 1);
+        if(isNotSubset)				map.put("isSubset", 0);
         
         List<Integer> proteinIds = null;
         // peptide uniquely defined by sequence
@@ -518,17 +541,11 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         return proteinIds;
     }
     
-    private List<Integer> getProteinIdsWithNoUniquePeptides(int pinferId, boolean isParsimonious) {
-        Map<String, Number> map = new HashMap<String, Number>(8);
-        map.put("pinferId", pinferId);
-        if(isParsimonious)          map.put("isParsimonious", 1);
-        return queryForList(sqlMapNameSpace+".idPickerProteinIdsNoUniquePeptides", map);
-    }
-    
     private List<Integer> peptideIdsByPeptideCount_SM_OR_SC(int pinferId,
             int minPeptideCount, int maxPeptideCount, 
             boolean sort, boolean groupProteins,
-            boolean isParsimonious, boolean uniqueToProtein, String ionTableColumn) {
+            boolean isParsimonious, boolean isNotSubset,
+            boolean uniqueToProtein, String ionTableColumn) {
         
         Connection conn = null;
         Statement stmt = null;
@@ -561,7 +578,7 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
            
            
            // now run the query we are interested in
-           sql = prepareSql(pinferId, isParsimonious, 
+           sql = prepareSql(pinferId, isParsimonious, isNotSubset,
                    uniqueToProtein, sort, groupProteins);
            pstmt = conn.prepareStatement(sql);
            pstmt.setInt(1, pinferId);
@@ -600,7 +617,7 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         }
     }
 
-    private String prepareSql(int pinferId, boolean isParsimonious, boolean uniqueToProtein, 
+    private String prepareSql(int pinferId, boolean isParsimonious, boolean isNotSubset, boolean uniqueToProtein, 
             boolean sort, boolean groupProteins) {
         
         String sql = "SELECT prot.id, count(ion.piIonID) AS cnt "+
@@ -616,43 +633,70 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
                     "AND prot.id = m.piProteinID ";
         if(isParsimonious)
             sql += "AND idpProt.isParsimonious = 1 ";
+        if(isNotSubset)
+        	sql += "AND idpProt.isSubset = 0 ";
         sql += "GROUP BY prot.id HAVING cnt BETWEEN ? AND ?";
         if(sort) {
             sql += "ORDER BY cnt ";
             if(groupProteins) {
-                sql += ", idpProt.groupID ";
+                sql += ", idpProt.proteinGroupLabel ";
             }
             sql += "DESC";
         }
        return sql;
     }
     
-    
-
-    private List<Integer> getIdPickerProteinIds(int pinferId, boolean isParsimonious, boolean groupProteins) {
-        Map<String, Number> map = new HashMap<String, Number>(8);
-        map.put("pinferId", pinferId);
-        if(isParsimonious)          map.put("isParsimonious", 1);
-        if(groupProteins)           map.put("groupProteins", 1);
-        return queryForList(sqlMapNameSpace+".idPickerProteinIds", map);
+    public List<Integer> getIdPickerParsimoniousProteinIds(int pinferId) {
+    	
+        return getIdPickerProteinIds(pinferId, 
+        							true,  	// parsimonious
+        							false,	// non-parsimonious
+        							true,	// subset
+        							true	// non-subset
+        							);
     }
     
-    public List<Integer> getIdPickerProteinIds(int pinferId, boolean isParsimonious) {
+    public List<Integer> getIdPickerNonSubsetProteinIds(int pinferId) {
+    	return getIdPickerProteinIds(pinferId, 
+									true,  	// parsimonious
+									true,	// non-parsimonious
+									false,	// subset
+									true	// non-subset
+									);
+    }
+    
+    
+    private List<Integer> getIdPickerProteinIds(int pinferId, 
+    		boolean parsimonious, boolean nonParsimonious,
+    		boolean subset, boolean nonSubset) {
+    	
+    	if((!parsimonious && !nonParsimonious) || 
+    		(!subset && !nonSubset))
+    		return new ArrayList<Integer>(0);
+    	
         Map<String, Number> map = new HashMap<String, Number>(4);
         map.put("pinferId", pinferId);
-        if(isParsimonious)          map.put("isParsimonious", 1);
+        if(parsimonious && !nonParsimonious)      map.put("isParsimonious", 1);
+        if(!parsimonious && nonParsimonious)      map.put("isParsimonious", 0);
+        if(nonSubset && !subset)				  map.put("isSubset", 0);
+        if(!nonSubset && subset)				  map.put("isSubset", 1);
         return queryForList(sqlMapNameSpace+".idPickerProteinIds", map);
     }
     
     
-    public  List<Integer> getNrseqProteinIds(int pinferId, boolean isParsimonious) {
-        if(isParsimonious)
-            return getNrseqProteinIds(pinferId, isParsimonious, false); // return only parsimonious
-        else
-            return getNrseqIdsForRun(pinferId); // return parsimonious and non-parsimonious
+    public  List<Integer> getParsimoniousNrseqProteinIds(int pinferId) {
+    	return getNrseqProteinIds(pinferId, true, false, false); // return only parsimonious
     }
     
-    public List<Integer> getNrseqProteinIds(int pinferId, boolean parsimonious, boolean nonParsimonious) {
+    public  List<Integer> getNonParsimoniousNrseqProteinIds(int pinferId) {
+    	return getNrseqProteinIds(pinferId, false, true, false); // return only non-parsimonious
+    }
+    
+    public  List<Integer> getNonSubsetNrseqProteinIds(int pinferId) {
+    	return getNrseqProteinIds(pinferId, false, false, true); // return only non-subset
+    }
+    
+    private List<Integer> getNrseqProteinIds(int pinferId, boolean parsimonious, boolean nonParsimonious, boolean isNotSubset) {
         
         if(!parsimonious && !nonParsimonious)
             return new ArrayList<Integer>(0);
@@ -661,6 +705,10 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         map.put("pinferId", pinferId);
         if(parsimonious && !nonParsimonious)            map.put("isParsimonious", 1);
         else if(!parsimonious && nonParsimonious)       map.put("isParsimonious", 0);
+        
+        if(isNotSubset)
+        	map.put("isSubset", 0);
+        
         return queryForList(sqlMapNameSpace+".idPickerNrseqProteinIds", map);
     }
     
@@ -673,23 +721,22 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     @Override
     public boolean isProteinGrouped(int pinferProteinId) {
         P idpProt = this.loadProtein(pinferProteinId);
-        int groupId = idpProt.getGroupId();
-        return (this.getIdPickerGroupProteinIds(idpProt.getProteinferId(), groupId).size() > 1);
+        int proteinGroupLabel = idpProt.getProteinGroupLabel();
+        return (this.getIdPickerGroupProteinIds(idpProt.getProteinferId(), proteinGroupLabel).size() > 1);
     }
     
     /**
-     * Returns a map of proteinIds and proteinGroupIds.
-     * Keys in the map are proteinIds and Values are proteinGroupIds
+     * Returns a map of proteinIds and proteinGroupLabels.
+     * Keys in the map are proteinIds and Values are proteinGroupLabels
      */
-    public Map<Integer, Integer> getProteinGroupIds(int pinferId, boolean parsimonious) {
+    public Map<Integer, Integer> getProteinGroupLabels(int pinferId) {
         Map<String, Number> map = new HashMap<String, Number>(8);
         map.put("pinferId", pinferId);
-        if(parsimonious)          map.put("isParsimonious", 1);
-        List<ProteinAndGroupId> protGrps = queryForList(sqlMapNameSpace+".selectProteinAndGroupIds", map);
+        List<ProteinAndGroupLabel> protGrps = queryForList(sqlMapNameSpace+".selectProteinAndGroupLabels", map);
         
         Map<Integer, Integer> protGrpmap = new HashMap<Integer, Integer>((int) (protGrps.size() * 1.5));
-        for(ProteinAndGroupId pg: protGrps) {
-            protGrpmap.put(pg.getProteinId(), pg.getGroupId());
+        for(ProteinAndGroupLabel pg: protGrps) {
+            protGrpmap.put(pg.getProteinId(), pg.getGroupLabel());
         }
         return protGrpmap;
     }
@@ -698,11 +745,11 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     // PROTEIN CLUSTER
     // -----------------------------------------------------------------------------------
     public List<Integer> sortProteinIdsByCluster(int pinferId) {
-        return queryForList(sqlMapNameSpace+".proteinIdsByClusterId", pinferId);
+        return queryForList(sqlMapNameSpace+".proteinIdsByCluster", pinferId);
     }
 
     public List<Integer> sortProteinIdsByGroup(int pinferId) {
-        return queryForList(sqlMapNameSpace+".proteinIdsByGroupId", pinferId);
+        return queryForList(sqlMapNameSpace+".proteinIdsByGroup", pinferId);
     }
     
     // -----------------------------------------------------------------------------------
@@ -732,7 +779,10 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
                                             filterCriteria.getPeptideDefinition(),
                                             sort, 
                                             filterCriteria.isGroupProteins(), 
-                                            filterCriteria.parsimoniousOnly()
+                                            filterCriteria.getParsimonious(),
+                                            filterCriteria.getNonParsimonious(),
+                                            filterCriteria.getSubset(),
+                                            filterCriteria.getNonSubset()
                                             );
         
         // Get a list of protein ids filtered by UNIQUE peptide count
@@ -750,7 +800,11 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
                                                filterCriteria.getPeptideDefinition(),
                                                sort,
                                                filterCriteria.isGroupProteins(),
-                                               filterCriteria.parsimoniousOnly());
+                                               filterCriteria.getParsimonious(),
+                                               filterCriteria.getNonParsimonious(),
+                                               filterCriteria.getSubset(),
+                                               filterCriteria.getNonSubset()
+                                               );
         }
         
         
@@ -851,7 +905,8 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         List<Integer> ids_pept = nrseqIdsByAllPeptideCount(pinferId, 
                                             filterCriteria.getNumPeptides(), filterCriteria.getNumMaxPeptides(),
                                             filterCriteria.getPeptideDefinition(),
-                                            filterCriteria.parsimoniousOnly()
+                                            filterCriteria.parsimoniousOnly(),
+                                            filterCriteria.nonSubsetOnly()
                                             );
         
         // Get a list of nrseq ids filtered by UNIQUE peptide count
@@ -865,7 +920,8 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
                                                filterCriteria.getNumUniquePeptides(),
                                                filterCriteria.getNumMaxUniquePeptides(),
                                                filterCriteria.getPeptideDefinition(),
-                                               filterCriteria.parsimoniousOnly());
+                                               filterCriteria.parsimoniousOnly(),
+                                               filterCriteria.nonSubsetOnly());
         }
         
         // If the user is filtering on validation status 

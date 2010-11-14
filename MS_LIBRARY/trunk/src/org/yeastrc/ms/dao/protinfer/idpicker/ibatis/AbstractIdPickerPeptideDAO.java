@@ -36,11 +36,11 @@ public abstract class AbstractIdPickerPeptideDAO <T extends GenericIdPickerPepti
          return id;
      }
      
-     public List<Integer> getMatchingPeptGroupIds(int pinferId, int proteinGroupId) {
+     public List<Integer> getMatchingPeptGroupLabels(int pinferId, int proteinGroupLabel) {
          Map<String, Integer> map = new HashMap<String, Integer>(2);
          map.put("pinferId", pinferId);
-         map.put("groupId", proteinGroupId);
-         return super.queryForList(sqlMapNameSpace+".selectPeptGrpIdsForProtGrpId", map);
+         map.put("proteinGroupLabel", proteinGroupLabel);
+         return super.queryForList(sqlMapNameSpace+".selectPeptGrpLabelsForProtGrp", map);
      }
      
      public void delete(int id) {

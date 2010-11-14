@@ -39,10 +39,10 @@ public class ProteinGroupCoverageSorter {
 		List<ProteinGroupCoverage> grpList = new ArrayList<ProteinGroupCoverage>();
 
 		for(ProteinGroupCoverage pgc: list) {
-			if(pgc.proteinGroupId != lastGrp) {
+			if(pgc.proteinGroupLabel != lastGrp) {
 
 				setGrpCoverage(grpList, sortOrder);
-				lastGrp = pgc.proteinGroupId;
+				lastGrp = pgc.proteinGroupLabel;
 				grpList.clear();
 			}
 			grpList.add(pgc);
@@ -57,7 +57,7 @@ public class ProteinGroupCoverageSorter {
 				public int compare(ProteinGroupCoverage o1, ProteinGroupCoverage o2) {
 					int val = Double.valueOf(o1.grpCoverage).compareTo(o2.grpCoverage);
 					if(val != 0)    return val;
-					val = Integer.valueOf(o1.proteinGroupId).compareTo(o2.proteinGroupId);
+					val = Integer.valueOf(o1.proteinGroupLabel).compareTo(o2.proteinGroupLabel);
 					if(val != 0)    return val;
 					return Double.valueOf(o1.coverage).compareTo(o2.coverage);
 				}});
@@ -68,7 +68,7 @@ public class ProteinGroupCoverageSorter {
 				public int compare(ProteinGroupCoverage o1, ProteinGroupCoverage o2) {
 					int val = Double.valueOf(o2.grpCoverage).compareTo(o1.grpCoverage);
 					if(val != 0)    return val;
-					val = Integer.valueOf(o1.proteinGroupId).compareTo(o2.proteinGroupId);
+					val = Integer.valueOf(o1.proteinGroupLabel).compareTo(o2.proteinGroupLabel);
 					if(val != 0)    return val;
 					return Double.valueOf(o2.coverage).compareTo(o1.coverage);
 				}});
@@ -89,15 +89,15 @@ public class ProteinGroupCoverageSorter {
 
 	public static class ProteinGroupCoverage {
 		private int proteinId;
-		private int proteinGroupId;
+		private int proteinGroupLabel;
 		private double coverage;
 		private double grpCoverage;
 
 		public void setProteinId(int proteinId) {
 			this.proteinId = proteinId;
 		}
-		public void setProteinGroupId(int proteinGroupId) {
-			this.proteinGroupId = proteinGroupId;
+		public void setProteinGroupLabel(int proteinGroupLabel) {
+			this.proteinGroupLabel = proteinGroupLabel;
 		}
 		public void setCoverage(double coverage) {
 			this.coverage = coverage;

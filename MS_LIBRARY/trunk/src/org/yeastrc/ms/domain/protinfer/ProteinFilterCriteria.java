@@ -24,6 +24,9 @@ public class ProteinFilterCriteria implements Serializable {
     private boolean parsimonious = true;
     private boolean nonParsimonious = true;
     
+    private boolean subset = true;
+    private boolean nonSubset = true;
+    
     private boolean groupProteins = true;
     
     private boolean excludeIndistinGroups = false;
@@ -123,14 +126,6 @@ public class ProteinFilterCriteria implements Serializable {
         this.coverage = coverage;
     }
 
-//    public boolean showParsimonious() {
-//        return showParsimonious;
-//    }
-//
-//    public void setShowParsimonious(boolean isParsimonious) {
-//        this.showParsimonious = isParsimonious;
-//    }
-
     public boolean getParsimonious() {
         return parsimonious;
     }
@@ -147,7 +142,23 @@ public class ProteinFilterCriteria implements Serializable {
         this.nonParsimonious = nonParsimonious;
     }
     
-    public void setParsimoniousOnly() {
+    public boolean getSubset() {
+		return subset;
+	}
+
+	public void setSubset(boolean subset) {
+		this.subset = subset;
+	}
+
+	public boolean getNonSubset() {
+		return nonSubset;
+	}
+
+	public void setNonSubset(boolean nonSubset) {
+		this.nonSubset = nonSubset;
+	}
+
+	public void setParsimoniousOnly() {
         setParsimonious(true);
         setNonParsimonious(false);
     }
@@ -165,7 +176,15 @@ public class ProteinFilterCriteria implements Serializable {
         return !getParsimonious() && getNonParsimonious();
     }
     
-    public boolean isGroupProteins() {
+    public boolean subsetOnly() {
+        return getSubset() && !getNonSubset();
+    }
+    
+    public boolean nonSubsetOnly() {
+        return !getSubset() && getNonSubset();
+    }
+
+	public boolean isGroupProteins() {
         return groupProteins;
     }
 
@@ -376,6 +395,8 @@ public class ProteinFilterCriteria implements Serializable {
 //        if(this.groupProteins != that.groupProteins)            return false;
         if(this.parsimonious != that.parsimonious)              return false;
         if(this.nonParsimonious != that.nonParsimonious)        return false;
+        if(this.subset != that.subset)							return false;
+        if(this.nonSubset != that.nonSubset)					return false;
         
         if(this.chargeStates.size() != that.chargeStates.size())
             return false;

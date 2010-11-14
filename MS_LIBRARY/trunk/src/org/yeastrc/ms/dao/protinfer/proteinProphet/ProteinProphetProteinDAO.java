@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.protinfer.GenericProteinferProteinDAO;
-import org.yeastrc.ms.dao.protinfer.ibatis.ProteinAndGroupId;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinAndGroupLabel;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinGroupCoverageSorter.ProteinGroupCoverage;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinGroupPeptideCountSorter.ProteinGroupPeptideCount;
@@ -966,11 +966,11 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         Map<String, Number> map = new HashMap<String, Number>(8);
         map.put("pinferId", pinferId);
         if(parsimonious)          map.put("isSubsumed", 0);
-        List<ProteinAndGroupId> protGrps = queryForList(sqlMapNameSpace+".selectProteinAndGroupIds", map);
+        List<ProteinAndGroupLabel> protGrps = queryForList(sqlMapNameSpace+".selectProteinAndGroupIds", map);
         
         Map<Integer, Integer> protGrpmap = new HashMap<Integer, Integer>((int) (protGrps.size() * 1.5));
-        for(ProteinAndGroupId pg: protGrps) {
-            protGrpmap.put(pg.getProteinId(), pg.getGroupId());
+        for(ProteinAndGroupLabel pg: protGrps) {
+            protGrpmap.put(pg.getProteinId(), pg.getGroupLabel());
         }
         return protGrpmap;
     }
@@ -983,11 +983,11 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         Map<String, Number> map = new HashMap<String, Number>(8);
         map.put("pinferId", pinferId);
         if(parsimonious)          map.put("isSubsumed", 0);
-        List<ProteinAndGroupId> protGrps = queryForList(sqlMapNameSpace+".selectProteinAndProphetGroupIds", map);
+        List<ProteinAndGroupLabel> protGrps = queryForList(sqlMapNameSpace+".selectProteinAndProphetGroupIds", map);
         
         Map<Integer, Integer> protGrpmap = new HashMap<Integer, Integer>((int) (protGrps.size() * 1.5));
-        for(ProteinAndGroupId pg: protGrps) {
-            protGrpmap.put(pg.getProteinId(), pg.getGroupId());
+        for(ProteinAndGroupLabel pg: protGrps) {
+            protGrpmap.put(pg.getProteinId(), pg.getGroupLabel());
         }
         return protGrpmap;
     }

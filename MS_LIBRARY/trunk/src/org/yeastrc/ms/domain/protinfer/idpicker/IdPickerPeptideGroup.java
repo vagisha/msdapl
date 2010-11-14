@@ -6,23 +6,23 @@ import java.util.List;
 public class IdPickerPeptideGroup {
 
     private final int pinferId;
-    private final int groupId;
+    private final int peptideGroupLabel;
     private List<IdPickerPeptide> peptides;
-    private List<Integer> matchingProteinGroupIds;
+    private List<Integer> matchingProteinGroupLabels;
     
-    public IdPickerPeptideGroup(int pinferId, int groupId) {
+    public IdPickerPeptideGroup(int pinferId, int peptideGroupLabel) {
         this.pinferId = pinferId;
-        this.groupId = groupId;
+        this.peptideGroupLabel = peptideGroupLabel;
         peptides = new ArrayList<IdPickerPeptide>();
-        matchingProteinGroupIds = new ArrayList<Integer>();
+        matchingProteinGroupLabels = new ArrayList<Integer>();
     }
     
     public int getProteinferId() {
         return pinferId;
     }
     
-    public int getGroupId() {
-        return groupId;
+    public int getGroupLabel() {
+        return peptideGroupLabel;
     }
     
     public void setPeptides(List<IdPickerPeptide> peptides) {
@@ -38,19 +38,19 @@ public class IdPickerPeptideGroup {
         return peptides.size();
     }
     
-    public List<Integer> getMatchingProteinGroupIds() {
-        return matchingProteinGroupIds;
+    public List<Integer> getMatchingProteinGroupLabels() {
+        return matchingProteinGroupLabels;
     }
     
-    public void setMatchingProteinGroupIds(List<Integer> protGrpIds) {
-        this.matchingProteinGroupIds = protGrpIds;
+    public void setMatchingProteinGroupLabels(List<Integer> protGrpLabels) {
+        this.matchingProteinGroupLabels = protGrpLabels;
     }
     
-    public boolean matchesProteinGroup(int protGrpId) {
-        return matchingProteinGroupIds.contains(protGrpId);
+    public boolean matchesProteinGroup(int protGrpLabel) {
+        return matchingProteinGroupLabels.contains(protGrpLabel);
     }
     
     public boolean isUniqueToProteinGroup() {
-        return matchingProteinGroupIds.size() == 1;
+        return matchingProteinGroupLabels.size() == 1;
     }
 }

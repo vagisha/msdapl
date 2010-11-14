@@ -29,10 +29,10 @@ public class IdPickerPeptideBaseDAO extends AbstractIdPickerPeptideDAO<IdPickerP
     }
     
     @Override
-    public List<IdPickerPeptideBase> loadIdPickerGroupPeptides(int pinferId, int groupId) {
+    public List<IdPickerPeptideBase> loadIdPickerGroupPeptides(int pinferId, int peptideGroupLabel) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("pinferId", pinferId);
-        map.put("groupId", groupId);
+        map.put("peptideGroupLabel", peptideGroupLabel);
         return super.queryForList(sqlMapNameSpace+".selectBasePeptidesForGroup", map);
     }
 }

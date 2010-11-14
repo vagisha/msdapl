@@ -6,14 +6,14 @@ import java.util.List;
 
 public class IdPickerCluster {
 
-    private int pinferId;
-    private int clusterId;
+    private final int pinferId;
+    private final int clusterLabel;
     private List<IdPickerProteinGroup> proteinGroups;
     private List<IdPickerPeptideGroup> peptideGroups;
     
-    public IdPickerCluster(int pinferId, int clusterId) {
+    public IdPickerCluster(int pinferId, int clusterLabel) {
         this.pinferId = pinferId;
-        this.clusterId = clusterId;
+        this.clusterLabel = clusterLabel;
         proteinGroups = new ArrayList<IdPickerProteinGroup>();
         peptideGroups = new ArrayList<IdPickerPeptideGroup>();
     }
@@ -22,8 +22,8 @@ public class IdPickerCluster {
         return pinferId;
     }
     
-    public int getClusterId() {
-        return clusterId;
+    public int getClusterLabel() {
+        return clusterLabel;
     }
     
     public List<IdPickerPeptideGroup> getPeptideGroups() {
@@ -50,10 +50,10 @@ public class IdPickerCluster {
         this.peptideGroups.add(group);
     }
     
-    public boolean proteinAndPeptideGroupsMatch(int protGrpId, int peptGrpId) {
+    public boolean proteinAndPeptideGroupsMatch(int protGrpLabel, int peptGrpLabel) {
         for(IdPickerPeptideGroup peptGrp: peptideGroups) {
-            if(peptGrp.getGroupId() == peptGrpId) {
-                return peptGrp.matchesProteinGroup(protGrpId);
+            if(peptGrp.getGroupLabel() == peptGrpLabel) {
+                return peptGrp.matchesProteinGroup(protGrpLabel);
             }
         }
         return false;

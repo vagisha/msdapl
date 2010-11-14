@@ -16,23 +16,29 @@ public interface GenericIdPickerProteinDAO <P extends GenericIdPickerProtein<?>>
     
     public abstract int updateIdPickerProtein(GenericIdPickerProtein<?> protein);
     
-    public abstract boolean proteinPeptideGrpAssociationExists(int pinferId, int proteinGrpId, int peptideGrpId);
+    public abstract boolean proteinPeptideGrpAssociationExists(int pinferId, int proteinGrpLabel, int peptideGrpLabel);
     
-    public abstract void saveProteinPeptideGroupAssociation(int pinferId, int proteinGrpId, int peptideGrpId);
+    public abstract void saveProteinPeptideGroupAssociation(int pinferId, int proteinGrpLabel, int peptideGrpLabel);
     
-    public abstract List<P> loadIdPickerClusterProteins(int pinferId,int clusterId);
+    public abstract void saveSubsetProtein(int subsetProteinId, int superProteinId);
     
-    public abstract List<P> loadIdPickerGroupProteins(int pinferId,int groupId);
+    public abstract List<P> loadIdPickerClusterProteins(int pinferId,int clusterLabel);
     
-    public abstract List<Integer> getIdPickerGroupProteinIds(int pinferId, int groupId);
+    public abstract List<P> loadIdPickerGroupProteins(int pinferId,int groupLabel);
     
-    public abstract List<Integer> getGroupIdsForCluster(int pinferId, int clusterId);
+    public abstract List<Integer> getIdPickerGroupProteinIds(int pinferId, int groupLabel);
     
-    public abstract List<Integer> getClusterIds(int pinferId);
+    public abstract List<Integer> getGroupLabelsForCluster(int pinferId, int clusterLabel);
+    
+    public abstract List<Integer> getClusterLabels(int pinferId);
     
     public abstract int getFilteredParsimoniousProteinCount(int proteinferId);
     
-    public abstract int getIdPickerGroupCount(int pinferId, boolean parsimonious);
+    public abstract int getIdPickerGroupCount(int pinferId);
+    
+    public abstract int getIdPickerParsimoniousGroupCount(int pinferId);
+    
+    public abstract int getIdPickerNonSubsetGroupCount(int pinferId);
     
     public abstract List<Integer> getFilteredSortedProteinIds(int pinferId, ProteinFilterCriteria filterCriteria);
     
@@ -54,13 +60,17 @@ public interface GenericIdPickerProteinDAO <P extends GenericIdPickerProtein<?>>
     
     public abstract List<Integer> sortProteinIdsByGroup(int pinferId);
     
-    public abstract List<Integer> getIdPickerProteinIds(int pinferId, boolean isParsimonious);
+    public abstract List<Integer> getIdPickerParsimoniousProteinIds(int pinferId);
     
-    public  abstract List<Integer> getNrseqProteinIds(int pinferId, boolean parsimonious);
+    public abstract List<Integer> getIdPickerNonSubsetProteinIds(int pinferId);
     
-    public abstract List<Integer> getNrseqProteinIds(int pinferId, boolean parsimonious, boolean nonParsimonious);
+    public  abstract List<Integer> getParsimoniousNrseqProteinIds(int pinferId);
     
-    public abstract Map<Integer, Integer> getProteinGroupIds(int pinferId, boolean parsimonious);
+    public  abstract List<Integer> getNonParsimoniousNrseqProteinIds(int pinferId);
+    
+    public  abstract List<Integer> getNonSubsetNrseqProteinIds(int pinferId);
+    
+    public abstract Map<Integer, Integer> getProteinGroupLabels(int pinferId);
     
     public abstract boolean isNrseqProteinGrouped(int pinferId, int nrseqId);
     

@@ -85,10 +85,10 @@
     	AND ppProt.subsumed = 0
     </select>
     
-    <resultMap class="org.yeastrc.ms.dao.protinfer.ibatis.ProteinAndGroupId" 
+    <resultMap class="org.yeastrc.ms.dao.protinfer.ibatis.ProteinAndGroupLabel" 
     				id="protAndGroupResult">
 		<result property="proteinId" jdbcType="INTEGER"/>
-		<result property="groupId" jdbcType="INTEGER"/>
+		<result property="groupLabel" jdbcType="INTEGER"/>
 	</resultMap>
 	
     <select id="selectProteinAndGroupIds" resultMap="protAndGroupResult" 

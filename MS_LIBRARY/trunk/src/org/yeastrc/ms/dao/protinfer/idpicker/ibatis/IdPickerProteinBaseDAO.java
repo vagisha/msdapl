@@ -25,19 +25,19 @@ private static final String sqlMapNameSpace = "IdPickerProtein";
         return queryForList(sqlMapNameSpace+".selectBaseProteinsForProteinferRun", proteinferId);
     }
     
-    public List<IdPickerProteinBase> loadIdPickerClusterProteins(int pinferId,int clusterId) {
+    public List<IdPickerProteinBase> loadIdPickerClusterProteins(int pinferId,int clusterLabel) {
         
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("pinferId", pinferId);
-        map.put("clusterId", clusterId);
+        map.put("clusterLabel", clusterLabel);
         return queryForList(sqlMapNameSpace+".selectBaseProteinsForCluster", map);
     }
     
-    public List<IdPickerProteinBase> loadIdPickerGroupProteins(int pinferId,int groupId) {
+    public List<IdPickerProteinBase> loadIdPickerGroupProteins(int pinferId,int proteinGroupLabel) {
         
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("pinferId", pinferId);
-        map.put("groupId", groupId);
+        map.put("proteinGroupLabel", proteinGroupLabel);
         return queryForList(sqlMapNameSpace+".selectBaseProteinsForGroup", map);
     }
 }

@@ -7,19 +7,19 @@ import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
 public abstract class GenericIdPickerPeptide <S extends ProteinferSpectrumMatch, T extends GenericProteinferIon<S>> 
                             extends GenericProteinferPeptide<S, T> {
 
-    private int groupId = -1;
+    private int peptideGroupLabel = -1;
     
     public GenericIdPickerPeptide () {}
     
-    public GenericIdPickerPeptide (int peptideGroupId) {
-        this.groupId = peptideGroupId;
+    public GenericIdPickerPeptide (int peptideGroupLabel) {
+        this.peptideGroupLabel = peptideGroupLabel;
     }
     
-    public int getGroupId() {
-        return groupId;
+    public int getPeptideGroupLabel() {
+        return peptideGroupLabel;
     }
 
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
+    public void setPeptideGroupLabel(int peptideGroupLabel) {
+        this.peptideGroupLabel = peptideGroupLabel;
     }
 }

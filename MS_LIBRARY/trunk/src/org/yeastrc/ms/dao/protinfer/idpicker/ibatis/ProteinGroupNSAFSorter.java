@@ -40,10 +40,10 @@ public class ProteinGroupNSAFSorter {
 		List<ProteinGroupNsaf> grpList = new ArrayList<ProteinGroupNsaf>();
 
 		for(ProteinGroupNsaf pgc: list) {
-			if(pgc.proteinGroupId != lastGrp) {
+			if(pgc.proteinGroupLabel != lastGrp) {
 
 				setGrpNsaf(grpList, sortOrder);
-				lastGrp = pgc.proteinGroupId;
+				lastGrp = pgc.proteinGroupLabel;
 				grpList.clear();
 			}
 			grpList.add(pgc);
@@ -58,7 +58,7 @@ public class ProteinGroupNSAFSorter {
 				public int compare(ProteinGroupNsaf o1, ProteinGroupNsaf o2) {
 					int val = Double.valueOf(o1.grpNsaf).compareTo(o2.grpNsaf);
 					if(val != 0)    return val;
-					val = Integer.valueOf(o1.proteinGroupId).compareTo(o2.proteinGroupId);
+					val = Integer.valueOf(o1.proteinGroupLabel).compareTo(o2.proteinGroupLabel);
 					if(val != 0)    return val;
 					return Double.valueOf(o1.nsaf).compareTo(o2.nsaf);
 				}});
@@ -69,7 +69,7 @@ public class ProteinGroupNSAFSorter {
 				public int compare(ProteinGroupNsaf o1, ProteinGroupNsaf o2) {
 					int val = Double.valueOf(o2.grpNsaf).compareTo(o1.grpNsaf);
 					if(val != 0)    return val;
-					val = Integer.valueOf(o1.proteinGroupId).compareTo(o2.proteinGroupId);
+					val = Integer.valueOf(o1.proteinGroupLabel).compareTo(o2.proteinGroupLabel);
 					if(val != 0)    return val;
 					return Double.valueOf(o2.nsaf).compareTo(o1.nsaf);
 				}});
@@ -90,14 +90,14 @@ public class ProteinGroupNSAFSorter {
 	
 	public static class ProteinGroupNsaf {
         private int proteinId;
-        private int proteinGroupId;
+        private int proteinGroupLabel;
         private double nsaf;
         private double grpNsaf;
         public void setProteinId(int proteinId) {
             this.proteinId = proteinId;
         }
-        public void setProteinGroupId(int proteinGroupId) {
-            this.proteinGroupId = proteinGroupId;
+        public void setProteinGroupLabel(int proteinGroupLabel) {
+            this.proteinGroupLabel = proteinGroupLabel;
         }
         public void setNsaf(double nsaf) {
             this.nsaf = nsaf;

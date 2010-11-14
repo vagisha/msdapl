@@ -7,14 +7,14 @@
 	<typeAlias alias="IdPickerPeptideBase" type="org.yeastrc.ms.domain.protinfer.idpicker.IdPickerPeptideBase"/>
 	
 	<resultMap class="IdPickerPeptide" id="idpickerPeptideResult" extends="ProteinferPeptide.pinferPeptideBaseResult">
-		<result property="groupId" column="groupID" nullValue="0" />
+		<result property="peptideGroupLabel" column="peptideGroupLabel" nullValue="0" />
 		<result property="ionList" 
 				select="IdPickerIon.selectIonsForPeptide"
 				column="id"/>
 	</resultMap>
 	
 	<resultMap class="IdPickerPeptideBase" id="idpickerPeptideBaseResult" extends="ProteinferPeptide.pinferPeptideBaseResult">
-		<result property="groupId" column="groupID" nullValue="0" />
+		<result property="peptideGroupLabel" column="peptideGroupLabel" nullValue="0" />
 		<result property="ionList" 
 				select="ProteinferIon.selectIonsForPeptide"
 				column="id"/>
@@ -22,7 +22,7 @@
 	
 	<parameterMap class="IdPickerPeptideBase" id="idpickerPeptideParam">
 		<parameter property="id" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="groupId" jdbcType="INTEGER" />
+		<parameter property="peptideGroupLabel" jdbcType="INTEGER" />
 	</parameterMap>
 	
 	<select id="select" resultMap="idpickerPeptideResult" parameterClass="Integer">
@@ -58,7 +58,7 @@
     	FROM msProteinInferPeptide as pept, IDPickerPeptide as idpPep
     	WHERE pept.piRunID=#pinferId#
     	AND pept.id = idpPep.piPeptideID
-    	AND idpPep.groupID=#groupId#
+    	AND idpPep.peptideGroupLabel=#peptideGroupLabel#
     </select>
     
     <select id="selectBasePeptidesForGroup" resultMap="idpickerPeptideBaseResult" parameterClass="java.util.Map">
@@ -66,33 +66,33 @@
     	FROM msProteinInferPeptide as pept, IDPickerPeptide as idpPep
     	WHERE pept.piRunID=#pinferId#
     	AND pept.id = idpPep.piPeptideID
-    	AND idpPep.groupID=#groupId#
+    	AND idpPep.peptideGroupLabel=#peptideGroupLabel#
     </select>
     
-    <select id="selectPeptGrpIdsForProtGrpId" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT peptideGroupID FROM IDPickerGroupAssociation
+    <select id="selectPeptGrpLabelsForProtGrp" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT peptideGroupLabel FROM IDPickerGroupAssociation
     	WHERE piRunID=#pinferId#
-    	AND proteinGroupID=#groupId#
+    	AND proteinGroupLabel=#proteinGroupLabel#
     </select>
    
     <insert id="insert" parameterMap="idpickerPeptideParam">
     	INSERT INTO IDPickerPeptide (
     	piPeptideID,
-    	groupID) 
+    	peptideGroupLabel) 
     	VALUES (?,?)
     </insert>
     
     <insert id="insertGroupAssociation" parameterClass="java.util.Map">
     	INSERT INTO IDPickerGroupAssociation (
     	piRunID,
-    	proteinGroupID,
-    	peptideGroupID) 
-    	VALUES (#protGrpId#, #peptGrpId#)
+    	proteinGroupLabel,
+    	peptideGroupLabel) 
+    	VALUES (#proteinGroupLabel#, #peptideGroupLabel#)
     </insert>
     
     <update id="updateIdPickerPeptide" parameterClass="IdPickerPeptideBase">
     	UPDATE IDPickerPeptide 
-    	SET groupID=#groupId#
+    	SET peptideGroupLabel=#peptideGroupLabel#
     	WHERE piPeptideID=#id#
     </update>
     
