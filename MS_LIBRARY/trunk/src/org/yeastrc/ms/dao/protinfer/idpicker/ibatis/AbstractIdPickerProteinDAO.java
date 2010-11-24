@@ -57,6 +57,10 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         return 0;
     }
     
+    public int updateIdPickerProteinOnly(GenericIdPickerProtein<?> protein) {
+    	return update(sqlMapNameSpace+".updateIdPickerProtein", protein);
+    }
+    
     public int saveIdPickerProtein(GenericIdPickerProtein<?> protein) {
         int proteinId = save(protein);
         protein.setId(proteinId);
