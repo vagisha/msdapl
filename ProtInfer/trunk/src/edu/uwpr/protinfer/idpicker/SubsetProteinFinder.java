@@ -27,7 +27,7 @@ public class SubsetProteinFinder {
 
 	private static final Logger log = Logger.getLogger(SubsetProteinFinder.class);
 	
-	public void markSubsetProteins(List<? extends InferredProtein<? extends SpectrumMatch>> inputProteinList) {
+	public void markSubsetProteins(List<? extends InferredProtein<? extends SpectrumMatch>> inputProteinList) throws SubsetProteinFinderException {
 		
 		
 		// Make a copy of the list; we will be sorting this list
@@ -60,14 +60,15 @@ public class SubsetProteinFinder {
 					// make sure that the peptides in this cluster were unique to this cluster
 					for(String peptide: clusterPeptides) {
 						if(peptides.contains(peptide)) {
-							log.error("Petide "+peptide+" in cluster "+clusterLabel+" also found in another cluster");
+							throw new SubsetProteinFinderException("Petide "+peptide+" in cluster "+clusterLabel+" also found in another cluster");
 						}
 						peptides.add(peptide);
 					}
 					Map<Integer, Set<Integer>> mapForCluster = getSubsetSuperProteinGroupIdMap(clusterProteins);
 					for(Integer subsetGroupId: mapForCluster.keySet()) {
 						if(subsetSuperProteinGroupIdMap.containsKey(subsetGroupId))
-							log.error("Group ID: "+subsetGroupId+" seen multiple times");
+							throw new SubsetProteinFinderException("Group ID: "+subsetGroupId+" seen in multiple clusters");
+						
 						subsetSuperProteinGroupIdMap.put(subsetGroupId, mapForCluster.get(subsetGroupId));
 					}
 				}
@@ -88,14 +89,14 @@ public class SubsetProteinFinder {
 		// make sure that the peptides in this cluster were unique to this cluster
 		for(String peptide: clusterPeptides) {
 			if(peptides.contains(peptide)) {
-				log.error("Petide "+peptide+" in cluster "+clusterLabel+" also found in another cluster");
+				throw new SubsetProteinFinderException("Petide "+peptide+" in cluster "+clusterLabel+" also found in another cluster");
 			}
 			peptides.add(peptide);
 		}
 		Map<Integer, Set<Integer>> mapForCluster = getSubsetSuperProteinGroupIdMap(clusterProteins);
 		for(Integer subsetGroupId: mapForCluster.keySet()) {
 			if(subsetSuperProteinGroupIdMap.containsKey(subsetGroupId))
-				log.error("Group ID: "+subsetGroupId+" seen multiple times");
+				throw new SubsetProteinFinderException("Group ID: "+subsetGroupId+" seen in multiple clusters");
 			subsetSuperProteinGroupIdMap.put(subsetGroupId, mapForCluster.get(subsetGroupId));
 		}
 		
@@ -115,7 +116,8 @@ public class SubsetProteinFinder {
 	 * @param clusterProteins
 	 * @return
 	 */
-	private Map<Integer, Set<Integer>> getSubsetSuperProteinGroupIdMap(List<InferredProtein<? extends SpectrumMatch>> clusterProteins) {
+	private Map<Integer, Set<Integer>> getSubsetSuperProteinGroupIdMap(List<InferredProtein<? extends SpectrumMatch>> clusterProteins) 
+			throws SubsetProteinFinderException {
 		
 		
 		// get one representative from each indistinguishable protein group
@@ -159,12 +161,19 @@ public class SubsetProteinFinder {
 				}
 			}		
 		}
+		
+		// remove group labels that have been added as super proteins but are themselves subset proteins
+		Set<Integer> subsetProteinGrpLabels = subsetSuperGroupIdMap.keySet();
+		for(Set<Integer> superProteinGrpLabels: subsetSuperGroupIdMap.values()) {
+			superProteinGrpLabels.removeAll(subsetProteinGrpLabels);
+		}
+		
 		return subsetSuperGroupIdMap;
 	}
 
 	// Returns true if protein_i is a subset protein of protein_j
 	private boolean isSubset(InferredProtein<? extends SpectrumMatch> protein_i,
-			InferredProtein<? extends SpectrumMatch> protein_j) {
+			InferredProtein<? extends SpectrumMatch> protein_j) throws SubsetProteinFinderException {
 		
 		Set<String> peptides_i = new HashSet<String>();
 		for(PeptideEvidence<? extends SpectrumMatch> pev: protein_i.getPeptides()) {
@@ -178,9 +187,13 @@ public class SubsetProteinFinder {
 		
 		if(peptides_j.containsAll(peptides_i)) {
 			if(peptides_j.size() == peptides_i.size()) {
+				
 				log.error("Same set of peptides found for protein_i ("+protein_i.getProteinId()+","+protein_i.getAccession()+") and protein_j ("+
 						+protein_j.getProteinId()+","+protein_j.getAccession()+")");
 				log.error("Peptides are: "+org.yeastrc.ms.util.StringUtils.makeCommaSeparated(peptides_i));
+				
+				throw new SubsetProteinFinderException("Proteins "+protein_i.getProteinId()+", and "+protein_j.getProteinId()+
+						" are in different groups but have the same set of peptides");
 			}
 			return true;
 		}

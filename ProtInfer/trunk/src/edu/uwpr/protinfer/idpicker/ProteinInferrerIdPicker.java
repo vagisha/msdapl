@@ -135,7 +135,12 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
         s = System.currentTimeMillis();
         
         SubsetProteinFinder subsetFinder = new SubsetProteinFinder();
-        subsetFinder.markSubsetProteins(allProteins);
+        try {
+			subsetFinder.markSubsetProteins(allProteins);
+		} catch (SubsetProteinFinderException e1) {
+			log.error(e1.getMessage());
+			return null;
+		}
         int subsetCount = 0;
         int subsetGrpCount = 0;
         Set<Integer> grpIdSeen = new HashSet<Integer>();
@@ -146,9 +151,9 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
         		}
         		subsetCount++;
         	}
-        	else if(!prot.getProtein().isAccepted()) {
-        		log.info("NOT parsimonious AND NOT subset: "+prot.getAccession());
-        	}
+//        	else if(!prot.getProtein().isAccepted()) {
+//        		log.info("NOT parsimonious AND NOT subset: "+prot.getAccession());
+//        	}
         	if(grpIdSeen.contains(prot.getProteinGroupLabel()))
         		continue;
         	grpIdSeen.add(prot.getProteinGroupLabel());
