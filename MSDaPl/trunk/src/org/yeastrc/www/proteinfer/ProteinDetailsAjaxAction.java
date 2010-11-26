@@ -179,7 +179,6 @@ public class ProteinDetailsAjaxAction extends Action {
             // is this protein a subset protein
             if(iProt.getProtein().getIsSubset()) {
             	List<WIdPickerProtein> superProteins = IdPickerResultsLoader.getSuperProteins(iProt.getProtein(), pinferId);
-            	System.out.println("Found "+superProteins.size()+" super proteins");
             	request.setAttribute("superProteins", superProteins);
             }
             

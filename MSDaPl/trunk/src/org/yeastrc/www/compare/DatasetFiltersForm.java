@@ -36,7 +36,7 @@ public class DatasetFiltersForm extends ActionForm {
     private List<SelectableDataset> notList = new ArrayList<SelectableDataset>();
     private List<SelectableDataset> xorList = new ArrayList<SelectableDataset>();
     
-    private int parsimoniousParam = ProteinDatasetComparer.PARSIM.ONE.getNumericValue(); // parsimonious in at least one
+    private int parsimoniousParam = ProteinDatasetComparer.PARSIM.PARSIM_ONE.getNumericValue(); // parsimonious in at least one
     
     private boolean groupIndistinguishableProteins = false;
     
@@ -698,6 +698,8 @@ public class DatasetFiltersForm extends ActionForm {
         
         filterCriteria.setParsimonious(true);
         filterCriteria.setNonParsimonious(false);
+        filterCriteria.setSubset(true);
+        filterCriteria.setNonSubset(true);
         
         //filterCriteria.setSearchAllDescriptions(this.isSearchAllDescriptions());
        

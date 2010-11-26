@@ -269,25 +269,58 @@ function showActionOptions() {
 	<tr>
 		<td valign="top" style="padding-bottom: 10px;">Include Proteins:</td>
 		<td valign="top" colspan="3" style="padding-bottom: 10px;">
-			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="0">
-				<span class="tooltip" title="All proteins from each dataset are included in the analysis"><b>All</b></span>
-			</html:radio>
-			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="1">
-			<span class="tooltip" title="Proteins not parsimonious in a dataset but parsimonious in at least one other dataset are included, in addition to all parsimonious proteins in the dataset.">
-				<b>Parsimonious in &gt;= 1 Dataset</b>
-			</span>
-			</html:radio>
-			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="2">
-			<span class="tooltip" title="Only parsimonious proteins from each dataset are included in the analysis">
-			<b>Parsimonious ONLY</b>
-			</span>
-			</html:radio>
+		
+			<table cellpadding="0" cellspacing="0">
+			<tr>
+				<td>
+					<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="0">
+					<span class="tooltip" title="All proteins from each dataset are included in the analysis"><b>All</b></span>
+					</html:radio>
+				</td>
+				<td>
+					<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="1">
+					<span class="tooltip" title="Proteins not parsimonious in a dataset but parsimonious in at least one other dataset are included, in addition to all parsimonious proteins in the dataset.">
+					<b>Parsimonious in &gt;= 1 Dataset</b>
+					</span>
+					</html:radio>
+				</td>
+				<td>
+					<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="2">
+					<span class="tooltip" title="Only parsimonious proteins from each dataset are included in the analysis">
+					<b>Parsimonious ONLY</b>
+					</span>
+					</html:radio>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="3">
+					<span class="tooltip" title="All proteins that are non-subset in at least one of the datasets are included in the analysis">
+					<b>Non-subset in &gt;= 1 Dataset</b>
+					</span>
+					</html:radio>
+				</td>
+				<td>
+					<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="4">
+					<span class="tooltip" title="Only non-subset proteins from each dataset are included in the analysis">
+					<b>Non-subset ONLY</b>
+					</span>
+					</html:radio>
+				</td>
+			</tr>
+			
 			<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
-			<br>
-			<span style="font-size:8pt;">
-				NOTE: For ProteinProphet datasets "parsimonious" = NOT "subsumed"
-			</span>
+			<tr>
+				<td colspan="3">
+					<span style="font-size:8pt;">
+					NOTE: For ProteinProphet datasets "parsimonious" = NOT "subsumed"
+					</span>
+				</td>
+			</tr>
 			</logic:equal>
+			</table>
+			
 		</td>
 	</tr>
 	

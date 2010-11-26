@@ -234,8 +234,8 @@
 <table align="center" cellpadding="2" style="border: 1px solid gray; border-spacing: 2px">
 <tr class="pinfer_A">
 	<td style="border: 1px #CCCCCC dotted;" align="center">Coverage(%)</td>
-	<td style="border: 1px #CCCCCC dotted;" align="center"># Peptides</td>
-	<td style="border: 1px #CCCCCC dotted;" align="center"># Uniq.Peptides</td>
+	<td style="border: 1px #CCCCCC dotted;" align="center"># Sequences</td>
+	<td style="border: 1px #CCCCCC dotted;" align="center"># Uniq.Sequence</td>
 	<td style="border: 1px #CCCCCC dotted;" align="center"># Spectra </td>
 	<logic:equal name="isIdPicker" value="true">
 		<td style="border: 1px #CCCCCC dotted;" align="center">NSAF** </td>

@@ -333,14 +333,37 @@ public class IdPickerResultsLoader {
         
     	List<WIdPickerProtein> proteins = getWIdPickerProteins(protein.getSuperProteinIds(), pinferId);
     	
+    	// return one representative of each protein group
+    	Collections.sort(proteins, new Comparator<WIdPickerProtein>() {
+			@Override
+			public int compare(WIdPickerProtein o1, WIdPickerProtein o2) {
+				int o1_grp = o1.getProtein().getProteinGroupLabel();
+				int o2_grp = o2.getProtein().getProteinGroupLabel();
+				if(o1_grp == o2_grp)
+					return Integer.valueOf(o1.getProtein().getId()).compareTo(o2.getProtein().getId());
+				
+				return o1_grp < o2_grp ? -1 : 1;
+			}
+		});
+    	
+    	List<WIdPickerProtein> toReturn = new ArrayList<WIdPickerProtein>();
+    	int lastGrpId = -1;
+    	for(WIdPickerProtein prot: proteins) {
+    		if(prot.getProtein().getProteinGroupLabel() != lastGrpId) {
+    			toReturn.add(prot);
+    		}
+    		lastGrpId = prot.getProtein().getProteinGroupLabel();
+    	}
+    	
+    	
         long e = System.currentTimeMillis();
         log.info("Time to get SUPER proteins for piProtenID: "+protein.getId()+" was "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
-        return proteins;
+        return toReturn;
     }
     
     //---------------------------------------------------------------------------------------------------
-    // Get all proteins that are a subset of this protien
+    // Get all proteins that are a subset of this protein	
     //---------------------------------------------------------------------------------------------------
     public static List<WIdPickerProtein> getSubsetProteins(IdPickerProteinBase protein, int pinferId) {
         
@@ -348,10 +371,32 @@ public class IdPickerResultsLoader {
 
     	List<WIdPickerProtein> proteins = getWIdPickerProteins(protein.getSubsetProteinIds(), pinferId);
         
+    	// return one representative of each protein group
+    	Collections.sort(proteins, new Comparator<WIdPickerProtein>() {
+			@Override
+			public int compare(WIdPickerProtein o1, WIdPickerProtein o2) {
+				int o1_grp = o1.getProtein().getProteinGroupLabel();
+				int o2_grp = o2.getProtein().getProteinGroupLabel();
+				if(o1_grp == o2_grp)
+					return Integer.valueOf(o1.getProtein().getId()).compareTo(o2.getProtein().getId());
+				
+				return o1_grp < o2_grp ? -1 : 1;
+			}
+		});
+    	
+    	List<WIdPickerProtein> toReturn = new ArrayList<WIdPickerProtein>();
+    	int lastGrpId = -1;
+    	for(WIdPickerProtein prot: proteins) {
+    		if(prot.getProtein().getProteinGroupLabel() != lastGrpId) {
+    			toReturn.add(prot);
+    		}
+    		lastGrpId = prot.getProtein().getProteinGroupLabel();
+    	}
+    	
         long e = System.currentTimeMillis();
         log.info("Time to get SUBSET proteins for piProtenID: "+protein.getId()+" was "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
-        return proteins;
+        return toReturn;
     }
     
     private static List<WIdPickerProtein> getWIdPickerProteins(List<Integer> piProteinIds, int pinferId) {
@@ -598,8 +643,8 @@ public class IdPickerResultsLoader {
         WIdPickerResultSummary summary = new WIdPickerResultSummary();
         
         // TODO remove this later
-        if(pinferId > 256)
-        	summary.setHasSubsetInformation(true);
+        //if(pinferId > 256)
+        summary.setHasSubsetInformation(true);
         
         // protein counts before filtering
         summary.setAllProteinCount(idpProtBaseDao.getProteinCount(pinferId));
