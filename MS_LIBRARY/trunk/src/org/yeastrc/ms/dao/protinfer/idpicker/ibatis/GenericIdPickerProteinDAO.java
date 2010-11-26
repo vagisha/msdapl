@@ -72,6 +72,8 @@ public interface GenericIdPickerProteinDAO <P extends GenericIdPickerProtein<?>>
     
     public  abstract List<Integer> getNonSubsetNrseqProteinIds(int pinferId);
     
+    public  abstract List<Integer> getSubsetNrseqProteinIds(int pinferId);
+    
     public abstract Map<Integer, Integer> getProteinGroupLabels(int pinferId);
     
     public abstract boolean isNrseqProteinGrouped(int pinferId, int nrseqId);
