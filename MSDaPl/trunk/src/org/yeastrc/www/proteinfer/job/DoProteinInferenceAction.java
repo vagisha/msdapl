@@ -96,6 +96,24 @@ public class DoProteinInferenceAction extends Action {
             params.addParam(myParam);
         }
         
+        // If "Allow I/L substitution" was unchecked it may not be in the parameters list
+        // or its value will be empty. Set it to false.
+        boolean foundItoLSubstParam = false;
+        ProgramParam doItoLSubstitutionParam = ParamMaker.makeDoItoLSubstitutionParam();
+        for(Param param: params.getParamList()) {
+            if(param.getName().equals(doItoLSubstitutionParam.getName())) {
+                if(param.getValue() == null || param.getValue().trim().length() == 0)
+                    param.setValue("false");
+                foundItoLSubstParam = true;
+                break;
+            }
+        }
+        if(!foundItoLSubstParam) {
+            Param myParam = new Param(doItoLSubstitutionParam);
+            myParam.setValue("false");
+            params.addParam(myParam);
+        }
+        
         if(prinferForm.isIndividualRuns()) {
             ProteinferJobSaver.instance().saveMultiJobToDatabase(user.getID(), inputSummary, params, 
                     prinferForm.getInputType(), prinferForm.getComments());

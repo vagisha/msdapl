@@ -47,6 +47,7 @@ import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.service.database.fasta.FastaInMemorySuffixCreator;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
@@ -870,7 +871,11 @@ public class IdPickerResultsLoader {
             String sequence) {
         List<Character> nterm = new ArrayList<Character>(2);
         List<Character> cterm = new ArrayList<Character>(2);
-        int idx = proteinSeq.indexOf(sequence);
+        
+        String SeqWSubstitution = FastaInMemorySuffixCreator.format(sequence);
+        String protSeqWSubstitution = FastaInMemorySuffixCreator.format(proteinSeq);
+        
+        int idx = protSeqWSubstitution.indexOf(SeqWSubstitution);
         while(idx != -1) {
             if(idx == 0)    nterm.add('-');
             else            nterm.add(proteinSeq.charAt(idx-1));

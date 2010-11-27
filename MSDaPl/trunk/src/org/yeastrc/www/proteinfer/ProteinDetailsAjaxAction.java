@@ -112,7 +112,7 @@ public class ProteinDetailsAjaxAction extends Action {
             request.setAttribute("protein", iProt);
             
             
-            // Abundance information. Only for yeaset
+            // Abundance information. Only for yeast
             // Ghaemmaghami, et al., Nature 425, 737-741 (2003)
             if(iProt.getProteinListing().getSpeciesId() == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE) {
             	List<YeastOrfAbundance> abundances = ProteinAbundanceDao.getInstance().getAbundance(iProt.getProteinListing().getNrseqProteinId());
