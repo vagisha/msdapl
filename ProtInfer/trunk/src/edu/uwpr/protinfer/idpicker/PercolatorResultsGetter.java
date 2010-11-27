@@ -99,7 +99,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         // 3. Get all the matching proteins
         if(params.isRefreshPeptideProteinMatches()) {
         	log.info("Refreshing peptide protein matches");
-        	assignMatchingProteinsFromFasta(psmList, inputList.get(0).getProteinferId());
+        	assignMatchingProteinsFromFasta(psmList, inputList.get(0).getProteinferId(), percParams);
         }
         else {
         	assignMatchingProteins(psmList);
@@ -146,40 +146,70 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
     }
     
     // Assign matching proteins to each peptide
-    private void assignMatchingProteinsFromFasta(List<PeptideSpectrumMatchNoFDR> psmList, int pinferId) throws ResultGetterException{
+    private void assignMatchingProteinsFromFasta(List<PeptideSpectrumMatchNoFDR> psmList, int pinferId, 
+    		PercolatorParams percParams) throws ResultGetterException{
         
         
         long s = System.currentTimeMillis();
         
-        PeptideProteinMatchingService matchService = initializePeptideProteinMatchingService(pinferId);
+        PeptideProteinMatchingService matchService = initializePeptideProteinMatchingService(pinferId, percParams);
         
         // map of protein accession and protein
         Map<String, Protein> proteinMap = new HashMap<String, Protein>();
         
+        // map of peptide sequence and protein matches
+        Map<String, List<Protein>> peptideProteinMap = new HashMap<String, List<Protein>>();
+        
+        int cnt = 0;
         for(PeptideSpectrumMatchNoFDR psm: psmList) {
             
         	String peptide = psm.getPeptideSequence();
         	
-        	List<PeptideProteinMatch> matches = matchService.getMatchingProteins(peptide);
+        	List<Protein> protMatches = peptideProteinMap.get(peptide);
         	
-            for (PeptideProteinMatch protein: matches) {
-            
-            	String accession = protein.getProtein().getAccessionString();
-                Protein prot = proteinMap.get(accession);
-                // If we have not already seen this protein create a new entry
-                if(prot == null) {
-                    prot = new Protein(accession, -1);
-                    proteinMap.put(accession, prot);
+        	if(protMatches == null) {
+        		
+        		List<PeptideProteinMatch> matches = matchService.getMatchingProteins(peptide);
+            	
+        		if(matches.size() == 0) {
+            		log.error("No protein matches found for peptide: "+peptide);
+            	}
+        		
+        		protMatches = new ArrayList<Protein>(matches.size());
+        		peptideProteinMap.put(peptide, protMatches);
+        		
+                for (PeptideProteinMatch protein: matches) {
+                
+                	String accession = protein.getProtein().getAccessionString();
+                    Protein prot = proteinMap.get(accession);
+                    // If we have not already seen this protein create a new entry
+                    if(prot == null) {
+                        prot = new Protein(accession, -1);
+                        proteinMap.put(accession, prot);
+                    }
+                    protMatches.add(prot);
+                    //psm.getPeptideHit().addProtein(prot);
                 }
-                psm.getPeptideHit().addProtein(prot);
-            }
+        	}
+        	
+        	for(Protein prot: protMatches) {
+        		psm.getPeptideHit().addProtein(prot);
+        	}
+        	
+        	cnt++;
+        	if(cnt % 10000 == 0) {
+        		log.info("Peptide to protein matches found for "+cnt+" PSMs");
+        	}
         }
+        
+        matchService.clearMaps();
         
         long e = System.currentTimeMillis();
         log.info("\tTime to get matching proteins: "+TimeUtils.timeElapsedSeconds(s,e)+" seconds.");
     }
     
-    private PeptideProteinMatchingService initializePeptideProteinMatchingService(int pinferId) throws ResultGetterException{
+    private PeptideProteinMatchingService initializePeptideProteinMatchingService(int pinferId, 
+    		PercolatorParams percParams) throws ResultGetterException{
 
     	// Get the database ID of the fasta file used for the search
         List<Integer> fastaDatabaseIds = getDatabaseIdsForProteinInference(pinferId);
@@ -227,6 +257,8 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
 
         matchService.setNumEnzymaticTermini(numEnzymaticTermini);
         matchService.setEnzymes(enzymes);
+        
+        matchService.setDoItoLSubstitution(percParams.getIdPickerParams().isDoItoLSubstitution());
         return matchService;
     }
     

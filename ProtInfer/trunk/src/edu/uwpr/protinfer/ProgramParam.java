@@ -6,6 +6,7 @@
  */
 package edu.uwpr.protinfer;
 
+
 /**
  * 
  */
@@ -185,6 +186,13 @@ public final class ProgramParam {
               "refreshPeptideProteinMatches", "Refresh Protein Matches", 
               "false", null,
               "If checked, peptide protein matches will be re-calculated. Otherwise matches reported in SQT files will be used.");
+        }
+        
+        public static ProgramParam makeDoItoLSubstitutionParam() {
+            return new ProgramParam(TYPE.BOOLEAN, 
+              "doItoLSubstitution", "Allow I/L substitutions", 
+              "false", null,
+              "If checked, I/L substitution will be allowed when determining protein matches for peptides. Ignored if \"Refresh Peptide Protein Matches\" is unchecked.");
         }
     
     }

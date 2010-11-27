@@ -96,6 +96,10 @@ public class IdPickerParamsMaker {
             else if(param.getName().equals("refreshPeptideProteinMatches")) {
             	idpParams.setRefreshPeptideProteinMatches(Boolean.parseBoolean(param.getValue()));
             }
+            // Allow I/L substutions
+            else if(param.getName().equals("doItoLSubstitution")) {
+            	idpParams.setDoItoLSubstitution(Boolean.parseBoolean(param.getValue()));
+            }
             else {
                 moreFilters.add(param);
             }
