@@ -703,19 +703,19 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     
     
     public  List<Integer> getParsimoniousNrseqProteinIds(int pinferId) {
-    	return getNrseqProteinIds(pinferId, true, false, false, false); // return only parsimonious
+    	return getNrseqProteinIds(pinferId, true, false, true, true); // return only parsimonious
     }
     
     public  List<Integer> getNonParsimoniousNrseqProteinIds(int pinferId) {
-    	return getNrseqProteinIds(pinferId, false, true, false, false); // return only non-parsimonious
+    	return getNrseqProteinIds(pinferId, false, true, true, true); // return only non-parsimonious
     }
     
     public  List<Integer> getNonSubsetNrseqProteinIds(int pinferId) {
-    	return getNrseqProteinIds(pinferId, false, false, false, true); // return only non-subset
+    	return getNrseqProteinIds(pinferId, true, true, false, true); // return only non-subset
     }
     
     public List<Integer> getSubsetNrseqProteinIds(int pinferId) {
-    	return getNrseqProteinIds(pinferId, false, false, true, false); // return only subset
+    	return getNrseqProteinIds(pinferId, true, true, true, false); // return only subset
     }
     
     private List<Integer> getNrseqProteinIds(int pinferId, boolean parsimonious, boolean nonParsimonious, 

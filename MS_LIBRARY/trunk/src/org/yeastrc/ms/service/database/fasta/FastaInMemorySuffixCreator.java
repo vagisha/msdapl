@@ -93,16 +93,16 @@ public class FastaInMemorySuffixCreator {
         }
     }
     
-    public static String format(String peptide) {
+    public static String format(String sequence) {
     	
     	// Remove any '*' characters from the sequence
-    	peptide = peptide.replaceAll("\\*", "");
+    	sequence = sequence.replaceAll("\\*", "");
     	// Replace all 'L' with '1'
-    	peptide = peptide.replaceAll("L", "1");
+    	sequence = sequence.replaceAll("L", "1");
         // Replace all "I" with "1"
-    	peptide = peptide.replaceAll("I", "1");
+    	sequence = sequence.replaceAll("I", "1");
     	
-    	return peptide;
+    	return sequence;
    
     }
 }

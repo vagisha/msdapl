@@ -39,6 +39,7 @@ public class PeptideProteinMatchingService {
     private final int databaseId;
     private int numEnzymaticTermini = 0;
     private List<EnzymeRule> enzymeRules;
+    private boolean doItoLSubstitution = false;
     
     private Map<String, List<Integer>> suffixMap;
     
@@ -60,6 +61,17 @@ public class PeptideProteinMatchingService {
         else if(createSuffixInMemory) {
             buildInMemorySuffixes(databaseId);
         }
+    }
+    
+    public void clearMaps() {
+    	if(suffixMap != null) {
+    		suffixMap.clear();
+    		suffixMap = null;
+    	}
+    	if(suffixIdMap != null) {
+    		suffixIdMap.clear();
+    		suffixIdMap = null;
+    	}
     }
     
     // --------------------------------------------------------------------------------
@@ -87,7 +99,11 @@ public class PeptideProteinMatchingService {
         this.numEnzymaticTermini = net;
     }
     
-    public int getNumEnzymaticTermini() {
+    public void setDoItoLSubstitution(boolean doItoLSubstitution) {
+		this.doItoLSubstitution = doItoLSubstitution;
+	}
+
+	public int getNumEnzymaticTermini() {
         return this.numEnzymaticTermini;
     }
    
@@ -123,6 +139,7 @@ public class PeptideProteinMatchingService {
             }
         }
         log.debug("Number of matches after applying emzyme rules: "+matchingProteins.size());
+        
         return matchingProteins;
     }
     
@@ -141,6 +158,11 @@ public class PeptideProteinMatchingService {
             NrDbProtein dbProt, String peptide, List<EnzymeRule> enzymeRules,
             int minEnzymaticTermini, String sequence) {
         
+    	if(doItoLSubstitution) {
+    		peptide = FastaInMemorySuffixCreator.format(peptide);
+    		sequence = FastaInMemorySuffixCreator.format(sequence);
+    	}
+    	
         int idx = sequence.indexOf(peptide);
         
         while(idx != -1) {
@@ -398,11 +420,12 @@ public class PeptideProteinMatchingService {
         		for(Integer proteinId: matchingProteins)
         			matches.put(proteinId, 1);
         	}
-
-        	for(Integer proteinId: matchingProteins) {
-        		Integer num = matches.get(proteinId);
-        		if(num != null) {
-        			matches.put(proteinId, ++num);
+        	else {
+        		for(Integer proteinId: matchingProteins) {
+        			Integer num = matches.get(proteinId);
+        			if(num != null) {
+        				matches.put(proteinId, ++num);
+        			}
         		}
         	}
         	idx++;

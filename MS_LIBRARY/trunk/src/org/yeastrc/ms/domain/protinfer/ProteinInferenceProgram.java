@@ -177,7 +177,8 @@ public class ProteinInferenceProgram {
                     ParamMaker.makeMinCoverageParam(),
                     ParamMaker.makeMinPeptLengthParam(),
                     ParamMaker.makeRemoveAmbigSpectraParam(),
-                    ParamMaker.makeRefreshPeptideProteinMatchParam()
+                    ParamMaker.makeRefreshPeptideProteinMatchParam(),
+                    ParamMaker.makeDoItoLSubstitutionParam()
             });
         }
     }
@@ -228,7 +229,8 @@ public class ProteinInferenceProgram {
                     ParamMaker.makeMinCoverageParam(),
                     ParamMaker.makeMinPeptLengthParam(),
                     ParamMaker.makeRemoveAmbigSpectraParam(),
-                    ParamMaker.makeRefreshPeptideProteinMatchParam()
+                    ParamMaker.makeRefreshPeptideProteinMatchParam(),
+                    ParamMaker.makeDoItoLSubstitutionParam()
             });
         }
     }

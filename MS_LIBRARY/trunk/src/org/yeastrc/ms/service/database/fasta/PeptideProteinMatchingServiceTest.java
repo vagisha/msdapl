@@ -68,8 +68,10 @@ public class PeptideProteinMatchingServiceTest extends TestCase {
         for(PeptideProteinMatch match: matches) {
         	accessions.add(match.getProtein().getAccessionString());
         }
+        
+        //System.out.println(matches.size());
+        assertEquals(53, matches.size());
         assertTrue(accessions.contains("YML045W-A"));
-        assertEquals(52, matches.size());
         
         NrDbProtein dbProt = new NrDbProtein();
         dbProt.setAccessionString("YKR094C");
@@ -80,9 +82,17 @@ public class PeptideProteinMatchingServiceTest extends TestCase {
         
         assertNotNull(match);
         assertEquals(2, match.getNumEnzymaticTermini());
+        
+        peptide = "MQSDTQEANDLVTIANLQYNGSTPADAFETK"; // switch L and I
+        
+        match = service.getPeptideProteinMatch(dbProt, peptide, rules, minEnzymaticTermini, proteinSequence);
+        
+        assertNotNull(match);
+        assertEquals(2, match.getNumEnzymaticTermini());
+        
 	}
 
-//    public void testGetPeptideProteinMatch2() throws SQLException {
+//    public void testGetPeptideProteinMatch3() throws SQLException {
 //    	
 //		String proteinSequence = "MQIFVKTLTGKTITLEVESSDTIDNVKSKIQDKEGIPPDQQRLIFAGKQLEDGRTLSDYNIQKESTLHLVLRLRGGIIEPSLKALASKYNCDKSVCRKCYARLPPRATNCRKRKCGHTNQLRPKKKLK";
 //        int minEnzymaticTermini = 1;
