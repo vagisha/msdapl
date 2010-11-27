@@ -259,6 +259,8 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         matchService.setEnzymes(enzymes);
         
         matchService.setDoItoLSubstitution(percParams.getIdPickerParams().isDoItoLSubstitution());
+        
+        log.info("Initialized peptide protein matching service");
         return matchService;
     }
     
