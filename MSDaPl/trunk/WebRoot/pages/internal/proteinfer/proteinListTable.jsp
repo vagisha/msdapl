@@ -91,7 +91,7 @@ if(request.getAttribute("philiusResults") != null)
 		
 		
 		<logic:equal name="displayColumns" property="showFastaId" value="true">
-		<th><span class="tooltip" title="Subset / Not Subset">S</span></th> <!-- column header for subset protein -->
+		<th><span class="tooltip" title="Subset Protein">S</span></th> <!-- column header for subset protein -->
 		<!-- Make FastaID sortable only if indistinguishable proteins are NOT grouped together -->
 		<logic:equal name="groupProteins" value="true">
 			<th width="5%">Fasta ID</th>

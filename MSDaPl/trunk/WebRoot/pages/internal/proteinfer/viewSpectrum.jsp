@@ -65,7 +65,9 @@ $(document).ready(function() {
 
 <!--<yrcwww:contentbox centered="true" title="Peptide Spectrum" width="95" widthRel="true" scheme="content">-->
 <center>
-<div class="content_header" style="width:95%">Spectrum Viewer</div>
+<div style="padding:5px;background:#FFFFFF;">
+<div class="content_header" style="width:100%;">Spectrum Viewer</div>
+</div>
 <!--==================================================================== -->
 <!-- APPLET -->
 <!--==================================================================== -->
@@ -159,7 +161,7 @@ function precursorPeakClicked(precursorMz) {
 
 
 <!-- OTHER RESULTS FOR THIS SCAN -->
-	<div style="background-color: #FFFFFF; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
+	<div style="background-color: #FFFFFF; padding:10px;" > 
 	<logic:present name="results">
 		<yrcwww:table name="results" tableId='other_results' tableClass=" table_basic other_results" center="true" />
 	</logic:present>

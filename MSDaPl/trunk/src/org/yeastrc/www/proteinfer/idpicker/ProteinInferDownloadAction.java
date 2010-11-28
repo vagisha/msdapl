@@ -131,6 +131,8 @@ public class ProteinInferDownloadAction extends Action {
         writer.write("Filtered Protein Groups:\t"+summary.getFilteredProteinGroupCount()+"\n");
         writer.write("Parsimonious Proteins:\t"+summary.getFilteredParsimoniousProteinCount()+"\n");
         writer.write("Parsimonious Protein Groups:\t"+summary.getFilteredParsimoniousProteinGroupCount()+"\n");
+        writer.write("Non-subset Proteins:\t"+summary.getFilteredNonSubsetProteinCount()+"\n");
+        writer.write("Non-subset Protein Groups:\t"+summary.getFilteredNonSubsetProteinGroupCount()+"\n");
         writer.write("\n\n");
         
         
@@ -186,8 +188,10 @@ public class ProteinInferDownloadAction extends Action {
     	
     	if(displayColumns.getShowGroupId())
     		writer.write("ProteinGroupID\t");
-    	if(displayColumns.getShowFastaId() || displayColumns.getShowCommonName())
+    	if(displayColumns.getShowFastaId() || displayColumns.getShowCommonName()) {
     		writer.write("Parsimonious\t");
+    		writer.write("Subset\t");
+    	}
     	if(displayColumns.getShowFastaId())
     		writer.write("FastaID\t");
     	if(displayColumns.getShowCommonName())
@@ -238,6 +242,11 @@ public class ProteinInferDownloadAction extends Action {
             if(displayColumns.getShowFastaId() || displayColumns.getShowCommonName()) {
             	if(wProt.getProtein().getIsParsimonious())
             		writer.write("P\t");
+            	else
+            		writer.write("\t");
+            	
+            	if(wProt.getProtein().getIsSubset())
+            		writer.write("S\t");
             	else
             		writer.write("\t");
             }
@@ -369,8 +378,10 @@ public class ProteinInferDownloadAction extends Action {
     	
     	if(displayColumns.getShowGroupId())
     		writer.write("ProteinGroupID\t");
-    	if(displayColumns.getShowFastaId() || displayColumns.getShowCommonName())
+    	if(displayColumns.getShowFastaId() || displayColumns.getShowCommonName()) {
     		writer.write("Parsimonious\t");
+    		writer.write("Subset\t");
+    	}
     	if(displayColumns.getShowFastaId())
     		writer.write("FastaID\t");
     	if(displayColumns.getShowCommonName())
@@ -403,6 +414,7 @@ public class ProteinInferDownloadAction extends Action {
         
         int currentGroupLabel = -1;
         boolean parsimonious = false;
+        boolean subset = false;
         String fastaIds = "";
         String commonNames = "";
         String descStr = "";
@@ -441,6 +453,12 @@ public class ProteinInferDownloadAction extends Action {
                 			writer.write("P\t");
                 		else
                 			writer.write("\t");
+                		
+                		if(subset)
+                			writer.write("S\t");
+                		else
+                			writer.write("\t");
+                		
                 	}
                 	
                 	// Fasta ID
@@ -540,6 +558,7 @@ public class ProteinInferDownloadAction extends Action {
                 yeastAbundanceStr = "";
                 currentGroupLabel = wProt.getProtein().getProteinGroupLabel();
                 parsimonious = wProt.getProtein().getIsParsimonious();
+                subset = wProt.getProtein().getIsSubset();
                 spectrumCount = wProt.getProtein().getSpectrumCount();
                 numPept = wProt.getProtein().getPeptideCount();
                 numUniqPept = wProt.getProtein().getUniquePeptideCount();
@@ -649,6 +668,11 @@ public class ProteinInferDownloadAction extends Action {
     	if(displayColumns.getShowFastaId() || displayColumns.getShowCommonName()) {
     		if(parsimonious)
     			writer.write("P\t");
+    		else
+    			writer.write("\t");
+    		
+    		if(subset)
+    			writer.write("S\t");
     		else
     			writer.write("\t");
     	}
