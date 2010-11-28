@@ -61,6 +61,13 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     	return update(sqlMapNameSpace+".updateIdPickerProtein", protein);
     }
     
+    public int updateProteinSubsetValue(int proteinferId, boolean isSubset) {
+    	Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("piProteinID", proteinferId);
+        map.put("isSubset", isSubset);
+        return super.update(sqlMapNameSpace+".updateProteinSubsetValue", map);
+    }
+    
     public int saveIdPickerProtein(GenericIdPickerProtein<?> protein) {
         int proteinId = save(protein);
         protein.setId(proteinId);

@@ -18,6 +18,8 @@ public interface GenericIdPickerProteinDAO <P extends GenericIdPickerProtein<?>>
     
     public abstract int updateIdPickerProteinOnly(GenericIdPickerProtein<?> protein);
     
+    public abstract int updateProteinSubsetValue(int proteinferId, boolean isSubset);
+    
     public abstract boolean proteinPeptideGrpAssociationExists(int pinferId, int proteinGrpLabel, int peptideGrpLabel);
     
     public abstract void saveProteinPeptideGroupAssociation(int pinferId, int proteinGrpLabel, int peptideGrpLabel);

@@ -499,6 +499,12 @@
     	INSERT INTO IDPickerSubsetProtein (subsetProteinID, superProteinID) VALUES (#subsetProteinId#, #superProteinId#)
     </insert>
     
+    <update id="updateProteinSubsetValue" parameterClass="java.util.Map">
+    	UPDATE IDPickerProtein 
+    	SET isSubset=#isSubset#
+    	WHERE piProteinID=#piProteinID#
+    </update>
+    
     <update id="updateIdPickerProtein" parameterClass="IdPickerProteinBase">
     	UPDATE IDPickerProtein 
     	SET clusterLabel=#clusterLabel#,
