@@ -203,8 +203,10 @@ function validateFormForAnalysisInput() {
     		<span style="color: red; font-size: 8pt;"><bean:write name="param" property="notes" /></span>
     	</logic:present>
     	<logic:equal name="param" property="newOption" value="true">
-    		<a href="" onclick="openInformationPopup('<yrcwww:link path='pages/internal/docs/proteinInference.jsp#PI_OPTIONS'/>'); return false;">
-   				<img src="<yrcwww:link path='images/new_21.gif'/>" align="bottom" border="2" style="background:yellow; border-color:orange;"/></a>
+    		<a href="" onclick="openInformationPopup('pages/internal/docs/proteinInference.jsp#PI_OPTIONS'); return false;">
+   				<img src="images/new_21.gif" align="bottom" border="2" style="background:yellow; border-color:orange;"/></a>
+   			<a href="" onclick="openInformationPopup('pages/internal/docs/proteinInference.jsp#PI_OPTIONS'); return false;">
+   				<img src="images/info_16.png" align="bottom" border="0"/></a>
     	</logic:equal>
     </td>
     
