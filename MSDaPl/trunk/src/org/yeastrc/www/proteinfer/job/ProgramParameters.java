@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.protinfer.ProgramParam;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
+import org.yeastrc.ms.domain.protinfer.ProgramParam.ParamMaker;
 import org.yeastrc.ms.domain.protinfer.ProgramParam.TYPE;
 
 public class ProgramParameters {
@@ -101,8 +102,17 @@ public class ProgramParameters {
         private String notes;
         private String value;
         private String[] values; // used for radiobox / list options
+        private boolean newOption = false;
         
-        public String getValue() {
+        public boolean isNewOption() {
+			return newOption;
+		}
+
+		public void setNewOption(boolean newOption) {
+			this.newOption = newOption;
+		}
+
+		public String getValue() {
             return value;
         }
 
@@ -133,6 +143,12 @@ public class ProgramParameters {
                 this.type = "radio";
             else 
                 this.type="text";
+            if(param.getName().equals(ParamMaker.makeRefreshPeptideProteinMatchParam().getName()) ||
+               param.getName().equals(ParamMaker.makeDoItoLSubstitutionParam().getName()) ||
+               param.getName().equals("peptide_qval_percolator") ||
+               param.getName().equals("peptide_pep_percolator")) {
+            	this.newOption = true;
+            }
         }
         
         public void updateDefaults(ProgramParam param) {

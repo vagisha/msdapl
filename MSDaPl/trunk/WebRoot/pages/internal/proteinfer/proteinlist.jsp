@@ -10,7 +10,16 @@
 		<td valign="top">
 		<table CELLPADDING="5px" CELLSPACING="2px" align="center" style="border: 1px solid gray;">
 			<tr>
-				<td style="border: 1px dotted #AAAAAA;" align="center">&nbsp;</td>
+				<td style="border: 1px dotted #AAAAAA;" align="center">
+				
+				<a href="" onclick="openInformationPopup('pages/internal/docs/proteinInference.jsp#PI_PARSIM_SUBSET'); return false;">
+   				<img src="images/new_21.gif" align="bottom" border="2" style="background:yellow; border-color:orange;"/></a>
+   				
+   				<a href="" onclick="openInformationPopup('pages/internal/docs/proteinInference.jsp#PI_PARSIM_SUBSET'); return false;">
+   				<img src="images/info_16.png" align="bottom" border="0"/></a>
+   				
+   				
+				</td>
 				<td style="border: 1px dotted #AAAAAA;font-weight:bold;" align="center"># Groups (# Proteins)</td>
 				<td style="border: 1px dotted #AAAAAA;font-weight:bold;" align="center">Parsimonious<br/># Groups (# Proteins)</td>
 				<logic:equal name="resultSummary" property="hasSubsetInformation" value="true">

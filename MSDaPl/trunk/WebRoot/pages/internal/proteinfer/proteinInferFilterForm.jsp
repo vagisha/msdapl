@@ -206,7 +206,11 @@ function saveDisplayColumnsCookie() {
   </logic:notPresent>
   
   <tr>
-  	<td colspan="2">Exlcude: </td>
+  	<td colspan="2" rowspan="2">Exlcude: <br/>
+  	<a href="" onclick="openInformationPopup('pages/internal/docs/proteinInference.jsp#PI_PARSIM_SUBSET'); return false;">
+   		<img src="images/new_21.gif" align="bottom" border="2" style="background:yellow; border-color:orange;"/></a>
+   				
+  	</td>
   	<td>
   		<nobr>
   		<html:checkbox name="proteinInferFilterForm" property="excludeParsimoniousProteins">Parsimonious</html:checkbox>
@@ -219,7 +223,6 @@ function saveDisplayColumnsCookie() {
   	</td>
   </tr>
   <tr>
-  	<td colspan="2"></td>
   	<td>
   		<nobr>
   		<html:checkbox name="proteinInferFilterForm" property="excludeNonSubsetProteins" >Non-Subset</html:checkbox>
