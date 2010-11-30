@@ -63,7 +63,7 @@ public class ProjectsSearcher {
             boolean haveConstraint = false;
             String sqlStr = "SELECT P.projectID, P.projectSubmitDate ";
             sqlStr += "FROM tblProjects AS P ";
-            sqlStr += "INNER JOIN projectResearcher AS PR ON P.projectID = PR.projectID ";
+            sqlStr += "LEFT OUTER JOIN projectResearcher AS PR ON P.projectID = PR.projectID ";
             sqlStr += "LEFT OUTER JOIN tblResearchers AS RPI ON RPI.researcherID = P.projectPI ";
             sqlStr += "LEFT OUTER JOIN tblResearchers AS R ON R.researcherID = PR.researcherID";
             

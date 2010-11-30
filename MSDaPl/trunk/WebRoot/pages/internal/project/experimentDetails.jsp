@@ -35,8 +35,11 @@
 				<tr>	
 					<td><b>Date Uploaded: </b></td>
 					<td style="padding-left:10">
-						<bean:write name="experiment" property="uploadDate"/> &nbsp; &nbsp;
-						<span class="clickable underline" style="color:red; font-weight:bold;" onClick="confirmDeleteExperiment('<bean:write name="experiment" property="id"/>')">[Delete Experiment]</span>
+						<bean:write name="experiment" property="uploadDate"/> 
+						<logic:equal name="writeAccess" value="true">
+							&nbsp; &nbsp;
+							<span class="clickable underline" style="color:red; font-weight:bold;" onClick="confirmDeleteExperiment('<bean:write name="experiment" property="id"/>')">[Delete Experiment]</span>
+						</logic:equal>
 					</td>
 				</tr>
 				<tr>

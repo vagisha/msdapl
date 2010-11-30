@@ -208,7 +208,7 @@ function saveDisplayColumnsCookie() {
   <tr>
   	<td colspan="2" rowspan="2">Exlcude: <br/>
   	<a href="" onclick="openInformationPopup('pages/internal/docs/proteinInference.jsp#PI_PARSIM_SUBSET'); return false;">
-   		<img src="images/new_21.gif" align="bottom" border="2" style="background:yellow; border-color:orange;"/></a>
+   		<img src="<yrcwww:link path="images/new_21.gif"/>" align="bottom" border="2" style="background:yellow; border-color:orange;"/></a>
    				
   	</td>
   	<td>

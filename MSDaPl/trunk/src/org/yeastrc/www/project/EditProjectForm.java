@@ -60,9 +60,9 @@ public class EditProjectForm extends ActionForm {
 		}
 		
 		// need at least one researcher
-		if (validResearcherCount() < 1) {
-            errors.add("researchers", new ActionMessage("error.project.noresearchers"));
-    }
+//		if (validResearcherCount() < 1) {
+//            errors.add("researchers", new ActionMessage("error.project.noresearchers"));
+//		}
 
 		if (this.getTitle() == null || this.getTitle().length() < 1) {
             errors.add("title", new ActionMessage("error.project.notitle"));

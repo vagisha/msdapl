@@ -86,25 +86,40 @@ public class Project implements Comparable<Project> {
 	/**
 	 * Determine whether or not a Researcher has READ access to this project, that is
 	 * are they affiliated with the project.
+	 * researchers have read access if:
+	 * 1. researcher is an administrator
+	 * 2. researcher is the project PI
+	 * 3. researcher is listed as a researcher on the project
+	 * 4. researcher is a member of one of the groups associated with the project
 	 * @param researcher The Researcher to check
 	 * @return true if they have access, false if not
 	 */
 	public boolean checkReadAccess(Researcher researcher) {		
 		if (researcher == null) { return false; }
 		
-		// First check if this is a researcher directly affiliated with the project
+		Groups groupsMan = Groups.getInstance();
+		
+		// Admins have access to all projects.
+		if (groupsMan.isMember(researcher.getID(), "administrators"))
+			return true;
+		
+		// User has access if he/she is the project PI
 		if(this.PI != null && this.PI.equals(researcher))
 		    return true;
 		
+		// If the user is listed as a researcher on the project they have read access
 		for(Researcher r: this.researchers) {
 		    if(r != null && r.equals(researcher))
 		        return true;
 		}
 		
-		// If the researcher is in a member of any of the groups, then they should have read access to the project
-		Groups groupsMan = Groups.getInstance();
-		if (groupsMan.isInAGroup(researcher.getID()))
-			return true;
+		// If the user is a member of one of the groups associated with the project
+		// they have read access
+		String[] tGroups = this.getGroupsArray();
+		for (int i = 0; i < tGroups.length; i++) {
+			if (groupsMan.isMember(researcher.getID(), tGroups[i]))
+				return true;
+		}
 		
 		// Access -DENIED-
 		return false;
@@ -112,39 +127,33 @@ public class Project implements Comparable<Project> {
 	
 	
 	/**
-	 * Determine whether or not a Researcher has access to this project, that is
-	 * are they affiliated with the project.
+	 * Determine whether or not a Researcher has write access to this project.
+	 * researchers have read access if:
+	 * 1. researcher is an administrator
+	 * 2. researcher is the project PI
+	 * 3. researcher is listed as a researcher on the project
 	 * @param researcher The Researcher to check
 	 * @return true if they have access, false if not
 	 */
 	public boolean checkAccess(Researcher researcher) {		
 	    
-	    // TODO write access to entire group should be made an option in the interface.
-	    // Till then only read access is given to the group
 		if (researcher == null) { return false; }
 		
-		// First check if this is a researcher directly affiliated with the project
-		if(this.PI != null && this.PI.equals(researcher))
-            return true;
-        
-        for(Researcher r: this.researchers) {
-            if(r != null && r.equals(researcher))
-                return true;
-        }
-		
-		// Now check whether or not this is a site administrator with access to this project.
 		Groups groupsMan = Groups.getInstance();
 		
 		// Admins have access to all projects.
 		if (groupsMan.isMember(researcher.getID(), "administrators"))
 			return true;
 		
-		// Now check for access to the actual groups with which this project is affiliated
-//		String[] tGroups = this.getGroupsArray();
-//		for (int i = 0; i < tGroups.length; i++) {
-//			if (groupsMan.isMember(researcher.getID(), tGroups[i]))
-//				return true;
-//		}
+		// User has write access if he/she is the project PI
+		if(this.PI != null && this.PI.equals(researcher))
+		    return true;
+		
+		// If the user is listed as a researcher on the project they have write access
+		for(Researcher r: this.researchers) {
+		    if(r != null && r.equals(researcher))
+		        return true;
+		}
 		
 		// Access -DENIED-
 		return false;

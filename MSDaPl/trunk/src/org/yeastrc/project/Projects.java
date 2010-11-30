@@ -98,7 +98,7 @@ public class Projects {
 	 * @param researcherID The researcher ID of the YRC member
 	 * @return A list of new projects (within the last 30 days) for this member's groups, null if this is not a YRC member
 	 */
-	public static List getNewProjectsForYRCMember(Researcher r) throws SQLException {
+	public static List<Project> getNewProjectsForYRCMember(Researcher r) throws SQLException {
 		int researcherID = r.getID();
 		Groups gm = Groups.getInstance();
 
@@ -123,7 +123,7 @@ public class Projects {
 			}
 		}
 
-		List projects = ps.search();
+		List<Project> projects = ps.search();
 		return projects;
 	}
 	
@@ -143,9 +143,10 @@ public class Projects {
 		try{
 			// Our SQL statement
 		    String sqlStr = "SELECT DISTINCT  p.projectID "+
-		    "FROM tblProjects AS p, projectResearcher AS pr "+
-		    "WHERE p.projectID = pr.projectID "+
-		    "AND (p.projectPI = ? OR pr.researcherID = ?) "+
+		    "FROM tblProjects AS p " +
+		    "LEFT OUTER JOIN projectResearcher AS pr "+
+		    "ON p.projectID = pr.projectID "+
+		    "WHERE (p.projectPI = ? OR pr.researcherID = ?) "+
 		    "ORDER BY p.projectID";
 			
 			stmt = conn.prepareStatement(sqlStr);

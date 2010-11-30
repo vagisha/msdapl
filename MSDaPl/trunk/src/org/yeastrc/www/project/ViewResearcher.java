@@ -61,7 +61,7 @@ public class ViewResearcher extends Action {
 		*/
 		
 		Researcher researcher = new Researcher();
-		List projects = new ArrayList();
+		List<Project> projects = new ArrayList<Project>();
 		
 		try {
 			researcher.load( Integer.parseInt( request.getParameter( "id" ) ) );
@@ -83,9 +83,9 @@ public class ViewResearcher extends Action {
 		}
 		
 		projects = Projects.getProjectsByResearcher( Integer.parseInt( request.getParameter( "id" ) ) );
-		Iterator iter = projects.iterator();
+		Iterator<Project> iter = projects.iterator();
 		while (iter.hasNext()) {
-			Project p = (Project)(iter.next());
+			Project p = iter.next();
 			if (!p.checkReadAccess( user.getResearcher() ))
 				iter.remove();
 		}

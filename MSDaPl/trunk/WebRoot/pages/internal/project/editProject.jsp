@@ -54,7 +54,12 @@ function addResearcher() {
 	newRow += " <a href='javascript:confirmRemoveResearcher("+lastResearcherIndex+")' style='color:red; font-size:8pt;'>[Remove]</a>";
 	newRow += "</td>";
 	newRow +="</tr>";
-	$("#researcherRow_"+(lastResearcherIndex-1)).after(newRow);
+	if(lastResearcherIndex == 0) {
+		$("#pi_row").after(newRow);
+	}
+	else {
+		$("#researcherRow_"+(lastResearcherIndex-1)).after(newRow);
+	}
 	lastResearcherIndex++;
 }
 
@@ -70,7 +75,7 @@ function addResearcher() {
   
   <TABLE CELLPADDING="no" CELLSPACING="0" width="90%" align="center">
 
-   <TR>
+   <TR id="pi_row">
     <TD WIDTH="25%" VALIGN="top">PI:</TD>
     <TD WIDTH="75%" VALIGN="top">
     
@@ -83,6 +88,7 @@ function addResearcher() {
    </TR>
    
    <logic:iterate id="researcher" property="researcherList" name="editProjectForm" indexId="cnt">
+   <!-- index is 0-based -->
    <tr id="researcherRow_<%=cnt%>" >
    	<TD WIDTH="25%" VALIGN="top">Researcher:</TD>
    	<td WIDTH="25%" VALIGN="top">

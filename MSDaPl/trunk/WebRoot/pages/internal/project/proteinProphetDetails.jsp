@@ -19,6 +19,9 @@
 		<tbody>
 		<logic:iterate name="experiment" property="proteinProphetRuns" id="prpRun" type="org.yeastrc.experiment.ExperimentProteinProphetRun">
 			<tr>
+			
+			<!-- bookmark link is editable -->
+			<logic:equal name="writeAccess" value="true">
 			<logic:equal name="prpRun" property="isBookmarked" value="true">
 				<td valign="top"><img alt="B" class="clickable has_bookmark"
 						src="<yrcwww:link path="images/bookmark.png"/>"
@@ -33,6 +36,21 @@
 						onclick="javascript:editBookmark(this, <bean:write name='prpRun' property='proteinProphetRun.id'/>)"/>
 				</td>
 			</logic:equal>
+			</logic:equal>
+			
+			
+			<!-- bookmark link is NOT editable -->
+			<logic:equal name="writeAccess" value="false">
+				<logic:equal name="prpRun" property="isBookmarked" value="true">
+				<td valign="top"><img alt="B" src="<yrcwww:link path="images/bookmark.png"/>"/>
+				</td>
+				</logic:equal>
+				<logic:equal name="prpRun" property="isBookmarked" value="false">
+				<td valign="top"><img alt="B" src="<yrcwww:link path="images/no_bookmark.png"/>"/>
+				</td>
+				</logic:equal>
+			</logic:equal>
+			
 			<td valign="top"><b><bean:write name="prpRun" property="proteinProphetRun.id"/></b></td>
 			<td valign="top"><bean:write name="prpRun" property="programVersionShort"/></td>
 			<td valign="top"><b><bean:write name="prpRun" property="proteinProphetRun.filename"/></b></td>

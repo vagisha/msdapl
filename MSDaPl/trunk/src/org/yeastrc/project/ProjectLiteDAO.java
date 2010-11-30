@@ -34,9 +34,10 @@ public class ProjectLiteDAO {
         try {
             
             String sql = "select p.projectID, p.projectTitle "+
-            "FROM tblProjects AS p, projectResearcher AS pr "+
-            "WHERE p.projectID = pr.projectID "+
-            "AND (p.projectPI = "+researcherId+" OR pr.researcherID = "+researcherId+")";
+            "FROM tblProjects AS p "+
+            "LEFT OUTER JOIN projectResearcher AS pr "+
+            "ON p.projectID = pr.projectID "+
+            "WHERE (p.projectPI = "+researcherId+" OR pr.researcherID = "+researcherId+")";
 
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
@@ -65,46 +66,4 @@ public class ProjectLiteDAO {
         }
         return projects;
     }
-    
-    public boolean isResearcherProject(int projectId, int researcherId) throws SQLException {
-        
-        // Get our connection to the database.
-        Connection conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
-        Statement stmt = null;
-        ResultSet rs = null;
-        
-        try {
-            
-            String sql = "select p.projectID "+
-            "FROM tblProjects AS p, projectResearcher AS pr "+
-            "WHERE p.projectID = pr.projectID "+"AND p.projectID="+projectId+
-            " AND (p.projectPI = "+researcherId+" OR pr.researcherID = "+researcherId+") ";
-            
-
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-            if(rs.next()) {
-               return true;
-            }
-            else
-            	return false;
-        }
-        finally {
-            // Always make sure result sets and statements are closed,
-            // and the connection is returned to the pool
-            if (rs != null) {
-                try { rs.close(); } catch (SQLException e) { ; }
-                rs = null;
-            }
-            if (stmt != null) {
-                try { stmt.close(); } catch (SQLException e) { ; }
-                stmt = null;
-            }
-            if (conn != null) {
-                try { conn.close(); } catch (SQLException e) { ; }
-                conn = null;
-            }
-        }
-    }
-    
 }

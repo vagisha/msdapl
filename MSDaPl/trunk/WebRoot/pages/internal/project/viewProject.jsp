@@ -115,8 +115,10 @@
 
  
   <div>
-  	<input type="button" class="plain_button" value="Edit Project" onClick="goEdit()">
-
+  	<logic:equal name="writeAccess" value="true" scope="request">
+  		<input type="button" class="plain_button" value="Edit Project" onClick="goEdit()">
+	</logic:equal>
+	
 	<logic:equal name="showMSDataUpload" value="true" scope="request">
 	  	<input type="button" class="plain_button" value="Upload Data" onClick="goMSUpload()">
 	</logic:equal>

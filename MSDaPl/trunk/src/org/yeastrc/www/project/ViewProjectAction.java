@@ -57,10 +57,8 @@ import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
-import org.yeastrc.project.Researcher;
 import org.yeastrc.www.proteinfer.job.ProteinInferJobSearcher;
 import org.yeastrc.www.proteinfer.job.ProteinferJob;
-import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.yates.YatesRun;
@@ -182,25 +180,10 @@ public class ViewProjectAction extends Action {
 
 		
 		// Should the user be able to upload data to this project.
-		Groups groupMan = Groups.getInstance();
-		boolean showUpload = false;
-		if(groupMan.isMember( user.getResearcher().getID(), "administrators" ) ) {
-		    showUpload = true;
-		}
-		else {
-		    int userId = user.getResearcher().getID();
-		    for(Researcher researcher: project.getResearchers()) {
-		        
-		        if(researcher.getID() == userId) {
-		            showUpload = true; 
-		            break;
-		        }
-		    }
-		}
-
-		if(showUpload)
-		    request.setAttribute( "showMSDataUpload", true );
-
+        // If the user has write access to the project he/she should be able to upload data
+        if(writeAccess)
+        	request.setAttribute( "showMSDataUpload", true );
+        
 
 		// Set a list of available instruments in the request. 
 		List<MsInstrument> instrumentList = DAOFactory.instance().getInstrumentDAO().loadAllInstruments();

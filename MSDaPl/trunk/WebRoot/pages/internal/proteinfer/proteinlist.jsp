@@ -1,6 +1,7 @@
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
+<%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 
 
 
@@ -13,10 +14,10 @@
 				<td style="border: 1px dotted #AAAAAA;" align="center">
 				
 				<a href="" onclick="openInformationPopup('pages/internal/docs/proteinInference.jsp#PI_PARSIM_SUBSET'); return false;">
-   				<img src="images/new_21.gif" align="bottom" border="2" style="background:yellow; border-color:orange;"/></a>
+   				<img src="<yrcwww:link path="images/new_21.gif"/>" align="bottom" border="2" style="background:yellow; border-color:orange;"/></a>
    				
    				<a href="" onclick="openInformationPopup('pages/internal/docs/proteinInference.jsp#PI_PARSIM_SUBSET'); return false;">
-   				<img src="images/info_16.png" align="bottom" border="0"/></a>
+   				<img src="<yrcwww:link path="images/info_16.png"/>" align="bottom" border="0"/></a>
    				
    				
 				</td>

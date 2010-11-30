@@ -88,13 +88,15 @@
 
 <!-- SEARCH ANALYSES FOR THE EXPERIMENT -->
 <logic:notEmpty name="experiment" property="analyses">
-	
+
+<logic:equal name="writeAccess" value="true">	
 <div>
 <logic:equal name="experiment" property="analysisProgramName" value="<%=Program.PERCOLATOR.displayName() %>">
 	&nbsp;&nbsp;
 	<span class="clickable underline" style="color:red; font-weight:bold;" onClick="viewPercolatorUploadForm('<bean:write name="experiment" property="id"/>')">[Add Percolator Results]</span>
 </logic:equal>
 </div>
+</logic:equal>
 
 	<!-- !!!!!! PERCOLATOR !!!!!! -->
 	<logic:equal name="experiment" property="analysisProgramName" value="<%=Program.PERCOLATOR.displayName() %>">
@@ -108,6 +110,7 @@
 				<td  valign="middle" width="10%"><b>Percolator <bean:write name="analysis" property="analysisProgramVersionShort"/></b></td>
 				<td valign="middle">
 					<span id="analysis_<bean:write name='analysis' property='id'/>_text"><bean:write name="analysis" property="comments"/></span>
+					<logic:equal name="writeAccess" value="true">
 					<logic:notEmpty name="analysis" property="comments">
 						<span class="underline clickable small_font editableComment" style="color:red;"
 						id="analysis_<bean:write name='analysis' property='id'/>"
@@ -118,6 +121,7 @@
 						id="analysis_<bean:write name='analysis' property='id'/>"
 						title="expt_<bean:write name='experiment' property='id'/>" >[Add Comments]</span>
 					</logic:empty>
+					</logic:equal>
 				</td>
 				<logic:equal name="analysis" property="complete" value="true">
 					<td valign="middle">

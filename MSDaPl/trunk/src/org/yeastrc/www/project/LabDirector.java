@@ -10,8 +10,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.db.DBConnectionManager;
@@ -35,20 +33,23 @@ public class LabDirector {
 	
 	public static int getMacCoss() {
 		if(MACCOSS == 0) {
-			List<Integer> idsForMacCoss = getUserId("MacCoss");
-			if(idsForMacCoss.size() == 0) {
-				log.error("No ID found for MacCoss");
+			int groupId;
+			try {
+				groupId = Groups.getInstance().getGroupID(Projects.MACCOSS);
+			} catch (SQLException e) {
+				log.error("Error getting groupID form : "+Projects.MACCOSS, e);
+				return 0;
 			}
-			else if(idsForMacCoss.size() > 1) {
-				log.error("Multiple IDs found for MacCoss");
+			int userId = getLabDirector(groupId);
+			if(userId == 0) {
+				log.error("No Lab Director found for group MacCoss");
 			}
 			else {
-				int id = idsForMacCoss.get(0);
-				if (Groups.getInstance().isMember(id, Projects.MACCOSS)) {
-					MACCOSS = id;
+				if (Groups.getInstance().isMember(userId, Projects.MACCOSS)) {
+					MACCOSS = userId;
 				}
 				else {
-					log.error("User with last name MacCoss is not a member of MacCoss group");
+					log.error("Lab director for MacCoss group not a member of MacCoss group");
 				}
 			}
 		}
@@ -58,21 +59,23 @@ public class LabDirector {
 	public static int getGoodlett() {
 		
 		if(GOODLETT == 0) {
-			
-			List<Integer> idsForGoodlett = getUserId("Goodlett");
-			if(idsForGoodlett.size() == 0) {
-				log.error("No ID found for Goodlett");
+			int groupId;
+			try {
+				groupId = Groups.getInstance().getGroupID(Projects.GOODLETT);
+			} catch (SQLException e) {
+				log.error("Error getting groupID form : "+Projects.GOODLETT, e);
+				return 0;
 			}
-			else if(idsForGoodlett.size() > 1) {
-				log.error("Multiple IDs found for Goodlett");
+			int userId = getLabDirector(groupId);
+			if(userId == 0) {
+				log.error("No Lab Director found for group Goodlett");
 			}
 			else {
-				int id = idsForGoodlett.get(0);
-				if (Groups.getInstance().isMember(id, Projects.GOODLETT)) {
-					GOODLETT = id;
+				if (Groups.getInstance().isMember(userId, Projects.GOODLETT)) {
+					GOODLETT = userId;
 				}
 				else {
-					log.error("User with last name Goodlett is not a member of Goodlett group");
+					log.error("Lab director for Goodlett group not a member of Goodlett group");
 				}
 			}
 		}
@@ -81,21 +84,23 @@ public class LabDirector {
 	
 	public static int getBruce() {
 		if(BRUCE == 0) {
-			
-			List<Integer> idsForBruce = getUserId("Bruce");
-			if(idsForBruce.size() == 0) {
-				log.error("No ID found for Bruce");
+			int groupId;
+			try {
+				groupId = Groups.getInstance().getGroupID(Projects.BRUCE);
+			} catch (SQLException e) {
+				log.error("Error getting groupID form : "+Projects.BRUCE, e);
+				return 0;
 			}
-			else if(idsForBruce.size() > 1) {
-				log.error("Multiple IDs found for Bruce");
+			int userId = getLabDirector(groupId);
+			if(userId == 0) {
+				log.error("No Lab Director found for group Bruce");
 			}
 			else {
-				int id = idsForBruce.get(0);
-				if (Groups.getInstance().isMember(id, Projects.BRUCE)) {
-					BRUCE = id;
+				if (Groups.getInstance().isMember(userId, Projects.BRUCE)) {
+					BRUCE = userId;
 				}
 				else {
-					log.error("User with last name Bruce is not a member of Bruce group");
+					log.error("Lab director for Bruce group not a member of Bruce group");
 				}
 			}
 		}
@@ -104,28 +109,31 @@ public class LabDirector {
 	
 	public static int getVillen() {
 		if(VILLEN == 0) {
-			
-			List<Integer> idsForVillen = getUserId("Villen");
-			if(idsForVillen.size() == 0) {
-				log.error("No ID found for Villen");
+			int groupId;
+			try {
+				groupId = Groups.getInstance().getGroupID(Projects.VILLEN);
+			} catch (SQLException e) {
+				log.error("Error getting groupID form : "+Projects.VILLEN, e);
+				return 0;
 			}
-			else if(idsForVillen.size() > 1) {
-				log.error("Multiple IDs found for Villen");
+			int userId = getLabDirector(groupId);
+			if(userId == 0) {
+				log.error("No Lab Director found for group Villen");
 			}
 			else {
-				int id = idsForVillen.get(0);
-				if (Groups.getInstance().isMember(id, Projects.VILLEN)) {
-					VILLEN = id;
+				if (Groups.getInstance().isMember(userId, Projects.VILLEN)) {
+					VILLEN = userId;
 				}
 				else {
-					log.error("User with last name Villen is not a member of Villen group");
+					log.error("Lab director for Villen group not a member of Villen group");
 				}
 			}
 		}
 		return VILLEN;
 	}
 	
-	private static List<Integer> getUserId(String lastName) {
+	
+	private static int getLabDirector(int groupId) {
 		
 		// Get our connection to the database.
 		Connection conn = null;
@@ -135,19 +143,18 @@ public class LabDirector {
 		try {
 			conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
 			stmt = conn.createStatement();
-			String sql = "SELECT researcherID from tblResearchers WHERE researcherLastName = \""+lastName+"\"";
+			String sql = "SELECT researcherID FROM tblLabDirector WHERE groupID = "+groupId;
 			rs = stmt.executeQuery(sql);
 
-			List<Integer> ids = new ArrayList<Integer>();
-			while (rs.next()) {
-				ids.add(rs.getInt("researcherID"));
+			if (rs.next()) {
+				return rs.getInt("researcherID");
 			}
-			
-			return ids;
+			else
+				return 0;
 		}
 		catch(SQLException e) {
-			log.error("Error getting Lab director with name: "+lastName, e);
-			return new ArrayList<Integer>(0);
+			log.error("Error getting Lab director for groupID: "+groupId, e);
+			return 0;
 		}
 		finally {
 

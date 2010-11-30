@@ -19,22 +19,42 @@
 		<tbody>
 		<logic:iterate name="analysis" property="protInferRuns" id="piRun" type="org.yeastrc.experiment.ExperimentProteinferRun">
 			<tr>
+			<!-- Protein inference job is complete -->
 			<logic:equal name="piRun" property="job.complete" value="true">
-			<logic:equal name="piRun" property="isBookmarked" value="true">
+			
+			<!-- bookmark link is editable -->
+			<logic:equal name="writeAccess" value="true">
+				<logic:equal name="piRun" property="isBookmarked" value="true">
 				<td valign="top"><img alt="B" class="clickable has_bookmark"
 						src="<yrcwww:link path="images/bookmark.png"/>"
 						id="expt_piRun_<bean:write name='piRun' property='job.pinferId'/>"
 						onclick="editBookmark(this, <bean:write name='piRun' property='job.pinferId'/>)"/>
 				</td>
-			</logic:equal>
-			<logic:equal name="piRun" property="isBookmarked" value="false">
+				</logic:equal>
+				<logic:equal name="piRun" property="isBookmarked" value="false">
 				<td valign="top"><img alt="B" class="clickable no_bookmark"
 						src="<yrcwww:link path="images/no_bookmark.png"/>"
 						id="expt_piRun_<bean:write name='piRun' property='job.pinferId'/>"
 						onclick="javascript:editBookmark(this, <bean:write name='piRun' property='job.pinferId'/>)"/>
 				</td>
+				</logic:equal>
+			</logic:equal>
+			
+			<!-- bookmark link is NOT editable -->
+			<logic:equal name="writeAccess" value="false">
+				<logic:equal name="piRun" property="isBookmarked" value="true">
+				<td valign="top"><img alt="B" src="<yrcwww:link path="images/bookmark.png"/>"/>
+				</td>
+				</logic:equal>
+				<logic:equal name="piRun" property="isBookmarked" value="false">
+				<td valign="top"><img alt="B" src="<yrcwww:link path="images/no_bookmark.png"/>"/>
+				</td>
+				</logic:equal>
 			</logic:equal>
 			</logic:equal>
+			
+			
+			<!-- Protein inference job is NOT complete -->
 			<logic:equal name="piRun" property="job.complete" value="false">
 				<td>&nbsp;</td>
 			</logic:equal>
@@ -74,10 +94,14 @@
 				<nobr>
 				<a href="<yrcwww:link path='viewProteinInferenceResult.do?'/>pinferId=<bean:write name='piRun' property='job.pinferId'/>">
 				<b><font color="green">View</font></b></a>
+				
+				<logic:equal name="writeAccess" value="true">
 				&nbsp;
 				<span class="clickable" style="text-decoration: underline; color:red;" 
 				      onclick="javascript:deleteProtInferRun(<bean:write name='piRun' property='job.pinferId'/>);">Delete</span>
 				</nobr>
+				</logic:equal>
+				
 				<yrcwww:member group="administrators">
 				&nbsp;
 				<span class="clickable" style="text-decoration: underline; color:red;" 

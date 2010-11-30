@@ -12,6 +12,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
@@ -34,6 +35,8 @@ import org.yeastrc.www.user.UserUtils;
  */
 public class DeleteExperimentAction extends Action {
 
+	private static final Logger log = Logger.getLogger(DeleteExperimentAction.class);
+	
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -66,7 +69,7 @@ public class DeleteExperimentAction extends Action {
             errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.invalid.id", 
                     "deleting experiment: "+strId));
             saveErrors( request, errors );
-            return mapping.findForward("Failure");
+            return mapping.findForward("standardHome");
         }
         
         int projectId = ProjectExperimentDAO.instance().getProjectIdForExperiment(experimentId);
@@ -88,7 +91,10 @@ public class DeleteExperimentAction extends Action {
             ActionErrors errors = new ActionErrors();
             errors.add("project", new ActionMessage("error.project.noaccess"));
             saveErrors( request, errors );
-            return mapping.findForward("Failure");
+            ActionForward failure = mapping.findForward("Failure") ;
+            failure = new ActionForward( failure.getPath() + "?ID="+projectId,
+            		failure.getRedirect());
+            return failure;
         }
         
         // Make sure this experimentID is not currently being uploaded
@@ -102,11 +108,27 @@ public class DeleteExperimentAction extends Action {
                 errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
                         "Experiment ID "+experimentId+" cannot be deleted. It is still being uploaded."));
                 saveErrors( request, errors );
-                return mapping.findForward("standardHome");
+                ActionForward failure = mapping.findForward("Failure") ;
+                failure = new ActionForward( failure.getPath() + "?ID="+projectId,
+                		failure.getRedirect());
+                
+                return failure;
             }
             
         }
-        catch(Exception e) {;} // because job with experimentID does not exist. Should not really happen.
+        catch(Exception e) { // because job with experimentID does not exist. Should not really happen.
+        	ActionErrors errors = new ActionErrors();
+            errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
+                    "Error getting job for experiment ID "+experimentId+" Error Message: "+e.getMessage()));
+            saveErrors( request, errors );
+            
+            log.error("Error getting job for experimentID: "+experimentId, e);
+            
+        	ActionForward failure = mapping.findForward("Failure") ;
+            failure = new ActionForward( failure.getPath() + "?ID="+projectId,
+            		failure.getRedirect());
+            return failure;
+        } 
         
         // Make sure there are no running protein inference jobs for this experiment
         List<ProteinferJob> piJobs = ProteinInferJobSearcher.getInstance().getProteinferJobsForMsExperiment(experimentId);
@@ -119,7 +141,11 @@ public class DeleteExperimentAction extends Action {
                              "Experiment ID "+experimentId+" cannot be deleted. "+
                              "There are unfinished Protein Inference jobs."));
                      saveErrors( request, errors );
-                     return mapping.findForward("standardHome");
+                     
+                     ActionForward failure = mapping.findForward("Failure") ;
+                     failure = new ActionForward( failure.getPath() + "?ID="+projectId,
+                     		failure.getRedirect());
+                     return failure;
                  }
         }
         
@@ -133,7 +159,11 @@ public class DeleteExperimentAction extends Action {
             errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
                     "Error deleting experiment ID "+experimentId+". "+e.getMessage()));
             saveErrors( request, errors );
-            return mapping.findForward("standardHome");
+            
+            ActionForward failure = mapping.findForward("Failure") ;
+            failure = new ActionForward( failure.getPath() + "?ID="+projectId,
+            		failure.getRedirect());
+            return failure;
         }
        
         ActionForward success = mapping.findForward("Success") ;
