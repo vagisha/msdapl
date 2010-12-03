@@ -283,7 +283,7 @@ public class ViewSpectraAction extends Action {
         }
         if (fragMassType == null) {
             ActionErrors errors = new ActionErrors();
-            errors.add("spectra", new ActionMessage("error.msdata.spectra.massTypeError"));
+            errors.add("spectra", new ActionMessage("error.msdata.spectra.massTypeError", searchId));
             saveErrors( request, errors );
             return null;
         }
@@ -292,7 +292,7 @@ public class ViewSpectraAction extends Action {
         }
         if (parentMassType == null) {
             ActionErrors errors = new ActionErrors();
-            errors.add("spectra", new ActionMessage("error.msdata.spectra.massTypeError"));
+            errors.add("spectra", new ActionMessage("error.msdata.spectra.massTypeError", searchId));
             saveErrors( request, errors );
             return null;
         }
