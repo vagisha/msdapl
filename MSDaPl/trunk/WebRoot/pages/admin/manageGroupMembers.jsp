@@ -26,8 +26,12 @@
    <logic:iterate id="researcher" name="memberList">
 
     <TR>
-     <TD WIDTH="50%"><bean:write name="researcher" property="firstName"/>
-     				 <bean:write name="researcher" property="lastName"/></TD>
+     <TD WIDTH="50%">
+     <html:link action="viewResearcher.do" paramId="id" paramName="researcher" paramProperty="ID">
+     	<bean:write name="researcher" property="firstName"/>
+     	<bean:write name="researcher" property="lastName"/></TD>
+     </html:link>
+     
      <TD WIDTH="50%">
       <jsp:useBean id="params" class="java.util.HashMap"/>
 	   <%

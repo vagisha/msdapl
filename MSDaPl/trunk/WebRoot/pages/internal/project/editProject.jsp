@@ -55,7 +55,7 @@ function addResearcher() {
 	newRow += "</td>";
 	newRow +="</tr>";
 	if(lastResearcherIndex == 0) {
-		$("#pi_row").after(newRow);
+		$("#piRow").after(newRow);
 	}
 	else {
 		$("#researcherRow_"+(lastResearcherIndex-1)).after(newRow);
@@ -75,7 +75,7 @@ function addResearcher() {
   
   <TABLE CELLPADDING="no" CELLSPACING="0" width="90%" align="center">
 
-   <TR id="pi_row">
+   <TR id="piRow">
     <TD WIDTH="25%" VALIGN="top">PI:</TD>
     <TD WIDTH="75%" VALIGN="top">
     
