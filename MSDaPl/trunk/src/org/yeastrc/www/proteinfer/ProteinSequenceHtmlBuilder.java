@@ -39,14 +39,24 @@ public class ProteinSequenceHtmlBuilder {
         Map<Integer, Integer> atResidues = new HashMap<Integer, Integer>();         // residues marked with a @
         Map<Integer, Integer> hashResidues = new HashMap<Integer, Integer>();       // residues marked with a #
 
-        // remove '*' characters from the protein sequence
-        sequence = sequence.replaceAll("\\*", "");
+        
         
         String altSequence = sequence;
+        // remove '*' characters from the protein sequence
+        altSequence = altSequence.replaceAll("\\*", "");
+        Map<Integer, Integer> indexMap = null;
+        boolean hasAsterisk = false;
+        if(sequence.length() > altSequence.length()) {
+        	indexMap = makeIndexMap(sequence, altSequence);
+        	hasAsterisk = true;
+        }
+        
+        
         // Replace all 'L' with '1'
         altSequence = altSequence.replaceAll("L", "1");
         // Replace all "I" with "1"
         altSequence = altSequence.replaceAll("I", "1");
+        
         
         //  Add in font tags for labelling covered sequences in the parent sequence
         for( String peptideSequence : peptideSequences ) {
@@ -70,24 +80,41 @@ public class ProteinSequenceHtmlBuilder {
         			break;
         		
         		lastMatchIndex = pepIndex + altPeptide.length();
-            
+        		
+        		// If there were '*' characters in the original sequence, get the actual index 
+        		// in the original sequence (with all the '*' characters).
+        		Integer origSIndex = null;
+        		Integer origEIndex = null;
+        		if(hasAsterisk) {
+        			origSIndex = indexMap.get(pepIndex);
+        			if(origSIndex == null)
+        				throw new ProteinSequenceHtmlBuilderException("Error mapping indices in protein sequence for peptide: "+peptideSequence);
+        			origEIndex = indexMap.get(pepIndex + peptideSequence.length() - 1);
+        			if(origEIndex == null)
+        				throw new ProteinSequenceHtmlBuilderException("Error mapping indices in protein sequence for peptide: "+peptideSequence);
+        		}
+        		else {
+        			origSIndex = pepIndex;
+        			origEIndex = origSIndex + peptideSequence.length() - 1;
+        		}
+        		
 
-        		if (pepIndex > residues.length - 1)  { //shouldn't happen
+        		if (origSIndex > residues.length - 1)  { //shouldn't happen
         			throw new ProteinSequenceHtmlBuilderException("Matching index out of bounds for peptide: "+peptideSequence);
         		}
 
         		// Place a red font start at beginning of this sub sequence in main sequence
-        		residues[pepIndex] = "<span class=\"covered_peptide\">" + residues[pepIndex];
+        		residues[origSIndex] = "<span class=\"covered_peptide\">" + residues[origSIndex];
 
         		// this means that the sub-peptide extends beyond the main peptide's sequence... shouldn't happen but check for it
-        		if (pepIndex + peptideSequence.length() > residues.length) {
+        		if (origEIndex > residues.length) {
         			throw new ProteinSequenceHtmlBuilderException("Peptide ("+peptideSequence+") match extends beyond length of protein");
         			// just stop the red font at the end of the main sequence string
         			//residues[residues.length - 1] = residues[residues.length - 1] + "</span>";
         		} else {
 
         			// add the font end tag after the last residue in the sub sequence
-        			residues[pepIndex + peptideSequence.length() - 1] = residues[pepIndex + peptideSequence.length() - 1] + "</span>";
+        			residues[origEIndex] = residues[origEIndex] + "</span>";
         		}
         	}
         }
@@ -126,8 +153,28 @@ public class ProteinSequenceHtmlBuilder {
         return retStr;
     }
     
-    public static void main(String[] args) throws ProteinSequenceHtmlBuilderException {
+    private Map<Integer, Integer> makeIndexMap(String origSeq,  String trimSeq) throws ProteinSequenceHtmlBuilderException {
+    	
+    	Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+    	
+    	int j = 0;
+    	for(int i = 0; i < trimSeq.length(); i++,j++) {
+    		
+    		while(origSeq.charAt(j) == '*') {
+    			j++;
+    			if(j >= origSeq.length()) {
+    				throw new ProteinSequenceHtmlBuilderException("Error building index map for protein sequence");
+    			}
+    		}
+    		map.put(i, j);
+    	}
+
+    	return map;
+	}
+
+	public static void main(String[] args) throws ProteinSequenceHtmlBuilderException {
     	String protein = "WNLASSRVPFLFRVL*SA*R*SRHQKSSAVPMGRLRAVR*IVSVLCSSAKPSSPAACRRGSCRSLTATTPCPLFQPTS*KILLPGCLMENRVHTTPNCVLSPRKRKGLGHHLTLPLSKMALQKLS*RSPKRT*TGSLSLNLPFVVTVLLMCLSQKKLDKNQNTKQEGTGRGA*NMTPCWSRALSKQLLCLRSRVLQIKRFQLRKSLVQTLEETKTTC*NTMSVIWCGPKCRVTLGGLAWFLQIHSFTAIPNLKVRKRVHASITYSSLVTPQKELGYLRRAS*LLKEKDSLKNYARKVPSRHPRKLRKLSY*NLFQGN*GPSGKWALFKQKKLQACQWRSGKPSSPFYTWGTSFISTLK*PRRLALLQSLSEKWQSPQESVKKLLKTPSLREKRAFP*REGGGPNCVALQRPWRVTPM**RVLLKRRQRLTPEEE*RLLLGGRRPQPLRHEAGREMQHPSFWSSVKNTGMRWWLSTQMLQVRRLKSCSGHSGVC*VRSRERATTPSLPWWPLSRLKKTLVT*MGKKETTQRGHRTLQKMLRLRTHPGKDSGQTSTVFGXXXXXXXXXXEQALTRPWRQPPRSRARQQRKICLMHANH*RSEIGLPRQHLQLLGLAKVHLLLHP*LRMRSRTARETSPRSPHMKVQMKHKLKCLSHPKSLSEELLPKRSTCASCVRSQAASCSVKDPAAELSTSPALGFPGGQKGGSPAASVPQGFTHVSCVKRARQMLSAVW*LSVENFTMRLV*KNTL*LYLRAEVSAAPFTAV*AATLPTLQTQGHQKVK*CGVSAAPLPITAGMLVWQQDVQ*SPPTASSALPTSLLGRGSDTTPTST*AGALCAPKGGAFCAASPAQRPSTLTA*TSRCLMAAGSATTAGLGRSCTSRISFG*NLGTTDGGRQKFAIPKMFPQIFRK*STRLENSLCFSLGLKIITGRIRRECSRTWRGTGAAATRGSEGSEESSKTHCKKLKLVFVKLSFRGKPEKHRRASASPHHTSTSR*ISLTGKSRSTQRIFQKSLSATASPQMRILVALIRSV*TGC*CLSATRRCVPQASSARTSASPSASTQRPRSSRQMAKGGAWSPRGISERENLLTSTSGS*SMRRSAWRESSTHMRTTSPTSTCSL*TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXPQRPFLQRKRAXXXXXXXXXXXXXXXXXXSQRTSASAAAMAGSWCCVTASSAPRPTTCPAWALASGPSGSGNVLGIIVTCVANLQLHFATSAPIHSVRSTRTGQPSAAPRTGRSYCCEHDLGAASVRSAKTEKPPPEPGKPKGKRRRRRGWRRVTEGK";
+    	//protein = protein.replaceAll("\\*", "");
     	Set<String> peptides = new HashSet<String>();
     	peptides.add("VKCGVSAAPLPITAGMLVWQQ");
     	
