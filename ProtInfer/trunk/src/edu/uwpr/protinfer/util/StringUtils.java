@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.yeastrc.ms.service.database.fasta.FastaInMemorySuffixCreator;
+
 
 public class StringUtils {
 
@@ -12,8 +14,14 @@ public class StringUtils {
     
     public static final int getCoveredSequenceLength(String sequence, List<String> subseqList) {
         
+    	// remove "*" from sequence and substitute 'I' and 'L' with a single character
+    	sequence = FastaInMemorySuffixCreator.format(sequence);
+    	
         List<Coordinates> coords = new ArrayList<Coordinates>(subseqList.size());
         for (String subseq: subseqList) {
+        	
+        	subseq = FastaInMemorySuffixCreator.format(subseq);
+        	
             int nextStart = 0;
             int idx;
             while((idx = sequence.indexOf(subseq, nextStart)) >= 0) {
