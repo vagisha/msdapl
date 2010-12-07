@@ -18,6 +18,7 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
     
     private char[] sequence;
     private String modifiedSequence;
+    private String modifiedSequence_massDiffOnly;
     private char preResidue = MsModification.EMPTY_CHAR;
     private char postResidue = MsModification.EMPTY_CHAR;
     
@@ -81,6 +82,7 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
     public void setDynamicResidueModifications(List<MsResultResidueMod> dynaMods) {
         this.dynaResidueMods = dynaMods;
         this.modifiedSequence = null;
+        this.modifiedSequence_massDiffOnly = null;
     }
     
     //-----------------------------------------------------------------------------------------
@@ -93,6 +95,7 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
     public void setDynamicTerminalModifications(List<MsResultTerminalMod> termDynaMods) {
         this.dynaTerminalMods = termDynaMods;
         this.modifiedSequence = null;
+        this.modifiedSequence_massDiffOnly = null;
     }
     
     /**
@@ -128,22 +131,22 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
                 seq.append(origseq.subSequence(lastIdx, origseq.length()));
             
             return seq.toString();
-//            modifiedSequence = preResidue+"."+modifiedSequence+"."+postResidue;
         }
     }
     
     /**
-     * Returns the modified peptide sequence: e.g. PEP[80]TIDE
+     * Returns the modified peptide sequence: e.g. PEP[177]TIDE
+     * The number in the square brackets is the modification mass plus the mass of the amino acid.
      * @return
      * @throws ModifiedSequenceBuilderException 
      */
+    @Override
     public String getModifiedPeptide() throws ModifiedSequenceBuilderException {
         
         if (modifiedSequence != null)
             return modifiedSequence;
         
         if (dynaResidueMods.size() == 0) {
-//            modifiedSequence = preResidue+"."+String.valueOf(sequence)+"."+postResidue;
             modifiedSequence = String.valueOf(sequence);
         }
         else {
@@ -155,6 +158,32 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
         return modifiedSequence;
     }
     
+    /**
+     * Returns the modified peptide sequence.
+     * If massDiffOnly is true, only the modification mass is displayed within the square brackets:
+     *  e.g. PEP[+80]TIDE
+     * Otherwise, the mass of the residue is added to the modification mass
+     *  e.g. PEP[177]TIDE
+     * @return 
+     * @throws ModifiedSequenceBuilderException 
+     */
+    public String getModifiedPeptide(boolean massDiffOnly) throws ModifiedSequenceBuilderException {
+    	
+    	if (modifiedSequence_massDiffOnly != null)
+            return modifiedSequence_massDiffOnly;
+        
+        if (dynaResidueMods.size() == 0) {
+            modifiedSequence_massDiffOnly = String.valueOf(sequence);
+        }
+        else {
+            
+            String origseq = String.valueOf(sequence);
+            modifiedSequence_massDiffOnly = ModifiedSequenceBuilder.buildWithDiffMass(origseq, dynaResidueMods, dynaTerminalMods);
+        }
+        
+        return modifiedSequence_massDiffOnly;
+    }
+    
     private void sortDynaResidueModifications() {
         Collections.sort(dynaResidueMods, new Comparator<MsResultResidueMod>(){
             public int compare(MsResultResidueMod o1, MsResultResidueMod o2) {
@@ -162,15 +191,41 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
             }});
     }
 
+    /**
+     * Returns the modified peptide along with the pre and post residues. e.g. K.PEP[177]TIDE.L
+     * The number in the square brackets is the modification mass plus the mass of the amino acid.
+     * @return
+     * @throws ModifiedSequenceBuilderException 
+     */
     @Override
     public String getFullModifiedPeptide() throws ModifiedSequenceBuilderException {
         String pept = getModifiedPeptide();
         return preResidue+"."+pept+"."+postResidue;
     }
 
+    /**
+     * Returns the modified peptide along with the pre and post residues. 
+     * If massDiffOnly is true, only the modification mass is displayed within the square brackets:
+     *  e.g. K.PEP[+80]TIDE.L
+     * Otherwise, the mass of the residue is added to the modification mass
+     *  e.g. K.PEP[177]TIDE.L
+     * @return
+     * @throws ModifiedSequenceBuilderException 
+     */
+    @Override
+    public String getFullModifiedPeptide(boolean massDiffOnly) throws ModifiedSequenceBuilderException {
+    	String pept = getModifiedPeptide(massDiffOnly);
+        return preResidue+"."+pept+"."+postResidue;
+    }
+    
     @Override
     public String getFullModifiedPeptidePS() {
         String pept = getModifiedPeptidePS();
         return preResidue+"."+pept+"."+postResidue;
     }
+
+	@Override
+	public boolean hasDynamicModification() {
+		return dynaResidueMods.size() > 0;
+	}
 }

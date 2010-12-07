@@ -39,21 +39,46 @@ public interface MsSearchResultPeptide {
     
     
     /**
-     * Returns the modified peptide sequence: e.g. PEP[80]TIDE
+     * Returns the modified peptide sequence: e.g. PEP[177]TIDE
+     * The number in the square brackets is the modification mass plus the mass of the amino acid.
      * @return
      * @throws ModifiedSequenceBuilderException 
      */
     public abstract String getModifiedPeptide() throws ModifiedSequenceBuilderException;
     
     /**
-     * Returns the modified peptide along with the pre and post residues
+     * Returns the modified peptide sequence.
+     * If massDiffOnly is true, only the modification mass is displayed within the square brackets:
+     *  e.g. PEP[+80]TIDE
+     * Otherwise, the mass of the residue is added to the modification mass
+     *  e.g. PEP[177]TIDE
+     * @return 
+     * @throws ModifiedSequenceBuilderException 
+     */
+    public abstract String getModifiedPeptide(boolean massDiffOnly) throws ModifiedSequenceBuilderException;
+    
+    /**
+     * Returns the modified peptide along with the pre and post residues. e.g. K.PEP[177]TIDE.L
+     * The number in the square brackets is the modification mass plus the mass of the amino acid.
      * @return
      * @throws ModifiedSequenceBuilderException 
      */
     public abstract String getFullModifiedPeptide() throws ModifiedSequenceBuilderException;
     
     /**
-     * Returns the modified peptide in a program specific format
+     * Returns the modified peptide along with the pre and post residues. 
+     * If massDiffOnly is true, only the modification mass is displayed within the square brackets:
+     *  e.g. K.PEP[+80]TIDE.L
+     * Otherwise, the mass of the residue is added to the modification mass
+     *  e.g. K.PEP[177]TIDE.L
+     * @return
+     * @throws ModifiedSequenceBuilderException 
+     */
+    public abstract String getFullModifiedPeptide(boolean massDiffOnly) throws ModifiedSequenceBuilderException;
+    
+    
+    /**
+     * Returns the modified peptide in a program specific format. 
      * @return
      */
     public abstract String getModifiedPeptidePS();
@@ -75,4 +100,6 @@ public interface MsSearchResultPeptide {
     
     
     public abstract int getSequenceLength();
+    
+    public abstract boolean hasDynamicModification();
 }

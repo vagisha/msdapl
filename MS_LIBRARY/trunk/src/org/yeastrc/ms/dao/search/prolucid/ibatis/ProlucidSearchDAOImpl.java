@@ -91,7 +91,7 @@ public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements ProlucidSear
         map.put("searchId", searchId);
         map.put("paramName", paramName);
         map.put("parentParamName", parentParamName);
-        return (String) queryForObject("SequestSearch.selectSearchParamValue", map);
+        return (String) queryForObject("ProlucidSearch.selectSearchParamValue", map);
     }
     
     @Override
