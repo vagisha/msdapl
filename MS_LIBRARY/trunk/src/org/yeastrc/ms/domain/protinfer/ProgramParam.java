@@ -180,7 +180,7 @@ public final class ProgramParam {
         public static ProgramParam makeRefreshPeptideProteinMatchParam() {
             return new ProgramParam(TYPE.BOOLEAN, 
               "refreshPeptideProteinMatches", "Refresh Protein Matches", 
-              "false", null,
+              "true", null,
               "If checked, protein matches for peptides will be re-calculated. Otherwise matches reported in SQT files will be used.");
         }
         
