@@ -197,7 +197,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         	}
         	
         	cnt++;
-        	if(cnt % 10000 == 0) {
+        	if(cnt % 1000 == 0) {
         		log.info("Peptide to protein matches found for "+cnt+" PSMs");
         	}
         }
