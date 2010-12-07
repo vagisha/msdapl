@@ -82,7 +82,8 @@ public class WIdPickerIon {
     
     public String getIonSequence() {
         try {
-            return removeTerminalResidues(bestSpectrumMatch.getResultPeptide().getModifiedPeptide());
+        	// get modified peptide of the form: PEP[+80]TIDE
+            return removeTerminalResidues(bestSpectrumMatch.getResultPeptide().getModifiedPeptide(true));
         }
         catch (ModifiedSequenceBuilderException e) {
             return null;

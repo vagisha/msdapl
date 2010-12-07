@@ -78,7 +78,8 @@ public class WProteinProphetIon {
             return null;
         String seq;
         try {
-            seq = removeTerminalResidues(getBestSpectrumMatch().getResultPeptide().getModifiedPeptide());
+        	// get modified peptide of the form: PEP[+80]TIDE
+            seq = removeTerminalResidues(getBestSpectrumMatch().getResultPeptide().getModifiedPeptide(true));
         }
         catch (ModifiedSequenceBuilderException e) {
             return null;

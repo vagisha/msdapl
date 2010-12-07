@@ -132,7 +132,8 @@ public class TabularMascotResults implements Tabular, Pageable {
             
             String modifiedSequence = null;
             try {
-            	modifiedSequence = result.getResultPeptide().getFullModifiedPeptide();
+            	// get modified peptide of the form: K.PEP[+80]TIDE.L
+            	modifiedSequence = result.getResultPeptide().getFullModifiedPeptide(true); 
             }
             catch (ModifiedSequenceBuilderException e) {
                 cell = new TableCell("Error building peptide sequence");
@@ -155,7 +156,10 @@ public class TabularMascotResults implements Tabular, Pageable {
             	jsLink.setTargetName("spec_view_js");
             	cell.addData(jsLink);
             	
-            	cell.addData(modifiedSequence);
+            	if(result.getResultPeptide().hasDynamicModification())
+            		cell.addData("<span class=\"peptide\">"+modifiedSequence+"</span>");
+            	else
+            		cell.addData(modifiedSequence);
             }
             row.addCell(cell);
             

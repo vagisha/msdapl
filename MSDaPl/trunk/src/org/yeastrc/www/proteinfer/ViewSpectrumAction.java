@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
@@ -79,6 +80,8 @@ import org.yeastrc.www.util.RoundingUtils;
 
 public class ViewSpectrumAction extends Action {
 
+	private static final Logger log = Logger.getLogger(ViewSpectrumAction.class);
+	
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -479,13 +482,18 @@ public class ViewSpectrumAction extends Action {
                     row.addCell(new TableCell("NULL", null));
             }
             
-            String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
-            HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptidePS());
-            data.setAbsoluteHyperlink(url, true);
-            data.setTargetName("SPECTRUM_WINDOW");
-            TableCell cell = new TableCell();
-            cell.addData(data);
             
+            TableCell cell = new TableCell();
+			try {
+				HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptide(true));
+				String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+				data.setAbsoluteHyperlink(url, true);
+	            data.setTargetName("SPECTRUM_WINDOW");
+	            cell.addData(data);
+			} catch (ModifiedSequenceBuilderException e) {
+				log.error("Error building modified sequence", e);
+				cell.addData("ERROR");
+			}
             cell.setClassName("left_align");
             row.addCell(cell);
             
@@ -573,14 +581,18 @@ public class ViewSpectrumAction extends Action {
             row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getHomologyScore()), null));
             row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getExpect()), null));
             
-            String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
 
-            HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptidePS());
-            data.setAbsoluteHyperlink(url, true);
-            data.setTargetName("SPECTRUM_WINDOW");
             TableCell cell = new TableCell();
-            cell.addData(data);
-            
+			try {
+				HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptide(true));
+				String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+				data.setAbsoluteHyperlink(url, true);
+	            data.setTargetName("SPECTRUM_WINDOW");
+	            cell.addData(data);
+			} catch (ModifiedSequenceBuilderException e) {
+				log.error("Error building modified sequence", e);
+				cell.addData("ERROR");
+			}
             cell.setClassName("left_align");
             row.addCell(cell);
             
@@ -669,15 +681,21 @@ public class ViewSpectrumAction extends Action {
             row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getYscore()), null));
             row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getExpect()), null));
             
-            String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
             
-            HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptidePS());
-            data.setAbsoluteHyperlink(url, true);
-            data.setTargetName("SPECTRUM_WINDOW");
             TableCell cell = new TableCell();
-            cell.addData(data);
+			try {
+				HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptide(true));
+				String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+				data.setAbsoluteHyperlink(url, true);
+	            data.setTargetName("SPECTRUM_WINDOW");
+	            cell.addData(data);
+			} catch (ModifiedSequenceBuilderException e) {
+				log.error("Error building modified sequence", e);
+				cell.addData("ERROR");
+			}
             cell.setClassName("left_align");
             row.addCell(cell);
+            
             
             if(highlightedRow == index)
                 row.setRowHighighted(true);
@@ -898,7 +916,7 @@ public class ViewSpectrumAction extends Action {
         
         // peptide sequence
         MsSearchResultPeptide resPeptide = result.getResultPeptide();
-        json.put("sequence", resPeptide.getModifiedPeptide());
+        json.put("sequence", resPeptide.getPeptideSequence());
         json.put("charge", Integer.valueOf(result.getCharge()));
         
         

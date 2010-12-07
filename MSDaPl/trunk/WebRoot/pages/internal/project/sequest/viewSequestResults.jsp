@@ -19,6 +19,16 @@
 <%@ include file="/includes/errors.jsp" %>
 
 <%@ include file="/pages/internal/project/resultsTableJS.jsp" %>
+
+<script src="<yrcwww:link path='js/peptideHighlighter.js'/>"></script>
+<script type="text/javascript">
+
+$(document).ready(function() { 
+	$(".peptide").highlightPeptide();
+});
+
+</script>
+
 <yrcwww:contentbox title="Sequest Results" centered="true" width="95" widthRel="true">
 <center>
 

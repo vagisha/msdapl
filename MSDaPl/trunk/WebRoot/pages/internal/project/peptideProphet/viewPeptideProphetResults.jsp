@@ -20,6 +20,16 @@
 
 <%@ include file="/pages/internal/project/resultsTableJS.jsp" %>
 
+<script src="<yrcwww:link path='js/peptideHighlighter.js'/>"></script>
+<script type="text/javascript">
+
+$(document).ready(function() { 
+	$(".peptide").highlightPeptide();
+});
+
+</script>
+
+
 <yrcwww:contentbox title="PeptideProphet Results" centered="true" width="95" widthRel="true">
 <center>
 

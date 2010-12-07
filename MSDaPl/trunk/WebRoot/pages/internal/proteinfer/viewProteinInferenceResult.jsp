@@ -26,6 +26,8 @@
 
 <script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
 
+<script src="<yrcwww:link path='js/peptideHighlighter.js'/>"></script>
+
 
 <link rel="stylesheet" href="<yrcwww:link path='/css/proteinfer.css'/>" type="text/css" >
 
@@ -414,6 +416,10 @@ function showProteinDetails(proteinId, display, block) {
 								  		// stripe the table
 										$("#protdetailstbl_"+proteinId+" th.main").addClass("pinfer_A");
 										$("#protdetailstbl_"+proteinId+" tbody tr.main").addClass("pinfer_A");
+										
+										// highlight any modified residues 
+										$("#protdetailstbl_"+proteinId+" .peptide").highlightPeptide();
+										
 										$(this).show();
 										// save a cookie
 										saveProtDetailCookie(<%=pinferId%>, proteinId);
@@ -615,6 +621,8 @@ function setupShowPeptidesLinks() {
   									 	$.unblockUI();
   										$(this).show();
   										makeSortable($("#peptforprottbl_"+id));
+  										// highlight any modified residues 
+  										$("#peptforprottbl_"+id+" .peptide").highlightPeptide();
   								   });
   			}
   			else {

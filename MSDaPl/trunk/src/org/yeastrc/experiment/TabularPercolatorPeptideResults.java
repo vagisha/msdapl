@@ -104,12 +104,17 @@ public class TabularPercolatorPeptideResults implements Tabular, Pageable {
         TableCell cell;
         String modifiedSequence = null;
         try {
-        	modifiedSequence = result.getResultPeptide().getFullModifiedPeptide();
+        	// get modified peptide of the form: K.PEP[+80]TIDE.L
+        	modifiedSequence = result.getResultPeptide().getFullModifiedPeptide(true); 
         }
         catch (ModifiedSequenceBuilderException e) {
             modifiedSequence = "Error building peptide sequence";
         }
-        cell = new TableCell(modifiedSequence);
+        cell = new TableCell();
+        if(result.getResultPeptide().hasDynamicModification())
+    		cell.addData("<span class=\"peptide\">"+modifiedSequence+"</span>");
+    	else
+    		cell.addData(modifiedSequence);
         row.addCell(cell);
         
         

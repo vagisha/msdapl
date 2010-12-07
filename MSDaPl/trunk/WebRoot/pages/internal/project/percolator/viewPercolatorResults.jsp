@@ -21,7 +21,14 @@
 <%@ include file="/pages/internal/project/resultsTableJS.jsp" %>
 <script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
 
+<script src="<yrcwww:link path='js/peptideHighlighter.js'/>"></script>
+
+
 <script>
+
+$(document).ready(function() { 
+	$(".peptide").highlightPeptide();
+});
 
 // ---------------------------------------------------------------------------------------
 // AJAX DEFAULTS

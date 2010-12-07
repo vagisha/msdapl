@@ -122,6 +122,17 @@ function foldOpen(foldable) {
 	return false;
 }
 
+//---------------------------------------------------------------------------------------
+//HIGHLIGHT MODIFICATIONS IN PEPTIDE SEQUENCES
+//---------------------------------------------------------------------------------------
+function highlightModifications (highightable) {
+	
+	var options = {};
+	options.colors = new Array();
+	
+    highlightable.highlightPeptide(options); 
+}
+
 function openInformationPopup(url) {
 	window.open(
 		url,
