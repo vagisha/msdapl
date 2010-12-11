@@ -99,7 +99,7 @@ public class ListJobsAction extends Action {
 		
 		if(request.getParameter("queued") != null) {
 			request.setAttribute( "queued", Boolean.TRUE );
-			int jobId = Integer.parseInt(request.getParameter("queued"));
+			String jobId = request.getParameter("queued");
 			request.setAttribute("jobId", jobId);
 		}
 		return mapping.findForward( "Success" );

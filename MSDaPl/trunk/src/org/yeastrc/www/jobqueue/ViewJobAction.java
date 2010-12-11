@@ -6,6 +6,7 @@ package org.yeastrc.www.jobqueue;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
@@ -17,6 +18,7 @@ import org.yeastrc.jobqueue.Job;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
 import org.yeastrc.jobqueue.MsAnalysisUploadJob;
+import org.yeastrc.jobqueue.PercolatorJob;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -27,6 +29,8 @@ import org.yeastrc.www.user.UserUtils;
  */
 public class ViewJobAction extends Action {
 
+	private static final Logger log = Logger.getLogger(ViewJobAction.class);
+	
 	public ActionForward execute( ActionMapping mapping,
 								  ActionForm form,
 								  HttpServletRequest request,
@@ -71,8 +75,17 @@ public class ViewJobAction extends Action {
 			else if(job instanceof MsAnalysisUploadJob) {
 				request.setAttribute("analysisUploadJob",true);
 			}
+			else if(job instanceof PercolatorJob) {
+				request.setAttribute("percolatorJob", true);
+			}
 			
 		} catch (Exception e) {
+			
+			log.error("Error loading job with ID: "+request.getParameter( "id" ), e);
+			ActionErrors errors = new ActionErrors();
+			errors.add("general", new ActionMessage("error.general.errorMessage","Error reading job with ID: "
+					+request.getParameter( "id" )+". Error was: "+e.getMessage()));
+			saveErrors( request, errors );
 			return mapping.findForward( "Failure" );
 		}
 		

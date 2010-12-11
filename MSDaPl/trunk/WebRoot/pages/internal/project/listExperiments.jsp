@@ -46,7 +46,7 @@ function makeCommentEditable() {
 	});
 }
 function setupEditableComment(editable) {
-	//alert("making comment editable "+editable);
+	// alert("making comment editable "+editable);
 	$(editable).click(function() {
 		var id = $(this).attr('id');
 		var currentComments = $.trim($("#"+id+"_text").text());
@@ -384,9 +384,6 @@ function confirmDeleteExperiment(experimentId) {
     }
  }
  
-function viewPercolatorUploadForm(experimentId) {
-	document.location.href="<yrcwww:link path='percolatorUploadForm.do?experimentId='/>"+experimentId+"&projectId="+<bean:write name='project' property='ID'/>;
-}
  
  function goToExperiment(exptId) {
  

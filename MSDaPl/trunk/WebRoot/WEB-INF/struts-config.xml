@@ -53,6 +53,7 @@
 	<form-bean name="searchProjectsForm" type="org.yeastrc.www.project.SearchProjectsForm"/>
 	<form-bean name="uploadMSDataForm" type="org.yeastrc.www.upload.UploadMSDataForm"/>
 	<form-bean name="uploadPercolatorResultForm" type="org.yeastrc.www.upload.UploadPercolatorResultForm"></form-bean>
+	<form-bean name="percolatorRunForm" type="org.yeastrc.www.upload.PercolatorRunForm"></form-bean>
 	<form-bean name="GOAnnotationForm" type="org.yeastrc.www.microscopy.GOAnnotationForm"/>
 	<form-bean name="MSCommentsForm" type="org.yeastrc.www.yates.MSCommentsForm"/>
 	<form-bean name="editGrantForm" type="org.yeastrc.www.project.EditGrantForm"></form-bean>
@@ -131,6 +132,7 @@
 	<forward name="availableFasta" path="/availableFasta.do"/>
 	<forward name="sequestPepxmlDownload" path="/newSequestPepXmlDownload.do" />
 	<forward name="percolatorUploadForm" path="/percolatorUploadForm.do" />
+	<forward name="percolatorRunForm" path="/percolatorRunForm.do" />
 	<forward name="uploadMSDataForm" path="/uploadMSDataFormAction.do" />
     </global-forwards>
 
@@ -770,7 +772,7 @@
 	  <forward name="Failure" path="/viewProject.do" redirect="false"/>
 	  <forward name="Success" path="/pages/admin/upload/uploadPercolatorResultForm.jsp" redirect="false"/>
 	</action>
-
+	
 	<action
 	  path="/uploadPercolatorResult"
 	  input="/pages/admin/upload/uploadPercolatorResultForm.jsp"
@@ -820,11 +822,33 @@
 	  type="org.yeastrc.www.jobqueue.ViewJobAction"
 	  validate="false">
 		<forward name="Success" path="/pages/admin/upload/viewJob.jsp" redirect="false"/>
-		<forward name="Failure" path="/pages/internal/front.jsp" redirect="true"/>
+		<forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	</action>
 
 
 
+
+	<!-- ================================================================================== -->
+	<!-- Actions related to running Percolator -->
+	<!-- ================================================================================== -->
+	<action
+	  path="/percolatorRunForm"
+	  type="org.yeastrc.www.upload.PercolatorRunFormAction"
+	  validate="false">
+	  <forward name="Failure" path="/viewProject.do" redirect="true"/>
+	  <forward name="Success" path="/pages/internal/project/percolator/percolatorRunForm.jsp" redirect="false"/>
+	</action>
+	
+	<action
+	  path="/percolatorRun"
+	  input="/pages/admin/upload/percolatorRunForm.jsp"
+	  name="percolatorRunForm"
+	  scope="request"
+	  type="org.yeastrc.www.upload.PercolatorRunAction"
+	  validate="true">
+	  <forward name="Failure" path="/pages/internal/project/percolator/percolatorRunForm.jsp" redirect="false"/>
+	  <forward name="Success" path="/listUploadJobs.do" redirect="true"/>
+	</action>
 
 
 

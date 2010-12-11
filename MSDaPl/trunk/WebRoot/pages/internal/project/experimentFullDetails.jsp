@@ -83,6 +83,17 @@
 			</tr>
 		</table>
 		</div>	
+		
+		
+		<logic:equal name="experiment" property="analysisProgramName" value="<%=Program.PERCOLATOR.displayName() %>">
+			<div>
+			&nbsp;&nbsp;
+			<html:link action="percolatorRunForm.do" paramId="searchId" paramName="search" paramProperty="id"><span style="color:red; font-weight:bold;">[Run Percolator]</span></html:link>
+			&nbsp;&nbsp;
+			<html:link action="percolatorUploadForm.do" paramId="experimentId" paramName="experiment" paramProperty="id"><span style="color:red; font-weight:bold;">[Add Percolator Results]</span></html:link>
+			</div>
+		</logic:equal>
+
 	</logic:iterate>
 </logic:notEmpty>
 
@@ -91,10 +102,7 @@
 
 <logic:equal name="writeAccess" value="true">	
 <div>
-<logic:equal name="experiment" property="analysisProgramName" value="<%=Program.PERCOLATOR.displayName() %>">
-	&nbsp;&nbsp;
-	<span class="clickable underline" style="color:red; font-weight:bold;" onClick="viewPercolatorUploadForm('<bean:write name="experiment" property="id"/>')">[Add Percolator Results]</span>
-</logic:equal>
+
 </div>
 </logic:equal>
 

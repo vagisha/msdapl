@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.www.user.Groups;
@@ -54,16 +55,6 @@ public class UploadPercolatorResultFormAction extends Action {
 		}
 		
 		String val = null;
-		int projectId = 0;
-		try {
-			val = request.getParameter("projectId");
-			if(val != null)
-				projectId = Integer.parseInt(val);
-		}
-		catch (NumberFormatException e) {
-			log.error("Invalid projectId in request: "+val);
-		}
-		
 		int experimentId = 0;
 		try {
 			val = request.getParameter("experimentId");
@@ -74,6 +65,8 @@ public class UploadPercolatorResultFormAction extends Action {
 			log.error("Invalid experimentId in request: "+val);
 		}
 
+		
+		int projectId = ProjectExperimentDAO.instance().getProjectIdForExperiment(experimentId);
 		
 		// User should have access to the project
         Project project = ProjectDAO.instance().load(projectId);

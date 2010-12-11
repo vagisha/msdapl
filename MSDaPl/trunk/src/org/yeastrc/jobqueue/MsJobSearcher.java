@@ -32,7 +32,8 @@ public class MsJobSearcher {
 		try {
 			
 			String sql = "SELECT COUNT(*) FROM tblJobs";
-			sql += " WHERE (type="+JobUtils.TYPE_MASS_SPEC_UPLOAD+" OR type="+JobUtils.TYPE_ANALYSIS_UPLOAD+")";
+			sql += " WHERE (type="+JobUtils.TYPE_MASS_SPEC_UPLOAD+" OR type="+JobUtils.TYPE_ANALYSIS_UPLOAD
+			+" OR type="+JobUtils.TYPE_PERC_EXE+")";
 			if (this.status != null && this.status.size() > 0) {
 				sql += " AND status IN (";
 				int cnt = 0;
@@ -92,7 +93,9 @@ public class MsJobSearcher {
 		try {
 			
 			String sql = "SELECT id FROM tblJobs ";
-			sql += " WHERE (type="+JobUtils.TYPE_MASS_SPEC_UPLOAD+" OR type="+JobUtils.TYPE_ANALYSIS_UPLOAD+")";
+			sql += " WHERE (type="+JobUtils.TYPE_MASS_SPEC_UPLOAD+" OR type="+JobUtils.TYPE_ANALYSIS_UPLOAD
+			+" OR type="+JobUtils.TYPE_PERC_EXE+")";
+			
 			if (this.status != null && this.status.size() > 0) {
 				sql += " AND status IN (";
 				int cnt = 0;
@@ -111,7 +114,7 @@ public class MsJobSearcher {
 			
 			while (rs.next()) {
 				try {
-					jobs.add( MSJobFactory.getInstance().getJob( rs.getInt( "id" ) ) );
+					jobs.add( MSJobFactory.getInstance().getJobLite( rs.getInt( "id" ) ) );
 				} catch (Exception e) { ; }
 			}
 			

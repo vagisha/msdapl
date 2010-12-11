@@ -6,8 +6,16 @@ package org.yeastrc.jobqueue;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.db.DBConnectionManager;
+import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
+import org.yeastrc.www.proteinfer.job.ProgramParameters;
+import org.yeastrc.www.proteinfer.job.ProgramParameters.Param;
+import org.yeastrc.www.upload.PercolatorRunForm.PercolatorInputFile;
 
 /**
  * @author Mike
@@ -29,13 +37,29 @@ public class MSJobFactory {
 	    return instance;
 	}
 	
+	
+	
 	/**
-	 * Get the given MSJob from the database
+	 * Get the given Job from the database
 	 * @param jobID
 	 * @return
 	 * @throws Exception
 	 */
-	public Job getJob( int jobID ) throws Exception {
+	public Job getJob( int jobID) throws Exception {
+		return getJob(jobID, true);
+	}
+	
+	/**
+	 * Get the given Job from the database. Returns a "Liter-re" version of PercolatorJob
+	 * @param jobID
+	 * @return
+	 * @throws Exception
+	 */
+	public Job getJobLite( int jobID) throws Exception {
+		return getJob(jobID, false);
+	}
+	
+	private Job getJob( int jobID, boolean fullJob ) throws Exception {
 		
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -57,6 +81,12 @@ public class MSJobFactory {
 			}
 			else if(rs.getInt("type") == JobUtils.TYPE_ANALYSIS_UPLOAD) {
 				return getMsAnalysisUploadJob(jobID, conn, stmt, rs);
+			}
+			else if(rs.getInt("type") == JobUtils.TYPE_PERC_EXE) {
+				if(fullJob)
+					return getPercolatorJob(jobID, conn, stmt, rs);
+				else
+					return getPercolatorJobLite(jobID, conn, stmt, rs);
 			}
 			else
 				return null;
@@ -149,6 +179,116 @@ public class MSJobFactory {
 		job.setSearchAnalysisId( rs.getInt( "searchAnalysisID" ) );
 		job.setServerDirectory( rs.getString( "serverDirectory" ) );
 		job.setComments( rs.getString( "comments" ) );
+		
+		return job;
+	}
+	
+	private PercolatorJob getPercolatorJobLite(int jobID, Connection conn, PreparedStatement stmt, ResultSet rs) throws Exception {
+		
+		PercolatorJob job;
+		job = new PercolatorJob();
+		job.setId( jobID );
+		job.setSubmitter( rs.getInt( "submitter" ) );
+		job.setType( rs.getInt( "type" ) );
+		job.setSubmitDate( rs.getDate( "submitDate" ) );
+		job.setLastUpdate( rs.getDate( "lastUpdate" ) );
+		job.setStatus( rs.getInt( "status" ) );
+		job.setAttempts( rs.getInt( "attempts" ) );
+		job.setLog( rs.getString( "log" ) );
+		
+		
+		rs.close(); rs = null;
+		stmt.close(); stmt = null;
+		
+		String sql = "SELECT * FROM tblPercolatorJobs WHERE jobID = ?";
+		stmt = conn.prepareStatement( sql );
+		stmt.setInt( 1, jobID );
+		rs = stmt.executeQuery();
+
+		if (!rs.next())
+			throw new Exception( "Invalid job ID on MSJob.getJob().  Job ID: " + jobID );
+
+		job.setProjectID( rs.getInt( "projectID" ) );
+		job.setExperimentID( rs.getInt( "experimentID" ) );
+		job.setSearchId( rs.getInt( "searchID" ) );
+		job.setResultDirectory( rs.getString( "resultDirectory" ) );
+		job.setRunProteinInference(rs.getBoolean("runProteinInference"));
+		job.setComments( rs.getString( "comments" ) );
+		
+		return job;
+	}
+	
+	private PercolatorJob getPercolatorJob(int jobID, Connection conn, PreparedStatement stmt, ResultSet rs) throws Exception {
+		
+		PercolatorJob job;
+		job = new PercolatorJob();
+		job.setId( jobID );
+		job.setSubmitter( rs.getInt( "submitter" ) );
+		job.setType( rs.getInt( "type" ) );
+		job.setSubmitDate( rs.getDate( "submitDate" ) );
+		job.setLastUpdate( rs.getDate( "lastUpdate" ) );
+		job.setStatus( rs.getInt( "status" ) );
+		job.setAttempts( rs.getInt( "attempts" ) );
+		job.setLog( rs.getString( "log" ) );
+		
+		
+		rs.close(); rs = null;
+		stmt.close(); stmt = null;
+		
+		String sql = "SELECT * FROM tblPercolatorJobs WHERE jobID = ?";
+		stmt = conn.prepareStatement( sql );
+		stmt.setInt( 1, jobID );
+		rs = stmt.executeQuery();
+
+		if (!rs.next())
+			throw new Exception( "Invalid job ID on MSJob.getJob().  Job ID: " + jobID );
+
+		job.setProjectID( rs.getInt( "projectID" ) );
+		job.setExperimentID( rs.getInt( "experimentID" ) );
+		job.setSearchId( rs.getInt( "searchID" ) );
+		job.setResultDirectory( rs.getString( "resultDirectory" ) );
+		int runProtInfer = rs.getInt("runProteinInference");
+		if(runProtInfer == 0)
+			job.setRunProteinInference(false);
+		else
+			job.setRunProteinInference(true);
+		job.setComments( rs.getString( "comments" ) );
+		
+		
+		sql = "SELECT * FROM tblPercolatorJobInput WHERE jobID=? ORDER BY runSearchID";
+		stmt = conn.prepareStatement( sql );
+		stmt.setInt( 1, jobID );
+		rs = stmt.executeQuery();
+		List<PercolatorInputFile> percInputFiles = new ArrayList<PercolatorInputFile>();
+		while(rs.next()) {
+			PercolatorInputFile iFile = new PercolatorInputFile();
+			iFile.setIsSelected(true);
+			iFile.setRunSearchId(rs.getInt("runSearchID"));
+			iFile.setRunName(rs.getString("fileName"));
+			percInputFiles.add(iFile);
+		}
+		job.setPercolatorInputFiles(percInputFiles);
+		
+		if(job.isRunProteinInference()) {
+			ProgramParameters params = new ProgramParameters(ProteinInferenceProgram.PROTINFER_PERC_PEPT);
+			Map<String, Param> paramMap = new HashMap<String, Param>();
+			for(Param param: params.getParamList()) {
+				paramMap.put(param.getName(), param);
+			}
+			
+			sql = "SELECT * FROM tblPercolatorToProteinInferParams WHERE jobID=?";
+			stmt = conn.prepareStatement(sql);
+			stmt.setInt( 1, jobID );
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				String name = rs.getString("name");
+				String value = rs.getString("value");
+				Param param = paramMap.get(name);
+				param.setValue(value);
+			}
+			
+			job.setProgramParams(params);
+		}
 		
 		return job;
 	}

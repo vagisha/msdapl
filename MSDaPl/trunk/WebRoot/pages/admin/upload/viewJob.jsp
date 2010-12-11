@@ -230,6 +230,93 @@
 		</tbody>
 		</logic:present>
 		
+		<!-- Percolator Job -->
+		<logic:present name="percolatorJob">
+		<thead>
+		<tr >
+			<th width="100%" colspan="2" align="center"><span style="margin-bottom:20px;font-size:10pt;font-weight:bold;"> Details</span></th>
+		</tr>
+		</thead>
+		
+		<tbody>
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Project:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<a href="<yrcwww:link path='viewProject.do?'/>ID=<bean:write name="job" property="projectID" />">
+					<bean:write name="job" property="project.title" /></a>
+			</td>
+		</tr>
+
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Job Type:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<bean:write name="job" property="typeDescription" />
+			</td>
+		</tr>
+		
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Directory:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<bean:write name="job" property="serverDirectory" />
+			</td>
+		</tr>
+		
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Experiment ID:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<bean:write name="job" property="experimentID" />
+			</td>
+		</tr>
+		
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Search ID:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<bean:write name="job" property="searchId" />
+			</td>
+		</tr>
+
+		<tr>
+			<td width="20%" align="left" valign="top" class="left_align">Input Files:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<logic:iterate name="job" property="percolatorInputFiles" id="inputFile">
+					<bean:write name="inputFile" property="runName"/><br/>
+				</logic:iterate>
+			</td>
+		</tr>
+		
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Run Protein Inference:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<bean:write name="job" property="runProteinInference" />
+			</td>
+		</tr>
+		
+		<logic:equal name="job" property="runProteinInference" value="true">
+			<tr>
+			<td width="20%" align="left" valign="top" class="left_align">Protein Inference Options:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<table width="95%" style="border: 1px dashed black;"><tbody>
+				<logic:iterate name="job" property="programParams.paramList" id="param">
+					<tr>
+						<td><bean:write name="param" property="displayName"/></td>
+						<td><bean:write name="param" property="value"/></td>
+					</tr>
+				</logic:iterate>
+				</tbody></table>
+			</td>
+			</tr>
+		</logic:equal>
+		
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Comments:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<bean:write name="job" property="comments" />
+			</td>
+		</tr>
+		</tbody>
+		</logic:present>
+		
+		
 	</table>
 	</center>
 	<br><br>

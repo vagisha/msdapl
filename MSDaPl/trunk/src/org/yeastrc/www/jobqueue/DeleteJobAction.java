@@ -18,6 +18,7 @@ import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
 import org.yeastrc.jobqueue.MsAnalysisUploadJob;
+import org.yeastrc.jobqueue.PercolatorJob;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.project.Project;
 import org.yeastrc.www.user.Groups;
@@ -55,7 +56,7 @@ public class DeleteJobAction extends Action {
 		}
 		
 		try {
-			Job job = MSJobFactory.getInstance().getJob( Integer.parseInt( request.getParameter( "id" ) ) );
+			Job job = MSJobFactory.getInstance().getJobLite( Integer.parseInt( request.getParameter( "id" ) ) );
 			
 			if (job == null) {
 				ActionErrors errors = new ActionErrors();
@@ -69,6 +70,8 @@ public class DeleteJobAction extends Action {
 				project = ((MSJob)job).getProject();
 			else if(job instanceof MsAnalysisUploadJob)
 				project = ((MsAnalysisUploadJob)job).getProject();
+			else if(job instanceof PercolatorJob)
+				project = ((PercolatorJob)job).getProject();
 			
 			if(project == null) {
 				ActionErrors errors = new ActionErrors();

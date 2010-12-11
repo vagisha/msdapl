@@ -165,6 +165,8 @@ public class Job {
 			return "A";
 		else if(this.type == JobUtils.TYPE_PROTEINFER_RUN)
 			return "I";
+		else if(this.type == JobUtils.TYPE_PERC_EXE)
+			return "P";
 		else
 			return "U";
 	}
@@ -177,6 +179,8 @@ public class Job {
 			return "Analysis Results Upload (e.g. Percolator results)";
 		else if(this.type == JobUtils.TYPE_PROTEINFER_RUN)
 			return "Protein Inference";
+		else if(this.type == JobUtils.TYPE_PERC_EXE)
+			return "Percolator Run";
 		else
 			return "Unknown";
 	}
