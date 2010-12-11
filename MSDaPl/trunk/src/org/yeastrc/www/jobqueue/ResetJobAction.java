@@ -84,7 +84,7 @@ public class ResetJobAction extends Action {
 	            }
 	            
 				JobResetter.getInstance().resetJob( job );
-				request.setAttribute( "job", job );
+				//request.setAttribute( "job", job );
 				
 			} catch (Exception e) {
 				return mapping.findForward( "Failure" );
