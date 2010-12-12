@@ -212,7 +212,11 @@ public class MSJobFactory {
 		job.setExperimentID( rs.getInt( "experimentID" ) );
 		job.setSearchId( rs.getInt( "searchID" ) );
 		job.setResultDirectory( rs.getString( "resultDirectory" ) );
-		job.setRunProteinInference(rs.getBoolean("runProteinInference"));
+		int runProtInfer = rs.getInt("runProteinInference");
+		if(runProtInfer == 0)
+			job.setRunProteinInference(false);
+		else
+			job.setRunProteinInference(true);
 		job.setComments( rs.getString( "comments" ) );
 		
 		return job;

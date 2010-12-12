@@ -17,9 +17,9 @@
 <logic:equal name="queued" value="true" scope="request">
  <center>
  <hr width="50%">
-  <B><font color="red">The data upload request has been successfully added to the queue.<BR>
-  The ID for the request is <bean:write name="jobId"/>.<br/>
-  You will be notified by email when it is completed.</font></B>
+  <B><font color="red">Your job request has been successfully added to the queue.<BR>
+  The ID(s) for the request are <bean:write name="jobId"/>.<br/>
+  You will be notified by email when the job(s) are complete.</font></B>
  <hr width="50%">
  </center>
 </logic:equal>

@@ -62,7 +62,7 @@ public class MsAnalysisUploadJobSaver {
 				rs.updateInt("searchAnalysisID", this.searchAnalysisId);
 			else
 				rs.updateNull("searchAnalysisID");
-			
+			rs.updateInt("runProteinInference", 0);
 			rs.insertRow();
 			
 			return id;

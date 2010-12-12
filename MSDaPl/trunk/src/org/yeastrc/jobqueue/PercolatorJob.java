@@ -6,9 +6,7 @@
 package org.yeastrc.jobqueue;
 
 import java.util.List;
-import java.util.Map;
 
-import org.yeastrc.ms.domain.protinfer.ProgramParam;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.www.proteinfer.job.ProgramParameters;
