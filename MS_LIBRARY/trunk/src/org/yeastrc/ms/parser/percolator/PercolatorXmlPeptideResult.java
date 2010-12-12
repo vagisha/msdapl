@@ -36,7 +36,8 @@ public class PercolatorXmlPeptideResult implements PercolatorPeptideResultIn {
     }
     
     public boolean isComplete() {
-		return (resultPeptide != null && pep != -1.0 && qvalue != 1.0 &&
+    	
+		return (resultPeptide != null && pep != -1.0 && qvalue != -1.0 &&
 				observedMass != null &&
 				matchingPsmIds.size() > 0 &&
 				matchingLoci.size() > 0);
@@ -57,6 +58,8 @@ public class PercolatorXmlPeptideResult implements PercolatorPeptideResultIn {
 		buf.append("discriminantScore: "+discriminantScore);
 		buf.append("\n");
 		buf.append("pvalue: "+pvalue);
+		buf.append("\n");
+		buf.append("observedMass: "+observedMass);
 		buf.append("\n");
 		if(matchingLoci.size() == 0)
 			buf.append("NO MATCHING PROTEINS\n");
