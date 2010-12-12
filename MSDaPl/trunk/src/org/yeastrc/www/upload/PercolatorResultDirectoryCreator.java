@@ -47,6 +47,7 @@ public class PercolatorResultDirectoryCreator {
 		if(!created) {
 			throw new PercolatorExecutorException("Error creating output directory: "+resultDir);
 		}
+		dir.setWritable(true,false);
 		
 		// make sure we have sequest and decoy files for this experiment
 		int experimentId = job.getExperimentID();
@@ -55,8 +56,6 @@ public class PercolatorResultDirectoryCreator {
 			FileUtils.deleteFile(new File(resultDir));
 			throw new PercolatorExecutorException("No sequest directory found for experiment: "+experimentId);
 		}
-		File edfile = new File(exptDir);
-		edfile.setWritable(true,false);
 		
 		// create the input files for Percolator
 		String realSqtFile = resultDir+File.separator+"realSqt.list";
@@ -83,7 +82,7 @@ public class PercolatorResultDirectoryCreator {
 					FileUtils.deleteFile(new File(resultDir));
 					throw new PercolatorExecutorException("Sequest SQT does not exist in backup experiment directory: "+exptFilePath);
 				}
-				writer.write(resultDir+File.separator+fileName+".sqt\n");
+				writer.write(exptFilePath+"\n");
 			}
 		}
 		catch (RuntimeException e) {
@@ -116,7 +115,7 @@ public class PercolatorResultDirectoryCreator {
 					FileUtils.deleteFile(new File(resultDir));
 					throw new PercolatorExecutorException("Sequest decoy SQT does not exist in backup experiment directory: "+exptFilePath);
 				}
-				writer.write(resultDir+File.separator+"decoy"+File.separator+fileName+".sqt\n");
+				writer.write(exptFilePath+"\n");
 			}
 		}
 		catch (RuntimeException e) {
