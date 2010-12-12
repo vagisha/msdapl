@@ -55,6 +55,8 @@ public class PercolatorResultDirectoryCreator {
 			FileUtils.deleteFile(new File(resultDir));
 			throw new PercolatorExecutorException("No sequest directory found for experiment: "+experimentId);
 		}
+		File edfile = new File(exptDir);
+		edfile.setWritable(true,false);
 		
 		// create the input files for Percolator
 		String realSqtFile = resultDir+File.separator+"realSqt.list";
