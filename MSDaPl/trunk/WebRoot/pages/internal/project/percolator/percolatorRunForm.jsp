@@ -228,9 +228,10 @@ function toggleSelection(button) {
     		
 		<tr>
 		<td colspan="2">
-		
+			<html:hidden name="percolatorRunForm" property="programParams.programName"/>
 			<table id="pi_opts_table" style="margin:10px;border:1px dashed;display:none;">
 			<tbody>
+			
 			<logic:iterate name="percolatorRunForm" property="programParams.paramList" id="param"
   				type="org.yeastrc.www.proteinfer.job.ProgramParameters.Param">
     
