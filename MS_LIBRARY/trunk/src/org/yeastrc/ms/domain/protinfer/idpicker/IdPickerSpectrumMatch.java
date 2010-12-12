@@ -10,8 +10,8 @@ public class IdPickerSpectrumMatch extends ProteinferSpectrumMatch {
         super();
     }
     
-    public IdPickerSpectrumMatch(int pinferPeptideId, int resultId, double fdr) {
-        super(pinferPeptideId, resultId);
+    public IdPickerSpectrumMatch(int pinferIonId, int resultId, double fdr) {
+        super(pinferIonId, resultId);
         this.fdr = fdr;
     }
     

@@ -24,6 +24,8 @@ public class MsDataUploadProperties {
     
     private static String backupDirectory;
     
+    private static String percRunDirectory;
+    
     private static PeakStorageType peakStorageType;
     
     private static boolean checkPeptideProteinMatches = false;
@@ -47,6 +49,8 @@ public class MsDataUploadProperties {
         
         backupDirectory = props.getProperty("backup.dir");
         
+        percRunDirectory = props.getProperty("perc.run.dir");
+        
         value = props.getProperty("interact.pepxml.checkpeptideproteinmatches");
         checkPeptideProteinMatches = Boolean.parseBoolean(value);
         
@@ -69,6 +73,10 @@ public class MsDataUploadProperties {
     
     public static String getBackupDirectory() {
         return backupDirectory;
+    }
+    
+    public static String getPercolatorRunDirectory() {
+        return percRunDirectory;
     }
     
     public static boolean getCheckPeptideProteinMatches() {

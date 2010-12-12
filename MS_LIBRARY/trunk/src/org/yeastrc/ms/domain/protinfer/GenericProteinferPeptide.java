@@ -122,4 +122,15 @@ public abstract class GenericProteinferPeptide <S extends ProteinferSpectrumMatc
     
     protected abstract GenericProteinferPeptide<S,T>  newPeptide();
     
+    public String toString() {
+    	
+    	StringBuilder buf = new StringBuilder();
+    	if(this.isUniqueToProtein())
+    		buf.append("U\t");
+    	else
+    		buf.append("\t");
+    	buf.append(this.sequence);
+    	return buf.toString();
+    }
+    
 }
