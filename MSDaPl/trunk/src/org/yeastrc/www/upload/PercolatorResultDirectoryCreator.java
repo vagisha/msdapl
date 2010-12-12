@@ -50,7 +50,7 @@ public class PercolatorResultDirectoryCreator {
 		
 		// make sure we have sequest and decoy files for this experiment
 		int experimentId = job.getExperimentID();
-		String exptDir = MsDataUploadProperties.getBackupDirectory()+File.separator+experimentId;
+		String exptDir = MsDataUploadProperties.getBackupDirectory()+File.separator+experimentId+File.separator+"sequest";
 		if(!(new File(exptDir).exists())) {
 			FileUtils.deleteFile(new File(resultDir));
 			throw new PercolatorExecutorException("No sequest directory found for experiment: "+experimentId);
