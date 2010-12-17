@@ -359,6 +359,19 @@ function showActionOptions() {
 	</tr>
 	<tr><td colspan="4" style="padding-bottom:10px;"><span style="font-size:8pt;">* Peptide = sequence + modifications + charge</span></td></tr>
 	
+	
+	<!-- ################## MIN / MAX SPECTRUM COUNT FILTERS	  ########################################### -->
+	<tr>
+		<td style="padding: 0 0 10 5;"><b># Spectra:</b> </td>
+		<td style="padding: 0 5 10 0" align="left">
+			Min. <html:text name="proteinSetComparisonForm" property="minSpectrumCount" size="8"></html:text> 
+		    Max. <html:text name="proteinSetComparisonForm" property="maxSpectrumCount" size="8"></html:text>
+		</td>
+		<td style="padding:0 0 10 5;"></td>
+		<td style="padding:0 0 10 0;" align="left"></td>
+	</tr>
+	
+	
 	<!-- ################## PEPTIDE PROBABILITY FILTERS	  ########################################### -->
 	<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
 	<tr>

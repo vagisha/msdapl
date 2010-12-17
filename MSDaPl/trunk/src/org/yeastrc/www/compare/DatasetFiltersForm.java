@@ -51,6 +51,9 @@ public class DatasetFiltersForm extends ActionForm {
     private String maxUniquePeptides;
     private boolean peptideUniqueSequence = false;
     
+    private String minSpectrumCount = "1";
+    private String maxSpectrumCount;
+    
     private String commonNameLike = null;
     private String accessionLike = null;
     private String descriptionLike = null;
@@ -312,13 +315,44 @@ public class DatasetFiltersForm extends ActionForm {
         this.maxUniquePeptides = maxUniquePeptides;
     }
     
+    
+    // MIN SPECTRUM COUNT
+    public String getMinSpectrumCount() {
+		return minSpectrumCount;
+	}
+    public int getMinSpectrumCountInteger() {
+        if(minSpectrumCount == null || minSpectrumCount.trim().length() == 0)
+            return 1;
+        else
+            return Integer.parseInt(minSpectrumCount);
+    }
+    public void setMinSpectrumCount(String minSpectrumCount) {
+		this.minSpectrumCount = minSpectrumCount;
+	}
+
+    
+    // MAX SPECTRUM COUNT
+    public String getMaxSpectrumCount() {
+		return maxSpectrumCount;
+	}
+    public int getMaxSpectrumCountInteger() {
+        if(maxSpectrumCount == null || maxSpectrumCount.trim().length() == 0)
+            return Integer.MAX_VALUE;
+        else
+            return Integer.parseInt(maxSpectrumCount);
+    }
+	public void setMaxSpectrumCount(String maxSpectrumCount) {
+		this.maxSpectrumCount = maxSpectrumCount;
+	}
+    
     //-----------------------------------------------------------------------------
     // Molecular Weight
     //-----------------------------------------------------------------------------
     public String getMinMolecularWt() {
         return minMolecularWt;
     }
-    public Double getMinMolecularWtDouble() {
+
+	public Double getMinMolecularWtDouble() {
         if(minMolecularWt != null && minMolecularWt.trim().length() > 0)
             return Double.parseDouble(minMolecularWt);
         return 0.0;
@@ -633,6 +667,9 @@ public class DatasetFiltersForm extends ActionForm {
         filters.setMinUniqPeptideCount(this.getMinUniquePeptidesInteger());
         filters.setMaxUniqPeptideCount(this.getMaxUniquePeptidesInteger());
         
+        filters.setMinSpectrumCount(this.getMinSpectrumCountInteger());
+        filters.setMaxSpectrumCount(this.getMaxSpectrumCountInteger());
+        
         if(this.getGoTerms() != null && this.getGoTerms().trim().length() > 0) {
         	GOProteinFilterCriteria goFilters = new GOProteinFilterCriteria();
         	
@@ -688,6 +725,8 @@ public class DatasetFiltersForm extends ActionForm {
         filterCriteria.setNumMaxPeptides(this.getMaxPeptidesInteger());
         filterCriteria.setNumUniquePeptides(this.getMinUniquePeptidesInteger());
         filterCriteria.setNumMaxUniquePeptides(this.getMaxUniquePeptidesInteger());
+        filterCriteria.setNumSpectra(this.getMinSpectrumCountInteger());
+        filterCriteria.setNumMaxSpectra(this.getMaxSpectrumCountInteger());
         
         PeptideDefinition peptDef = new PeptideDefinition();
         if(!this.peptideUniqueSequence) {

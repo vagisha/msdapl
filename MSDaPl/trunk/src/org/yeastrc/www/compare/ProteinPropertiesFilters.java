@@ -34,6 +34,9 @@ public class ProteinPropertiesFilters {
     private int minUniqPeptideCount = 0;
     private int maxUniqPeptideCount = Integer.MAX_VALUE;
     
+    private int minSpectrumCount = 0;
+    private int maxSpectrumCount = Integer.MAX_VALUE;
+    
     // ProteinProphet related
     private boolean hasProteinProphetFilters = false;
 	private double peptideProbability = 0.0;
@@ -68,6 +71,9 @@ public class ProteinPropertiesFilters {
         if(this.maxPeptideCount != that.maxPeptideCount)				return false;
         if(this.minUniqPeptideCount != that.minUniqPeptideCount)		return false;
         if(this.maxUniqPeptideCount != that.maxUniqPeptideCount)		return false;
+        
+        if(this.minSpectrumCount != that.minSpectrumCount)				return false;
+        if(this.maxSpectrumCount != that.maxSpectrumCount)				return false;
         
         if(this.hasProteinProphetFilters != that.hasProteinProphetFilters)	return false;
         if(this.peptideProbability != that.peptideProbability)				return false;
@@ -158,8 +164,24 @@ public class ProteinPropertiesFilters {
 	public void setMaxUniqPeptideCount(int maxUniqPeptideCount) {
 		this.maxUniqPeptideCount = maxUniqPeptideCount;
 	}
+	
+    public int getMinSpectrumCount() {
+		return minSpectrumCount;
+	}
 
-    public String getCommonNameLike() {
+	public void setMinSpectrumCount(int minSpectrumCount) {
+		this.minSpectrumCount = minSpectrumCount;
+	}
+
+	public int getMaxSpectrumCount() {
+		return maxSpectrumCount;
+	}
+
+	public void setMaxSpectrumCount(int maxSpectrumCount) {
+		this.maxSpectrumCount = maxSpectrumCount;
+	}
+
+	public String getCommonNameLike() {
 		return commonNameLike;
 	}
 
@@ -262,6 +284,10 @@ public class ProteinPropertiesFilters {
     
     public boolean hasUniquePeptideCountFilter() {
     	return (minUniqPeptideCount != 0 || maxUniqPeptideCount != Integer.MAX_VALUE);
+    }
+    
+    public boolean hasSpectrumCountFilter() {
+    	return (minSpectrumCount != 0 && maxSpectrumCount != Integer.MAX_VALUE);
     }
 
 	public GOProteinFilterCriteria getGoFilter() {
