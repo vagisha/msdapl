@@ -126,7 +126,7 @@
  		 			
  		 	<logic:equal name="piRun" property="job.complete" value="true">
  		 	<td valign="top" align="center" >
- 		 		<input type="checkbox" class="compare_cb" value="<bean:write name='piRun' property='job.pinferId'/>"></input>
+ 		 		<input type="checkbox" class="compare_cb"  id="<bean:write name='analysis' property='id'/>" value="<bean:write name='piRun' property='job.pinferId'/>"></input>
 			</td>
 			</logic:equal>
  		 			
@@ -155,4 +155,24 @@
 		
 		</tbody>
 		</table>
+	</div>
+	<div style="margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
+	<table width="100%">
+	<tr>
+			<td colspan="9" align="right">
+				<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:selectAllProtInfer(<bean:write name='analysis' property='id'/>);">[Select All]</span>
+				&nbsp;
+				<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer(<bean:write name='analysis' property='id'/>);">[Clear Selected]</span>
+				&nbsp;
+				<input type="checkbox" id="grpProts" value="group" checked="checked" />Group Indistinguishable Proteins
+				&nbsp;
+				<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInferAndMore();"><b>[Compare More]</b></span>
+				&nbsp;
+				<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInfer();"
+				title="Protein inferences from multiple experiments in this project can be selected for comparison.  To include protein inferences from other projects click on 'Compare More'.">
+					<b>[Compare]</b>
+				</span>
+			</td>
+		</tr>
+	</table>
 	</div>

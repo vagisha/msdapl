@@ -371,9 +371,25 @@ function compareSelectedProtInferAndMore() {
 	window.location.href = url;
 }
 
+// Used for ProteinProphet inferences
+// TODO update to use the same method as MSDaPl's protein inferences.
 function clearSelectedProtInfer() {
 	$("input.compare_cb:checked").each(function() {
 		$(this).attr('checked', false);
+	});
+}
+
+// Used for MSDaPl's protein inferences
+function clearSelectedProtInfer(analysisId) {
+	$("input.compare_cb#"+analysisId).each(function() {
+		$(this).attr('checked', false);
+	});
+}
+
+
+function selectAllProtInfer(analysisId) {
+	$("input.compare_cb#"+analysisId).each(function() {
+		$(this).attr('checked', true);
 	});
 }
 

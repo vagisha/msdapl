@@ -257,15 +257,8 @@
 
 <logic:notEmpty name="experiment" property="proteinProphetRuns">
 	<%@ include file="proteinProphetDetails.jsp" %>
-</logic:notEmpty>
-
-<logic:notEmpty name="experiment" property="protInferRuns">
-	<%@ include file="protInferDetails.jsp" %>
-</logic:notEmpty>
-
-
-<div style="margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
-<table width="100%">
+	<div style="margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
+	<table width="100%">
 	<tr>
 			<td colspan="9" align="right">
 				<input type="checkbox" id="grpProts" value="group" checked="checked" />Group Indistinguishable Proteins
@@ -277,8 +270,10 @@
 				<span class="clickable" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer();">[Clear Selected]</span>
 			</td>
 		</tr>
-</table>
-</div>
+	</table>
+	</div>
+</logic:notEmpty>
+
 </logic:equal>
 
 
