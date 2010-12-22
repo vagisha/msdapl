@@ -192,6 +192,9 @@ public class ClusteringGatewayAction extends Action {
 			}
 		}
 		
+		if(myForm.getParsimoniousParam() != savedForm.getParsimoniousParam()) 
+			return false;
+		
 		if(myForm.getGroupIndistinguishableProteins() != savedForm.getGroupIndistinguishableProteins())
 			return false;
 		

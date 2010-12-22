@@ -17,7 +17,6 @@ import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
-import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
 import org.yeastrc.www.compare.dataset.DatasetSource;
 import org.yeastrc.www.compare.dataset.FilterableDataset;
@@ -230,10 +229,23 @@ public class ProteinDatasetComparer {
         }
     }
     
-    private List<Integer> getAllNonParsimoniousProteinIdsForDataset(Dataset dataset) {
+    private List<Integer> getAllNonParsimoniousProteinIdsForDataset(FilterableDataset dataset) {
         
         if(dataset.getSource() == DatasetSource.PROTINFER) {
-            return protDao.getNonParsimoniousNrseqProteinIds(dataset.getDatasetId()); // non-parsimonious only
+        	ProteinFilterCriteria filterCriteria = dataset.getProteinFilterCrteria();
+        	filterCriteria.setParsimonious(false);
+    		filterCriteria.setNonParsimonious(true);
+    		filterCriteria.setSubset(true);
+    		filterCriteria.setNonSubset(true);
+    		List<Integer> ids = protDao.getFilteredNrseqIds(dataset.getDatasetId(), 
+        			filterCriteria);
+    		
+    		filterCriteria.setParsimonious(true);
+    		filterCriteria.setNonParsimonious(false);
+    		filterCriteria.setSubset(true);
+    		filterCriteria.setNonSubset(true);
+    		return ids;
+//            return protDao.getNonParsimoniousNrseqProteinIds(dataset.getDatasetId()); // non-parsimonious only
         }
         else if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
             return ppProtDao.getNrseqProteinIds(dataset.getDatasetId(), false, true); // non-parsimonious only
@@ -243,10 +255,24 @@ public class ProteinDatasetComparer {
         }
     }
     
-    private List<Integer> getAllSubsetProteinIdsForDataset(Dataset dataset) {
+    private List<Integer> getAllSubsetProteinIdsForDataset(FilterableDataset dataset) {
         
         if(dataset.getSource() == DatasetSource.PROTINFER) {
-            return protDao.getSubsetNrseqProteinIds(dataset.getDatasetId()); // subset only
+        	
+        	ProteinFilterCriteria filterCriteria = dataset.getProteinFilterCrteria();
+        	filterCriteria.setParsimonious(true);
+    		filterCriteria.setNonParsimonious(true);
+    		filterCriteria.setSubset(true);
+    		filterCriteria.setNonSubset(false);
+    		List<Integer> ids = protDao.getFilteredNrseqIds(dataset.getDatasetId(), 
+        			filterCriteria);
+    		
+    		filterCriteria.setParsimonious(true);
+    		filterCriteria.setNonParsimonious(true);
+    		filterCriteria.setSubset(false);
+    		filterCriteria.setNonSubset(true);
+    		return ids;
+            //return protDao.getSubsetNrseqProteinIds(dataset.getDatasetId()); // subset only
         }
         else if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
         	// For ProteinProphet non-parsimonious == subset (OR subsumed)

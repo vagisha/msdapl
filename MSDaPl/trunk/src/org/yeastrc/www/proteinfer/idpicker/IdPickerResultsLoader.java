@@ -451,10 +451,14 @@ public class IdPickerResultsLoader {
     	int firstIndex = descending ? pageIndices[1] : pageIndices[0];
     	int lastIndex = descending ? pageIndices[0] : pageIndices[1];
     	
+    	//log.info("firstIndex: "+firstIndex+"; lastIndex: "+lastIndex);
     	if(completeGroups) {
     		firstIndex = getStartIndexToCompleteFirstGroup(allProteinIds, firstIndex);
     		lastIndex = getEndIndexToCompleteFirstGroup(allProteinIds, lastIndex);
+    		//log.info("AFTER completeGroups firstIndex: "+firstIndex+"; lastIndex: "+lastIndex);
     	}
+    	
+    	//log.info("ALL protein ID size: "+allProteinIds);
     	
     	// sublist
         List<Integer> proteinIds = new ArrayList<Integer>();
@@ -487,11 +491,11 @@ public class IdPickerResultsLoader {
     	while(idx >= 0) {
     		protein = idpProtBaseDao.loadProtein(allProteinIds.get(idx));
     		if(protein.getProteinGroupLabel() != groupLabel) {
-    			idx = idx+1;
     			break;
     		}
     		idx--;
     	}
+    	idx = idx+1;
     	return idx;
     }
     
@@ -513,11 +517,11 @@ public class IdPickerResultsLoader {
     	while(idx < allProteinIds.size()) {
     		protein = idpProtBaseDao.loadProtein(allProteinIds.get(idx));
     		if(protein.getProteinGroupLabel() != groupLabel) {
-    			idx = idx-1;
     			break;
     		}
     		idx++;
     	}
+    	idx = idx-1;
     	return idx;
     }
     
