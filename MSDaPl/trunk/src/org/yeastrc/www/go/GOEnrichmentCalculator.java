@@ -85,7 +85,7 @@ public class GOEnrichmentCalculator {
         calculateEnrichment(enrichedTerms, output.getNumInputAnnotatedProteins(), output.getNumAllAnnotatedSpeciesProteins());
         
         if(output.isApplyMultiTestCorrection()) {
-        	log.info("Applying Benjamini Horchberg correction");
+        	log.info("Applying Benjamini Hochberg correction");
         	// Apply Benjamini-Hochberg correction to control FDR rate
         	applyBenjaminiHochbergCorrection(enrichedTerms);
         }
@@ -111,19 +111,7 @@ public class GOEnrichmentCalculator {
     private static void applyBenjaminiHochbergCorrection(
 			List<EnrichedGOTerm> enrichedTerms) {
 		
-    	// sort the terms by hypergeometric p-value (ascending)
-    	Collections.sort(enrichedTerms);
-    	
-    	int n = enrichedTerms.size();
-    	
-    	for (int i = 0; i < enrichedTerms.size(); i++) {
-    		
-    		EnrichedGOTerm term = enrichedTerms.get(i);
-    		
-    		double corrected = term.getPValue() * (n/(i+1)); // pvalue * (n/(rank_in_list)))
-    		//log.info("original: "+term.getPValue()+" corrected: "+corrected);
-    		term.setCorrectedPvalue(corrected);
-    	}
+    	BenjaminiHochbergPVal.adjust(enrichedTerms);
 	}
 
 	private static int totalAnnotatedInputProteinCount(List<Integer> proteinIds) throws SQLException {

@@ -115,6 +115,8 @@ public class EnrichedGOTerm implements Comparable<EnrichedGOTerm> {
         buf.append("\t");
         buf.append("pval: "+getPValue());
         buf.append("\t");
+        buf.append("corrected pval: "+correctedPValue);
+        buf.append("\t");
         buf.append(goNode.getAccession());
         buf.append("\t");
         buf.append(goNode.getName());

@@ -1,6 +1,7 @@
 package org.yeastrc.www.go;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.naming.Context;
@@ -13,11 +14,14 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.yeastrc.bio.go.GOUtils;
+import org.yeastrc.www.compare.go.BenjaminiHochbergFDR;
 
 public class GOEnrichmentCalculatorTest extends TestCase {
 
     private List<Integer> proteinIds;
     private int speciesId = 4932; // yeast (S.cerevisiae)
+    
+    private static final Logger log = Logger.getLogger(GOEnrichmentCalculatorTest.class);
     
     static {
         
@@ -129,7 +133,7 @@ public class GOEnrichmentCalculatorTest extends TestCase {
         assertEquals(18, proteinIds.size());
         GOEnrichmentInput input = new GOEnrichmentInput(speciesId);
         input.setProteinIds(proteinIds);
-        input.setPValCutoff(0.01);
+        input.setPValCutoff(1.0);
         input.setGoAspect(GOUtils.BIOLOGICAL_PROCESS);
         
         GOEnrichmentOutput output = null;
@@ -143,11 +147,37 @@ public class GOEnrichmentCalculatorTest extends TestCase {
         assertNotNull(output);
         
         List<EnrichedGOTerm> bpEnriched = output.getEnrichedTerms();
-        for(EnrichedGOTerm term: bpEnriched) {
-            System.out.println(term);
-        }
+        assertTrue(bpEnriched.size() == 219);
+        
+//        for(EnrichedGOTerm term: bpEnriched) {
+//            log.info(term);
+//        }
         
         
+//        HashMap<String, String> mapForBingoCalc = new HashMap<String, String>();
+//        HashMap<String, EnrichedGOTerm> myCalculations = new HashMap<String, EnrichedGOTerm>();
+//        
+//        
+//        for(EnrichedGOTerm term: bpEnriched) {
+//        	String pval = term.getPvalueString();
+//        	//log.info(term);
+//        	String name = term.getGoNode().getAccession();
+//        	mapForBingoCalc.put(name, pval);
+//        	
+//        	myCalculations.put(name, term);
+//        }
+//        
+//        BenjaminiHochbergFDR bingoCalc = new BenjaminiHochbergFDR(mapForBingoCalc, "0.05");
+//        bingoCalc.calculate();
+//        
+//        HashMap<String, String> correctedBingoMap = bingoCalc.getCorrectionMap();
+//        
+//        for(String name: correctedBingoMap.keySet()) {
+//        	double bingoPval = Double.valueOf(correctedBingoMap.get(name));
+//        	
+//        	double myPval = myCalculations.get(name).getCorrectedPvalue();
+//        	assertEquals(myPval, bingoPval, 0.00005);
+//        }
     }
 
     public void testGetEnrichedTerms() {
