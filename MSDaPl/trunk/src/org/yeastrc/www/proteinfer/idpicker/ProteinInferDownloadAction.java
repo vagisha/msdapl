@@ -89,6 +89,7 @@ public class ProteinInferDownloadAction extends Action {
         writer.write("Exclude Indistinguishable Groups: "+filterForm.isExcludeIndistinProteinGroups()+"\n");
         writer.write("Validation Status: "+filterForm.getValidationStatusString()+"\n");
         writer.write("Include proteins with peptide charge states: "+filterForm.getChargeStatesString()+"\n");
+        writer.write("Peptide sequence: "+filterForm.getPeptide()+"; Exact match: "+filterForm.getExactPeptideMatch()+"\n");
         writer.write("Fasta ID filter: "+filterForm.getAccessionLike()+"\n");
         writer.write("Description filter (Like): "+filterForm.getDescriptionLike()+"\n");
         writer.write("Description filter (Not Like): "+filterForm.getDescriptionNotLike()+"\n");
@@ -583,7 +584,7 @@ public class ProteinInferDownloadAction extends Action {
             			commonNames += ";"+cn;
             	} catch (SQLException e) {
             		log.error("Error getting common names", e);
-            		fastaIds += ",ERROR";
+            		commonNames += ",ERROR";
             	}
             }
 			

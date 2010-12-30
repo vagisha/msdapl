@@ -1106,6 +1106,7 @@
 	>
 		<forward name="ViewResults" path="/viewNewPProphetResult.do" redirect="false" />
 		<forward name="Update" path="/updateProteinProphetResult.do" redirect="false" />
+		<forward name="Download" path="/downloadProteinProphetResults.do" redirect="false" />
 		<forward name="GOSlimAnalysis" path="/proteinProphetGoSlimAnalysis.do" redirect="false" />
 		<forward name="GOEnrichAnalysis" path="/proteinProphetGoEnrichment.do" redirect="false" />
 		<forward name="Failure" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
@@ -1117,6 +1118,17 @@
 		name="proteinProphetFilterForm"
 		scope="request"
 		validate="true"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/downloadProteinProphetResults"
+		name="proteinProphetFilterForm"
+		scope="request"
+		validate="true"
+		type="org.yeastrc.www.proteinfer.proteinProphet.ProteinProphetDownloadAction"
 	>
 		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
 		<forward name="Failure" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />

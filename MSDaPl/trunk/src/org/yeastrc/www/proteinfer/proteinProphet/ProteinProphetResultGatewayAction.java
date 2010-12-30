@@ -44,9 +44,9 @@ public class ProteinProphetResultGatewayAction extends Action {
         // form for filtering and display options
         ProteinProphetFilterForm filterForm = (ProteinProphetFilterForm)form;
         
-//        if(filterForm.isDoDownload()) {
-//        	return mapping.findForward("Download");
-//        }
+        if(filterForm.isDoDownload()) {
+        	return mapping.findForward("Download");
+        }
         if (filterForm.isDoGoSlimAnalysis()) {
         	return mapping.findForward("GOSlimAnalysis");
         }

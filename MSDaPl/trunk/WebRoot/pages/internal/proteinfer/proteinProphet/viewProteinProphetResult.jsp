@@ -812,6 +812,7 @@ function updateResults() {
 	if(!validateForm())
     	return false;
     
+    $("form#filterForm input[name='doDownload']").val("false");
     $("form#filterForm input[name='doGoSlimAnalysis']").val("false");
 	$("form#filterForm input[name='doGoEnrichAnalysis']").val("false");
     	
@@ -837,6 +838,21 @@ function refreshProteinList(responseText) {
 }
 
 // ---------------------------------------------------------------------------------------
+// DOWNLOAD RESULTS
+// ---------------------------------------------------------------------------------------
+function downloadResults() {
+
+	// validate form
+	if(!validateForm())
+    	return false;
+	$("form#filterForm input[name='doDownload']").val("true");
+    $("form#filterForm input[name='doGoSlimAnalysis']").val("false");
+	$("form#filterForm input[name='doGoEnrichAnalysis']").val("false");
+    
+	$("form#filterForm").submit();
+}
+
+// ---------------------------------------------------------------------------------------
 // GENE ONTOLOGY ANALYSIS RESULTS
 // ---------------------------------------------------------------------------------------
 function goSlimAnalysisResults() {
@@ -847,6 +863,7 @@ function goSlimAnalysisResults() {
     var goAspect = $("#goAspectField1").val();
     var goSlim = $("#goSlimTermIdField").val();
     
+    $("form#filterForm input[name='doDownload']").val("false");
 	//alert("GO aspect "+goAspect+"; GO SLIM: "+goSlim);
 	$("form#filterForm input[name='doGoSlimAnalysis']").val("true");
 	$("form#filterForm input[name='getGoSlimTree']").val("false");
@@ -930,6 +947,7 @@ function goEnrichmentResults() {
     var goPVal = $("#goEnrichmentPValField").val();
     var species = $("#speciesField").val();
     
+    $("form#filterForm input[name='doDownload']").val("false");
 	$("form#filterForm input[name='doGoEnrichAnalysis']").val("true");
 	$("form#filterForm input[name='doGoSlimAnalysis']").val("false");
 	

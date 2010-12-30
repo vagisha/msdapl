@@ -90,6 +90,7 @@ function removeFromGoTermFilters(goTerm, warn) {
   <html:form action="/proteinProphetGateway" method="post" styleId="filterForm" >
   
   <html:hidden name="proteinProphetFilterForm" property="pinferId" />
+  <html:hidden name="proteinProphetFilterForm" property="doDownload" />
   <html:hidden name="proteinProphetFilterForm" property="doGoSlimAnalysis" />
   <html:hidden name="proteinProphetFilterForm" property="getGoSlimTree" />
   <html:hidden name="proteinProphetFilterForm" property="doGoEnrichAnalysis" />
@@ -311,11 +312,16 @@ function removeFromGoTermFilters(goTerm, warn) {
     		<button class="plain_button" style="margin-top:2px;" 
     		        onclick="javascript:updateResults();return false;">Update</button>
     		<!--<html:submit styleClass="plain_button" style="margin-top:2px;">Update</html:submit>-->
+    		
+    		<!-- Download Results -->
+    		&nbsp;
+    		<a href="" onclick="javascript:downloadResults();return false;" ><b>Download Results</b></a> &nbsp; 
     	</td>
     	 
   </tr>
   
   
  </TABLE>
+
 
 </html:form>
