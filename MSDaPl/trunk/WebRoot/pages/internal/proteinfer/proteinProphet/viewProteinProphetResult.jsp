@@ -1319,20 +1319,32 @@ function hideAllDescriptionsForProtein(proteinId) {
     		P-Value: <html:text name="proteinProphetFilterForm" property="goEnrichmentPVal" styleId="goEnrichmentPValField"></html:text>
     		</nobr>
     	</td>
-		
-		<td style="padding:5x;">
-			<nobr>
-    		Species: <html:select name="proteinProphetFilterForm" property="speciesId" styleId="speciesField">
-    		<html:option value="0">None</html:option>
-    		<html:options collection="speciesList" property="id" labelProperty="name"/>
-    		</html:select>
-    		</nobr>
-    	</td>
     	
 		<td style="padding:5x;">
 			<a href="" onclick="javascript:goEnrichmentResults();return false;"><b>Update</b></a>
 		</td> 
 		   	
+    	</tr>
+    	
+    	<tr>
+    		<td></td>
+    		<td style="padding:5x;">
+				<nobr>
+    			Species: <html:select name="proteinProphetFilterForm" property="speciesId" styleId="speciesField">
+    			<html:option value="0">None</html:option>
+    			<html:options collection="speciesList" property="id" labelProperty="name"/>
+    			</html:select>
+    			</nobr>
+    		</td>
+    		
+    		<td>
+    			<nobr>
+    			Multiple Test Correction: 
+    			<html:checkbox name="proteinProphetFilterForm" property="applyMultiTestCorrection" styleId="applyMultiTestCorrectionField"></html:checkbox>
+    			<br/>
+    			<span style="font-size:8pt;color:gray">Benjamini-Hochberg</span>
+    			</nobr>
+    		</td>
     	</tr>
     	
     	<tr>

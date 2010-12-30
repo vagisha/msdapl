@@ -1517,21 +1517,8 @@ function hideAllDescriptionsForProtein(proteinId) {
     		<nobr>
     		P-Value: <html:text name="proteinInferFilterForm" property="goEnrichmentPVal" styleId="goEnrichmentPValField" size="4"></html:text>
     		</nobr>
-    		&nbsp;
-    		<nobr>
-    		<span class="tooltip" title="Apply multiple test correction (Benjamini-Hochberg)">Adjust:</span> 
-    		<html:checkbox name="proteinInferFilterForm" property="applyMultiTestCorrection" styleId="applyMultiTestCorrectionField"></html:checkbox>
-    		</nobr>
     	</td>
 		
-		<td style="padding:5x;">
-			<nobr>
-    		Species: <html:select name="proteinInferFilterForm" property="speciesId" styleId="speciesField">
-    		<html:option value="0">None</html:option>
-    		<html:options collection="speciesList" property="id" labelProperty="name"/>
-    		</html:select>
-    		</nobr>
-    	</td>
     	
 		<td style="padding:5x;">
 			<a href="" onclick="javascript:goEnrichmentResults();return false;"><b>Update</b></a>
@@ -1539,11 +1526,32 @@ function hideAllDescriptionsForProtein(proteinId) {
 		   	
     	</tr>
     	<tr>
+    		<td></td>
+    		<td style="padding:5x;">
+				<nobr>
+    			Species: <html:select name="proteinInferFilterForm" property="speciesId" styleId="speciesField">
+    			<html:option value="0">None</html:option>
+    			<html:options collection="speciesList" property="id" labelProperty="name"/>
+    			</html:select>
+    			</nobr>
+    		</td>
+    		<td>
+    			<nobr>
+    			Multiple Test Correction: 
+    			<html:checkbox name="proteinInferFilterForm" property="applyMultiTestCorrection" styleId="applyMultiTestCorrectionField"></html:checkbox>
+    			<br/>
+    			<span style="font-size:8pt;color:gray">Benjamini-Hochberg</span>
+    			</nobr>
+    		</td>
+    	</tr>
+    	
+    	<tr>
     		<td colspan="5">
     		<span style="font-size:8pt; color:red;"><b>NOTE:</b> If the filtering criteria under the "Protein List" tab has been changed 
     		please click "Update" to analyze the current list of filtered proteins.</span>
     		</td>
     	</tr>
+    	
     	</table>
     	</div>
     	
