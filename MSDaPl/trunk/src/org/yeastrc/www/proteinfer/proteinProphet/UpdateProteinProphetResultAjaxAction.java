@@ -176,12 +176,7 @@ public class UpdateProteinProphetResultAjaxAction extends Action {
         
         // Results summary
         WProteinProphetResultSummary summary = ProteinProphetResultsLoader.getProteinProphetResultSummary(pinferId, proteinIds);
-        request.setAttribute("filteredProteinCount", summary.getFilteredProteinCount());
-        request.setAttribute("parsimProteinCount", summary.getFilteredParsimoniousProteinCount());
-        request.setAttribute("filteredProteinGrpCount", summary.getFilteredProteinGroupCount());
-        request.setAttribute("parsimProteinGrpCount", summary.getFilteredParsimoniousProteinGroupCount());
-        request.setAttribute("filteredProphetGrpCount", summary.getFilteredProphetGroupCount());
-        request.setAttribute("parsimProphetGrpCount", summary.getFilteredParsimoniousProphetGroupCount());
+        request.setAttribute("resultSummary", summary);
         
         
         long e = System.currentTimeMillis();

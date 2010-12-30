@@ -20,6 +20,17 @@ public class WProteinProphetResultSummary {
     private int filteredProteinGroupCount;
     private int filteredParsimoniousProteinGroupCount;
     
+    private int allProteinCount;
+	private int allParsimoniousProteinCount;
+	
+	private int allProteinProphetGroupCount;
+	private int allParsimoniousProteinProphetGroupCount;
+	
+	private int allProteinGroupCount;
+	private int allParsimoniousProteinGroupCount;
+	
+	
+    
     public int getFilteredProteinCount() {
         return filteredProteinCount;
     }
@@ -58,5 +69,43 @@ public class WProteinProphetResultSummary {
 	public void setFilteredParsimoniousProphetGroupCount(
 			int filteredParsimoniousProphetGroupCount) {
 		this.filteredParsimoniousProphetGroupCount = filteredParsimoniousProphetGroupCount;
+	}
+	public int getAllProteinCount() {
+		return allProteinCount;
+	}
+	public void setAllProteinCount(int allProteinCount) {
+		this.allProteinCount = allProteinCount;
+	}
+	public int getAllParsimoniousProteinCount() {
+		return allParsimoniousProteinCount;
+	}
+	public void setAllParsimoniousProteinCount(int allParsimoniousProteinCount) {
+		this.allParsimoniousProteinCount = allParsimoniousProteinCount;
+	}
+	public int getAllProteinProphetGroupCount() {
+		return allProteinProphetGroupCount;
+	}
+	public void setAllProteinProphetGroupCount(int allProteinProphetGroupCount) {
+		this.allProteinProphetGroupCount = allProteinProphetGroupCount;
+	}
+	public int getAllParsimoniousProteinProphetGroupCount() {
+		return allParsimoniousProteinProphetGroupCount;
+	}
+	public void setAllParsimoniousProteinProphetGroupCount(
+			int allParsimoniousProteinProphetGroupCount) {
+		this.allParsimoniousProteinProphetGroupCount = allParsimoniousProteinProphetGroupCount;
+	}
+	public int getAllProteinGroupCount() {
+		return allProteinGroupCount;
+	}
+	public void setAllProteinGroupCount(int allProteinGroupCount) {
+		this.allProteinGroupCount = allProteinGroupCount;
+	}
+	public int getAllParsimoniousProteinGroupCount() {
+		return allParsimoniousProteinGroupCount;
+	}
+	public void setAllParsimoniousProteinGroupCount(
+			int allParsimoniousProteinGroupCount) {
+		this.allParsimoniousProteinGroupCount = allParsimoniousProteinGroupCount;
 	}
 }

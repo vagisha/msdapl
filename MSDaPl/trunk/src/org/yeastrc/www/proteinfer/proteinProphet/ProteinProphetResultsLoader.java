@@ -543,10 +543,35 @@ public class ProteinProphetResultsLoader {
         long s = System.currentTimeMillis();
         
         WProteinProphetResultSummary summary = new WProteinProphetResultSummary();
+        
+        
+        // protein counts before filtering
+        summary.setAllProteinCount(ppProtDao.getProteinCount(pinferId));
+        
+        // parsimonious (non-subset) protein IDs before filtering
+        List<Integer> parsimProteinIds = ppProtDao.getProteinferProteinIds(pinferId,true);
+        summary.setAllParsimoniousProteinCount(parsimProteinIds.size());
+        
+        // ProteinProphet group count before filtering
+        int allProphetGroupCount = ppProtDao.getProteinProphetGroupCount(pinferId, false);
+        summary.setAllProteinProphetGroupCount(allProphetGroupCount);
+        
+        // Parsimonious (non-subset) ProteinProphet group count before filtering
+        int allParsmimProphetGroupCount = ppProtDao.getProteinProphetGroupCount(pinferId, true);
+        summary.setAllParsimoniousProteinProphetGroupCount(allParsmimProphetGroupCount);
+        
+        // Indistinguishable group count before filtering
+        int allIndGroupCount = ppProtDao.getIndistinguishableGroupCount(pinferId, false);
+        summary.setAllProteinGroupCount(allIndGroupCount);
+        
+        // Parsimonious (non-subset) Indistinguishable group count before filtering
+        int allParsimIndGroupCount = ppProtDao.getIndistinguishableGroupCount(pinferId, true);
+        summary.setAllParsimoniousProteinGroupCount(allParsimIndGroupCount);
+        
+        
+        // protein counts after filtering
         summary.setFilteredProteinCount(proteinIds.size());
         
-        // parsimonious protein IDs
-        List<Integer> parsimProteinIds = ppProtDao.getProteinferProteinIds(pinferId, true);
         Map<Integer, Integer> protGroupMap = ppProtDao.getProteinGroupIds(pinferId, false);
         Map<Integer, Integer> protProphetGroupMap = ppProtDao.getProteinProphetGroupIds(pinferId, false);
         
