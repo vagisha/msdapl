@@ -189,7 +189,7 @@
 	</td>
 	<td align="left" valign="top">
 	<div id="protsequence_<bean:write name="protein" property="protein.id"/>">
-	<!-- Protein sequwnce -->
+	<!-- Protein sequence -->
 	<pre><bean:write name="proteinSequenceHtml" filter="false"/></pre>
 	</div>
 	<!-- Place holder for Philius Annotations -->

@@ -420,6 +420,9 @@ function showProteinDetails(proteinId, display, block) {
 										// highlight any modified residues 
 										$("#protdetailstbl_"+proteinId+" .peptide").highlightPeptide();
 										
+										// highlight any modified residues in the protein
+										$("#protsequence_"+proteinId+" .peptide").highlightPeptide();
+										
 										$(this).show();
 										// save a cookie
 										saveProtDetailCookie(<%=pinferId%>, proteinId);

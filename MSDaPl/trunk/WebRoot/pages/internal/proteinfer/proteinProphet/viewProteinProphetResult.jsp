@@ -391,8 +391,11 @@ function showProteinDetails(proteinId, display, block) {
 										$("#protdetailstbl_"+proteinId+" th.main").addClass("pinfer_A");
 										$("#protdetailstbl_"+proteinId+" tbody tr.main").addClass("pinfer_A");
 										
-										// highlight any modified residues 
+										// highlight any modified residues in the peptides
 										$("#protdetailstbl_"+proteinId+" .peptide").highlightPeptide();
+										
+										// highlight any modified residues in the protein
+										$("#protsequence_"+proteinId+" .peptide").highlightPeptide();
 										
 										$(this).show();
 										// save a cookie

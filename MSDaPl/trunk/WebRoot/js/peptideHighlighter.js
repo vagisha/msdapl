@@ -49,7 +49,7 @@
 	           	  	      while(text[j] != ']') j += 1;
 	           	  	      
 	           	  	      var label = text.substring(i+1, j);
-	           	  	      var tooltip = label; // text within the square brachets will be used as the tooltip
+	           	  	      var tooltip = label; // text within the square brackets will be used as the tooltip
 	           	  	      
 	           	  	      // remove a leading '+' or a '-' from the label
 	           	  	      if(label.match("^\\+") || label.match("^\\-"))
@@ -79,7 +79,7 @@
 	           	  	      
 	           	  	      newText += '<span style=\"background-color:'+h_color+
 	           	  	      			 '; color: '+t_color+
-	           	  	                 '; font-weight:bold; border:1px solid '+o.borderColor+
+	           	  	                 '; border:0px solid '+o.borderColor+
 	           	  	                 '; cursor: help;\" title=\"'+tooltip+'\">';
 	           	  	      newText += prevChar;
 	           	  	      newText += '</span>';
