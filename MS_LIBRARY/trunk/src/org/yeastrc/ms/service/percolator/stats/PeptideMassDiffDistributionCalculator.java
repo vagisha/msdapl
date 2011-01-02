@@ -7,7 +7,6 @@
 package org.yeastrc.ms.service.percolator.stats;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
@@ -34,12 +33,14 @@ public class PeptideMassDiffDistributionCalculator {
 	private double stdDev;
 	private List<Bin> bins; 
 	private int totalCount;
+	private boolean usePpmDifference = false;
 	
 	private static final Logger log = Logger.getLogger(PeptideMassDiffDistributionCalculator.class);
 	
-	public PeptideMassDiffDistributionCalculator (int analysisId, double scoreCutoff) {
+	public PeptideMassDiffDistributionCalculator (int analysisId, double scoreCutoff, boolean usePpmDifference) {
 		this.analysisId = analysisId;
 		this.scoreCutoff = scoreCutoff;
+		this.usePpmDifference = usePpmDifference;
 	}
 	                            
 	public double getMinDiff() {
@@ -102,6 +103,11 @@ public class PeptideMassDiffDistributionCalculator {
 				BigDecimal calcMass = seqRes.getSequestResultData().getCalculatedMass();
 
 				double diff = obsMass.doubleValue() - calcMass.doubleValue();
+				
+				if(this.usePpmDifference) {
+					
+					diff = (diff / calcMass.doubleValue()) * 1000000;
+				}
 				stats.addValue(diff);
 			}
 		}
@@ -119,9 +125,11 @@ public class PeptideMassDiffDistributionCalculator {
 		maxDiff = stats.getMax();
 		System.out.println("VARIANCE: "+stats.getVariance());
 		
-		initBins();
+		initBins(minDiff, maxDiff);
 		
 		double[] sortedDiffs = stats.getSortedValues();
+		
+		
 		int idx = 0;
 		for(Bin bin: bins) {
 			
@@ -145,22 +153,23 @@ public class PeptideMassDiffDistributionCalculator {
 	}
 
 
-	private void initBins() {
+	private void initBins(double minValue, double maxValue) {
 		
-		bins = new ArrayList<Bin>();
-		double s = -3.25;
-		for(int i = 0; i < 13; i++) {
-			bins.add(new Bin(s, s+0.5));
-			s += 0.5;
-		}
+		this.bins = BinCalculator.getInstance().getBins(minValue, maxValue, 15);
+//		bins = new ArrayList<Bin>();
+//		double s = -3.25;
+//		for(int i = 0; i < 13; i++) {
+//			bins.add(new Bin(s, s+0.5));
+//			s += 0.5;
+//		}
 	}
 	
 	public static void main(String[] args) {
 		
-		int analysisId = 97;
+		int analysisId = 99;
 		double qvalue = 0.01;
 		
-		PeptideMassDiffDistributionCalculator calculator = new PeptideMassDiffDistributionCalculator(analysisId, qvalue);
+		PeptideMassDiffDistributionCalculator calculator = new PeptideMassDiffDistributionCalculator(analysisId, qvalue, false);
 		calculator.calculate();
 		List<Bin> bins = calculator.getBins();
 		System.out.println("Min: "+calculator.getMinDiff());
