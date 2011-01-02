@@ -5,6 +5,7 @@
  */
 package org.yeastrc.experiment.stats;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.yeastrc.ms.service.percolator.stats.Bin;
@@ -57,7 +58,8 @@ public class PercolatorPsmDeltaMassDistribution {
 		buf.append("&chbh=12");
 		
 		List<Bin> bins = calculator.getBins();
-		
+		Collections.sort(bins);
+	
 		buf.append("&chd=t:");
 		String data = "";
 		int maxCount = 0;
@@ -72,8 +74,11 @@ public class PercolatorPsmDeltaMassDistribution {
 		
 		buf.append("&chxl=1:");
 		data = "";
-		for(Bin bin: bins)
+		// labels go in reverse order of data; 
+		for(int i = bins.size() - 1; i >= 0; i--) {
+			Bin bin = bins.get(i);
 			data += "|"+bin.getBinStart()+" - "+bin.getBinEnd();
+		}
 		buf.append(data);
 		
 		buf.append("&chds=0,"+maxCount);
@@ -87,7 +92,7 @@ public class PercolatorPsmDeltaMassDistribution {
 		int analysisId = 97;
 		double qvalue = 0.01;
 		
-		PeptideMassDiffDistributionCalculator calculator = new PeptideMassDiffDistributionCalculator(analysisId, qvalue);
+		PeptideMassDiffDistributionCalculator calculator = new PeptideMassDiffDistributionCalculator(analysisId, qvalue, false);
 		calculator.calculate();
 		List<Bin> bins = calculator.getBins();
 		System.out.println("Min: "+calculator.getMinDiff());

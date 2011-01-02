@@ -62,15 +62,28 @@ public class PsmDeltaMassStatsAjaxAction extends Action {
         }
         request.setAttribute("qvalue", qvalue);
         
+        
+        boolean usePpmMassDiff = false;
+        strVal = request.getParameter("usePpmMassDiff");
+        if(strVal == null) {
+        	response.setContentType("text/html");
+            response.getWriter().write("<b>Attribute usePpmMassDiff not found in request.</b>");
+            return null;
+        }
+        else
+        	usePpmMassDiff = Boolean.parseBoolean(strVal);
+        request.setAttribute("usePpmMassDiff", usePpmMassDiff);	
+        	
+        	
         PlotUrlCache cache = PlotUrlCache.getInstance();
-        PercolatorPsmDeltaMassDistribution stats = cache.getPsmDeltaMassResult(analysisId, qvalue);
+        PercolatorPsmDeltaMassDistribution stats = cache.getPsmDeltaMassResult(analysisId, qvalue, usePpmMassDiff);
         
         if(stats == null) {
-        	PeptideMassDiffDistributionCalculator calculator = new PeptideMassDiffDistributionCalculator(analysisId, qvalue);
+        	PeptideMassDiffDistributionCalculator calculator = new PeptideMassDiffDistributionCalculator(analysisId, qvalue, usePpmMassDiff);
         	calculator.calculate();
         	stats = new PercolatorPsmDeltaMassDistribution();
         	stats.setCalculator(calculator);
-        	cache.setPsmDeltaMassResult(analysisId, qvalue, stats);
+        	cache.setPsmDeltaMassResult(analysisId, qvalue, usePpmMassDiff, stats);
         }
         
         request.setAttribute("deltaMassStats", stats);

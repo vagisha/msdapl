@@ -76,14 +76,15 @@ function updateSpectraRetTimeResults() {
 	 });
 }
 
-function getPsmDeltaMassResults() {
+function getPsmDeltaMassResults(usePpmMassDiff) {
 	
 	qval = 0.01;
 	var analysisId = <bean:write name="analysisId"/>
 	$.blockUI();
 	$("#deltaMassPlot").load("<yrcwww:link path='viewPsmDeltaMassResults.do'/>", 	//url
 						{'analysisId': analysisId, 		// data
-						 'qvalue': qval
+						 'qvalue': qval,
+						 'usePpmMassDiff': usePpmMassDiff
 						 },
 						 function(responseText, status, xhr) {						// callback
 						 	$.unblockUI();
@@ -96,11 +97,17 @@ function getPsmDeltaMassResults() {
 function updatePsmDeltaMassResults() {
 
 	var qval = $("#psm_delta_mass_qval_input").val();
+	var massType = $("input[name='massType']:checked").val();
+	var usePpm = false;
+	if(massType=='ppm')
+		usePpm = true;
+	
 	var analysisId = <bean:write name="analysisId"/>
 	$.blockUI();
 	$("#deltaMassPlot").load("<yrcwww:link path='viewPsmDeltaMassResults.do'/>", 	//url
 						{'analysisId': analysisId, 		// data
-						 'qvalue': qval
+						 'qvalue': qval,
+						 'usePpmMassDiff': usePpm
 						 },
 						 function(responseText, status, xhr) {						// callback
 						 	$.unblockUI();
@@ -119,7 +126,11 @@ function updatePsmDeltaMassResults() {
 		<br/><br/>
 		<a href="#spectra_vs_rt">Retention Time vs MS/MS Spectra</a>
 		<br/><br/>
-		<span class="underline clickable" onclick="getPsmDeltaMassResults();return false;">Delta precursor mass historgram</span>
+		Delta precursor mass historgram:
+		&nbsp;
+		<span class="underline clickable" onclick="getPsmDeltaMassResults(false);return false;">[Da]</span>
+		&nbsp;
+		<span class="underline clickable" onclick="getPsmDeltaMassResults(true);return false;">[ppm]</span>
 		<br/>
 	</div>
 	

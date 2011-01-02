@@ -12,7 +12,18 @@
 	<div style="padding:10 7 10 7; margin-bottom:5; border: 1px dashed gray;background-color: #FFFFFF;" id="psm_delta_mass_fold_target">
 	
 		<b>qvalue</b>: <input type="text" id="psm_delta_mass_qval_input" value="<bean:write name='qvalue'/>"/>
+		<logic:equal name="usePpmMassDiff" value="true">
+			<input type="radio" name="massType" value="Da"/>Da
+			<input type="radio" name="massType" value="ppm" checked="checked"/>ppm
+		</logic:equal>
+		<logic:equal name="usePpmMassDiff" value="false">
+			<input type="radio" value="Da"  name="massType" checked="checked"/>Da
+			<input type="radio" name="massType" value="ppm"/>ppm
+		</logic:equal>
+		
+		<br/>
 		<input type="button" onclick="updatePsmDeltaMassResults()" value="Update"/>
+		
 	
 		<logic:present name="deltaMassStats">
 		<table>

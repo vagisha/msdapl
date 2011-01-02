@@ -54,7 +54,7 @@ public class PlotUrlCache {
     
     
     public String getPsmRtPlotUrl(int analysisId, double qvalue) {
-        Value value = psmRtPlotUrlStore.get(new Key(analysisId, qvalue));
+        Value value = psmRtPlotUrlStore.get(new Key(analysisId+"", qvalue+""));
         if(value != null)
             return value.plotUrl;
         else
@@ -62,7 +62,7 @@ public class PlotUrlCache {
     }
     
     public List<FileStats> getPsmRtFileStats(int analysisId, double qvalue) {
-        Value value = psmRtPlotUrlStore.get(new Key(analysisId, qvalue));
+        Value value = psmRtPlotUrlStore.get(new Key(analysisId+"", qvalue+""));
         if(value != null)
             return value.fileStats;
         else
@@ -70,7 +70,7 @@ public class PlotUrlCache {
     }
     
     public String getSpectraRtPlotUrl(int analysisId, double qvalue) {
-        Value value = spectraRtPlotUrlStore.get(new Key(analysisId, qvalue));
+        Value value = spectraRtPlotUrlStore.get(new Key(analysisId+"", qvalue+""));
         if(value != null)
             return value.plotUrl;
         else
@@ -78,7 +78,7 @@ public class PlotUrlCache {
     }
     
     public List<FileStats> getSpectraRtFileStats(int analysisId, double qvalue) {
-        Value value = spectraRtPlotUrlStore.get(new Key(analysisId, qvalue));
+        Value value = spectraRtPlotUrlStore.get(new Key(analysisId+"", qvalue+""));
         if(value != null)
             return value.fileStats;
         else
@@ -86,28 +86,28 @@ public class PlotUrlCache {
     }
     
     public void addPsmRtPlotUrl(int analysisId, double qvalue, String url, List<FileStats> fileStats) {
-        Key key = new Key(analysisId, qvalue);
+        Key key = new Key(analysisId+"", qvalue+"");
         Value value = new Value(url, fileStats);
         psmRtPlotUrlStore.put(key, value);
     }
     
     public void addSpectraRtPlotUrl(int analysisId, double qvalue, String url, List<FileStats> fileStats) {
-        Key key = new Key(analysisId, qvalue);
+        Key key = new Key(analysisId+"", qvalue+"");
         Value value = new Value(url, fileStats);
         spectraRtPlotUrlStore.put(key, value);
     }
     
     
-    public PercolatorPsmDeltaMassDistribution getPsmDeltaMassResult(int analysisId, double qvalue) {
-    	PercolatorPsmDeltaMassDistribution value = psmDeltaMassPlotUrlStore.get(new Key(analysisId, qvalue));
+    public PercolatorPsmDeltaMassDistribution getPsmDeltaMassResult(int analysisId, double qvalue, boolean usePpmMassDiff) {
+    	PercolatorPsmDeltaMassDistribution value = psmDeltaMassPlotUrlStore.get(new Key(analysisId+"", qvalue+""+usePpmMassDiff+""));
         if(value != null)
             return value;
         else
             return null;
     }
     
-    public void setPsmDeltaMassResult(int analysisId, double qvalue, PercolatorPsmDeltaMassDistribution result) {
-        Key key = new Key(analysisId, qvalue);
+    public void setPsmDeltaMassResult(int analysisId, double qvalue, boolean usePpmMassDiff, PercolatorPsmDeltaMassDistribution result) {
+        Key key = new Key(analysisId+"", qvalue+""+usePpmMassDiff+"");
         psmDeltaMassPlotUrlStore.put(key, result);
     }
     
@@ -119,25 +119,35 @@ public class PlotUrlCache {
     
 
     private static class Key {
-        int analysisId;
-        double qvalue;
+    	
+        String[] keyParts;
         
         public Key() {}
-        public Key(int analysisId, double qvalue) {
-            this.analysisId = analysisId;
-            this.qvalue = qvalue;
+        
+        public Key(String...keyParts) {
+        	this.keyParts = keyParts;
+        }
+        
+        public String getKey() {
+        	
+        	String key = "";
+        	for(String part: keyParts) 
+        		key += "_"+part;
+        	
+        	if(key.length() > 0)
+        		key = key.substring(1);
+        	return key;
         }
         
         public boolean equals(Object o) {
             if(!(o instanceof Key))
                 return false;
             Key that = (Key)o;
-            return (this.analysisId == that.analysisId) && (this.qvalue == that.qvalue);
+            return (this.getKey().equals(that.getKey()));
         }
         
         public int hashCode() {
-            String key = analysisId+"_"+qvalue;
-            return key.hashCode();
+            return getKey().hashCode();
         }
     }
     
