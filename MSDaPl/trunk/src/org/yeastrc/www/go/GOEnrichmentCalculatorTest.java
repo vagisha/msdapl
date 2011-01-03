@@ -1,7 +1,6 @@
 package org.yeastrc.www.go;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.naming.Context;
@@ -14,7 +13,6 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.yeastrc.bio.go.GOUtils;
-import org.yeastrc.www.compare.go.BenjaminiHochbergFDR;
 
 public class GOEnrichmentCalculatorTest extends TestCase {
 
