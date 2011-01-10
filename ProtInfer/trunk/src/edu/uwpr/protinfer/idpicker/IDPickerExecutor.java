@@ -24,8 +24,8 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.Program;
-import org.yeastrc.nrseq.NrDbProtein;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
+import org.yeastrc.nrseq.domain.NrDbProtein;
 
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;
