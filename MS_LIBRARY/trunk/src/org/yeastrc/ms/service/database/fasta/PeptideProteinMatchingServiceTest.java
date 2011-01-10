@@ -10,7 +10,7 @@ import junit.framework.TestCase;
 
 import org.yeastrc.ms.domain.general.EnzymeRule;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.nrseq.NrDbProtein;
+import org.yeastrc.nrseq.domain.NrDbProtein;
 
 public class PeptideProteinMatchingServiceTest extends TestCase {
 

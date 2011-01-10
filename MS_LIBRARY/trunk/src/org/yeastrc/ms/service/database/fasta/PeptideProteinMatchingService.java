@@ -24,8 +24,8 @@ import org.yeastrc.ms.domain.general.EnzymeRule;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.util.StringUtils;
-import org.yeastrc.nrseq.NrDbProtein;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
+import org.yeastrc.nrseq.domain.NrDbProtein;
 
 /**
  * 

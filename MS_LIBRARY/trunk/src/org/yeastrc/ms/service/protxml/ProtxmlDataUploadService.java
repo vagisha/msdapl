@@ -72,8 +72,8 @@ import org.yeastrc.ms.service.ProtinferUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.util.TimeUtils;
-import org.yeastrc.nrseq.NrDbProtein;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
+import org.yeastrc.nrseq.domain.NrDbProtein;
 
 /**
  * 

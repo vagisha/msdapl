@@ -19,9 +19,9 @@ import javax.sql.DataSource;
 import org.yeastrc.ms.ConnectionFactory;
 import org.yeastrc.ms.service.database.DatabaseCopier;
 import org.yeastrc.ms.service.database.DatabaseCopyException;
-import org.yeastrc.nrseq.NrDatabase;
-import org.yeastrc.nrseq.NrDbProtein;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
+import org.yeastrc.nrseq.domain.NrDatabase;
+import org.yeastrc.nrseq.domain.NrDbProtein;
 
 /**
  * 
