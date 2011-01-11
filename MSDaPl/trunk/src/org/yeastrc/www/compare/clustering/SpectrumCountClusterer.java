@@ -18,7 +18,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.util.FileUtils;
 import org.yeastrc.ms.util.TimeUtils;
-import org.yeastrc.nrseq.ProteinListing;
+import org.yeastrc.nr_seq.listing.ProteinListing;
 import org.yeastrc.www.compare.ComparisonProtein;
 import org.yeastrc.www.compare.DisplayColumns;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
