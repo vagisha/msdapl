@@ -26,7 +26,7 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerParam;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.ms.util.TimeUtils;
-import org.yeastrc.nrseq.ProteinReference;
+import org.yeastrc.nr_seq.listing.ProteinReference;
 import org.yeastrc.philius.dao.PhiliusDAOFactory;
 import org.yeastrc.philius.dao.PhiliusResultDAO;
 import org.yeastrc.philius.domain.PhiliusResult;

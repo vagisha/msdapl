@@ -22,6 +22,7 @@ import org.yeastrc.bio.go.GONode;
 import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.bio.taxonomy.TaxonomyUtils;
 import org.yeastrc.db.DBConnectionManager;
+import org.yeastrc.nr_seq.listing.ProteinListing;
 
 /**
  * 

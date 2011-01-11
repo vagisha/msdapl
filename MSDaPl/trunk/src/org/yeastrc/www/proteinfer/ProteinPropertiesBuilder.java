@@ -12,8 +12,8 @@ import java.util.Set;
 
 import org.yeastrc.ms.domain.protinfer.GenericProteinferProtein;
 import org.yeastrc.ms.util.ProteinUtils;
-import org.yeastrc.nrseq.NrDbProtein;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
+import org.yeastrc.nrseq.domain.NrDbProtein;
 
 /**
  * 

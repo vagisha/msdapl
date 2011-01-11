@@ -17,8 +17,8 @@ import java.util.Set;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.nrseq.FastaProteinLookupUtil;
-import org.yeastrc.nrseq.NrDbProtein;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
+import org.yeastrc.nrseq.domain.NrDbProtein;
 
 /**
  * 

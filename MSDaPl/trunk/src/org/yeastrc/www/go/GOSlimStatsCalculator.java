@@ -20,8 +20,8 @@ import org.yeastrc.bio.go.GOAnnotation;
 import org.yeastrc.bio.go.GONode;
 import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.bio.taxonomy.TaxonomySearcher;
-import org.yeastrc.nrseq.NrsProtein;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
+import org.yeastrc.nrseq.domain.NrProtein;
 import org.yeastrc.www.go.GOSlimAnalysis.SpeciesProteinCount;
 
 /**
@@ -115,7 +115,7 @@ public class GOSlimStatsCalculator {
 				throw new GOException("Error getting terms for GO annotations for protein: "+nrseqProteinId, e);
 			}
 			
-			NrsProtein prot = NrSeqLookupUtil.getNrProtein(nrseqProteinId);
+			NrProtein prot = NrSeqLookupUtil.getNrProtein(nrseqProteinId);
 			SpeciesProteinCount spCount = speciesCountMap.get(prot.getSpeciesId());
 			if(spCount == null) {
 				spCount = initProteinSpeciesCount(prot);
@@ -153,7 +153,7 @@ public class GOSlimStatsCalculator {
 		this.termNodes = new ArrayList<GOSlimTerm>(slimTermMap.values());
 	}
 	
-	private SpeciesProteinCount initProteinSpeciesCount(NrsProtein prot) {
+	private SpeciesProteinCount initProteinSpeciesCount(NrProtein prot) {
 		SpeciesProteinCount spCount;
 		spCount = new SpeciesProteinCount();
 		spCount.setSpeciesId(prot.getSpeciesId());

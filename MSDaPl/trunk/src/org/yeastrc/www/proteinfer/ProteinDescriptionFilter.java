@@ -19,13 +19,13 @@ import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.util.TimeUtils;
+import org.yeastrc.nr_seq.database.StandardDatabase;
+import org.yeastrc.nr_seq.database.StandardDatabaseCache;
 import org.yeastrc.nrseq.FastaProteinLookupUtil;
 import org.yeastrc.nrseq.FlyBaseUtils;
-import org.yeastrc.nrseq.NrDatabase;
-import org.yeastrc.nrseq.NrsProtein;
-import org.yeastrc.nrseq.StandardDatabase;
-import org.yeastrc.nrseq.StandardDatabaseCache;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
+import org.yeastrc.nrseq.domain.NrDatabase;
+import org.yeastrc.nrseq.domain.NrProtein;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 
 /**
@@ -139,7 +139,7 @@ public class ProteinDescriptionFilter {
     			// load the protein inference protein
     			ProteinferProtein protein = protDao.loadProtein(piProteinId);
 
-    			NrsProtein nrProtein = NrSeqLookupUtil.getNrProtein(protein.getNrseqProteinId());
+    			NrProtein nrProtein = NrSeqLookupUtil.getNrProtein(protein.getNrseqProteinId());
 
     			// first look for matching descriptions in Swiss-Prot
     			s = System.currentTimeMillis();

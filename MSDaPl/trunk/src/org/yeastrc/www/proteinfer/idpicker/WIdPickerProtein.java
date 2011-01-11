@@ -11,8 +11,8 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
 import org.yeastrc.ms.util.StringUtils;
-import org.yeastrc.nrseq.ProteinListing;
-import org.yeastrc.nrseq.ProteinReference;
+import org.yeastrc.nr_seq.listing.ProteinListing;
+import org.yeastrc.nr_seq.listing.ProteinReference;
 import org.yeastrc.www.protein.ProteinAbundanceDao.YeastOrfAbundance;
 
 public class WIdPickerProtein {

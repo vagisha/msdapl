@@ -22,7 +22,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.util.TimeUtils;
-import org.yeastrc.nrseq.ProteinReference;
+import org.yeastrc.nr_seq.listing.ProteinReference;
 import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;

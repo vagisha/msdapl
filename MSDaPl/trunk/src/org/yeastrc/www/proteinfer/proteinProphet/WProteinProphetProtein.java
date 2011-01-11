@@ -11,8 +11,8 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
 import org.yeastrc.ms.util.StringUtils;
-import org.yeastrc.nrseq.ProteinListing;
-import org.yeastrc.nrseq.ProteinReference;
+import org.yeastrc.nr_seq.listing.ProteinListing;
+import org.yeastrc.nr_seq.listing.ProteinReference;
 
 /**
  * 

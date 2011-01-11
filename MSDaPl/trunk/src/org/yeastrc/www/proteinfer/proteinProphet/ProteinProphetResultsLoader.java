@@ -6,7 +6,6 @@
  */
 package org.yeastrc.www.proteinfer.proteinProphet;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -47,10 +46,9 @@ import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.util.TimeUtils;
-import org.yeastrc.nr_seq.NRProtein;
-import org.yeastrc.nr_seq.NRProteinFactory;
-import org.yeastrc.nrseq.ProteinListing;
-import org.yeastrc.nrseq.ProteinListingBuilder;
+import org.yeastrc.nr_seq.listing.ProteinListing;
+import org.yeastrc.nr_seq.listing.ProteinListingBuilder;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 import org.yeastrc.www.proteinfer.MsResultLoader;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
@@ -755,19 +753,7 @@ public class ProteinProphetResultsLoader {
     }
 
     private static String getProteinSequence(ProteinferProtein protein) {
-        NRProtein nrprot = null;
-        NRProteinFactory nrpf = NRProteinFactory.getInstance();
-        try {
-            nrprot = (NRProtein)(nrpf.getProtein(protein.getNrseqProteinId()));
-        }
-        catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }        
-
-        return nrprot.getPeptide().getSequenceString();
+    	return NrSeqLookupUtil.getProteinSequence(protein.getNrseqProteinId());
     }
     
 

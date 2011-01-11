@@ -16,6 +16,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.bio.go.GONode;
+import org.yeastrc.bio.go.GoTermSearcher;
 import org.yeastrc.ms.util.TimeUtils;
 
 /**

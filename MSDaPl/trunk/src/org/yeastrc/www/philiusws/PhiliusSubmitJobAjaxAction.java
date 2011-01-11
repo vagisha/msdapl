@@ -19,8 +19,8 @@ import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.domain.protinfer.ProteinferPeptide;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
-import org.yeastrc.nrseq.NrsProtein;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
+import org.yeastrc.nrseq.domain.NrProtein;
 import org.yeastrc.philius.dao.PhiliusDAOFactory;
 import org.yeastrc.philius.domain.PhiliusResult;
 import org.yeastrc.www.proteinfer.ProteinSequenceHtmlBuilder;
@@ -82,7 +82,7 @@ public class PhiliusSubmitJobAjaxAction extends Action {
         
         
         // Check if we already have the Philius result for this sequence
-        NrsProtein nrProtein = NrSeqLookupUtil.getNrProtein(nrseqId);
+        NrProtein nrProtein = NrSeqLookupUtil.getNrProtein(nrseqId);
         PhiliusResult philiusResult = PhiliusDAOFactory.getInstance().getPhiliusResultDAO().
         															loadForSequence(nrProtein.getSequenceId());
         if(philiusResult != null) {

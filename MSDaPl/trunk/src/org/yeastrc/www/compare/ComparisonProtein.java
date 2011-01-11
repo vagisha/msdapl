@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.util.StringUtils;
-import org.yeastrc.nrseq.ProteinListing;
-import org.yeastrc.nrseq.ProteinReference;
+import org.yeastrc.nr_seq.listing.ProteinListing;
+import org.yeastrc.nr_seq.listing.ProteinReference;
 import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
 

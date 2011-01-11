@@ -30,10 +30,10 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.ProteinferPeptide;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.util.TimeUtils;
-import org.yeastrc.nrseq.NrsProtein;
-import org.yeastrc.nrseq.ProteinListing;
-import org.yeastrc.nrseq.ProteinListingBuilder;
+import org.yeastrc.nr_seq.listing.ProteinListing;
+import org.yeastrc.nr_seq.listing.ProteinListingBuilder;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
+import org.yeastrc.nrseq.domain.NrProtein;
 import org.yeastrc.philius.dao.PhiliusDAOFactory;
 import org.yeastrc.philius.domain.PhiliusResult;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
@@ -121,7 +121,7 @@ private static final Logger log = Logger.getLogger(ProteinDetailsAjaxAction.clas
         
         // Load our protein
         Protein protein = new Protein();
-        NrsProtein nrProtein = NrSeqLookupUtil.getNrProtein(proteinId);
+        NrProtein nrProtein = NrSeqLookupUtil.getNrProtein(proteinId);
         protein.setProtein(nrProtein);
         
         ProteinListing listing = ProteinListingBuilder.getInstance().build(nrProtein.getId(), fastaDatabaseIds);

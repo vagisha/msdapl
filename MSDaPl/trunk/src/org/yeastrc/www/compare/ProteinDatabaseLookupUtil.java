@@ -18,9 +18,9 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.nrseq.NrDatabase;
-import org.yeastrc.nrseq.StandardDatabase;
-import org.yeastrc.nrseq.StandardDatabaseCache;
+import org.yeastrc.nr_seq.database.StandardDatabase;
+import org.yeastrc.nr_seq.database.StandardDatabaseCache;
+import org.yeastrc.nrseq.domain.NrDatabase;
 
 /**
  * 
