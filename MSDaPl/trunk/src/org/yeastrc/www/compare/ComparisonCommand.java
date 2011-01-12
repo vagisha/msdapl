@@ -48,15 +48,6 @@ public enum ComparisonCommand {
 		List<ComparisonCommand> commands = new ArrayList<ComparisonCommand>();
 		commands.add(FILTER);
 		commands.add(CLUSTER);
-		//commands.add(GO_SLIM);
-		//commands.add(GO_ENRICH);
-		return commands;
-	}
-	
-	public static List<ComparisonCommand> getCommandsMinusGO() {
-		List<ComparisonCommand> commands = new ArrayList<ComparisonCommand>();
-		commands.add(FILTER);
-		commands.add(CLUSTER);
 		return commands;
 	}
 }

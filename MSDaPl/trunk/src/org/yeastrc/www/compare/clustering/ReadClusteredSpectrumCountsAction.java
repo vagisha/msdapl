@@ -243,31 +243,7 @@ public class ReadClusteredSpectrumCountsAction extends Action {
 		request.setAttribute("datasetIds", StringUtils.makeCommaSeparated(allRunIds));
 
 		
-        // GO analysis supported only for some species
-        // Species list is required for rendering the form
-        List<Integer> speciesIds = getMySpeciesIds(myForm.getAllSelectedRunIdsOrdered());
-        boolean supported = false;
-        for(Integer speciesId: speciesIds) {
-        	if(GOSupportUtils.isSpeciesSupported(speciesId)) {
-        		supported = true;
-        		break;
-        	}
-        }
-        if(supported) {
-        	request.setAttribute("goSupported", true);
-        	
-        	List<Species> speciesList = getSpeciesList(speciesIds);
-            request.setAttribute("speciesList", speciesList);
-            
-            request.setAttribute("comparisonCommands", ComparisonCommand.getCommands());
-        }
-        else {
-        	request.setAttribute("comparisonCommands", ComparisonCommand.getCommandsMinusGO());
-        }
-        
-        // Species for GO analyses
-        if(myForm.getSpeciesId() == 0 && speciesIds.size() == 1) 
-        	myForm.setSpeciesId(speciesIds.get(0));
+		request.setAttribute("comparisonCommands", ComparisonCommand.getCommands());
         
         
         

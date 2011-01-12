@@ -89,38 +89,15 @@ public class DoComparisonAction extends Action {
         }
         
         
-        // GO analysis supported only for some species. 
+        request.setAttribute("comparisonCommands", ComparisonCommand.getCommands());
+        
+        // Get the species. 
         List<Integer> speciesIds = getMySpeciesIds(allRunIds);
-        boolean supported = false;
-        for(Integer speciesId: speciesIds) {
-        	if(GOSupportUtils.isSpeciesSupported(speciesId)) {
-        		supported = true;
-        		break;
-        	}
-        }
-        if(supported) {
-        	request.setAttribute("goSupported", true);
-        	
-        	List<Species> speciesList = getSpeciesList(speciesIds);
-            request.setAttribute("speciesList", speciesList);
-            
-            request.setAttribute("comparisonCommands", ComparisonCommand.getCommands());
-        }
-        else {
-        	request.setAttribute("comparisonCommands", ComparisonCommand.getCommandsMinusGO());
-        }
-        
-        
         for(Integer speciesId: speciesIds) {
         	if(CommonNameSupportUtils.isSpeciesSupported(speciesId)) {
         		request.setAttribute("commonNameSupported", true);
         	}
         }
-        
-        // Species for GO analyses
-        if(myForm.getSpeciesId() == 0 && speciesIds.size() == 1) 
-        	myForm.setSpeciesId(speciesIds.get(0));
-        
         
         
         // Get the datasets we will be comparing
