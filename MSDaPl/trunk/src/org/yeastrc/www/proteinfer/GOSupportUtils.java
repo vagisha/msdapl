@@ -52,7 +52,15 @@ public class GOSupportUtils {
 		return speciesList;
 	}
 	
-	public static boolean isSpeciesSupported(int speciesId) {
+	public static boolean isGOSlimSupported(int speciesId) {
+		return (speciesId == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE 
+				|| speciesId == TaxonomyUtils.DROSOPHILA_MELANOGASTER
+				|| speciesId == TaxonomyUtils.CAENORHABDITIS_ELEGANS
+				|| speciesId == TaxonomyUtils.HOMO_SAPIENS
+				);
+	}
+	
+	public static boolean isGOEnrichmentSupported(int speciesId) {
 		return (speciesId == TaxonomyUtils.SACCHAROMYCES_CEREVISIAE 
 				|| speciesId == TaxonomyUtils.DROSOPHILA_MELANOGASTER
 				|| speciesId == TaxonomyUtils.CAENORHABDITIS_ELEGANS

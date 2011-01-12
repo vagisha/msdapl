@@ -194,11 +194,17 @@ public class ProteinInferViewAction extends Action {
         // Determine if we support GO analysis for this species
         // Species for GO analyses
         List<Integer> speciesIds = ProteinInferToSpeciesMapper.map(pinferId);
-        boolean supported = false;
+        boolean supported = false; 
+        boolean goslimSupported = false; 
+        boolean goEnrichmentSupported = false;
         for(Integer speciesId: speciesIds) {
-        	if(GOSupportUtils.isSpeciesSupported(speciesId)) {
+        	if(GOSupportUtils.isGOSlimSupported(speciesId)) {
         		supported = true;
-        		break;
+        		goslimSupported = true;
+        	}
+        	if(GOSupportUtils.isGOEnrichmentSupported(speciesId)) {
+        		supported = true;
+        		goEnrichmentSupported = true;
         	}
         }
         if(supported) {
@@ -208,17 +214,23 @@ public class ProteinInferViewAction extends Action {
         	List<Species> speciesList = getSpeciesList(speciesIds);
         	request.setAttribute("speciesList", speciesList);
 
-        	// GO Slim terms
-        	List<GONode> goslims = GOSlimUtils.getGOSlims();
-        	request.setAttribute("goslims", goslims);
-        	if(goslims.size() > 0) {
-        		for(GONode slim: goslims) {
-        			if(slim.getName().contains("Generic")) {
-        				filterForm.setGoSlimTermId(slim.getId());
-        				break;
+        	if(goslimSupported) {
+        		// GO Slim terms
+        		List<GONode> goslims = GOSlimUtils.getGOSlims();
+        		request.setAttribute("goslims", goslims);
+        		if(goslims.size() > 0) {
+        			for(GONode slim: goslims) {
+        				if(slim.getName().contains("Generic")) {
+        					filterForm.setGoSlimTermId(slim.getId());
+        					break;
+        				}
         			}
         		}
+        		request.setAttribute("goSlimSupported", true);
         	}
+        	
+        	if(goEnrichmentSupported)
+        		request.setAttribute("goEnrichmentSupported", true);
         }
         
         for(Integer speciesId: speciesIds) {

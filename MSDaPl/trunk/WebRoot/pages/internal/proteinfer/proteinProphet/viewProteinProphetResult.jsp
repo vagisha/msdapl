@@ -1286,6 +1286,8 @@ function hideAllDescriptionsForProtein(proteinId) {
     
     	<div align="center" style="padding: 5; border: 1px dashed gray; background-color: #F0F8FF; margin:5 0 5 0">
     	<table cellpadding="5">
+    	
+    	<logic:present name="goSlimSupported">
     	<tr>
     	<td valign="top" style="padding:5x;"><b>GO Slim Analysis: </b></td>
     	<td style="padding:5x;" valign="top">
@@ -1318,7 +1320,10 @@ function hideAllDescriptionsForProtein(proteinId) {
     		<a href="" onclick="javascript:goSlimAnalysisResults();return false;"><b>Update</b></a>
     	</td>
     	</tr>
+    	</logic:present>
     	
+    	
+    	<logic:present name="goEnrichmentSupported">
     	<tr>
     	<td valign="top" style="padding:5x;"><b>GO Enrichment: </b></td>
     	<td style="padding:5x;">
@@ -1367,6 +1372,8 @@ function hideAllDescriptionsForProtein(proteinId) {
     			</nobr>
     		</td>
     	</tr>
+    	</logic:present>
+    	
     	
     	<tr>
     		<td colspan="5">
