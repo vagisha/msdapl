@@ -22,6 +22,7 @@ public class MsDataUploadProperties {
 
     private static final Logger log = Logger.getLogger(MsDataUploadProperties.class.getName());
     
+    private static boolean doSqtBackup;
     private static String backupDirectory;
     
     private static String percRunDirectory;
@@ -48,6 +49,7 @@ public class MsDataUploadProperties {
         log.info("PeakStorageType is "+peakStorageType.name());
         
         backupDirectory = props.getProperty("backup.dir");
+        doSqtBackup = Boolean.parseBoolean(props.getProperty("backup.sqt"));
         
         percRunDirectory = props.getProperty("perc.run.dir");
         
@@ -73,6 +75,10 @@ public class MsDataUploadProperties {
     
     public static String getBackupDirectory() {
         return backupDirectory;
+    }
+    
+    public static boolean doSqtBackup() {
+    	return doSqtBackup;
     }
     
     public static String getPercolatorRunDirectory() {

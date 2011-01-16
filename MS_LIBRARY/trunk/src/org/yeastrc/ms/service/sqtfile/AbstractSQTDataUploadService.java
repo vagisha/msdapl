@@ -47,6 +47,7 @@ import org.yeastrc.ms.parser.SQTSearchDataProvider;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.service.DynamicModLookupUtil;
+import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.service.SearchDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
@@ -310,7 +311,8 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         }
         
         // copy files to a directory
-        copyFiles(experimentId);
+        if(MsDataUploadProperties.doSqtBackup())
+        	copyFiles(experimentId);
         
     }
     

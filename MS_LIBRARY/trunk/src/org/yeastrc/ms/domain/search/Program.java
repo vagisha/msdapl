@@ -5,6 +5,7 @@ public enum Program {
     SEQUEST("SEQUEST"),
     MASCOT("MASCOT"),
     XTANDEM("XTANDEM"),
+    TIDE("Tide"),
     //EE_NORM_SEQUEST("EE-normalized SEQUEST"),
     PERCOLATOR("Percolator"),
     PEPTIDE_PROPHET("PeptideProphet"),
@@ -30,6 +31,8 @@ public enum Program {
 //            return Program.EE_NORM_SEQUEST;
         else if (SearchFileFormat.SQT_PLUCID == format)
             return Program.PROLUCID;
+        else if (SearchFileFormat.SQT_TIDE == format)
+            return Program.TIDE;
         else if (SearchFileFormat.SQT_PERC == format)
             return Program.PERCOLATOR;
         else if (SearchFileFormat.SQT_PPROBE == format)
@@ -61,6 +64,8 @@ public enum Program {
             return Program.PROLUCID;
         else if (Program.PEPPROBE.name().equalsIgnoreCase(prog))
             return Program.PEPPROBE;
+        else if (Program.TIDE.name().equalsIgnoreCase(prog))
+            return Program.TIDE;
         else if (Program.PERCOLATOR.name().equalsIgnoreCase(prog))
             return Program.PERCOLATOR;
         else if (Program.PEPTIDE_PROPHET.name().equalsIgnoreCase(prog))

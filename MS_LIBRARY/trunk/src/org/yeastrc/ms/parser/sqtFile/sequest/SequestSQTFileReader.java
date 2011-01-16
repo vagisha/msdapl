@@ -121,7 +121,9 @@ public class SequestSQTFileReader extends SQTFileReader<SequestSearchScan> {
             result.setxCorrRank(Integer.parseInt(tokens[1]));
             result.setSpRank(Integer.parseInt(tokens[2]));
             result.setCalculatedMass(new BigDecimal(tokens[3]));
-            result.setDeltaCN(new BigDecimal(tokens[4]));
+            String deltaCn = tokens[4];
+            if(deltaCn.equalsIgnoreCase("nan")) deltaCn = "-1.0";
+            result.setDeltaCN(new BigDecimal(deltaCn));
             result.setxCorr(new BigDecimal(tokens[5]));
             if (useEvalue)
                 result.setEvalue(Double.parseDouble(tokens[6]));

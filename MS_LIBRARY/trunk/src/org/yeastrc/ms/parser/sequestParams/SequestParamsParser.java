@@ -157,7 +157,6 @@ public class SequestParamsParser implements SearchParamsDataProvider {
                 // look for the sequest enzyme info section so that we can get the details for the enzyme
                 // used for the search.
                 else if (currentLine.startsWith("[SEQUEST_ENZYME_INFO]")){
-                    System.out.println("Found enzyme section");
                     parseEnzymes(reader);
                 }
             }

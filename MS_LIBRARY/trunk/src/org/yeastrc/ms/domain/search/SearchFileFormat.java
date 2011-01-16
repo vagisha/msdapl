@@ -15,6 +15,7 @@ public enum SearchFileFormat {
     //SQT_NSEQ("SQT: "+Program.EE_NORM_SEQUEST.displayName()), 
     SQT_PLUCID("SQT: "+Program.PROLUCID.displayName()), 
     SQT_PPROBE("SQT: "+Program.PEPPROBE), 
+    SQT_TIDE("SQT: "+Program.TIDE), 
     SQT_PERC("SQT: "+Program.PERCOLATOR.displayName()),
     SQT_BIBLIO("SQT: "+Program.BIBLIOSPEC.displayName()),
     XML("XML: GENERIC"),
@@ -25,6 +26,7 @@ public enum SearchFileFormat {
     PEPXML_XTANDEM("pepxml: "+Program.XTANDEM.displayName()),
     PEPXML_PEPT_PROPHET("pepxml: "+Program.PEPTIDE_PROPHET.displayName()),
     PROTXML("protxml"),
+    DTASELECT_FILTER("DTASelect-filter"),
     UNKNOWN("Unknown");
 
     private String typeName;
@@ -46,6 +48,8 @@ public enum SearchFileFormat {
             return SearchFileFormat.SQT_PERC;
         else if (SearchFileFormat.SQT_PPROBE.name().equalsIgnoreCase(fmtString))
             return SearchFileFormat.SQT_PPROBE;
+        else if (SearchFileFormat.SQT_TIDE.name().equalsIgnoreCase(fmtString))
+            return SearchFileFormat.SQT_TIDE;
         else if (SearchFileFormat.PEPXML.name().equalsIgnoreCase(fmtString))
             return SearchFileFormat.PEPXML;
         else if (SearchFileFormat.PEPXML_SEQ.name().equalsIgnoreCase(fmtString))
@@ -56,6 +60,8 @@ public enum SearchFileFormat {
             return SearchFileFormat.PEPXML_XTANDEM;
         else if (SearchFileFormat.PROTXML.name().equalsIgnoreCase(fmtString))
             return SearchFileFormat.PROTXML;
+        else if(SearchFileFormat.DTASELECT_FILTER.name().equalsIgnoreCase(fmtString))
+        	return SearchFileFormat.DTASELECT_FILTER;
         else return SearchFileFormat.UNKNOWN;
     }
     
@@ -73,5 +79,24 @@ public enum SearchFileFormat {
         else if (extString.equalsIgnoreCase(SearchFileFormat.XML.name()))
         	return SearchFileFormat.XML;
         else return SearchFileFormat.UNKNOWN;
+    }
+    
+    public static SearchFileFormat forFile(String fileName) {
+    	
+    	String ext = null;
+    	
+    	if(fileName.toLowerCase().endsWith("pep.xml"))
+            ext = "pep.xml";
+    	
+    	else if(fileName.toLowerCase().endsWith("prot.xml"))
+            ext = "prot.xml";
+    	
+    	else {
+    		int idx = fileName.lastIndexOf(".");
+    		if(idx == -1)   return SearchFileFormat.UNKNOWN;
+    		ext = fileName.substring(idx);
+    	}
+        
+        return forFileExtension(ext);
     }
 }
