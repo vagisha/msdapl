@@ -754,15 +754,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         
         // 2. valid and supported search data format
         // 3. consistent data format 
-        File[] files = dir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                String name_uc = name.toLowerCase();
-                return name_uc.endsWith(".sqt");
-            }});
-        for (int i = 0; i < files.length; i++) {
-            filenames.add(files[i].getName());
-        }
+        filenames = getSqtFiles(dir);
         
         // make sure all files are of the same type
         for (String file: filenames) {
@@ -804,6 +796,22 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         
         return true;
     }
+
+    List<String> getSqtFiles(File dir) {
+    	
+    	List<String> mySqtFiles = new ArrayList<String>();
+    	
+		File[] files = dir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String name_lc = name.toLowerCase();
+                return name_lc.endsWith(".sqt");
+            }});
+        for (int i = 0; i < files.length; i++) {
+            mySqtFiles.add(files[i].getName());
+        }
+        return mySqtFiles;
+	}
 
     private String removeFileExtension(String file) {
         int idx = file.lastIndexOf(".sqt");

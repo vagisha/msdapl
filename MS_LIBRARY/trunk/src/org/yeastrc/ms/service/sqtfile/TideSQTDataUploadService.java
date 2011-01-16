@@ -6,6 +6,7 @@
 package org.yeastrc.ms.service.sqtfile;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,25 +90,38 @@ private final SequestSearchResultDAO sqtResultDao;
         return program;
     }
     
+    List<String> getSqtFiles(File dir) {
+    	
+    	List<String> mySqtFiles = new ArrayList<String>();
+    	
+		File[] files = dir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String name_lc = name.toLowerCase();
+                return (name_lc.endsWith(".sqt") && !(name_lc.endsWith("reverse.sqt")));
+            }});
+        for (int i = 0; i < files.length; i++) {
+            mySqtFiles.add(files[i].getName());
+        }
+        return mySqtFiles;
+	}
+    
+    
     @Override
     int uploadSearchParameters(int experimentId, String paramFileDirectory, 
             String remoteServer, String remoteDirectory,
             Date searchDate) throws UploadException {
         
-        SequestParamsParser parser = parseSequestParams(paramFileDirectory, remoteServer);
+    	TideParamsParser parser = parseTideParams(paramFileDirectory, remoteServer);
         
         usesEvalue = false;
-        
-        dynaResidueMods = new ArrayList<MsResidueModificationIn>();
-        dynaTermMods = new ArrayList<MsTerminalModificationIn>(0);
+        db = parser.getSearchDatabase();
+        dynaResidueMods = parser.getDynamicResidueMods();
+        dynaTermMods = parser.getDynamicTerminalMods();
         
         
         // get the id of the search database used (will be used to look up protein ids later)
-//        SearchDatabase sdb = new SearchDatabase();
-//        sdb.setServerAddress(remoteServer);
-//        sdb.setServerPath(""); // FIXME hard coded
-        db = parser.getSearchDatabase();
-        sequenceDatabaseId = getSearchDatabaseId(db);
+        sequenceDatabaseId = getSearchDatabaseId(parser.getSearchDatabase());
         
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
@@ -122,22 +136,21 @@ private final SequestSearchResultDAO sqtResultDao;
         }
     }
     
-    private SequestParamsParser parseSequestParams(String fileDirectory, final String remoteServer) throws UploadException {
+    
+    
+    
+    private TideParamsParser parseTideParams(String fileDirectory, final String remoteServer) throws UploadException {
         
         // parse the parameters file
-        final SequestParamsParser parser = new SequestParamsParser();
-        log.info("BEGIN Sequest search UPLOAD -- parsing parameters file: "+parser.paramsFileName());
-        if (!(new File(fileDirectory+File.separator+parser.paramsFileName()).exists())) {
-            UploadException ex = new UploadException(ERROR_CODE.MISSING_SEQUEST_PARAMS);
-            throw ex;
-        }
+        final TideParamsParser parser = new TideParamsParser();
+        log.info("BEGIN Tide search UPLOAD -- parsing parameters");
+        
         try {
             parser.parseParams(remoteServer, fileDirectory);
             return parser;
         }
         catch (DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.PARAM_PARSING_ERROR);
-            ex.setFile(fileDirectory+File.separator+parser.paramsFileName());
             ex.setErrorMessage(e.getMessage());
             throw ex;
         }
@@ -325,14 +338,14 @@ private final SequestSearchResultDAO sqtResultDao;
         }
     }
     
-    static SequestSearchIn makeSearchObject(final SequestParamsParser parser, final Program searchProgram,
+    static SequestSearchIn makeSearchObject(final TideParamsParser parser, final Program searchProgram,
                 final String remoteDirectory, final java.util.Date searchDate) {
         return new SequestSearchIn() {
             @Override
             public List<Param> getSequestParams() {return parser.getParamList();}
             @Override
             public List<MsResidueModificationIn> getDynamicResidueMods() {return parser.getDynamicResidueMods();}
-            @Override
+			@Override
             public List<MsTerminalModificationIn> getDynamicTerminalMods() {return parser.getDynamicTerminalMods();}
             @Override
             public List<MsEnzymeIn> getEnzymeList() {
@@ -356,6 +369,7 @@ private final SequestSearchResultDAO sqtResultDao;
             public String getServerDirectory() {return remoteDirectory;}
         };
     }
+    
     
     void uploadSearchResult(SequestSearchResultIn result, int runSearchId, int scanId) throws UploadException {
         
