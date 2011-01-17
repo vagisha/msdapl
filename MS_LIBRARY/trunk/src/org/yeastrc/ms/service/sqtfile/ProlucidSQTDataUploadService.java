@@ -301,4 +301,9 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
     protected void copyFiles(int experimentId) throws UploadException {
         // Does nothing
     }
+    
+    @Override
+    boolean doRefreshPeptideProteinMatches() {
+    	return false;
+    }
 }

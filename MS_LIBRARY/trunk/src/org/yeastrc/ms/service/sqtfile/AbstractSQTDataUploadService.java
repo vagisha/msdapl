@@ -3,6 +3,7 @@ package org.yeastrc.ms.service.sqtfile;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,10 +23,13 @@ import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
+import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultResidueModIds;
 import org.yeastrc.ms.domain.search.MsResultTerminalModIds;
+import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
@@ -51,6 +55,8 @@ import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.service.SearchDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.service.database.fasta.PeptideProteinMatch;
+import org.yeastrc.ms.service.database.fasta.PeptideProteinMatchingService;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
 public abstract class AbstractSQTDataUploadService implements SearchDataUploadService {
@@ -106,6 +112,8 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     
     boolean doScanChargeMassCheck = false; // for data from MacCoss lab
 
+    private PeptideProteinMatchingService matchService;
+    private Map<String, List<PeptideProteinMatch>> proteinMatches;
     
     public AbstractSQTDataUploadService() {
         
@@ -174,6 +182,9 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         resultTerminalModList.clear();
         searchScanMap.clear();
 
+        if(proteinMatches != null)
+        	proteinMatches.clear();
+        
 //        lastUploadedRunSearchId = 0;
     }
 
@@ -233,6 +244,10 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     
     abstract int uploadSqtFile(String filePath, int runId) throws UploadException;
     
+    protected abstract void copyFiles(int experimentId) throws UploadException;
+    
+    abstract boolean doRefreshPeptideProteinMatches();
+    
     //--------------------------------------------------------------------------------------------------
     @Override
     public void upload() throws UploadException {
@@ -273,6 +288,11 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         dynaModLookup = new DynamicModLookupUtil(searchId);
         
         
+        // initialize PeptideProteinMatchingService, if required
+        if(doRefreshPeptideProteinMatches()) {
+        	initializePeptideProteinMatchingService(searchId);
+        }
+        
         // now upload the individual sqt files
         for (String file: filenames) {
             String filePath = dataDirectory+File.separator+file;
@@ -282,6 +302,11 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
             Integer runId = runIdMap.get(file); 
             
             resetCaches();
+            
+            if(doRefreshPeptideProteinMatches()) {
+            	proteinMatches = new HashMap<String, List<PeptideProteinMatch>>();
+            }
+            
             int runSearchId;
             try {
                 runSearchId = uploadSqtFile(filePath, runId);
@@ -319,9 +344,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     public int getUploadedSearchId() {
         return searchId;
     }
-
-    protected abstract void copyFiles(int experimentId) throws UploadException;
-    
 
     private Map<String, Integer> createRunIdMap() throws UploadException {
         
@@ -524,14 +546,56 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         if (proteinMatchList.size() >= BUF_SIZE) {
             uploadProteinMatchBuffer();
         }
+        
+        
         // add the protein matches for this result to the cache
-        Set<String> accSet = new HashSet<String>(result.getProteinMatchList().size());
-        for (MsSearchResultProteinIn match: result.getProteinMatchList()) {
-            // only UNIQUE accession strings for this result will be added.
-            if (accSet.contains(match.getAccession()))
-                continue;
-            accSet.add(match.getAccession());
-            proteinMatchList.add(new SearchResultProteinBean(resultId, match.getAccession()));
+    	Set<String> accSet = new HashSet<String>(result.getProteinMatchList().size());
+    	for (MsSearchResultProteinIn match: result.getProteinMatchList()) {
+    		// only UNIQUE accession strings for this result will be added.
+    		accSet.add(match.getAccession());
+    	}
+    	
+        // Find additional protein matches if required
+        if(doRefreshPeptideProteinMatches()) {
+        	
+        	String peptideSeq = result.getResultPeptide().getPeptideSequence();
+        	
+        	List<PeptideProteinMatch> matches = proteinMatches.get(peptideSeq);
+            if(matches == null) {
+                matches = matchService.getMatchingProteins(peptideSeq);
+                if(matches.size() == 0) {
+
+                	UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+                    ex.setErrorMessage("No protein matches found for peptide: "+peptideSeq);
+                    throw ex;
+                }
+                proteinMatches.put(peptideSeq, matches);
+            }
+            
+            
+            Set<String> myMatchAcc = new HashSet<String>(matches.size()*2);
+            for(PeptideProteinMatch match: matches) {
+            	myMatchAcc.add(match.getProtein().getAccessionString());
+            }
+            
+            // Make sure the protein(s) reported as a match in the SQT file are present 
+            // in the list of matches we found
+            for(String acc: accSet) {
+            	if(!myMatchAcc.contains(acc)) {
+            		UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+                    ex.setErrorMessage("Protein match for peptide: "+peptideSeq+" in SQT file: "+acc
+                    		+" not found by PeptideProteinMatchingService");
+                    throw ex;
+            	}
+            }
+            
+            // add all the matches found by the PeptideProteinMatchingService
+            accSet.addAll(myMatchAcc);
+            
+        }
+        
+        for(String acc: accSet) {
+        	proteinMatchList.add(new SearchResultProteinBean(resultId, acc));
         }
     }
     
@@ -786,10 +850,15 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         }
         
         // 5. Make sure the search parameters file is present
-        File paramsFile = new File(dataDirectory+File.separator+searchParamsFile());
-        if(!paramsFile.exists()) {
-            appendToMsg("Cannot find search parameters file: "+paramsFile.getAbsolutePath());
-            return false;
+        try {
+        	File paramsFile = new File(dataDirectory+File.separator+searchParamsFile());
+        	if(!paramsFile.exists()) {
+        		appendToMsg("Cannot find search parameters file: "+paramsFile.getAbsolutePath());
+        		return false;
+        	}
+        }
+        catch(UnsupportedOperationException e) {
+        	log.info("No params file for program: "+this.getSearchProgram());
         }
         
         preUploadCheckDone = true;
@@ -837,6 +906,42 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     public String getUploadSummary() {
         return "\tSearch file format: "+getSearchFileFormat()+
         "\n\t#Search files in Directory: "+filenames.size()+"; #Uploaded: "+numSearchesUploaded;
+    }
+    
+    private void initializePeptideProteinMatchingService(int searchId)
+    throws UploadException {
+
+        if(this.matchService != null)
+            return;
+
+        // get the search
+        MsSearch search = DAOFactory.instance().getMsSearchDAO().loadSearch(searchId);
+        List<MsEnzyme> enzymes = search.getEnzymeList();
+        List<MsSearchDatabase> databases = search.getSearchDatabases();
+
+        
+        int numEnzymaticTermini = 0; 
+        // TODO What is the Tide parameter for this option? 
+        if(databases.size() != 1) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.setErrorMessage("Multiple search databases found for search: "+
+                    searchId+
+            "; PeptideProteinMatchingService does not handle multiple databases");
+            throw ex; 
+        }
+        try {
+            this.matchService = new PeptideProteinMatchingService(databases.get(0).getSequenceDatabaseId());
+        }
+        catch (SQLException e) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
+            ex.setErrorMessage("Error initializing PeptideProteinMatchingService for databaseID: "+
+                    databases.get(0).getSequenceDatabaseId());
+            ex.appendErrorMessage(e.getMessage());
+            throw ex; 
+        }
+
+        matchService.setNumEnzymaticTermini(numEnzymaticTermini);
+        matchService.setEnzymes(enzymes);
     }
 
 }

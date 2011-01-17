@@ -399,5 +399,10 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         SequestParamsParser parser = new SequestParamsParser();
         return parser.paramsFileName();
     }
+    
+    @Override
+    boolean doRefreshPeptideProteinMatches() {
+    	return false;
+    }
 
 }

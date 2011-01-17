@@ -30,7 +30,6 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
 import org.yeastrc.ms.domain.search.sequest.impl.SequestResultDataWrap;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
 import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.service.UploadException;
@@ -45,7 +44,7 @@ public class TideSQTDataUploadService extends AbstractSQTDataUploadService {
 private final SequestSearchResultDAO sqtResultDao;
     
     // these are the things we will cache and do bulk-inserts
-    List<SequestResultDataWId> sequestResultDataList; // sequest scores
+    List<SequestResultDataWId> tideResultDataList; // tide scores
     
     private MsSearchDatabaseIn db = null;
     private boolean usesEvalue = false;
@@ -55,11 +54,13 @@ private final SequestSearchResultDAO sqtResultDao;
     private final Program program;
     private final SearchFileFormat format;
     
+    private boolean hasAllProteinMatches = false;
+    
     public TideSQTDataUploadService(SearchFileFormat format) {
         super();
         this.format = format;
         program = Program.programForFileFormat(format);
-        this.sequestResultDataList = new ArrayList<SequestResultDataWId>();
+        this.tideResultDataList = new ArrayList<SequestResultDataWId>();
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
         this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
         
@@ -78,7 +79,7 @@ private final SequestSearchResultDAO sqtResultDao;
     // resetCaches() is called by reset() in the superclass.
     void resetCaches() {
         super.resetCaches();
-        sequestResultDataList.clear();
+        tideResultDataList.clear();
     }
     
     MsSearchDatabaseIn getSearchDatabase() {
@@ -86,7 +87,6 @@ private final SequestSearchResultDAO sqtResultDao;
     }
 
     public Program getSearchProgram() {
-//        return Program.SEQUEST;
         return program;
     }
     
@@ -118,6 +118,7 @@ private final SequestSearchResultDAO sqtResultDao;
         db = parser.getSearchDatabase();
         dynaResidueMods = parser.getDynamicResidueMods();
         dynaTermMods = parser.getDynamicTerminalMods();
+        hasAllProteinMatches = parser.printAllProteinMatches();
         
         
         // get the id of the search database used (will be used to look up protein ids later)
@@ -135,8 +136,6 @@ private final SequestSearchResultDAO sqtResultDao;
             throw ex;
         }
     }
-    
-    
     
     
     private TideParamsParser parseTideParams(String fileDirectory, final String remoteServer) throws UploadException {
@@ -179,7 +178,7 @@ private final SequestSearchResultDAO sqtResultDao;
         
         int runSearchId;
         try {
-            runSearchId = uploadSequestSqtFile(provider, searchId, runId, sequenceDatabaseId);
+            runSearchId = uploadTideSqtFile(provider, searchId, runId, sequenceDatabaseId);
         }
         catch (UploadException ex) {
             ex.setFile(filePath);
@@ -202,7 +201,7 @@ private final SequestSearchResultDAO sqtResultDao;
     }
     
     // parse and upload a sqt file
-    private int uploadSequestSqtFile(SequestSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
+    private int uploadTideSqtFile(SequestSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
         
         int runSearchId;
         try {
@@ -375,29 +374,29 @@ private final SequestSearchResultDAO sqtResultDao;
         
         int resultId = super.uploadBaseSearchResult(result, runSearchId, scanId);
         
-        // upload the SQT sequest specific information for this result.
-        uploadSequestResultData(result.getSequestResultData(), resultId);
+        // upload the SQT Tide specific information for this result.
+        uploadTideResultData(result.getSequestResultData(), resultId);
     }
 
-    private void uploadSequestResultData(SequestResultData resultData, int resultId) {
+    private void uploadTideResultData(SequestResultData resultData, int resultId) {
         // upload the Sequest specific result information if the cache has enough entries
-        if (sequestResultDataList.size() >= BUF_SIZE) {
-            uploadSequestResultBuffer();
+        if (tideResultDataList.size() >= BUF_SIZE) {
+            uploadTideResultBuffer();
         }
         // add the Sequest specific information for this result to the cache
         SequestResultDataWrap resultDataDb = new SequestResultDataWrap(resultData, resultId);
-        sequestResultDataList.add(resultDataDb);
+        tideResultDataList.add(resultDataDb);
     }
     
-    private void uploadSequestResultBuffer() {
-        sqtResultDao.saveAllSequestResultData(sequestResultDataList);
-        sequestResultDataList.clear();
+    private void uploadTideResultBuffer() {
+        sqtResultDao.saveAllSequestResultData(tideResultDataList);
+        tideResultDataList.clear();
     }
     
     void flush() {
         super.flush();
-        if (sequestResultDataList.size() > 0) {
-            uploadSequestResultBuffer();
+        if (tideResultDataList.size() > 0) {
+            uploadTideResultBuffer();
         }
     }
     
@@ -408,7 +407,12 @@ private final SequestSearchResultDAO sqtResultDao;
 
     @Override
     String searchParamsFile() {
-        SequestParamsParser parser = new SequestParamsParser();
+        TideParamsParser parser = new TideParamsParser();
         return parser.paramsFileName();
+    }
+    
+    @Override
+    boolean doRefreshPeptideProteinMatches() {
+    	return !hasAllProteinMatches;
     }
 }
