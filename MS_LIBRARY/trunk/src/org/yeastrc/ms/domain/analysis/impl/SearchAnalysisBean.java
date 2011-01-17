@@ -13,6 +13,7 @@ public class SearchAnalysisBean implements MsSearchAnalysis {
     private Program analysisProgram;
     private String analysisProgramVersion;
     private String comments;
+    private String filename;
     
     /**
      * @return the id
@@ -62,5 +63,14 @@ public class SearchAnalysisBean implements MsSearchAnalysis {
         return uploadDate;
     }
     
+	@Override
+	public String getFilename() {
+		return this.filename;
+	}
+	
+	@Override
+	public void setFilename(String filename) {
+		this.filename = filename;
+	}
     
 }

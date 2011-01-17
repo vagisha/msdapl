@@ -8,6 +8,7 @@ import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.util.StringUtils;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -40,6 +41,21 @@ public class MsSearchAnalysisDAOImpl extends BaseSqlMapDAO implements MsSearchAn
         return saveAndReturnId(namespace+".insert", analysis);
     }
 
+    @Override
+    public MsSearchAnalysis loadAnalysisForFileName(String fileName, int searchId) {
+        // get all the runSearchIds for the search
+        List<Integer> analysisIds = getAnalysisIdsForSearch(searchId);
+        if(analysisIds == null || analysisIds.size() == 0)
+            return null;
+        String idString = StringUtils.makeCommaSeparated(analysisIds);
+        //System.out.println(idString);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("filename", fileName);
+        map.put("analysisIds", "("+idString+")");
+        
+        return (MsSearchAnalysis) queryForObject(namespace+".selectAnalysisForFileName", map);
+    }
+   
     @Override
     public int updateAnalysisProgram(int analysisId, Program program) {
         Map<String, Object> map = new HashMap<String, Object>(2);

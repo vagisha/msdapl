@@ -15,6 +15,8 @@ public interface MsSearchAnalysisDAO {
     
     public abstract List<Integer> getSearchIdsForAnalysis(int analysisId);
     
+    public MsSearchAnalysis loadAnalysisForFileName(String fileName, int searchId);
+    
     public abstract int updateAnalysisProgramVersion(int analysisId, String versionStr);
     
     public abstract int updateAnalysisProgram(int analysisId, Program program);

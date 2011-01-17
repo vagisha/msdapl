@@ -48,4 +48,8 @@ public interface MsSearchAnalysis {
     
     public abstract void setComments(String comments);
     
+    public abstract String getFilename();
+    
+    public abstract void setFilename(String filename);
+    
 }

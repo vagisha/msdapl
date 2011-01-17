@@ -28,9 +28,12 @@ import org.yeastrc.ms.service.protxml.ProtxmlDataUploadService;
 import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.ProlucidSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService;
+import org.yeastrc.ms.service.sqtfile.TideSQTDataUploadService;
 
 /**
- * 
+ * This class determines the upload service class for a particular type of data 
+ * (spectrum, search results, analysis results or protein inference results) based on the 
+ * files in the input directory.
  */
 public class UploadServiceFactory {
 
@@ -48,6 +51,14 @@ public class UploadServiceFactory {
     // ------------------------------------------------------------------------------------------------------
     // Spectrum Data Upload service
     // ------------------------------------------------------------------------------------------------------
+    /**
+     * Looks for supported file formats for spectrum data in the given input directory and returns the appropriate
+     * upload service class
+     * @param dataDirectory
+     * @return 
+     * @throws UploadServiceFactoryException if the directory does not contain any, or contains multiple supported
+     *                                       file formats for spectrum data.
+     */
     public SpectrumDataUploadService getSpectrumDataUploadService(String dataDirectory) throws UploadServiceFactoryException {
         
         if(dataDirectory == null) {
@@ -113,6 +124,14 @@ public class UploadServiceFactory {
     // ------------------------------------------------------------------------------------------------------
     // SEARCH Data Upload service
     // ------------------------------------------------------------------------------------------------------
+    /**
+     * Looks for supported file formats for search results in the given input directory and returns the appropriate
+     * upload service class.
+     * @param dataDirectory
+     * @return
+     * @throws UploadServiceFactoryException if the directory does not contain any, or contains multiple supported
+     *                                       file formats for search results.
+     */
     public SearchDataUploadService getSearchDataUploadService(String dataDirectory) throws UploadServiceFactoryException {
         
         if(dataDirectory == null) {
@@ -180,6 +199,12 @@ public class UploadServiceFactory {
                 service.setDecoyDirectory(dataDirectory+File.separator+"decoy");
                 return service;
             }
+            if (sqtFormat == SearchFileFormat.SQT_TIDE) {
+                SearchDataUploadService service = new TideSQTDataUploadService(sqtFormat);
+                service.setDirectory(dataDirectory);
+                //service.setDecoyDirectory(dataDirectory+File.separator+"decoy");
+                return service;
+            }
             else if (sqtFormat == SearchFileFormat.SQT_PLUCID) {
                 SearchDataUploadService service = new ProlucidSQTDataUploadService();
                 service.setDirectory(dataDirectory);
@@ -221,6 +246,14 @@ public class UploadServiceFactory {
     // ------------------------------------------------------------------------------------------------------
     // ANALYSIS Data Upload service
     // ------------------------------------------------------------------------------------------------------
+    /**
+     * Looks for supported file formats for analysis results (post search results) in the given input directory
+     * and returns the appropriate upload service class.
+     * @param dataDirectory
+     * @return
+     * @throws UploadServiceFactoryException if the directory does not contain any, or contains multiple supported
+     *                                       file formats for analysis results
+     */
     public AnalysisDataUploadService getAnalysisDataUploadService(String dataDirectory) throws UploadServiceFactoryException {
         
         if(dataDirectory == null) {
@@ -245,30 +278,23 @@ public class UploadServiceFactory {
                 continue;
             String fileName = files[i].getName();
             
-            String ext = null;
-            if(fileName.toLowerCase().endsWith("pep.xml"))
-                ext = "pep.xml";
-            else if(fileName.toLowerCase().endsWith("prot.xml")) // Ignore prot XML files
+            SearchFileFormat format = SearchFileFormat.forFile(fileName);
+            if(format == SearchFileFormat.UNKNOWN 
+            		|| format == SearchFileFormat.PROTXML) // Ignore protxml files
             	continue;
-            else {
-                int idx = fileName.lastIndexOf(".");
-                if(idx == -1)   continue;
-
-                ext = fileName.substring(idx);
-            }
             
-            SearchFileFormat format = SearchFileFormat.UNKNOWN;
-            
-            if(fileName.equals(PercolatorXmlDataUploadService.PERC_XML)) {
-            	format = SearchFileFormat.XML_PERC;
+            if(format == SearchFileFormat.XML) {
+            	// Add only supported Percolator XML files (post version 1.14)
+            	if(isPercolatorXml(dataDirectory+File.separator+fileName)) {
+            		formats.add(SearchFileFormat.XML_PERC);
+            	}
             }
             else {
-            	format = SearchFileFormat.forFileExtension(ext);
+            	formats.add(format);
             }
-            if(format == SearchFileFormat.UNKNOWN) 
-        		continue;
+            
             filenames.add(fileName);
-            formats.add(format);
+            
         }
         
         if(formats.size() == 0) {
@@ -276,28 +302,13 @@ public class UploadServiceFactory {
         }
         
         if(formats.size() > 1) {
-        	if(formats.contains(SearchFileFormat.XML_PERC) && formats.contains(SearchFileFormat.XML)) {
-        		formats.remove(SearchFileFormat.XML);
-        	}
-        	if(formats.contains(SearchFileFormat.SQT) && formats.contains(SearchFileFormat.XML)) {
-        		formats.remove(SearchFileFormat.XML);
-        	}
-        	// We may have .sqt and Percolator xml file in the same directory.  If so we will upload the xml file
-        	// ONLY if the version is "UNOFFICIAL" or > 1.14
+        	
+        	
         	if(formats.contains(SearchFileFormat.SQT) && formats.contains(SearchFileFormat.XML_PERC)) {
-        		for(String file: filenames) {
-        			if(file.equals(PercolatorXmlDataUploadService.PERC_XML)) {
-        				if(isPercolatorXml(dataDirectory+File.separator+file)) {
-        					formats.clear();
-        					formats.add(SearchFileFormat.XML_PERC);
-        				}
-        				else {
-        					formats.clear();
-        					formats.add(SearchFileFormat.SQT);
-        				}
-        				break;
-        			}
-        		}
+	        	// We may have .sqt and Percolator xml file in the same directory.  If so we will upload the xml file
+	        	// ONLY if the version is "UNOFFICIAL" or > 1.14
+        		
+        		formats.remove(SearchFileFormat.SQT);
         	}
         	
         	if(formats.size() > 1)
@@ -363,6 +374,7 @@ public class UploadServiceFactory {
             if (SearchFileFormat.SQT_SEQ != myType && 
 //                    SearchFileFormat.SQT_NSEQ != myType &&
                     SearchFileFormat.SQT_PLUCID != myType &&
+                    SearchFileFormat.SQT_TIDE != myType &&
                     SearchFileFormat.SQT_PERC != myType) {
                 throw new UploadServiceFactoryException("We do not currently have support for the SQT format: "+myType);
             }

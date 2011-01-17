@@ -13,19 +13,18 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
-import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.impl.RunSearchAnalysisBean;
+import org.yeastrc.ms.domain.analysis.impl.SearchAnalysisBean;
 import org.yeastrc.ms.domain.analysis.peptideProphet.BasePeptideProphetResultIn;
-import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetROC;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResultDataWId;
-import org.yeastrc.ms.domain.analysis.peptideProphet.impl.PeptideProphetAnalysisBean;
 import org.yeastrc.ms.domain.analysis.peptideProphet.impl.PeptideProphetResultDataBean;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsRunSearch;
@@ -72,7 +71,6 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
     private final MsRunSearchAnalysisDAO runSearchAnalysisDao;
     private final PeptideProphetRocDAO rocDao;
     private final PeptideProphetResultDAO ppResDao;
-    private final PeptideProphetAnalysisDAO ppAnalysisDao;
     
     
     // these are the things we will cache and do bulk-inserts
@@ -116,7 +114,6 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         
         this.rocDao = daoFactory.getPeptideProphetRocDAO();
         this.ppResDao = daoFactory.getPeptideProphetResultDAO();
-        this.ppAnalysisDao = daoFactory.getPeptideProphetAnalysisDAO();
         
         uploadMsg = new StringBuilder();
         this.analysisIds = new ArrayList<Integer>();
@@ -148,7 +145,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
 
     @Override
     public String getUploadSummary() {
-        return "\tSearch file format: "+SearchFileFormat.PEPXML+
+        return "\tAnalysis file format: "+SearchFileFormat.PEPXML+
                 uploadMsg.toString();
     }
 
@@ -277,7 +274,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
             numAnalysisUploaded = 0;
             
             // determine if a file with this name has already been uploaded for this experiment
-            PeptideProphetAnalysis ppAnalysis = ppAnalysisDao.loadAnalysisForFileName(file, searchId);
+            MsSearchAnalysis ppAnalysis = analysisDao.loadAnalysisForFileName(file, searchId);
             if(ppAnalysis != null) {
                 log.info("Analysis file: "+file+" has already been uploaded. AnalysisID: "+ppAnalysis.getId());
                 this.analysisIds.add(ppAnalysis.getId());
@@ -373,15 +370,15 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
     // ---------------------------------------------------------------------------------------------
     private int createPeptideProphetAnalysis(PepXmlBaseFileReader parser, String pepxmlFile) throws UploadException {
             
-        PeptideProphetAnalysisBean analysis = new PeptideProphetAnalysisBean();
+        SearchAnalysisBean analysis = new SearchAnalysisBean();
 //      analysis.setSearchId(searchId);
         analysis.setAnalysisProgram(Program.PEPTIDE_PROPHET);
         analysis.setAnalysisProgramVersion(parser.getPeptideProphetVersion());
-        analysis.setFileName(pepxmlFile);
+        analysis.setFilename(pepxmlFile);
         analysis.setComments(comments);
         int analysisId;
         try {
-            analysisId = ppAnalysisDao.save(analysis);
+            analysisId = analysisDao.save(analysis);
         }
         catch(RuntimeException e) {
             UploadException ex = new UploadException(ERROR_CODE.RUNTIME_ERROR, e);

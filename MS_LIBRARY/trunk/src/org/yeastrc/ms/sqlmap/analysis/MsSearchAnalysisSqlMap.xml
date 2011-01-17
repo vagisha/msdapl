@@ -16,12 +16,14 @@
 		<result property="analysisProgramVersion" column="programVersion" />
 		<result property="uploadDate" column="uploadDate" />
 		<result property="comments" column="comments" />
+		<result property="fileName" column="filename" />
 	</resultMap>
 	
 	<parameterMap class="MsSearchAnalysisIn" id="msAnalysisParam">
 		<parameter property="analysisProgram" typeHandler="ProgramTypeHandler"/>
 		<parameter property="analysisProgramVersion"/>
 		<parameter property="comments" jdbcType="TEXT" />
+		<parameter property="fileName" jdbcType="STRING" />
 	</parameterMap>
 	
 	
@@ -43,12 +45,19 @@
     	AND rs.id = ra.runSearchID
     </select>
     
+    <select id="selectAnalysisForFileName" resultMap="msAnalysisResult" parameterClass="java.util.Map">
+		SELECT * FROM msSearchAnalysis
+		WHERE id IN $analysisIds$
+		AND filename = #filename#
+	</select>
+	
     <insert id="insert" parameterMap="msAnalysisParam">
     	INSERT INTO msSearchAnalysis (
     	programName,
     	programVersion,
-    	comments)
-    	VALUES (?,?,?)
+    	comments,
+    	filename)
+    	VALUES (?,?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>

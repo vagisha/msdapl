@@ -11,10 +11,8 @@ import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.ibatis.MsRunSearchAnalysisDAOImpl;
 import org.yeastrc.ms.dao.analysis.ibatis.MsSearchAnalysisDAOImpl;
-import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
-import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetAnalysisDAOImpl;
 import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetResultDAOImpl;
 import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetRocDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorFilteredPsmResultDAO;
@@ -194,7 +192,6 @@ public class DAOFactory {
     private PercolatorFilteredSpectraResultDAO percFiltersSpectraDAO;
     
     // DAOs related to PeptideProphet search analysis
-    private PeptideProphetAnalysisDAO ppAnalysisDAO;
     private PeptideProphetRocDAO ppRocDAO;
     private PeptideProphetResultDAO pprophResultDAO;
     
@@ -262,7 +259,6 @@ public class DAOFactory {
 		percFiltersSpectraDAO = new PercolatorFilteredSpectraResultDAOImpl(sqlMap, rsAnalysisDAO);
         
         // PeptideProphet post search analysis related
-        ppAnalysisDAO = new PeptideProphetAnalysisDAOImpl(sqlMap, analysisDAO);
         ppRocDAO = new PeptideProphetRocDAOImpl(sqlMap);
         pprophResultDAO = new PeptideProphetResultDAOImpl(sqlMap, rsAnalysisDAO);
         
@@ -458,10 +454,6 @@ public class DAOFactory {
     //-------------------------------------------------------------------------------------------
     // PeptideProphet related
     //-------------------------------------------------------------------------------------------
-    public PeptideProphetAnalysisDAO getPeptideProphetAnalysisDAO() {
-        return ppAnalysisDAO;
-    }
-    
     public PeptideProphetResultDAO getPeptideProphetResultDAO() {
         return pprophResultDAO;
     }

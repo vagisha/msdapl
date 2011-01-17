@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
-import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferInputDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferIonDAO;
@@ -39,7 +39,7 @@ import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunSummaryDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetSubsumedProteinDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
-import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput;
@@ -822,9 +822,9 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         
         boolean first = true;
         for(String inputPepXml: inputFiles) {
-            PeptideProphetAnalysisDAO pprophAnalysisDao = daoFactory.getPeptideProphetAnalysisDAO();
+            MsSearchAnalysisDAO pprophAnalysisDao = daoFactory.getMsSearchAnalysisDAO();
             String fileName = new File(inputPepXml).getName();
-            PeptideProphetAnalysis analysis = pprophAnalysisDao.loadAnalysisForFileName(fileName, this.searchId);
+            MsSearchAnalysis analysis = pprophAnalysisDao.loadAnalysisForFileName(fileName, this.searchId);
             if(analysis == null) {
                 UploadException e = new UploadException(ERROR_CODE.GENERAL);
                 e.appendErrorMessage("No matching PeptideProphet analysis found for input file: "+fileName+" and searchID: "+searchId);

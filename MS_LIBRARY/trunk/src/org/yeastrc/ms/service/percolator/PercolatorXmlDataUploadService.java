@@ -7,6 +7,7 @@ package org.yeastrc.ms.service.percolator;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.impl.RunSearchAnalysisBean;
 import org.yeastrc.ms.domain.analysis.impl.SearchAnalysisBean;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorParam;
@@ -63,7 +65,9 @@ public class PercolatorXmlDataUploadService implements
 
 	private static final Logger log = Logger.getLogger(PercolatorSQTDataUploadService.class);
 
-	public static final String PERC_XML = "combined-results.xml";
+	//public static final String PERC_XML = "combined-results.xml";
+	
+	private List<String> percXmlFiles;
 	
     private final MsSearchResultDAO resultDao;
     private final MsSearchAnalysisDAO analysisDao;
@@ -85,9 +89,11 @@ public class PercolatorXmlDataUploadService implements
     
     private Set<Integer> uploadedResultIds;
 
-    private int numAnalysisUploaded = 0;
+    private List<Integer> analysisIds;
+    private boolean presetAnalysisId = false;
+    private int numFilesUploaded;
     
-    private int analysisId;
+    //private int analysisId;
     private String comments;
     private Map<String,Integer> runSearchIdMap; // key = filename; value = runSearchId
     private Map<String, Integer> runSearchAnalysisIdMap; // key = filename; value runSearchAnalysisId
@@ -104,7 +110,6 @@ public class PercolatorXmlDataUploadService implements
 
 	private int numPsmUploaded;
 	private int numPeptUploaded;
-    
     
     public PercolatorXmlDataUploadService() {
     	
@@ -131,23 +136,29 @@ public class PercolatorXmlDataUploadService implements
     void reset() {
 
         //analysisId = 0;
+    	if(this.analysisIds == null)
+    		this.analysisIds = new ArrayList<Integer>();
+    	this.analysisIds.clear();
+    	
         if(runSearchIdMap != null)
         	runSearchIdMap.clear();
         
-        numAnalysisUploaded = 0;
-        numPsmUploaded = 0;
-        numPeptUploaded = 0;
+        numFilesUploaded = 0;
 
         resetCaches();
 
         dynaResidueMods.clear();
         dynaTermMods.clear();
+        
     }
 
     void resetCaches() {
+    	
         percolatorResultDataList.clear();
         percolatorPeptideResultList.clear();
         uploadedResultIds.clear();
+        numPsmUploaded = 0;
+        numPeptUploaded = 0;
     }
 
 
@@ -170,100 +181,129 @@ public class PercolatorXmlDataUploadService implements
         getSearchModifications(searchId);
         
         
-        // now upload results in the Precolator Xml file
-        String filePath = dataDirectory+File.separator+PERC_XML;
+        // now upload results in the Precolator Xml file(s)
         
-        // Open the XML file and read the Percolator version, params etc.
-        PercolatorXmlFileReader reader = new PercolatorXmlFileReader();
-        reader.setSearchProgram(Program.SEQUEST);
-        reader.setDynamicResidueMods(this.dynaResidueMods);
-        try {
-        	reader.open(filePath);
-        }
-        catch(DataProviderException e) {
+        for(String percXmlFile: this.percXmlFiles) {
+        	
+        	resetCaches();
+        	
+        	// determine if a file with this name has already been uploaded for this experiment
+            MsSearchAnalysis ppAnalysis = analysisDao.loadAnalysisForFileName(percXmlFile, searchId);
+            if(ppAnalysis != null) {
+                log.info("Analysis file: "+percXmlFile+" has already been uploaded. AnalysisID: "+ppAnalysis.getId());
+                this.analysisIds.add(ppAnalysis.getId());
+                continue;
+            }
+            
+        	String filePath = dataDirectory+File.separator+percXmlFile;
+
+        	log.info("Uploading analysis results in Percolator XML file: "+percXmlFile);
+        	
+        	// Open the XML file and read the Percolator version, params etc.
+        	PercolatorXmlFileReader reader = new PercolatorXmlFileReader();
+        	reader.setSearchProgram(Program.SEQUEST);
+        	reader.setDynamicResidueMods(this.dynaResidueMods);
+        	try {
+        		reader.open(filePath);
+        	}
+        	catch(DataProviderException e) {
+        		reader.close();
+        		UploadException ex = new UploadException(ERROR_CODE.PERC_XML_ERROR, e);
+        		ex.setFile(percXmlFile);
+        		ex.setErrorMessage(e.getMessage()+"\n\t!!!PERCOLATOR XML FILE WILL NOT BE UPLOADED!!!");
+        		throw ex;
+        	}
+
+        	// create a new entry in the msSearchAnalysis table (if required)
+        	int analysisId = 0;
+        	if(presetAnalysisId)
+        		analysisId = analysisIds.get(0);
+        	
+        	try {
+        		if(!presetAnalysisId) {
+        			analysisId = saveTopLevelAnalysis(percXmlFile, reader.getPercolatorVersion());
+        			this.analysisIds.add(analysisId);
+        		}
+        		else
+        			updateProgramVersion(analysisId, reader.getPercolatorVersion());
+        	}
+        	catch (UploadException e) {
+        		e.appendErrorMessage("\n\t!!!PERCOLATOR ANALYSIS WILL NOT BE UPLOADED\n");
+        		log.error(e.getMessage(), e);
+        		reader.close();
+        		throw e;
+        	}
+
+
+        	// Add the Percolator parameters
+        	try {
+        		addPercolatorParams(reader.getPercolatorParams(), analysisId);
+        	}
+        	catch(UploadException e) {
+        		e.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
+        		log.error(e.getMessage(), e);
+        		deleteAnalysis(analysisId);
+        		reader.close();
+        		throw e;
+        	}
+
+
+        	int numRunSearchAnalysisUploaded = 0;
+        	try {
+        		numRunSearchAnalysisUploaded = uploadXml(reader, analysisId);
+        	}
+        	catch (UploadException ex) {
+        		ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
+        		deleteAnalysis(analysisId);
+        		numRunSearchAnalysisUploaded = 0;
+        		reader.close();
+        		throw ex;
+        	}
+        	finally {
+        		reader.close();
+        	}
+
+        	// if no analyses were uploaded delete the top level search analysis
+        	if (numRunSearchAnalysisUploaded == 0) {
+        		UploadException ex = new UploadException(ERROR_CODE.NO_PERC_ANALYSIS_UPLOADED);
+        		ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
+        		deleteAnalysis(analysisId);
+        		numRunSearchAnalysisUploaded = 0;
+        		reader.close();
+        		throw ex;
+        	}
+
+
         	reader.close();
-            UploadException ex = new UploadException(ERROR_CODE.PERC_XML_ERROR, e);
-            ex.setFile(PERC_XML);
-            ex.setErrorMessage(e.getMessage()+"\n\t!!!PERCOLATOR XML FILE WILL NOT BE UPLOADED!!!");
-            throw ex;
-        }
-        
-        // create a new entry in the msSearchAnalysis table
-        try {
-        	if(analysisId == 0)
-        		analysisId = saveTopLevelAnalysis(reader.getPercolatorVersion());
-        	else
-        		updateProgramVersion(analysisId, reader.getPercolatorVersion());
-        }
-        catch (UploadException e) {
-            e.appendErrorMessage("\n\t!!!PERCOLATOR ANALYSIS WILL NOT BE UPLOADED\n");
-            log.error(e.getMessage(), e);
-            reader.close();
-            throw e;
-        }
-        
-        
-        // Add the Percolator parameters
-        try {
-            addPercolatorParams(reader.getPercolatorParams(), analysisId);
-        }
-        catch(UploadException e) {
-            e.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
-            log.error(e.getMessage(), e);
-            deleteAnalysis(analysisId);
-            numAnalysisUploaded = 0;
-            reader.close();
-            throw e;
-        }
-        
-        
-        try {
-        	numAnalysisUploaded = uploadXml(reader);
-        }
-        catch (UploadException ex) {
-        	ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
-        	deleteAnalysis(analysisId);
-        	numAnalysisUploaded = 0;
-        	reader.close();
-        	throw ex;
-        }
-        finally {
-        	reader.close();
-        }
-        
-        // if no analyses were uploaded delete the top level search analysis
-        if (numAnalysisUploaded == 0) {
-            UploadException ex = new UploadException(ERROR_CODE.NO_PERC_ANALYSIS_UPLOADED);
-            ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
-            deleteAnalysis(analysisId);
-            numAnalysisUploaded = 0;
-            reader.close();
-            throw ex;
-        }
-        
-        
-        reader.close();
-        
-        // Finally, save the filtered results stats
-        try {
-        	PercolatorFilteredPsmStatsSaver psmStatsSaver = PercolatorFilteredPsmStatsSaver.getInstance();
-        	psmStatsSaver.save(analysisId, 0.01);
-        	PercolatorFilteredSpectraStatsSaver spectraStatsSaver = PercolatorFilteredSpectraStatsSaver.getInstance();
-        	spectraStatsSaver.save(analysisId, 0.01);
-        }
-        catch(Exception e) {
-        	log.error("Error saving filtered stats for analysisID: "+analysisId, e);
+
+        	// Finally, save the filtered results stats
+        	try {
+        		PercolatorFilteredPsmStatsSaver psmStatsSaver = PercolatorFilteredPsmStatsSaver.getInstance();
+        		psmStatsSaver.save(analysisId, 0.01);
+        		PercolatorFilteredSpectraStatsSaver spectraStatsSaver = PercolatorFilteredSpectraStatsSaver.getInstance();
+        		spectraStatsSaver.save(analysisId, 0.01);
+        	}
+        	catch(Exception e) {
+        		log.error("Error saving filtered stats for analysisID: "+analysisId, e);
+        	}
+        	
+        	numFilesUploaded++;
         }
     }
     
     public List<Integer> getUploadedAnalysisIds() {
-        List<Integer> analysisIds = new ArrayList<Integer>();
-        analysisIds.add(analysisId);
-        return analysisIds;
+        return this.analysisIds;
     }
     
-    public void setAnalysisId(int analysisId) {
-    	this.analysisId = analysisId;
+    /**
+     * Method used only by MsAnalysisUploader for uploading results of a Percolator execute job
+     * @param analysisId
+     */
+	public void setAnalysisId(int analysisId) {
+		// This method is to be used only by MsAnalysisUploader. 
+		analysisIds = new ArrayList<Integer>();
+		analysisIds.add(analysisId);
+		this.presetAnalysisId = true;
     }
     
     public void setComments(String comments) {
@@ -315,13 +355,14 @@ public class PercolatorXmlDataUploadService implements
        this.dynaTermMods = search.getDynamicTerminalMods();
     }
 
-    private int saveTopLevelAnalysis(String version) throws UploadException {
+    private int saveTopLevelAnalysis(String filename, String version) throws UploadException {
         
         SearchAnalysisBean analysis = new SearchAnalysisBean();
 //        analysis.setSearchId(searchId);
         analysis.setAnalysisProgram(Program.PERCOLATOR);
         analysis.setAnalysisProgramVersion(version);
         analysis.setComments(comments);
+        analysis.setFilename(filename);
         try {
             return analysisDao.save(analysis);
         }
@@ -341,7 +382,7 @@ public class PercolatorXmlDataUploadService implements
         }
     }
     
-    private int uploadXml(PercolatorXmlFileReader reader) throws UploadException {
+    private int uploadXml(PercolatorXmlFileReader reader, int analysisId) throws UploadException {
         
         log.info("BEGIN PERCOLATOR XML FILE UPLOAD");
         
@@ -356,19 +397,19 @@ public class PercolatorXmlDataUploadService implements
         }
         
         // read the PSMs
-        int numAnalysesUploaded = uploadPsms(reader);
+        int numRunSearchAnalysesUploaded = uploadPsms(reader, analysisId);
         
         // Now read peptide-level results, if any
-    	uploadPeptideResults(reader);
+    	uploadPeptideResults(reader, analysisId);
         
         long endTime = System.currentTimeMillis();
         
         log.info("END PERCOLATOR XML FILE UPLOAD; SEARCH_ANALYSIS_ID: "+analysisId+ " in "+(endTime - startTime)/(1000L)+"seconds\n");
         
-        return numAnalysesUploaded;
+        return numRunSearchAnalysesUploaded;
     }
 
-    private int uploadPsms(PercolatorXmlFileReader reader) throws UploadException {
+    private int uploadPsms(PercolatorXmlFileReader reader, int analysisId) throws UploadException {
 		
 		runSearchAnalysisIdMap = new HashMap<String, Integer>(); // key = filename; value runSearchAnalysisId
         runIdMap = new HashMap<Integer, Integer>(); // key = runSearchId; value = runId
@@ -386,7 +427,6 @@ public class PercolatorXmlDataUploadService implements
         			UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_ANALYSIS_FILE);
         			ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
         			deleteAnalysis(analysisId);
-        			numAnalysisUploaded = 0;
         			throw ex;
         		}
 
@@ -410,8 +450,10 @@ public class PercolatorXmlDataUploadService implements
                 	runIdMap.put(runSearchId, runId);
                 }
                 
+                BigDecimal observedMassBD = result.getObservedMass();
+                double obsMass = observedMassBD != null ? observedMassBD.doubleValue() : -1.0;
         		int runSearchResultId = getMatchingSearchResultId(runSearchId, result.getScanNumber(), 
-        				result.getCharge(), result.getObservedMass().doubleValue(), result.getResultPeptide());
+        				result.getCharge(), obsMass, result.getResultPeptide());
         		// upload the Percolator specific information for this result.
                 uploadPercolatorResultData(result, runSearchAnalysisId, runSearchResultId);
 
@@ -434,7 +476,7 @@ public class PercolatorXmlDataUploadService implements
         return runSearchAnalysisIdMap.size();
 	}
     
-	private void uploadPeptideResults(PercolatorXmlFileReader reader)
+	private void uploadPeptideResults(PercolatorXmlFileReader reader, int analysisId)
 			throws UploadException {
 		
 		
@@ -461,7 +503,6 @@ public class PercolatorXmlDataUploadService implements
 	        			UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_ANALYSIS_FILE);
 	        			ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
 	        			deleteAnalysis(analysisId);
-	        			numAnalysisUploaded = 0;
 	        			throw ex;
 	        		}
 					
@@ -490,7 +531,6 @@ public class PercolatorXmlDataUploadService implements
 						UploadException ex = new UploadException(ERROR_CODE.NO_RSANALYSISID_FOR_ANALYSIS_FILE);
 	        			ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
 	        			deleteAnalysis(analysisId);
-	        			numAnalysisUploaded = 0;
 	        			throw ex;
 					}
 					
@@ -826,22 +866,28 @@ public class PercolatorXmlDataUploadService implements
             return false;
         }
         
-        // 2. We should have a combined-results.xml file
+        // 2. Make sure we have Percolator-generated xml files
+        percXmlFiles = new ArrayList<String>();
         File[] files = dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String name_uc = name.toLowerCase();
                 return name_uc.endsWith(".xml");
             }});
-        boolean found = false;
         for (int i = 0; i < files.length; i++) {
-            if(files[i].getName().equals(PERC_XML)) {
-            	found = true;
-            	break;
-            }
+        	
+        	File ifile = files[i];
+        	try {
+				if(PercolatorXmlFileReader.isSupportedPercolatorXml(ifile.getAbsolutePath())) {
+					percXmlFiles.add(ifile.getName());
+				}
+			} catch (DataProviderException e) {
+				appendToMsg("Error opening file: "+ifile.getAbsolutePath()+"\n"+e.getMessage());
+                return false;
+			}
         }
-        if(!found) {
-        	appendToMsg("Could not find file: "+PERC_XML+" in directory: "+dataDirectory);
+        if(percXmlFiles.size() == 0) {
+        	appendToMsg("Could not find Percolator-generated XML files in directory: "+dataDirectory);
         	return false;
         }
         
@@ -865,7 +911,7 @@ public class PercolatorXmlDataUploadService implements
     @Override
     public String getUploadSummary() {
         return "\tAnalysis file format: "+getAnalysisFileFormat()+
-        "\n\t# results uploaded: "+numAnalysisUploaded;
+        "\n\t# files uploaded: "+numFilesUploaded;
     }
 
     @Override
@@ -893,7 +939,8 @@ public class PercolatorXmlDataUploadService implements
     public int getMaxPsmRank() {
 
     	
-            String filePath = dataDirectory+File.separator+PERC_XML;
+    		// open one of the Percolator xml files 
+            String filePath = dataDirectory+File.separator+percXmlFiles.get(0);
             
             PercolatorXmlFileReader provider = new PercolatorXmlFileReader();
             try {
