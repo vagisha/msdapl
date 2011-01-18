@@ -91,12 +91,8 @@ public class SearchAnalysis implements MsSearchAnalysis {
         return analysis.getUploadDate();
     }
 
-    public String getAnalysisName() {
-        return analysisName;
-    }
-
-    public void setAnalysisName(String analysisName) {
-        this.analysisName = analysisName;
+    public String getFilename() {
+        return analysis.getFilename();
     }
 
     @Override

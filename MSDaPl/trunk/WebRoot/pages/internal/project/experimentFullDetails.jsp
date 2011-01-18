@@ -238,7 +238,7 @@
 			<td><bean:write name="analysis" property="id"/></td>
 			<td><bean:write name="analysis" property="analysisProgramVersionShort"/></td>
 			<td valign="top">
-				<b><bean:write name="analysis" property="analysisName" /></b>
+				<b><bean:write name="analysis" property="filename" /></b>
 			</td>
 			<td valign="top">
 				<b>

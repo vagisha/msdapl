@@ -45,7 +45,6 @@ import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
-import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.general.MsInstrument;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
@@ -54,7 +53,6 @@ import org.yeastrc.ms.domain.protinfer.ProteinferRunSummary;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRunSummary;
 import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.www.proteinfer.job.ProteinInferJobSearcher;
@@ -415,11 +413,6 @@ public class ViewProjectAction extends Action {
         
         MsSearchAnalysis analysis = daoFactory.getMsSearchAnalysisDAO().load(searchAnalysisId);
         SearchAnalysis sAnalysis = new SearchAnalysis(analysis);
-        if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
-           PeptideProphetAnalysis prophetAnalysis = daoFactory.getPeptideProphetAnalysisDAO().load(analysis.getId());
-           if(prophetAnalysis != null)
-               sAnalysis.setAnalysisName(prophetAnalysis.getFileName());
-        }
         
         try {
 			MsAnalysisUploadJob job = MSJobFactory.getInstance().getJobForAnalysis(searchAnalysisId);

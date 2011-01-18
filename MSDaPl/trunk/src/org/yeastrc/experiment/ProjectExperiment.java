@@ -348,8 +348,8 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
         }
         for(SearchAnalysis analysis: analyses) {
             String text = analysis.getAnalysisProgram().displayName();
-            if(analysis.getAnalysisName() != null && analysis.getAnalysisName().length() > 0) {
-                text += "<br><NOBR>"+analysis.getAnalysisName()+"</NOBR></br>";
+            if(analysis.getFilename() != null && analysis.getFilename().length() > 0) {
+                text += "<br><NOBR>"+analysis.getFilename()+"</NOBR></br>";
             }
             text += " "+analysis.getId();
             header = new TableHeader(text);
