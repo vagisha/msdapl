@@ -605,69 +605,47 @@ public class MsDataUploader {
         
         // ----- UPLOAD ANALYSIS DATA
         if(uploadAnalysis) {
-            // If the search analysis is already uploaded, don't re-upload it.
-            int searchAnalysisID = 0;
-            // TODO We are looking for a Analysis id for our search ID. 
-            // However, we can have multiple entries in the msSearchAnalysis for each searchId
-            // Need to think about how to handle this.
+            
+            // disable keys
             try {
-                searchAnalysisID = getSearchAnalysisId(uploadedSearchId);
+            	disableAnalysisTableKeys();
             }
-            catch (Exception e) {
-                UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
-                ex.appendErrorMessage(e.getMessage());
-                uploadExceptionList.add(ex);
-                log.error(ex.getMessage());
-                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-                return;
+            catch (SQLException e) {
+            	UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
+            	uploadExceptionList.add(ex);
+            	log.error(ex.getMessage(), ex);
+            	log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+            	return;
             }
-            if(searchAnalysisID == 0) {
-                
-                // disable keys
-                try {
-                    disableAnalysisTableKeys();
-                }
-                catch (SQLException e) {
-                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
-                    uploadExceptionList.add(ex);
-                    log.error(ex.getMessage(), ex);
-                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-                    return;
-                }
-                
-                log.info("BEGINNING upload of analysis results");
-                try {
-                    this.uploadedAnalysisIds = exptUploader.uploadAnalysisData(this.uploadedSearchId);
-                }
-                catch (UploadException ex) {
-                    uploadExceptionList.add(ex);
-                    log.error(ex.getMessage(), ex);
-                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-                    
-                    // enable keys
-                    try {
-                        enableAnalysisTableKeys();
-                    }
-                    catch(SQLException e){log.error("Error enabling keys");}
-                    
-                    return;
-                }
-                
-                // enable keys
-                try {
-                    enableAnalysisTableKeys();
-                }
-                catch (SQLException e) {
-                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
-                    uploadExceptionList.add(ex);
-                    log.error(ex.getMessage(), ex);
-                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-                    return;
-                }
+
+            log.info("BEGINNING upload of analysis results");
+            try {
+            	this.uploadedAnalysisIds = exptUploader.uploadAnalysisData(this.uploadedSearchId);
             }
-            else {
-                this.uploadedAnalysisIds.add(searchAnalysisID);
-                log.info("Search Analysis was uploaded previously. SearchAnalysisID: "+searchAnalysisID);
+            catch (UploadException ex) {
+            	uploadExceptionList.add(ex);
+            	log.error(ex.getMessage(), ex);
+            	log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+
+            	// enable keys
+            	try {
+            		enableAnalysisTableKeys();
+            	}
+            	catch(SQLException e){log.error("Error enabling keys");}
+
+            	return;
+            }
+
+            // enable keys
+            try {
+            	enableAnalysisTableKeys();
+            }
+            catch (SQLException e) {
+            	UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
+            	uploadExceptionList.add(ex);
+            	log.error(ex.getMessage(), ex);
+            	log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+            	return;
             }
         }
         
@@ -688,33 +666,6 @@ public class MsDataUploader {
         long end = System.currentTimeMillis();
         logEndExperimentUpload(exptUploader, start, end);
        
-    }
-
-    private int getSearchAnalysisId(int searchId) throws Exception {
-        MsSearchAnalysisDAO adao = DAOFactory.instance().getMsSearchAnalysisDAO();
-        List<Integer> analysisIds = adao.getAnalysisIdsForSearch(searchId);
-        
-        if(analysisIds == null || analysisIds.size() == 0)
-            return 0;
-        
-        if(analysisIds.size() > 0) {
-            // If we are uploading PEPTIDE_PROPHET results we may have multiple
-            // pepxml files in the same folder. So we will have to look at each one and 
-            // check if it has been uploaded or not. In this method we just check if 
-            // any of the returned analyses is a PeptideProphet analysis.  If it is, 
-            // we return 0 so that each input PeptideProphet pep.xml file is checked.
-            MsSearchAnalysis analysis = adao.load(analysisIds.get(0));
-            if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
-                return 0;
-            }
-        }
-        // If none of the returned analyses was PeptideProphet we throw an exception
-        // TODO:  Multiple analyses per search is allowed only for PeptideProphet for now.
-        if(analysisIds.size() > 1) {
-            throw new Exception("Multiple analysis ids for found for searchID: "+searchId);
-        }
-        
-        return analysisIds.get(0);
     }
 
     private int getExperimentSearchId(int uploadedExptId2) throws Exception {

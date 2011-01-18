@@ -16,14 +16,14 @@
 		<result property="analysisProgramVersion" column="programVersion" />
 		<result property="uploadDate" column="uploadDate" />
 		<result property="comments" column="comments" />
-		<result property="fileName" column="filename" />
+		<result property="filename" column="filename" />
 	</resultMap>
 	
 	<parameterMap class="MsSearchAnalysisIn" id="msAnalysisParam">
 		<parameter property="analysisProgram" typeHandler="ProgramTypeHandler"/>
 		<parameter property="analysisProgramVersion"/>
 		<parameter property="comments" jdbcType="TEXT" />
-		<parameter property="fileName" jdbcType="STRING" />
+		<parameter property="filename" jdbcType="STRING" />
 	</parameterMap>
 	
 	
