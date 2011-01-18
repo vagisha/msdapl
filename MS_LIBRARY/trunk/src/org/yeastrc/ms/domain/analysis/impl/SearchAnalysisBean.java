@@ -68,7 +68,6 @@ public class SearchAnalysisBean implements MsSearchAnalysis {
 		return this.filename;
 	}
 	
-	@Override
 	public void setFilename(String filename) {
 		this.filename = filename;
 	}

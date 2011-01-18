@@ -50,6 +50,4 @@ public interface MsSearchAnalysis {
     
     public abstract String getFilename();
     
-    public abstract void setFilename(String filename);
-    
 }
