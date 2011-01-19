@@ -3,7 +3,7 @@
  * @author Vagisha Sharma
  * Jan 15, 2011
  */
-package org.yeastrc.ms.service.sqtfile;
+package org.yeastrc.ms.parser.tideParams;
 
 import java.io.File;
 import java.io.FilenameFilter;

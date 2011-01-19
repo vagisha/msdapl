@@ -31,6 +31,7 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
 import org.yeastrc.ms.domain.search.sequest.impl.SequestResultDataWrap;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
+import org.yeastrc.ms.parser.tideParams.TideParamsParser;
 import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
