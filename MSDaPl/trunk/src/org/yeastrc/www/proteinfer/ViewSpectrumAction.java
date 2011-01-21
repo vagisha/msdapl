@@ -356,6 +356,22 @@ public class ViewSpectrumAction extends Action {
             }
         }
         
+        if(search.getSearchProgram() == Program.TIDE) {
+            
+            TabularSequestResults tabRes = new TabularSequestResults();
+            SequestSearchResultDAO seqDao = DAOFactory.instance().getSequestResultDAO();
+            
+            for(int resultId: resultIds) {
+                SequestSearchResult sres = seqDao.load(resultId);
+                MsScan scan = scanDao.load(sres.getScanId());
+                boolean highlight = runSearchResultId == sres.getId() ? true : false;
+                tabRes.addResult(new SequestResultPlus(sres, scan), highlight);
+            }
+            if(resultIds.size() > 0) {
+                request.setAttribute("results", tabRes);
+            }
+        }
+        
         else if(search.getSearchProgram() == Program.MASCOT) {
             
             TabularMascotResults tabRes = new TabularMascotResults();
@@ -485,11 +501,33 @@ public class ViewSpectrumAction extends Action {
             
             TableCell cell = new TableCell();
 			try {
-				HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptide(true));
-				String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
-				data.setAbsoluteHyperlink(url, true);
-	            data.setTargetName("SPECTRUM_WINDOW");
-	            cell.addData(data);
+				String modifiedSequence = result.getResultPeptide().getFullModifiedPeptide(true); 
+				// link to Java spectrum viewer
+	        	HyperlinkedData javaLink = new HyperlinkedData("<span style='font-size:8pt;' title='Java Spectrum Viewer'>(J)</span>");
+	        	String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId()
+	        	//+"&runSearchAnalysisID="+result.getRunSearchAnalysisId()
+	        	+"&java=true";
+	        	javaLink.setHyperlink(url, true);
+	        	javaLink.setTargetName("spec_view_java");
+	        	cell.addData(javaLink);
+	        	
+	        	HyperlinkedData jsLink = new HyperlinkedData("<span style='font-size:8pt;' title='JavaScript Spectrum Viewer'>(JS)</span>");
+	        	url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+	        	//+"&runSearchAnalysisID="+result.getRunSearchAnalysisId();
+	        	jsLink.setHyperlink(url, true);
+	        	jsLink.setTargetName("spec_view_js");
+	        	cell.addData(jsLink);
+	        	
+	        	if(result.getResultPeptide().hasDynamicModification())
+	        		cell.addData("<span class=\"peptide\">"+modifiedSequence+"</span>");
+	        	else
+	        		cell.addData(modifiedSequence);
+	        	
+//				HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptide(true));
+//				String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+//				data.setAbsoluteHyperlink(url, true);
+//	            data.setTargetName("SPECTRUM_WINDOW");
+//	            cell.addData(data);
 			} catch (ModifiedSequenceBuilderException e) {
 				log.error("Error building modified sequence", e);
 				cell.addData("ERROR");
@@ -511,6 +549,8 @@ public class ViewSpectrumAction extends Action {
             for(SORT_BY col: columns) {
                 TableHeader header = new TableHeader(col.getDisplayName(), col.name());
                 headers.add(header);
+                if(col.getTooltip() != null)
+                	header.setTitle(col.getTooltip());
             }
             return headers;
         }
@@ -584,11 +624,34 @@ public class ViewSpectrumAction extends Action {
 
             TableCell cell = new TableCell();
 			try {
-				HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptide(true));
-				String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
-				data.setAbsoluteHyperlink(url, true);
-	            data.setTargetName("SPECTRUM_WINDOW");
-	            cell.addData(data);
+				
+				String modifiedSequence = result.getResultPeptide().getFullModifiedPeptide(true); 
+				// link to Java spectrum viewer
+	        	HyperlinkedData javaLink = new HyperlinkedData("<span style='font-size:8pt;' title='Java Spectrum Viewer'>(J)</span>");
+	        	String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId()
+	        	//+"&runSearchAnalysisID="+result.getRunSearchAnalysisId()
+	        	+"&java=true";
+	        	javaLink.setHyperlink(url, true);
+	        	javaLink.setTargetName("spec_view_java");
+	        	cell.addData(javaLink);
+	        	
+	        	HyperlinkedData jsLink = new HyperlinkedData("<span style='font-size:8pt;' title='JavaScript Spectrum Viewer'>(JS)</span>");
+	        	url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+	        	//+"&runSearchAnalysisID="+result.getRunSearchAnalysisId();
+	        	jsLink.setHyperlink(url, true);
+	        	jsLink.setTargetName("spec_view_js");
+	        	cell.addData(jsLink);
+	        	
+	        	if(result.getResultPeptide().hasDynamicModification())
+	        		cell.addData("<span class=\"peptide\">"+modifiedSequence+"</span>");
+	        	else
+	        		cell.addData(modifiedSequence);
+	        	
+//				HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptide(true));
+//				String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+//				data.setAbsoluteHyperlink(url, true);
+//	            data.setTargetName("SPECTRUM_WINDOW");
+//	            cell.addData(data);
 			} catch (ModifiedSequenceBuilderException e) {
 				log.error("Error building modified sequence", e);
 				cell.addData("ERROR");
@@ -610,6 +673,8 @@ public class ViewSpectrumAction extends Action {
             for(SORT_BY col: columns) {
                 TableHeader header = new TableHeader(col.getDisplayName(), col.name());
                 headers.add(header);
+                if(col.getTooltip() != null)
+                	header.setTitle(col.getTooltip());
             }
             return headers;
         }
@@ -684,11 +749,34 @@ public class ViewSpectrumAction extends Action {
             
             TableCell cell = new TableCell();
 			try {
-				HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptide(true));
-				String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
-				data.setAbsoluteHyperlink(url, true);
-	            data.setTargetName("SPECTRUM_WINDOW");
-	            cell.addData(data);
+				
+				String modifiedSequence = result.getResultPeptide().getFullModifiedPeptide(true); 
+				// link to Java spectrum viewer
+	        	HyperlinkedData javaLink = new HyperlinkedData("<span style='font-size:8pt;' title='Java Spectrum Viewer'>(J)</span>");
+	        	String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId()
+	        	//+"&runSearchAnalysisID="+result.getRunSearchAnalysisId()
+	        	+"&java=true";
+	        	javaLink.setHyperlink(url, true);
+	        	javaLink.setTargetName("spec_view_java");
+	        	cell.addData(javaLink);
+	        	
+	        	HyperlinkedData jsLink = new HyperlinkedData("<span style='font-size:8pt;' title='JavaScript Spectrum Viewer'>(JS)</span>");
+	        	url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+	        	//+"&runSearchAnalysisID="+result.getRunSearchAnalysisId();
+	        	jsLink.setHyperlink(url, true);
+	        	jsLink.setTargetName("spec_view_js");
+	        	cell.addData(jsLink);
+	        	
+	        	if(result.getResultPeptide().hasDynamicModification())
+	        		cell.addData("<span class=\"peptide\">"+modifiedSequence+"</span>");
+	        	else
+	        		cell.addData(modifiedSequence);
+	        	
+//				HyperlinkedData data = new HyperlinkedData(result.getResultPeptide().getFullModifiedPeptide(true));
+//				String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+//				data.setAbsoluteHyperlink(url, true);
+//	            data.setTargetName("SPECTRUM_WINDOW");
+//	            cell.addData(data);
 			} catch (ModifiedSequenceBuilderException e) {
 				log.error("Error building modified sequence", e);
 				cell.addData("ERROR");
@@ -711,6 +799,8 @@ public class ViewSpectrumAction extends Action {
             for(SORT_BY col: columns) {
                 TableHeader header = new TableHeader(col.getDisplayName(), col.name());
                 headers.add(header);
+                if(col.getTooltip() != null)
+                	header.setTitle(col.getTooltip());
             }
             return headers;
         }
@@ -861,6 +951,16 @@ public class ViewSpectrumAction extends Action {
             fragMassType = seqSearchDao.getFragmentMassType(searchId);
             parentMassType = seqSearchDao.getParentMassType(searchId);
         }
+        if (search.getSearchProgram() == Program.TIDE) { 
+                SequestSearchDAO seqSearchDao = DAOFactory.instance().getSequestSearchDAO();
+                fragMassType = MassType.MONO;
+                String val = seqSearchDao.getSearchParamValue(searchId, "MonoisotopicPrecursor");
+                if(val.equals("1"))
+                	parentMassType = MassType.MONO;
+                else
+                	parentMassType = MassType.AVG;
+                	
+            }
         else if(search.getSearchProgram() == Program.MASCOT) {
             MascotSearchDAO masSearchDao = DAOFactory.instance().getMascotSearchDAO();
             fragMassType = masSearchDao.getFragmentMassType(searchId);
@@ -878,7 +978,7 @@ public class ViewSpectrumAction extends Action {
         }
         if (fragMassType == null) {
             ActionErrors errors = new ActionErrors();
-            errors.add("spectra", new ActionMessage("error.msdata.spectra.massTypeError"));
+            errors.add("spectra", new ActionMessage("error.msdata.spectra.massTypeError", searchId));
             saveErrors( request, errors );
             return null;
         }
