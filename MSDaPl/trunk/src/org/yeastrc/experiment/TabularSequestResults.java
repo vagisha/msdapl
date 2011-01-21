@@ -105,6 +105,9 @@ public class TabularSequestResults implements Tabular, Pageable {
             }
             if(col == SORT_BY.PROTEIN || col == SORT_BY.AREA)
                 header.setSortable(false);
+            
+            if(col.getTooltip() != null)
+            	header.setTitle(col.getTooltip());
             headers.add(header);
         }
         return headers;
@@ -118,34 +121,35 @@ public class TabularSequestResults implements Tabular, Pageable {
         TableRow row = new TableRow();
         
         // row.addCell(new TableCell(String.valueOf(result.getId())));
-        TableCell cell = new TableCell(result.getFilename());
-        row.addCell(cell);
-        row.addCell(new TableCell(String.valueOf(result.getScanNumber())));
-        row.addCell(new TableCell(String.valueOf(result.getCharge())));
-        row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getObservedMass()))));
+        row.addCell(new TableCell(result.getFilename()));
+        row.addCell(makeRightAlignCell(String.valueOf(result.getScanNumber())));
+        row.addCell(makeRightAlignCell(String.valueOf(result.getCharge())));
+        row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getObservedMass())));
         
         // Retention time
         BigDecimal temp = result.getRetentionTime();
         if(temp == null) {
             row.addCell(new TableCell(""));
         }
-        else
-            row.addCell(new TableCell(String.valueOf(rounder.roundFour(temp))));
+        else {
+            row.addCell(makeRightAlignCell(rounder.roundTwoFormat(temp)));
+        }
         
         // Area of the precursor ion
         if(this.hasBullsEyeArea) {
-            row.addCell(new TableCell(String.valueOf(rounder.roundTwo(result.getArea()))));
+            row.addCell(makeRightAlignCell(rounder.roundTwoFormat(result.getArea())));
         }
         
-        row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getxCorrRank())));
-        row.addCell(new TableCell(String.valueOf(rounder.roundTwo(result.getSequestResultData().getxCorr()))));
-        row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getDeltaCN())));
+        row.addCell(makeRightAlignCell(String.valueOf(result.getSequestResultData().getxCorrRank())));
+        row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getSequestResultData().getxCorr())));
+        row.addCell(makeRightAlignCell(String.valueOf(result.getSequestResultData().getDeltaCN())));
         if(useEvalue)
-            row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getEvalue())));
+            row.addCell(makeRightAlignCell(String.valueOf(result.getSequestResultData().getEvalue())));
         else
-            row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getSp())));
+            row.addCell(makeRightAlignCell(String.valueOf(result.getSequestResultData().getSp())));
         
         
+        TableCell cell = null;
         String modifiedSequence = null;
         try {
         	// get modified peptide of the form: K.PEP[+80]TIDE.L
@@ -187,9 +191,14 @@ public class TabularSequestResults implements Tabular, Pageable {
             cellContents += " \n<div style=\"display: none;\" id=\"proteins_for_"+result.getId()+"\">"+result.getOtherProteinsShortHtml()+"</div>";
         }
         cell = new TableCell(cellContents);
-        cell.setClassName("left_align");
         row.addCell(cell);
         return row;
+    }
+    
+    private TableCell makeRightAlignCell(String content) {
+    	TableCell cell = new TableCell(content);
+    	cell.setClassName("right_align");
+    	return cell;
     }
     
     @Override

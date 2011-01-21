@@ -140,6 +140,10 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
                     header.setSorted(true);
                     header.setSortOrder(sortOrder);
                 }
+                
+                if(col.getTooltip() != null)
+                	header.setTitle(col.getTooltip());
+                
                 headers.add(header);
             }
             return headers;
@@ -154,12 +158,10 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
             TableRow row = new TableRow();
             
             // row.addCell(new TableCell(String.valueOf(result.getPeptideProphetResultId())));
-            TableCell cell = new TableCell(result.getFilename());
-            cell.setClassName("left_align");
-            row.addCell(cell);
-            row.addCell(new TableCell(String.valueOf(result.getScanNumber())));
-            row.addCell(new TableCell(String.valueOf(result.getCharge())));
-            row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getObservedMass()))));
+            row.addCell(new TableCell(result.getFilename()));
+            row.addCell(makeRightAlignCell(String.valueOf(result.getScanNumber())));
+            row.addCell(makeRightAlignCell(String.valueOf(result.getCharge())));
+            row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getObservedMass())));
             
             // Retention time
             BigDecimal temp = result.getRetentionTime();
@@ -167,38 +169,39 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
                 row.addCell(new TableCell(""));
             }
             else
-                row.addCell(new TableCell(String.valueOf(rounder.roundFour(temp))));
+                row.addCell(makeRightAlignCell(rounder.roundTwoFormat(temp)));
             
             
-            row.addCell(new TableCell(String.valueOf(result.getProbabilityRounded())));
+            row.addCell(makeRightAlignCell(String.valueOf(result.getProbabilityRounded())));
             
             // Sequest data
             if(searchProgram == Program.SEQUEST) {
-                row.addCell(new TableCell(String.valueOf(((PeptideProphetResultPlusSequest)result).getSequestData().getxCorrRank())));
-                row.addCell(new TableCell(String.valueOf(rounder.roundTwo(((PeptideProphetResultPlusSequest)result).getSequestData().getxCorr()))));
+                row.addCell(makeRightAlignCell(String.valueOf(((PeptideProphetResultPlusSequest)result).getSequestData().getxCorrRank())));
+                row.addCell(makeRightAlignCell(rounder.roundTwoFormat(((PeptideProphetResultPlusSequest)result).getSequestData().getxCorr())));
 //            row.addCell(new TableCell(String.valueOf(round(result.getSequestData().getDeltaCN()))));
             }
             
             // Mascot data
             else if(searchProgram == Program.MASCOT) {
-                row.addCell(new TableCell(String.valueOf(((PeptideProphetResultPlusMascot)result).getMascotData().getRank())));
-                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusMascot)result).getMascotData().getIonScore()))));
-                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusMascot)result).getMascotData().getIdentityScore()))));
-                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusMascot)result).getMascotData().getHomologyScore()))));
-                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusMascot)result).getMascotData().getExpect()))));
+                row.addCell(makeRightAlignCell(String.valueOf(((PeptideProphetResultPlusMascot)result).getMascotData().getRank())));
+                row.addCell(makeRightAlignCell(rounder.roundFourFormat(((PeptideProphetResultPlusMascot)result).getMascotData().getIonScore())));
+                row.addCell(makeRightAlignCell(rounder.roundFourFormat(((PeptideProphetResultPlusMascot)result).getMascotData().getIdentityScore())));
+                row.addCell(makeRightAlignCell(rounder.roundFourFormat(((PeptideProphetResultPlusMascot)result).getMascotData().getHomologyScore())));
+                row.addCell(makeRightAlignCell(rounder.roundFourFormat(((PeptideProphetResultPlusMascot)result).getMascotData().getExpect())));
             }
             
             // Xtandem data
             else if(searchProgram == Program.XTANDEM) {
-                row.addCell(new TableCell(String.valueOf(((PeptideProphetResultPlusXtandem)result).getXtandemData().getRank())));
-                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusXtandem)result).getXtandemData().getHyperScore()))));
-                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusXtandem)result).getXtandemData().getNextScore()))));
-                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusXtandem)result).getXtandemData().getBscore()))));
-                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusXtandem)result).getXtandemData().getYscore()))));
-                row.addCell(new TableCell(String.valueOf(rounder.roundFour(((PeptideProphetResultPlusXtandem)result).getXtandemData().getExpect()))));
+                row.addCell(makeRightAlignCell(String.valueOf(((PeptideProphetResultPlusXtandem)result).getXtandemData().getRank())));
+                row.addCell(makeRightAlignCell(rounder.roundFourFormat(((PeptideProphetResultPlusXtandem)result).getXtandemData().getHyperScore())));
+                row.addCell(makeRightAlignCell(rounder.roundFourFormat(((PeptideProphetResultPlusXtandem)result).getXtandemData().getNextScore())));
+                row.addCell(makeRightAlignCell(rounder.roundFourFormat(((PeptideProphetResultPlusXtandem)result).getXtandemData().getBscore())));
+                row.addCell(makeRightAlignCell(rounder.roundFourFormat(((PeptideProphetResultPlusXtandem)result).getXtandemData().getYscore())));
+                row.addCell(makeRightAlignCell(rounder.roundFourFormat(((PeptideProphetResultPlusXtandem)result).getXtandemData().getExpect())));
             }
             
             
+            TableCell cell = null;
             String modifiedSequence = null;
             try {
             	// get modified peptide of the form: K.PEP[+80]TIDE.L
@@ -244,10 +247,15 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
                 			 +result.getPeptideProphetResultId()+"\">"+result.getOtherProteinsShortHtml()+"</div>";
             }
             cell = new TableCell(cellContents);
-            cell.setClassName("left_align");
             row.addCell(cell);
             
             return row;
+        }
+        
+        private TableCell makeRightAlignCell(String content) {
+        	TableCell cell = new TableCell(content);
+        	cell.setClassName("right_align");
+        	return cell;
         }
 
         @Override

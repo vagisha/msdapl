@@ -115,6 +115,10 @@ public class TabularPercolatorResults implements Tabular, Pageable {
                 header.setSorted(true);
                 header.setSortOrder(sortOrder);
             }
+            
+            if(col.getTooltip() != null)
+            	header.setTitle(col.getTooltip());
+            
             headers.add(header);
         }
         return headers;
@@ -128,11 +132,10 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         TableRow row = new TableRow();
         
         // row.addCell(new TableCell(String.valueOf(result.getPercolatorResultId())));
-        TableCell cell = new TableCell(result.getFilename());
-        row.addCell(cell);
-        row.addCell(new TableCell(String.valueOf(result.getScanNumber())));
-        row.addCell(new TableCell(String.valueOf(result.getCharge())));
-        row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getObservedMass()))));
+        row.addCell(new TableCell(result.getFilename()));
+        row.addCell(makeRightAlignCell(String.valueOf(result.getScanNumber())));
+        row.addCell(makeRightAlignCell(String.valueOf(result.getCharge())));
+        row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getObservedMass())));
         
         // Retention time
         BigDecimal temp = result.getRetentionTime();
@@ -140,28 +143,29 @@ public class TabularPercolatorResults implements Tabular, Pageable {
             row.addCell(new TableCell(""));
         }
         else
-            row.addCell(new TableCell(String.valueOf(rounder.roundFour(temp))));
+            row.addCell(makeRightAlignCell(rounder.roundTwoFormat(temp)));
         
         // Area of the precursor ion
         if(hasBullsEyeArea) {
-            row.addCell(new TableCell(String.valueOf(rounder.roundTwo(result.getArea()))));
+            row.addCell(makeRightAlignCell(rounder.roundTwoFormat(result.getArea())));
         }
         
-        row.addCell(new TableCell(String.valueOf(result.getQvalueRounded())));
+        row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getQvalueRounded())));
         if(this.hasPEP)
-            row.addCell(new TableCell(String.valueOf(result.getPosteriorErrorProbabilityRounded())));
+            row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getPosteriorErrorProbabilityRounded())));
         else
-            row.addCell(new TableCell(String.valueOf(result.getDiscriminantScoreRounded())));
+            row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getDiscriminantScoreRounded())));
         
         if(hasPeptideResults) {
-        	row.addCell(new TableCell(String.valueOf(result.getPeptideQvalue())));
-        	row.addCell(new TableCell(String.valueOf(result.getPeptidePosteriorErrorProbability())));
+        	row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getPeptideQvalue())));
+        	row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getPeptidePosteriorErrorProbability())));
         }
         // Sequest data
-        row.addCell(new TableCell(String.valueOf(result.getSequestData().getxCorrRank())));
-        row.addCell(new TableCell(String.valueOf(rounder.roundTwo(result.getSequestData().getxCorr()))));
+        row.addCell(makeRightAlignCell(String.valueOf(result.getSequestData().getxCorrRank())));
+        row.addCell(makeRightAlignCell((rounder.roundFourFormat(result.getSequestData().getxCorr()))));
 //        row.addCell(new TableCell(String.valueOf(round(result.getSequestData().getDeltaCN()))));
         
+        TableCell cell = null;
         String modifiedSequence = null;
         try {
         	// get modified peptide of the form: K.PEP[+80]TIDE.L
@@ -205,10 +209,15 @@ public class TabularPercolatorResults implements Tabular, Pageable {
             			 +result.getPercolatorResultId()+"\">"+result.getOtherProteinsShortHtml()+"</div>";
         }
         cell = new TableCell(cellContents);
-        cell.setClassName("left_align");
         row.addCell(cell);
         
         return row;
+    }
+    
+    private TableCell makeRightAlignCell(String content) {
+    	TableCell cell = new TableCell(content);
+    	cell.setClassName("right_align");
+    	return cell;
     }
     
     @Override

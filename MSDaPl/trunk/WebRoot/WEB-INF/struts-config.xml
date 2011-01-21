@@ -475,6 +475,17 @@
 	</action>
 	
 	<action
+	  path="/viewTideResults"
+	  type="org.yeastrc.www.project.experiment.ViewSequestResults"
+	  name="filterSequestResultsForm"
+	  validate="true"
+	  scope="request"
+	  input="/pages/internal/project/tide/viewTideResults.jsp">
+	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+	  <forward name="Success" path="/pages/internal/project/tide/viewTideResults.jsp" redirect="false"/>
+	</action>
+	
+	<action
 	  path="/viewMascotResults"
 	  type="org.yeastrc.www.project.experiment.ViewMascotResults"
 	  name="filterMascotResultsForm"

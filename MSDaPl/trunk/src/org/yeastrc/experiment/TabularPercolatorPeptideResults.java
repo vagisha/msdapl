@@ -18,6 +18,7 @@ import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
+import org.yeastrc.www.util.RoundingUtils;
 
 /**
  * 
@@ -37,6 +38,7 @@ public class TabularPercolatorPeptideResults implements Tabular, Pageable {
     private int lastPage = currentPage;
     private List<Integer> displayPageNumbers;
     
+    private RoundingUtils rounder;
     
     public TabularPercolatorPeptideResults(List<PercolatorPeptideResult> results) {
         this.results = results;
@@ -52,6 +54,7 @@ public class TabularPercolatorPeptideResults implements Tabular, Pageable {
         columns.add(SORT_BY.PVAL);
         columns.add(SORT_BY.NUM_PSM);
        
+        this.rounder = RoundingUtils.getInstance();
     }
     
     @Override
@@ -88,6 +91,10 @@ public class TabularPercolatorPeptideResults implements Tabular, Pageable {
                 header.setSorted(true);
                 header.setSortOrder(sortOrder);
             }
+            
+            if(col.getTooltip() != null)
+            	header.setTitle(col.getTooltip());
+            
             headers.add(header);
         }
         return headers;
@@ -130,14 +137,14 @@ public class TabularPercolatorPeptideResults implements Tabular, Pageable {
         row.addCell(cell);
         
         
-        row.addCell(new TableCell(String.valueOf(result.getQvalueRounded())));
-        row.addCell(new TableCell(String.valueOf(result.getPosteriorErrorProbabilityRounded())));
+        row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getQvalueRounded())));
+        row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getPosteriorErrorProbabilityRounded())));
         if(result.getDiscriminantScore() != null)
-        	row.addCell(new TableCell(String.valueOf(result.getDiscriminantScoreRounded())));
+        	row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getDiscriminantScoreRounded())));
         else
         	row.addCell(new TableCell(""));
         if(result.getPvalue() != -1.0)
-        	row.addCell(new TableCell(String.valueOf(result.getPvalueRounded())));
+        	row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getPvalueRounded())));
         else
         	row.addCell(new TableCell(""));
         
@@ -145,7 +152,7 @@ public class TabularPercolatorPeptideResults implements Tabular, Pageable {
         cellContents = "<span class=\"underline clickable\" id=\"psm_"+result.getId()+"\""+
         "onClick=javascript:viewPsms("+result.getSearchAnalysisId()+","+result.getId()+") "+
         ">"+result.getPsmIdList().size()+"</span>";
-        row.addCell(new TableCell(cellContents));
+        row.addCell(makeRightAlignCell(cellContents));
         
         return row;
     }
@@ -182,6 +189,12 @@ public class TabularPercolatorPeptideResults implements Tabular, Pageable {
                 buf.delete(0, "<br>".length());
             return buf.toString();
         }
+    }
+    
+    private TableCell makeRightAlignCell(String content) {
+    	TableCell cell = new TableCell(content);
+    	cell.setClassName("right_align");
+    	return cell;
     }
     
     @Override

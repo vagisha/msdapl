@@ -95,6 +95,10 @@ public class TabularMascotResults implements Tabular, Pageable {
                 }
                 if(col == SORT_BY.PROTEIN)
                     header.setSortable(false);
+                
+                if(col.getTooltip() != null)
+                	header.setTitle(col.getTooltip());
+                
                 headers.add(header);
             }
             return headers;
@@ -108,12 +112,10 @@ public class TabularMascotResults implements Tabular, Pageable {
             TableRow row = new TableRow();
             
             // row.addCell(new TableCell(String.valueOf(result.getId())));
-            TableCell cell = new TableCell(result.getFilename());
-            cell.setClassName("left_align");
-            row.addCell(cell);
-            row.addCell(new TableCell(String.valueOf(result.getScanNumber())));
-            row.addCell(new TableCell(String.valueOf(result.getCharge())));
-            row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getObservedMass()))));
+            row.addCell(new TableCell(result.getFilename()));
+            row.addCell(makeRightAlignCell(String.valueOf(result.getScanNumber())));
+            row.addCell(makeRightAlignCell(String.valueOf(result.getCharge())));
+            row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getObservedMass())));
             
             // Retention time
             BigDecimal temp = result.getRetentionTime();
@@ -121,15 +123,16 @@ public class TabularMascotResults implements Tabular, Pageable {
                 row.addCell(new TableCell(""));
             }
             else
-                row.addCell(new TableCell(String.valueOf(rounder.roundFour(temp))));
+                row.addCell(makeRightAlignCell(rounder.roundTwoFormat(temp)));
             
             
-            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getRank())));
-            row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getMascotResultData().getIonScore()))));
-            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getIdentityScore())));
-            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getHomologyScore())));
-            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getExpect())));
+            row.addCell(makeRightAlignCell(String.valueOf(result.getMascotResultData().getRank())));
+            row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getMascotResultData().getIonScore())));
+            row.addCell(makeRightAlignCell(String.valueOf(result.getMascotResultData().getIdentityScore())));
+            row.addCell(makeRightAlignCell(String.valueOf(result.getMascotResultData().getHomologyScore())));
+            row.addCell(makeRightAlignCell(String.valueOf(result.getMascotResultData().getExpect())));
             
+            TableCell cell = null;
             String modifiedSequence = null;
             try {
             	// get modified peptide of the form: K.PEP[+80]TIDE.L
@@ -171,9 +174,14 @@ public class TabularMascotResults implements Tabular, Pageable {
                 cellContents += " \n<div style=\"display: none;\" id=\"proteins_for_"+result.getId()+"\">"+result.getOtherProteinsShortHtml()+"</div>";
             }
             cell = new TableCell(cellContents);
-            cell.setClassName("left_align");
             row.addCell(cell);
             return row;
+        }
+        
+        private TableCell makeRightAlignCell(String content) {
+        	TableCell cell = new TableCell(content);
+        	cell.setClassName("right_align");
+        	return cell;
         }
         
         @Override

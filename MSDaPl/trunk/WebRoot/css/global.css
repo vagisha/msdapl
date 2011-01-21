@@ -266,6 +266,10 @@ DIV.pinfer_header_small {
 	text-align: center;
 }
 
+.table_basic td.right_align, .table_compare_grp td.right_align{
+	text-align: right;
+}
+
 .table_compare_grp td {
 	border-style: none solid solid none;
 	border-width: medium 1px 1px medium;

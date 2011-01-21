@@ -90,6 +90,9 @@ $(document).ready(function() {
  <logic:equal name="dir" scope="request" value="sequest">
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>
+  <logic:equal name="dir" scope="request" value="tide">
+ 	<%home_class = "current"; home_menus = true;%>
+ </logic:equal>
  <logic:equal name="dir" scope="request" value="mascot">
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>

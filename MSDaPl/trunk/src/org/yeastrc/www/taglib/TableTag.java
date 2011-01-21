@@ -151,6 +151,9 @@ public class TableTag extends TagSupport {
                 if(header.getWidth() > 0) {
                     writer.print(" width=\""+header.getWidth()+"%\" ");
                 }
+                if(header.getTitle() != null) {
+                	writer.print(" title=\""+header.getTitle()+"\" ");
+                }
                 writer.print(">"+header.getHeaderName()+"</th>\n");
             }
             writer.print("</tr>\n");

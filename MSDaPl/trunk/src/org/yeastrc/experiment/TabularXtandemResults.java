@@ -97,6 +97,9 @@ public class TabularXtandemResults implements Tabular, Pageable {
                 if(col == SORT_BY.PROTEIN)
                     header.setSortable(false);
                 headers.add(header);
+                
+                if(col.getTooltip() != null)
+                	header.setTitle(col.getTooltip());
             }
             return headers;
         }
@@ -112,9 +115,9 @@ public class TabularXtandemResults implements Tabular, Pageable {
             TableCell cell = new TableCell(result.getFilename());
             cell.setClassName("left_align");
             row.addCell(cell);
-            row.addCell(new TableCell(String.valueOf(result.getScanNumber())));
-            row.addCell(new TableCell(String.valueOf(result.getCharge())));
-            row.addCell(new TableCell(String.valueOf(rounder.roundFour(result.getObservedMass()))));
+            row.addCell(makeRightAlignCell(String.valueOf(result.getScanNumber())));
+            row.addCell(makeRightAlignCell(String.valueOf(result.getCharge())));
+            row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getObservedMass())));
             
             // Retention time
             BigDecimal temp = result.getRetentionTime();
@@ -122,15 +125,15 @@ public class TabularXtandemResults implements Tabular, Pageable {
                 row.addCell(new TableCell(""));
             }
             else
-                row.addCell(new TableCell(String.valueOf(rounder.roundFour(temp))));
+                row.addCell(makeRightAlignCell(rounder.roundTwoFormat(temp)));
             
             
-            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getRank())));
-            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getHyperScore())));
-            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getNextScore())));
-            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getBscore())));
-            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getYscore())));
-            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getExpect())));
+            row.addCell(makeRightAlignCell(String.valueOf(result.getXtandemResultData().getRank())));
+            row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getXtandemResultData().getHyperScore())));
+            row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getXtandemResultData().getNextScore())));
+            row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getXtandemResultData().getBscore())));
+            row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getXtandemResultData().getYscore())));
+            row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getXtandemResultData().getExpect())));
             
             String modifiedSequence = null;
             try {
@@ -173,9 +176,14 @@ public class TabularXtandemResults implements Tabular, Pageable {
                 cellContents += " \n<div style=\"display: none;\" id=\"proteins_for_"+result.getId()+"\">"+result.getOtherProteinsShortHtml()+"</div>";
             }
             cell = new TableCell(cellContents);
-            cell.setClassName("left_align");
             row.addCell(cell);
             return row;
+        }
+        
+        private TableCell makeRightAlignCell(String content) {
+        	TableCell cell = new TableCell(content);
+        	cell.setClassName("right_align");
+        	return cell;
         }
         
         @Override

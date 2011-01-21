@@ -24,6 +24,7 @@ public class TableHeader {
     private int colspan = 0;
     private int rowspan = 0;
     private int rowIndex = 1;
+    private String title;
 
 	private SORT_CLASS sortClass = SORT_CLASS.SORT_ALPHA;
     private String styleClass = null;
@@ -130,6 +131,14 @@ public class TableHeader {
 
     public void setStyleClass(String styleClass) {
         this.styleClass = styleClass;
+    }
+    
+    public void setTitle(String title) {
+    	this.title = title;
+    }
+    
+    public String getTitle() {
+    	return title;
     }
     
 }
