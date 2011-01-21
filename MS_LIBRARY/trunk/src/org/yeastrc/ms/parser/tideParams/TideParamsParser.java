@@ -320,7 +320,7 @@ public class TideParamsParser implements SearchParamsDataProvider {
 		System.out.println(parser.getSearchProgram());
 		System.out.println("Enzyme used: "+parser.isEnzymeUsedForSearch());
 		System.out.println("HAS all Protein matches: "+parser.printAllProteinMatches());
-		System.out.println(parser.getStaticResidueMods().size());
+		
 		for(MsResidueModificationIn mod: parser.getStaticResidueMods())
 			System.out.println("STATIC "+mod.getModifiedResidue()+"; "+mod.getModificationMass());
 		

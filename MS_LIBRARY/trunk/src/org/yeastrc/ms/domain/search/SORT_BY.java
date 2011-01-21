@@ -13,7 +13,7 @@ public enum SORT_BY {
     SCAN("Scan", "startScanNumber"), 
     CHARGE("Charge", "charge"), 
     MASS("Obs. Mass", "observedMass"), 
-    RT("RT", "retentionTime"), 
+    RT("RT", "retentionTime", "Retention Time"), 
     AREA("Area", "area"),
     PEPTIDE("Peptide", "peptide"),
     PROTEIN("Protein", "accession"),
@@ -22,11 +22,11 @@ public enum SORT_BY {
     
     // Sequest specific
     XCORR("XCorr", "XCorr"),
-    XCORR_RANK("XCr", "XCorrRank"),
+    XCORR_RANK("XCr", "XCorrRank", "XCorr Rank"),
     SP("Sp", "sp"),
-    DELTACN("dCN", "deltaCN"),
+    DELTACN("dCN", "deltaCN", "DeltaCN"),
     EVAL("e-value", "evalue"),
-    CALC_MASS_SEQ("Calc. Mass", "calculatedMass"),
+    CALC_MASS_SEQ("Calc. Mass", "calculatedMass", "Calculated Mass"),
     
     // Mascot specific
     ION_SCORE("IonScore", "ionScore"),
@@ -47,11 +47,11 @@ public enum SORT_BY {
     // Percolator specific
     QVAL("qvalue", "qvalue"),
     PVAL("pvalue", "pvalue"),
-    PEP("PEP", "pep"),
-    QVAL_PEPT("qvalue(P)", "qvalue"),
-    PEP_PEPT("PEP(P)", "pep"),
-    DS("DS", "discriminantScore"),
-    P_RT("Predict. RT", "predictedRetentionTime"),
+    PEP("PEP", "pep", "Posterior Error Probability"),
+    QVAL_PEPT("qvalue(P)", "qvalue", "Peptide-level qvalue"),
+    PEP_PEPT("PEP(P)", "pep", "Peptide-level Posterior Error Probability"),
+    DS("DS", "discriminantScore", "Discriminant Score"),
+    P_RT("Predict. RT", "predictedRetentionTime", "Predicted Retention Time"),
     NUM_PSM("#PSMs", "numPsms"),
 
     // PeptideProphet specific
@@ -59,10 +59,16 @@ public enum SORT_BY {
     
     private String displayName;
     private String columnName;
+    private String tooltip;
 
-    private SORT_BY(String displayName, String columnName) {
+    private SORT_BY(String displayName, String columnName, String tooltip) {
         this.displayName = displayName;
         this.columnName = columnName;
+        this.tooltip = tooltip;
+    }
+    
+    private SORT_BY(String displayName, String columnName) {
+       this(displayName, columnName, null);
     }
 
     public String getDisplayName() {
@@ -71,6 +77,10 @@ public enum SORT_BY {
     
     public String getColumnName() {
         return columnName;
+    }
+    
+    public String getTooltip() {
+    	return tooltip;
     }
 
     public static SORT_BY getSortByForName(String name) {
