@@ -100,12 +100,22 @@ public class FileStats implements File, Comparable<FileStats>{
     	buf.append("&chls=15,4,0|15,4,0|15,4,0|15,4,0");
     	buf.append("&chma=10,10,0,0");
     	buf.append("&chd=t:");
-    	buf.append(populationMin+","+(populationMean - populationStandardDeviation)+"|0,0");
-    	buf.append("|"+(populationMean - populationStandardDeviation)+","+(populationMean + populationStandardDeviation)+"|0,0");
+    	buf.append(populationMin+","+(Math.max(0,(populationMean - populationStandardDeviation)))+"|0,0");
+    	buf.append("|"+Math.max(0,(populationMean - populationStandardDeviation))+","+(populationMean + populationStandardDeviation)+"|0,0");
     	buf.append("|"+(populationMean + populationStandardDeviation)+","+populationMax+"|0,0");
     	buf.append("|"+samplePercent+","+(samplePercent+1)+"|0,0");
     	
+    	// scale has to be specified for each series, otherwise marker gets cut off
     	buf.append("&chds=0,"+populationMax);
+    	buf.append(",0,10");
+    	buf.append(",0,"+populationMax);
+    	buf.append(",0,10");
+    	buf.append(",0,"+populationMax);
+    	buf.append(",0,10");
+    	buf.append(",0,"+populationMax);
+    	buf.append(",0,10");
+    	
+    	
     	buf.append("&chxr=0,0,"+populationMax);
     	String color = "191970";
     	if(!inRange)
@@ -145,7 +155,16 @@ public class FileStats implements File, Comparable<FileStats>{
     	buf.append("|"+(populationMean + populationStandardDeviation)+","+populationMax+"|15,15");
     	buf.append("|"+samplePercent+","+(samplePercent+1)+"|15,15");
     	
+    	// scale has to be specified for each series, otherwise pin gets cut off
     	buf.append("&chds=0,"+populationMax);
+    	buf.append(",0,30");
+    	buf.append(",0,"+populationMax);
+    	buf.append(",0,30");
+    	buf.append(",0,"+populationMax);
+    	buf.append(",0,30");
+    	buf.append(",0,"+populationMax);
+    	buf.append(",0,30");
+    	
     	buf.append("&chxr=0,0,"+populationMax);
     	String color = "6495ed";
     	if(!inRange)
