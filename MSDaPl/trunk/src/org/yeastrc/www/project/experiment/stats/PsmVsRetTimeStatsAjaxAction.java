@@ -5,10 +5,6 @@
  */
 package org.yeastrc.www.project.experiment.stats;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,10 +13,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.experiment.stats.DistributionPlotter;
-import org.yeastrc.experiment.stats.FileStats;
-import org.yeastrc.experiment.stats.PercolatorPsmRetTimeDistribution;
-import org.yeastrc.experiment.stats.PercolatorPsmRetTimeDistributionGetter;
+import org.yeastrc.experiment.stats.PercolatorQCStatsGetter;
 
 /**
  * 
@@ -70,49 +63,17 @@ public class PsmVsRetTimeStatsAjaxAction extends Action {
         request.setAttribute("qvalue", qvalue);
         
         
-        DistributionPlotter plotter = new DistributionPlotter();
-        PlotUrlCache cache = PlotUrlCache.getInstance();
+        PercolatorQCStatsGetter statsGetter = new PercolatorQCStatsGetter();
+        statsGetter.setGetPsmRtStats(true);
+        statsGetter.getStats(analysisId, qvalue);
         
         
         // -----------------------------------------------------------------------------
         // PSM-RT plot
         // -----------------------------------------------------------------------------
-        String psmDistrUrl = cache.getPsmRtPlotUrl(analysisId, qvalue);
-        List<FileStats> psmFileStats = cache.getPsmRtFileStats(analysisId, qvalue);
-        int totalCount = 0; int goodCount = 0;
-        if(psmDistrUrl == null) {
-        	PercolatorPsmRetTimeDistributionGetter distrGetter = new PercolatorPsmRetTimeDistributionGetter(analysisId, qvalue);
-        	PercolatorPsmRetTimeDistribution result = distrGetter.getDistribution();
-            psmFileStats = result.getFileStatsList();
-            Collections.sort(psmFileStats, new Comparator<FileStats>() {
-				@Override
-				public int compare(FileStats o1, FileStats o2) {
-					return o1.getFileName().compareTo(o2.getFileName());
-				}
-			});
-            psmDistrUrl = plotter.plotGoogleChartForPSM_RTDistribution(result);
-            cache.addPsmRtPlotUrl(analysisId, qvalue, psmDistrUrl, psmFileStats);
-        }
-        
-        log.info("#PSM-RT Plot URL: "+psmDistrUrl);
-        
-        for(FileStats stat: psmFileStats) { totalCount += stat.getTotalCount(); goodCount += stat.getGoodCount();}
-        request.setAttribute("psmRTDistributionChart", psmDistrUrl);
-        request.setAttribute("psmRtFileStats", psmFileStats);
-        
-        FileStats psmAnalysisStats = new FileStats(analysisId, "none");
-    	psmAnalysisStats.setTotalCount(totalCount);
-    	psmAnalysisStats.setGoodCount(goodCount);
-    	
-        if(psmFileStats.get(0).getHasPopulationStats()) {
-        	FileStats st = psmFileStats.get(0);
-        	psmAnalysisStats.setPopulationMin(st.getPopulationMin());
-        	psmAnalysisStats.setPopulationMax(st.getPopulationMax());
-        	psmAnalysisStats.setPopulationMean(st.getPopulationMean());
-        	psmAnalysisStats.setPopulationStandardDeviation(st.getPopulationStandardDeviation());
-        }
-        
-        request.setAttribute("psmAnalysisStats", psmAnalysisStats);
+        request.setAttribute("psmRTDistributionChart", statsGetter.getPsmDistrUrl());
+        request.setAttribute("psmRtFileStats", statsGetter.getPsmFileStats());
+        request.setAttribute("psmAnalysisStats", statsGetter.getPsmAnalysisStats());
         
         
         return mapping.findForward("Success");

@@ -12,7 +12,6 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
-<script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
 <script>
 
 // ---------------------------------------------------------------------------------------

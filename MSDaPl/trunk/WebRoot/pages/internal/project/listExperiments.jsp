@@ -5,7 +5,6 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
 
 <bean:define name="instrumentList" id="instrumentList" type="java.util.List"></bean:define>
 <script>
@@ -15,7 +14,15 @@
 // --------------------------------------------------------------------------------------- 
 $(document).ready(function() {
   	makeEditable();
+	$("a.thumb").each(function() {
+		makeZoomableThumbnail(this);
+	});
 });
+
+function makeZoomableThumbnail(element) {
+	var title=$(element).attr('title');
+	$(element).colorbox({transition:"none", photo: true, title:title});
+}
 
 function makeEditable() {
 	makeCommentEditable();
@@ -439,6 +446,10 @@ function confirmDeleteExperiment(experimentId) {
 								  						$(".cancelAnalysisComments[title='"+title+"']").each(function() {
 								  							setupCancelAnalysisComments($(this));
 								  						});
+								  						
+								  						$("#expt_fold_"+exptId+"_target a.thumb").each(function() {
+															makeZoomableThumbnail(this);
+														});
 														
 								  					});
  		

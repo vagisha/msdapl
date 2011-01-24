@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import org.yeastrc.jobqueue.MsAnalysisUploadJob;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.www.project.experiment.QCPlot;
 import org.yeastrc.yates.YatesRun;
 
 
@@ -28,6 +29,9 @@ public class SearchAnalysis implements MsSearchAnalysis {
     private String analysisName;
     private List<AnalysisFile> files;
     private MsAnalysisUploadJob job;
+    
+    private List<QCPlot> qcPlots;
+    private String qcSummaryString;
     
     private YatesRun dtaSelect;
     private List<ExperimentProteinProphetRun> prophetRuns;
@@ -139,6 +143,24 @@ public class SearchAnalysis implements MsSearchAnalysis {
     public void setProteinProphetRun(List<ExperimentProteinProphetRun> runs) {
         this.prophetRuns = runs;
     }
+    
+    public List<QCPlot> getQcPlots() {
+    	if(this.qcPlots == null)
+    		return new ArrayList<QCPlot>(0);
+    	return this.qcPlots;
+    }
+    
+    public void setQcPlots(List<QCPlot> plots) {
+    	this.qcPlots = plots;
+    }
+    
+	public String getQcSummaryString() {
+		return qcSummaryString;
+	}
+
+	public void setQcSummaryString(String qcSummaryString) {
+		this.qcSummaryString = qcSummaryString;
+	}
 
 	@Override
 	public String getComments() {

@@ -5,6 +5,8 @@
  */
 package org.yeastrc.experiment.stats;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -23,6 +25,12 @@ public class PercolatorSpectraRetTimeDistribution {
 	
 	
 	public List<FileStats> getFileStatsList() {
+		Collections.sort(fileStatsList, new Comparator<FileStats>() {
+			@Override
+			public int compare(FileStats o1, FileStats o2) {
+				return o1.getFileName().compareTo(o2.getFileName());
+			}
+		});
 		return fileStatsList;
 	}
 
@@ -30,6 +38,10 @@ public class PercolatorSpectraRetTimeDistribution {
 		this.fileStatsList = fileStatsList;
 	}
 
+	public String getGoogleChartUrl() {
+		 return DistributionPlotter.getInstance().plotGoogleChartForScan_RTDistribution(this);
+	}
+	
 	public double getScoreCutoff() {
 		return scoreCutoff;
 	}

@@ -35,6 +35,8 @@ import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.experiment.ProjectProteinInferBookmarkDAO;
 import org.yeastrc.experiment.SearchAnalysis;
 import org.yeastrc.experiment.proteinfer.ProteinferRunSummaryLookup;
+import org.yeastrc.experiment.stats.FileStats;
+import org.yeastrc.experiment.stats.PercolatorQCStatsGetter;
 import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
@@ -53,8 +55,10 @@ import org.yeastrc.ms.domain.protinfer.ProteinferRunSummary;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRunSummary;
 import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
+import org.yeastrc.www.project.experiment.QCPlot;
 import org.yeastrc.www.proteinfer.job.ProteinInferJobSearcher;
 import org.yeastrc.www.proteinfer.job.ProteinferJob;
 import org.yeastrc.www.user.User;
@@ -432,6 +436,22 @@ public class ViewProjectAction extends Action {
         
         // If any of the protein inferences have been bookmarked, mark them now.
         getBookmarkedProteinInferences(sAnalysis, projectId);
+        
+        // get QC results for this analysis
+        if(analysis.getAnalysisProgram() == Program.PERCOLATOR) {
+        	PercolatorQCStatsGetter qcStatsGetter = new PercolatorQCStatsGetter();
+        	qcStatsGetter.setGetPsmRtStats(true);
+        	qcStatsGetter.setGetSpectraRtStats(true);
+        	qcStatsGetter.getStats(searchAnalysisId, PercolatorQCStatsGetter.QVAL);
+        	FileStats analysisPsmStat = qcStatsGetter.getPsmAnalysisStats();
+        	String qcSummaryString = "% PSMs (qvalue <= 0.01) = "+analysisPsmStat.getPercentGoodCount();
+        	sAnalysis.setQcSummaryString(qcSummaryString);
+        	
+        	List<QCPlot> qcPlots = new ArrayList<QCPlot>(2);
+        	qcPlots.add(new QCPlot(qcStatsGetter.getPsmDistrUrl(), "Retention Time vs # PSM"));
+        	qcPlots.add(new QCPlot(qcStatsGetter.getSpectraDistrUrl(), "Retention Time vs # Spectra"));
+        	sAnalysis.setQcPlots(qcPlots);
+        }
         
         return sAnalysis;
     }

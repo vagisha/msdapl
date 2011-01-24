@@ -14,6 +14,15 @@ import java.io.IOException;
 public class DistributionPlotter {
 
     
+	private static DistributionPlotter instance = null;
+	private DistributionPlotter() {}
+	
+	public static synchronized DistributionPlotter getInstance() {
+		if(instance == null)
+			instance = new DistributionPlotter();
+		return instance;
+	}
+	
     public String plotGoogleChartForPSM_RTDistribution(int analysisId, double qValCutoff) {
         
         PercolatorPsmRetTimeDistributionGetter dg = new PercolatorPsmRetTimeDistributionGetter(analysisId, qValCutoff);

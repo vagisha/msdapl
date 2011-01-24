@@ -24,8 +24,6 @@
 
 <script src="<yrcwww:link path='/js/jquery.form.js'/>"></script>
 
-<script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
-
 <script src="<yrcwww:link path='js/peptideHighlighter.js'/>"></script>
 
 

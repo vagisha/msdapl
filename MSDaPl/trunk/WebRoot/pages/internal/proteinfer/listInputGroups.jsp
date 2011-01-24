@@ -16,7 +16,7 @@
   
 <%@ include file="/includes/errors.jsp" %>
 
-<script src="<yrcwww:link path='js/jquery-1.3.2.min.js'/>" > </script>
+<script src="<yrcwww:link path='js/jquery-1.4.2.js'/>" > </script>
 
 <script type="text/javascript">
 	

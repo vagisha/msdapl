@@ -25,7 +25,6 @@
 <bean:define name="comparison" id="comparison" type="org.yeastrc.www.compare.ProteinGroupComparisonDataset"></bean:define>
 
 <script src="<yrcwww:link path='js/jquery.form.js'/>"></script>
-<script src="<yrcwww:link path='js/jquery.blockUI.js'/>"></script>
 
 <%@include file="comparisonFunctions.jsp" %>
 <script>

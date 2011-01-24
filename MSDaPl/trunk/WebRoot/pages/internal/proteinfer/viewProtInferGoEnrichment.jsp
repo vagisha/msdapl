@@ -26,8 +26,6 @@
 
 <script src="<yrcwww:link path='/js/jquery.form.js'/>"></script>
 
-<script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
-
 
 <link rel="stylesheet" href="<yrcwww:link path='/css/proteinfer.css'/>" type="text/css" >
 

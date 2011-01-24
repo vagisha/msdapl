@@ -17,6 +17,8 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
+<script src="<yrcwww:link path='js/jquery.colorbox.js'/>"></script>
+
 <yrcwww:contentbox title="Project Details" centered="true" width="95" widthRel="true">
 
 <SCRIPT LANGUAGE="JavaScript">
@@ -28,6 +30,7 @@
        }
     }
  }
+ 
 </SCRIPT>
 
  <CENTER>

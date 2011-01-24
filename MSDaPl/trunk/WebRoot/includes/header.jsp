@@ -14,12 +14,14 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 <head>
  <yrcwww:title />
  <link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='/css/global.css' />">
+ <link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='/css/colorbox.css' />">
 </head>
 
 <body>
 
-<script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
+<script src="<yrcwww:link path='js/jquery-1.4.2.js'/>"></script>
 <script src="<yrcwww:link path='js/msdapl.js'/>"></script>
+<script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
 <script src="<yrcwww:link path='js/tooltip.js'/>"></script>
 
 <script>

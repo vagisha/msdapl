@@ -32,6 +32,8 @@ import org.yeastrc.experiment.ProjectExperiment;
 import org.yeastrc.experiment.ProjectProteinInferBookmarkDAO;
 import org.yeastrc.experiment.SearchAnalysis;
 import org.yeastrc.experiment.proteinfer.ProteinferRunSummaryLookup;
+import org.yeastrc.experiment.stats.FileStats;
+import org.yeastrc.experiment.stats.PercolatorQCStatsGetter;
 import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
@@ -346,6 +348,22 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 		 // If any of the protein inferences have been bookmarked, mark them now.
 		 getBookmarkedProteinInferences(sAnalysis, projectId);
 
+		// get QC results for this analysis
+		 if(analysis.getAnalysisProgram() == Program.PERCOLATOR) {
+			 PercolatorQCStatsGetter qcStatsGetter = new PercolatorQCStatsGetter();
+			 qcStatsGetter.setGetPsmRtStats(true);
+			 qcStatsGetter.setGetSpectraRtStats(true);
+			 qcStatsGetter.getStats(searchAnalysisId, PercolatorQCStatsGetter.QVAL);
+			 FileStats analysisPsmStat = qcStatsGetter.getPsmAnalysisStats();
+			 String qcSummaryString = "% PSMs (qvalue <= 0.01) = "+analysisPsmStat.getPercentGoodCount();
+			 sAnalysis.setQcSummaryString(qcSummaryString);
+
+			 List<QCPlot> qcPlots = new ArrayList<QCPlot>(2);
+			 qcPlots.add(new QCPlot(qcStatsGetter.getPsmDistrUrl(), "RT vs # PSM"));
+			 qcPlots.add(new QCPlot(qcStatsGetter.getSpectraDistrUrl(), "RT vs # Spectra"));
+			 sAnalysis.setQcPlots(qcPlots);
+		 }
+		 
 		 return sAnalysis;
 			 
 	 }

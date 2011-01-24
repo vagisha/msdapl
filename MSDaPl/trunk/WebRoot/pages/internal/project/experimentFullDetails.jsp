@@ -147,9 +147,23 @@
 				</td>
 				<logic:equal name="analysis" property="complete" value="true">
 					<td valign="middle">
+						<logic:present name="analysis" property="qcSummaryString">
+							<span style="font-weight:bold;color:green;"><bean:write name="analysis" property="qcSummaryString"/></span>
+							<br/>
+						</logic:present>
 						<b><html:link action="viewPercolatorResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link></b>
 					</td>
-					<td>
+					<td align="left">
+						<logic:present name="analysis" property="qcPlots">
+							<div style="padding:5px;">
+							<logic:iterate name="analysis" property="qcPlots" id="plot">
+								<a  class="thumb" href="<bean:write name='plot' property='plotUrl'/>" title="<bean:write name='plot' property='plotTitle'/>">
+									<img style="width: 30px; height: 30px;text-decoration: none; border: 2px solid gray;" 
+									 	 src="<bean:write name='plot' property='plotUrl'/>" alt="<bean:write name='plot' property='plotTitle'/>"/>
+								</a>
+							</logic:iterate>
+							</div>
+						</logic:present>
 						<b><a href="<yrcwww:link path='viewQCPlots.do?'/>analysisId=<bean:write name='analysis' property='id' />&experimentId=<bean:write name='experiment' property='id'/>"> 
 						[Statistics]</a></b>
 					</td>
