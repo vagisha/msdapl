@@ -21,10 +21,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.bio.go.GONode;
+import org.yeastrc.bio.go.slim.GOSlimUtils;
 import org.yeastrc.www.compare.dataset.DatasetBuilder;
 import org.yeastrc.www.compare.dataset.DatasetSource;
 import org.yeastrc.www.compare.dataset.SelectableDataset;
-import org.yeastrc.www.go.GOSlimUtils;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 

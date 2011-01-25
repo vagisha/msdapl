@@ -3,10 +3,16 @@
  */
 package org.yeastrc.www.go;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import org.yeastrc.bio.go.slim.GOSlimAnalysis;
+import org.yeastrc.bio.go.slim.GOSlimTermResult;
+import org.yeastrc.www.util.RoundingUtils;
+
 /**
- * GoogleChartUrlCreator.java
+ * GOSlimChartUrlCreator.java
  * @author Vagisha Sharma
  * May 26, 2010
  * 
@@ -15,7 +21,7 @@ public class GOSlimChartUrlCreator {
 
 	private GOSlimChartUrlCreator() {}
 	
-	public static String getPieChartUrl(GOSlimAnalysis analysis, int maxSlices) {
+	public static String getPieChartUrl(GOSlimAnalysis analysis, int maxSlices, boolean useGroupCounts) {
 		
 		StringBuilder buf = new StringBuilder();
 		buf.append("http://chart.apis.google.com/chart?cht=p&chs=800x300&chco=003388,BBBB00");
@@ -23,27 +29,57 @@ public class GOSlimChartUrlCreator {
 		String data = "";
 		String labels = "";
 		String legend= "";
-		List<GOSlimTerm> slimTerms = analysis.getTermNodesMinusRootNodes();
+		List<GOSlimTermResult> slimTerms = analysis.getTermNodesMinusRootNodes();
+		
+		if(useGroupCounts) {
+			
+			Collections.sort(slimTerms, new Comparator<GOSlimTermResult>() {
+				@Override
+				public int compare(GOSlimTermResult o1, GOSlimTermResult o2) {
+					return Integer.valueOf(o2.getAnnotatedGroupCount()).compareTo(o1.getAnnotatedGroupCount());
+				}
+			});
+		}
+		else {
+			
+			Collections.sort(slimTerms, new Comparator<GOSlimTermResult>() {
+				@Override
+				public int compare(GOSlimTermResult o1, GOSlimTermResult o2) {
+					return Integer.valueOf(o2.getAnnotatedProteinCount()).compareTo(o1.getAnnotatedProteinCount());
+				}
+			});
+		}
 		
 		int totalAnnotCount = 0;
+		// Look at the top "maxSlices" terms
 		for(int i = 0; i < maxSlices; i++) {
 			if(i >= slimTerms.size())
 				break;
-			GOSlimTerm term = slimTerms.get(i);
-			totalAnnotCount += term.getProteinCountForTerm();
+			GOSlimTermResult term = slimTerms.get(i);
+			if(useGroupCounts)
+				totalAnnotCount += term.getAnnotatedGroupCount();
+			else
+				totalAnnotCount += term.getAnnotatedProteinCount();
 		}
 		
 		for(int i = 0; i < maxSlices; i++) {
 			if(i >= slimTerms.size())
 				break;
-			GOSlimTerm term = slimTerms.get(i);
-			if(term.getProteinCountForTerm() == 0)
+			GOSlimTermResult term = slimTerms.get(i);
+			
+			if(term.getAnnotatedProteinCount() == 0)
 				continue;
 			
-			int frac = (int)Math.round((term.getProteinCountForTerm() * 100.0) / totalAnnotCount);
+			int annotCountForTerm = 0;
+			if(useGroupCounts)
+				annotCountForTerm = term.getAnnotatedGroupCount();
+			else
+				annotCountForTerm = term.getAnnotatedProteinCount();
+			
+			int frac = (int)Math.round((annotCountForTerm * 100.0) / (double)totalAnnotCount);
 			data += ","+frac;
-			labels += "|"+term.getProteinCountForTerm()+" ("+frac+"%)";
-			legend += "|"+term.getProteinCountForTerm()+" ("+term.getShortName()+")";
+			labels += "|"+annotCountForTerm+" ("+frac+"%)";
+			legend += "|"+annotCountForTerm+" ("+term.getShortName()+")";
 		}
 		
 		if(data.length() > 0)
@@ -65,26 +101,59 @@ public class GOSlimChartUrlCreator {
 		return buf.toString();
 	}
 	
-	public static String getBarChartUrl(GOSlimAnalysis analysis, int maxBars) {
+	public static String getBarChartUrl(GOSlimAnalysis analysis, int maxBars, boolean useGroupCounts) {
 		
 		StringBuilder buf = new StringBuilder();
 		buf.append("http://chart.apis.google.com/chart?cht=bhs&chxt=x,y&chs=450x260&chco=008888");
 		
 		String data = "";
 		String labels = "";
-		List<GOSlimTerm> slimTerms = analysis.getTermNodesMinusRootNodes();
+		List<GOSlimTermResult> slimTerms = analysis.getTermNodesMinusRootNodes();
 		
+		
+		if(useGroupCounts) {
+			
+			Collections.sort(slimTerms, new Comparator<GOSlimTermResult>() {
+				@Override
+				public int compare(GOSlimTermResult o1, GOSlimTermResult o2) {
+					return Integer.valueOf(o2.getAnnotatedGroupCount()).compareTo(o1.getAnnotatedGroupCount());
+				}
+			});
+		}
+		else {
+			
+			Collections.sort(slimTerms, new Comparator<GOSlimTermResult>() {
+				@Override
+				public int compare(GOSlimTermResult o1, GOSlimTermResult o2) {
+					return Integer.valueOf(o2.getAnnotatedProteinCount()).compareTo(o1.getAnnotatedProteinCount());
+				}
+			});
+		}
+
 		double maxValue = 0.0;
 		for(int i = 0; i < maxBars; i++) {
 			if(i >= slimTerms.size())
 				break;
-			GOSlimTerm term = slimTerms.get(i);
-			if(term.getProteinCountForTerm() == 0)
+			GOSlimTermResult term = slimTerms.get(i);
+			if(term.getAnnotatedProteinCount() == 0)
 				continue;
 			
-			data += ","+term.getProteinCountForTermPerc();
+			double annotPercForTerm = 0;
+			if(useGroupCounts) {
+				int totalGroups = analysis.getTotalProteinGroupCount();
+				annotPercForTerm = (RoundingUtils.getInstance().roundOne(((double)term.getAnnotatedGroupCount()*100.0) / (double)totalGroups));
+				
+			}
+			else {
+				int totalProteins = analysis.getTotalProteinCount();
+				annotPercForTerm = (RoundingUtils.getInstance().roundOne(((double)term.getAnnotatedProteinCount()*100.0) / (double)totalProteins));
+			}
+			
+			
+			
+			data += ","+annotPercForTerm;
 			labels = "|"+term.getShortName()+labels;
-			maxValue = Math.max(maxValue, term.getProteinCountForTermPerc());
+			maxValue = Math.max(maxValue, annotPercForTerm	);
 		}
 		
 		if(data.length() > 0)

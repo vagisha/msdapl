@@ -13,6 +13,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.bio.go.GOAnnotation;
 import org.yeastrc.bio.go.GONode;
+import org.yeastrc.bio.go.slim.GOSlimProtein;
+import org.yeastrc.bio.go.slim.GOSlimTermResult;
+import org.yeastrc.bio.go.slim.GOSlimUtils;
 
 /**
  * GOSlimTreeCreator.java
@@ -25,7 +28,7 @@ public class GOSlimTreeCreator {
 	private final int goSlimTermId;
 	private List<GONode> slimTerms;
 	private final List<Integer> nrseqProteinIds;
-	private final Map<String, GOSlimTerm> nodesWithAnnotations;
+	private final Map<String, GOSlimTermResult> nodesWithAnnotations;
 	private final int goAspect;
 	
 	private static final Logger log = Logger.getLogger(GOSlimTreeCreator.class.getName());
@@ -33,7 +36,7 @@ public class GOSlimTreeCreator {
 	public GOSlimTreeCreator(int goSlimTermId, List<Integer> nrseqProteinIds, int goAspect) {
 		
 		this.nrseqProteinIds = nrseqProteinIds;
-		nodesWithAnnotations = new HashMap<String, GOSlimTerm>();
+		nodesWithAnnotations = new HashMap<String, GOSlimTermResult>();
 		this.goAspect = goAspect;
 		this.goSlimTermId = goSlimTermId;
 		
@@ -175,18 +178,19 @@ public class GOSlimTreeCreator {
 			}
 			
 			for(GOAnnotation annot: annotNodes) {
-				GOSlimTerm node = nodesWithAnnotations.get(annot.getNode().getAccession());
+				GOSlimTermResult node = nodesWithAnnotations.get(annot.getNode().getAccession());
 				
 				// If we haven't seen this node yet add it to the map
 				if(node == null) {
-					node = new GOSlimTerm(annot.getNode(), nrseqProteinIds.size());
+					node = new GOSlimTermResult(annot.getNode());
 					nodesWithAnnotations.put(node.getAccession(), node);
 				}
 				
-				node.addProteinIdForTerm(nrseqProteinId);
+				GOSlimProtein protein = new GOSlimProtein(nrseqProteinId);
 				if(annot.isExact()) {
-					node.addProteinIdForExactTerm(nrseqProteinId);
+					protein.setExactAnnotation(true);
 				}
+				node.addProtein(protein);
 			}
 		}
 	}
@@ -216,14 +220,14 @@ public class GOSlimTreeCreator {
 	}
 
 	private void setAnnotations(GOTreeNode treeNode) {
-		GOSlimTerm annotNode = nodesWithAnnotations.get(treeNode.getGoNode().getAccession());
+		GOSlimTermResult annotNode = nodesWithAnnotations.get(treeNode.getGoNode().getAccession());
 		if(annotNode == null) {
 			treeNode.setNumAnnotated(0);
 			treeNode.setNumExactAnnotated(0);
 		}
 		else {
-			treeNode.setNumAnnotated(annotNode.getProteinCountForTerm());
-			treeNode.setNumExactAnnotated(annotNode.getProteinCountForExactTerm());
+			treeNode.setNumAnnotated(annotNode.getAnnotatedProteinCount());
+			treeNode.setNumExactAnnotated(annotNode.getExactAnnotatedProteinCount());
 		}
 	}
 }

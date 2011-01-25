@@ -1,4 +1,7 @@
 
+<%@page import="org.yeastrc.bio.go.slim.GOSlimTermResult"%>
+<%@page import="org.yeastrc.bio.go.slim.GOSlimAnalysis"%>
+<%@page import="org.yeastrc.www.util.RoundingUtils"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
@@ -57,6 +60,8 @@ function toggleSlimBarChart() {
 		# Not annotated: <bean:write name="goAnalysis" property="numProteinsNotAnnotated"/>
 		&nbsp;&nbsp; <span class="underline clickable" onClick="toggleSpeciesTable()" style="color:#666666;">(Details)</span>
 	</div>
+	
+	
 	<div align="center">
 		<table style="border: 1px dotted gray; display:none; margin-bottom:10px;" id="go_slim_species_table">
 			<tr>
@@ -76,7 +81,7 @@ function toggleSlimBarChart() {
 		</table>
 	</div>
 	
-	<logic:present name="pieChartUrl">
+	<logic:present name="pieChartUrlGroup">
 	<div align="center">
 		<b><bean:write name="goAnalysis" property="goSlimName" /> has <bean:write name="goAnalysis" property="slimTermCount"/> 
 		terms for <font color="red"><bean:write name="goAnalysis" property="goAspectString"/></font>. 
@@ -90,28 +95,76 @@ function toggleSlimBarChart() {
 		&nbsp; &nbsp; &nbsp;
 		<a href="http://www.geneontology.org/GO.slims.shtml" target="go_window" style="font-size:10pt;"><b>[More information on GO Slims]</b></a>
 	</div>
-		
+	
 	<table width="75%">
+	
+	<!--  ====================================================== -->
+	<!-- Pie chart at the protein group level -->
+	<!--  ====================================================== -->
+	<logic:present name="pieChartUrlGroup">
 	<tr>
 	<td>
 		<div style="font-weight:bold; font-size:8pt; padding: 1 3 1 3; color:#D74D2D; width:100%; margin-bottom:3px; background: #CBCBCB;">
 			<span class="clickable underline" onclick="toggleSlimPieChart();" id="slim_pie_chart_link">Hide</span>
 		</div>
 		<div style="margin-bottom: 10px; padding: 3px; border:1px dashed #BBBBBB; width:100%;" align="center" id="slim_pie_chart_div">
-		<img src="<bean:write name='pieChartUrl'/>" alt="Can't see the Google Pie Chart??"/></img>
+		<img src="<bean:write name='pieChartUrlGroup'/>" alt="Can't see the Google Pie Chart??"/></img>
 		</div>
 	</td>
 	</tr>
+	</logic:present>
+	
+	<!--  ====================================================== -->
+	<!-- Pie chart at the protein level -->
+	<!--  ====================================================== -->
+	<logic:present name="pieChartUrlProtein">
+	<tr>
+	<td>
+		<div style="font-weight:bold; font-size:8pt; padding: 1 3 1 3; color:#D74D2D; width:100%; margin-bottom:3px; background: #CBCBCB;">
+			<span class="clickable underline" onclick="toggleSlimPieChart();" id="slim_pie_chart_link">Hide</span>
+		</div>
+		<div style="margin-bottom: 10px; padding: 3px; border:1px dashed #BBBBBB; width:100%;" align="center" id="slim_pie_chart_div">
+		<img src="<bean:write name='pieChartUrlProtein'/>" alt="Can't see the Google Pie Chart??"/></img>
+		</div>
+	</td>
+	</tr>
+	</logic:present>
+	
+	
+	<!--  ====================================================== -->
+	<!-- Bar chart at the protein group level -->
+	<!--  ====================================================== -->
+	<logic:present name="barChartUrlGroup">
 	<tr>
 	<td>
 		<div style="font-weight:bold; font-size:8pt; padding: 1 3 1 3; color:#D74D2D; width:100%; margin-bottom:3px; background: #CBCBCB;">
 			<span class="clickable underline" onclick="toggleSlimBarChart();" id="slim_bar_chart_link">Hide</span>
 		</div>
 		<div style="margin-bottom: 10px; padding: 3px; border:1px dashed #BBBBBB; width:100%;" align="center" id="slim_bar_chart_div">
-		<img src="<bean:write name='barChartUrl'/>" alt="Can't see the Google Bar Chart??"/></img>
+		<img src="<bean:write name='barChartUrlGroup'/>" alt="Can't see the Google Bar Chart??"/></img>
 		</div>
 	</td>
 	</tr>
+	</logic:present>
+	
+	
+	<!--  ====================================================== -->
+	<!-- Bar chart at the protein level -->
+	<!--  ====================================================== -->
+	<logic:present name="barChartUrlProtein">
+	<tr>
+	<td>
+		<div style="font-weight:bold; font-size:8pt; padding: 1 3 1 3; color:#D74D2D; width:100%; margin-bottom:3px; background: #CBCBCB;">
+			<span class="clickable underline" onclick="toggleSlimBarChart();" id="slim_bar_chart_link">Hide</span>
+		</div>
+		<div style="margin-bottom: 10px; padding: 3px; border:1px dashed #BBBBBB; width:100%;" align="center" id="slim_bar_chart_div">
+		<img src="<bean:write name='barChartUrlProtein'/>" alt="Can't see the Google Bar Chart??"/></img>
+		</div>
+	</td>
+	</tr>
+	</logic:present>
+	
+	
 	</table>
 	</logic:present>
 	
@@ -131,13 +184,19 @@ function toggleSlimBarChart() {
 			<td style="font-size:8pt;" valign="top">Number of proteins in the input list annotated with the GO term or any of its descendants</td>
 		</tr>
 	</table>
+	
+	<bean:define name="goAnalysis" property="totalProteinCount" id="totalProteinCount" type="java.lang.Integer"/>
+	<bean:define name="goAnalysis" property="totalProteinGroupCount" id="totalProteinGroupCount" type="java.lang.Integer"/>
+	
 	<table class="table_basic" id="go_slim_table" width="95%">
 	<thead>
 	<tr>
 	<th class="sort-alpha clickable">GO ID</th>
 	<th class="sort-alpha clickable">Name</th>
-	<th class="sort-int clickable"># Proteins(exact)</th>
+	<th class="sort-int clickable"># Proteins (exact)</th>
 	<th class="sort-int clickable"># Proteins</th>
+	<th class="sort-float clickable">%</th>
+	<th class="sort-int clickable"># Protein Groups</th>
 	<th class="sort-float clickable">%</th>
 	</tr>
 	</thead>
@@ -165,9 +224,16 @@ function toggleSlimBarChart() {
         </span>
         </td>
 		<td><span title="<bean:write name="node" property="goNode.definition"/>" class="tooltip"><bean:write name="node" property="name"/></span></td>
-		<td><bean:write name="node" property="proteinCountForExactTerm"/></td>
-		<td><bean:write name="node" property="proteinCountForTerm"/></td>
-		<td><bean:write name="node" property="proteinCountForTermPerc"/></td>
+		<td><bean:write name="node" property="exactAnnotatedProteinCount"/></td>
+		<td><bean:write name="node" property="annotatedProteinCount"/></td>
+		<td>
+			<%=RoundingUtils.getInstance().roundOne((((GOSlimTermResult)node).getAnnotatedProteinCount() * 100.0) / (double)totalProteinCount) %>
+		</td>
+		<td><bean:write name="node" property="annotatedGroupCount"/></td>
+		<td>
+			<%=RoundingUtils.getInstance().roundOne((((GOSlimTermResult)node).getAnnotatedGroupCount() * 100.0) / (double)totalProteinGroupCount) %>
+		</td>
+		
 	</tr>
 	
 	</logic:iterate>

@@ -14,9 +14,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.bio.go.GONode;
+import org.yeastrc.bio.go.slim.GOSlimUtils;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.go.GOSlimTreeCreator;
-import org.yeastrc.www.go.GOSlimUtils;
 import org.yeastrc.www.go.GOTree;
 import org.yeastrc.www.go.GOTreeNode;
 
