@@ -52,7 +52,7 @@
 		AND pres.runSearchAnalysisID = #runSearchAnalysisId#
 	</select>
 	
-	<select id="selectForSearchAnalysis" resultMap="percolatorResultResult" parameterClass="Integer">
+	<select id="selectForSearchAnalysis" resultMap="percolatorResultResult" parameterClass="java.util.Map">
 		SELECT res.id AS sresID, pres.id AS presID, res.*, pres.* 
 		FROM msRunSearchResult AS res, PercolatorResult AS pres, msRunSearchAnalysis AS rsa
 		WHERE res.id = #searchResultId#
