@@ -82,24 +82,24 @@ function validateForm() {
     var minPept = parseInt(value);
     $('form#filterForm input[name=minPeptides]').val(minPept);
     
-    value = $('form#filterForm input[@name=minUniquePeptides]').fieldValue();
+    value = $('form#filterForm input[name=minUniquePeptides]').fieldValue();
     valid = validateInt(value, "Min. Unique Peptides", 0, minPept);
     if(!valid)	return false;
-    $('form#filterForm input[@name=minUniquePeptides]').val(parseInt(value));
+    $('form#filterForm input[name=minUniquePeptides]').val(parseInt(value));
     
-    value = $('form#filterForm input[@name=minCoverage]').fieldValue();
+    value = $('form#filterForm input[name=minCoverage]').fieldValue();
     valid = validateFloat(value, "Min. Coverage", 0.0, 100.0);
     if(!valid)	return false;
     
-    value = $('form#filterForm input[@name=minSpectrumMatches]').fieldValue();
+    value = $('form#filterForm input[name=minSpectrumMatches]').fieldValue();
     valid = validateInt(value, "Min. Spectrum Matches", 1);
     if(!valid)	return false;
-    $('form#filterForm input[@name=minSpectrumMatches]').val(parseInt(value));
+    $('form#filterForm input[name=minSpectrumMatches]').val(parseInt(value));
     
-    value = $('form#filterForm input[@name=minMolecularWt]').fieldValue();
+    value = $('form#filterForm input[name=minMolecularWt]').fieldValue();
     valid = validateFloat(value, "Min. Molecular Wt.", 0);
     if(!valid)	return false;
-    $('form#filterForm input[@name=minMolecularWt]').val(parseInt(value));
+    $('form#filterForm input[name=minMolecularWt]').val(parseInt(value));
     
     
     return true;

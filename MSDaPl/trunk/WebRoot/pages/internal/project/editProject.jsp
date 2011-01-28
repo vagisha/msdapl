@@ -17,8 +17,6 @@
 
 
 
-
-<script type="text/javascript" src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>" ></script>
 <script type="text/javascript">
 
 <bean:size name="editProjectForm" property="researcherList" id="researchers_size"/>

@@ -12,18 +12,10 @@
 
 
 <script src="<yrcwww:link path='/js/dragtable.js'/>"></script>
-
-<script type="text/javascript" src="<yrcwww:link path='/js/jquery.ui-1.6rc2/ui/ui.core.js'/>"></script>
-<script type="text/javascript" src="<yrcwww:link path='/js/jquery.ui-1.6rc2/ui/ui.tabs.js'/>"></script>
-<script type="text/javascript" src="<yrcwww:link path='/js/jquery.ui-1.6rc2/ui/ui.dialog.js'/>"></script>
-<script type="text/javascript" src="<yrcwww:link path='/js/jquery.ui-1.6rc2/ui/ui.draggable.js'/>"></script>
-<script type="text/javascript" src="<yrcwww:link path='/js/jquery.ui-1.6rc2/ui/ui.resizable.js'/>"></script>
-
+<script type="text/javascript" src="<yrcwww:link path='/js/jquery-ui-1.8.9.custom.min.js'/>"></script>
 <script type="text/javascript" src="<yrcwww:link path='/js/jquery.history.js'/>"></script>
 <script type="text/javascript" src="<yrcwww:link path='/js/jquery.cookie.js'/>"></script>
-
 <script src="<yrcwww:link path='/js/jquery.form.js'/>"></script>
-
 <script src="<yrcwww:link path='js/peptideHighlighter.js'/>"></script>
 
 
@@ -99,7 +91,7 @@ function callback(hash)
 // FOR HISTORY
 $(document).ready(function() {
     $.history.init(callback);
-    $("a[@rel='history']").click(function(){
+    $("a[rel='history']").click(function(){
     	var hash = this.href;
 		hash = hash.replace(/^.*#/, '');
         $.history.load(hash);
@@ -713,12 +705,12 @@ function validateForm() {
     
     
     // unique peptides
-    value = $("form#filterForm input[@name='minUniquePeptides']").fieldValue();
+    value = $("form#filterForm input[name='minUniquePeptides']").fieldValue();
     valid = validateInt(value, "Min. Unique Peptides", 0, minPept);
     if(!valid)	return false;
     var minUniqPept = parseInt(value);
     
-    value = $("form#filterForm input[@name='maxUniquePeptides']").fieldValue();
+    value = $("form#filterForm input[name='maxUniquePeptides']").fieldValue();
     if(!isNaN(parseInt(value))) {
     	valid = validateInt(value, "Max. Unique Peptides", minUniqPept);
     	if(!valid)	return false;
@@ -726,53 +718,53 @@ function validateForm() {
     
     
     // coverage
-    value = $("form#filterForm input[@name='minCoverage']").fieldValue();
+    value = $("form#filterForm input[name='minCoverage']").fieldValue();
     valid = validateFloat(value, "Min. Coverage", 0.0, 100.0);
     if(!valid)	return false;
     var minCoverage = parseFloat(value);
     
-    value = $("form#filterForm input[@name='maxCoverage']").fieldValue();
+    value = $("form#filterForm input[name='maxCoverage']").fieldValue();
     valid = validateFloat(value, "Max. Coverage", minCoverage, 100.0);
     if(!valid)	return false;
     
     
     // spectrum matches
-    value = $("form#filterForm input[@name='minSpectrumMatches']").fieldValue();
+    value = $("form#filterForm input[name='minSpectrumMatches']").fieldValue();
     valid = validateInt(value, "Min. Spectrum Matches", 1);
     if(!valid)	return false;
     var minSpecMatch = parseInt(value);
     
-    value = $("form#filterForm input[@name='maxSpectrumMatches']").fieldValue();
+    value = $("form#filterForm input[name='maxSpectrumMatches']").fieldValue();
     if(!isNaN(parseFloat(value))) {
     	valid = validateInt(value, "Max. Spectrum Matches", minSpecMatch);
     	if(!valid)	return false;
     }
 
 	// ProteinProphet group probability
-    value = $("form#filterForm input[@name='minGroupProbability']").fieldValue();
+    value = $("form#filterForm input[name='minGroupProbability']").fieldValue();
     valid = validateFloat(value, "Min. Group Probability", 0.0, 1.0);
     if(!valid)	return false;
     var minProb = parseFloat(value);
     
-    value = $("form#filterForm input[@name='maxGroupProbability']").fieldValue();
+    value = $("form#filterForm input[name='maxGroupProbability']").fieldValue();
     valid = validateFloat(value, "Max. Group Probability", minProb, 1.0);
     if(!valid)	return false;
     
     // ProteinProphet protein probability
-    value = $("form#filterForm input[@name='minProteinProbability']").fieldValue();
+    value = $("form#filterForm input[name='minProteinProbability']").fieldValue();
     valid = validateFloat(value, "Min. Protein Probability", 0.0, 1.0);
     if(!valid)	return false;
     var minProb = parseFloat(value);
     
-    value = $("form#filterForm input[@name='maxProteinProbability']").fieldValue();
+    value = $("form#filterForm input[name='maxProteinProbability']").fieldValue();
     valid = validateFloat(value, "Max. Protein Probability", minProb, 1.0);
     if(!valid)	return false;
     
     // Molecular Wt.
-    value = $('form#filterForm input[@name=minMolecularWt]').fieldValue();
+    value = $('form#filterForm input[name=minMolecularWt]').fieldValue();
     valid = validateFloat(value, "Min. Molecular Wt.", 0);
     if(!valid)	return false;
-    $('form#filterForm input[@name=minMolecularWt]').val(parseInt(value));
+    $('form#filterForm input[name=minMolecularWt]').val(parseInt(value));
     
     return true;
 }
@@ -1002,9 +994,9 @@ function sortResults(pinferId, sortBy, sortOrder) {
   
   //alert(sortBy);
   
-  //var useMods = $("input[@name='peptideDef_useMods']:checked").val() == null ? false : true;
-  //var useCharge = $("input[@name='peptideDef_useCharge']:checked").val() == null ? false : true;
-  //var groupProteins = $("input[@name='joinGroupProteins']:checked").val();
+  //var useMods = $("input[name='peptideDef_useMods']:checked").val() == null ? false : true;
+  //var useCharge = $("input[name='peptideDef_useCharge']:checked").val() == null ? false : true;
+  //var groupProteins = $("input[name='joinGroupProteins']:checked").val();
   
 	var sortOrderStr  = sortOrder == 1 ? 'ASC' : 'DESC';
 	// get data from the server and put it in the appropriate div
@@ -1190,8 +1182,6 @@ function hideAllDescriptionsForProtein(proteinId) {
           	<li><a href="#gene_ontology" rel="history" id="golink"><span>Gene Ontology</span></a></li>
           </logic:present>
       </ul>
-   </div>
-      
       
     <!-- Protein Annotation Dialog -->
 	<div id="prot_annot_dialog" class="flora" title="Validate Protein">
@@ -1389,7 +1379,7 @@ function hideAllDescriptionsForProtein(proteinId) {
     	
     </div>
     </logic:present>
-    	
+    </div>	
     	
 </yrcwww:contentbox>
 </CENTER>
