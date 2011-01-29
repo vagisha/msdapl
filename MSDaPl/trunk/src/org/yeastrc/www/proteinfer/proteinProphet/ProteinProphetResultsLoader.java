@@ -45,6 +45,7 @@ import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPepti
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.service.database.fasta.FastaInMemorySuffixCreator;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nr_seq.listing.ProteinListing;
 import org.yeastrc.nr_seq.listing.ProteinListingBuilder;
@@ -737,17 +738,34 @@ public class ProteinProphetResultsLoader {
     
     private static List<Character>[] getTerminalresidues(String proteinSeq,
             String sequence) {
-        List<Character> nterm = new ArrayList<Character>(2);
+    	
+    	List<Character> nterm = new ArrayList<Character>(2);
         List<Character> cterm = new ArrayList<Character>(2);
+        
+    	// Remove any '*' characters from the sequence
+        proteinSeq = proteinSeq.replaceAll("\\*", "");
+    	sequence = sequence.replaceAll("\\*", "");
+    	
+    	// This will substitute I and L with 1 so that we can look for matches
+    	// with I/L substitutions.
+        String seqWSubstitution = FastaInMemorySuffixCreator.format(sequence);
+        String protSeqWSubstitution = FastaInMemorySuffixCreator.format(proteinSeq);
+        
+        
         int idx = proteinSeq.indexOf(sequence);
         while(idx != -1) {
+        	
+        	// nterm residue
             if(idx == 0)    nterm.add('-');
             else            nterm.add(proteinSeq.charAt(idx-1));
-            if(idx+sequence.length() >= proteinSeq.length())
-                cterm.add('-');
-            else            cterm.add(proteinSeq.charAt(idx+sequence.length()));
             
-            idx = proteinSeq.indexOf(sequence, idx+sequence.length());
+            // cterm residue
+            if(idx+seqWSubstitution.length() >= protSeqWSubstitution.length())
+                cterm.add('-');
+            else            
+            	cterm.add(proteinSeq.charAt(idx+seqWSubstitution.length()));
+            
+            idx = protSeqWSubstitution.indexOf(seqWSubstitution, idx+seqWSubstitution.length());
         }
         return new List[]{nterm, cterm};
     }

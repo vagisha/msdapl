@@ -875,16 +875,27 @@ public class IdPickerResultsLoader {
         List<Character> nterm = new ArrayList<Character>(2);
         List<Character> cterm = new ArrayList<Character>(2);
         
+        // Remove any '*' characters from the sequence
+        proteinSeq = proteinSeq.replaceAll("\\*", "");
+    	sequence = sequence.replaceAll("\\*", "");
+    	
+    	// This will substitute I and L with 1 so that we can look for matches
+    	// with I/L substitutions.
         String seqWSubstitution = FastaInMemorySuffixCreator.format(sequence);
         String protSeqWSubstitution = FastaInMemorySuffixCreator.format(proteinSeq);
         
         int idx = protSeqWSubstitution.indexOf(seqWSubstitution);
         while(idx != -1) {
+        	
+        	// nterm residue
             if(idx == 0)    nterm.add('-');
-            else            nterm.add(protSeqWSubstitution.charAt(idx-1));
+            else            nterm.add(proteinSeq.charAt(idx-1));
+            
+            // cterm residue
             if(idx+seqWSubstitution.length() >= protSeqWSubstitution.length())
                 cterm.add('-');
-            else            cterm.add(protSeqWSubstitution.charAt(idx+seqWSubstitution.length()));
+            else            
+            	cterm.add(proteinSeq.charAt(idx+seqWSubstitution.length()));
             
             idx = protSeqWSubstitution.indexOf(seqWSubstitution, idx+seqWSubstitution.length());
         }
