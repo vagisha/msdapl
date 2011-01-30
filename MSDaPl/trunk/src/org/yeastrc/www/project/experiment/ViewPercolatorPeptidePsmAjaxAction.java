@@ -31,7 +31,6 @@ import org.yeastrc.ms.domain.analysis.percolator.PercolatorPeptideResult;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
-import org.yeastrc.ms.parser.sqtFile.PeptideResultBuilder;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -40,7 +39,7 @@ import org.yeastrc.www.user.UserUtils;
  */
 public class ViewPercolatorPeptidePsmAjaxAction extends Action {
 
-	private static final Logger log = Logger.getLogger(ViewPercolatorResults.class);
+	private static final Logger log = Logger.getLogger(ViewPercolatorPeptidePsmAjaxAction.class);
 	
 	public ActionForward execute( ActionMapping mapping,
             ActionForm form,

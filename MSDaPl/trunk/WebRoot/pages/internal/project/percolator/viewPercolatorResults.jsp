@@ -84,15 +84,15 @@ function viewPsms(searchAnalysisId, peptideResultId) {
 		
 		
 		$.blockUI();
-  				$("td#td_"+peptideResultId).load("<yrcwww:link path='viewPercolatorPeptidePsms.do'/>", 	//url
-  									{'percolatorPeptideId': peptideResultId, 		// data
-  									 'searchAnalysisId': searchAnalysisId
-  									 },
-  									 function(responseText, status, xhr) {						// callback
-  									 	$.unblockUI();
-  										$(this).show();
-  										makeSortableTable($("#psmlist_"+peptideResultId));
-  				 });
+		$("td#td_"+peptideResultId).load("<yrcwww:link path='viewPercolatorPeptidePsms.do'/>", 	//url
+					{'percolatorPeptideId': peptideResultId, 		// data
+					 'searchAnalysisId': searchAnalysisId
+					 },
+					 function(responseText, status, xhr) {						// callback
+					 	$.unblockUI();
+						$(this).show();
+						makeSortableTable($("#psmlist_"+peptideResultId));
+		 });
   								   
   		/*						   
 		$.ajax({

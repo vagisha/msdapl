@@ -1,5 +1,5 @@
 /**
- * ViewAnalysisResults.java
+ * ViewPeptideProphetResults.java
  * @author Vagisha Sharma
  * Aug 4, 2009
  * @version 1.0
@@ -25,27 +25,20 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.PeptideProphetResultPlusMascot;
 import org.yeastrc.experiment.PeptideProphetResultPlusSequest;
 import org.yeastrc.experiment.PeptideProphetResultPlusXtandem;
-import org.yeastrc.experiment.PercolatorResultPlus;
 import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.experiment.TabularPeptideProphetResults;
-import org.yeastrc.experiment.TabularPercolatorResults;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
-import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
-import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
-import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.mascot.MascotSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.xtandem.XtandemSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
-import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.run.MsScan;
-import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
@@ -63,9 +56,9 @@ import org.yeastrc.www.util.RoundingUtils;
 /**
  * 
  */
-public class ViewAnalysisResults extends Action {
+public class ViewPeptideProphetResults extends Action {
 
-    private static final Logger log = Logger.getLogger(ViewAnalysisResults.class.getName());
+    private static final Logger log = Logger.getLogger(ViewPeptideProphetResults.class.getName());
 
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
@@ -85,7 +78,7 @@ public class ViewAnalysisResults extends Action {
         }
 
         // Get the form
-        AnalysisFilterResultsForm myForm = (AnalysisFilterResultsForm)form;
+        PeptideProphetFilterResultsForm myForm = (PeptideProphetFilterResultsForm)form;
 
         int searchAnalysisId = myForm.getSearchAnalysisId();
         if(searchAnalysisId == 0) {
@@ -135,16 +128,10 @@ public class ViewAnalysisResults extends Action {
             	myForm.setModificationList(modBeans);
             }
             
-            if(myForm instanceof PeptideProphetFilterResultsForm) {
-                ((PeptideProphetFilterResultsForm)myForm).setMinProbability("0.05");
-                ((PeptideProphetFilterResultsForm)myForm).setSortBy(SORT_BY.PEPTP_PROB);
-                ((PeptideProphetFilterResultsForm)myForm).setSortOrder(SORT_ORDER.DESC);
-            }
-            else if(myForm instanceof PercolatorFilterResultsForm) {
-                ((PercolatorFilterResultsForm)myForm).setMaxQValue("0.05");
-                ((PercolatorFilterResultsForm)myForm).setSortBy(SORT_BY.QVAL);
-                ((PercolatorFilterResultsForm)myForm).setSortOrder(SORT_ORDER.ASC);
-            }
+            ((PeptideProphetFilterResultsForm)myForm).setMinProbability("0.05");
+            ((PeptideProphetFilterResultsForm)myForm).setSortBy(SORT_BY.PEPTP_PROB);
+            ((PeptideProphetFilterResultsForm)myForm).setSortOrder(SORT_ORDER.DESC);
+            
         }
 
 
@@ -262,12 +249,9 @@ public class ViewAnalysisResults extends Action {
     // TABULAR RESULTS
     // ----------------------------------------------------------------------------------------
     private Tabular getTabularResults(MsSearchAnalysis analysis, Program searchProgram,
-            List<Integer> forPage, int numResultsPerPage, AnalysisFilterResultsForm myForm) {
+            List<Integer> forPage, int numResultsPerPage, PeptideProphetFilterResultsForm myForm) {
         
-        if(analysis.getAnalysisProgram() == Program.PERCOLATOR) {
-            return getPercolatorResults(analysis, forPage, numResultsPerPage, myForm);
-        }
-        else if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET &&
+        if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET &&
                 searchProgram == Program.SEQUEST) {
             return getPeptideProphetSequestResults(analysis, forPage, numResultsPerPage, myForm);
         }
@@ -284,73 +268,10 @@ public class ViewAnalysisResults extends Action {
         return null;
     }
 
-    // -------PERCOLATOR RESULTS
-    private Tabular getPercolatorResults(MsSearchAnalysis analysis,
-            List<Integer> forPage, int numResultsPerPage, AnalysisFilterResultsForm myForm) {
-        
-        // Get details for the result we will display
-        Map<Integer, String> filenameMap = getFileNames(analysis.getId());
-        
-        MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
-        SequestSearchResultDAO seqResDao = DAOFactory.instance().getSequestResultDAO();
-        
-        // Do we have Bullseye results for the searched files
-        boolean hasBullsEyeArea = false;
-        List<Integer> searchIds = DAOFactory.instance().getMsSearchAnalysisDAO().getSearchIdsForAnalysis(analysis.getId());
-        MsRunSearchDAO rsDao = DAOFactory.instance().getMsRunSearchDAO();
-        MS2RunDAO runDao = DAOFactory.instance().getMS2FileRunDAO();
-        List<Integer> runSearchIds = rsDao.loadRunSearchIdsForSearch(searchIds.get(0));
-        for(int runSearchId: runSearchIds) {
-            int runId = rsDao.loadRunSearch(runSearchId).getRunId();
-            if(runDao.isGeneratedByBullseye(runId)) {
-                hasBullsEyeArea = true;
-                break;
-            }
-        }
-        
-        PercolatorResultDAO presDao = DAOFactory.instance().getPercolatorResultDAO();
-        MS2ScanDAO ms2ScanDao = DAOFactory.instance().getMS2FileScanDAO();
-        List<PercolatorResultPlus> results = new ArrayList<PercolatorResultPlus>(numResultsPerPage);
-        for(Integer percResultId: forPage) {
-            PercolatorResult result = presDao.loadForPercolatorResultId(percResultId);
-            PercolatorResultPlus resPlus = null;
-            
-            if(hasBullsEyeArea) {
-                MS2Scan scan = ms2ScanDao.loadScanLite(result.getScanId());
-                resPlus = new PercolatorResultPlus(result, scan);
-            }
-            else {
-                MsScan scan = scanDao.loadScanLite(result.getScanId());
-                resPlus = new PercolatorResultPlus(result, scan);
-            }
-            
-            resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
-            resPlus.setSequestData(seqResDao.load(result.getId()).getSequestResultData());
-            results.add(resPlus);
-        }
-
-        // Which version of Percolator are we using
-        String version = analysis.getAnalysisProgramVersion();
-        boolean hasPEP = true;
-        try {
-            float vf = Float.parseFloat(version.trim());
-            if(vf < 1.06)   hasPEP = false;
-        }
-        catch(NumberFormatException e){
-            log.error("Cannot determine if this version of Percolator prints PEP. Version: "+version);
-        }
-
-        // TODO Remove this method. ViewPercolatorResults is a separate action.
-        TabularPercolatorResults tabResults = new TabularPercolatorResults(results, hasPEP, hasBullsEyeArea, false);
-        tabResults.setSortedColumn(myForm.getSortBy());
-        tabResults.setSortOrder(myForm.getSortOrder());
-        
-        return tabResults;
-    }
     
     // -------PEPTIDE PROPHET SEQUEST RESULTS
     private Tabular getPeptideProphetSequestResults(MsSearchAnalysis analysis,
-            List<Integer> forPage, int numResultsPerPage, AnalysisFilterResultsForm myForm) {
+            List<Integer> forPage, int numResultsPerPage, PeptideProphetFilterResultsForm myForm) {
         
         // Get details for the result we will display
         Map<Integer, String> filenameMap = getFileNames(analysis.getId());
@@ -378,7 +299,7 @@ public class ViewAnalysisResults extends Action {
     
     // -------PEPTIDE PROPHET MASCOT RESULTS
     private Tabular getPeptideProphetMascotResults(MsSearchAnalysis analysis,
-            List<Integer> forPage, int numResultsPerPage, AnalysisFilterResultsForm myForm) {
+            List<Integer> forPage, int numResultsPerPage, PeptideProphetFilterResultsForm myForm) {
         
         // Get details for the result we will display
         Map<Integer, String> filenameMap = getFileNames(analysis.getId());
@@ -406,7 +327,7 @@ public class ViewAnalysisResults extends Action {
     
     // -------PEPTIDE PROPHET XTANDEM RESULTS
     private Tabular getPeptideProphetXtandemResults(MsSearchAnalysis analysis,
-            List<Integer> forPage, int numResultsPerPage, AnalysisFilterResultsForm myForm) {
+            List<Integer> forPage, int numResultsPerPage, PeptideProphetFilterResultsForm myForm) {
         
         // Get details for the result we will display
         Map<Integer, String> filenameMap = getFileNames(analysis.getId());

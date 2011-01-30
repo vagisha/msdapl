@@ -182,6 +182,7 @@ public class ViewPercolatorResults extends Action {
 
         // Get ALL the filtered and sorted resultIds
         numResults = getUnfilteredResultCount(searchAnalysisId, usePeptideResults);
+        // peptide IDs if we are getting peptide-level results. Otherwise, psm IDs
         List<Integer> resultIds = getFilteredResultIds(searchAnalysisId, myForm);
         
         if(myForm.isDoDownload()) {
@@ -262,6 +263,9 @@ public class ViewPercolatorResults extends Action {
     // ----------------------------------------------------------------------------------------
     // FILTERED RESULT IDS
     // ----------------------------------------------------------------------------------------
+    /*
+     * Returns peptide IDs if we are getting peptide-level results. Otherwise, psm IDs are returned
+     */
     private List<Integer> getFilteredResultIds(int searchAnalysisId, PercolatorFilterResultsForm myForm) {
         
     	if(myForm.isPeptideResults()) {
@@ -348,7 +352,6 @@ public class ViewPercolatorResults extends Action {
         }
         
         PercolatorResultDAO presDao = DAOFactory.instance().getPercolatorResultDAO();
-        PercolatorPeptideResultDAO peptideResDao = DAOFactory.instance().getPercolatorPeptideResultDAO();
         MS2ScanDAO ms2ScanDao = DAOFactory.instance().getMS2FileScanDAO();
         List<PercolatorResultPlus> results = new ArrayList<PercolatorResultPlus>(numResultsPerPage);
         for(Integer percResultId: forPage) {
@@ -365,7 +368,7 @@ public class ViewPercolatorResults extends Action {
             }
             
             if(hasPeptideResults) {
-            	resPlus.setPeptideResult(peptideResDao.load(result.getPeptideResultId()));
+            	resPlus.setPeptideResult(peptResDao.load(result.getPeptideResultId()));
             }
             
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));

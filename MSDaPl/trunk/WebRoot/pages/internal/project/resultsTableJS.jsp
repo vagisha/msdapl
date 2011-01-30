@@ -1,5 +1,4 @@
 <%@page import="org.yeastrc.ms.domain.search.SORT_ORDER"%>
-<script src="<yrcwww:link path='js/jquery-1.4.2.js'/>"></script>
 
 <script>
 // ---------------------------------------------------------------------------------------
@@ -39,6 +38,7 @@ $(document).ready(function() {
 // ---------------------------------------------------------------------------------------
 function pageResults(pageNum) {
   	$("input#pageNum").val(pageNum);
+  	$("input[name='doDownload']").val("false");
   	//alert("setting to "+pageNum+" value set to: "+$("input#pageNum").val());
   	$("form").submit();
 }
@@ -47,6 +47,7 @@ function pageResults(pageNum) {
 // ---------------------------------------------------------------------------------------
 function sortResults(sortBy, sortOrder) {
   	// alert(sortBy+" "+sortOrder);
+  	$("input[name='doDownload']").val("false");
   	$("input#pageNum").val(1); // reset the page number to 1
   	$("input#sortBy").val(sortBy);
   	$("input#sortOrder").val(sortOrder);

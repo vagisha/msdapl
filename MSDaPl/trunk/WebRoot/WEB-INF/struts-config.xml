@@ -434,7 +434,7 @@
 	  input="/pages/internal/project/percolator/viewPercolatorResults.jsp">
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	  <forward name="Success" path="/pages/internal/project/percolator/viewPercolatorResults.jsp" redirect="false"/>
-	  <forward name="Download" path="/downloadAnalysisResults.do" redirect="false"/>
+	  <forward name="Download" path="/downloadPercolatorResults.do" redirect="false"/>
 	</action>
 	
 	<action
@@ -445,8 +445,16 @@
 	</action>
 	
 	<action
+	  path="/downloadPercolatorResults"
+	  type="org.yeastrc.www.project.experiment.DownloadPercolatorResults"
+	  >
+	  <forward name="Failure" path="/pages/internal/project/percolator/viewPercolatorResults.jsp" redirect="false"/>
+	  <forward name="Success" path="/pages/internal/project/percolator/viewPercolatorResults.jsp" redirect="false"/>
+	</action>
+	
+	<action
 	  path="/viewPeptideProphetResults"
-	  type="org.yeastrc.www.project.experiment.ViewAnalysisResults"
+	  type="org.yeastrc.www.project.experiment.ViewPeptideProphetResults"
 	  name="filterPeptideProphetResultsForm"
 	  validate="true"
 	  scope="request"
@@ -455,13 +463,7 @@
 	  <forward name="Success" path="/pages/internal/project/peptideProphet/viewPeptideProphetResults.jsp" redirect="false"/>
 	</action>
 	
-	<action
-	  path="/downloadAnalysisResults"
-	  type="org.yeastrc.www.project.experiment.DownloadAnalysisResults"
-	  >
-	  <forward name="Failure" path="/pages/internal/project/percolator/viewPercolatorResults.jsp" redirect="false"/>
-	  <forward name="Success" path="/pages/internal/project/percolator/viewPercolatorResults.jsp" redirect="false"/>
-	</action>
+	
 	
 	<action
 	  path="/viewSequestResults"
