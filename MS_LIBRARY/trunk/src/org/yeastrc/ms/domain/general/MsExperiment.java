@@ -8,6 +8,7 @@ package org.yeastrc.ms.domain.general;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * 
@@ -39,4 +40,12 @@ public interface MsExperiment {
     public abstract int getInstrumentId();
     
     public abstract void setInstrumentId(int instrumentId);
+    
+    public abstract List<Integer> getSpeciesIds();
+    
+    public abstract void setSpeciesIds(List<Integer> speciesIds);
+    
+    public abstract MsExperimentStatus getStatus();
+    
+    public abstract void setStatus(MsExperimentStatus status);
 }

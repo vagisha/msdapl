@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="MsExperimentStatus"> 
+
+	<typeAlias alias="MsExperimentStatusOut" type="org.yeastrc.ms.domain.general.impl.MsExperimentStatusBean" />
+	<typeAlias alias="MsExperimentStatusIn" type="org.yeastrc.ms.domain.general.MsExperimentStatus" />
+	
+	<typeAlias alias="MsExperimentStatusTypeHandler" 
+				type="org.yeastrc.ms.dao.general.ibatis.StatusTypeHandler"/>
+				
+	<resultMap class="MsExperimentStatusOut" id="msExperimentStatusResult">
+		<result property="experimentId" column="experimentID" />
+		<result property="status" column="status" typeHandler="MsExperimentStatusTypeHandler" />
+		<result property="log" column="log" />
+	</resultMap>
+	
+	<parameterMap class="MsExperimentStatusIn" id="msExperimentStatusParam">
+		<parameter property="experimentId" jdbcType="INTEGER"/>
+		<parameter property="status" jdbcType="CHAR" typeHandler="MsExperimentStatusTypeHandler"/>
+		<parameter property="log" jdbcType="TEXT" />
+	</parameterMap>
+	
+    <select id="select" resultMap="msExperimentStatusResult" parameterClass="Integer">
+    	SELECT * from msExperimentStatus WHERE experimentID=#experimentId#
+    </select>
+    
+    <insert id="insert" parameterMap="msExperimentStatusParam">
+    	INSERT INTO msExperimentStatus (experimentID, status, log) 
+    	VALUES (?,?,?)
+    </insert>
+    
+    <update id="update" parameterMap="msExperimentStatusParam">
+    	UPDATE msExperimentStatus SET 
+	    	status=#status#, 
+    	log=#log# 
+    	WHERE experimentID=#experimentId#
+    </update>
+    
+</sqlMap>
