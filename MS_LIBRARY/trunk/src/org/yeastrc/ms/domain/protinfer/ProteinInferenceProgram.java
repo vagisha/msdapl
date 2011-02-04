@@ -14,7 +14,7 @@ public class ProteinInferenceProgram {
     private String description;
     private ProgramParam[] params;
     
-    public static final String protInferVersion = "0.2";
+    public static final String protInferVersion = "0.2.1";
     
     public static final ProteinInferenceProgram PROTINFER_SEQ = new PISequestProgram();
     public static final ProteinInferenceProgram PROTINFER_PLCID = new PIProlucidProgram();
@@ -195,7 +195,7 @@ public class ProteinInferenceProgram {
             
             ProgramParam qvalParam = new ProgramParam(TYPE.DOUBLE, 
                     "qval_percolator", "Max. q-value (PSM)", 
-                    "1.0", null,
+                    "0.01", null,
                     "PSM-level Qvalue cutoff");
             qvalParam.setValidator(validator);
             
