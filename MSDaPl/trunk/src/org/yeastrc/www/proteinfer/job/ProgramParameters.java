@@ -143,12 +143,12 @@ public class ProgramParameters {
                 this.type = "radio";
             else 
                 this.type="text";
-            if(param.getName().equals(ParamMaker.makeRefreshPeptideProteinMatchParam().getName()) ||
-               param.getName().equals(ParamMaker.makeDoItoLSubstitutionParam().getName()) ||
-               param.getName().equals("peptide_qval_percolator") ||
-               param.getName().equals("peptide_pep_percolator")) {
-            	this.newOption = true;
-            }
+//            if(param.getName().equals(ParamMaker.makeRefreshPeptideProteinMatchParam().getName()) ||
+//               param.getName().equals(ParamMaker.makeDoItoLSubstitutionParam().getName()) ||
+//               param.getName().equals("peptide_qval_percolator") ||
+//               param.getName().equals("peptide_pep_percolator")) {
+//            	this.newOption = true;
+//            }
         }
         
         public void updateDefaults(ProgramParam param) {

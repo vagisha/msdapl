@@ -230,7 +230,15 @@ function validateFormForAnalysisInput() {
    </logic:iterate>
    </tbody>
    </table>
-   
+   <div style="; color:red; margin:10 30 5 30" align="left">
+   		<logic:equal name="proteinInferenceFormAnalysis" property="programParams.programName"  value="PROTINFER_PERC_PEPT">
+        	UPDATE (02/04/2011):  The default PSM-level qvalue cutoff has been changed from 1.0 to 0.01. 
+        	If you used the old default options to run protein inference on Percolator v1.17 results you should re-run with the new defaults.
+        <br/>
+        <br/>
+        </logic:equal>
+   		NOTE: If your data was processed with Bullseye you should uncheck the "Remove Ambiguous Spectra" option
+   </div>
    <br>
    
    
