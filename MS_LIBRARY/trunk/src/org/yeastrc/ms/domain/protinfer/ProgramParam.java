@@ -174,7 +174,7 @@ public final class ProgramParam {
             return new ProgramParam(TYPE.BOOLEAN, 
               "removeAmbigSpectra", "Remove Ambiguous Spectra", 
               "true", null,
-              "If checked, spectra with > 1 peptide matches, that pass through the filter criteria, will be removed from analysis.");
+              "If checked, spectra with > 1 peptide spectrum matches (PSMs), that pass through the filter criteria, will be removed from analysis.");
         }
         
         public static ProgramParam makeRefreshPeptideProteinMatchParam() {
