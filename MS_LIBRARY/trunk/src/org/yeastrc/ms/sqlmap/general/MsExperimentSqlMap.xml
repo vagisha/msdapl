@@ -13,10 +13,6 @@
 		<result property="lastUpdateDate" column="lastUpdate" />
 		<result property="comments" column="comments" />
 		<result property="instrumentId" column="instrumentID" nullValue="0"/>
-		<result property="status"
-				select="MsExperimentStatus.select"
-				column="id"
-				/>
 	</resultMap>
 	
 	<parameterMap class="MsExperiment" id="msExperimentParam">

@@ -8,11 +8,8 @@ package org.yeastrc.ms.domain.general.impl;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.yeastrc.ms.domain.general.MsExperiment;
-import org.yeastrc.ms.domain.general.MsExperimentStatus;
 
 /**
  * 
@@ -26,8 +23,7 @@ public class ExperimentBean implements MsExperiment {
     private Timestamp lastUpdateDate;
     private String comments;
     private int instrumentId;
-    private List<Integer> speciesIds;
-    private MsExperimentStatus status;
+    
     
     public void setId(int id) {
         this.id = id;
@@ -90,26 +86,4 @@ public class ExperimentBean implements MsExperiment {
     public Date getUploadDate() {
         return uploadDate;
     }
-
-	@Override
-	public List<Integer> getSpeciesIds() {
-		if(this.speciesIds == null)
-			return new ArrayList<Integer>(0);
-		else
-			return speciesIds;
-	}
-
-	@Override
-	public void setSpeciesIds(List<Integer> speciesIds) {
-		this.speciesIds = speciesIds;
-	}
-
-	@Override
-	public MsExperimentStatus getStatus() {
-		return status;
-	}
-	
-	public void setStatus(MsExperimentStatus status) {
-		this.status = status;
-	}
 }
