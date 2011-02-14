@@ -15,11 +15,11 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.bio.go.GOAnalysisProtein;
 import org.yeastrc.bio.go.slim.GOSlimAnalysis;
 import org.yeastrc.bio.go.slim.GOSlimCalculator;
 import org.yeastrc.bio.go.slim.GOSlimFilter;
 import org.yeastrc.bio.go.slim.GOSlimFilterBuilder;
-import org.yeastrc.bio.go.slim.GOSlimProtein;
 import org.yeastrc.bio.go.slim.GOSlimTermResult;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.go.GOSlimChartUrlCreator;
@@ -45,7 +45,7 @@ public class GOSlimAjaxAction extends Action {
 		
         int goAspect = (Integer)request.getAttribute("goAspect");
         int goSlimTermId = (Integer) request.getAttribute("goSlimTermId");
-        List<GOSlimProtein> proteins = (List<GOSlimProtein>) request.getAttribute("goSlimProteins");
+        List<GOAnalysisProtein> proteins = (List<GOAnalysisProtein>) request.getAttribute("goSlimProteins");
         boolean proteinGroupAnalysis = (Boolean)(request.getAttribute("doGroupAnalysis"));
         
         
@@ -58,7 +58,7 @@ public class GOSlimAjaxAction extends Action {
         calculator.setCalculateForProteinGroups(proteinGroupAnalysis);
         calculator.setFilter(filter);
         
-        for(GOSlimProtein protein: proteins)
+        for(GOAnalysisProtein protein: proteins)
         	calculator.addProtein(protein);
         
         GOSlimAnalysis goAnalysis = calculator.calculate();

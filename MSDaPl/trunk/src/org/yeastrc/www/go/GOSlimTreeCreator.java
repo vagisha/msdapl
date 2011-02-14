@@ -11,11 +11,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.bio.go.GOAnalysisProtein;
 import org.yeastrc.bio.go.GOAnnotation;
 import org.yeastrc.bio.go.GONode;
-import org.yeastrc.bio.go.slim.GOSlimProtein;
+import org.yeastrc.bio.go.slim.GOSlimException;
+import org.yeastrc.bio.go.slim.GOSlimLookup;
 import org.yeastrc.bio.go.slim.GOSlimTermResult;
-import org.yeastrc.bio.go.slim.GOSlimUtils;
 
 /**
  * GOSlimTreeCreator.java
@@ -42,17 +43,14 @@ public class GOSlimTreeCreator {
 		
 	}
 
-	public List<GONode> getSlimTerms() throws GOException {
+	public List<GONode> getSlimTerms() throws GOSlimException {
 		
 		if(slimTerms != null)
 			return slimTerms;
 		
 		// Get the GO terms for the given GO Slim
-		try {
-			slimTerms = GOSlimUtils.getGOSlimTerms(goSlimTermId, goAspect);
-		} catch (SQLException e) {
-			throw new GOException("Error getting terms for GO Slim Term ID: "+goSlimTermId, e);
-		}
+		slimTerms = GOSlimLookup.getGOSlimTerms(goSlimTermId, goAspect);
+		
 		
 		return slimTerms;
 	}
@@ -186,9 +184,9 @@ public class GOSlimTreeCreator {
 					nodesWithAnnotations.put(node.getAccession(), node);
 				}
 				
-				GOSlimProtein protein = new GOSlimProtein(nrseqProteinId);
+				GOAnalysisProtein protein = new GOAnalysisProtein(nrseqProteinId);
 				if(annot.isExact()) {
-					protein.setExactAnnotation(true);
+					protein.setExactAnnotation(annot.getNode().getId());
 				}
 				node.addProtein(protein);
 			}

@@ -20,7 +20,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.bio.go.GONode;
-import org.yeastrc.bio.go.slim.GOSlimUtils;
+import org.yeastrc.bio.go.slim.GOSlimLookup;
 import org.yeastrc.bio.taxonomy.Species;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
@@ -216,7 +216,7 @@ public class ProteinInferViewAction extends Action {
 
         	if(goslimSupported) {
         		// GO Slim terms
-        		List<GONode> goslims = GOSlimUtils.getGOSlims();
+        		List<GONode> goslims = GOSlimLookup.getGOSlims();
         		request.setAttribute("goslims", goslims);
         		if(goslims.size() > 0) {
         			for(GONode slim: goslims) {
@@ -281,6 +281,7 @@ public class ProteinInferViewAction extends Action {
 				}
 			}
 		}
+		
 		return displayColumns;
 	}
 }

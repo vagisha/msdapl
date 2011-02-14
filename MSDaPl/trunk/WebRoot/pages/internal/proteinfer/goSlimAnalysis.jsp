@@ -101,6 +101,7 @@ function toggleSlimBarChart() {
 	<!--  ====================================================== -->
 	<!-- Pie chart at the protein group level -->
 	<!--  ====================================================== -->
+	<!-- 
 	<logic:present name="pieChartUrlGroup">
 	<tr>
 	<td>
@@ -113,7 +114,7 @@ function toggleSlimBarChart() {
 	</td>
 	</tr>
 	</logic:present>
-	
+	-->
 	<!--  ====================================================== -->
 	<!-- Pie chart at the protein level -->
 	<!--  ====================================================== -->
@@ -134,6 +135,7 @@ function toggleSlimBarChart() {
 	<!--  ====================================================== -->
 	<!-- Bar chart at the protein group level -->
 	<!--  ====================================================== -->
+	<!--
 	<logic:present name="barChartUrlGroup">
 	<tr>
 	<td>
@@ -146,7 +148,7 @@ function toggleSlimBarChart() {
 	</td>
 	</tr>
 	</logic:present>
-	
+	-->
 	
 	<!--  ====================================================== -->
 	<!-- Bar chart at the protein level -->
@@ -196,8 +198,10 @@ function toggleSlimBarChart() {
 	<th class="sort-int clickable"># Proteins (exact)</th>
 	<th class="sort-int clickable"># Proteins</th>
 	<th class="sort-float clickable">%</th>
+	<!-- 
 	<th class="sort-int clickable"># Protein Groups</th>
 	<th class="sort-float clickable">%</th>
+	-->
 	</tr>
 	</thead>
 	<tbody>
@@ -229,10 +233,13 @@ function toggleSlimBarChart() {
 		<td>
 			<%=RoundingUtils.getInstance().roundOne((((GOSlimTermResult)node).getAnnotatedProteinCount() * 100.0) / (double)totalProteinCount) %>
 		</td>
+		
+		<!--
 		<td><bean:write name="node" property="annotatedGroupCount"/></td>
 		<td>
 			<%=RoundingUtils.getInstance().roundOne((((GOSlimTermResult)node).getAnnotatedGroupCount() * 100.0) / (double)totalProteinGroupCount) %>
 		</td>
+		-->
 		
 	</tr>
 	

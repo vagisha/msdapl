@@ -14,11 +14,15 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.bio.go.GOAnalysisProtein;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
+import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.proteinfer.ProteinInferSessionManager;
 
 /**
@@ -97,27 +101,46 @@ public class GOSlimAjaxAction extends Action {
                 proteinIds = ProteinProphetResultsLoader.getProteinIds(pinferId, filterCriteria_request);
             }
         }
+        
+        long e = System.currentTimeMillis();
+        log.info("Got filtered nrseq protein ids for GO Slim analysis in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
 		
         request.setAttribute("pinferId", pinferId);
         request.setAttribute("goAspect", filterForm.getGoAspect());
         request.setAttribute("goSlimTermId", filterForm.getGoSlimTermId());
         
-        // We have the protein inference protein IDs; Get the corresponding nrseq protein IDs
-        List<Integer> nrseqIds = new ArrayList<Integer>(proteinIds.size());
-        ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
-        ProteinferProteinDAO protDao = factory.getProteinferProteinDao();
-        for(int proteinId: proteinIds) {
-            ProteinferProtein protein = protDao.loadProtein(proteinId);
-            nrseqIds.add(protein.getNrseqProteinId());
-        }
-        request.setAttribute("nrseqProteinIds", nrseqIds);
-        
         
         if(filterForm.isGetGoSlimTree()) {
+        	
+	        // We have the protein inference protein IDs; Get the corresponding nrseq protein IDs
+	        List<Integer> nrseqIds = new ArrayList<Integer>(proteinIds.size());
+	        ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
+	        ProteinferProteinDAO protDao = factory.getProteinferProteinDao();
+	        for(int proteinId: proteinIds) {
+	            ProteinferProtein protein = protDao.loadProtein(proteinId);
+	            nrseqIds.add(protein.getNrseqProteinId());
+	        }
+	        request.setAttribute("nrseqProteinIds", nrseqIds);
+        
         	return mapping.findForward("GoTree");
         }
-        else
+        
+        else {
+        	
+        	// We have the protein inference protein IDs; Get the corresponding nrseq protein IDs and protein group IDs
+	        List<GOAnalysisProtein> goAnalysisProteins = new ArrayList<GOAnalysisProtein>(proteinIds.size());
+	        ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
+	        ProteinProphetProteinDAO protDao = factory.getProteinProphetProteinDao();
+	        for(int proteinId: proteinIds) {
+	            ProteinProphetProtein protein = protDao.loadProtein(proteinId);
+	            goAnalysisProteins.add(new GOAnalysisProtein(protein.getNrseqProteinId(), protein.getGroupId()));
+	        }
+	        
+        	request.setAttribute("goSlimProteins", goAnalysisProteins);
+        	request.setAttribute("doGroupAnalysis", true); // default is to get GO information at the group level
         	return mapping.findForward("Success");
+        }
+        
 	}
 	
 	private boolean matchFilterCriteria(ProteinProphetFilterCriteria filterCritSession,  ProteinProphetFilterCriteria filterCriteria) {

@@ -14,7 +14,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.bio.go.slim.GOSlimProtein;
+import org.yeastrc.bio.go.GOAnalysisProtein;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinDAO;
@@ -132,15 +132,15 @@ public class GOSlimAjaxAction extends Action {
         else {
         	
         	// We have the protein inference protein IDs; Get the corresponding nrseq protein IDs and protein group IDs
-	        List<GOSlimProtein> goSlimProteins = new ArrayList<GOSlimProtein>(proteinIds.size());
+	        List<GOAnalysisProtein> goAnalysisProteins = new ArrayList<GOAnalysisProtein>(proteinIds.size());
 	        ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
 	        IdPickerProteinDAO protDao = factory.getIdPickerProteinDao();
 	        for(int proteinId: proteinIds) {
 	            IdPickerProtein protein = protDao.loadProtein(proteinId);
-	            goSlimProteins.add(new GOSlimProtein(protein.getNrseqProteinId(), protein.getProteinGroupLabel()));
+	            goAnalysisProteins.add(new GOAnalysisProtein(protein.getNrseqProteinId(), protein.getProteinGroupLabel()));
 	        }
 	        
-        	request.setAttribute("goSlimProteins", goSlimProteins);
+        	request.setAttribute("goSlimProteins", goAnalysisProteins);
         	request.setAttribute("doGroupAnalysis", true); // default is to get GO information at the group level
         	return mapping.findForward("Success");
         }
