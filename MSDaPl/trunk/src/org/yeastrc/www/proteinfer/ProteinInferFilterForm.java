@@ -601,6 +601,10 @@ public class ProteinInferFilterForm extends ActionForm {
         filterCriteria.setExcludeIndistinGroups(isExcludeIndistinProteinGroups());
         filterCriteria.setPeptide(getPeptide());
         filterCriteria.setExactPeptideMatch(getExactPeptideMatch());
+        filterCriteria.setChargeStates(this.getChargeStateList());
+        int chgGreaterThan = this.getChargeGreaterThan();
+        if(chgGreaterThan != -1)
+        	filterCriteria.setChargeGreaterThan(chgGreaterThan);
         
         filterCriteria.setSortBy(ProteinFilterCriteria.defaultSortBy());
         filterCriteria.setSortOrder(ProteinFilterCriteria.defaultSortOrder());

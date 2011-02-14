@@ -275,7 +275,7 @@ function saveDisplayColumnsCookie() {
   		<nobr><html:multibox name="proteinInferFilterForm" property="chargeStates" value="4"/> +4</nobr> &nbsp;
   		<nobr><html:multibox name="proteinInferFilterForm" property="chargeStates" value=">4"/> &gt; +4</nobr>
   		<br>
-  		<span style="font-size:8pt;">Filter proteins with peptides identifies in the selected charge states</span> 
+  		<span style="font-size:8pt;">Get proteins with peptides identified in at least one of the selected charge states</span> 
   	</td>
   </tr>
   
