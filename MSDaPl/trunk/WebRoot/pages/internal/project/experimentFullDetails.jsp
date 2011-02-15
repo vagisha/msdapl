@@ -215,7 +215,7 @@
 		</div>
 		
 		
-		<!-- DTASELECT RUN -- only for the first Percolator run -->
+		<!-- DTASELECT RUN -- only for the original Percolator run uploaded as part of an experiment -->
 		<logic:equal name="analysis_idx" value="0">
 		<logic:equal name="experiment" property="hasProtInferResults" value="true" >
 			<logic:present name="experiment" property="dtaSelect">
@@ -280,7 +280,7 @@
   </logic:equal>
 </logic:notEmpty>
 
-<!-- PROTEIN INFERENCE RESULTS FOR THE EXPERIMENT -->
+<!-- PROTEIN INFERENCE RESULTS FOR THE EXPERIMENT -- PROTEIN PROPHET ONLY-->
 <logic:equal name="experiment" property="hasProtInferResults" value="true" >
 
 <logic:notEmpty name="experiment" property="proteinProphetRuns">
@@ -288,15 +288,21 @@
 	<div style="margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
 	<table width="100%">
 	<tr>
-			<td colspan="9" align="right">
-				<input type="checkbox" id="grpProts" value="group" checked="checked" />Group Indistinguishable Proteins
-				&nbsp;
-				<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInferAndMore();"><b>[Compare More]</b></span>
-				&nbsp;
-				<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInfer();"><b>[Compare]</b></span>
-				<br><br>
-				<span class="clickable" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer();">[Clear Selected]</span>
-			</td>
+		<td colspan="9" align="right">
+			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:selectAllProteinProphet(<bean:write name='experiment' property='id'/>);">[Select All]</span>
+			&nbsp;
+			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:clearSelectedProteinProphet(<bean:write name='experiment' property='id'/>);">[Clear Selected]</span>
+			&nbsp;
+			<input type="checkbox" id="grpProts" value="group" checked="checked" />Group Indistinguishable Proteins
+			&nbsp;
+			<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInferAndMore();"><b>[Compare More]</b></span>
+			&nbsp;
+			<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInfer();"
+			title="Protein inferences from multiple experiments in this project can be selected for comparison.  To include protein inferences from other projects click on 'Compare More'.">
+				<b>[Compare]</b>
+			</span>
+		</td>
+			
 		</tr>
 	</table>
 	</div>

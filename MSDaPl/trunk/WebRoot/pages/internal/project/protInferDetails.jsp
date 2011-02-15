@@ -126,7 +126,7 @@
  		 			
  		 	<logic:equal name="piRun" property="job.complete" value="true">
  		 	<td valign="top" align="center" >
- 		 		<input type="checkbox" class="compare_cb"  id="<bean:write name='analysis' property='id'/>" value="<bean:write name='piRun' property='job.pinferId'/>"></input>
+ 		 		<input type="checkbox" class="compare_cb"  name="<bean:write name='analysis' property='id'/>" value="<bean:write name='piRun' property='job.pinferId'/>"></input>
 			</td>
 			</logic:equal>
  		 			

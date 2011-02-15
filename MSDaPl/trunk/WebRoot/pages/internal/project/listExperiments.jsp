@@ -378,27 +378,34 @@ function compareSelectedProtInferAndMore() {
 	window.location.href = url;
 }
 
+// Used for ProteinProphet protein inferences
+function selectAllProteinProphet(experimentId) {
+	$("input.compare_cb[name='"+experimentId+"']").each(function() {
+		$(this).attr('checked', true);
+	});
+}
+
 // Used for ProteinProphet inferences
-// TODO update to use the same method as MSDaPl's protein inferences.
-function clearSelectedProtInfer() {
-	$("input.compare_cb:checked").each(function() {
+function clearSelectedProteinProphet(experimentId) {
+	$("input.compare_cb[name='"+experimentId+"']").each(function() {
 		$(this).attr('checked', false);
 	});
 }
 
 // Used for MSDaPl's protein inferences
 function clearSelectedProtInfer(analysisId) {
-	$("input.compare_cb#"+analysisId).each(function() {
+	$("input.compare_cb[name='"+analysisId+"']").each(function() {
 		$(this).attr('checked', false);
 	});
 }
 
-
+// Used for MSDaPl's protein inferences
 function selectAllProtInfer(analysisId) {
-	$("input.compare_cb#"+analysisId).each(function() {
+	$("input.compare_cb[name='"+analysisId+"']").each(function() {
 		$(this).attr('checked', true);
 	});
 }
+
 
 function confirmDeleteExperiment(experimentId) {
     if(confirm("Are you sure you want to delete ExperimentID "+experimentId+"?")) {
@@ -529,6 +536,15 @@ function removeBookmark(imgElement, piRunId) {
 		There are no experiments for this project. To upload an experiment for this project click <a href="" onClick="javascript:goMSUpload(); return false;">here</a>
 		</div>
 	</logic:empty>
+
+	<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!! TEMP  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+	<logic:equal name="project" property="ID" value="29">
+	<center>
+	<%@ include file="/includes/unknown_orfs_summary.jsp" %>
+	</center>
+	</logic:equal>
+	<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!! TEMP  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
 
 	<!--  Experiment summaries -->
 	<logic:notEmpty name="experiments">

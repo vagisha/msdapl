@@ -71,7 +71,7 @@
 				<b><font color="green">View</font></b></a>
 			</td>
 			<td valign="top" align="center" >
- 		 				<input type="checkbox" class="compare_cb" value="<bean:write name='prpRun' property='proteinProphetRun.id'/>"></input>
+ 		 		<input type="checkbox" class="compare_cb" name="<bean:write name='experiment' property='id'/>" value="<bean:write name='prpRun' property='proteinProphetRun.id'/>"></input>
 			</td>
 			</tr>
 			<tr>
