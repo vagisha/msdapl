@@ -21,7 +21,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.bio.go.GONode;
-import org.yeastrc.bio.go.slim.GOSlimUtils;
+import org.yeastrc.bio.go.slim.GOSlimLookup;
 import org.yeastrc.www.compare.dataset.DatasetBuilder;
 import org.yeastrc.www.compare.dataset.DatasetSource;
 import org.yeastrc.www.compare.dataset.SelectableDataset;
@@ -115,7 +115,7 @@ public class CompareProteinSetsAction extends Action {
         }
         
         // GO Slim terms
-        List<GONode> goslims = GOSlimUtils.getGOSlims();
+        List<GONode> goslims = GOSlimLookup.getGOSlims();
         request.getSession().setAttribute("goslims", goslims); // set this in the session
         if(goslims.size() > 0) {
         	for(GONode slim: goslims) {

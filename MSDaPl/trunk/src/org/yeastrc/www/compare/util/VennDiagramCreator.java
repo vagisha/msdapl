@@ -105,8 +105,8 @@ public class VennDiagramCreator {
             String[] colors = new String[3];
             
             if(comparison.getProteinCount(0) > comparison.getProteinCount(1)) {
-                ds1 = comparison.getProteinCount(0);
-                ds2 = comparison.getProteinCount(1);
+                ds1 = comparison.getProteinGroupCount(0);
+                ds2 = comparison.getProteinGroupCount(1);
                 label1 = "ID"+comparison.getDatasets().get(0).getDatasetId();
                 label2 = "ID"+comparison.getDatasets().get(1).getDatasetId();
                 colors[0] = DatasetColor.get(0).hexValue();
@@ -114,8 +114,8 @@ public class VennDiagramCreator {
                 colors[2] = DatasetColor.get(2).hexValue();
             }
             else {
-                ds1 = comparison.getProteinCount(1);
-                ds2 = comparison.getProteinCount(0);
+                ds1 = comparison.getProteinGroupCount(1);
+                ds2 = comparison.getProteinGroupCount(0);
                 label1 = "ID"+comparison.getDatasets().get(1).getDatasetId();
                 label2 = "ID"+comparison.getDatasets().get(0).getDatasetId();
                 colors[0] = DatasetColor.get(1).hexValue();
@@ -123,7 +123,7 @@ public class VennDiagramCreator {
                 colors[2] = DatasetColor.get(2).hexValue();
             }
             
-            int common1_2 = comparison.getCommonProteinCount(0, 1);
+            int common1_2 = comparison.getCommonProteinGroupCount(0, 1);
             
             
             StringBuilder googleChartUrl = createChartUrl(ds1, ds2,
@@ -141,13 +141,13 @@ public class VennDiagramCreator {
                     return Integer.valueOf(o2.proteinCount).compareTo(o1.proteinCount);
                 }});
             
-            int ds1 = comparison.getProteinCount(protCountRanks.get(0).datasetIndex);
-            int ds2 = comparison.getProteinCount(protCountRanks.get(1).datasetIndex);
-            int ds3 = comparison.getProteinCount(protCountRanks.get(2).datasetIndex);
+            int ds1 = comparison.getProteinGroupCount(protCountRanks.get(0).datasetIndex);
+            int ds2 = comparison.getProteinGroupCount(protCountRanks.get(1).datasetIndex);
+            int ds3 = comparison.getProteinGroupCount(protCountRanks.get(2).datasetIndex);
 
-            int common1_2 = comparison.getCommonProteinCount(protCountRanks.get(0).datasetIndex, protCountRanks.get(1).datasetIndex);
-            int common1_3 = comparison.getCommonProteinCount(protCountRanks.get(0).datasetIndex, protCountRanks.get(2).datasetIndex);
-            int common2_3 = comparison.getCommonProteinCount(protCountRanks.get(1).datasetIndex, protCountRanks.get(2).datasetIndex);
+            int common1_2 = comparison.getCommonProteinGroupCount(protCountRanks.get(0).datasetIndex, protCountRanks.get(1).datasetIndex);
+            int common1_3 = comparison.getCommonProteinGroupCount(protCountRanks.get(0).datasetIndex, protCountRanks.get(2).datasetIndex);
+            int common2_3 = comparison.getCommonProteinGroupCount(protCountRanks.get(1).datasetIndex, protCountRanks.get(2).datasetIndex);
             int common1_2_3 = 0; // commonIds(nrseqIds1, nrseqIds2, nrseqIds3);
 
             String[] colors = new String[3];

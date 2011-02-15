@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.www.compare.ComparisonProtein;
+import org.yeastrc.www.compare.dataset.Dataset;
 
 import edu.uwpr.protinfer.infer.graph.Vertex;
 
@@ -95,5 +96,19 @@ public class ComparisonProteinGroup extends Vertex<ComparisonProteinGroup> {
     
     public int getTotalPeptideSeqCount() {
         return proteins.get(0).getTotalPeptideSeqCount();
+    }
+    
+    /**
+     * Returns true if any of the proteins in this group was found in the given dataset
+     * @param dataset
+     * @return
+     */
+    public boolean isInDataset(Dataset dataset) {
+    	
+    	for(ComparisonProtein protein: this.proteins) {
+    		if(protein.isInDataset(dataset))
+    			return true;
+    	}
+        return false;
     }
 }

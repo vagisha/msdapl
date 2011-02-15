@@ -342,26 +342,23 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
                 proteinGroupCounts[i][j] = 0;
         }
         
+        
         for(ComparisonProteinGroup proteinGroup: proteinGroups) {
             
             for(int i = 0; i < datasets.size(); i++) {
                 
                 Dataset dsi = datasets.get(i);
                 
-                for(ComparisonProtein protein: proteinGroup.getProteins()) {
-                    if(protein.isInDataset(dsi)) {
+                if(proteinGroup.isInDataset(dsi)) {
+                	proteinGroupCounts[i][i]++;
+                	
+                	for(int j = i+1; j < datasets.size(); j++) {
 
-                        proteinGroupCounts[i][i]++;
-
-                        for(int j = i+1; j < datasets.size(); j++) {
-
-                            Dataset dsj = datasets.get(j);
-                            if(protein.isInDataset(dsj)) {
-                                proteinGroupCounts[i][j]++;
-                                proteinGroupCounts[j][i]++;
-                            }
+                        Dataset dsj = datasets.get(j);
+                        if(proteinGroup.isInDataset(dsj)) {
+                            proteinGroupCounts[i][j]++;
+                            proteinGroupCounts[j][i]++;
                         }
-                        break; 
                     }
                 }
             }
