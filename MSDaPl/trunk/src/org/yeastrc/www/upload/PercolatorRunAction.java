@@ -203,7 +203,7 @@ public class PercolatorRunAction extends Action {
 			percJob.setProjectID(myForm.getProjectId());
 			percJob.setExperimentID(myForm.getExperimentId());
 			percJob.setSearchId(myForm.getSearchId());
-			percJob.setPercolatorInputFiles(myForm.getInputFiles());
+			percJob.setPercolatorInputFiles(myForm.getSelectedInputFiles());
 			percJob.setProgramParams(myForm.getProgramParams());
 			percJob.setComments(myForm.getComments());
 			percJob.setRunProteinInference(myForm.isRunProteinInference());

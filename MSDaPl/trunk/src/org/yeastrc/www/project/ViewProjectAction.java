@@ -11,6 +11,7 @@ package org.yeastrc.www.project;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -274,7 +275,7 @@ public class ViewProjectAction extends Action {
             }
             List<SearchAnalysis> analyses = new ArrayList<SearchAnalysis>(analysisIds.size());
             List<Integer> analysisIdsList = new ArrayList<Integer>(analysisIds);
-            Collections.sort(analysisIdsList);
+            Collections.sort(analysisIdsList, Collections.reverseOrder());
             for(int analysisId: analysisIdsList) {
             	SearchAnalysis a = getSearchAnalysis(analysisId, projectId);
             	if(a != null)
@@ -285,7 +286,7 @@ public class ViewProjectAction extends Action {
             
             // load protein prophet results, if any
             List<Integer> piRunIds = ProteinInferJobSearcher.getInstance().getProteinferIdsForMsExperiment(experimentId);
-            Collections.sort(piRunIds);
+            Collections.sort(piRunIds, Collections.reverseOrder());
             
             if(piRunIds.size() > 0)
             	pExpt.setHasProtinferRuns(true);
@@ -428,7 +429,7 @@ public class ViewProjectAction extends Action {
 		
 		// associate any protein inferences with this analysis
         List<Integer> piRunIds = ProteinInferJobSearcher.getInstance().getProteinferIdsForMsSearchAnalysis(searchAnalysisId);
-        Collections.sort(piRunIds);
+        Collections.sort(piRunIds, Collections.reverseOrder());
         
         // load the protein inference jobs, if any
         List<ExperimentProteinferRun> piRuns = getProteinInferRuns(piRunIds);
