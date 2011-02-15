@@ -198,8 +198,10 @@ public class DownloadComparisonResults extends Action {
         		writer.write("#Ion("+dataset.getDatasetId()+")\t");
         	if(displayColumns.isShowNumUniqIons())
         		writer.write("#U.Ion("+dataset.getDatasetId()+")\t");
-        	if(displayColumns.isShowSpectrumCount())
+        	if(displayColumns.isShowSpectrumCount()) {
         		writer.write("SC("+dataset.getDatasetId()+")\t");
+        		writer.write("SC_Norm("+dataset.getDatasetId()+")\t");
+        	}
         	if(displayColumns.isShowNsaf()) // NSAF column headers.
         		writer.write("NSAF("+dataset.getDatasetId()+")\t");
         }
@@ -477,8 +479,10 @@ public class DownloadComparisonResults extends Action {
             		writer.write("0\t"); // #ions
             	if(displayColumns.isShowNumUniqIons())
             		writer.write("0\t"); // # uniq ions
-            	if(displayColumns.isShowSpectrumCount())
+            	if(displayColumns.isShowSpectrumCount()) {
             		writer.write("0\t"); // SC
+            		writer.write("0\t"); // SC_Norm
+            	}
             }
             else {
             	if(displayColumns.isShowNumSeq())
@@ -487,8 +491,10 @@ public class DownloadComparisonResults extends Action {
             		writer.write(dpi.getIonCount()+"\t");
             	if(displayColumns.isShowNumUniqIons())
             		writer.write(dpi.getUniqueIonCount()+"\t");
-            	if(displayColumns.isShowSpectrumCount())
-            		writer.write(dpi.getSpectrumCount()+"("+dpi.getNormalizedSpectrumCountRounded()+")\t");
+            	if(displayColumns.isShowSpectrumCount()) {
+            		writer.write(dpi.getSpectrumCount()+"\t");
+            		writer.write(dpi.getNormalizedSpectrumCountRounded()+"\t");
+            	}
             }
             
             // NSAF information
@@ -645,8 +651,10 @@ public class DownloadComparisonResults extends Action {
                 		writer.write("0\t"); // #ions
                 	if(displayColumns.isShowNumUniqIons())
                 		writer.write("0\t"); // # uniq ions
-                	if(displayColumns.isShowSpectrumCount())
+                	if(displayColumns.isShowSpectrumCount()) {
                 		writer.write("0\t"); // SC
+                		writer.write("0\t"); // SC_Norm
+                	}
                 }
                 else {
                 	if(displayColumns.isShowNumSeq())
@@ -655,8 +663,10 @@ public class DownloadComparisonResults extends Action {
                 		writer.write(dpi.getIonCount()+"\t");
                 	if(displayColumns.isShowNumUniqIons())
                 		writer.write(dpi.getUniqueIonCount()+"\t");
-                	if(displayColumns.isShowSpectrumCount())
-                		writer.write(dpi.getSpectrumCount()+"("+dpi.getNormalizedSpectrumCountRounded()+")\t");
+                	if(displayColumns.isShowSpectrumCount()) {
+                		writer.write(dpi.getSpectrumCount()+"\t");
+                		writer.write(dpi.getNormalizedSpectrumCountRounded()+"\t");
+                	}
                 }
                 
                 if(displayColumns.isShowNsaf()) {
