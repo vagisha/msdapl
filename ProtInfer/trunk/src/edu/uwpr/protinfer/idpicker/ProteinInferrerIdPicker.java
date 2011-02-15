@@ -263,7 +263,7 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
                 numUnaccepted++;
             }
         }
-        log.info("Num protein GROUPS below MIN PEPTIDES: "+numUnaccepted);
+        log.info("Num protein GROUPS below MIN UNIQUE PEPTIDES: "+numUnaccepted);
     }
     
     private <S extends SpectrumMatch> void removeUnacceptedProteins(

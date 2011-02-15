@@ -75,51 +75,6 @@ public class IDPickerExecutor {
         log.info("IDPicker TOTAL run time: "+TimeUtils.timeElapsedMinutes(start, end)+" minutes");
     }
     
-
-    private static <T extends SpectrumMatch> void removeNonEnzymeSpecificPeptides(List<InferredProtein<T>> proteins) throws Exception {
-        
-        long start = System.currentTimeMillis();
-        
-        for(InferredProtein<T> prot: proteins) {
-            int nrseqProteinId = prot.getProteinId();
-            String proteinSeq = null;
-            try {
-//                proteinSeq = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(nrseqProteinId);
-                proteinSeq = NrSeqLookupUtil.getProteinSequence(nrseqProteinId);
-            }
-            catch (Exception e) {
-                log.error("Exception getting nrseq protein for proteinId: "+nrseqProteinId, e);
-                throw e;
-            }
-            
-            if(proteinSeq == null) {
-                log.error("Protein sequence for proteinId: "+nrseqProteinId+" is null.");
-                throw new Exception("Protein sequence for proteinId: "+nrseqProteinId+" is null.");
-            }
-                
-            for(PeptideEvidence<T> pev: prot.getPeptides()) {
-                if(!peptideProteinMatch(proteinSeq, pev.getPeptide().getPeptideSequence()))
-                    log.error(pev.getPeptide().getPeptideSequence()+"\t"+nrseqProteinId);
-            }
-        }
-        long end = System.currentTimeMillis();
-        log.info("Removed non-enzyme specific peptides in : "+TimeUtils.timeElapsedSeconds(start, end)+" seconds");
-    }
-    
-    static boolean peptideProteinMatch(String protein, String peptide) {
-        if(protein == null || peptide == null)
-            return false;
-        int start = 0;
-        int idx = -1;
-        while((idx = protein.indexOf(peptide, start)) != -1) {
-            start += peptide.length();
-            if(idx == 0)    continue;
-            
-            if(protein.charAt(idx-1) == 'K' || protein.charAt(idx-1) == 'R')
-                return true;
-        }
-        return false;
-    }
     
     static <T extends SpectrumMatch> void calculateProteinSequenceCoverage(List<InferredProtein<T>> proteins) throws Exception {
         
