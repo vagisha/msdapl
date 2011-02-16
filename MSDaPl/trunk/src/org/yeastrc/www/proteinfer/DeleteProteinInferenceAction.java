@@ -16,6 +16,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.experiment.ProjectProteinInferBookmarkDAO;
 import org.yeastrc.jobqueue.JobDeleter;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.project.Project;
@@ -116,6 +117,19 @@ public class DeleteProteinInferenceAction extends Action {
         catch(Exception e) {
             ActionErrors errors = new ActionErrors();
             errors.add("proteinfer", new ActionMessage("error.proteinfer.deletejob", "Error deleting protein inference ID: "+pinferId));
+            saveErrors(request, errors);
+            return mapping.findForward( "Failure" );
+        }
+        
+        // If this protein inference was bookmarked delete the entry
+        try {
+            ProjectProteinInferBookmarkDAO dao = ProjectProteinInferBookmarkDAO.getInstance();
+            dao.deleteBookmark(pinferId);
+        }
+        catch(Exception e) {
+        	ActionErrors errors = new ActionErrors();
+            errors.add("proteinfer", new ActionMessage("error.proteinfer.deletejob", "Protein inference ID: "+pinferId+" was deleted"+
+            		" but there was an error deleting the bookmark entry."));
             saveErrors(request, errors);
             return mapping.findForward( "Failure" );
         }

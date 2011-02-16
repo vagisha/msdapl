@@ -30,6 +30,31 @@ private static ProjectProteinInferBookmarkDAO instance;
         return instance;
     }
     
+    public void deleteBookmark(int pinferId) throws SQLException {
+        Connection conn = null;
+        Statement stmt = null;
+        
+        try {
+            
+            String sql = "DELETE FROM tblProjectProteinInference WHERE "+
+                         "piRunID="+pinferId;
+                    
+            conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+            
+        } finally {
+            
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }           
+        }
+    }
+    
     public void deleteBookmark(int pinferId, int projectId, int researcherId) throws SQLException {
         Connection conn = null;
         Statement stmt = null;
