@@ -292,6 +292,8 @@ function showActionOptions() {
 					</html:radio>
 				</td>
 			</tr>
+			
+			<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="false">
 			<tr>
 				<td></td>
 				<td>
@@ -309,6 +311,7 @@ function showActionOptions() {
 					</html:radio>
 				</td>
 			</tr>
+			</logic:equal>
 			
 			<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
 			<tr>

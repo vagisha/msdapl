@@ -34,7 +34,7 @@
 				<td style="border: 1px dotted #AAAAAA;">
 					<b><bean:write name="resultSummary" property="filteredProphetGroupCount" /></b>
 				</td>
-				<td style="border: 1px dotted #AAAAAA;">
+				<td style="border: 1px dotted #AAAAAA; color:red;">
 					<b><bean:write name="resultSummary" property="filteredParsimoniousProphetGroupCount" /></b>
 				</td>
 			</tr>
@@ -51,7 +51,7 @@
 				<td style="border: 1px dotted #AAAAAA;">
 					<b><bean:write name="resultSummary" property="filteredProteinGroupCount" /></b>
 				</td>
-				<td style="border: 1px dotted #AAAAAA;">
+				<td style="border: 1px dotted #AAAAAA; color:red">
 					<b><bean:write name="resultSummary" property="filteredParsimoniousProteinGroupCount" /></b>
 				</td>
 			</tr>
@@ -68,7 +68,7 @@
 				<td style="border: 1px dotted #AAAAAA;">
 					<b><bean:write name="resultSummary" property="filteredProteinCount" /></b>
 				</td>
-				<td style="border: 1px dotted #AAAAAA;">
+				<td style="border: 1px dotted #AAAAAA; color:red">
 					<b><bean:write name="resultSummary" property="filteredParsimoniousProteinCount" /></b>
 				</td>
 			</tr>
