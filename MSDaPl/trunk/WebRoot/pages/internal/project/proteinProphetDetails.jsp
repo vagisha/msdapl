@@ -88,13 +88,20 @@
 				</td>
 			</tr>
 		</logic:iterate>
-		<tr><td colspan="11" style="font-size:8pt;" >
+		<tr>
+		<td colspan="11" style="font-size:8pt;" >
 			<ul>
 			<li>Subsumed proteins are excluded in calculating group and protein counts</li>
 			<li>#Indist. Groups = number of indistinguishable protein groups</li>
 			<li>#Ions = number of unique combinations of sequence + modifications + charge</li>
 			</ul>
-		</td></tr>
+		</td>
+		<td colspan="1" style="text-align:center" >
+			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:selectAllProteinProphet(<bean:write name='experiment' property='id'/>);">[Select All]</span>
+			<br/>
+			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:clearSelectedProteinProphet(<bean:write name='experiment' property='id'/>);">[Clear Selected]</span>
+		</td>
+		</tr>
 		</tbody>
 		</table>
 	</div>

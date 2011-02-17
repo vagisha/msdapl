@@ -289,15 +289,11 @@
 	<table width="100%">
 	<tr>
 		<td colspan="9" align="right">
-			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:selectAllProteinProphet(<bean:write name='experiment' property='id'/>);">[Select All]</span>
-			&nbsp;
-			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:clearSelectedProteinProphet(<bean:write name='experiment' property='id'/>);">[Clear Selected]</span>
-			&nbsp;
-			<input type="checkbox" id="grpProts" value="group" checked="checked" />Group Indistinguishable Proteins
+			<input type="checkbox" id="grpProts_<bean:write name='experiment' property='id'/>" value="group" />Group Indistinguishable Proteins
 			&nbsp;
 			<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInferAndMore();"><b>[Compare More]</b></span>
 			&nbsp;
-			<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInfer();"
+			<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInfer(<bean:write name='experiment' property='id'/>);"
 			title="Protein inferences from multiple experiments in this project can be selected for comparison.  To include protein inferences from other projects click on 'Compare More'.">
 				<b>[Compare]</b>
 			</span>

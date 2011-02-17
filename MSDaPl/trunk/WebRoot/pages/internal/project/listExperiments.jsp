@@ -332,7 +332,7 @@ function rerunProtInferRun(pinferId) {
 // ---------------------------------------------------------------------------------------
 // COMPARE SELECTED PROTEIN INFERENCE RUNS
 // --------------------------------------------------------------------------------------- 
-function compareSelectedProtInfer() {
+function compareSelectedProtInfer(id) {
 	var pinferIds = "";
 	var forDisplay = "\n";
 	var i = 0;
@@ -348,10 +348,12 @@ function compareSelectedProtInfer() {
 		alert("Please select at least two protein inference results to compare");
 		return false;
 	}
-	var groupIndistinguishable = $("input#grpProts:checked").val() != null;
+	var groupIndistinguishable = false;
+	if($("input#grpProts_"+id).is(':checked'))
+		groupIndistinguishable = true;
 	forDisplay +="Group Indistinguishable Proteins: "+groupIndistinguishable;
 	
-	// var doCompare = confirm("Compare protein inference results: "+forDisplay);
+	//var doCompare = confirm("Compare protein inference results: "+forDisplay);
 	// if(doCompare) {
 		// var url = "<yrcwww:link path='setComparisonFilters.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;
 		var url = "<yrcwww:link path='doProteinSetComparison.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;

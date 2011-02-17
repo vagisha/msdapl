@@ -60,6 +60,7 @@
      	</logic:equal>
      </logic:equal>
      <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTEIN_PROPHET.name()%>">
+     	<th class="sort-int" align="left">Conrib. Evidence</th>
      	<th class="sort-float" align="left">nsp</th>
      	<th class="sort-float" align="left">Wt.</th>
      	<th class="sort-float" align="left">Init.Prob.</th>
@@ -166,6 +167,14 @@
      		
      		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTEIN_PROPHET.name()%>">
      			<bean:define name="ion" property="ion" id="prophetIon" type="org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon"/>
+     		 	<td style="text-align:center">
+     		 		<logic:equal name="prophetIon" property="isContributingEvidence" value="true">
+     		 		1
+     		 		</logic:equal>
+     		 		<logic:equal name="prophetIon" property="isContributingEvidence" value="false">
+     		 		0
+     		 		</logic:equal>
+     		 	</td>
      		 	<td><bean:write name="prophetIon" property="numSiblingPeptides" /></td>
      		 	<td><bean:write name="prophetIon" property="weight" /></td>
 	     		<td><bean:write name="prophetIon" property="initialProbability" /></td>

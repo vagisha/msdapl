@@ -146,12 +146,19 @@
 			</tr>
 		</logic:iterate>
 		
-		<tr><td colspan="10" style="font-size:8pt;" >
+		<tr>
+		<td colspan="11" style="font-size:8pt;" >
 			<ul>
 			<li>Only parsimonious proteins are included in calculating indistinguishable group and protein counts</li>
 			<li>#Ions = number of unique combinations of sequence + modifications + charge</li>
 			</ul>
-		</td></tr>
+		</td>
+		<td colspan="1" style="text-align:center" >
+			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:selectAllProteinProphet(<bean:write name='analysis' property='id'/>);">[Select All]</span>
+			<br/>
+			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:clearSelectedProteinProphet(<bean:write name='analysis' property='id'/>);">[Clear Selected]</span>
+		</td>
+		</tr>
 		
 		</tbody>
 		</table>
@@ -160,15 +167,11 @@
 	<table width="100%">
 	<tr>
 			<td colspan="9" align="right">
-				<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:selectAllProtInfer(<bean:write name='analysis' property='id'/>);">[Select All]</span>
-				&nbsp;
-				<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer(<bean:write name='analysis' property='id'/>);">[Clear Selected]</span>
-				&nbsp;
-				<input type="checkbox" id="grpProts" value="group" checked="checked" />Group Indistinguishable Proteins
+				<input type="checkbox" id="grpProts_<bean:write name='analysis' property='id'/>" value="group" checked="checked" />Group Indistinguishable Proteins
 				&nbsp;
 				<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInferAndMore();"><b>[Compare More]</b></span>
 				&nbsp;
-				<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInfer();"
+				<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInfer(<bean:write name='analysis' property='id'/>);"
 				title="Protein inferences from multiple experiments in this project can be selected for comparison.  To include protein inferences from other projects click on 'Compare More'.">
 					<b>[Compare]</b>
 				</span>
