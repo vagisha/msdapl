@@ -67,6 +67,7 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
     XMLStreamReader reader = null;
     
     // these will be read once for the entire file
+    boolean isTppFile = false;
     boolean refreshParserRun = false;
     boolean peptideProphetRun = false;
     private String peptideProphetVersion;
@@ -139,7 +140,10 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
         while(reader.hasNext()) {
             if(reader.next() == XMLStreamReader.START_ELEMENT) {
                 
-                if(reader.getLocalName().equalsIgnoreCase("analysis_summary")) {
+            	if(reader.getLocalName().equalsIgnoreCase("msms_pipeline_analysis")) {
+            		this.isTppFile = true;
+            	}
+            	else if(reader.getLocalName().equalsIgnoreCase("analysis_summary")) {
                     // refresh parser analysis
                     if(reader.getAttributeValue(null,"analysis").equalsIgnoreCase("database_refresh")) {
                         refreshParserRun = true;
@@ -207,6 +211,10 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
     
     public boolean isPeptideProphetRun() {
     	return peptideProphetRun;
+    }
+    
+    public boolean isTPPFile() {
+    	return this.isTppFile;
     }
     
     public String getPeptideProphetVersion() {

@@ -186,7 +186,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
                 appendToMsg("Error opening file: "+fileName+"\n"+e.getMessage());
                 return false;
             }
-            if (parser.isRefreshParserRun()) {
+            if (parser.isPeptideProphetRun()) {
             	interactPepxmlFiles.add(fileName);
             	found = true;
             }
@@ -198,7 +198,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         }
         
         // 3. If we know the search data file names that were uploaded match them with up with the 
-        //    file names in the interact*.pep.xml file(s) 
+        //    file names in the PeptideProphet *.pep.xml file(s) 
         for(String file: interactPepxmlFiles) {
             PepXmlBaseFileReader parser = new PepXmlBaseFileReader();
             try {

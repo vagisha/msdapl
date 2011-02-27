@@ -155,19 +155,7 @@ public class UploadServiceFactory {
                 continue;
             String fileName = files[i].getName();
             
-            String ext = null;
-            if(fileName.toLowerCase().endsWith("pep.xml"))
-                ext = "pep.xml";
-            else if(fileName.toLowerCase().endsWith(".xml")) // Ignore all other XML files
-            	continue;
-            else {
-                int idx = fileName.lastIndexOf(".");
-                if(idx == -1)   continue;
-
-                ext = fileName.substring(idx);
-            }
-           
-            SearchFileFormat format = SearchFileFormat.forFileExtension(ext);
+            SearchFileFormat format = SearchFileFormat.forFile(fileName);
             if(format == SearchFileFormat.UNKNOWN) 
                 continue;
             
@@ -179,7 +167,17 @@ public class UploadServiceFactory {
             throw new UploadServiceFactoryException("No valid search data file format found in directory: "+dataDirectory);
         }
         
+        
+        if(formats.contains(SearchFileFormat.XML) && formats.contains(SearchFileFormat.SQT)) {
+    		formats.remove(SearchFileFormat.XML);
+    	}
+    	else if(formats.contains(SearchFileFormat.XML) && formats.contains(SearchFileFormat.PEPXML)) {
+    		formats.remove(SearchFileFormat.XML);
+    		formats.remove(SearchFileFormat.PROTXML);
+    	}
+        
         if(formats.size() > 1) {
+        	
         	String formatsFound = "";
         	for(SearchFileFormat format: formats)
         		formatsFound += ", "+format.name();

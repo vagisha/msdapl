@@ -45,6 +45,7 @@ import org.yeastrc.ms.domain.search.impl.RunSearchBean;
 import org.yeastrc.ms.domain.search.impl.SearchResultProteinBean;
 import org.yeastrc.ms.domain.search.pepxml.PepXmlSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
+import org.yeastrc.ms.parser.pepxml.PepXmlBaseFileReader;
 import org.yeastrc.ms.parser.pepxml.PepXmlGenericFileReader;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.service.DynamicModLookupUtil;
@@ -75,7 +76,8 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
     protected StringBuilder preUploadCheckMsg;
     protected boolean preUploadCheckDone;
 
-    protected List<String> searchDataFileNames;
+    protected List<String> searchDataFileNames; // names without extensions
+    private String fileExtension;
     private List<String> spectrumFileNames;
 
     
@@ -189,19 +191,89 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
             return false;
         }
 
-        // 2. Look for *.pep.xml file
+        // 2. Look for *.xml or *.pep.xml file that may contain search results
         File[] files = dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String name_uc = name.toLowerCase();
-                return name_uc.endsWith(".pep.xml");
+                return (name_uc.endsWith(".pep.xml") || name_uc.endsWith(".xml"));
             }});
+        // Remove files where PeptideProphet has been run. We are interested in files
+        // that contain only search results.
+        List<File> searchResultFiles = new ArrayList<File>();
         for (int i = 0; i < files.length; i++) {
-            String name = files[i].getName();
-            name = name.substring(0, name.lastIndexOf(".pep.xml"));
-            if(!name.startsWith("interact")) // don't add interact*.pep.xml files here
-                searchDataFileNames.add(name);
+        	String fileName = files[i].getName();
+        	
+        	PepXmlBaseFileReader parser = new PepXmlBaseFileReader();
+            try {
+                parser.open(dataDirectory+File.separator+fileName);
+            }
+            catch (DataProviderException e) {
+                appendToMsg("Error opening file: "+fileName+"\n"+e.getMessage());
+                return false;
+            }
+            
+            if(!parser.isTPPFile()) {
+            	parser.close();
+            	continue;
+            }
+            else if (parser.isPeptideProphetRun()) {
+            	parser.close();
+            	continue;
+            }
+            // This is a TPP-generated file and does not contain PeptideProphet results
+            searchResultFiles.add(files[i]);
+            parser.close();
         }
+        // If we did not find any TPP generated files that also do not contain PeptideProphet results
+        // add files that contain PeptideProphet results.  In this case we will only upload
+        // search results that made it through the PeptideProphet analysis
+        if(searchResultFiles.size() == 0) {
+        	
+        	log.info("No files found containing only search results and not PeptideProphet results");
+        	for (int i = 0; i < files.length; i++) {
+            	String fileName = files[i].getName();
+            	
+            	PepXmlBaseFileReader parser = new PepXmlBaseFileReader();
+                try {
+                    parser.open(dataDirectory+File.separator+fileName);
+                }
+                catch (DataProviderException e) {
+                    appendToMsg("Error opening file: "+fileName+"\n"+e.getMessage());
+                    return false;
+                }
+                
+                if(parser.isTPPFile()) {
+                	searchResultFiles.add(files[i]);
+                }
+                parser.close();
+            }
+        }
+        
+        for (File file: searchResultFiles) {
+            String name = file.getName();
+            
+            int idx = name.lastIndexOf(".pep.xml");
+            if(idx == -1)
+            	idx = name.lastIndexOf(".xml");
+            
+            String ext = name.substring(idx);
+            name = name.substring(0, idx);
+            searchDataFileNames.add(name);
+            
+            
+            if(this.fileExtension == null) {
+            	this.fileExtension = ext;
+            }
+            else {
+            	
+            	if(!this.fileExtension.equals(ext)) {
+            		appendToMsg("Multiple file extensions: "+this.fileExtension+", "+ext);
+            		return false;
+            	}
+            }
+        }
+        log.info("File extension is: "+this.fileExtension);
 
 
         // 3. If we know the raw data file names that will be uploaded match them with up with the 
@@ -285,11 +357,14 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         // initialize the Modification lookup map; will be used when uploading modifications for search results
         dynaModLookup = new DynamicModLookupUtil(searchId);
         
-        // now upload the search data in the *.pep.xml files
+        // now upload the search data in the *.pep.xml or *.xml files
         for (String file: searchDataFileNames) {
-            String filePath = dataDirectory+File.separator+file+".pep.xml";
+            
             Integer runId = runIdMap.get(file); 
 
+            String filePath = dataDirectory+File.separator+file+fileExtension;
+            log.info("Reading file: "+filePath);
+            
             resetCaches();
             // int runSearchId;
 
