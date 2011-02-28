@@ -411,11 +411,11 @@ public class PeptideProteinMatchingService {
         int idx = 0;
         for(String suffix: suffixList) {
         	List<Integer> matchingProteins = suffixMap.get(suffix);
-//        	if(matchingProteins == null || matchingProteins.isEmpty()) {
-//        		// This can happen since we are looking for I<->L substitutions also
-//        		log.debug("No protein matches found for suffix: "+suffix+" for peptide: "+peptide);
-//        		continue;	
-//        	}
+        	if(matchingProteins == null || matchingProteins.isEmpty()) {
+        		// This can happen since we are looking for I<->L substitutions also
+        		log.error("No protein matches found for suffix: "+suffix+" for peptide: "+peptide);
+        		continue;	
+        	}
         	if(idx == 0) {
         		for(Integer proteinId: matchingProteins)
         			matches.put(proteinId, 1);

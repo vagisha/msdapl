@@ -450,6 +450,8 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
             return;
         }
         
+        //log.info("matching proteins");
+        
         // load the stored result
         MsSearchResult storedResult = resDao.load(matchingSearchResultId);
         List<MsSearchResultProtein> storedMatches = storedResult.getProteinMatchList();
@@ -472,36 +474,43 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         
         if(storedMatches.size() != pepXmlAccessions.size()) {
         	
-        	if(storedMatches.size() < pepXmlAccessions.size()) {
-        		
-        		String notFound = "";
-        		for(String pepxmlAcc: pepXmlAccessions) {
-        			if(!storedAccessions.contains(pepxmlAcc)) {
-                    	notFound += ","+pepxmlAcc;
-                    }
-        		}
-        		if(notFound.length() > 0)
-        			notFound = notFound.substring(1);
-        		
-        		UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-        		ex.setErrorMessage("Number of protein matches stored: "+storedMatches.size()+
-        				" LESS THAN the number of matches found in interact files: "+pepXmlMatches.size()+
-        				" for searchResultID: "+matchingSearchResultId+"\nMissing: "+notFound);
-        		throw ex;
-        	}
-        	else { // otherwise simply log a warning.  TPP converted Mascot pepXML files can have
-        		   // incorrect number of protein matchces.
-        		log.warn("Number of protein matches stored: "+storedMatches.size()+
-        				" MORE THAN the number of matches found in interact files: "+pepXmlMatches.size()+
-        				" for searchResultID: "+matchingSearchResultId);
-        	}
+//        	if(storedMatches.size() < pepXmlAccessions.size()) {
+//        		
+//        		String notFound = "";
+//        		for(String pepxmlAcc: pepXmlAccessions) {
+//        			if(!storedAccessions.contains(pepxmlAcc)) {
+//                    	notFound += ","+pepxmlAcc;
+//                    }
+//        		}
+//        		if(notFound.length() > 0)
+//        			notFound = notFound.substring(1);
+//        		
+//        		UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+//        		ex.setErrorMessage("Number of protein matches stored: "+storedMatches.size()+
+//        				" LESS THAN the number of matches found in interact files: "+pepXmlMatches.size()+
+//        				" for searchResultID: "+matchingSearchResultId+"\nMissing: "+notFound);
+//        		throw ex;
+//        	}
+//        	else { // otherwise simply log a warning.  TPP converted Mascot pepXML files can have
+//        		   // incorrect number of protein matchces.
+//        		log.warn("Number of protein matches stored: "+storedMatches.size()+
+//        				" MORE THAN the number of matches found in interact files: "+pepXmlMatches.size()+
+//        				" for searchResultID: "+matchingSearchResultId);
+//        	}
             
 //            log.error("Number of protein matches stored: "+storedMatches.size()+
-//            		" does not match the number of matches found in interact files: "+myMatches.size()+
+//            		" does not match the number of matches found in interact files: "+pepXmlMatches.size()+
 //            		" for searchResultID: "+matchingSearchResultId);
-//            if(myMatches.size() > storedMatches.size()) {
+//            if(pepXmlMatches.size() > storedMatches.size()) {
 //            	log.error("MORE PROTEINS IN interact pepxml");
 //            }
+            
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+    		ex.setErrorMessage("Number of protein matches stored: "+storedMatches.size()+
+    				" NOT EQUAL to the number of matches found in interact files: "+pepXmlMatches.size()+
+    				" for searchResultID: "+matchingSearchResultId);
+    		throw ex;
+            
         }
         
         

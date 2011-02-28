@@ -589,8 +589,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
                 if(result == null)
                     continue;
 
-                // ignore all spectra with PeptideProphet probability < 0.05
-                if(result.getProbability() < parser.getMinInitialProbability())
+                // ignore all spectra with PeptideProphet probability <= 0.05
+                if(result.getProbability() <= parser.getMinInitialProbability())
                     continue;
 
                 matchingResults.add(result);
@@ -643,12 +643,12 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         // make sure the number of results returned above match the spectrum count for this ion in the 
         // ProtXml file.
         if(numFound != ion.getSpectrumCount()) {
-//            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-//            ex.appendErrorMessage("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
-//                        ") in protXML does not match the number of results returned: "+numFound);
-//            throw ex;
-            log.error("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
-            ") in protXML does not match the number of results returned: "+numFound);
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.appendErrorMessage("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
+                        ") in protXML does not match the number of results returned: "+numFound);
+            throw ex;
+//            log.error("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
+//            ") in protXML does not match the number of results returned: "+numFound);
         }
     }
 
