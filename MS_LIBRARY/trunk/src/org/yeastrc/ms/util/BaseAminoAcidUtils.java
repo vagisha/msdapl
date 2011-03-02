@@ -55,7 +55,7 @@ public class BaseAminoAcidUtils {
         aminoAcidsChars[i++] = 'G'; // Glycine
         aminoAcidsChars[i++] = 'H'; // Histidine
         aminoAcidsChars[i++] = 'I'; // Isoleucine
-        aminoAcidsChars[i++] = 'K'; // Lycine
+        aminoAcidsChars[i++] = 'K'; // Lysine
         aminoAcidsChars[i++] = 'L'; // Leucine
         aminoAcidsChars[i++] = 'M'; // Methionine
         aminoAcidsChars[i++] = 'N'; // Asparagine
@@ -78,6 +78,58 @@ public class BaseAminoAcidUtils {
     
     public boolean isAminoAcid(char aa) {
         return validChars.contains(Character.toUpperCase(aa));
+    }
+    
+    public String getFullName(char aa) {
+    	
+    	if(isAminoAcid(aa)) {
+    		switch(aa) {
+	    		case 'A':
+	    			return "Ananine";
+	    		case 'C':
+	    			return "Cysteine";
+	    		case 'D': 
+	    			return "Aspartic Acid";
+	    		case 'E':
+	    			return "Glutamic Acid";
+	    		case 'F': 
+	    			return "Phenyl-ananine";
+	    		case 'G':
+	    			return "Glycine";
+	    		case 'H': 
+	    			return "Histidine";
+	    		case 'I':
+	    			return "Isoleucine";
+	    		case 'K':
+	    			return "Lysine";
+	    		case 'L': 
+	    			return "Leucine";
+	    		case 'M':
+	    			return "Methionine";
+	    		case 'N':
+	    			return "Asparagine";
+	    		case 'P':
+	    			return "Proline";  
+	    		case 'Q': 
+	    			return "Glutamine";
+	    		case 'R': 
+	    			return "Arginine";        
+	    		case 'S': 
+	    			return "Serine";
+	    		case 'T': 
+	    			return "Threonine";
+	    		case 'V': 
+	    			return "Valine";
+	    		case 'W': 
+	    			return "Tryptophan";
+	    		case 'Y': 
+	    			return "Tyrosine";
+	    		default:
+	    			return aa+"";
+    		}
+    	}
+    	
+    	return aa+"";
     }
     
     public double avgMass(char aminoAcid) {
