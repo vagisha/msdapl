@@ -9,8 +9,10 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.PeptideTerminiStatsDAO;
 import org.yeastrc.ms.dao.analysis.ibatis.MsRunSearchAnalysisDAOImpl;
 import org.yeastrc.ms.dao.analysis.ibatis.MsSearchAnalysisDAOImpl;
+import org.yeastrc.ms.dao.analysis.ibatis.PeptideTerminiStatsDAOImpl;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetResultDAOImpl;
@@ -188,12 +190,15 @@ public class DAOFactory {
     private PercolatorParamsDAO percSQTHeaderDAO;
     private PercolatorResultDAO percResultDAO;
     private PercolatorPeptideResultDAO percPeptResultDAO;
-    private PercolatorFilteredPsmResultDAO percFiltersPsmDAO;
-    private PercolatorFilteredSpectraResultDAO percFiltersSpectraDAO;
     
     // DAOs related to PeptideProphet search analysis
     private PeptideProphetRocDAO ppRocDAO;
     private PeptideProphetResultDAO pprophResultDAO;
+    
+    // DAOs for stats tables
+    private PeptideTerminiStatsDAO peptideTerminiStatsDAO;
+    private PercolatorFilteredPsmResultDAO percFiltersPsmDAO;
+    private PercolatorFilteredSpectraResultDAO percFiltersSpectraDAO;
     
     private DAOFactory() {
         
@@ -255,12 +260,16 @@ public class DAOFactory {
         percSQTHeaderDAO = new PercolatorParamsDAOImpl(sqlMap);
         percResultDAO = new PercolatorResultDAOImpl(sqlMap, rsAnalysisDAO, runSearchDAO, modDAO);
         percPeptResultDAO = new PercolatorPeptideResultDAOImpl(sqlMap, rsAnalysisDAO, runSearchDAO, modDAO, percResultDAO);
-        percFiltersPsmDAO = new PercolatorFilteredPsmResultDAOImpl(sqlMap, rsAnalysisDAO);
-		percFiltersSpectraDAO = new PercolatorFilteredSpectraResultDAOImpl(sqlMap, rsAnalysisDAO);
+       
         
         // PeptideProphet post search analysis related
         ppRocDAO = new PeptideProphetRocDAOImpl(sqlMap);
         pprophResultDAO = new PeptideProphetResultDAOImpl(sqlMap, rsAnalysisDAO);
+        
+        // DAOs for stats tables;
+        percFiltersPsmDAO = new PercolatorFilteredPsmResultDAOImpl(sqlMap, rsAnalysisDAO);
+		percFiltersSpectraDAO = new PercolatorFilteredSpectraResultDAOImpl(sqlMap, rsAnalysisDAO);
+		peptideTerminiStatsDAO = new PeptideTerminiStatsDAOImpl(sqlMap);
         
     }
     
@@ -443,13 +452,6 @@ public class DAOFactory {
     	return percPeptResultDAO;
     }
     
-    public PercolatorFilteredPsmResultDAO getPrecolatorFilteredPsmResultDAO() {
-    	return percFiltersPsmDAO;
-    }
-    
-    public PercolatorFilteredSpectraResultDAO getPrecolatorFilteredSpectraResultDAO() {
-    	return percFiltersSpectraDAO;
-    }
     
     //-------------------------------------------------------------------------------------------
     // PeptideProphet related
@@ -460,5 +462,20 @@ public class DAOFactory {
     
     public PeptideProphetRocDAO getPeptideProphetRocDAO() {
         return ppRocDAO;
+    }
+    
+    //-------------------------------------------------------------------------------------------
+    // stats related
+    //-------------------------------------------------------------------------------------------
+    public PeptideTerminiStatsDAO getPeptideTerminiStatsDAO() {
+    	return peptideTerminiStatsDAO;
+    }
+    
+    public PercolatorFilteredPsmResultDAO getPrecolatorFilteredPsmResultDAO() {
+    	return percFiltersPsmDAO;
+    }
+    
+    public PercolatorFilteredSpectraResultDAO getPrecolatorFilteredSpectraResultDAO() {
+    	return percFiltersSpectraDAO;
     }
 }

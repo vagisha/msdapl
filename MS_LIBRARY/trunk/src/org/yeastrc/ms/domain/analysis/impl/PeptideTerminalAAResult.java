@@ -321,4 +321,22 @@ public class PeptideTerminalAAResult {
 	private double roundOne(double num) {
         return Math.round(num*10.0)/10.0;
     }
+	
+	public String toString() {
+		
+		StringBuilder buf = new StringBuilder();
+		buf.append("analysisID: "+this.analysisId+"\n");
+		buf.append("scoreCutoff: "+this.scoreCutoff+"; scoreType: "+this.scoreType+"\n");
+		buf.append("totalResultCount: "+this.totalResultCount+"\n");
+		buf.append("numResultsWithEnzTerm_0: "+this.numResultsWithEnzTerm_0+"\n");
+		buf.append("numResultsWithEnzTerm_1: "+this.numResultsWithEnzTerm_1+"\n");
+		buf.append("numResultsWithEnzTerm_2: "+this.numResultsWithEnzTerm_2+"\n");
+		if(this.enzyme != null)
+			buf.append("enzyme: "+this.enzyme.getName()+"\n");
+		buf.append("AA\tNterm-1\tNterm\tCterm\tCterm+1\n");
+		for(Character aa: this.aaCounts.keySet()) {
+			buf.append(aaCounts.get(aa).toString()+"\n");
+		}
+		return buf.toString();
+	}
 }

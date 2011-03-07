@@ -90,4 +90,11 @@ public class AminoAcidTermCount {
 		this.ctermCount += other.getCtermCount();
 		this.ctermPlusOneCount += other.getCtermPlusOneCount();
 	}
+	
+	public String toString() {
+		
+		StringBuilder buf = new StringBuilder();
+		buf.append(this.aa+"\t"+this.ntermMinusOneCount+"\t"+this.ntermCount+"\t"+this.ctermCount+"\t"+this.ctermPlusOneCount);
+		return buf.toString();
+	}
 }

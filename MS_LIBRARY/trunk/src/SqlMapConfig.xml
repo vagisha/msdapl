@@ -136,6 +136,7 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetRunSummary.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorFilteredPsmResultSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorFilteredSpectraResultSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/PeptideTerminiStatsSqlMap.xml"/>
 	
 	
 </sqlMapConfig>	

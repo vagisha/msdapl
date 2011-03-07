@@ -19,7 +19,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 public class PeptideTerminiStatsDAOImpl extends BaseSqlMapDAO implements
 	PeptideTerminiStatsDAO {
 
-	private static final String namespace = "AnalysisPeptideTerminiStats";
+	private static final String namespace = "PeptideTerminiStats";
 	
 	public PeptideTerminiStatsDAOImpl(SqlMapClient sqlMap) {
 		super(sqlMap);
