@@ -17,6 +17,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.stats.PercolatorQCStatsGetter;
+import org.yeastrc.ms.domain.analysis.impl.PeptideTerminalAAResult;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -102,6 +103,7 @@ public class ViewAnalysisStats extends Action {
         PercolatorQCStatsGetter statsGetter = new PercolatorQCStatsGetter();
         statsGetter.setGetPsmRtStats(true);
         statsGetter.setGetSpectraRtStats(true);
+        statsGetter.setGetPeptideTerminiStats(true);
         statsGetter.getStats(analysisId, myForm.getQvalue());
         
         // -----------------------------------------------------------------------------
@@ -120,6 +122,17 @@ public class ViewAnalysisStats extends Action {
         request.setAttribute("spectraAnalysisStats", statsGetter.getSpectraAnalysisStats());
         
 //        request.setAttribute("spectraRTDistributionChart", "http://chart.apis.google.com/chart?cht=bvs&chbh=a&chs=500x325&chdl=MS/MS%20scans%20with%20good%20results%20(qvalue%3C=0.01)|All%20MS/MS%20Scans&chdlp=t&chg=10,10&chf=c,s,EFEFEF&chxt=x,y,x,y&chxl=2:|Retention%20Time|3:|Scans|&chxp=2,50|3,50&chxr=0,0,119.96055,11|1,0,1491,149&chds=0,1501,0,1501&chco=008000,800080&chd=t:87,26,27,47,24,28,90,232,381,398,407,360,475,503,577,532,537,533,546,447,504,513,477,497,477,422,501,440,426,406,468,443,496,502,437,470,449,448,427,461,446,443,429,444,463,421,373,327,156,7|669,427,672,699,487,402,451,774,1066,1045,1078,1115,1015,988,914,950,944,946,936,1024,965,939,979,959,979,1028,940,994,1009,1020,958,979,928,914,962,928,948,940,951,916,925,918,905,874,860,903,912,824,371,31");
+        
+        // -----------------------------------------------------------------------------
+        // Terminal residue plot
+        // -----------------------------------------------------------------------------
+        PeptideTerminalAAResult peptideTerminalAAResult = statsGetter.getPeptideTerminalResidueStats();
+        String peptideTerminalAAResultUrl = statsGetter.getPeptideTerminalResiduePlotUrl();
+        if(peptideTerminalAAResult != null && peptideTerminalAAResultUrl != null) {
+        	
+        	request.setAttribute("peptideTerminalAAResult", peptideTerminalAAResult);
+            request.setAttribute("peptideTerminalAAResultUrl", peptideTerminalAAResultUrl);
+        }
         
         return mapping.findForward("Success");
     }

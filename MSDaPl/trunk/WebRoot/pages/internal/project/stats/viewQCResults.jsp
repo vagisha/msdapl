@@ -131,6 +131,11 @@ function updatePsmDeltaMassResults() {
 		&nbsp;
 		<span class="underline clickable" onclick="getPsmDeltaMassResults(true);return false;">[ppm]</span>
 		<br/>
+		<logic:present name="peptideTerminalAAResult">
+		<br/>
+		<a href="#peptide_termini_aa_result">Amino Acid Frequency at Peptide Termini</a>
+		<br/>
+		</logic:present>
 	</div>
 	
 	
@@ -149,6 +154,12 @@ function updatePsmDeltaMassResults() {
 	<!-- PSM Delta mass histogram -->
 	<a name="psm_delta_mass"></a>
 	<div id="deltaMassPlot"></div>
+	
+	<!-- Amino Acid Frequency at Peptide Termini -->
+	<logic:present name="peptideTerminalAAResult">
+		<a name="peptide_termini_aa_result"></a>
+		<%@ include file="peptideTerminiAAResult.jsp" %>
+	</logic:present>
 	
 </center>	
 </yrcwww:contentbox>

@@ -8,6 +8,10 @@ package org.yeastrc.experiment.stats;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.PeptideTerminiStatsDAO;
+import org.yeastrc.ms.domain.analysis.impl.PeptideTerminalAAResult;
+import org.yeastrc.ms.service.stats.PeptideAAFrequencyGooglePlotUrlBuilder;
 import org.yeastrc.www.project.experiment.stats.PlotUrlCache;
 
 /**
@@ -27,6 +31,11 @@ public class PercolatorQCStatsGetter {
 	private List<FileStats> spectraFileStats;	// stats for the individual files in the analysis
 	private String spectraDistrUrl;
 	
+	
+	private boolean getTerminalResidueStats = false;
+	private PeptideTerminalAAResult peptideTerminiStats = null;
+	private String peptideTerminalResiduePlotUrl = null;
+	
 	public static final double QVAL = 0.01;
 	
 	public PercolatorQCStatsGetter () {}
@@ -38,6 +47,8 @@ public class PercolatorQCStatsGetter {
 			getPsmRtStats(analysisId, qvalue, cache);
 		if(getSpectraRtStats)
 			getSpectraRtStats(analysisId, qvalue, cache);
+		if(getTerminalResidueStats)
+			getPeptideTerminalAAStats(analysisId, qvalue);
 	}
 	
 	public void setGetPsmRtStats(boolean getPsmRtStats) {
@@ -46,6 +57,10 @@ public class PercolatorQCStatsGetter {
 
 	public void setGetSpectraRtStats(boolean getSpectraRtStats) {
 		this.getSpectraRtStats = getSpectraRtStats;
+	}
+	
+	public void setGetPeptideTerminiStats(boolean getTerminalResidueStats) {
+		this.getTerminalResidueStats = getTerminalResidueStats;
 	}
 
 	public FileStats getPsmAnalysisStats() {
@@ -70,6 +85,14 @@ public class PercolatorQCStatsGetter {
 
 	public String getSpectraDistrUrl() {
 		return spectraDistrUrl;
+	}
+	
+	public PeptideTerminalAAResult getPeptideTerminalResidueStats() {
+		return this.peptideTerminiStats;
+	}
+	
+	public String getPeptideTerminalResiduePlotUrl() {
+		return this.peptideTerminalResiduePlotUrl;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -137,6 +160,23 @@ public class PercolatorQCStatsGetter {
         	spectraAnalysisStats.setPopulationMean(st.getPopulationMean());
         	spectraAnalysisStats.setPopulationStandardDeviation(st.getPopulationStandardDeviation());
         }
+	}
+	
+	// -----------------------------------------------------------------------------
+    // Peptide terminal residue stats
+    // -----------------------------------------------------------------------------
+	private void getPeptideTerminalAAStats(int analysisId, double qvalue) {
+		
+		PeptideTerminiStatsDAO dao = DAOFactory.instance().getPeptideTerminiStatsDAO();
+		PeptideTerminalAAResult result = dao.load(analysisId);
+		
+		// We are only saving stats for qvalue of 0.01
+		// For now we are not giving the user the option of recalculating at another qvalue cutoff
+		if(result != null && result.getScoreCutoff() == qvalue) {
+			
+			this.peptideTerminiStats = result;
+			this.peptideTerminalResiduePlotUrl = PeptideAAFrequencyGooglePlotUrlBuilder.getUrl(result);
+		}
 	}
 	
 }
