@@ -5,19 +5,21 @@
  */
 package org.yeastrc.ms.service.percolator.stats.termini;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
-import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
-import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorPeptideResultDAO;
+import org.yeastrc.ms.domain.analysis.impl.PeptideTerminalAAResult;
+import org.yeastrc.ms.domain.analysis.impl.PeptideTerminalAAResultBuilder;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorPeptideResult;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultFilterCriteria;
+import org.yeastrc.ms.domain.general.EnzymeFactory;
 import org.yeastrc.ms.domain.general.EnzymeRule;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.general.impl.EnzymeBean;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
-import org.yeastrc.ms.service.EnzymeRules.ENZYME;
 import org.yeastrc.ms.util.TimeUtils;
 
 /**
@@ -29,113 +31,79 @@ public class PeptideAAFrequencyCalculator {
 	private MsEnzyme enzyme;
 	private EnzymeRule rule;
 	
+	
 	private static final Logger log = Logger.getLogger(PeptideAAFrequencyCalculator.class);
 	
 	public PeptideAAFrequencyCalculator (MsEnzyme enzyme, double minQvalue) {
 		
 		this.enzyme = enzyme;
+		
 		// If we are not given an enzyme; assume it is Trypsin.
 		if(this.enzyme == null) {
-			EnzymeBean enz = new EnzymeBean();
-			enz.setName(ENZYME.TRYPSIN.name());
-	        enz.setCut(ENZYME.TRYPSIN.getCut());
-	        enz.setNocut(ENZYME.TRYPSIN.getNoCut());
-	        enz.setSense(ENZYME.TRYPSIN.getSense());
-	        this.enzyme = enz;
+	        this.enzyme = EnzymeFactory.getTrypsin();
 		}
 		if(this.enzyme != null)
 			this.rule = new EnzymeRule(this.enzyme);
 		
 		this.scoreCutoff = minQvalue;
+		
 	}
 	
-	public PeptideTerminalResidueResult calculateForAnalysis(int analysisId) {
+	public PeptideTerminalAAResult calculateForAnalysis(int analysisId) {
 		
-		DAOFactory daoFactory = DAOFactory.instance();
-		
-		MsRunSearchAnalysisDAO rsaDao = daoFactory.getMsRunSearchAnalysisDAO();
-		List<Integer> runSearchAnalysisIds = rsaDao.getRunSearchAnalysisIdsForAnalysis(analysisId);
-		
-		PeptideTerminalResidueResult result = calculateForRunSearchAnalysisIds(runSearchAnalysisIds);
-		result.setEnzyme(enzyme);
-		return result;
-		
-	}
+		PercolatorPeptideResultDAO percDao = DAOFactory.instance().getPercolatorPeptideResultDAO();
 
-	public PeptideTerminalResidueResult calculateForRunSearchAnalysisIds(List<Integer> runSearchAnalysisIds) {
-		
-		
-		long s = System.currentTimeMillis();
-		
-		PeptideTerminalResidueResult result = new PeptideTerminalResidueResult();
-		for(Integer rsaId: runSearchAnalysisIds) {
-			
-			PeptideTerminalResidueResult rsaResult = calculateForRunSearchAnalysis(rsaId);
-			result.combineWith(rsaResult);
-		}
-		
-		long e = System.currentTimeMillis();
-		
-		log.info("Total time to get results "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
-		log.info("Total filtered results: "+result.getTotalResultCount());
-		
-		result.setEnzyme(enzyme);
-		return result;
-	}
-	
-	
-	public PeptideTerminalResidueResult calculateForRunSearchAnalysis(int runSearchAnalysisId) {
-		
-		PercolatorResultDAO percDao = DAOFactory.instance().getPercolatorResultDAO();
-		
 		PercolatorResultFilterCriteria filterCriteria = new PercolatorResultFilterCriteria();
 		filterCriteria.setMaxQValue(scoreCutoff);
 		
 		long s = System.currentTimeMillis();
 		
-		PeptideTerminalResidueResult result = new PeptideTerminalResidueResult();
+		PeptideTerminalAAResultBuilder builder = new PeptideTerminalAAResultBuilder(analysisId, this.enzyme);
+		builder.setScoreCutoff(this.scoreCutoff);
+		builder.setScoreType("PERC_PEPTIDE_QVAL");
+		
 		int totalResults = 0;
 			
-		List<Integer> percResultIds = percDao.loadIdsForRunSearchAnalysis(runSearchAnalysisId, filterCriteria, null);
-		totalResults += percResultIds.size();
+		List<Integer> percPeptideResultIds = percDao.loadIdsForSearchAnalysis(analysisId, filterCriteria, null);
 
-		log.info("Found "+percResultIds.size()+" Percolator results at qvalue <= "+scoreCutoff+
-				" for runSearchAnalysisID "+runSearchAnalysisId);
+		log.info("Found "+percPeptideResultIds.size()+" Percolator (peptide) results at qvalue <= "+scoreCutoff+
+				" for analysisID "+analysisId);
 
 		
-		for(Integer percResultId: percResultIds) {
+		for(Integer percPeptideResultId: percPeptideResultIds) {
 
-			PercolatorResult pres = percDao.loadForPercolatorResultId(percResultId);
+			PercolatorPeptideResult pres = percDao.load(percPeptideResultId);
 			MsSearchResultPeptide peptide = pres.getResultPeptide();
 			String seq = peptide.getPeptideSequence();
-
+			
+			
 			char ntermMinusOne = peptide.getPreResidue(); // nterm - 1 residue
-			result.addNtermMinusOneCount(ntermMinusOne);
+			builder.addNtermMinusOneCount(ntermMinusOne);
 
 			char nterm = seq.charAt(0); // nterm residue
-			result.addNtermCount(nterm);
+			builder.addNtermCount(nterm);
 
 			char cterm = seq.charAt(seq.length() - 1); // cterm residue
-			result.addCtermCount(cterm);
+			builder.addCtermCount(cterm);
 
 			char ctermPlusOne = peptide.getPostResidue(); // cterm + 1 residue
-			result.addCtermPlusOneCount(ctermPlusOne);
+			builder.addCtermPlusOneCount(ctermPlusOne);
 
 			int numEnzTerm = 0;
 			if(this.rule != null)
 				numEnzTerm = rule.getNumEnzymaticTermini(seq, ntermMinusOne, ctermPlusOne);
-			result.addEnzymaticTerminiCount(numEnzTerm);
+			builder.addEnzymaticTerminiCount(numEnzTerm);
+			
+			totalResults++;
 		}
 			
 		long e = System.currentTimeMillis();
 		
-		log.info("Time to get results for runSearchAnalysisId "+runSearchAnalysisId+" "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
-		log.info("# filtered results: "+totalResults);
+		log.info("Time to get results for analysisId "+analysisId+" "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+		log.info("# filtered peptide sequences: "+totalResults);
 		
-		result.setTotalResultCount(totalResults);
-		result.setEnzyme(enzyme);
+		builder.setTotalResultCount(totalResults);
 		
-		return result;
+		return builder.getResult();
 	}
-	
 }
