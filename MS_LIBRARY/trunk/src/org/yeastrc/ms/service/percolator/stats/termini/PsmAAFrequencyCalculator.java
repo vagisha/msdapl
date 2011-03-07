@@ -5,7 +5,9 @@
  */
 package org.yeastrc.ms.service.percolator.stats.termini;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
@@ -30,6 +32,9 @@ public class PsmAAFrequencyCalculator {
 	private MsEnzyme enzyme;
 	private EnzymeRule rule;
 	
+	private boolean lookAtUniqPeptides = false;
+	private Set<String> peptides;
+	
 	private static final Logger log = Logger.getLogger(PsmAAFrequencyCalculator.class);
 	
 	public PsmAAFrequencyCalculator (MsEnzyme enzyme, double minQvalue) {
@@ -44,6 +49,11 @@ public class PsmAAFrequencyCalculator {
 		
 		this.scoreCutoff = minQvalue;
 	}
+	
+	public void setUniquePeptides(boolean uniqPeptides) {
+		this.lookAtUniqPeptides = uniqPeptides;
+	}
+	
 	
 	public PeptideTerminalAAResult calculateForAnalysis(int analysisId) {
 		
@@ -87,6 +97,13 @@ public class PsmAAFrequencyCalculator {
 	
 	public PeptideTerminalAAResult calculateForRunSearchAnalysis(int analysisId, int runSearchAnalysisId) {
 		
+		
+		if(lookAtUniqPeptides) {
+			if(this.peptides == null) {
+				peptides = new HashSet<String>();
+			}
+		}
+		
 		PercolatorResultDAO percDao = DAOFactory.instance().getPercolatorResultDAO();
 		
 		PercolatorResultFilterCriteria filterCriteria = new PercolatorResultFilterCriteria();
@@ -101,7 +118,6 @@ public class PsmAAFrequencyCalculator {
 		int totalResults = 0;
 			
 		List<Integer> percResultIds = percDao.loadIdsForRunSearchAnalysis(runSearchAnalysisId, filterCriteria, null);
-		totalResults += percResultIds.size();
 
 		log.info("Found "+percResultIds.size()+" Percolator results at qvalue <= "+scoreCutoff+
 				" for runSearchAnalysisID "+runSearchAnalysisId);
@@ -113,6 +129,16 @@ public class PsmAAFrequencyCalculator {
 			MsSearchResultPeptide peptide = pres.getResultPeptide();
 			String seq = peptide.getPeptideSequence();
 
+			if(this.lookAtUniqPeptides) {
+				String fullseq = peptide.getPreResidue()+"."+seq+"."+peptide.getPostResidue();
+				if(peptides.contains(fullseq))
+					continue;
+				else
+					peptides.add(fullseq);
+			}
+			
+			totalResults++;
+			
 			char ntermMinusOne = peptide.getPreResidue(); // nterm - 1 residue
 			builder.addNtermMinusOneCount(ntermMinusOne);
 
