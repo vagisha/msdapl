@@ -26,6 +26,9 @@ public class PeptideTerminalAAResultConverter {
 	
 	public static PeptideTerminalAAResult convert(PeptideTerminalAAResultDb resultDb) {
 		
+		if(resultDb == null)
+			return null;
+		
 		PeptideTerminalAAResult result = new PeptideTerminalAAResult();
 		
 		result.setAnalysisId(resultDb.getAnalysisId());
@@ -131,6 +134,9 @@ public class PeptideTerminalAAResultConverter {
 	}
 	
 	public static PeptideTerminalAAResultDb convert(PeptideTerminalAAResult result) {
+		
+		if(result == null)
+			return null;
 		
 		PeptideTerminalAAResultDb resultDb = new PeptideTerminalAAResultDb();
 		resultDb.setAnalysisId(result.getAnalysisId());

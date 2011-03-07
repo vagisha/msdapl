@@ -30,7 +30,10 @@ public class PeptideTerminiStatsDAOImpl extends BaseSqlMapDAO implements
 	public PeptideTerminalAAResult load(int searchAnalysisId) {
 		
 		PeptideTerminalAAResultDb dbResult = (PeptideTerminalAAResultDb) queryForObject(namespace+".select", searchAnalysisId);
-		return PeptideTerminalAAResultConverter.convert(dbResult);
+		if(dbResult == null)
+			return null;
+		else
+			return PeptideTerminalAAResultConverter.convert(dbResult);
 	}
 	
 
