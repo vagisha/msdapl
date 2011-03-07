@@ -20,6 +20,7 @@
 		<tr align="left">
 			<th></th>
 			<th valign="top">ID</th>
+			<th valign="top">User</th>
 			<th valign="top">Version</th>
 			<th valign="top">Date</th>
 			<th valign="top" align="center">#Indist.<br>Groups</th>
@@ -39,6 +40,7 @@
 			</td>
 			
 			<td valign="top"><b><bean:write name="piRun" property="job.pinferId"/></b></td>
+			<td valign="top"><bean:write name="piRun" property="job.researcher.lastName"/></td>
 			<td valign="top" align="center"><b><bean:write name="piRun" property="job.version"/></b></td>
 			<td valign="top"><bean:write name="piRun" property="job.submitDate"/></td>
 			
@@ -84,12 +86,26 @@
  		 			
  		 	<logic:equal name="piRun" property="job.complete" value="true">
  		 	<td valign="top" align="center" >
- 		 		<input type="checkbox" class="compare_cb" value="<bean:write name='piRun' property='job.pinferId'/>"></input>
+ 		 		<input type="checkbox" class="compare_cb" name="bookmarked_protinfer" value="<bean:write name='piRun' property='job.pinferId'/>"></input>
 			</td>
 			</logic:equal>
  		 			
 			</tr>
 		</logic:iterate>
+		
+		<tr>
+		<td colspan="11" style="font-size:8pt;" >
+			<ul>
+			<li>Only parsimonious proteins are included in calculating indistinguishable group and protein counts</li>
+			<li>#Ions = number of unique combinations of sequence + modifications + charge</li>
+			</ul>
+		</td>
+		<td colspan="1" style="text-align:center" >
+			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:selectAllProtInfer('bookmarked_protinfer');">[Select All]</span>
+			<br/>
+			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer('bookmarked_protinfer');">[Clear Selected]</span>
+		</td>
+		</tr>
 		
 		</tbody>
 		</table>
@@ -139,10 +155,24 @@
 			<b><font color="green">View</font></b></a>
 		</td>
 		<td valign="top" align="center" >
-		 				<input type="checkbox" class="compare_cb" value="<bean:write name='prpRun' property='proteinProphetRun.id'/>"></input>
+		 	<input type="checkbox" class="compare_cb" name="bookmarked_protprophet" value="<bean:write name='prpRun' property='proteinProphetRun.id'/>"></input>
 		</td>
 		</tr>
 	</logic:iterate>
+	tr>
+		<td colspan="11" style="font-size:8pt;" >
+			<ul>
+			<li>Subsumed proteins are excluded in calculating group and protein counts</li>
+			<li>#Indist. Groups = number of indistinguishable protein groups</li>
+			<li>#Ions = number of unique combinations of sequence + modifications + charge</li>
+			</ul>
+		</td>
+		<td colspan="1" style="text-align:center" >
+			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:selectAllProtInfer('bookmarked_protprophet');">[Select All]</span>
+			<br/>
+			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer('bookmarked_protprophet');">[Clear Selected]</span>
+		</td>
+		</tr>
 	</tbody>
 	</table>
 </div>
@@ -152,13 +182,11 @@
 <table width="100%">
 	<tr>
 			<td colspan="9" align="right">
-				<input type="checkbox" id="grpProts" value="group" checked="checked" />Group Indistinguishable Proteins
+				<input type="checkbox" id="grpProts_bookmarked" value="group" checked="checked" />Group Indistinguishable Proteins
 				&nbsp;
-				<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInferAndMore();"><b>[Compare More]</b></span>
+				<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInferAndMore('bookmarked');"><b>[Compare More]</b></span>
 				&nbsp;
-				<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInfer();"><b>[Compare]</b></span>
-				<br><br>
-				<span class="clickable" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer();">[Clear Selected]</span>
+				<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInfer('bookmarked');"><b>[Compare]</b></span>
 			</td>
 		</tr>
 </table>

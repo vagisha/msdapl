@@ -97,9 +97,9 @@
 			</ul>
 		</td>
 		<td colspan="1" style="text-align:center" >
-			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:selectAllProteinProphet(<bean:write name='experiment' property='id'/>);">[Select All]</span>
+			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:selectAllProtInfer(<bean:write name='experiment' property='id'/>);">[Select All]</span>
 			<br/>
-			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:clearSelectedProteinProphet(<bean:write name='experiment' property='id'/>);">[Clear Selected]</span>
+			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer(<bean:write name='experiment' property='id'/>);">[Clear Selected]</span>
 		</td>
 		</tr>
 		</tbody>

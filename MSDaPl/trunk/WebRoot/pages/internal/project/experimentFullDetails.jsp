@@ -291,7 +291,7 @@
 		<td colspan="9" align="right">
 			<input type="checkbox" id="grpProts_<bean:write name='experiment' property='id'/>" value="group" />Group Indistinguishable Proteins
 			&nbsp;
-			<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInferAndMore();"><b>[Compare More]</b></span>
+			<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInferAndMore(<bean:write name='experiment' property='id'/>);"><b>[Compare More]</b></span>
 			&nbsp;
 			<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInfer(<bean:write name='experiment' property='id'/>);"
 			title="Protein inferences from multiple experiments in this project can be selected for comparison.  To include protein inferences from other projects click on 'Compare More'.">

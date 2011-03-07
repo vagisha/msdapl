@@ -154,9 +154,9 @@
 			</ul>
 		</td>
 		<td colspan="1" style="text-align:center" >
-			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:selectAllProteinProphet(<bean:write name='analysis' property='id'/>);">[Select All]</span>
+			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:selectAllProtInfer(<bean:write name='analysis' property='id'/>);">[Select All]</span>
 			<br/>
-			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:clearSelectedProteinProphet(<bean:write name='analysis' property='id'/>);">[Clear Selected]</span>
+			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer(<bean:write name='analysis' property='id'/>);">[Clear Selected]</span>
 		</td>
 		</tr>
 		
@@ -169,7 +169,7 @@
 			<td colspan="9" align="right">
 				<input type="checkbox" id="grpProts_<bean:write name='analysis' property='id'/>" value="group" checked="checked" />Group Indistinguishable Proteins
 				&nbsp;
-				<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInferAndMore();"><b>[Compare More]</b></span>
+				<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInferAndMore(<bean:write name='analysis' property='id'/>);"><b>[Compare More]</b></span>
 				&nbsp;
 				<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInfer(<bean:write name='analysis' property='id'/>);"
 				title="Protein inferences from multiple experiments in this project can be selected for comparison.  To include protein inferences from other projects click on 'Compare More'.">

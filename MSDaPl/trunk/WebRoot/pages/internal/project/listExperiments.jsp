@@ -361,7 +361,7 @@ function compareSelectedProtInfer(id) {
 	// }
 }
 
-function compareSelectedProtInferAndMore() {
+function compareSelectedProtInferAndMore(id) {
 	var pinferIds = "";
 	var i = 0;
 	$("input.compare_cb:checked").each(function() {
@@ -372,7 +372,10 @@ function compareSelectedProtInferAndMore() {
 		i++;
 	});
 	
-	var groupIndistinguishable = $("input#grpProts:checked").val() != null;
+	var groupIndistinguishable = false;
+	if($("input#grpProts_"+id).is(':checked'))
+		groupIndistinguishable = true;
+	
 	var url = "<yrcwww:link path='selectComparisonDatasetProjects.do?'/>"+
 	"piRunIds="+pinferIds+
 	"&groupProteins="+groupIndistinguishable+
@@ -380,31 +383,17 @@ function compareSelectedProtInferAndMore() {
 	window.location.href = url;
 }
 
-// Used for ProteinProphet protein inferences
-function selectAllProteinProphet(experimentId) {
-	$("input.compare_cb[name='"+experimentId+"']").each(function() {
+// Select all protein inferences
+function selectAllProtInfer(checkbox_name) {
+	$("input.compare_cb[name='"+checkbox_name+"']").each(function() {
 		$(this).attr('checked', true);
 	});
 }
 
-// Used for ProteinProphet inferences
-function clearSelectedProteinProphet(experimentId) {
-	$("input.compare_cb[name='"+experimentId+"']").each(function() {
+// Deselect all protein inferences
+function clearSelectedProtInfer(checkbox_name) {
+	$("input.compare_cb[name='"+checkbox_name+"']").each(function() {
 		$(this).attr('checked', false);
-	});
-}
-
-// Used for MSDaPl's protein inferences
-function clearSelectedProtInfer(analysisId) {
-	$("input.compare_cb[name='"+analysisId+"']").each(function() {
-		$(this).attr('checked', false);
-	});
-}
-
-// Used for MSDaPl's protein inferences
-function selectAllProtInfer(analysisId) {
-	$("input.compare_cb[name='"+analysisId+"']").each(function() {
-		$(this).attr('checked', true);
 	});
 }
 
