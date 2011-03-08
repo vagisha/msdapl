@@ -60,7 +60,7 @@ public class SaveExperimentCommentsAjaxAction extends Action {
         }
         
         
-        String comments = request.getParameter("comments");
+        String comments = request.getParameter("text");
         if(comments == null) {
             response.setContentType("text/html");
             response.getWriter().write("<b>No comments found.</b>");

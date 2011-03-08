@@ -383,6 +383,7 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 			        	continue;
 			        }
 			        ExperimentProteinferRun eppRun = new ExperimentProteinferRun(job);
+			        eppRun.setName(run.getName());
 			        
 			        if(job.getStatus() == JobUtils.STATUS_COMPLETE) {
 				        ProteinferRunSummary summary = ProteinferRunSummaryLookup.getIdPickerRunSummary(piRunId);

@@ -1,7 +1,7 @@
 /**
- * SaveCommentsAjaxAction.java
+ * SaveProtInferNameAjaxAction.java
  * @author Vagisha Sharma
- * Apr 30, 2009
+ * Mar 7, 2011
  * @version 1.0
  */
 package org.yeastrc.www.proteinfer;
@@ -22,7 +22,7 @@ import org.yeastrc.www.user.UserUtils;
 /**
  * 
  */
-public class SaveProtInferCommentsAjaxAction extends Action {
+public class SaveProtInferNameAjaxAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -47,9 +47,9 @@ public class SaveProtInferCommentsAjaxAction extends Action {
             return null;
         }
 
-        String comments = request.getParameter("text");
-        if(comments == null)
-            comments = "";
+        String name = request.getParameter("text");
+        if(name == null)
+            name = "";
         
         // Save
         try {
@@ -60,7 +60,7 @@ public class SaveProtInferCommentsAjaxAction extends Action {
                 response.getWriter().write("<b>No protein inference run found with ID: "+piRunId+"</b>");
                 return null;
             }
-            run.setComments(comments);
+            run.setName(name);
             runDao.update(run);
         }
         catch(Exception e) {

@@ -19,6 +19,7 @@ public class ExperimentProteinferRun {
     private int numParsimoniousProteins;
     private int numParsimoniousProteinGroups;
     private boolean isBookmarked = false;
+    private String name;
     
     public ExperimentProteinferRun(ProteinferJob job) {
         this.job = job;
@@ -67,4 +68,12 @@ public class ExperimentProteinferRun {
     public ProteinferJob getJob() {
         return job;
     }
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }

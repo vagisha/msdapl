@@ -1233,6 +1233,11 @@
 	</action>
 	
 	<action
+	  path="/saveProtInferName"
+	  type="org.yeastrc.www.proteinfer.SaveProtInferNameAjaxAction"
+	  >
+	</action>
+	<action
 	  path="/saveProtInferComments"
 	  type="org.yeastrc.www.proteinfer.SaveProtInferCommentsAjaxAction"
 	  >

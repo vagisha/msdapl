@@ -39,6 +39,9 @@ function makeCommentEditable() {
 	$(".editablePiRunComment").each(function() {
 		setupEditablePiRunComment(this);
 	});
+	$(".editablePiRunName").each(function() {
+		setupEditablePiRunName(this);
+	});
 	$(".saveExptComments").each(function() {
 		setupSaveExptComments(this);
 	});
@@ -80,6 +83,30 @@ function setupCancelExptComments(editable) {
 	});
 }
 
+function setupEditablePiRunName(editable) {
+	// alert("making comment editable "+editable);
+	$(editable).click(function() {
+		var id = $(this).attr('data-editable_id'); // looks like <id>_name_main OR <id>_name_bkmrk
+		var currentName = $.trim($("#piRun_"+id+"_text").text());
+		$("#piRun_"+id+"_text").hide();
+		
+		var parent_tr = $(this).closest('tr');
+		
+		var editbox = "<tr id='pirun_edit_box'> ";
+		editbox += "<td colspan='10' valign='top'> ";
+		editbox += "<div id='piRun_"+id+"_edit' align='center'> ";
+		editbox += "<textarea rows='5' cols='60' class='edit_text'>"+currentName+"</textarea> ";
+		editbox += "<br> ";
+		editbox += "<button onclick='javascript:savePiRunText(\""+id+"\", true);'>Save</button> ";
+		editbox += "<button onclick='javascript:cancelPiRunText(\""+id+"\");' >Cancel</button> ";
+		editbox += "</div> </td> </tr>";
+		
+		$(parent_tr).after(editbox);
+		
+		$("#"+id+"_edit .edit_text").val(currentName);
+	});
+}
+
 function setupEditablePiRunComment(editable) {
 	// alert("making comment editable "+editable);
 	$(editable).click(function() {
@@ -89,13 +116,13 @@ function setupEditablePiRunComment(editable) {
 		
 		var parent_tr = $(this).closest('tr');
 		
-		var editbox = "<tr id='pirun_comment'> ";
+		var editbox = "<tr id='pirun_edit_box'> ";
 		editbox += "<td colspan='10' valign='top'> ";
 		editbox += "<div id='piRun_"+id+"_edit' align='center'> ";
 		editbox += "<textarea rows='5' cols='60' class='edit_text'>"+currentComments+"</textarea> ";
 		editbox += "<br> ";
-		editbox += "<button class='savePiRunComments' onclick='javascript:savePiRunComments(\""+id+"\");'>Save</button> ";
-		editbox += "<button class='cancelPiRunComments' onclick='javascript:cancelPiRunComments(\""+id+"\");' >Cancel</button> ";
+		editbox += "<button onclick='javascript:savePiRunText(\""+id+"\", false);'>Save</button> ";
+		editbox += "<button onclick='javascript:cancelPiRunText(\""+id+"\");' >Cancel</button> ";
 		editbox += "</div> </td> </tr>";
 		
 		$(parent_tr).after(editbox);
@@ -103,25 +130,40 @@ function setupEditablePiRunComment(editable) {
 		$("#"+id+"_edit .edit_text").val(currentComments);
 	});
 }
-function savePiRunComments(piRunIdWithSuffix) {
+function savePiRunText(piRunIdWithSuffix, saveName) {
 
 	$("#piRun_"+piRunIdWithSuffix+"_text").show();
 	// remove the _main or _bookmark suffix from the protein inference ID
 	var piRunId = piRunIdWithSuffix.substr(0,piRunIdWithSuffix.indexOf("_"));
-	saveComments("<yrcwww:link path='saveProtInferComments.do'/>", 'piRun_'+piRunIdWithSuffix, piRunId, true);
+	if(saveName) {
+		
+		var newname = $("#piRun_"+piRunIdWithSuffix+"_edit .edit_text").val();
+		//alert("saving name "+newname);
+		if(newname.length > 10) {
+			alert("Name cannot be longer than 10 characters.");
+			cancelPiRunText(piRunIdWithSuffix);
+			return;
+		}
+		saveText("<yrcwww:link path='saveProtInferName.do'/>", 'piRun_'+piRunIdWithSuffix, piRunId, true);
+	}
+	else {
+		saveText("<yrcwww:link path='saveProtInferComments.do'/>", 'piRun_'+piRunIdWithSuffix, piRunId, true);
+	}
 }
 
-function cancelPiRunComments(piRunIdWithSuffix) {
+function cancelPiRunText(piRunIdWithSuffix) {
 	$("#piRun_"+piRunIdWithSuffix+"_text").show();
-	$("tr#pirun_comment").remove();
+	$("tr#pirun_edit_box").remove(); // // remove the text box for editing comment/name
 }
-function syncProtInferComments(piRunId, comments) {
+function syncProtInferText(fieldId, text) {
 
-	$("tr#pirun_comment").remove(); // remove the comment text box
+	$("tr#pirun_edit_box").remove(); // remove the text box for editing comment/name
 	
-	//alert("syncing");
-	$("#piRun_"+piRunId+"_main_text").text(comments);
-	$("#piRun_"+piRunId+"_bkmrk_text").text(comments);
+	// remove the _main or _bookmark suffix from the protein inference ID
+	var minusSuffix = fieldId.substr(0,fieldId.lastIndexOf("_"));
+	//alert("syncing "+minusSuffix);
+	$("#"+minusSuffix+"_main_text").text(text);
+	$("#"+minusSuffix+"_bkmrk_text").text(text);
 }
 
 function setupSaveAnalysisComments(editable) {
@@ -142,27 +184,27 @@ function setupCancelAnalysisComments(editable) {
 }
 
 function saveExptComments(exptId) {
-	saveComments("<yrcwww:link path='saveExperimentComments.do'/>", 'experiment_'+exptId, exptId);
+	saveText("<yrcwww:link path='saveExperimentComments.do'/>", 'experiment_'+exptId, exptId);
 }
 
 function saveAnalysisComments(analysisId) {
-	saveComments("<yrcwww:link path='saveAnalysisComments.do'/>", 'analysis_'+analysisId, analysisId);
+	saveText("<yrcwww:link path='saveAnalysisComments.do'/>", 'analysis_'+analysisId, analysisId);
 }
 
-function saveComments(url, comment_field_id, data_id, update_other) {
-	var oldComments = $.trim($("#"+comment_field_id+"_text").text());
-	var newComments = $.trim($("#"+comment_field_id+"_edit .edit_text").val());
-	//alert("old: "+oldComments+"; new: "+newComments);
+function saveText(url, text_field_id, data_id, update_other) {
+	var oldText = $.trim($("#"+text_field_id+"_text").text());
+	var newText = $.trim($("#"+text_field_id+"_edit .edit_text").val());
+	//alert("old: "+oldText+"; new: "+newText);
 	
-	var textFieldId = "#"+comment_field_id+"_text";
-	var textBoxId   = "#"+comment_field_id+"_edit";
+	var textFieldId = "#"+text_field_id+"_text";
+	var textBoxId   = "#"+text_field_id+"_edit";
 	var success = false;
 	
 	$.ajax({
 		url:      url,
 		dataType: "text",
 		data:     {'id': 			data_id, 
-		           'comments': 		newComments},
+		           'text': 		newText},
 		beforeSend: function(xhr) {
 						$(textFieldId).text("Saving....");
 						$(textFieldId).show();
@@ -170,22 +212,22 @@ function saveComments(url, comment_field_id, data_id, update_other) {
 					},
 		success:  function(data) {
 			        if(data == 'OK') {
-			        	$(textFieldId).text(newComments);
+			        	$(textFieldId).text(newText);
+			        	success = true;
 			        }
 			        else {
-			        	$(textFieldId).text(oldComments);
-			        	alert("Error saving comments: "+data);
+			        	$(textFieldId).text(oldText);
+			        	alert("Error saving text: "+data);
 			        }
-			        success = true;
 		          },
 		complete:  function(xhr, textStatus) {
 			if(!success) {
-				$(textFieldId).text(oldComments);
-				alert("Error saving comments");
+				$(textFieldId).text(oldText);
+				alert("Error saving text");
 			}
 			else {
 				if(update_other) {
-					syncProtInferComments(data_id, newComments);
+					syncProtInferText(text_field_id, newText);
 				}
 			}
 		}

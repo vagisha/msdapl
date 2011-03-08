@@ -27,6 +27,7 @@
 			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Proteins</th>
 			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Pept.<br/>Seq.</th>
 			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Ions</th>
+			<th class="sort-alpha sortable" style="color:black; background:url('')" valign="top">Name</th>
 			<th class="sort-alpha sortable" style="color:black; background:url('')" valign="top">Comments</th>
 			<th valign="top">&nbsp;</th>
 			<th valign="top">Compare</th></tr>
@@ -57,7 +58,16 @@
 			</logic:equal>
 			
 			
+			<!-- Name -->
+			<td valign="top">
+				<span id="piRun_<bean:write name='piRun' property='job.pinferId'/>_name_bkmrk_text"><bean:write name="piRun" property="name"/></span>
+				<logic:equal name="writeAccess" value="true">
+				<span class="editablePiRunName clickable" 
+				data-editable_id="<bean:write name='piRun' property='job.pinferId'/>_name_bkmrk" style="font-size:8pt; color:red;">[Edit]</span>
+				</logic:equal>
+			</td>
 			
+			<!-- Comments -->
 			<td valign="top">
 				<span id="piRun_<bean:write name='piRun' property='job.pinferId'/>_bkmrk_text"><bean:write name="piRun" property="job.comments"/></span>
 				<logic:equal name="writeAccess" value="true">
