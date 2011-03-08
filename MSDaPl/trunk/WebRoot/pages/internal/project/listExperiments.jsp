@@ -14,6 +14,9 @@
 // --------------------------------------------------------------------------------------- 
 $(document).ready(function() {
   	makeEditable();
+  	$(".sortable_table").each(function() {
+  		makeSortableTable($(this));
+  	});
 	$("a.thumb").each(function() {
 		makeZoomableThumbnail(this);
 	});
@@ -33,17 +36,14 @@ function makeCommentEditable() {
 	$(".editableComment").each(function() {
 		setupEditableComment(this);
 	});
+	$(".editablePiRunComment").each(function() {
+		setupEditablePiRunComment(this);
+	});
 	$(".saveExptComments").each(function() {
 		setupSaveExptComments(this);
 	});
 	$(".cancelExptComments").each(function() {
 		setupCancelExptComments(this);
-	});
-	$(".savePiRunComments").each(function() {
-		setupSavePiRunComments(this);
-	});
-	$(".cancelPiRunComments").each(function() {
-		setupCancelPiRunComments(this);
 	});
 	$(".saveAnalysisComments").each(function() {
 		setupSaveAnalysisComments(this);
@@ -62,6 +62,7 @@ function setupEditableComment(editable) {
 		$("#"+id+"_edit").show();
 	});
 }
+
 function setupSaveExptComments(editable) {
 	
 	$(editable).click(function() {
@@ -78,20 +79,49 @@ function setupCancelExptComments(editable) {
 		$("#experiment_"+experiment_id+"_edit").hide();
 	});
 }
-function setupSavePiRunComments(editable) {
-	
+
+function setupEditablePiRunComment(editable) {
+	// alert("making comment editable "+editable);
 	$(editable).click(function() {
-		var pinfer_id = $(this).attr('data-editable_id');
-		savePiRunComments(pinfer_id);
+		var id = $(this).attr('data-editable_id'); // looks like <id>_main OR <id>_bkmrk
+		var currentComments = $.trim($("#piRun_"+id+"_text").text());
+		$("#piRun_"+id+"_text").hide();
+		
+		var parent_tr = $(this).closest('tr');
+		
+		var editbox = "<tr id='pirun_comment'> ";
+		editbox += "<td colspan='10' valign='top'> ";
+		editbox += "<div id='piRun_"+id+"_edit' align='center'> ";
+		editbox += "<textarea rows='5' cols='60' class='edit_text'>"+currentComments+"</textarea> ";
+		editbox += "<br> ";
+		editbox += "<button class='savePiRunComments' onclick='javascript:savePiRunComments(\""+id+"\");'>Save</button> ";
+		editbox += "<button class='cancelPiRunComments' onclick='javascript:cancelPiRunComments(\""+id+"\");' >Cancel</button> ";
+		editbox += "</div> </td> </tr>";
+		
+		$(parent_tr).after(editbox);
+		
+		$("#"+id+"_edit .edit_text").val(currentComments);
 	});
 }
-function setupCancelPiRunComments(editable) {
-	$(editable).click(function() {
-		var pinfer_id = $(this).attr('data-editable_id');
-		$("#piRun_"+pinfer_id+"_text").show();
-		$("#piRun_"+pinfer_id+"_edit .edit_text").text("");
-		$("#piRun_"+pinfer_id+"_edit").hide();
-	});
+function savePiRunComments(piRunIdWithSuffix) {
+
+	$("#piRun_"+piRunIdWithSuffix+"_text").show();
+	// remove the _main or _bookmark suffix from the protein inference ID
+	var piRunId = piRunIdWithSuffix.substr(0,piRunIdWithSuffix.indexOf("_"));
+	saveComments("<yrcwww:link path='saveProtInferComments.do'/>", 'piRun_'+piRunIdWithSuffix, piRunId, true);
+}
+
+function cancelPiRunComments(piRunIdWithSuffix) {
+	$("#piRun_"+piRunIdWithSuffix+"_text").show();
+	$("tr#pirun_comment").remove();
+}
+function syncProtInferComments(piRunId, comments) {
+
+	$("tr#pirun_comment").remove(); // remove the comment text box
+	
+	//alert("syncing");
+	$("#piRun_"+piRunId+"_main_text").text(comments);
+	$("#piRun_"+piRunId+"_bkmrk_text").text(comments);
 }
 
 function setupSaveAnalysisComments(editable) {
@@ -115,20 +145,6 @@ function saveExptComments(exptId) {
 	saveComments("<yrcwww:link path='saveExperimentComments.do'/>", 'experiment_'+exptId, exptId);
 }
 
-function savePiRunComments(piRunIdWithSuffix) {
-	// remove the _main or _bookmark suffix from the protein inference ID
-	var piRunId = piRunIdWithSuffix.substr(0,piRunIdWithSuffix.indexOf("_"));
-	saveComments("<yrcwww:link path='saveProtInferComments.do'/>", 'piRun_'+piRunIdWithSuffix, piRunId, true);
-}
-
-function syncProtInferComments(piRunId, comments) {
-	//alert("syncing");
-	$("#piRun_"+piRunId+"_main_text").text(comments);
-	$("#piRun_"+piRunId+"_main_edit .edit_text").text(comments);
-	$("#piRun_"+piRunId+"_bkmrk_text").text(comments);
-	$("#piRun_"+piRunId+"_bkmrk_edit .edit_text").text(comments);
-}
-
 function saveAnalysisComments(analysisId) {
 	saveComments("<yrcwww:link path='saveAnalysisComments.do'/>", 'analysis_'+analysisId, analysisId);
 }
@@ -136,6 +152,7 @@ function saveAnalysisComments(analysisId) {
 function saveComments(url, comment_field_id, data_id, update_other) {
 	var oldComments = $.trim($("#"+comment_field_id+"_text").text());
 	var newComments = $.trim($("#"+comment_field_id+"_edit .edit_text").val());
+	//alert("old: "+oldComments+"; new: "+newComments);
 	
 	var textFieldId = "#"+comment_field_id+"_text";
 	var textBoxId   = "#"+comment_field_id+"_edit";
@@ -542,6 +559,14 @@ function removeBookmark(imgElement, piRunId) {
 		There are no experiments for this project. To upload an experiment for this project click <a href="" onClick="javascript:goMSUpload(); return false;">here</a>
 		</div>
 	</logic:empty>
+
+	<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!! TEMP  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+	<logic:equal name="project" property="ID" value="29">
+	<center>
+	<%@ include file="/includes/unknown_orfs_summary.jsp" %>
+	</center>
+	</logic:equal>
+	<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!! TEMP  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
 
 
 	<!--  Experiment summaries -->

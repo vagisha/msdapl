@@ -1,18 +1,18 @@
 <div style="background-color: #FFFFF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
 		<div><b>ProteinProphet Results</b></div> 
-		<table width="100%">
+		<table width="100%" class="sortable_table">
 		<thead>
 		<tr align="left">
 			<th></th>
-			<th valign="top">ID</th>
+			<th class="sort-int sortable" style="color:black; background:url('')" valign="top">ID</th>
 			<th valign="top">Version</th>
-			<th valign="top">File</th>
-			<th valign="top" align="center">#Prophet<br>Groups</th>
-			<th valign="top" align="center">#Indist.<br>Groups</th>
-			<th valign="top" align="center">#Proteins</th>
-			<th valign="top" align="center">#Pept.<br/>Seq.</th>
-			<th valign="top" align="center">#Ions</th>
-			<th valign="top">Comments</th>
+			<th class="sort-alpha sortable" style="color:black; background:url('')" valign="top">File</th>
+			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Prophet<br>Groups</th>
+			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Indist.<br>Groups</th>
+			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Proteins</th>
+			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Pept.<br/>Seq.</th>
+			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Ions</th>
+			<th class="sort-alpha sortable" style="color:black; background:url('')" valign="top">Comments</th>
 			<th valign="top"></th>
 			<th valign="top">Compare</th></tr>
 		</thead>
@@ -62,8 +62,8 @@
 			<td valign="top">
 				<span id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_main_text"><bean:write name="prpRun" property="proteinProphetRun.comments"/></span>
 				<logic:equal name="writeAccess" value="true">
-				<span class="editableComment clickable"
-				data-editable_id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_main" style="font-size:8pt; color:red;">[Edit]</span>
+				<span class="editablePiRunComment clickable"
+				data-editable_id="<bean:write name='prpRun' property='proteinProphetRun.id'/>_main" style="font-size:8pt; color:red;">[Edit]</span>
 				</logic:equal>
 			</td>
 			<td valign="top">
@@ -74,34 +74,25 @@
  		 		<input type="checkbox" class="compare_cb" name="<bean:write name='experiment' property='id'/>" value="<bean:write name='prpRun' property='proteinProphetRun.id'/>"></input>
 			</td>
 			</tr>
-			<tr>
-				<td colspan="11" valign="top">
-				<div id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_main_edit" align="center"
-			     style="display:none;">
-			     <textarea rows="5" cols="60" class="edit_text"></textarea>
-			     <br>
-			     <button class="savePiRunComments"
-			     		data-editable_id="<bean:write name='prpRun' property='proteinProphetRun.id'/>_main">Save</button>
-			     <button class="cancelPiRunComments"
-			     		data-editable_id="<bean:write name='prpRun' property='proteinProphetRun.id'/>_main">Cancel</button>
-				</div>
-				</td>
-			</tr>
+			
 		</logic:iterate>
+		</tbody>
+		</table>
+		
+		<table width="100%">
 		<tr>
-		<td colspan="11" style="font-size:8pt;" >
+		<td style="font-size:8pt;" width="90%">
 			<ul>
 			<li>Subsumed proteins are excluded in calculating group and protein counts</li>
 			<li>#Indist. Groups = number of indistinguishable protein groups</li>
 			<li>#Ions = number of unique combinations of sequence + modifications + charge</li>
 			</ul>
 		</td>
-		<td colspan="1" style="text-align:center" >
+		<td style="text-align:center" >
 			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:selectAllProtInfer(<bean:write name='experiment' property='id'/>);">[Select All]</span>
 			<br/>
 			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer(<bean:write name='experiment' property='id'/>);">[Clear Selected]</span>
 		</td>
 		</tr>
-		</tbody>
 		</table>
 	</div>

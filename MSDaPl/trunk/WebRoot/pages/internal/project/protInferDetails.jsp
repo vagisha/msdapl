@@ -1,18 +1,18 @@
 <div style="background-color: #F0F8FF; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
 		<div><b>Protein Inference Results</b></div> 
-		<table width="100%">
+		<table width="100%" class="sortable_table">
 		<thead>
 		<tr align="left">
 			<th></th>
-			<th valign="top">ID</th>
-			<th valign="top">User</th>
+			<th class="sort-int sortable" style="color:black; background:url('')" valign="top">ID</th>
+			<th class="sort-alpha sortable" style="color:black; background:url('')" valign="top">User</th>
 			<th valign="top">Version</th>
 			<th valign="top">Date</th>
-			<th valign="top" align="center">#Indist.<br>Groups</th>
-			<th valign="top" align="center">#Proteins</th>
-			<th valign="top" align="center">#Pept.<br/>Seq.</th>
-			<th valign="top" align="center">#Ions</th>
-			<th valign="top">Comments</th>
+			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Indist.<br>Groups</th>
+			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Proteins</th>
+			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Pept.<br/>Seq.</th>
+			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Ions</th>
+			<th class="sort-alpha sortable" style="color:black; background:url('')" valign="top">Comments</th>
 			<th valign="top">&nbsp;</th>
 			<th valign="top">Compare</th></tr>
 		</thead>
@@ -83,8 +83,8 @@
 			<td valign="top">
 				<span id="piRun_<bean:write name='piRun' property='job.pinferId'/>_main_text"><bean:write name="piRun" property="job.comments"/></span>
 				<logic:equal name="writeAccess" value="true">
-				<span class="editableComment clickable" 
-				data-editable_id="piRun_<bean:write name='piRun' property='job.pinferId'/>_main" style="font-size:8pt; color:red;">[Edit]</span>
+				<span class="editablePiRunComment clickable" 
+				data-editable_id="<bean:write name='piRun' property='job.pinferId'/>_main" style="font-size:8pt; color:red;">[Edit]</span>
 				</logic:equal>
 			</td>
 			<td valign="top">
@@ -131,37 +131,27 @@
 			</logic:equal>
  		 			
 			</tr>
-			<tr>
-				<td colspan="10" valign="top">
-				<div id="piRun_<bean:write name='piRun' property='job.pinferId'/>_main_edit" align="center"
-			     style="display:none;">
-			     <textarea rows="5" cols="60" class="edit_text"></textarea>
-			     <br>
-			     <button class="savePiRunComments"
-			     		data-editable_id="<bean:write name='piRun' property='job.pinferId'/>_main">Save</button>
-			     <button class="cancelPiRunComments"
-			     		data-editable_id="<bean:write name='piRun' property='job.pinferId'/>_main">Cancel</button>
-				</div>
-				</td>
-			</tr>
+			
 		</logic:iterate>
 		
+		</tbody>
+		</table>
+		<table width="100%">
 		<tr>
-		<td colspan="11" style="font-size:8pt;" >
+		<td style="font-size:8pt;" width="90%">
 			<ul>
 			<li>Only parsimonious proteins are included in calculating indistinguishable group and protein counts</li>
 			<li>#Ions = number of unique combinations of sequence + modifications + charge</li>
 			</ul>
 		</td>
-		<td colspan="1" style="text-align:center" >
+		<td style="text-align:center" >
 			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:selectAllProtInfer(<bean:write name='analysis' property='id'/>);">[Select All]</span>
 			<br/>
 			<span class="clickable small_font" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer(<bean:write name='analysis' property='id'/>);">[Clear Selected]</span>
 		</td>
 		</tr>
+		</table> 
 		
-		</tbody>
-		</table>
 	</div>
 	<div style="margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
 	<table width="100%">
