@@ -16,6 +16,7 @@ public class GenericProteinferRun<T extends ProteinferInput> {
     private String programVersion;
     private Program inputGenerator;
     private String comments;
+    private String name;
     private List<T> inputSummaryList;
 
     
@@ -90,4 +91,12 @@ public class GenericProteinferRun<T extends ProteinferInput> {
         this.comments = comments;
     }
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+    
 }

@@ -20,6 +20,7 @@
 		<result property="program" column="program" typeHandler="ProteinferProgramTypeHandler"/>
 		<result property="inputGenerator" column="inputGenerator" typeHandler="ProgramTypeHandler"/>
 		<result property="comments" column="comments" />
+		<result property="name" column="name" />
 		<result property="date" column="dateRun" />
 	</resultMap>
 		
@@ -35,6 +36,7 @@
 		<parameter property="programVersion" jdbcType="VARCHAR" />
 		<parameter property="inputGenerator" jdbcType="VARCHAR" typeHandler="ProgramTypeHandler"/>
 		<parameter property="comments" jdbcType="TEXT" />
+		<parameter property="name" jdbcType="VARCHAR" />
 	</parameterMap>
 	
 	<select id="select" resultMap="pinferRunResult" parameterClass="Integer">
@@ -90,8 +92,9 @@
     	program,
     	programVersion,
     	inputGenerator,
-    	comments)
-    	VALUES(?,?,?,?)
+    	comments,
+    	name)
+    	VALUES(?,?,?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
@@ -102,7 +105,8 @@
     	SET program = #programString#,
     	programVersion = #programVersion#,
     	inputGenerator = #inputGeneratorString#,
-    	comments = #comments#
+    	comments = #comments#,
+    	name = #name#
     	<isNotNull property="date">
     		, dateRun = #date#
     	</isNotNull>
