@@ -135,12 +135,14 @@
 					<logic:equal name="writeAccess" value="true">
 					<logic:notEmpty name="analysis" property="comments">
 						<span class="underline clickable small_font editableComment" style="color:red;"
-						id="analysis_<bean:write name='analysis' property='id'/>"
+						data-editable_id="analysis_<bean:write name='analysis' property='id'/>"
+						id="analysis_comment_<bean:write name='analysis' property='id'/>"
 						title="expt_<bean:write name='experiment' property='id'/>" >[Edit]</span>
 					</logic:notEmpty>
 					<logic:empty name="analysis" property="comments">
 						<span class="underline clickable small_font editableComment" style="color:red;"
-						id="analysis_<bean:write name='analysis' property='id'/>"
+						data-editable_id="analysis_<bean:write name='analysis' property='id'/>"
+						id="analysis_comment_<bean:write name='analysis' property='id'/>"
 						title="expt_<bean:write name='experiment' property='id'/>" >[Add Comments]</span>
 					</logic:empty>
 					</logic:equal>
@@ -201,10 +203,10 @@
 			     <textarea rows="5" cols="60" class="edit_text"></textarea>
 			     <br>
 			     <button class="saveAnalysisComments"
-			     		id="<bean:write name='analysis' property='id'/>"
+			     		data-editable_id="<bean:write name='analysis' property='id'/>"
 			     		title="expt_<bean:write name='experiment' property='id'/>">Save</button>
 			     <button class="cancelAnalysisComments"
-			     		id="<bean:write name='analysis' property='id'/>"
+			     		data-editable_id="<bean:write name='analysis' property='id'/>"
 			     		title="expt_<bean:write name='experiment' property='id'/>">Cancel</button>
 				</div>
 				</td>

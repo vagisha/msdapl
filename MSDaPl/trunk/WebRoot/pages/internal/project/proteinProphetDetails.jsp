@@ -60,10 +60,10 @@
 			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="uniqPeptideSequenceCount"/></td>
 			<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="uniqIonCount"/></td>
 			<td valign="top">
-				<span id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_text"><bean:write name="prpRun" property="proteinProphetRun.comments"/></span>
+				<span id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_main_text"><bean:write name="prpRun" property="proteinProphetRun.comments"/></span>
 				<logic:equal name="writeAccess" value="true">
-				<span class="editableComment clickable" title="expt_<bean:write name='experiment' property='id'/>" 
-				id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>" style="font-size:8pt; color:red;">[Edit]</span>
+				<span class="editableComment clickable"
+				data-editable_id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_main" style="font-size:8pt; color:red;">[Edit]</span>
 				</logic:equal>
 			</td>
 			<td valign="top">
@@ -76,14 +76,14 @@
 			</tr>
 			<tr>
 				<td colspan="11" valign="top">
-				<div id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_edit" align="center"
+				<div id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_main_edit" align="center"
 			     style="display:none;">
 			     <textarea rows="5" cols="60" class="edit_text"></textarea>
 			     <br>
-			     <button class="savePiRunComments" title="expt_<bean:write name='experiment' property='id'/>"
-			     		id="<bean:write name='prpRun' property='proteinProphetRun.id'/>">Save</button>
-			     <button class="cancelPiRunComments" title="expt_<bean:write name='experiment' property='id'/>"
-			     		id="<bean:write name='prpRun' property='proteinProphetRun.id'/>">Cancel</button>
+			     <button class="savePiRunComments"
+			     		data-editable_id="<bean:write name='prpRun' property='proteinProphetRun.id'/>_main">Save</button>
+			     <button class="cancelPiRunComments"
+			     		data-editable_id="<bean:write name='prpRun' property='proteinProphetRun.id'/>_main">Cancel</button>
 				</div>
 				</td>
 			</tr>

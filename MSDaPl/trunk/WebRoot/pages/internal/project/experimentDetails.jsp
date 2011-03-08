@@ -66,7 +66,7 @@
 				<tr>
 					<td valign="top"><b>Comments </b>
 						<logic:equal name="writeAccess" value="true">
-						<span class="editableComment clickable" id="experiment_<bean:write name='experiment' property='id'/>" style="font-size:8pt; color:red;">[Edit]</span>
+						<span class="editableComment clickable" data-editable_id="experiment_<bean:write name='experiment' property='id'/>" style="font-size:8pt; color:red;">[Edit]</span>
 						</logic:equal>
 						<b>: </b></td>
 					<td style="padding-left:10">
@@ -75,8 +75,8 @@
 						     style="display:none;">
 						     <textarea rows="5" cols="60" class="edit_text"></textarea>
 						     <br>
-						     <button class="saveExptComments" id="<bean:write name='experiment' property='id'/>">Save</button>
-						     <button class="cancelExptComments" id="<bean:write name='experiment' property='id'/>">Cancel</button>
+						     <button class="saveExptComments" data-editable_id="<bean:write name='experiment' property='id'/>">Save</button>
+						     <button class="cancelExptComments" data-editable_id="<bean:write name='experiment' property='id'/>">Cancel</button>
 						</div>
 					</td>
 				</tr>

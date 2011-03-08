@@ -59,7 +59,11 @@
 			
 			
 			<td valign="top">
-				<span id="piRun_<bean:write name='piRun' property='job.pinferId'/>_text"><bean:write name="piRun" property="job.comments"/></span>
+				<span id="piRun_<bean:write name='piRun' property='job.pinferId'/>_bkmrk_text"><bean:write name="piRun" property="job.comments"/></span>
+				<logic:equal name="writeAccess" value="true">
+					<span class="editableComment clickable"
+					data-editable_id="piRun_<bean:write name='piRun' property='job.pinferId'/>_bkmrk" style="font-size:8pt; color:red;">[Edit]</span>
+				</logic:equal>
 			</td>
 			<td valign="top">
 			
@@ -91,6 +95,21 @@
 			</logic:equal>
  		 			
 			</tr>
+			
+			<tr>
+				<td colspan="10" valign="top">
+				<div id="piRun_<bean:write name='piRun' property='job.pinferId'/>_bkmrk_edit" align="center"
+			     style="display:none;">
+			     <textarea rows="5" cols="60" class="edit_text"></textarea>
+			     <br>
+			     <button class="savePiRunComments"
+			     		data-editable_id="<bean:write name='piRun' property='job.pinferId'/>_bkmrk">Save</button>
+			     <button class="cancelPiRunComments"
+			     		data-editable_id="<bean:write name='piRun' property='job.pinferId'/>_bkmrk">Cancel</button>
+				</div>
+				</td>
+			</tr>
+			
 		</logic:iterate>
 		
 		<tr>
@@ -148,7 +167,11 @@
 		<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="uniqPeptideSequenceCount"/></td>
 		<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="uniqIonCount"/></td>
 		<td valign="top">
-			<span id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_text"><bean:write name="prpRun" property="proteinProphetRun.comments"/></span>
+			<span id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_bkmrk_text"><bean:write name="prpRun" property="proteinProphetRun.comments"/></span>
+			<logic:equal name="writeAccess" value="true">
+			<span class="editableComment clickable"
+			data-editable_id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_bkmrk" style="font-size:8pt; color:red;">[Edit]</span>
+			</logic:equal>
 		</td>
 		<td valign="top">
 		<a href="<yrcwww:link path='viewProteinProphetResult.do?'/>pinferId=<bean:write name='prpRun' property='proteinProphetRun.id'/>">
@@ -158,6 +181,21 @@
 		 	<input type="checkbox" class="compare_cb" name="bookmarked_protprophet" value="<bean:write name='prpRun' property='proteinProphetRun.id'/>"></input>
 		</td>
 		</tr>
+		
+		<tr>
+			<td colspan="11" valign="top">
+			<div id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_bkmrk_edit" align="center"
+		     style="display:none;">
+		     <textarea rows="5" cols="60" class="edit_text"></textarea>
+		     <br>
+		     <button class="savePiRunComments"
+		     		data-editable_id="<bean:write name='prpRun' property='proteinProphetRun.id'/>_bkmrk">Save</button>
+		     <button class="cancelPiRunComments"
+		     		data-editable_id="<bean:write name='prpRun' property='proteinProphetRun.id'/>_bkmrk">Cancel</button>
+			</div>
+			</td>
+		</tr>
+			
 	</logic:iterate>
 	tr>
 		<td colspan="11" style="font-size:8pt;" >
