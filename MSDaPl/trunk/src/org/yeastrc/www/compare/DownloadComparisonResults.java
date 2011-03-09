@@ -123,7 +123,8 @@ public class DownloadComparisonResults extends Action {
         writer.write("Datasets: \n");
         int idx = 0;
         for(Dataset dataset: comparison.getDatasets()) {
-            writer.write(dataset.getSourceString()+" ID "+dataset.getDatasetId()+
+        	String dsString = getDatasetStringWithSource(dataset);
+            writer.write(dsString+
                     ": Proteins  "+comparison.getProteinCount(idx++)+
                     "; SpectrumCount(max.) "+dataset.getSpectrumCount()+"("+dataset.getMaxProteinSpectrumCount()+")\n");
         }
@@ -133,11 +134,14 @@ public class DownloadComparisonResults extends Action {
         writer.write("Common Proteins:\n");
         writer.write("\t");
         for(Dataset dataset: comparison.getDatasets()) {
-            writer.write("ID_"+dataset.getDatasetId()+"\t");
+        	String dsString = getDatasetString(dataset);
+            writer.write(dsString+"\t");
         }
         writer.write("\n");
         for(int i = 0; i < comparison.getDatasetCount(); i++) {
-            writer.write("ID_"+comparison.getDatasets().get(i).getDatasetId()+"\t");
+        	Dataset dataset = comparison.getDatasets().get(i);
+        	String dsString = getDatasetString(dataset);
+            writer.write(dsString+"\t");
             for(int j = 0; j < comparison.getDatasetCount(); j++) 
                 writer.write(comparison.getCommonProteinCount(i, j)+"\t");
             writer.write("\n");
@@ -166,6 +170,28 @@ public class DownloadComparisonResults extends Action {
     }
 
 
+	private String getDatasetString(Dataset dataset) {
+		
+		String dsString = "ID_"+dataset.getDatasetId();
+		String dsName = dataset.getDatasetName();
+		if(dsName != null && dsName.length() > 0) {
+			dsString += "("+dataset.getDatasetName()+")";
+		}
+		return dsString;
+	}
+
+
+	private String getDatasetStringWithSource(Dataset dataset) {
+		
+		String dsString = dataset.getSourceString()+" ID "+dataset.getDatasetId();
+		String dsName = dataset.getDatasetName();
+		if(dsName != null && dsName.length() > 0) {
+			dsString += " ("+dataset.getDatasetName()+")";
+		}
+		return dsString;
+	}
+
+
 	private void writeHeader(PrintWriter writer, List<? extends Dataset> datasets, DisplayColumns displayColumns,
 			boolean printDescription, boolean writeProteinGroupsHeader) {
 		// print the header
@@ -175,7 +201,7 @@ public class DownloadComparisonResults extends Action {
         
         if(displayColumns.isShowPresent()) {
         	for(Dataset dataset: datasets) {
-        		writer.write(dataset.getSourceString()+"("+dataset.getDatasetId()+")\t");
+        		writer.write(dataset.getSourceString()+"("+getDatasetString(dataset)+")\t");
         	}
         }
         
@@ -193,17 +219,17 @@ public class DownloadComparisonResults extends Action {
         // sequence, ion, unique ion, spectrum count column headers.
         for(Dataset dataset: datasets) {
         	if(displayColumns.isShowNumSeq())
-        		writer.write("#Seq("+dataset.getDatasetId()+")\t");
+        		writer.write("#Seq("+getDatasetString(dataset)+")\t");
         	if(displayColumns.isShowNumIons())
-        		writer.write("#Ion("+dataset.getDatasetId()+")\t");
+        		writer.write("#Ion("+getDatasetString(dataset)+")\t");
         	if(displayColumns.isShowNumUniqIons())
-        		writer.write("#U.Ion("+dataset.getDatasetId()+")\t");
+        		writer.write("#U.Ion("+getDatasetString(dataset)+")\t");
         	if(displayColumns.isShowSpectrumCount()) {
-        		writer.write("SC("+dataset.getDatasetId()+")\t");
-        		writer.write("SC_Norm("+dataset.getDatasetId()+")\t");
+        		writer.write("SC("+getDatasetString(dataset)+")\t");
+        		writer.write("SC_Norm("+getDatasetString(dataset)+")\t");
         	}
         	if(displayColumns.isShowNsaf()) // NSAF column headers.
-        		writer.write("NSAF("+dataset.getDatasetId()+")\t");
+        		writer.write("NSAF("+getDatasetString(dataset)+")\t");
         }
         
         if(printDescription)
@@ -355,7 +381,8 @@ public class DownloadComparisonResults extends Action {
       writer.write("Datasets: \n");
       int idx = 0;
       for(Dataset dataset: comparison.getDatasets()) {
-          writer.write(dataset.getSourceString()+" ID "+dataset.getDatasetId()+
+    	  String dsString = getDatasetStringWithSource(dataset);
+          writer.write(dsString+
                   ": Proteins Groups (# Proteins)  "+comparison.getProteinGroupCount(idx)+" ("+comparison.getProteinCount(idx++)+") "+
                   "; SpectrumCount(max.) "+dataset.getSpectrumCount()+"("+dataset.getMaxProteinSpectrumCount()+")\n");
       }
@@ -365,11 +392,14 @@ public class DownloadComparisonResults extends Action {
       writer.write("Common Proteins:\n");
       writer.write("\t");
       for(Dataset dataset: comparison.getDatasets()) {
-          writer.write("ID_"+dataset.getDatasetId()+"\t");
+    	  String dsString = getDatasetString(dataset);
+          writer.write(dsString+"\t");
       }
       writer.write("\n");
       for(int i = 0; i < comparison.getDatasetCount(); i++) {
-          writer.write("ID_"+comparison.getDatasets().get(i).getDatasetId()+"\t");
+    	  Dataset dataset = comparison.getDatasets().get(i);
+    	  String dsString = getDatasetString(dataset);
+          writer.write(dsString+"\t");
           for(int j = 0; j < comparison.getDatasetCount(); j++) {
               writer.write(comparison.getCommonProteinGroupCount(i, j)+" ("+comparison.getCommonProteinGroupsPerc(i, j)+"%)\t");
           }

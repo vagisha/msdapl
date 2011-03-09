@@ -1386,6 +1386,17 @@ function hideAllDescriptionsForProtein(proteinId) {
 					<bean:write name="idpickerRun" property="date"/>&nbsp;
 				</td>
 			</tr>
+			
+			
+			<logic:notEmpty name="idpickerRun" property="name">
+			<tr>
+				<td><b>Name </b></td>
+				<td>
+					<span><bean:write name="idpickerRun" property="name"/></span>
+				</td>
+			</tr>
+			</logic:notEmpty>
+			
 			<tr>
 				<td><b>Comments </b>
 					<logic:equal name="writeAccess" value="true">

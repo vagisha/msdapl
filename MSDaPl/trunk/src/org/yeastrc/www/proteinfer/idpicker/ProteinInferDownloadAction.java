@@ -111,6 +111,14 @@ public class ProteinInferDownloadAction extends Action {
         // Get the protein Ids that fulfill the criteria.
         List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
         
+        // print the protein inference ID, short name(if available) and the comments
+        writer.write("Protein Inference ID: "+idpRun.getId()+"\n");
+        String shortName = idpRun.getName();
+        if(shortName != null && shortName.length() > 0)
+        	writer.write("Short Name: "+idpRun.getName()+"\n");
+        writer.write("Comments: "+idpRun.getComments()+"\n");
+        writer.write("\n\n");
+        
         // print the parameters used for the protein inference run
         writer.write("Program Version: "+idpRun.getProgramVersion()+"\n");
         writer.write("Parameters used for Protein Inference ID: "+idpRun.getId()+"\n");
