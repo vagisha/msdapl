@@ -29,7 +29,12 @@ public class HeatMapData {
 		datasetLabels = new ArrayList<String>(grpComparison.getDatasetCount()+1);
 		
 		for(Dataset ds: grpComparison.getDatasets()) {
-			datasetLabels.add(("ID_"+ds.getDatasetId()));
+			if(ds.getDatasetName() != null && ds.getDatasetName().length() > 0) {
+				datasetLabels.add((ds.getDatasetName()+"(ID"+ds.getDatasetId())+")");
+			}
+			else {
+				datasetLabels.add(("ID_"+ds.getDatasetId()));
+			}
 		}
 		
 		rows = new ArrayList<HeatMapRow>(grpComparison.getTotalProteinGroupCount() + 1);
@@ -88,7 +93,7 @@ public class HeatMapData {
 
 	private String getPlotUrl(ComparisonProtein protein, List<? extends Dataset> datasets) {
 		
-		String plotUrl = "http://chart.apis.google.com/chart?cht=bvg&chxt=x,y,x";
+		String plotUrl = "http://chart.apis.google.com/chart?cht=bhg&chxt=x,y";
 		String data1 = "";
 		String data2 = "";
 		//String colors = "";
@@ -104,11 +109,26 @@ public class HeatMapData {
 		int idx = 0;
 		int maxSc = 0;
 		int maxLabel = 0;
+		
+		boolean allDatasetsHaveNames = true;
+		for(Dataset ds: datasets) {
+			if(ds.getDatasetName() == null && ds.getDatasetName().length() == 0) {
+				allDatasetsHaveNames = false;
+				break;
+			}
+		}
+		
 		for(Dataset ds: datasets) {
 			
 			DatasetProteinInformation dpi = protein.getDatasetProteinInformation(ds);
 			
-			xlabel += "|"+ds.getDatasetId();
+			if(allDatasetsHaveNames) {
+				xlabel = "|"+ds.getDatasetName() + xlabel;
+			}
+			else {
+				xlabel = "|"+ds.getDatasetId() + xlabel;
+			}
+			
 			//colors += "|"+DatasetColor.get(idx).hexValue();
 			idx++;
 			
@@ -128,8 +148,8 @@ public class HeatMapData {
 		int barWidth = (maxLabel*6)/2;
 		if(barWidth < 12)	barWidth = 12;
 		String barSpacing = barWidth+",1,10";
-		int chartWidth = ((barWidth*2 + 1 + 10)*datasets.size())+50;
-		chartSize += chartWidth+"x250";
+		int chartHeight = ((barWidth*2 + 1 + 10)*datasets.size())+50;
+		chartSize += "250x"+chartHeight;
 		plotUrl += "&"+chartSize;
 		plotUrl += "&chbh="+barSpacing;
 		
@@ -147,15 +167,15 @@ public class HeatMapData {
 		if(div > 5) {
 			div = Math.round((float)div / 5.0f) * 5;
 		}
-		xrange = "1,0,"+maxSc+","+div;
+		xrange = "0,0,"+maxSc+","+div;
 		plotUrl += "&chxr="+xrange;
 		
 		scale = "0,"+maxSc;
 		plotUrl += "&chds="+scale;
 		
 		// x-axis labels
-		plotUrl += "&chxl=0:"+xlabel;
-		plotUrl += "|2:|Dataset+ID&chxp=2,50";
+		plotUrl += "&chxl=1:"+xlabel+"|";
+		
 		
 		// bar labels
 		plotUrl += "&chm=N,000000,0,,10|N,000000,1,,10";

@@ -141,7 +141,7 @@ function savePiRunText(piRunIdWithSuffix, saveName) {
 		//alert("saving name "+newname);
 		if(newname.length > 10) {
 			alert("Name cannot be longer than 10 characters.");
-			cancelPiRunText(piRunIdWithSuffix);
+			//cancelPiRunText(piRunIdWithSuffix);
 			return;
 		}
 		saveText("<yrcwww:link path='saveProtInferName.do'/>", 'piRun_'+piRunIdWithSuffix, piRunId, true);

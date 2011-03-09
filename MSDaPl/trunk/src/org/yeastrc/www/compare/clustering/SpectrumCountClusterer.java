@@ -457,7 +457,8 @@ public class SpectrumCountClusterer {
 			// write the IDs of the protein inferences being compared
 			writer.write("Name");
 			for(Dataset dataset: grpComparison.getDatasets()) {
-				writer.write("\tID_"+dataset.getDatasetId());
+				String dsString = getDatasetString(dataset);
+				writer.write("\t"+dsString);
 			}
 			writer.write("\n");
 			
@@ -495,6 +496,15 @@ public class SpectrumCountClusterer {
 		
 		return true;
 	}
+
+	private String getDatasetString(Dataset dataset) {
+		String dsString = "ID"+dataset.getDatasetId();
+		String name = dataset.getDatasetName();
+		if(name != null && name.length() > 0) {
+			dsString += "_"+name;
+		}
+		return dsString;
+	}
 	
 	private boolean writeInputFile(ProteinComparisonDataset grpComparison,
 			StringBuilder errorMesage, String dir) {
@@ -507,7 +517,8 @@ public class SpectrumCountClusterer {
 			// write the IDs of the protein inferences being compared
 			writer.write("Name");
 			for(Dataset dataset: grpComparison.getDatasets()) {
-				writer.write("\tID_"+dataset.getDatasetId());
+				String dsString = getDatasetString(dataset);
+				writer.write("\t"+dsString);
 			}
 			writer.write("\n");
 			
@@ -724,7 +735,7 @@ public class SpectrumCountClusterer {
 			writer.write(devType+"(\""+dir+File.separator+ClusteringConstants.IMG_FILE+"\")\n");
 			writer.write("options(expressions=10000)\n");
 			//writer.write("hm <- heatmap.2(as.matrix(test_sc), cexCol=1.0, col=my.colorFct(), scale=\"none\", margins=c(5,10)");
-			writer.write("hm <- heatmap.2(as.matrix(test_sc), cexCol=1.0, col=my_cols, scale=\"none\", margins=c(5,10), trace=\"none\" ");
+			writer.write("hm <- heatmap.2(as.matrix(test_sc), cexCol=0.8, col=my_cols, scale=\"none\", margins=c(8,10), trace=\"none\" ");
 			if(rinfo.numCols <= 2 || !rinfo.isClusterColumns()) {
 				writer.write(", Colv=NA ");
 			}
@@ -735,9 +746,9 @@ public class SpectrumCountClusterer {
 			writer.write(")\n");
 			writer.write("dev.off()\n");
 			// write the index of protein groups after clustering
-			writer.write("write(hm$rowInd, file=\""+dir+File.separator+ClusteringConstants.OUTPUT_FILE+"\", sep=\",\", append=FALSE, length(ncolumns=hm$rowInd))\n");
+			writer.write("write(hm$rowInd, file=\""+dir+File.separator+ClusteringConstants.OUTPUT_FILE+"\", sep=\",\", append=FALSE, length(hm$rowInd))\n");
 			// write the index of the datasets after clustering
-			writer.write("write(hm$colInd, file=\""+dir+File.separator+ClusteringConstants.OUTPUT_FILE+"\", sep=\",\", append=TRUE, length(ncolumns=hm$colInd))\n");
+			writer.write("write(hm$colInd, file=\""+dir+File.separator+ClusteringConstants.OUTPUT_FILE+"\", sep=\",\", append=TRUE, length(hm$colInd))\n");
 		}
 		finally {
 			if(writer != null) try{writer.close();}catch(IOException e){}
