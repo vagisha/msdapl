@@ -18,6 +18,7 @@ public abstract class FilterableDataset extends Dataset {
     public FilterableDataset(Dataset dataset) {
         super(dataset.getDatasetId(), dataset.getSource());
         super.setDatasetComments(dataset.getDatasetComments());
+        super.setDatasetName(dataset.getDatasetName());
         super.setSpectrumCount(dataset.getSpectrumCount());
         super.setMinProteinSpectrumCount(dataset.getMinProteinSpectrumCount());
         super.setMaxProteinSpectrumCount(dataset.getMaxProteinSpectrumCount());

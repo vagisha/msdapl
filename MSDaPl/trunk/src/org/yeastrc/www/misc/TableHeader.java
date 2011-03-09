@@ -6,6 +6,9 @@
  */
 package org.yeastrc.www.misc;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.www.project.SORT_CLASS;
 
@@ -28,6 +31,7 @@ public class TableHeader {
 
 	private SORT_CLASS sortClass = SORT_CLASS.SORT_ALPHA;
     private String styleClass = null;
+    private Map<String, String> styles;
     
     public SORT_CLASS getSortClass() {
         return sortClass;
@@ -131,6 +135,27 @@ public class TableHeader {
 
     public void setStyleClass(String styleClass) {
         this.styleClass = styleClass;
+    }
+    
+    public void addStyle(String key, String value) {
+    	if(this.styles == null)
+    		styles = new HashMap<String, String>();
+    	styles.put(key, value);
+    }
+    
+    public String getStyleString() {
+    	if(this.styles == null) {
+    		return null;
+    	}
+    	else {
+    		StringBuilder buf = new StringBuilder();
+    		for(String key: styles.keySet()) {
+    			buf.append(key+":");
+    			buf.append(styles.get(key));
+    			buf.append(";");
+    		}
+    		return buf.toString();
+    	}
     }
     
     public void setTitle(String title) {

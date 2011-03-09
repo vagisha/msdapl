@@ -52,6 +52,7 @@ public class DatasetBuilder {
         DatasetSource source = DatasetSource.getSourceForProtinferProgram(run.getProgram());
         Dataset dataset = new Dataset(datasetId, source);
         dataset.setDatasetComments(run.getComments());
+        dataset.setDatasetName(run.getName());
         initDataset(dataset);
         return dataset;
     }

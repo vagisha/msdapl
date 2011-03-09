@@ -171,6 +171,15 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
 	public List<? extends Dataset> getDatasets() {
         return datasets;
     }
+	
+	public boolean isAllDatasetsHaveNames() {
+		for(Dataset ds: this.datasets) {
+			if(ds.getDatasetName() == null || ds.getDatasetName().length() == 0) {
+				return false;
+			}
+		}
+		return true;
+	}
 
     public List<ComparisonProteinGroup> getProteinsGroups() {
         return proteinGroups;
@@ -804,12 +813,27 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         List<TableHeader> headers = new ArrayList<TableHeader>(columnCount());
         TableHeader header = null;
         
+        boolean allDatasetsHaveNames = this.isAllDatasetsHaveNames();
+        
         if(displayColumns.isShowPresent()) {
         	for(Dataset dataset: datasets) {
-        		header = new TableHeader(String.valueOf(dataset.getDatasetId()));
+        		
+        		header = new TableHeader();
         		header.setWidth(2);
         		header.setRowspan(2);
         		header.setSortable(false);
+        		
+        		String contents = "";
+        		
+        		if(allDatasetsHaveNames) {
+        			header.addStyle("height", "70px");
+        			contents += "<span class=\"box_rotate small_font\" style=\"width:20px;\">"+dataset.getDatasetName()+"</span>";
+        		}
+        		else {
+        			contents += String.valueOf(dataset.getDatasetId());
+        		}
+        		
+        		header.setHeaderName(contents);
         		headers.add(header);
         	}
         }
@@ -909,10 +933,24 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         
         if(colspan > 0) {
         	for(Dataset dataset: datasets) {
-        		header = new TableHeader(""+dataset.getDatasetId());
+        		
+        		header = new TableHeader();
         		header.setColspan(colspan);
         		header.setSortable(false);
+        		
+        		String contents = "";
+        		
+        		if(allDatasetsHaveNames) {
+        			header.addStyle("height", "70px");
+        			contents += "<span class=\"box_rotate small_font\" style=\"width:20px;\">"+dataset.getDatasetName()+"</span>";
+        		}
+        		else {
+        			contents += String.valueOf(dataset.getDatasetId());
+        		}
+        		
+        		header.setHeaderName(contents);
         		headers.add(header);
+        		
         	}
 
         	for(Dataset dataset: datasets) {

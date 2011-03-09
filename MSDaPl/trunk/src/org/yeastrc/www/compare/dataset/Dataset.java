@@ -16,6 +16,7 @@ public class Dataset implements Serializable {
 
     private int datasetId;
     private String datasetComments;
+    private String datasetName;
     private DatasetSource source;
     private float spectrumCountNormalizationFactor = 1.0f;
     private int totalSpectrumCount;
@@ -116,4 +117,12 @@ public class Dataset implements Serializable {
     public void setDatasetComments(String datasetComments) {
         this.datasetComments = datasetComments;
     }
+
+	public String getDatasetName() {
+		return datasetName;
+	}
+
+	public void setDatasetName(String datasetName) {
+		this.datasetName = datasetName;
+	}
 }
