@@ -10,7 +10,8 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
 <script type="text/javascript" src="<yrcwww:link path='/js/jquery.cookie.js'/>"></script>
-<script type="text/javascript" src="<yrcwww:link path='/js/jquery.listreorder.js'/>"></script>
+<!-- http://www.isocra.com/2008/02/table-drag-and-drop-jquery-plugin/ -->
+<script type="text/javascript" src="<yrcwww:link path='/js/jquery.tablednd_0_5.js'/>"></script>
 <script type="text/javascript" src="<yrcwww:link path='/js/jquery.disable.text.select.pack.js'/>"></script>
 <script type="text/javascript">
 // Popup window code
@@ -69,28 +70,128 @@ $(document).ready(function() {
 	// not resest, so we reset it manually. 
  	$("form")[0].reset();
  	
-	var datasetList = $('ol#datasetList').ListReorder();
-	datasetList.bind('listorderchanged', function(evt, jqList, listOrder) {
-		var str = "";
-		for (var i = 0; i < listOrder.length; i++) {
-			// i is current datasetIndex; listOrder[i] is the original datasetIndex
-			//var origIndex = $("#AND_index_"+listOrder[i]).val();
-			$("#AND_index_"+listOrder[i]).val(i);
-			$("#OR_index_"+listOrder[i]).val(i);
-			$("#NOT_index_"+listOrder[i]).val(i);
-			$("#XOR_index_"+listOrder[i]).val(i);
-			//var newIndex = $("#AND_index_"+listOrder[i]).val();
-			//str += "orig: "+origIndex+"; new: "+newIndex+"\n";
-		}
-		//alert(str);
+ 	$("#datasetOrderTbl").tableDnD({
+	    onDragClass: "myDragClass",
+	    onDrop: function(table, row) {
+            var rows = table.tBodies[0].rows;
+            //var debugStr = "Row dropped was "+row.id+". New order: ";
+            for (var i=0; i<rows.length; i++) {
+            	var rowid = rows[i].id;
+                //debugStr += rowid+" (new idx: "+i+")";
+                
+                $("#AND_index_"+rowid).val(i);
+				$("#OR_index_"+rowid).val(i);
+				$("#NOT_index_"+rowid).val(i);
+				$("#XOR_index_"+rowid).val(i);
+            }
+            //alert(debugStr);
+	    },
+		dragHandle: "draggable"
 	});
-	
+ 	
+ 	makeSortable($('#datasetOrderTbl'));
+ 	
 	$('#resetDatasetOrder').click(function(){
-		datasetList.get(0).restoreOrder();
+	
+		var newOrder = new Array();
+		var trIdOrder = new Array();
+		// get the current rows in the table;
+		$("#datasetOrderTbl >tbody >tr").each(function() {
+			var originalIdx = $(this).attr('id');
+			newOrder[originalIdx] = $(this);
+			trIdOrder[originalIdx] = originalIdx;
+		});
+		redoDatasetOrder(newOrder, trIdOrder);
 		return false;
 	});
-	
 });
+
+function makeSortable(table) {
+  	
+  	
+	var $table = $(table);
+	$('th', $table).each(function(column) {
+  		
+  		if ($(this).is('.sort-alpha') || $(this).is('.sort-int')) {
+  			
+  			var $header = $(this);
+      		$(this).click(function() {
+      		
+				// sorting direction
+				var newDirection = 1;
+        		if ($(this).is('.sorted-asc')) {
+          			newDirection = -1;
+        		}
+        				
+        		var rows = $table.find('tbody > tr').get();
+        				
+        		if ($header.is('.sort-alpha')) {
+        			$.each(rows, function(index, row) {
+						row.sortKey = $(row).children('td').eq(column).text().toUpperCase();
+					});
+				}
+				
+				if ($header.is('.sort-int')) {
+        					$.each(rows, function(index, row) {
+								var key = parseInt($(row).children('td').eq(column).text());
+						row.sortKey = isNaN(key) ? 0 : key;
+					});
+				}
+				
+     			rows.sort(function(a, b) {
+       				if (a.sortKey < b.sortKey) return -newDirection;
+					if (a.sortKey > b.sortKey) return newDirection;
+					return 0;
+     			});
+
+     			$.each(rows, function(index, row) {
+       				$table.children('tbody').append(row);
+       				row.sortKey = null;
+     			});
+     			
+     			// the header for the column used for sorting is highlighted
+				$('th', $table).each(function(){
+					$(this).removeClass('sorted-desc');
+	    			$(this).removeClass('sorted-asc');
+				});
+				
+     			var $sortHead = $table.find('th').filter(':nth-child(' + (column + 1) + ')');
+
+	          	if (newDirection == 1) {$sortHead.addClass('sorted-asc'); $sortHead.removeClass('sorted-desc');} 
+	          	else {$sortHead.addClass('sorted-desc'); $sortHead.removeClass('sorted-asc');}
+        
+        		$.each(rows, function(index, row) {
+        			var id = $(row).attr('id');
+       				$("#AND_index_"+id).val(index);
+					$("#OR_index_"+id).val(index);
+					$("#NOT_index_"+id).val(index);
+					$("#XOR_index_"+id).val(index);
+     			});
+     			
+     			// make rows draggable and droppable again
+				$("#datasetOrderTbl").tableDnDUpdate();
+        		
+      		});
+	}
+  });
+}
+
+function redoDatasetOrder(newOrder, trIdOrder) {
+
+	// remove all rows from the table
+	$("#datasetOrderTbl >tbody >tr").remove();
+	// add rows in the original order
+	for(var i = 0; i < newOrder.length; i = i+1) {
+		$('#datasetOrderTbl > tbody:last').append('<tr id="'+trIdOrder[i]+'">'+newOrder[i].html()+'</tr>');
+		$("#AND_index_"+trIdOrder[i]).val(i);
+		$("#OR_index_"+trIdOrder[i]).val(i);
+		$("#NOT_index_"+trIdOrder[i]).val(i);
+		$("#XOR_index_"+trIdOrder[i]).val(i);
+	}
+	
+	// make rows draggable and droppable again
+	$("#datasetOrderTbl").tableDnDUpdate();
+}
  	
 
 function showActionOptions() {
@@ -170,6 +271,8 @@ function showActionOptions() {
 					<html:hidden name="andDataset" property="datasetIndex" indexed="true" 
 								styleId='<%= "AND_index_"+datasetIndex%>'/>
 					<html:hidden name="andDataset" property="sourceString" indexed="true" />
+					<html:hidden name="andDataset" property="datasetComments" indexed="true" />
+					<html:hidden name="andDataset" property="datasetName" indexed="true" />
 					<html:hidden name="andDataset" property="selected" indexed="true" 
 				             styleId='<%= "AND_"+datasetIndex+"_select"%>' />
 				</td>
@@ -197,6 +300,8 @@ function showActionOptions() {
 					<html:hidden name="orDataset" property="datasetIndex" indexed="true"
 								 styleId='<%= "OR_index_"+datasetIndex%>'/>
 					<html:hidden name="orDataset" property="sourceString" indexed="true" />
+					<html:hidden name="orDataset" property="datasetComments" indexed="true" />
+					<html:hidden name="orDataset" property="datasetName" indexed="true" />
 					<html:hidden name="orDataset" property="selected" indexed="true" 
 								styleId='<%= "OR_"+datasetIndex+"_select"%>' />
 				</td>
@@ -225,6 +330,8 @@ function showActionOptions() {
 					<html:hidden name="notDataset" property="datasetIndex" indexed="true" 
 								 styleId='<%= "NOT_index_"+datasetIndex%>'/>
 					<html:hidden name="notDataset" property="sourceString" indexed="true" />
+					<html:hidden name="notDataset" property="datasetComments" indexed="true" />
+					<html:hidden name="notDataset" property="datasetName" indexed="true" />
 					<html:hidden name="notDataset" property="selected" indexed="true" 
 								styleId='<%= "NOT_"+datasetIndex+"_select"%>' />
 				</td>
@@ -253,6 +360,8 @@ function showActionOptions() {
 					<html:hidden name="xorDataset" property="datasetIndex" indexed="true" 
 								 styleId='<%= "XOR_index_"+datasetIndex%>'/>
 					<html:hidden name="xorDataset" property="sourceString" indexed="true" />
+					<html:hidden name="xorDataset" property="datasetComments" indexed="true" />
+					<html:hidden name="xorDataset" property="datasetName" indexed="true" />
 					<html:hidden name="xorDataset" property="selected" indexed="true" 
 								styleId='<%= "XOR_"+datasetIndex+"_select"%>' />
 					</td>
@@ -643,18 +752,33 @@ function showActionOptions() {
 	
 	<!-- DATASET ORDER CHANGER -->
 	<div id="orderChangerTgt" class="small_font" align="left" 
-		 style="padding: 5 0 5 0; border: 1px solid gray; width:50%; display:none; margin-bottom:5px;">
-		<ol id="datasetList">
-			<logic:iterate name="proteinSetComparisonForm" property="andList" id="andDataset" indexId="row">
-				<li style="margin: 0 5 5 5">
-				<span style="display:block; float:left; width:10px; height:10px; background: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> );;"></span>&nbsp;
-				<span id="<bean:write name='andDataset' property='datasetIndex' />"><b>ID <bean:write name="andDataset" property="datasetId" /></b>
-				<bean:write name="andDataset" property="datasetComments" />
-				</span>
-				</li>
-			</logic:iterate>
-		</ol>
-		<span class="small_font">Drag the blue-bordered white boxes to reorder the datasets. Click "Update" to display results with the new order</span>
+		 style="padding: 5 0 5 0; border: 1px solid gray; width:70%; display:none; margin-bottom:5px;">
+		 
+		 <table id="datasetOrderTbl" cellpadding="3" cellspacing="2" align="center">
+		 <thead>
+		 	<tr>
+		 		<th></th>
+		 		<th class="sort-int clickable">ID</th>
+		 		<th class="sort-alpha clickable">Name</th>
+		 		<th class="sort-alpha clickable">Comments</th>
+		 		<th></th>
+		 	</tr>
+		 </thead>
+		 <tbody>
+		 	<logic:iterate name="proteinSetComparisonForm" property="andList" id="andDataset" indexId="row">
+		 	<tr id="<bean:write name='andDataset' property='datasetIndex' />">
+		 		<!-- <td class="small_font"><%=row %></td> -->
+		 		<td><span style="display:block; float:left; width:10px; height:10px; background: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> );;"></span></td>
+		 		<td class="small_font"><b><bean:write name='andDataset' property='datasetId' /></b></td>
+		 		<td class="small_font"><bean:write name='andDataset' property='datasetName' /></td>
+		 		<td class="small_font"><bean:write name='andDataset' property='datasetComments' /></td>
+		 		<td class="draggable"><span class="dragHandle"></span></td>
+		 	</tr>
+		 	</logic:iterate>
+		 </tbody>
+		 </table>
+		
+		<div class="small_font" style="padding:10px;">Drag the blue-bordered white boxes to reorder the datasets, or click on the column headers to sort. Click "Update" to display results with the new order</div>
 		
 		<div align="center" style="padding:3px;"><input type="button" value="Reset"  id="resetDatasetOrder"/></div>
 		

@@ -606,17 +606,6 @@ SPAN.multiple_hash_residue {
 	background-color: #FF0000;
 }
 
-/* For ListReorder */
-.dragHandle {
-	display: block;
-	float: right;
-	width: 10px;
-	height: 10px;
-	border: 2px solid #06f;
-	background:#fff;
-	cursor: move;
-}
-
 .box_rotate {
 	display:block;
 	-moz-transform: rotate(-90deg);  /* FF3.5+ */

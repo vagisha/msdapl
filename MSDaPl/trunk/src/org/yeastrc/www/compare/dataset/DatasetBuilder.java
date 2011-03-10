@@ -92,6 +92,7 @@ public class DatasetBuilder {
         SelectableDataset dataset = new SelectableDataset(datasetId, source);
         dataset.setSelected(false);
         dataset.setDatasetComments(run.getComments());
+        dataset.setDatasetName(run.getName());
         return dataset;
     }
     

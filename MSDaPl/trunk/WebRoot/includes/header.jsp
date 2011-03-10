@@ -15,6 +15,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
  <yrcwww:title />
  <link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='/css/global.css' />">
  <link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='/css/colorbox.css' />">
+ <link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='/css/table_dnd.css' />">
 </head>
 
 <body>

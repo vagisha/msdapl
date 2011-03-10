@@ -18,6 +18,7 @@ public class SelectableDataset implements Serializable {
     private int datasetId;
     private DatasetSource source;
     private String datasetComments;
+    private String datasetName;
     private int datasetIndex;
 
    
@@ -32,6 +33,7 @@ public class SelectableDataset implements Serializable {
         this.datasetId = dataset.getDatasetId();
         this.source = dataset.getSource();
         this.datasetComments = dataset.getDatasetComments();
+        this.datasetName = dataset.getDatasetName();
     }
     
     public boolean isSelected() {
@@ -86,7 +88,15 @@ public class SelectableDataset implements Serializable {
         this.datasetComments = datasetComments;
     }
 
-    public int getDatasetIndex() {
+    public String getDatasetName() {
+		return datasetName;
+	}
+
+	public void setDatasetName(String datasetName) {
+		this.datasetName = datasetName;
+	}
+
+	public int getDatasetIndex() {
         return datasetIndex;
     }
 
