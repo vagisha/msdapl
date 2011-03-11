@@ -198,12 +198,12 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         else if (nameAndVal.length == 1) {
             scan.addAnalysisItem(nameAndVal[0], null);
             DataProviderException e = new DataProviderException(currentLineNum, "Missing value in 'I' line. Setting value to null.", line);
-            log.warn(e.getMessage());
+            log.debug(e.getMessage());
         }
         else {
             // ignore if both label and value for this analysis item are missing
             DataProviderException e = new DataProviderException(currentLineNum, "Invalid 'I' line. Expected 2 fields. Ignoring.", line);
-            log.warn(e.getMessage());
+            log.debug(e.getMessage());
         }
     }
     

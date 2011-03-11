@@ -168,12 +168,12 @@ public class Cms2FileReader implements MS2RunDataProvider {
             else if (nameAndVal.length == 1) {
                 scan.addAnalysisItem(nameAndVal[0], null);
                 DataProviderException e = new DataProviderException("Missing value in 'I' line. Setting value to null --"+iField);
-                log.warn(e.getMessage());
+                log.debug(e.getMessage());
             }
             else {
                 // ignore if both label and value for this analysis item are missing
                 DataProviderException e = new DataProviderException("Invalid 'I' line. Expected 2 fields. Ignoring -- "+iField);
-                log.warn(e.getMessage());
+                log.debug(e.getMessage());
             }
         }
     }
