@@ -115,7 +115,8 @@ public class PercolatorFilteredPsmDistributionCalculator {
 
             		// If we don't have retention time for a scan skip the whole runSearchAnalysis
             		if(rs.getObject("retentionTime") == null) {
-            			log.error("!!!RETENTION TIME NOT FOUND for runSearchAnalysisID: "+runSearchAnalysisId+". Will not be binned....");
+            			log.warn("!!!RETENTION TIME NOT FOUND for runSearchAnalysisID: "+runSearchAnalysisId+". Will not be binned....");
+            			break;
             		}
             		else {
             			double rt = rs.getBigDecimal("retentionTime").doubleValue();

@@ -153,7 +153,7 @@ public abstract class SQTFileReader <T extends SQTSearchScanIn<?>> extends Abstr
          if(scan.getScanResults().size() == 0) {
              // This will not cause an UploadException
              DataProviderException ex = new DataProviderException(currentLineNum-1, "Invalid 'S' line.  No results found." , null);
-             log.warn(ex.getMessage());
+             log.debug(ex.getMessage());
          }
          
          for(int i = 0; i < scan.getScanResults().size(); i++) {
