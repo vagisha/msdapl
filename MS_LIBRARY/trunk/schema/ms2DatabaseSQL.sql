@@ -404,7 +404,9 @@ CREATE TABLE msSearchAnalysis (
 		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	   	programName VARCHAR(255) NOT NULL,
 	   	programVersion VARCHAR(255),
-	   	uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	   	uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	   	comments TEXT,
+	   	filename VARCHAR(255)
 );
 
 CREATE TABLE msRunSearchAnalysis (
@@ -435,7 +437,7 @@ CREATE TABLE PercolatorResult (
 		discriminantScore DOUBLE,
 		pvalue DOUBLE UNSIGNED,
 		predictedRetentionTime DECIMAL(10,5),
-		peptideResultID IN UNSIGNED NOT NULL
+		peptideResultID IN UNSIGNED
 );
 ALTER TABLE PercolatorResult ADD INDEX(runSearchAnalysisID);
 ALTER TABLE PercolatorResult ADD INDEX(resultID);
@@ -460,13 +462,6 @@ ALTER TABLE PercolatorPeptideResult ADD UNIQUE INDEX (searchAnalysisID, peptide)
 #####################################################################
 # PeptideProphet tables
 #####################################################################
-CREATE TABLE PeptideProphetAnalysis (
-	searchAnalysisID INT UNSIGNED NOT NULL PRIMARY KEY,
-	filename VARCHAR(255) NOT NULL
-);
-ALTER TABLE PeptideProphetAnalysis ADD INDEX(searchAnalysisID, filename);
-
-
 CREATE TABLE PeptideProphetROC (
 		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 		searchAnalysisID INT UNSIGNED NOT NULL,
@@ -507,7 +502,8 @@ CREATE TABLE msProteinInferRun (
 	programVersion VARCHAR(255) NOT NULL,
 	inputGenerator VARCHAR(255) NOT NULL,
 	dateRun DATETIME,
-	comments TEXT(10)
+	comments TEXT(10),
+	name VARCHAR(10)
 );
 
 CREATE TABLE msProteinInferInput (
@@ -596,29 +592,36 @@ ALTER TABLE  IDPickerParam ADD INDEX (piRunID);
 
 CREATE TABLE IDPickerProtein (
 	piProteinID INT UNSIGNED NOT NULL PRIMARY KEY,
-	clusterID INT UNSIGNED NOT NULL,
-    groupID INT UNSIGNED NOT NULL,
+	clusterLabel INT UNSIGNED NOT NULL,
+    proteinGroupLabel INT UNSIGNED NOT NULL,
     nsaf DOUBLE UNSIGNED,
-    isParsimonious TINYINT NOT NULL DEFAULT 0,
+	isParsimonious TINYINT NOT NULL DEFAULT 0,
     isSubset TINYINT NOT NULL DEFAULT = 0
 );
-ALTER TABLE IDPickerProtein ADD INDEX(clusterID);
-ALTER TABLE IDPickerProtein ADD INDEX(groupID);
+ALTER TABLE IDPickerProtein ADD INDEX(proteinGroupLabel);
+ALTER TABLE IDPickerProtein ADD INDEX(clusterLabel);
 
+
+CREATE TABLE IDPickerSubsetProtein (
+	subsetProteinID INT UNSIGNED NOT NULL,
+	superProteinID INT UNSIGNED NOT NULL 
+);
+ALTER TABLE IDPickerSubsetProtein ADD INDEX (subsetProteinID);
+ALTER TABLE IDPickerSubsetProtein ADD INDEX (superProteinID);
 
 CREATE TABLE IDPickerPeptide (
 	piPeptideID INT UNSIGNED NOT NULL PRIMARY KEY,
-	groupID INT UNSIGNED NOT NULL
+	peptideGroupLabel INT UNSIGNED NOT NULL
 );
-ALTER TABLE IDPickerPeptide ADD INDEX(groupID);
+ALTER TABLE IDPickerPeptide ADD INDEX(peptideGroupLabel);
 
 
 CREATE TABLE IDPickerGroupAssociation (
 	piRunID INT UNSIGNED NOT NULL,
-	proteinGroupID INT UNSIGNED NOT NULL,
-	peptideGroupID INT UNSIGNED NOT NULL
+	proteinGroupLabel INT UNSIGNED NOT NULL,
+	peptideGroupLabel INT UNSIGNED NOT NULL
 );
-ALTER TABLE IDPickerGroupAssociation ADD PRIMARY KEY(piRunID, proteinGroupID, peptideGroupID);
+ALTER TABLE IDPickerGroupAssociation ADD PRIMARY KEY(piRunID, proteinGroupLabel, peptideGroupLabel);
 
 
 CREATE TABLE IDPickerSpectrumMatch (
@@ -739,11 +742,15 @@ CREATE TRIGGER msProteinInferProtein_bdelete BEFORE DELETE ON msProteinInferProt
  FOR EACH ROW
  BEGIN
  	DELETE FROM IDPickerProtein WHERE piProteinID = OLD.id;
+ 	DELETE FROM IDPickerSubsetProtein WHERE subsetProteinID = OLD.id;
+   	DELETE FROM IDPickerSubsetProtein WHERE superProteinID = OLD.id;
  	DELETE FROM ProteinProphetProtein WHERE piProteinID = OLD.id;
    	DELETE FROM msProteinInferProteinPeptideMatch WHERE piProteinID = OLD.id;
    	DELETE FROM ProteinProphetSubsumedProtein WHERE subsumedProteinID = OLD.id;
    	DELETE FROM ProteinProphetSubsumedProtein WHERE subsumingProteinID = OLD.id;
    	DELETE FROM ProteinProphetProteinIon WHERE piProteinID = OLD.id;
+   	DELETE FROM IDPickerSubsetProtein WHERE subsetProteinID = OLD.id;
+   	DELETE FROM IDPickerSubsetProtein WHERE superProteinID = OLD.id;
  END;
 |
 DELIMITER ;
@@ -787,7 +794,6 @@ CREATE TRIGGER msSearchAnalysis_bdelete BEFORE DELETE ON msSearchAnalysis
  FOR EACH ROW
  BEGIN
    	DELETE FROM PercolatorParams WHERE searchAnalysisID = OLD.id;
-   	DELETE FROM PeptideProphetAnalysis WHERE searchAnalysisID = OLD.id;
    	DELETE FROM PeptideProphetROC WHERE searchAnalysisID = OLD.id;
    	DELETE FROM PercolatorPeptideResult WHERE searchAnalysisID = OLD.id;
 	DELETE FROM msRunSearchAnalysis WHERE searchAnalysisID = OLD.id;
