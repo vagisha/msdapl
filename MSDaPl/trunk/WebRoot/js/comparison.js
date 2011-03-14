@@ -228,3 +228,21 @@ function hideAllDescriptionsForProtein(nrseqId) {
 	$("#short_desc_"+nrseqId).show();
 	$("#full_desc_"+nrseqId).hide();
 }
+
+//---------------------------------------------------------------------------------------
+//TOGGLE DATASET NAME / ID IN THE COMPARISON TABLE HEADER
+//---------------------------------------------------------------------------------------
+function toggleDatasetNameId() {
+	var text = $("#headerValueChooser").text();
+	//alert(text);
+	if(text == "[Show Dataset IDs]") {
+		$("#headerValueChooser").text("[Show Dataset Names]");
+		$("span.dsid").show();
+		$("span.dsname").hide();
+	}
+	else {
+		$("#headerValueChooser").text("[Show Dataset IDs]");
+		$("span.dsname").show();
+		$("span.dsid").hide();
+	}
+}

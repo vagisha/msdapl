@@ -826,11 +826,12 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         		String contents = "";
         		
         		if(allDatasetsHaveNames) {
-        			header.addStyle("height", "70px");
-        			contents += "<span class=\"box_rotate small_font\" style=\"width:20px;\">"+dataset.getDatasetName()+"</span>";
+        			//header.addStyle("height", "70px");
+        			contents += "<span class=\"rotated_text font_9 dsname\">"+dataset.getDatasetName()+"</span>";
+        			contents += "<span class=\"font_9 dsid\" style=\"display:none;\">"+dataset.getDatasetId()+"</span>";
         		}
         		else {
-        			contents += String.valueOf(dataset.getDatasetId());
+        			contents += "<span class=\"font_9\">"+dataset.getDatasetId()+"</span>";
         		}
         		
         		header.setHeaderName(contents);
@@ -941,11 +942,17 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         		String contents = "";
         		
         		if(allDatasetsHaveNames) {
-        			header.addStyle("height", "70px");
-        			contents += "<span class=\"box_rotate small_font\" style=\"width:20px;\">"+dataset.getDatasetName()+"</span>";
+        			if(colspan == 1) {
+        				contents += "<span class=\"rotated_text font_9 dsname\">"+dataset.getDatasetName()+"</span>";
+        				contents += "<span class=\"font_9 dsid\" style=\"display:none;\">"+dataset.getDatasetId()+"</span>";
+        			}
+        			else {
+        				contents += "<span class=\"font_9 dsname\">"+dataset.getDatasetName()+"</span>";
+        				contents += "<span class=\"font_9 dsid\" style=\"display:none;\">"+dataset.getDatasetId()+"</span>";
+        			}
         		}
         		else {
-        			contents += String.valueOf(dataset.getDatasetId());
+        			contents += "<span class=\"font_9\">"+dataset.getDatasetId()+"</span>";
         		}
         		
         		header.setHeaderName(contents);

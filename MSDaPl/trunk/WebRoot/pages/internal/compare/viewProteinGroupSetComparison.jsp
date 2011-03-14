@@ -203,8 +203,8 @@ Total Protein Groups (Total Proteins): <bean:write name="comparison" property="t
 		
 			<!-- If all the datasets have names display the names instead of IDs -->
 			<logic:equal name="comparison" property="allDatasetsHaveNames" value="true">
-				<th style="height:70px;">
-				<span class="box_rotate small_font" style="width:20px;">
+				<th>
+				<span class="font_9">
 					<bean:write name="dataset" property="datasetName" />
 				</span>
 				</th>
@@ -223,11 +223,11 @@ Total Protein Groups (Total Proteins): <bean:write name="comparison" property="t
 <tbody>
 <logic:iterate name="comparison" property="datasets" id="dataset" indexId="row">
 	<tr>
-		<th style="text-align:left;" class="small_font">
+		<th style="text-align:left;" class="font_9">
 			<span>
 			
 				<logic:equal name="comparison" property="allDatasetsHaveNames" value="true">
-					&nbsp<span class="small_font"><bean:write name="dataset" property="datasetName" />(</span>
+					<bean:write name="dataset" property="datasetName" />(
 				</logic:equal>
 				
 				<logic:equal name="dataset" property="sourceString" value="<%= DatasetSource.PROTEIN_PROPHET.name()%>">
@@ -240,7 +240,7 @@ Total Protein Groups (Total Proteins): <bean:write name="comparison" property="t
 				</logic:notEqual>
 				
 				<logic:equal name="comparison" property="allDatasetsHaveNames" value="true">
-					<span class="small_font">)</span>
+					)
 				</logic:equal>
 				
 			</span>
@@ -285,7 +285,7 @@ Total Protein Groups (Total Proteins): <bean:write name="comparison" property="t
 	<td width="2%"style="background-color: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> );">
 		&nbsp;&nbsp;
 	</td>
-	<td style="font-size:8pt;text-align:left;">
+	<td style="text-align:left;" class="font_9">
 	<logic:equal name="dataset" property="sourceString" value="<%= DatasetSource.PROTEIN_PROPHET.name()%>">
 		<html:link action="viewProteinProphetResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link>
 	</logic:equal>
@@ -293,13 +293,12 @@ Total Protein Groups (Total Proteins): <bean:write name="comparison" property="t
 		<html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link>
 	</logic:notEqual>
 	</td>
-	<td style="font-size:8pt;text-align:left;">
-	<logic:notEmpty name="dataset" property="datasetName">
-		&nbsp<span class="small_font"><bean:write name="dataset" property="datasetName" /></span>
-	</logic:notEmpty>
-	
+	<td style="text-align:left;" class="font_9">
+		<logic:notEmpty name="dataset" property="datasetName">
+			<bean:write name="dataset" property="datasetName" />
+		</logic:notEmpty>
 	</td>
-	<td  width="35%" style="text-align:left; font-size:8pt;" ><bean:write name="dataset" property="datasetComments" /></td>
+	<td  width="35%" style="text-align:left;" class="small_font" ><bean:write name="dataset" property="datasetComments" /></td>
 	<logic:equal name="mod" value="1"></logic:equal>
 </logic:iterate>
 </tbody>
@@ -344,6 +343,9 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 	<td align="left" valign="bottom">
 		<span class="underline clickable" style="font-size:8pt;color:red;" id="full_names" onclick="toggleFullNames()">[Full Names]</span> &nbsp; &nbsp;
 		<span class="underline clickable" style="font-size:8pt;color:red;" id="full_descriptions" onclick="toggleFullDescriptions()">[Full Descriptions]</span>
+		<logic:equal name="comparison" property="allDatasetsHaveNames" value="true">
+			&nbsp; &nbsp;<span class="underline clickable" style="font-size:8pt;color:red;" id="headerValueChooser" onclick="toggleDatasetNameId()">[Show Dataset IDs]</span>
+		</logic:equal>
 		
 		<logic:present name="clusteredImgUrl">
 				&nbsp;&nbsp;

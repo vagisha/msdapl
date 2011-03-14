@@ -119,6 +119,15 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 		this.rowCount = count;
 	}
 
+	public boolean isAllDatasetsHaveNames() {
+		for(Dataset ds: this.datasets) {
+			if(ds.getDatasetName() == null || ds.getDatasetName().length() == 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public List<? extends Dataset> getDatasets() {
 		return datasets;
 	}
@@ -615,12 +624,28 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 		List<TableHeader> headers = new ArrayList<TableHeader>(columnCount());
         TableHeader header = null;
         
+        boolean allDatasetsHaveNames = this.isAllDatasetsHaveNames();
+        
         if(displayColumns.isShowPresent()) {
         	for(Dataset dataset: datasets) {
-        		header = new TableHeader(String.valueOf(dataset.getDatasetId()));
+        		
+        		header = new TableHeader();
         		header.setWidth(2);
         		header.setRowspan(2);
         		header.setSortable(false);
+        		
+        		String contents = "";
+        		
+        		if(allDatasetsHaveNames) {
+        			//header.addStyle("height", "70px");
+        			contents += "<span class=\"rotated_text font_9 dsname\">"+dataset.getDatasetName()+"</span>";
+        			contents += "<span class=\"font_9 dsid\" style=\"display:none;\">"+dataset.getDatasetId()+"</span>";
+        		}
+        		else {
+        			contents += "<span class=\"font_9\">"+dataset.getDatasetId()+"</span>";
+        		}
+        		
+        		header.setHeaderName(contents);
         		headers.add(header);
         	}
         }
@@ -714,9 +739,28 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
         
         if(colspan > 0) {
         	for(Dataset dataset: datasets) {
-        		header = new TableHeader(""+dataset.getDatasetId());
+        		
+        		header = new TableHeader();
         		header.setColspan(colspan);
         		header.setSortable(false);
+        		
+        		String contents = "";
+        		
+        		if(allDatasetsHaveNames) {
+        			if(colspan == 1) {
+        				contents += "<span class=\"rotated_text font_9 dsname\">"+dataset.getDatasetName()+"</span>";
+        				contents += "<span class=\"font_9 dsid\" style=\"display:none;\">"+dataset.getDatasetId()+"</span>";
+        			}
+        			else {
+        				contents += "<span class=\"font_9 dsname\">"+dataset.getDatasetName()+"</span>";
+        				contents += "<span class=\"font_9 dsid\" style=\"display:none;\">"+dataset.getDatasetId()+"</span>";
+        			}
+        		}
+        		else {
+        			contents += "<span class=\"font_9\">"+dataset.getDatasetId()+"</span>";
+        		}
+        		
+        		header.setHeaderName(contents);
         		headers.add(header);
         	}
 

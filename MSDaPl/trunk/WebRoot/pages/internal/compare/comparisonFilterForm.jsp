@@ -13,6 +13,7 @@
 <!-- http://www.isocra.com/2008/02/table-drag-and-drop-jquery-plugin/ -->
 <script type="text/javascript" src="<yrcwww:link path='/js/jquery.tablednd_0_5.js'/>"></script>
 <script type="text/javascript" src="<yrcwww:link path='/js/jquery.disable.text.select.pack.js'/>"></script>
+
 <script type="text/javascript">
 // Popup window code
 function newPopup(url) {
@@ -70,6 +71,10 @@ $(document).ready(function() {
 	// not resest, so we reset it manually. 
  	$("form")[0].reset();
  	
+ 	// If the browser supports text rotation apply the rotation
+ 	rotateText();
+ 	
+ 	
  	$("#datasetOrderTbl").tableDnD({
 	    onDragClass: "myDragClass",
 	    onDrop: function(table, row) {
@@ -105,6 +110,48 @@ $(document).ready(function() {
 		return false;
 	});
 });
+
+function rotateText() {
+
+	// If the browser supports text rotation apply the rotation
+	var b = document.body || document.documentElement;
+	var s = b.style;
+	// No css support detected
+	if(typeof s == 'undefined') { return; }
+		
+	// Tests if the required CSS property is supported
+	var supported = false;
+	if(typeof s['MozTransform'] == 'string') { supported = true; }	 // Mozilla support
+	else if(typeof s['WebkitTransform'] == 'string') { supported = true; } // Safari, Chrome support
+	else if(typeof s['OTransform'] == 'string') { supported = true; } // Opera support
+		
+	if(supported == true) {
+		$(".rotated_text").each(function() {
+		
+			// element
+	    	var $elem = $(this);
+	    	// parent
+	    	var parent = $elem.parent().get(0);
+	    
+	    	var o_width = $elem.outerWidth(true); 	// width before rotation; this will be the height after rotation
+	    	var n_width = $elem.outerHeight(true);	// this should be the width after rotation
+	    
+	    	$(parent).css("height", "74px");  // resize the parent to fit the rotated element
+	    
+		    $elem.css("display", "block");
+		    $elem.css("position", "relative");
+			$elem.css("width", n_width+"px");			// manually change the width so that the parent (th or td) resizes.
+													// Don't know what the behavior would be if the parent is not a th or td
+			$elem.css("bottom", "-40px");
+			$elem.css("-o-transform", "rotate(-90deg)");  		/* Opera 10.5 */
+    		$elem.css("-o-transform-origin", "0% 0%"); 
+    		$elem.css("-moz-transform", "rotate(-90deg)"); 		/* FF3.5+ */
+    		$elem.css("-moz-transform-origin", "0% 0%"); 
+    		$elem.css("-webkit-transform", "rotate(-90deg)"); 	/* Saf3.1+, Chrome */
+    		$elem.css("-webkit-transform-origin", "0% 0%"); 
+		});
+	}
+}
 
 function makeSortable(table) {
   	
