@@ -142,8 +142,7 @@ public class PercolatorFilteredSpectraDistributionCalculator {
 
         	// If we don't have retention time for a scan skip the whole runSearchAnalysis
     		if(scan.getRetentionTime() == null) {
-    			log.warn("!!!RETENTION TIME NOT FOUND for runSearchAnalysisID: "+runSearchAnalysisId+". Will not be binned....");
-    			break;
+    			log.debug("!!!RETENTION TIME NOT FOUND for runSearchAnalysisID: "+runSearchAnalysisId+". Will not be binned....");
     		}
     		else {
     			double rt = scan.getRetentionTime().doubleValue();
@@ -218,8 +217,7 @@ public class PercolatorFilteredSpectraDistributionCalculator {
                 
                 // If we don't have retention time for a scan skip the whole runSearchAnalysis
         		if(rs.getObject("retentionTime") == null) {
-        			log.warn("!!!RETENTION TIME NOT FOUND for runSearchAnalysisID: "+runSearchAnalysisId+". Will not be binned....");
-        			break;
+        			log.debug("!!!RETENTION TIME NOT FOUND for runSearchAnalysisID: "+runSearchAnalysisId+". Will not be binned....");
         		}
         		else {
         			double rt = rs.getBigDecimal("retentionTime").doubleValue();
