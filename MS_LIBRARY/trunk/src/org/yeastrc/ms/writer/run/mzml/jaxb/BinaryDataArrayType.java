@@ -51,7 +51,7 @@ public class BinaryDataArrayType
 {
 
     @XmlElement(required = true)
-    protected byte[] binary;
+    protected String binary;
     @XmlAttribute
     @XmlSchemaType(name = "nonNegativeInteger")
     protected BigInteger arrayLength;
@@ -70,7 +70,7 @@ public class BinaryDataArrayType
      *     possible object is
      *     byte[]
      */
-    public byte[] getBinary() {
+    public String getBinary() {
         return binary;
     }
 
@@ -81,8 +81,8 @@ public class BinaryDataArrayType
      *     allowed object is
      *     byte[]
      */
-    public void setBinary(byte[] value) {
-        this.binary = ((byte[]) value);
+    public void setBinary(String value) {
+        this.binary = ((String) value);
     }
 
     /**

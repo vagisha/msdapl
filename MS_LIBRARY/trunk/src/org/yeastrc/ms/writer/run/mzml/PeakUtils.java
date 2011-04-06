@@ -30,16 +30,16 @@ public class PeakUtils {
 	public static String compressMz(MsScan scan) throws IOException {
 		
 		byte[] mzarr = getMzArray(scan);
-		return compress(mzarr);
+		return new String(compress(mzarr));
 	}
 	
 	public static String compressIntensity(MsScan scan) throws IOException {
 		
 		byte[] intarr = getIntensityArray(scan);
-		return compress(intarr);
+		return new String(compress(intarr));
 	}
 
-	public static String compress(byte[] mzarr) throws IOException {
+	public static byte[] compress(byte[] mzarr) throws IOException {
 		
 		Deflater deflater = new Deflater();
 		deflater.setInput(mzarr);
@@ -67,7 +67,7 @@ public class PeakUtils {
 		//System.out.println("uncompressed length: "+mzarr.length);
 		//System.out.println("compressed length: "+compressed.length);
 		
-		return Base64.encodeBase64String(compressed);
+		return Base64.encodeBase64(compressed);
 	}
 	
 	public static double[] decompress(String data) throws IOException {
@@ -84,7 +84,7 @@ public class PeakUtils {
 		return null;
 	}
 
-	private static double[] decompress(byte[] compressed)
+	public static double[] decompress(byte[] compressed)
 			throws DataFormatException, IOException {
 		
 		// Decompress data
@@ -151,6 +151,27 @@ public class PeakUtils {
 			dos = new DataOutputStream(bos);
 			for(double value: input) {
 				dos.writeDouble(value);
+			}
+			dos.flush();
+		}
+		finally {
+			if(dos != null) dos.close();
+			if(bos != null) bos.close();
+		}
+		byte [] data = bos.toByteArray();
+		return data;
+	}
+	
+	public static byte[] toByteArr (float[] input) throws IOException {
+		
+		ByteArrayOutputStream bos = null;
+		DataOutputStream dos = null;
+
+		try {
+			bos = new ByteArrayOutputStream();
+			dos = new DataOutputStream(bos);
+			for(float value: input) {
+				dos.writeFloat(value);
 			}
 			dos.flush();
 		}

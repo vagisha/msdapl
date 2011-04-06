@@ -46,7 +46,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "CVListType", propOrder = {
     "cv"
 })
-@XmlRootElement
+@XmlRootElement(name="cvList")
 public class CVListType {
 
     @XmlElement(required = true)

@@ -62,7 +62,7 @@ import javax.xml.bind.annotation.XmlType;
     "productList",
     "binaryDataArrayList"
 })
-@XmlRootElement
+@XmlRootElement(name="spectrum")
 public class SpectrumType
     extends ParamGroupType
 {

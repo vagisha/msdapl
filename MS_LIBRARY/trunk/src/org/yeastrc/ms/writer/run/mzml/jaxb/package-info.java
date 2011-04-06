@@ -5,5 +5,5 @@
 // Generated on: 2011.03.14 at 10:42:33 PM PDT 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://psi.hupo.org/ms/mzml", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+// @javax.xml.bind.annotation.XmlSchema(namespace = "http://psi.hupo.org/ms/mzml", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.yeastrc.ms.writer.run.mzml.jaxb;
