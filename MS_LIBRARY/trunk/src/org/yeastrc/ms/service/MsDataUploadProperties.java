@@ -37,33 +37,38 @@ public class MsDataUploadProperties {
     
     static {
         Properties props = new Properties();
+        Reader reader = null;
         try {
-            Reader reader = Resources.getResourceAsReader("msDataDB.properties");
+            reader = Resources.getResourceAsReader("msDataDB.properties");
             props.load(reader);
+            String value = props.getProperty("db.peakdata.storage");
+            peakStorageType = PeakStorageType.instance(value);
+            log.info("PeakStorageType is "+peakStorageType.name());
+            
+            backupDirectory = props.getProperty("backup.dir");
+            doSqtBackup = Boolean.parseBoolean(props.getProperty("backup.sqt"));
+            
+            percRunDirectory = props.getProperty("perc.run.dir");
+            
+            value = props.getProperty("interact.pepxml.checkpeptideproteinmatches");
+            checkPeptideProteinMatches = Boolean.parseBoolean(value);
+            
+            value = props.getProperty("use.nrseq.suffix.tables");
+            useNrseqSuffixTables = Boolean.parseBoolean(value);
+            
+            value = props.getProperty("use.nrseq.suffix.in.memory");
+            useNrseqSuffixInMemory = Boolean.parseBoolean(value);
+            
+            value = props.getProperty("use.single.query");
+            useSingleQuery = Boolean.parseBoolean(value);
+            
         }
         catch (IOException e) {
             log.error("Error reading properties file msDataDB.properties", e);
         }
-        String value = props.getProperty("db.peakdata.storage");
-        peakStorageType = PeakStorageType.instance(value);
-        log.info("PeakStorageType is "+peakStorageType.name());
-        
-        backupDirectory = props.getProperty("backup.dir");
-        doSqtBackup = Boolean.parseBoolean(props.getProperty("backup.sqt"));
-        
-        percRunDirectory = props.getProperty("perc.run.dir");
-        
-        value = props.getProperty("interact.pepxml.checkpeptideproteinmatches");
-        checkPeptideProteinMatches = Boolean.parseBoolean(value);
-        
-        value = props.getProperty("use.nrseq.suffix.tables");
-        useNrseqSuffixTables = Boolean.parseBoolean(value);
-        
-        value = props.getProperty("use.nrseq.suffix.in.memory");
-        useNrseqSuffixInMemory = Boolean.parseBoolean(value);
-        
-        value = props.getProperty("use.single.query");
-        useSingleQuery = Boolean.parseBoolean(value);
+        finally {
+        	if(reader != null) try {reader.close();} catch(IOException e){}
+        }
         
     }
     

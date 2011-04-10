@@ -42,28 +42,31 @@ public class ConnectionFactory {
     
     static {
         Properties props = new Properties();
+        Reader reader = null;
         try {
-            Reader reader = Resources.getResourceAsReader("msDataDB.properties");
+            reader = Resources.getResourceAsReader("msDataDB.properties");
             props.load(reader);
+            String mainDbUrl = props.getProperty("db.url");
+            mainDbName = props.getProperty("db.name");
+            user = props.getProperty("db.user");
+            password = props.getProperty("db.password");
+            
+            String tempDbUrl = props.getProperty("db.temp.url");
+            tempDbName = props.getProperty("db.temp.name");
+            
+            mainMsData = setupDataSource(mainDbUrl, user, password);
+            tempMsData = setupDataSource(tempDbUrl, user, password);
+            
+            nrseqDbName = props.getProperty("db.nrseq.name");
+            String nrseqUrl = props.getProperty("db.nrseq.url");
+            nrseq = setupDataSource(nrseqUrl, user, password);
         }
         catch (IOException e) {
             log.error("Error reading properties file msDataDB.properties", e);
         }
-        
-        String mainDbUrl = props.getProperty("db.url");
-        mainDbName = props.getProperty("db.name");
-        user = props.getProperty("db.user");
-        password = props.getProperty("db.password");
-        
-        String tempDbUrl = props.getProperty("db.temp.url");
-        tempDbName = props.getProperty("db.temp.name");
-        
-        mainMsData = setupDataSource(mainDbUrl, user, password);
-        tempMsData = setupDataSource(tempDbUrl, user, password);
-        
-        nrseqDbName = props.getProperty("db.nrseq.name");
-        String nrseqUrl = props.getProperty("db.nrseq.url");
-        nrseq = setupDataSource(nrseqUrl, user, password);
+        finally {
+        	if(reader != null) try {reader.close();} catch(IOException e){}
+        }
         
     }
     private ConnectionFactory() {}

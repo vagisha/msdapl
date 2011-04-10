@@ -175,10 +175,18 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 
 			if(evtType == XMLStreamReader.START_ELEMENT) {
 
-				if(reader.getLocalName().equalsIgnoreCase("other_command_line")) {
+				if(reader.getLocalName().equalsIgnoreCase("command_line")) {
 					String value = reader.getElementText();
 					PercolatorParamBean param = new PercolatorParamBean();
 					param.setParamName("command_line");
+					param.setParamValue(value);
+					params.add(param);
+				}
+				
+				else if(reader.getLocalName().equalsIgnoreCase("other_command_line")) {
+					String value = reader.getElementText();
+					PercolatorParamBean param = new PercolatorParamBean();
+					param.setParamName("other_command_line");
 					param.setParamValue(value);
 					params.add(param);
 				}

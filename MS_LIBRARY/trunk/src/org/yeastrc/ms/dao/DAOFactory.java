@@ -100,16 +100,20 @@ public class DAOFactory {
     
     static {
         Properties props = new Properties();
+        Reader reader = null;
         try {
-            Reader reader = Resources.getResourceAsReader("msDataDB.properties");
+            reader = Resources.getResourceAsReader("msDataDB.properties");
             props.load(reader);
+            String value = props.getProperty("db.peakdata.storage");
+            peakStorageType = PeakStorageType.instance(value);
+            log.debug("PeakStorageType is "+peakStorageType.name());
         }
         catch (IOException e) {
             log.error("Error reading properties file msDataDB.properties", e);
         }
-        String value = props.getProperty("db.peakdata.storage");
-        peakStorageType = PeakStorageType.instance(value);
-        log.debug("PeakStorageType is "+peakStorageType.name());
+        finally {
+        	if(reader != null) try {reader.close();} catch(IOException e){}
+        }
     }
     
     static {
@@ -126,6 +130,9 @@ public class DAOFactory {
         catch (Exception e) {
             log.error("Error initializing "+DAOFactory.class.getName()+" class: ", e);
             throw new RuntimeException("Error initializing "+DAOFactory.class.getName()+" class: ", e);
+        }
+        finally {
+        	if(reader != null) try {reader.close();} catch(IOException e){}
         }
         System.out.println("Loaded Ibatis SQL map config -- "+ibatisConfigFile);
     }
