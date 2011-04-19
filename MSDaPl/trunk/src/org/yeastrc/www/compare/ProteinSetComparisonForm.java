@@ -32,6 +32,7 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
     private boolean download = false;
     private boolean collapseProteinGroups = false; // used only for downloading results
     private boolean includeDescription = false; // used only when downloading results
+    private boolean includePeptides = false; // used only when downloading results
     
     // GO ENRICHMENT
     private int goAspect = GOUtils.BIOLOGICAL_PROCESS;
@@ -170,6 +171,14 @@ public class ProteinSetComparisonForm extends DatasetFiltersForm {
     
     public void setIncludeDescriptions(boolean include) {
         this.includeDescription = include;
+    }
+    
+    public boolean isIncludePeptides() {
+        return this.includePeptides;
+    }
+    
+    public void setIncludePeptides(boolean include) {
+        this.includePeptides = include;
     }
 
     //-----------------------------------------------------------------------------

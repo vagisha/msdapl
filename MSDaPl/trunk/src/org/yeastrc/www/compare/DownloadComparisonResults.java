@@ -8,8 +8,11 @@ package org.yeastrc.www.compare;
 
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,11 +24,25 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferPeptideDAO;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.ProteinferIon;
+import org.yeastrc.ms.domain.protinfer.ProteinferPeptide;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
+import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
+import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
+import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nr_seq.listing.ProteinReference;
 import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
+import org.yeastrc.www.compare.dataset.DatasetSource;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
+import org.yeastrc.www.proteinfer.MsResultLoader;
 
 /**
  * 
@@ -152,7 +169,7 @@ public class DownloadComparisonResults extends Action {
         writeLegend(writer);
         
         // write the header
-        writeHeader(writer, comparison.getDatasets(), comparison.getDisplayColumns(), form.isIncludeDescriptions(), false);
+        writeHeader(writer, comparison.getDatasets(), comparison.getDisplayColumns(), form.isIncludeDescriptions(), false, form.isIncludePeptides());
         
         // Remove any sorting criteria so that all fields get initialized properly.
         comparison.setSortBy(null);
@@ -163,7 +180,7 @@ public class DownloadComparisonResults extends Action {
             
             comparison.initializeProteinInfo(protein);
             writeComparisonProtein(writer, comparison.getDatasets(), comparison.getDisplayColumns(),
-            		form.isIncludeDescriptions(), protein, false);
+            		form.isIncludeDescriptions(), protein, false, form.isIncludePeptides());
         }
         
         writer.write("\n\n");
@@ -193,7 +210,7 @@ public class DownloadComparisonResults extends Action {
 
 
 	private void writeHeader(PrintWriter writer, List<? extends Dataset> datasets, DisplayColumns displayColumns,
-			boolean printDescription, boolean writeProteinGroupsHeader) {
+			boolean printDescription, boolean writeProteinGroupsHeader, boolean printPeptides) {
 		// print the header
         writer.write("ProteinID\t");
         if(writeProteinGroupsHeader)
@@ -232,10 +249,13 @@ public class DownloadComparisonResults extends Action {
         		writer.write("NSAF("+getDatasetString(dataset)+")\t");
         }
         
+        if(printPeptides)
+        	writer.write("Peptides\t");
+        
         if(printDescription)
-            writer.write("Description\n");
-        else
-            writer.write("\n");
+            writer.write("Description");
+        
+        writer.write("\n");
 	}
 
 
@@ -412,23 +432,23 @@ public class DownloadComparisonResults extends Action {
       
 
       // print the proteins in each protein group
-      writeHeader(writer, comparison.getDatasets(), comparison.getDisplayColumns(), form.isIncludeDescriptions(), true);
+      writeHeader(writer, comparison.getDatasets(), comparison.getDisplayColumns(), form.isIncludeDescriptions(), true, form.isIncludePeptides());
       
       // Remove any sorting criteria so that all fields get initialized properly.
       comparison.setSortBy(null);
       comparison.setSortOrder(null);
       
       if(!form.isCollapseProteinGroups())
-          writeSplitProteinGroup(writer, comparison, form.isIncludeDescriptions());
+          writeSplitProteinGroup(writer, comparison, form.isIncludeDescriptions(), form.isIncludePeptides());
       else
-          writeCollapsedProteinGroup(writer, comparison, form.isIncludeDescriptions());
+          writeCollapsedProteinGroup(writer, comparison, form.isIncludeDescriptions(), form.isIncludePeptides());
       
       writer.write("\n\n");
       
     }
     
     private void writeSplitProteinGroup(PrintWriter writer,
-            ProteinGroupComparisonDataset comparison, boolean printDescription) {
+            ProteinGroupComparisonDataset comparison, boolean printDescription, boolean printPeptides) {
 
         for(ComparisonProteinGroup grpProtein: comparison.getProteinsGroups()) {
 
@@ -437,7 +457,7 @@ public class DownloadComparisonResults extends Action {
 
                 writeComparisonProtein(writer, comparison.getDatasets(), comparison.getDisplayColumns(),
                 		printDescription,
-						protein, true);
+						protein, true, printPeptides);
             }
         }
     }
@@ -445,7 +465,7 @@ public class DownloadComparisonResults extends Action {
 
 	private void writeComparisonProtein(PrintWriter writer,
 			List<? extends Dataset> datasets, DisplayColumns displayColumns, boolean printDescription,
-			ComparisonProtein protein, boolean printGroupId) {
+			ComparisonProtein protein, boolean printGroupId, boolean printPeptides) {
 		
 		writer.write(protein.getNrseqId()+"\t");
 		if(printGroupId)
@@ -545,6 +565,16 @@ public class DownloadComparisonResults extends Action {
             }
         }
         
+        if(printPeptides) {
+        	Set<String> peptides = getPeptides(protein.getNrseqId(), datasets);
+        	if(peptides == null)
+        		writer.write("ERROR_GETTTING_PEPTIDES");
+        	else {
+        		writer.write(StringUtils.makeCommaSeparated(peptides));
+        	}
+        	writer.write("\t");
+        }
+        
         if(printDescription) {
         	List<ProteinReference> descRefs = protein.getProteinListing().getDescriptionReferences();
         	
@@ -557,7 +587,7 @@ public class DownloadComparisonResults extends Action {
 	}
     
     private void writeCollapsedProteinGroup(PrintWriter writer,
-            ProteinGroupComparisonDataset comparison, boolean includeDescription) {
+            ProteinGroupComparisonDataset comparison, boolean includeDescription, boolean includePeptides) {
 
     	DisplayColumns displayColumns = comparison.getDisplayColumns();
     	
@@ -568,6 +598,7 @@ public class DownloadComparisonResults extends Action {
             String commonNameString = "";
             String molWtString = "";
             String piString = "";
+            
             String nsafStrings[] = new String[comparison.getDatasetCount()];
             for(int i = 0; i < comparison.getDatasetCount(); i++)
                 nsafStrings[i] = "";
@@ -705,6 +736,17 @@ public class DownloadComparisonResults extends Action {
                 }
             }
             
+            // print peptides, if required
+            // peptide information will be the same for all proteins in a group
+            if(includePeptides) {
+            	Set<String> peptides = getPeptides(oneProtein.getNrseqId(), comparison.getDatasets());
+            	if(peptides == null)
+            		writer.write("ERROR_GETTTING_PEPTIDES");
+            	else {
+            		writer.write(StringUtils.makeCommaSeparated(peptides));
+            	}
+            	writer.write("\t");
+            }
             
             // print description, if required
             if(includeDescription)
@@ -713,5 +755,55 @@ public class DownloadComparisonResults extends Action {
                 writer.write("\n");
         }
     }
-      
+    
+    
+    private Set<String> getPeptides(int nrseqProteinId, List<? extends Dataset> datasets) {
+        
+        Set<String> allPeptides = new HashSet<String>();
+        
+        ProteinferDAOFactory daoFactory = ProteinferDAOFactory.instance();
+        ProteinferProteinDAO protDao = daoFactory.getProteinferProteinDao();
+        ProteinferPeptideDAO peptDao = daoFactory.getProteinferPeptideDao();
+        
+        ArrayList<Integer> nrseqIds = new ArrayList<Integer>(1);
+        nrseqIds.add(nrseqProteinId);
+        
+        MsResultLoader resLoader = MsResultLoader.getInstance();
+        PeptideDefinition peptDef = new PeptideDefinition();
+        peptDef.setUseCharge(true);
+        peptDef.setUseMods(true);
+        
+        for(Dataset dataset: datasets) {
+            
+        	ProteinferRun run = daoFactory.getProteinferRunDao().loadProteinferRun(dataset.getDatasetId());
+        	Program inputGenerator = run.getInputGenerator();
+        	
+            if(dataset.getSource() != DatasetSource.DTA_SELECT) {
+                List<Integer> piProteinIds = protDao.getProteinIdsForNrseqIds(dataset.getDatasetId(), nrseqIds);
+                
+                for(int piProteinId: piProteinIds) {
+                    List<ProteinferPeptide> peptides = peptDao.loadPeptidesForProteinferProtein(piProteinId);
+                    
+                    for(ProteinferPeptide pept: peptides) {
+                    	
+                    	for(ProteinferIon ion: pept.getIonList()) {
+                    		ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
+                    		int resultId = psm.getResultId();
+                    		MsSearchResult result = resLoader.getResult(resultId, inputGenerator);
+                    		
+							try {
+								allPeptides.add(result.getResultPeptide().getModifiedPeptide());
+								
+							} catch (ModifiedSequenceBuilderException e) {
+								log.error("Error building modified sequence for ion: "+ion.getId());
+								return null;
+							}
+                    	}
+                    }
+                }
+            }
+        }
+        
+        return allPeptides;
+    }
 }

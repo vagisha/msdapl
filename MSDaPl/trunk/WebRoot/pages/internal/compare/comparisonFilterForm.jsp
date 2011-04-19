@@ -901,7 +901,10 @@ function showActionOptions() {
  		<td align="right">
  			<html:checkbox name="proteinSetComparisonForm" property="collapseProteinGroups">Collapse Protein Groups</html:checkbox>
  			&nbsp;
-			<html:checkbox name="proteinSetComparisonForm" property="includeDescriptions">Include Description</html:checkbox>
+ 			Include: 
+			<html:checkbox name="proteinSetComparisonForm" property="includeDescriptions">Description</html:checkbox>
+			&nbsp;
+			<html:checkbox name="proteinSetComparisonForm" property="includePeptides">Peptides</html:checkbox>
 			&nbsp; &nbsp;
 			<html:submit value="Download" onclick="javascript:downloadResults(); return false;" styleClass="plain_button" style="margin-top:0px;"></html:submit>
 		</td>
