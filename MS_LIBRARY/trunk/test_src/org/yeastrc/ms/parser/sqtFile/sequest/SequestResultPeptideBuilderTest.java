@@ -17,6 +17,7 @@ import junit.framework.TestCase;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.domain.search.impl.ResidueModification;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
 /**
@@ -129,11 +130,11 @@ public class SequestResultPeptideBuilderTest extends TestCase {
     }
     
     public void testGetResultMods() {
-        List<Mod> dynaMods = new ArrayList<Mod>(4);
-        dynaMods.add(new Mod('S', '*', "80.0"));
-        dynaMods.add(new Mod('T', '*', "80.0"));
-        dynaMods.add(new Mod('Y', '*', "80.0"));
-        dynaMods.add(new Mod('M', '#', "16.0"));
+        List<ResidueModification> dynaMods = new ArrayList<ResidueModification>(4);
+        dynaMods.add(new ResidueModification('S', '*', "80.0"));
+        dynaMods.add(new ResidueModification('T', '*', "80.0"));
+        dynaMods.add(new ResidueModification('Y', '*', "80.0"));
+        dynaMods.add(new ResidueModification('M', '#', "16.0"));
         
         String seq = "A.S*M#.Z";
         try{builder.getResultMods(seq, dynaMods); fail("Sequence still has dots");}
@@ -172,11 +173,11 @@ public class SequestResultPeptideBuilderTest extends TestCase {
     }
     
     public void testGetResultModsInvalid() {
-        List<Mod> dynaMods = new ArrayList<Mod>(4);
-        dynaMods.add(new Mod('S', '*', "80.0"));
-        dynaMods.add(new Mod('T', '*', "80.0"));
-        dynaMods.add(new Mod('Y', '*', "80.0"));
-        dynaMods.add(new Mod('M', '#', "16.0"));
+        List<ResidueModification> dynaMods = new ArrayList<ResidueModification>(4);
+        dynaMods.add(new ResidueModification('S', '*', "80.0"));
+        dynaMods.add(new ResidueModification('T', '*', "80.0"));
+        dynaMods.add(new ResidueModification('Y', '*', "80.0"));
+        dynaMods.add(new ResidueModification('M', '#', "16.0"));
         
         String seq = "S*M#C*AB";
         try{builder.getResultMods(seq, dynaMods); fail("Invalid mod char");}
@@ -189,11 +190,11 @@ public class SequestResultPeptideBuilderTest extends TestCase {
     
     
     public void testBuild1() {
-        List<Mod> dynaMods = new ArrayList<Mod>(4);
-        dynaMods.add(new Mod('S', '*', "80.0"));
-        dynaMods.add(new Mod('T', '*', "80.0"));
-        dynaMods.add(new Mod('Y', '*', "80.0"));
-        dynaMods.add(new Mod('M', '#', "16.0"));
+        List<ResidueModification> dynaMods = new ArrayList<ResidueModification>(4);
+        dynaMods.add(new ResidueModification('S', '*', "80.0"));
+        dynaMods.add(new ResidueModification('T', '*', "80.0"));
+        dynaMods.add(new ResidueModification('Y', '*', "80.0"));
+        dynaMods.add(new ResidueModification('M', '#', "16.0"));
         
         String seq = "I.QKLRNY*FEAFEM#PG.S";
         MsSearchResultPeptide resultPeptide = null;
@@ -229,7 +230,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
     }
     
     public void testBuild2() {
-        List<Mod> dynaMods = new ArrayList<Mod>(0);
+        List<ResidueModification> dynaMods = new ArrayList<ResidueModification>(0);
         
         String seq = "L.GI|62822520|gb|AAY15068.1|SGVSIVNAVTYEPTVAGRPNAV.H";
         String dotLess = null;
@@ -245,7 +246,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
     }
     
     public void testBuild3() {
-        List<Mod> dynaMods = new ArrayList<Mod>(0);
+        List<ResidueModification> dynaMods = new ArrayList<ResidueModification>(0);
         
         String seq = "L.Gi|62822520|gb|AAY15068.1|SGVSIVNAVTYEPTVAGRPNAV.H";
         String dotLess = null;
@@ -261,8 +262,8 @@ public class SequestResultPeptideBuilderTest extends TestCase {
     }
     
     public void testBuild4() {
-        List<Mod> dynaMods = new ArrayList<Mod>(4);
-        dynaMods.add(new Mod('S', '*', "80.0"));
+        List<ResidueModification> dynaMods = new ArrayList<ResidueModification>(4);
+        dynaMods.add(new ResidueModification('S', '*', "80.0"));
         String seq = "A.*SCDS*.Z";
         try {builder.build(seq, dynaMods, null);fail("Invalid sequence");}
         catch(SQTParseException e){
@@ -292,10 +293,10 @@ public class SequestResultPeptideBuilderTest extends TestCase {
     }
     
     public void testBuildResidueWithTwoPossibleMods() {
-        List<Mod> dynaMods = new ArrayList<Mod>(4);
-        dynaMods.add(new Mod('S', '*', "80.0"));
-        dynaMods.add(new Mod('S', '#', "111.0"));
-        dynaMods.add(new Mod('T', '*', "80.0"));
+        List<ResidueModification> dynaMods = new ArrayList<ResidueModification>(4);
+        dynaMods.add(new ResidueModification('S', '*', "80.0"));
+        dynaMods.add(new ResidueModification('S', '#', "111.0"));
+        dynaMods.add(new ResidueModification('T', '*', "80.0"));
         
         String seq = "I.QKLRS*FEAFS#MPGT*.S";
         MsSearchResultPeptide resultPeptide = null;
@@ -337,10 +338,10 @@ public class SequestResultPeptideBuilderTest extends TestCase {
     }
     
     public void testBuildOneCharTwoMods() {
-        List<Mod> dynaMods = new ArrayList<Mod>(4);
-        dynaMods.add(new Mod('S', '*', "80.0"));
-        dynaMods.add(new Mod('S', '#', "111.0"));
-        dynaMods.add(new Mod('T', '*', "80.0"));
+        List<ResidueModification> dynaMods = new ArrayList<ResidueModification>(4);
+        dynaMods.add(new ResidueModification('S', '*', new BigDecimal("80.0")));
+        dynaMods.add(new ResidueModification('S', '#', new BigDecimal("111.0")));
+        dynaMods.add(new ResidueModification('T', '*', new BigDecimal("80.0")));
         
         String seq = "I.QKLRS*#FEAFS#MPG.S";
         MsSearchResultPeptide resultPeptide = null;
@@ -380,32 +381,32 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         assertEquals(BigDecimal.valueOf(111.0), mod.getModificationMass());
     }
     
-    private static class Mod implements MsResidueModificationIn {
-
-        private char modResidue;
-        private char modSymbol;
-        private BigDecimal modMass;
-
-        public Mod(char modResidue, char modSymbol, String modMass) {
-            this.modResidue = modResidue;
-            this.modSymbol = modSymbol;
-            this.modMass = new BigDecimal(modMass);
-        }
-        public BigDecimal getModificationMass() {
-            return modMass;
-        }
-
-        public char getModificationSymbol() {
-            return modSymbol;
-        }
-
-//        public ModificationType getModificationType() {
-//            return ModificationType.DYNAMIC;
+//    private static class Mod implements MsResidueModificationIn {
+//
+//        private char modResidue;
+//        private char modSymbol;
+//        private BigDecimal modMass;
+//
+//        public Mod(char modResidue, char modSymbol, String modMass) {
+//            this.modResidue = modResidue;
+//            this.modSymbol = modSymbol;
+//            this.modMass = new BigDecimal(modMass);
 //        }
-
-        public char getModifiedResidue() {
-            return modResidue;
-        }
-    }
+//        public BigDecimal getModificationMass() {
+//            return modMass;
+//        }
+//
+//        public char getModificationSymbol() {
+//            return modSymbol;
+//        }
+//
+////        public ModificationType getModificationType() {
+////            return ModificationType.DYNAMIC;
+////        }
+//
+//        public char getModifiedResidue() {
+//            return modResidue;
+//        }
+//    }
     
 }

@@ -1,10 +1,10 @@
 package org.yeastrc.ms.dao.util;
 
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupException;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
-import org.yeastrc.ms.domain.nrseq.NrDbProtein;
-
 import junit.framework.TestCase;
+
+import org.yeastrc.nrseq.dao.NrSeqLookupException;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
+import org.yeastrc.nrseq.domain.NrDbProtein;
 
 public class NrSeqLookupUtilTest extends TestCase {
 

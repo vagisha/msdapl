@@ -19,7 +19,7 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
 
     public void testOperationsOnSQTSpectrumData() {
         
-        assertNull(sqtSpectrumDao.load(34, 1, 1)); // runSearchId = 34; scanId = 1; charge = 1
+        assertNull(sqtSpectrumDao.load(34, 1, 1, new BigDecimal("0"))); // runSearchId = 34; scanId = 1; charge = 1
         
         SQTSearchScanIn data = makeSearchScan(3, 0); // charge = 3; processtime = 0
         
@@ -46,7 +46,7 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
         
         sqtSpectrumDao.save(new SQTSearchScanWrap(data, 1024, 4201)); // runSearchId = 1024; scanId = 4201
         
-        SQTSearchScan data_db = sqtSpectrumDao.load(1024, 4201, 3);
+        SQTSearchScan data_db = sqtSpectrumDao.load(1024, 4201, 3, data.getObservedMass());
         assertNotNull(data_db);
         
         assertEquals(1024, data_db.getRunSearchId());
@@ -55,7 +55,7 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
         checkSearchScan(data, data_db);
         
         sqtSpectrumDao.deleteForRunSearch(1024);
-        data_db = sqtSpectrumDao.load(1024, 4201, 3);
+        data_db = sqtSpectrumDao.load(1024, 4201, 3, data.getObservedMass());
         assertNull(data_db);
     }
     

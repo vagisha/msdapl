@@ -277,7 +277,51 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
                 }
                 public int getxCorrRank() {
                     return xCorrRank;
-                }};
+                }
+				@Override
+				public BigDecimal getDeltaCNstar() {
+					throw new UnsupportedOperationException();
+				}
+				@Override
+				public void setCalculatedMass(BigDecimal mass) {
+					throw new UnsupportedOperationException();
+				}
+				@Override
+				public void setDeltaCN(BigDecimal deltaCn) {
+					throw new UnsupportedOperationException();
+				}
+				@Override
+				public void setDeltaCNstar(BigDecimal dcnStar) {
+					throw new UnsupportedOperationException();
+				}
+				@Override
+				public void setEvalue(Double evalue) {
+					throw new UnsupportedOperationException();
+				}
+				@Override
+				public void setMatchingIons(int matchingIons) {
+					throw new UnsupportedOperationException();
+				}
+				@Override
+				public void setPredictedIons(int predictedIons) {
+					throw new UnsupportedOperationException();
+				}
+				@Override
+				public void setSp(BigDecimal sp) {
+					throw new UnsupportedOperationException();
+				}
+				@Override
+				public void setSpRank(int rank) {
+					throw new UnsupportedOperationException();
+				}
+				@Override
+				public void setxCorr(BigDecimal xcorr) {
+					throw new UnsupportedOperationException();
+				}
+				@Override
+				public void setxCorrRank(int rank) {
+					throw new UnsupportedOperationException();
+				}};
         }
     }
 }

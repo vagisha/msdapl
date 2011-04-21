@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -25,11 +26,11 @@ import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
+import org.yeastrc.ms.domain.search.Param;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
@@ -94,7 +95,7 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
     private void checkSearchScan2(int runSearchId, int runId) {
         // S       00023   00023   3       22      shamu048        866.46000       1892.2  56.4    4716510
         int scanId = scanDao.loadScanIdForScanNumRun(23, runId);
-        SQTSearchScan scan = sqtScanDao.load(runSearchId, scanId, 3);
+        SQTSearchScan scan = sqtScanDao.load(runSearchId, scanId, 3, new BigDecimal("866.46000"));
         assertEquals(scanId, scan.getScanId());
         assertEquals(runSearchId, scan.getRunSearchId());
         assertEquals(3, scan.getCharge());
@@ -106,7 +107,7 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
         assertEquals(4716510, scan.getSequenceMatches());
         // S       00020   00020   1       22      shamu049        807.67000       2681.7  95.3    5138490
         scanId = scanDao.loadScanIdForScanNumRun(20, runId);
-        scan = sqtScanDao.load(runSearchId, scanId, 1);
+        scan = sqtScanDao.load(runSearchId, scanId, 1, new BigDecimal("807.67000"));
         assertEquals(scanId, scan.getScanId());
         assertEquals(runSearchId, scan.getRunSearchId());
         assertEquals(1, scan.getCharge());
@@ -118,7 +119,7 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
         assertEquals(5138490, scan.getSequenceMatches());
         // S       00010   00010   1       23      shamu050        717.62000       4000.6  111.6   5928764
         scanId = scanDao.loadScanIdForScanNumRun(10, runId);
-        scan = sqtScanDao.load(runSearchId, scanId, 1);
+        scan = sqtScanDao.load(runSearchId, scanId, 1, new BigDecimal("717.62000"));
         assertEquals(scanId, scan.getScanId());
         assertEquals(runSearchId, scan.getRunSearchId());
         assertEquals(1, scan.getCharge());
@@ -130,7 +131,7 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
         assertEquals(5928764, scan.getSequenceMatches());
         // S       00026   00026   1       23      shamu048        817.33000       2044.4  69.6    5697304
         scanId = scanDao.loadScanIdForScanNumRun(26, runId);
-        scan = sqtScanDao.load(runSearchId, scanId, 1);
+        scan = sqtScanDao.load(runSearchId, scanId, 1, new BigDecimal("817.33000"));
         assertEquals(scanId, scan.getScanId());
         assertEquals(runSearchId, scan.getRunSearchId());
         assertEquals(1, scan.getCharge());
@@ -383,10 +384,10 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
     }
 
     private void checkUploadedParams(SequestSearch search, String dir) throws IOException {
-        List<SequestParam> params = search.getSequestParams();
+        List<Param> params = search.getSequestParams();
         
         StringBuilder fromDb = new StringBuilder();
-        for (SequestParam p: params) {
+        for (Param p: params) {
             fromDb.append("\n"+p.getParamName()+"\t"+p.getParamValue());
         }
         fromDb.deleteCharAt(0);

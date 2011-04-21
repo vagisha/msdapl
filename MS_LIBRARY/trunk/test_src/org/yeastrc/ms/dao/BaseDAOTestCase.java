@@ -253,7 +253,12 @@ public class BaseDAOTestCase extends TestCase {
 
             public String getDescription() {
                 return desc;
-            }};
+            }
+
+			@Override
+			public void setAccession(String accession) {
+				throw new UnsupportedOperationException();
+			}};
         return match;
     }
 

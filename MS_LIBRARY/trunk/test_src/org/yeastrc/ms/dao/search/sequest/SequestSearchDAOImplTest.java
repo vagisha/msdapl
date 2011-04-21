@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.search.MsSearchDAOImplTest.MsSearchTest;
 import org.yeastrc.ms.dao.search.sqtfile.SQTBaseDAOTestCase;
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
+import org.yeastrc.ms.domain.search.Param;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
 
 
 public class SequestSearchDAOImplTest extends SQTBaseDAOTestCase {
@@ -73,23 +73,23 @@ public class SequestSearchDAOImplTest extends SQTBaseDAOTestCase {
     protected void checkSequestSearch(SequestSearchIn input, SequestSearch output) {
         super.checkSearch(input, output);
         
-        List<SequestParam> inputParams = input.getSequestParams();
-        List<SequestParam> outputParams = output.getSequestParams();
+        List<Param> inputParams = input.getSequestParams();
+        List<Param> outputParams = output.getSequestParams();
         
         assertEquals(inputParams.size(), outputParams.size());
         
-        Collections.sort(inputParams, new Comparator<SequestParam>() {
-            public int compare(SequestParam o1, SequestParam o2) {
+        Collections.sort(inputParams, new Comparator<Param>() {
+            public int compare(Param o1, Param o2) {
                 return o1.getParamName().compareTo(o2.getParamName());
             }});
-        Collections.sort(outputParams, new Comparator<SequestParam>() {
-            public int compare(SequestParam o1, SequestParam o2) {
+        Collections.sort(outputParams, new Comparator<Param>() {
+            public int compare(Param o1, Param o2) {
                 return o1.getParamName().compareTo(o2.getParamName());
             }});
         
         for (int i = 0; i < inputParams.size(); i++) {
-            SequestParam ip = inputParams.get(i);
-            SequestParam op = outputParams.get(i);
+            Param ip = inputParams.get(i);
+            Param op = outputParams.get(i);
             assertEquals(ip.getParamName(), op.getParamName());
             assertEquals(op.getParamValue(), op.getParamValue());
         }
@@ -97,15 +97,15 @@ public class SequestSearchDAOImplTest extends SQTBaseDAOTestCase {
     
     public static final class SequestSearchTest extends MsSearchTest implements SequestSearchIn {
 
-        private List<SequestParam> params;
+        private List<Param> params;
         
-        public void setSequestParams(List<SequestParam> params) {
+        public void setSequestParams(List<Param> params) {
             this.params = params;
         }
-        @Override
-        public List<SequestParam> getMascotParams() {
-            return params;
-        }
-        
+
+		@Override
+		public List<Param> getSequestParams() {
+			return params;
+		}
     }
 }

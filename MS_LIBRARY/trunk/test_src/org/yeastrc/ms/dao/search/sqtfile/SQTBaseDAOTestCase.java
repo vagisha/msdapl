@@ -14,10 +14,10 @@ import org.yeastrc.ms.dao.search.sequest.SequestSearchDAOImplTest.SequestSearchT
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.Param;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
@@ -70,10 +70,10 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
             search.setDynamicTerminalMods(Arrays.asList(new MsTerminalModificationIn[]{tmod1, tmod2}));
         }
         
-        List<SequestParam> params = new ArrayList<SequestParam>(10);
+        List<Param> params = new ArrayList<Param>(10);
         for (int i = 0; i < 10; i++) {
             final int idx = i;
-            SequestParam param = new SequestParam(){
+            Param param = new Param(){
                 public String getParamName() {return "param_"+idx;}
                 public String getParamValue() {return "value_"+idx;}
                 };

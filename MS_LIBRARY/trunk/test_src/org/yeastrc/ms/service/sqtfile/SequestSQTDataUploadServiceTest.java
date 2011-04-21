@@ -1,5 +1,6 @@
 package org.yeastrc.ms.service.sqtfile;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -17,11 +18,11 @@ import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.Param;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
@@ -149,7 +150,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(0, search.getDynamicTerminalMods().size());
         
         // check sequest params
-        List<SequestParam> params = search.getSequestParams();
+        List<Param> params = search.getSequestParams();
         String[] paramArr = new String[] {
                 "database_name = /net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta",
                 "peptide_mass_tolerance = 3.000",
@@ -206,12 +207,12 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         };
         assertEquals(paramArr.length, params.size());
         for (int i = 0; i < params.size(); i++) {
-            SequestParam p = params.get(i);
+            Param p = params.get(i);
             checkParam(p, paramArr[i]);
         }
     }
     
-    private void checkParam(SequestParam param, String origStr) {
+    private void checkParam(Param param, String origStr) {
        String[] tokens = origStr.trim().split("=");
        assertEquals(param.getParamName(), tokens[0].trim());
        if (tokens.length == 2)
@@ -280,7 +281,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         // S       00023   00023   1       22      shamu048        866.46000       1892.2  56.4    4716510
         int scanId = this.scanDao.loadScanIdForScanNumRun(23, runId);
         assertEquals(23, this.scanDao.load(scanId).getStartScanNum());
-        SQTSearchScan scan = searchScanDao.load(runSearchId, scanId, 1);
+        SQTSearchScan scan = searchScanDao.load(runSearchId, scanId, 1, new BigDecimal("866.46000"));
         assertNotNull(scan);
         assertEquals(scanId, scan.getScanId());
         assertEquals(1, scan.getCharge());
@@ -382,7 +383,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         scanId = this.scanDao.loadScanIdForScanNumRun(20, runId);
         assertEquals(20, this.scanDao.load(scanId).getStartScanNum());
         assertEquals(2, seqResDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, 1).size()); // number of results for this scan + charge combination
-        scan = searchScanDao.load(runSearchId, scanId, 1);
+        scan = searchScanDao.load(runSearchId, scanId, 1, new BigDecimal("807.67000"));
         assertNotNull(scan);
         assertEquals(scanId, scan.getScanId());
         assertEquals(1, scan.getCharge());
@@ -400,7 +401,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         scanId = this.scanDao.loadScanIdForScanNumRun(10, runId);
         assertEquals(10, this.scanDao.load(scanId).getStartScanNum());
         assertEquals(0, seqResDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, 1).size()); // number of results for this scan + charge combination
-        scan = searchScanDao.load(runSearchId, scanId, 1);
+        scan = searchScanDao.load(runSearchId, scanId, 1, new BigDecimal("717.62000"));
         assertNull(scan);
 //        assertNotNull(scan);
 //        assertEquals(scanId, scan.getScanId());
@@ -417,7 +418,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         scanId = this.scanDao.loadScanIdForScanNumRun(26, runId);
         assertEquals(26, this.scanDao.load(scanId).getStartScanNum());
         assertEquals(2, seqResDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, 1).size()); // number of results for this scan + charge combination
-        scan = searchScanDao.load(runSearchId, scanId, 1);
+        scan = searchScanDao.load(runSearchId, scanId, 1, new BigDecimal("817.33000"));
         assertNotNull(scan);
         assertEquals(scanId, scan.getScanId());
         assertEquals(1, scan.getCharge());

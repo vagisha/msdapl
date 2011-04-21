@@ -19,6 +19,22 @@ public class ResidueModification implements MsResidueModificationIn {
     private char modificationSymbol = EMPTY_CHAR;
     private char modifiedResidue = EMPTY_CHAR;
     
+    public ResidueModification() {}
+    
+    public ResidueModification(char modifiedResidue, char modificationSymbol, BigDecimal modificationMass) {
+    	
+    	this.modifiedResidue = modifiedResidue;
+    	this.modificationSymbol = modificationSymbol;
+    	this.modificationMass = modificationMass;
+    }
+    
+    public ResidueModification(char modifiedResidue, char modificationSymbol, String modificationMass) {
+    	
+    	this.modifiedResidue = modifiedResidue;
+    	this.modificationSymbol = modificationSymbol;
+    	this.modificationMass = new BigDecimal(modificationMass);
+    }
+    
     public char getModifiedResidue() {
         return modifiedResidue;
     }

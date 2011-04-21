@@ -210,5 +210,10 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         public void setObservedMass(BigDecimal mass) {
             this.observedMass = mass;
         }
+
+		@Override
+		public void addMatchingProteinMatch(MsSearchResultProteinIn match) {
+			throw new UnsupportedOperationException();
+		}
     }
 }

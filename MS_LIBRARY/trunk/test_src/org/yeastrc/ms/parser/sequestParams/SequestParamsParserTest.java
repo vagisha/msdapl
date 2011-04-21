@@ -12,7 +12,7 @@ import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
+import org.yeastrc.ms.domain.search.Param;
 import org.yeastrc.ms.parser.DataProviderException;
 
 public class SequestParamsParserTest extends TestCase {
@@ -31,7 +31,7 @@ public class SequestParamsParserTest extends TestCase {
     public void testMatchParamValuePair() {
         // matching pattern ([\\S]+)\\s*=\\s*(.+&&[^;])\\s*;{0,1}.*
         String line = "database_name = /net/maccoss/vol2/mouse-contam.fasta";
-        SequestParam param = parser.matchParamValuePair(line);
+        Param param = parser.matchParamValuePair(line);
         assertNotNull(param);
         assertEquals("database_name", param.getParamName());
         assertEquals("/net/maccoss/vol2/mouse-contam.fasta", param.getParamValue());
