@@ -4,13 +4,13 @@
  * Jun 16, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain.run.ms2file.impl;
+package org.yeastrc.ms.dao.run.ms2file.ibatis;
 
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 
 
 /**
- * 
+ * This class is used only by ibatis
  */
 public class MS2HeaderWrap  implements MS2NameValuePair {
 

@@ -11,7 +11,6 @@ import java.util.List;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2HeaderDAO;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
-import org.yeastrc.ms.domain.run.ms2file.impl.MS2HeaderWrap;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

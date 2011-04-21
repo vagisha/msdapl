@@ -4,7 +4,7 @@
 <sqlMap namespace="MS2Header"> 
 
 	<typeAlias alias="HeaderOut" type="org.yeastrc.ms.domain.run.ms2file.impl.NameValuePairBean"/>
-	<typeAlias alias="HeaderIn" type="org.yeastrc.ms.domain.run.impl.ms2file.MS2HeaderWrap"/>
+	<typeAlias alias="HeaderIn" type="org.yeastrc.ms.dao.run.ms2file.ibatis.MS2HeaderWrap"/>
 	
 	<resultMap class="HeaderOut" id="headerResult">
 		<result property="name" column="header" />
