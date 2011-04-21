@@ -4,12 +4,12 @@
  * Sep 7, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain.run.impl;
+package org.yeastrc.ms.dao.run.ibatis;
 
 import org.yeastrc.ms.domain.run.MsRunLocationIn;
 
 /**
- * 
+ * This class is used only by ibatis
  */
 public class MsRunLocationWrap {
 

@@ -4,7 +4,7 @@
 <sqlMap namespace="MsRunLocation"> 
 
 	<typeAlias alias="MsRunLocationOut" type="org.yeastrc.ms.domain.run.impl.RunLocationBean" />
-	<typeAlias alias="MsRunLocationIn" type="org.yeastrc.ms.domain.run.impl.MsRunLocationWrap" />
+	<typeAlias alias="MsRunLocationIn" type="org.yeastrc.ms.dao.run.ibatis.MsRunLocationWrap" />
 	
 	<resultMap class="MsRunLocationOut" id="msRunLocationResult">
 		<result property="id" column="id" />
