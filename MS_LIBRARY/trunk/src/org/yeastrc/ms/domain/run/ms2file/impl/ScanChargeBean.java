@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
-import org.yeastrc.ms.parser.ms2File.HeaderItem;
 import org.yeastrc.ms.util.PeakStringBuilder;
 
 /**
@@ -53,7 +52,7 @@ public class ScanChargeBean implements MS2ScanCharge {
 
     public void addAnalysisItem(String label, String value) {
         if (label == null)   return;
-        analysisItems.add(new HeaderItem(label, value));
+        analysisItems.add(new NameValuePairBean(label, value));
     }
 
     public String toString() {

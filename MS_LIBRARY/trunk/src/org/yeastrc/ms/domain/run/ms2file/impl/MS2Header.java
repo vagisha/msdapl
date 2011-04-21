@@ -4,7 +4,7 @@
  * Jun 16, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.parser.ms2File;
+package org.yeastrc.ms.domain.run.ms2file.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ public class MS2Header implements MS2RunIn {
 //            throw new NullPointerException("name for Header cannot be null.");
             return;
         
-        headerList.add(new HeaderItem(name, value));
+        headerList.add(new NameValuePairBean(name, value));
         
         // if there is no value for this header ignore it; It will still get added to the 
         // headerItems list. 

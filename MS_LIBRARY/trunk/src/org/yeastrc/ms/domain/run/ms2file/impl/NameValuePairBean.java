@@ -11,6 +11,12 @@ public class NameValuePairBean implements MS2NameValuePair {
     public NameValuePairBean() {
         super();
     }
+    
+    public NameValuePairBean(String name, String value) {
+        super();
+        this.name = name;
+        this.value = value;
+    }
 
     public String getName() {
         return name;
