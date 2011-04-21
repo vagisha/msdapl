@@ -6,7 +6,7 @@
  */
 package org.yeastrc.ms.domain.run.ms2file.impl;
 
-import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisWId;
+import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysis;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 
 
@@ -15,7 +15,7 @@ import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
  * Represents a "D" line in the MS2 file.  Charge dependent analysis for a particular scan.
  * A "D" line should follow a "Z" line in the MS2 file.
  */
-public class MS2ChargeDependentAnalysisWrap implements MS2ChargeDependentAnalysisWId {
+public class MS2ChargeDependentAnalysisWrap implements MS2ChargeDependentAnalysis {
 
     private int scanChargeId;               // the predicated charge for a particular scan to which
                                             // this charge dependent analysis corresponds.

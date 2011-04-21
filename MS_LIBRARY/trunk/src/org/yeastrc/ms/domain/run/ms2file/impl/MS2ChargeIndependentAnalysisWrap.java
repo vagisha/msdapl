@@ -6,7 +6,7 @@
  */
 package org.yeastrc.ms.domain.run.ms2file.impl;
 
-import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysisWId;
+import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysis;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 
 
@@ -14,7 +14,7 @@ import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
  * Represents an "I" line in the MS2 file.  Charge independent analysis for a particular scan.
  * There can be multiple "I" lines in the MS2 file for a single scan.
  */
-public class MS2ChargeIndependentAnalysisWrap implements MS2ChargeIndependentAnalysisWId {
+public class MS2ChargeIndependentAnalysisWrap implements MS2ChargeIndependentAnalysis {
 
     private int scanId;         // id (database) of the scan that was analyzed
     private MS2NameValuePair header;

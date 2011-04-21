@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
-import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysisWId;
+import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysis;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeIndependentAnalysisWrap;
 
@@ -36,11 +36,11 @@ public class MS2ChargeIndependentAnalysisDAOImpl extends BaseSqlMapDAO
     }
 
     @Override
-    public void saveAll(List<MS2ChargeIndependentAnalysisWId> analysisList) {
+    public void saveAll(List<MS2ChargeIndependentAnalysis> analysisList) {
         if (analysisList.size() == 0)
             return;
         StringBuilder values = new StringBuilder();
-        for (MS2ChargeIndependentAnalysisWId analysis: analysisList) {
+        for (MS2ChargeIndependentAnalysis analysis: analysisList) {
             values.append("(");
             values.append(analysis.getScanId());
             values.append(",");

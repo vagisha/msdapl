@@ -22,8 +22,8 @@ import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
 import org.yeastrc.ms.domain.run.RunFileFormat;
-import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisWId;
-import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysisWId;
+import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysis;
+import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysis;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2RunIn;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
@@ -51,8 +51,8 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     public static final int BUF_SIZE = 1000;
     
     // these are the things we will cache and do bulk-inserts
-    private List<MS2ChargeDependentAnalysisWId> dAnalysisList;
-    private List<MS2ChargeIndependentAnalysisWId> iAnalysisList;
+    private List<MS2ChargeDependentAnalysis> dAnalysisList;
+    private List<MS2ChargeIndependentAnalysis> iAnalysisList;
     
     int lastUploadedRunId = 0;
     
@@ -67,8 +67,8 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     private boolean preUploadCheckDone = false;
     
     public MS2DataUploadService() {
-        dAnalysisList = new ArrayList<MS2ChargeDependentAnalysisWId>();
-        iAnalysisList = new ArrayList<MS2ChargeIndependentAnalysisWId>();
+        dAnalysisList = new ArrayList<MS2ChargeDependentAnalysis>();
+        iAnalysisList = new ArrayList<MS2ChargeIndependentAnalysis>();
         
         filenames = new ArrayList<String>();
         fileFormats = new ArrayList<RunFileFormat>();

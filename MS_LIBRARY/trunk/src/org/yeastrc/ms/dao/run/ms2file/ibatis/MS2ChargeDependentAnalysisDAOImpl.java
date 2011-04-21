@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
-import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisWId;
+import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysis;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeDependentAnalysisWrap;
 
@@ -36,11 +36,11 @@ public class MS2ChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
     }
 
     @Override
-    public void saveAll(List<MS2ChargeDependentAnalysisWId> analysisList) {
+    public void saveAll(List<MS2ChargeDependentAnalysis> analysisList) {
         if (analysisList.size() == 0)
             return;
         StringBuilder values = new StringBuilder();
-        for (MS2ChargeDependentAnalysisWId analysis: analysisList) {
+        for (MS2ChargeDependentAnalysis analysis: analysisList) {
             values.append("(");
             values.append(analysis.getScanChargeId());
             values.append(",");
