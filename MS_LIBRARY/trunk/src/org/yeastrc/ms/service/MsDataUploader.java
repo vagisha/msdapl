@@ -8,10 +8,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
-import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
@@ -32,7 +30,7 @@ public class MsDataUploader {
     private String remoteSpectrumDataDirectory;
     private String searchDirectory;
     private String remoteSearchDataDirectory;
-    private java.util.Date searchDate;
+    private Date searchDate;
     private String analysisDirectory;
     private String protinferDirectory;
     private boolean doScanChargeMassCheck = false; // For MacCoss lab data
@@ -41,13 +39,6 @@ public class MsDataUploader {
     private boolean uploadAnalysis = false;
     private boolean uploadProtinfer = false;
     
-    
-    private void resetUploader() {
-        uploadExceptionList.clear();
-        uploadedAnalysisIds.clear();
-        uploadedSearchId = 0;
-        uploadedExptId = 0;
-    }
     
     public void setComments(String comments) {
         this.comments = comments;
@@ -87,7 +78,7 @@ public class MsDataUploader {
         this.remoteSearchDataDirectory = remoteSearchDataDirectory.trim();
     }
 
-    public void setSearchDate(java.util.Date searchDate) {
+    public void setSearchDate(Date searchDate) {
         this.searchDate = searchDate;
     }
 
@@ -131,17 +122,8 @@ public class MsDataUploader {
         return this.uploadedExptId;
     }
     
-    /**
-     * @param remoteServer
-     * @param remoteDirectory
-     * @param fileDirectory
-     * @return database id for experiment if it was uploaded successfully, 0 otherwise
-     * @throws UploadException 
-     */
     public void uploadData() {
 
-        resetUploader();
-        
         log.info("INITIALIZING EXPERIMENT UPLOAD"+
                 "\n\tTime: "+(new Date().toString()));
         
@@ -389,7 +371,6 @@ public class MsDataUploader {
              sdus = getSearchDataUploader(searchDirectory, 
                     remoteServer, remoteSearchDataDirectory, searchDate);
             exptUploader.setSearchDataUploader(sdus);
-            //sdus.setRawDataFileNames(rdus.getFileNames(), rdus.getFileFormat());
             log.info(sdus.getClass().getName());
         }
         // Get the analysis data uploader
@@ -476,7 +457,6 @@ public class MsDataUploader {
     
     public void uploadData(int experimentId) {
         
-        resetUploader();
         MsExperimentDAO exptDao = DAOFactory.instance().getMsExperimentDAO();
         MsExperiment expt = exptDao.loadExperiment(experimentId);
         if (expt == null) {
@@ -688,15 +668,6 @@ public class MsDataUploader {
         experimentDao.updateLastUpdateDate(experimentId);
         
     }
-
-//    private void deleteOldSearchesForExperiment(int experimentId) {
-//        MsSearchDAO searchDao = UploadDAOFactory.getInstance().getMsSearchDAO();
-//        List<Integer> searchIds = searchDao.getSearchIdsForExperiment(experimentId);
-//        for (Integer id: searchIds) {
-//            if (id != null)
-//                searchDao.deleteSearch(id);
-//        }
-//    }
 
     
     private void logEndExperimentUpload(MsExperimentUploader uploader, long start, long end) {

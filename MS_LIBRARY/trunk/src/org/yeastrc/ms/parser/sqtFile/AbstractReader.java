@@ -74,6 +74,23 @@ public abstract class AbstractReader {
         } 
         
     }
+    
+    protected void advanceLineNoTrim() throws DataProviderException {
+        currentLineNum++;
+        try {
+            currentLine = reader.readLine(); // advance first
+            // skip over blank lines and line that don't start with valid character
+            while(currentLine != null && !isValidLine(currentLine)) {
+                // log.warn("!!!LINE# "+currentLineNum+" Invalid line; skipping ... \n"+currentLine);
+                currentLineNum++;
+                currentLine = reader.readLine();
+            }
+        }
+        catch (IOException e) {
+            throw new DataProviderException(currentLineNum, "Error reading file", currentLine, e);
+        } 
+        
+    }
 
     protected final String[] parseNameValueLine(String line, Pattern pattern) {
         Matcher match = pattern.matcher(line);
