@@ -52,15 +52,10 @@ private final SequestSearchResultDAO sqtResultDao;
     private List<MsResidueModificationIn> dynaResidueMods;
     private List<MsTerminalModificationIn> dynaTermMods;
     
-    private final Program program;
-    private final SearchFileFormat format;
-    
     private boolean hasAllProteinMatches = false;
     
-    public TideSQTDataUploadService(SearchFileFormat format) {
+    public TideSQTDataUploadService() {
         super();
-        this.format = format;
-        program = Program.programForFileFormat(format);
         this.tideResultDataList = new ArrayList<SequestResultDataWId>();
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
         this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
@@ -88,7 +83,7 @@ private final SequestSearchResultDAO sqtResultDao;
     }
 
     public Program getSearchProgram() {
-        return program;
+        return Program.TIDE;
     }
     
     List<String> getSqtFiles(File dir) {
@@ -403,7 +398,7 @@ private final SequestSearchResultDAO sqtResultDao;
     
     @Override
     SearchFileFormat getSearchFileFormat() {
-        return this.format;
+    	return SearchFileFormat.SQT_TIDE;
     }
 
     @Override

@@ -192,13 +192,13 @@ public class UploadServiceFactory {
             // now figure out which program generated these files.
             SearchFileFormat sqtFormat = getSqtType(dataDirectory, filenames);
             if (sqtFormat == SearchFileFormat.SQT_SEQ) {
-                SearchDataUploadService service = new SequestSQTDataUploadService(sqtFormat);
+                SearchDataUploadService service = new SequestSQTDataUploadService();
                 service.setDirectory(dataDirectory);
                 service.setDecoyDirectory(dataDirectory+File.separator+"decoy");
                 return service;
             }
             if (sqtFormat == SearchFileFormat.SQT_TIDE) {
-                SearchDataUploadService service = new TideSQTDataUploadService(sqtFormat);
+                SearchDataUploadService service = new TideSQTDataUploadService();
                 service.setDirectory(dataDirectory);
                 //service.setDecoyDirectory(dataDirectory+File.separator+"decoy");
                 return service;

@@ -1,5 +1,5 @@
 /**
- * RawDataUploadService.java
+ * SpectrumDataUploadService.java
  * @author Vagisha Sharma
  * Mar 25, 2009
  * @version 1.0

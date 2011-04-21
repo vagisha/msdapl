@@ -44,7 +44,6 @@ public class MsExperimentUploader {
     
     private StringBuilder preUploadCheckMsg;
     
-    private int searchId = 0; // uploaded searchId
     private int experimentId = 0; // uploaded experimentId
     
     public MsExperimentUploader () {
@@ -182,7 +181,6 @@ public class MsExperimentUploader {
     
     private void doSequestResultRankCheck() {
     	
-    	// TODO If we are reading Percolator XML outptut get this information from the XML file
         if(do_sdupload && do_adupload) {
         	
         	int maxPsmRank = Integer.MAX_VALUE;
@@ -275,7 +273,6 @@ public class MsExperimentUploader {
     public List<Integer> uploadAnalysisData(int searchId) throws UploadException {
         
         List<Integer> uploadedAnalysisIds = null;
-        // if we have post-search analysis data upload that next
         if(do_adupload) {
             adus.setSearchId(searchId);
             adus.setSearchDataFileNames(sdus.getFileNames());
@@ -323,22 +320,5 @@ public class MsExperimentUploader {
         log.error("\n\tDELETING EXPERIMENT: "+experimentId);
         MsExperimentDAO exptDao = DAOFactory.instance().getMsExperimentDAO();
         exptDao.deleteExperiment(experimentId);
-    }
-    
-    private void logEndExperimentUpload(long start, long end) {
-        log.info("END EXPERIMENT UPLOAD: "+((end - start)/(1000L))+"seconds"+
-                "\n\tTime: "+(new Date().toString())+"\n"+
-                getUploadSummary());
-    }
-
-    private void logBeginExperimentUpload() {
-        log.info("BEGIN EXPERIMENT UPLOAD"+
-                "\n\tRemote server: "+remoteServer+
-                "\n\tRemote directory: "+remoteDirectory+
-                "\n\tDirectory: "+uploadDirectory+
-                "\n\tTime: "+(new Date().toString())+
-                "\n\tSPECTRUM DATA UPLOAD: "+do_rdupload+
-                "\n\tSEARCH DATA UPLOAD: "+do_sdupload+
-                "\n\tANALYSIS DATA UPLOAD: "+do_adupload);
     }
 }

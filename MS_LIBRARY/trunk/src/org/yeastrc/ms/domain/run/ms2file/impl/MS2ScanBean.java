@@ -1,5 +1,5 @@
 /**
- * MS2FileScan.java
+ * MS2ScanBean.java
  * @author Vagisha Sharma
  * Jul 2, 2008
  * @version 1.0

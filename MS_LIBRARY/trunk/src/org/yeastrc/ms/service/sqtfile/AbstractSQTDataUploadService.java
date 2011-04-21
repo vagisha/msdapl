@@ -188,9 +188,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
 //        lastUploadedRunSearchId = 0;
     }
 
-//    public final List<UploadException> getUploadExceptionList() {
-//        return this.uploadExceptionList;
-//    }
 
     public final int getNumSearchesUploaded() {
         return numSearchesUploaded;
@@ -217,15 +214,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         }
     }
 
-//    static void updateProgram(int searchId, Program program) {
-//        try {
-//            MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
-//            searchDao.updateSearchProgram(searchId, program);
-//        }
-//        catch(RuntimeException e) {
-//            log.warn("Error updating search program for searchID: "+searchId, e);
-//        }
-//    }
     
     //--------------------------------------------------------------------------------------------------
     // To be implemented by subclasses
@@ -295,10 +283,13 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         
         // now upload the individual sqt files
         for (String file: filenames) {
+        	
             String filePath = dataDirectory+File.separator+file;
+            
             // if the file does not exist skip over to the next
-            if (!(new File(filePath).exists()))
-                continue;
+            //if (!(new File(filePath).exists()))
+            //    continue;
+            
             Integer runId = runIdMap.get(file); 
             
             resetCaches();
@@ -307,9 +298,8 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
             	proteinMatches = new HashMap<String, List<PeptideProteinMatch>>();
             }
             
-            int runSearchId;
             try {
-                runSearchId = uploadSqtFile(filePath, runId);
+                uploadSqtFile(filePath, runId);
                 
                 numSearchesUploaded++;
             }
@@ -326,7 +316,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
             UploadException ex = new UploadException(ERROR_CODE.NO_RUN_SEARCHES_UPLOADED);
             ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
             deleteSearch(searchId);
-            numSearchesUploaded = 0;
             throw ex;
         }
         
@@ -830,7 +819,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
                 return false;
             }
             
-            // For now we support only sequest and ProLuCID sqt files. 
             if(myType != getSearchFileFormat()) {
                 appendToMsg("Unsupported SQT type for uploader. Expected: "+getSearchFileFormat()+"; Found: "+myType+". File: "+file);
                 return false;

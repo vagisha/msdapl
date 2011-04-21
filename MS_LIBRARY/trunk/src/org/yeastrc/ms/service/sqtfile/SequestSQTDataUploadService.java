@@ -53,13 +53,8 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     private List<MsResidueModificationIn> dynaResidueMods;
     private List<MsTerminalModificationIn> dynaTermMods;
     
-    private final Program program;
-    private final SearchFileFormat format;
-    
-    public SequestSQTDataUploadService(SearchFileFormat format) {
+    public SequestSQTDataUploadService() {
         super();
-        this.format = format;
-        program = Program.programForFileFormat(format);
         this.sequestResultDataList = new ArrayList<SequestResultDataWId>();
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
         this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
@@ -87,8 +82,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     }
 
     public Program getSearchProgram() {
-//        return Program.SEQUEST;
-        return program;
+        return Program.SEQUEST;
     }
     
     @Override
@@ -391,7 +385,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     
     @Override
     SearchFileFormat getSearchFileFormat() {
-        return this.format;
+        return SearchFileFormat.SQT_SEQ;
     }
 
     @Override
