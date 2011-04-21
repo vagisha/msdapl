@@ -15,10 +15,11 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
+import org.yeastrc.ms.domain.run.ms2file.impl.Scan;
 import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
+import org.yeastrc.ms.domain.run.ms2file.impl.Scan.PEAK_TYPE;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MS2RunDataProvider;
-import org.yeastrc.ms.parser.ms2File.Scan.PEAK_TYPE;
 import org.yeastrc.ms.parser.sqtFile.AbstractReader;
 
 

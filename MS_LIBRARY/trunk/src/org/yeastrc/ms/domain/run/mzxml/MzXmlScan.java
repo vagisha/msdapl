@@ -4,7 +4,7 @@
  * Jun 23, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.parser.mzxml;
+package org.yeastrc.ms.domain.run.mzxml;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -13,7 +13,6 @@ import java.util.List;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.Peak;
-import org.yeastrc.ms.parser.ms2File.Scan.PEAK_TYPE;
 
 /**
  * 
@@ -35,17 +34,10 @@ public class MzXmlScan implements MsScanIn {
     private int peakCount;
     private List<Peak> peakNList;
     private List<String[]> peakList;
-    private PEAK_TYPE peakType;
     
-    public MzXmlScan(PEAK_TYPE peakType) {
-        this.peakType = peakType;
+    public MzXmlScan() {
         
-        if(peakType == PEAK_TYPE.STRING) {
-            peakList = new ArrayList<String[]>();
-        }
-        else {
-            peakNList = new ArrayList<Peak>();
-        }
+    	peakNList = new ArrayList<Peak>();
     }
     
     @Override
@@ -77,8 +69,6 @@ public class MzXmlScan implements MsScanIn {
     }
     
     public void addPeak(double mz, float intensity) {
-        if(this.peakType == PEAK_TYPE.STRING)
-            throw new IllegalArgumentException("MzXmlScan does not accept peak data as numbers.");
         peakNList.add(new Peak(mz, intensity));
     }
     

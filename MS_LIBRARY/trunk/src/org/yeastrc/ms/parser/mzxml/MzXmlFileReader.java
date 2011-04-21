@@ -19,9 +19,9 @@ import org.systemsbiology.jrap.stax.SoftwareInfo;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsRunIn;
 import org.yeastrc.ms.domain.run.MsScanIn;
+import org.yeastrc.ms.domain.run.mzxml.MzXmlScan;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MzXmlDataProvider;
-import org.yeastrc.ms.parser.ms2File.Scan.PEAK_TYPE;
 
 public class MzXmlFileReader implements MzXmlDataProvider {
 
@@ -83,7 +83,7 @@ public class MzXmlFileReader implements MzXmlDataProvider {
             return null;
         
         ScanHeader header = scan.getHeader();
-        MzXmlScan mScan = new MzXmlScan(PEAK_TYPE.NUMBER);
+        MzXmlScan mScan = new MzXmlScan();
         mScan.setMsLevel(header.getMsLevel());
         mScan.setStartScanNum(header.getNum());
         mScan.setEndScanNum(header.getNum());

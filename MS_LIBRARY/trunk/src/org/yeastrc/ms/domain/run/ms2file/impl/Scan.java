@@ -4,7 +4,7 @@
  * Jun 16, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.parser.ms2File;
+package org.yeastrc.ms.domain.run.ms2file.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import org.yeastrc.ms.domain.run.Peak;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
-import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
+import org.yeastrc.ms.parser.ms2File.HeaderItem;
 import org.yeastrc.ms.util.PeakStringBuilder;
 
 /**

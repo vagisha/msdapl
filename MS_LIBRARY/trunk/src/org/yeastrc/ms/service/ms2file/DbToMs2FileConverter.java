@@ -13,10 +13,10 @@ import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2Run;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
+import org.yeastrc.ms.domain.run.ms2file.impl.Scan;
 import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
+import org.yeastrc.ms.domain.run.ms2file.impl.Scan.PEAK_TYPE;
 import org.yeastrc.ms.parser.ms2File.MS2Header;
-import org.yeastrc.ms.parser.ms2File.Scan;
-import org.yeastrc.ms.parser.ms2File.Scan.PEAK_TYPE;
 
 public class DbToMs2FileConverter {
 
