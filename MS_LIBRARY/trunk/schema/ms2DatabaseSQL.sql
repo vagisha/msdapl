@@ -437,7 +437,7 @@ CREATE TABLE PercolatorResult (
 		discriminantScore DOUBLE,
 		pvalue DOUBLE UNSIGNED,
 		predictedRetentionTime DECIMAL(10,5),
-		peptideResultID IN UNSIGNED
+		peptideResultID INT UNSIGNED
 );
 ALTER TABLE PercolatorResult ADD INDEX(runSearchAnalysisID, qvalue);
 ALTER TABLE PercolatorResult ADD INDEX(resultID);
@@ -451,7 +451,7 @@ CREATE TABLE BaristaPSMResult (
 		runSearchAnalysisID INT UNSIGNED NOT NULL,
 		qvalue DOUBLE UNSIGNED NOT NULL,
 		score DOUBLE UNSIGNED NOT NULL,
-		peptideResultID IN UNSIGNED NOT NULL
+		peptideResultID INT UNSIGNED NOT NULL
 );
 ALTER TABLE BaristaPSMResult ADD INDEX(runSearchAnalysisID, qvalue);
 ALTER TABLE BaristaPSMResult ADD INDEX(runSearchAnalysisID, baristaPsmID);
@@ -618,7 +618,7 @@ CREATE TABLE IDPickerProtein (
     proteinGroupLabel INT UNSIGNED NOT NULL,
     nsaf DOUBLE UNSIGNED,
 	isParsimonious TINYINT NOT NULL DEFAULT 0,
-    isSubset TINYINT NOT NULL DEFAULT = 0
+    isSubset TINYINT NOT NULL DEFAULT 0
 );
 ALTER TABLE IDPickerProtein ADD INDEX(proteinGroupLabel);
 ALTER TABLE IDPickerProtein ADD INDEX(clusterLabel);
