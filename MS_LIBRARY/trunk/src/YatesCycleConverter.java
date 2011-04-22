@@ -1,20 +1,16 @@
 
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.ZipException;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.service.MsDataUploader;
-import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms2.data.DTAPeptide;
 
 /**
@@ -47,18 +43,23 @@ public class YatesCycleConverter {
         int runId = 3048;
 //        for (Integer runId: yatesRunIds) {
             log.info("------UPLOADING YATES runID: "+runId);
-//            List<YatesTablesUtils.YatesCycle> cycles = YatesTablesUtils.getCyclesForRun(runId);
-//            // download the files first
-//            for (YatesTablesUtils.YatesCycle cycle: cycles) {
-//                YatesCycleDownloader downloader = new YatesCycleDownloader();
-//                downloader.downloadMS2File(cycle.cycleId, dataDir, cycle.cycleName+".ms2");
-//                downloader.downloadSQTFile(cycle.cycleId, dataDir, cycle.cycleName+".sqt");
-//            }
+            List<YatesTablesUtils.YatesCycle> cycles = YatesTablesUtils.getCyclesForRun(runId);
+            // download the files first
+            for (YatesTablesUtils.YatesCycle cycle: cycles) {
+                YatesCycleDownloader downloader = new YatesCycleDownloader();
+                downloader.downloadMS2File(cycle.cycleId, dataDir, cycle.cycleName+".ms2");
+                downloader.downloadSQTFile(cycle.cycleId, dataDir, cycle.cycleName+".sqt");
+            }
             
             // upload data to msData database
-//            MsDataUploader uploader = new MsDataUploader();
-//            int searchId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dataDir, new Date());
-            int searchId = 1;
+            MsDataUploader uploader = new MsDataUploader();
+            uploader.setSpectrumDataDirectory(dataDir);
+            uploader.setSearchDirectory(dataDir);
+            uploader.setComments("test upload");
+            uploader.setSearchDate(new Date());
+            uploader.uploadData();
+            int experimentId = uploader.getUploadedExperimentId();
+            int searchId = uploader.getUploadedSearchId();
             updateDTASelectTable(searchId, runId);
            
             // mysql> select pep.id from tblYatesRun as run, tblYatesRunResult as res, tblYatesResultPeptide as pep where run.id = 3079 and run.id = res.runID and res.id =  pep.resultID;
