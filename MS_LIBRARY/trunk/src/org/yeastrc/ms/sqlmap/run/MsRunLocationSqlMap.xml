@@ -3,7 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsRunLocation"> 
 
-	<typeAlias alias="MsRunLocationOut" type="org.yeastrc.ms.domain.run.impl.RunLocationBean" />
+	<typeAlias alias="MsRunLocationOut" type="org.yeastrc.ms.domain.run.impl.RunLocationDb" />
 	<typeAlias alias="MsRunLocationIn" type="org.yeastrc.ms.dao.run.ibatis.MsRunLocationWrap" />
 	
 	<resultMap class="MsRunLocationOut" id="msRunLocationResult">

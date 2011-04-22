@@ -15,7 +15,6 @@ import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
-import org.yeastrc.ms.domain.run.ms2file.impl.MS2ScanChargeWrap;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

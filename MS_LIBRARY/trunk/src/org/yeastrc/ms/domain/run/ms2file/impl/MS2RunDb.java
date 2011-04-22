@@ -9,18 +9,18 @@ package org.yeastrc.ms.domain.run.ms2file.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.run.impl.RunBean;
+import org.yeastrc.ms.domain.run.impl.RunDb;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2Run;
 
 /**
  * 
  */
-public class MS2RunBean extends RunBean implements MS2Run {
+public class MS2RunDb extends RunDb implements MS2Run {
 
     private List<MS2NameValuePair> headers;
     
-    public MS2RunBean() {
+    public MS2RunDb() {
         headers = new ArrayList<MS2NameValuePair>();
     }
     

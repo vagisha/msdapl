@@ -3,8 +3,8 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MS2ScanCharge"> 
 
-	<typeAlias alias="ScanChargeOut" type="org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean"/>
-	<typeAlias alias="ScanChargeIn" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2ScanChargeWrap"/>
+	<typeAlias alias="ScanChargeOut" type="org.yeastrc.ms.domain.run.ms2file.impl.ScanCharge"/>
+	<typeAlias alias="ScanChargeIn" type="org.yeastrc.ms.dao.run.ms2file.ibatis.MS2ScanChargeWrap"/>
 		
 	<resultMap class="ScanChargeOut" id="scanChargeResult">
 		<result property="charge" column="charge" nullValue="0"/>

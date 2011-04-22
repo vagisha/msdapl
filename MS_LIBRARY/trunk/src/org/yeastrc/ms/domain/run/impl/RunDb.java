@@ -8,9 +8,9 @@ import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 
 
-public class RunBean implements MsRun {
+public class RunDb implements MsRun {
 
-    private int id; // unique id (database) for this run
+    private int id; // database id for this run
 
     // File for this run
     private String fileName; 
@@ -34,7 +34,7 @@ public class RunBean implements MsRun {
 
     private List <MsEnzyme> enzymeList;
 
-    public RunBean() {
+    public RunDb() {
         enzymeList = new ArrayList<MsEnzyme>();
     }
 

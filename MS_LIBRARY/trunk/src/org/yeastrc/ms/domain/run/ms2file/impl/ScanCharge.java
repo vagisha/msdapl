@@ -1,5 +1,5 @@
 /**
- * Ms2FileScanCharge.java
+ * ScanCharge.java
  * @author Vagisha Sharma
  * Jun 16, 2008
  * @version 1.0
@@ -15,15 +15,16 @@ import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.util.PeakStringBuilder;
 
 /**
- * 
+ * Represents a "Z" line (and any following "D" lines) from a MS2 file.  Describes the charge for a scan.
+ * A scan can have multiple predicted charges
  */
-public class ScanChargeBean implements MS2ScanCharge {
+public class ScanCharge implements MS2ScanCharge {
 
     private int charge;
     private BigDecimal mass;
     private List<MS2NameValuePair> analysisItems;
 
-    public ScanChargeBean() {
+    public ScanCharge() {
         analysisItems = new ArrayList<MS2NameValuePair>();
     }
 
@@ -52,7 +53,7 @@ public class ScanChargeBean implements MS2ScanCharge {
 
     public void addAnalysisItem(String label, String value) {
         if (label == null)   return;
-        analysisItems.add(new NameValuePairBean(label, value));
+        analysisItems.add(new NameValuePair(label, value));
     }
 
     public String toString() {

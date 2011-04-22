@@ -18,11 +18,11 @@ public class PeakStringBuilder {
         peakBuffer = new StringBuilder();
     }
 
-    public void addPeak(String mz, String rt) {
+    public void addPeak(String mz, String intensity) {
 
         peakBuffer.append(trimTrailingZeros(mz));
         peakBuffer.append(" ");
-        peakBuffer.append(trimTrailingZeros(rt));
+        peakBuffer.append(trimTrailingZeros(intensity));
         peakBuffer.append("\n");
     }
 

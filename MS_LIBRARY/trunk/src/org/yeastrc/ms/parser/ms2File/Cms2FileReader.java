@@ -20,7 +20,7 @@ import org.yeastrc.ms.domain.run.ms2file.MS2RunIn;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
 import org.yeastrc.ms.domain.run.ms2file.impl.MS2Header;
 import org.yeastrc.ms.domain.run.ms2file.impl.Scan;
-import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
+import org.yeastrc.ms.domain.run.ms2file.impl.ScanCharge;
 import org.yeastrc.ms.domain.run.ms2file.impl.Scan.PEAK_TYPE;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MS2RunDataProvider;
@@ -91,7 +91,7 @@ public class Cms2FileReader implements MS2RunDataProvider {
                log.warn(e.getMessage());
            }
        }
-       header.setFileName(fileName, RunFileFormat.CMS2);
+       header.setFileName(fileName);
        header.setSha1Sum(sha1Sum);
        this.dataConversionType = header.getDataConversionType();
        return header;
@@ -183,9 +183,9 @@ public class Cms2FileReader implements MS2RunDataProvider {
     
     private void setScanChargeStates(ed.mslib.MS2Scan ms2Scan, Scan scan) {
         int numChgStates = ms2Scan.getchargeslist().size();
-        ScanChargeBean sc = null;
+        ScanCharge sc = null;
         for(int i = 0; i < numChgStates; i++) {
-            sc = new ScanChargeBean();
+            sc = new ScanCharge();
             sc.setCharge(ms2Scan.getcharge(i));
             sc.setMass(new BigDecimal(String.valueOf(ms2Scan.getmass(i))));
             scan.addChargeState(sc);

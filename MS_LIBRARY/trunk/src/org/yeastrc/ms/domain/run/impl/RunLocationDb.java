@@ -13,7 +13,7 @@ import org.yeastrc.ms.domain.run.MsRunLocation;
 /**
  * 
  */
-public class RunLocationBean implements MsRunLocation {
+public class RunLocationDb implements MsRunLocation {
 
     private int id;                 // database id for this location
     private int runId;              // database id for the locations's run

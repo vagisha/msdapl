@@ -46,7 +46,7 @@ public class MS2Header implements MS2RunIn {
 //            throw new NullPointerException("name for Header cannot be null.");
             return;
         
-        headerList.add(new NameValuePairBean(name, value));
+        headerList.add(new NameValuePair(name, value));
         
         // if there is no value for this header ignore it; It will still get added to the 
         // headerItems list. 
@@ -93,7 +93,7 @@ public class MS2Header implements MS2RunIn {
         this.sha1Sum = sha1Sum;
     }
     
-    public void setFileName(String fileName, RunFileFormat format) {
+    public void setFileName(String fileName) {
         int idx = fileName.lastIndexOf("."+format.name().toLowerCase());
         if(idx == -1)
             idx = fileName.lastIndexOf("."+format.name());

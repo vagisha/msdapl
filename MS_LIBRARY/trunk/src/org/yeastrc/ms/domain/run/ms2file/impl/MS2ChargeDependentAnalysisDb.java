@@ -1,5 +1,5 @@
 /**
- * MS2ChargeDependentAnalysisDbImpl.java
+ * MS2ChargeDependentAnalysisDb.java
  * @author Vagisha Sharma
  * Jun 16, 2008
  * @version 1.0
@@ -15,13 +15,13 @@ import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
  * Represents a "D" line in the MS2 file.  Charge dependent analysis for a particular scan.
  * A "D" line should follow a "Z" line in the MS2 file.
  */
-public class MS2ChargeDependentAnalysisWrap implements MS2ChargeDependentAnalysis {
+public class MS2ChargeDependentAnalysisDb implements MS2ChargeDependentAnalysis {
 
     private int scanChargeId;               // the predicated charge for a particular scan to which
                                             // this charge dependent analysis corresponds.
     private MS2NameValuePair header;
     
-    public MS2ChargeDependentAnalysisWrap (MS2NameValuePair header, int scanChargeId) {
+    public MS2ChargeDependentAnalysisDb (MS2NameValuePair header, int scanChargeId) {
         this.header = header;
         this.scanChargeId = scanChargeId;
     }

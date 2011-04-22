@@ -3,8 +3,8 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MS2ChgDAnalysis"> 
 
-	<typeAlias alias="DAnalysisOut" type="org.yeastrc.ms.domain.run.ms2file.impl.NameValuePairBean"/>
-	<typeAlias alias="DAnalysisIn" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeDependentAnalysisWrap"/>
+	<typeAlias alias="DAnalysisOut" type="org.yeastrc.ms.domain.run.ms2file.impl.NameValuePair"/>
+	<typeAlias alias="DAnalysisIn" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeDependentAnalysisDb"/>
 		
 	<resultMap class="DAnalysisOut" id="danalysisResult">
 		<result property="name" column="header" />

@@ -9,7 +9,7 @@ import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2Run;
 import org.yeastrc.ms.domain.run.ms2file.MS2RunIn;
-import org.yeastrc.ms.domain.run.ms2file.impl.NameValuePairBean;
+import org.yeastrc.ms.domain.run.ms2file.impl.NameValuePair;
 
 public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
 
@@ -90,7 +90,7 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
     }
     
     private MS2NameValuePair makeMS2Header(String name, String value) {
-        NameValuePairBean header = new NameValuePairBean();
+        NameValuePair header = new NameValuePair();
         header.setName(name);
         header.setValue(value);
         return header;

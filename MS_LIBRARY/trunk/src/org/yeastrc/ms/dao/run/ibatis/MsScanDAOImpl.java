@@ -124,6 +124,7 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
         delete("MsScan.deletePeakData", scanId);
     }
     
+    // ONLY USED FOR MZXML SCANS FOR NOW
     @Override
     public <T extends MsScanIn> List<Integer> save(List<T> scans, int runId) {
         
@@ -442,9 +443,9 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
             this.scanId = scanId;
             
             if(storageType == PeakStorageType.DOUBLE_FLOAT)
-                this.peakData = getPeakBinaryData(scan);
+                this.peakData = getBytesForPeakDataAsDoubleFloat(scan);
             else if(storageType == PeakStorageType.STRING)
-                this.peakData = getPeakDataString(scan);
+                this.peakData = getBytesForPeakDataAsString(scan);
             
             this.peakStorageType = storageType;
         }
@@ -461,7 +462,7 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
             return peakData;
         }
         
-        private byte[] getPeakDataString(MsScanIn scan) {
+        private byte[] getBytesForPeakDataAsString(MsScanIn scan) {
             List<String[]> peaksStr = scan.getPeaksString();
             PeakStringBuilder builder = new PeakStringBuilder();
             for(String[] peak: peaksStr) {
@@ -470,7 +471,7 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
             return builder.getPeaksAsString().getBytes();
         }
         
-        private byte[] getPeakBinaryData(MsScanIn scan) throws IOException {
+        private byte[] getBytesForPeakDataAsDoubleFloat(MsScanIn scan) throws IOException {
             
             ByteArrayOutputStream bos = null;
             DataOutputStream dos = null;
@@ -486,8 +487,8 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
                 dos.flush();
             }
             finally {
-                if(dos != null) dos.close();
-                if(bos != null) bos.close();
+                if(dos != null) try {dos.close();} catch(IOException e){}
+                if(bos != null) try {bos.close();} catch(IOException e){}
             }
             byte [] data = bos.toByteArray();
             return data;

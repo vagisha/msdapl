@@ -19,11 +19,11 @@ import org.yeastrc.ms.util.PeakConverter;
 /**
  * 
  */
-public class ScanBean implements MsScan {
+public class ScanDb implements MsScan {
 
-    private int runId;  // id (database) of the run this scan belongs to
+    private int runId;  // database id of the run this scan belongs to
     
-    private int id;     // unique id (database) of this scan
+    private int id;     // database id of this scan
     
     private int startScanNum = -1;
     private int endScanNum = -1;
@@ -45,7 +45,7 @@ public class ScanBean implements MsScan {
     private byte[] peakData;
     private PeakStorageType storageType;
     
-    public ScanBean() {
+    public ScanDb() {
         peakData = new byte[0];
     }
 

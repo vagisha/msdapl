@@ -3,8 +3,8 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsScan"> 
 
-	<typeAlias alias="MsScanOut" type="org.yeastrc.ms.domain.run.impl.ScanBean"/>
-	<typeAlias alias="MsScanIn" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$MMsScanSqlMapParam"/>
+	<typeAlias alias="MsScanOut" type="org.yeastrc.ms.domain.run.impl.ScanDb"/>
+	<typeAlias alias="MsScanIn" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$MsScanSqlMapParam"/>
 	<typeAlias alias="MsScanDataIn" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$MsScanDataSqlMapParam"/>
 	
 	<typeAlias alias="DataConversionTypeHandler" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$DataConversionTypeHandler"/>

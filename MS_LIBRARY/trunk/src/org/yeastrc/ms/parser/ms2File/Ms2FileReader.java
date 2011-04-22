@@ -17,7 +17,7 @@ import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
 import org.yeastrc.ms.domain.run.ms2file.impl.MS2Header;
 import org.yeastrc.ms.domain.run.ms2file.impl.Scan;
-import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
+import org.yeastrc.ms.domain.run.ms2file.impl.ScanCharge;
 import org.yeastrc.ms.domain.run.ms2file.impl.Scan.PEAK_TYPE;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MS2RunDataProvider;
@@ -77,7 +77,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
             advanceLine();
         }
         
-        header.setFileName(fileName, RunFileFormat.MS2);
+        header.setFileName(fileName);
         header.setSha1Sum(sha1Sum);
         this.dataConversionType = header.getDataConversionType();
         return header;
@@ -99,7 +99,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         while(currentLine != null) {
             // is this one of the charge states of the scan?
             if (isChargeLine(currentLine)) {
-                ScanChargeBean sc = parseScanCharge();
+                ScanCharge sc = parseScanCharge();
                 scan.addChargeState(sc);
             }
             // is this one of the charge independent analysis for this scan?
@@ -148,9 +148,9 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         return scan;
     }
 
-    private ScanChargeBean parseScanCharge() throws DataProviderException {
+    private ScanCharge parseScanCharge() throws DataProviderException {
         
-        ScanChargeBean scanCharge = parseScanCharge(currentLine);
+        ScanCharge scanCharge = parseScanCharge(currentLine);
 
         // parse any charge dependent analysis associated with this charge state
         advanceLine();
@@ -161,11 +161,11 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         return scanCharge;
     }
 
-    ScanChargeBean parseScanCharge(String line) throws DataProviderException {
+    ScanCharge parseScanCharge(String line) throws DataProviderException {
         
         Matcher match = chargeStatePattern.matcher(line);
         if (match.matches()) {
-            ScanChargeBean scanCharge = new ScanChargeBean();
+            ScanCharge scanCharge = new ScanCharge();
             scanCharge.setCharge(Integer.parseInt(match.group(1)));
             scanCharge.setMass(new BigDecimal(match.group(2)));
             return scanCharge;
@@ -175,7 +175,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         }
     }
 
-    void parseChargeDependentAnalysis(String line, ScanChargeBean scanCharge) {
+    void parseChargeDependentAnalysis(String line, ScanCharge scanCharge) {
         String[] nameAndVal = parseChargeDependentAnalysis(line);
         if (nameAndVal.length == 2) {
             scanCharge.addAnalysisItem(nameAndVal[0], nameAndVal[1]);
@@ -209,7 +209,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         }
     }
     
-    public void parsePeaks(Scan scan) throws DataProviderException {
+    private void parsePeaks(Scan scan) throws DataProviderException {
 
         while (isPeakDataLine(currentLine)) {
             String[] tokens = currentLine.split("\\s+");
@@ -223,11 +223,11 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
             }
             
             
-            if (!isValidDouble(tokens[0])) {
+            if (!isValidPeakItem(tokens[0])) {
                 throw new DataProviderException(currentLineNum, "Invalid m/z value found for peak in scan: "+scan.getStartScanNum(), currentLine);
             }
             
-            if (!isValidDouble(tokens[1])) {
+            if (!isValidPeakItem(tokens[1])) {
                 throw new DataProviderException(currentLineNum, "Invalid intensity value found for peak in scan: "+scan.getStartScanNum(), currentLine);
             }
             
@@ -248,8 +248,11 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         return parseNameValueLine(line, dAnalysisPattern);
     }
 
-    private boolean isValidDouble(String doubleStr) {
-        try {Double.parseDouble(doubleStr);}
+    private boolean isValidPeakItem(String doubleStr) {
+        try {
+        	if(Double.parseDouble(doubleStr) < 0)
+        		return false;
+        }
         catch(NumberFormatException e) {
             return false;
         }

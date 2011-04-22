@@ -28,8 +28,8 @@ import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2RunIn;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
-import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeDependentAnalysisWrap;
-import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeIndependentAnalysisWrap;
+import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeDependentAnalysisDb;
+import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeIndependentAnalysisDb;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MS2RunDataProvider;
 import org.yeastrc.ms.parser.ms2File.Cms2FileReader;
@@ -309,7 +309,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
         }
         
         for (final MS2NameValuePair dAnalysis: scanCharge.getChargeDependentAnalysisList()) {
-            dAnalysisList.add(new MS2ChargeDependentAnalysisWrap(dAnalysis, scanChargeId));
+            dAnalysisList.add(new MS2ChargeDependentAnalysisDb(dAnalysis, scanChargeId));
         }
     }
 
@@ -325,7 +325,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
         }
         
         for (final MS2NameValuePair iAnalysis: scan.getChargeIndependentAnalysisList()) {
-            iAnalysisList.add(new MS2ChargeIndependentAnalysisWrap(iAnalysis, scanId));
+            iAnalysisList.add(new MS2ChargeIndependentAnalysisDb(iAnalysis, scanId));
         }
     }
 

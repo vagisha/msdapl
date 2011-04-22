@@ -14,12 +14,12 @@ import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
  * Represents an "I" line in the MS2 file.  Charge independent analysis for a particular scan.
  * There can be multiple "I" lines in the MS2 file for a single scan.
  */
-public class MS2ChargeIndependentAnalysisWrap implements MS2ChargeIndependentAnalysis {
+public class MS2ChargeIndependentAnalysisDb implements MS2ChargeIndependentAnalysis {
 
     private int scanId;         // id (database) of the scan that was analyzed
     private MS2NameValuePair header;
     
-    public MS2ChargeIndependentAnalysisWrap(MS2NameValuePair header, int scanId) {
+    public MS2ChargeIndependentAnalysisDb(MS2NameValuePair header, int scanId) {
         this.scanId = scanId;
         this.header = header;
     }

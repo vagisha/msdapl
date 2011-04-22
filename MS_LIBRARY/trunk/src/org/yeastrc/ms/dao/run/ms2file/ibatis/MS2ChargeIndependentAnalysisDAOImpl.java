@@ -12,7 +12,7 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysis;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
-import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeIndependentAnalysisWrap;
+import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeIndependentAnalysisDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -31,7 +31,7 @@ public class MS2ChargeIndependentAnalysisDAOImpl extends BaseSqlMapDAO
     }
 
     public void save(MS2NameValuePair analysis, int scanId) {
-        MS2ChargeIndependentAnalysisWrap analysisDb = new MS2ChargeIndependentAnalysisWrap(analysis, scanId);
+        MS2ChargeIndependentAnalysisDb analysisDb = new MS2ChargeIndependentAnalysisDb(analysis, scanId);
         save("MS2ChgIAnalysis.insert", analysisDb);
     }
 

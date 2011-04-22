@@ -12,7 +12,7 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
 import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysis;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
-import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeDependentAnalysisWrap;
+import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeDependentAnalysisDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -31,7 +31,7 @@ public class MS2ChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
     }
 
     public void save(MS2NameValuePair analysis, int scanChargeId) {
-        MS2ChargeDependentAnalysisWrap analysisDb = new MS2ChargeDependentAnalysisWrap(analysis, scanChargeId);
+        MS2ChargeDependentAnalysisDb analysisDb = new MS2ChargeDependentAnalysisDb(analysis, scanChargeId);
         save("MS2ChgDAnalysis.insert", analysisDb);
     }
 
@@ -39,6 +39,8 @@ public class MS2ChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
     public void saveAll(List<MS2ChargeDependentAnalysis> analysisList) {
         if (analysisList.size() == 0)
             return;
+        
+        // TODO Change this to use the <iterate> tag in the ibatis sqlmap
         StringBuilder values = new StringBuilder();
         for (MS2ChargeDependentAnalysis analysis: analysisList) {
             values.append("(");

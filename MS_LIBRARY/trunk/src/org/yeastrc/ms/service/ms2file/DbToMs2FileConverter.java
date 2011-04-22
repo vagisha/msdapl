@@ -15,7 +15,7 @@ import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.run.ms2file.impl.MS2Header;
 import org.yeastrc.ms.domain.run.ms2file.impl.Scan;
-import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
+import org.yeastrc.ms.domain.run.ms2file.impl.ScanCharge;
 import org.yeastrc.ms.domain.run.ms2file.impl.Scan.PEAK_TYPE;
 
 public class DbToMs2FileConverter {
@@ -63,7 +63,7 @@ public class DbToMs2FileConverter {
        
        // add predicted charge states for the scan
        for (MS2ScanCharge scanCharge: scan.getScanChargeList()) {
-           ScanChargeBean sc = new ScanChargeBean();
+           ScanCharge sc = new ScanCharge();
            sc.setCharge(scanCharge.getCharge());
            sc.setMass(scanCharge.getMass());
            for (MS2NameValuePair dAnalysis: scanCharge.getChargeDependentAnalysisList()) {

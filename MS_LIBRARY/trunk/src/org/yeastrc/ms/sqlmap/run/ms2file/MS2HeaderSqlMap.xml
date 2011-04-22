@@ -3,7 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MS2Header"> 
 
-	<typeAlias alias="HeaderOut" type="org.yeastrc.ms.domain.run.ms2file.impl.NameValuePairBean"/>
+	<typeAlias alias="HeaderOut" type="org.yeastrc.ms.domain.run.ms2file.impl.NameValuePair"/>
 	<typeAlias alias="HeaderIn" type="org.yeastrc.ms.dao.run.ms2file.ibatis.MS2HeaderWrap"/>
 	
 	<resultMap class="HeaderOut" id="headerResult">

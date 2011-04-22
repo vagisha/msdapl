@@ -9,7 +9,7 @@ import junit.framework.TestCase;
 
 import org.yeastrc.ms.domain.run.Peak;
 import org.yeastrc.ms.domain.run.PeakStorageType;
-import org.yeastrc.ms.domain.run.impl.ScanBean;
+import org.yeastrc.ms.domain.run.impl.ScanDb;
 import org.yeastrc.ms.util.PeakStringBuilder;
 
 public class MsScanDbImplTest extends TestCase {
@@ -23,7 +23,7 @@ public class MsScanDbImplTest extends TestCase {
     }
 
     public final void testParsePeaksAsString() throws IOException, ClassNotFoundException {
-        ScanBean scanDb = new ScanBean();
+        ScanDb scanDb = new ScanDb();
         scanDb.setPeakStorageType(PeakStorageType.STRING);
         PeakStringBuilder builder = new PeakStringBuilder();
         List<String[]> peaks = new ArrayList<String[]>(10);

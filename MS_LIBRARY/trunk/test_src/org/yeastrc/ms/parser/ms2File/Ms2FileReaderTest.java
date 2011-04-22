@@ -2,7 +2,7 @@ package org.yeastrc.ms.parser.ms2File;
 
 import junit.framework.TestCase;
 
-import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
+import org.yeastrc.ms.domain.run.ms2file.impl.ScanCharge;
 import org.yeastrc.ms.parser.DataProviderException;
 
 public class Ms2FileReaderTest extends TestCase {
@@ -53,7 +53,7 @@ public class Ms2FileReaderTest extends TestCase {
         Ms2FileReader reader = new Ms2FileReader();
         String line = "Z       1       1394.58";
         try {
-            ScanChargeBean scanCharge = reader.parseScanCharge(line);
+            ScanCharge scanCharge = reader.parseScanCharge(line);
             assertEquals(1, scanCharge.getCharge());
             assertEquals(1394.58, scanCharge.getMass().doubleValue());
         }
@@ -64,7 +64,7 @@ public class Ms2FileReaderTest extends TestCase {
         
         line = "Z       1       1394.";
         try {
-            ScanChargeBean scanCharge = reader.parseScanCharge(line);
+            ScanCharge scanCharge = reader.parseScanCharge(line);
             assertEquals(1, scanCharge.getCharge());
             assertEquals(1394.0, scanCharge.getMass().doubleValue());
         }
@@ -75,7 +75,7 @@ public class Ms2FileReaderTest extends TestCase {
         
         line = "Z       1       1394   ";
         try {
-            ScanChargeBean scanCharge = reader.parseScanCharge(line);
+            ScanCharge scanCharge = reader.parseScanCharge(line);
             assertEquals(1, scanCharge.getCharge());
             assertEquals(1394.0, scanCharge.getMass().doubleValue());
         }

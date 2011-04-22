@@ -4,8 +4,8 @@
 <sqlMap namespace="MsRun"> 
 
 	<typeAlias alias="MsRunIn" type="org.yeastrc.ms.domain.run.MsRunIn" />
-	<typeAlias alias="MsRunOut" type="org.yeastrc.ms.domain.run.impl.RunBean"/>
-	<typeAlias alias="MS2RunOut" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2RunBean"/>
+	<typeAlias alias="MsRunOut" type="org.yeastrc.ms.domain.run.impl.RunDb"/>
+	<typeAlias alias="MS2RunOut" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2RunDb"/>
 	<typeAlias alias="RunType" type="org.yeastrc.ms.domain.run.RunFileFormat"/>
 	<typeAlias alias="RunTypeHandler" type="org.yeastrc.ms.dao.run.ibatis.MsRunDAOImpl$RunFileFormatTypeHandler"/>
 	

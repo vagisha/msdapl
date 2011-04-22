@@ -77,7 +77,7 @@ public class Scan implements MS2ScanIn {
 
     public void addAnalysisItem(String label, String value) {
         if (label == null)   return;
-        analysisItems.add(new NameValuePairBean(label, value));
+        analysisItems.add(new NameValuePair(label, value));
         if (label.equalsIgnoreCase(RET_TIME))
             setRetentionTime(value);
         else if (label.equalsIgnoreCase(RT_TIME))
@@ -117,7 +117,7 @@ public class Scan implements MS2ScanIn {
     public List<MS2ScanCharge> getScanChargeList() {
         return this.chargeStates;
     }
-    public void addChargeState(ScanChargeBean chargeState) {
+    public void addChargeState(ScanCharge chargeState) {
         chargeStates.add(chargeState);
     }
 

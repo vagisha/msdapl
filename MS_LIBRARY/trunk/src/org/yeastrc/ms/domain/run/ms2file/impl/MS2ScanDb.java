@@ -9,7 +9,7 @@ package org.yeastrc.ms.domain.run.ms2file.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.run.impl.ScanBean;
+import org.yeastrc.ms.domain.run.impl.ScanDb;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
@@ -17,13 +17,13 @@ import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 /**
  * 
  */
-public class MS2ScanBean extends ScanBean implements MS2Scan {
+public class MS2ScanDb extends ScanDb implements MS2Scan {
 
    
     private List<MS2ScanCharge> scanChargeList;
     private List<MS2NameValuePair> chargeIndependentAnalysisList;
     
-    public MS2ScanBean() {
+    public MS2ScanDb() {
         scanChargeList = new ArrayList<MS2ScanCharge>();
         chargeIndependentAnalysisList = new ArrayList<MS2NameValuePair>();
     }

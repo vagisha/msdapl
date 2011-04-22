@@ -3,16 +3,16 @@ package org.yeastrc.ms.domain.run.ms2file.impl;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 
 
-public class NameValuePairBean implements MS2NameValuePair {
+public class NameValuePair implements MS2NameValuePair {
 
     private String name;
     private String value;
 
-    public NameValuePairBean() {
+    public NameValuePair() {
         super();
     }
     
-    public NameValuePairBean(String name, String value) {
+    public NameValuePair(String name, String value) {
         super();
         this.name = name;
         this.value = value;
