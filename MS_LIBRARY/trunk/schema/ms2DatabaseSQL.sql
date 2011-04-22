@@ -439,11 +439,24 @@ CREATE TABLE PercolatorResult (
 		predictedRetentionTime DECIMAL(10,5),
 		peptideResultID IN UNSIGNED
 );
-ALTER TABLE PercolatorResult ADD INDEX(runSearchAnalysisID);
+ALTER TABLE PercolatorResult ADD INDEX(runSearchAnalysisID, qvalue);
 ALTER TABLE PercolatorResult ADD INDEX(resultID);
-ALTER TABLE PercolatorResult ADD INDEX(qvalue);
 ALTER TABLE PercolatorResult ADD INDEX(pep);
 ALTER TABLE PercolatorResult ADD INDEX(peptideResultID);
+
+CREATE TABLE BaristaPSMResult (
+		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		baristaPsmID INT UNSIGNED NOT NULL,
+		resultID INT UNSIGNED NOT NULL,
+		runSearchAnalysisID INT UNSIGNED NOT NULL,
+		qvalue DOUBLE UNSIGNED NOT NULL,
+		score DOUBLE UNSIGNED NOT NULL,
+		peptideResultID IN UNSIGNED NOT NULL
+);
+ALTER TABLE BaristaPSMResult ADD INDEX(runSearchAnalysisID, qvalue);
+ALTER TABLE BaristaPSMResult ADD INDEX(runSearchAnalysisID, baristaPsmID);
+ALTER TABLE BaristaPSMResult ADD INDEX(resultID);
+ALTER TABLE BaristaPSMResult ADD INDEX(peptideResultID);
 
 CREATE TABLE PercolatorPeptideResult (
 		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -458,6 +471,15 @@ ALTER TABLE PercolatorPeptideResult ADD INDEX(searchAnalysisID);
 ALTER TABLE PercolatorPeptideResult ADD INDEX(qvalue);
 ALTER TABLE PercolatorPeptideResult ADD INDEX(pep);
 ALTER TABLE PercolatorPeptideResult ADD UNIQUE INDEX (searchAnalysisID, peptide);
+
+CREATE TABLE BaristaPeptideResult (
+		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		searchAnalysisID INT UNSIGNED NOT NULL,
+		peptide VARCHAR(500) NOT NULL,
+		qvalue DOUBLE UNSIGNED NOT NULL,
+		score DOUBLE UNSIGNED NOT NULL
+);
+ALTER TABLE BaristaPeptideResult ADD INDEX(searchAnalysisID, qvalue);
 
 #####################################################################
 # PeptideProphet tables
@@ -697,6 +719,25 @@ CREATE TABLE ProteinProphetSubsumedProtein (
 ALTER TABLE ProteinProphetSubsumedProtein ADD INDEX (subsumedProteinID);
 ALTER TABLE ProteinProphetSubsumedProtein ADD INDEX (subsumingProteinID);
 
+#####################################################################
+# Barista Tables
+#####################################################################
+
+CREATE TABLE BaristaProteinGroup (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	piRunID INT UNSIGNED NOT NULL,
+    proteinGroupLabel INT UNSIGNED NOT NULL,
+    qvalue DOUBLE UNSIGNED NOT NULL,
+    score DOUBLE UNSIGNED NOT NULL
+);
+ALTER TABLE BaristaProteinGroup ADD INDEX(piRunID, qvalue);
+
+CREATE TABLE BaristaProtein (
+	piProteinID INT UNSIGNED NOT NULL PRIMARY KEY,
+	proteinGroupID INT UNSIGNED NOT NULL
+);
+ALTER TABLE BaristaProtein ADD INDEX(proteinGroupID);
+
 
 #######################################################################################
 # TRIGGERS TO ENSURE CASCADING DELETES
@@ -751,6 +792,7 @@ CREATE TRIGGER msProteinInferProtein_bdelete BEFORE DELETE ON msProteinInferProt
    	DELETE FROM ProteinProphetProteinIon WHERE piProteinID = OLD.id;
    	DELETE FROM IDPickerSubsetProtein WHERE subsetProteinID = OLD.id;
    	DELETE FROM IDPickerSubsetProtein WHERE superProteinID = OLD.id;
+   	DELETE FROM BaristaProtein WHERE piProteinID = OLD.id;
  END;
 |
 DELIMITER ;
@@ -778,6 +820,16 @@ CREATE TRIGGER msProteinInferRun_bdelete BEFORE DELETE ON msProteinInferRun
   	DELETE FROM ProteinProphetParam WHERE piRunID = OLD.id;
   	DELETE FROM ProteinProphetROC WHERE piRunID = OLD.id;
   	DELETE FROM ProteinProphetProteinGroup WHERE piRunID = OLD.id;
+  	DELETE FROM BaristaProteinGroup WHERE piRunID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER BaristaProteinGroup_bdelete BEFORE DELETE ON BaristaProteinGroup
+ FOR EACH ROW
+ BEGIN
+  	DELETE FROM BaristaProtein WHERE proteinGroupID = OLD.id;
  END;
 |
 DELIMITER ;
@@ -796,6 +848,7 @@ CREATE TRIGGER msSearchAnalysis_bdelete BEFORE DELETE ON msSearchAnalysis
    	DELETE FROM PercolatorParams WHERE searchAnalysisID = OLD.id;
    	DELETE FROM PeptideProphetROC WHERE searchAnalysisID = OLD.id;
    	DELETE FROM PercolatorPeptideResult WHERE searchAnalysisID = OLD.id;
+   	DELETE FROM BaristaPeptideResult WHERE searchAnalysisID = OLD.id;
 	DELETE FROM msRunSearchAnalysis WHERE searchAnalysisID = OLD.id;
  END;
 |
@@ -807,6 +860,7 @@ CREATE TRIGGER msRunSearchAnalysis_bdelete BEFORE DELETE ON msRunSearchAnalysis
  BEGIN
  	DELETE FROM PercolatorResult WHERE runSearchAnalysisID = OLD.id;
  	DELETE FROM PeptideProphetResult WHERE runSearchAnalysisID = OLD.id;
+ 	DELETE FROM BaristaPSMResult WHERE runSearchAnalysisID = OLD.id;
  END;
 |
 DELIMITER ;
@@ -816,6 +870,15 @@ CREATE TRIGGER PercolatorPeptideResult_bdelete BEFORE DELETE ON PercolatorPeptid
  FOR EACH ROW
  BEGIN
  	DELETE FROM PercolatorResult WHERE peptideResultId = OLD.id;
+ END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER BaristaPeptideResult_bdelete BEFORE DELETE ON BaristaPeptideResult
+ FOR EACH ROW
+ BEGIN
+ 	DELETE FROM BaristaPSMResult WHERE peptideResultId = OLD.id;
  END;
 |
 DELIMITER ;
