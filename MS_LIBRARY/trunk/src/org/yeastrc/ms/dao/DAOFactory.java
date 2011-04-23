@@ -106,7 +106,8 @@ public class DAOFactory {
             props.load(reader);
             String value = props.getProperty("db.peakdata.storage");
             peakStorageType = PeakStorageType.instance(value);
-            log.debug("PeakStorageType is "+peakStorageType.name());
+            if(peakStorageType != null)
+            	log.debug("PeakStorageType is "+peakStorageType.name());
         }
         catch (IOException e) {
             log.error("Error reading properties file msDataDB.properties", e);
