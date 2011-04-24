@@ -39,6 +39,8 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
     private List<? extends MsResidueModificationIn> searchDynamicResidueMods;
     private Program searchProgram;
     
+    private boolean skipDecoyResults = true;
+    
     //private static final String namespace = "http://github.com/percolator/percolator/raw/master/src/xml/percolator_out";
     //public static final String namespace = "http://per-colator.com/percolator_out/11";
     public String namespace = null;
@@ -54,6 +56,10 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
     
     public void setSearchProgram(Program program) {
     	this.searchProgram = program;
+    }
+    
+    public void setReadDecoyResults(boolean readDecoys) {
+    	this.skipDecoyResults = !readDecoys;
     }
     
 	public void open(String filePath) throws DataProviderException {
@@ -242,7 +248,21 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
                 if (evtType == XMLStreamReader.START_ELEMENT) {
                     // this is the end of one msms_run_summary
                     if (reader.getLocalName().equals("psm"))  {
-                        return true;
+                    	
+                    	// Skip over if this is a decoy result and we are not reading decoys
+                    	if(this.skipDecoyResults) {
+                    		String decoy = reader.getAttributeValue(namespace, "decoy");
+                    		if(decoy == null) {
+                    			// make one more attempt to get the attribute
+                    			decoy = reader.getAttributeValue(null, "decoy");
+                    		}
+                    		if(decoy == null || Boolean.valueOf(decoy) == false)
+                    			return true;
+                    	}
+                    	// otherwise return true since we are reading all results (target + decoy)
+                    	else {
+                    		return true;
+                    	}
                     }
                 }
 			}
@@ -270,6 +290,16 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 		catch(IllegalArgumentException e) {
 			throw new DataProviderException("Could not parse psm_id attribute: "+id);
 		}
+		
+		// determine if this is a decoy
+		String decoy = reader.getAttributeValue(namespace, "decoy");
+		if(decoy == null) {
+			// make one more attempt to get the attribute
+			decoy = reader.getAttributeValue(null, "decoy");
+		}
+		if(decoy == null) decoy = "false";
+		result.setDecoy(Boolean.parseBoolean(decoy));
+		
 		
 		String seq = null;
 		char nterm = '-';
@@ -379,7 +409,21 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
                 if (evtType == XMLStreamReader.START_ELEMENT) {
                     // this is the end of one msms_run_summary
                     if (reader.getLocalName().equals("peptide"))  {
-                        return true;
+                    	
+                    	// Skip over if this is a decoy result and we are not reading decoys
+                    	if(this.skipDecoyResults) {
+                    		String decoy = reader.getAttributeValue(namespace, "decoy");
+                    		if(decoy == null) {
+                    			// make one more attempt to get the attribute
+                    			decoy = reader.getAttributeValue(null, "decoy");
+                    		}
+                    		if(decoy == null || Boolean.valueOf(decoy) == false)
+                    			return true;
+                    	}
+                    	// otherwise return true since we are reading all results (target + decoy)
+                    	else {
+                    		return true;
+                    	}
                     }
                 }
 			}
@@ -433,6 +477,14 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
             throw new DataProviderException("Error building peptide result: "+e.getMessage());
         }
 		
+        // determine if this is a decoy result
+        String decoy = reader.getAttributeValue(namespace, "decoy");
+		if(decoy == null) {
+			// make one more attempt to get the attribute
+			decoy = reader.getAttributeValue(null, "decoy");
+		}
+		if(decoy == null) decoy = "false";
+		result.setDecoy(Boolean.parseBoolean(decoy));
 		
 		
 		try {

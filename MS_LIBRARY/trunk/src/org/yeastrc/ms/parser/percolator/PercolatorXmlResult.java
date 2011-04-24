@@ -34,6 +34,7 @@ public class PercolatorXmlResult implements PercolatorResultIn {
 	private List<MsSearchResultProteinIn> matchingLoci;
     private MsSearchResultPeptide resultPeptide;
     
+    private boolean isDecoy = false;
     
     public PercolatorXmlResult() {
         matchingLoci = new ArrayList<MsSearchResultProteinIn>();
@@ -212,4 +213,13 @@ public class PercolatorXmlResult implements PercolatorResultIn {
 	public ValidationStatus getValidationStatus() {
 		throw new UnsupportedOperationException("Validation status not read from Percolator XML outout");
 	}
+
+	public boolean isDecoy() {
+		return isDecoy;
+	}
+
+	public void setDecoy(boolean isDecoy) {
+		this.isDecoy = isDecoy;
+	}
+	
 }

@@ -30,6 +30,8 @@ public class PercolatorXmlPeptideResult implements PercolatorPeptideResultIn {
 	private List<MsSearchResultProteinIn> matchingLoci;
     private List<PercolatorXmlPsmId> matchingPsmIds;
     
+    private boolean isDecoy = false;
+    
     public PercolatorXmlPeptideResult() {
     	matchingLoci = new ArrayList<MsSearchResultProteinIn>();
     	matchingPsmIds = new ArrayList<PercolatorXmlPsmId>();
@@ -156,4 +158,12 @@ public class PercolatorXmlPeptideResult implements PercolatorPeptideResultIn {
 	public List<MsSearchResultProteinIn> getProteinMatchList() {
         return this.matchingLoci;
     }
+	
+	public boolean isDecoy() {
+		return isDecoy;
+	}
+
+	public void setDecoy(boolean isDecoy) {
+		this.isDecoy = isDecoy;
+	}
 }
