@@ -384,8 +384,8 @@ CREATE TABLE ProLuCIDSearchResult (
    primaryScoreRank INT UNSIGNED NOT NULL,
    secondaryScoreRank INT UNSIGNED NOT NULL,
    deltaCN DECIMAL(10,5)  NOT NULL,
-   primaryScore DOUBLE  UNSIGNED NOT NULL,
-   secondaryScore DOUBLE  UNSIGNED NOT NULL,
+   primaryScore DOUBLE UNSIGNED NOT NULL,
+   secondaryScore DOUBLE NOT NULL,
    calculatedMass DECIMAL(18,9),
    matchingIons INT UNSIGNED,
    predictedIons INT UNSIGNED
@@ -693,7 +693,7 @@ CREATE TABLE ProteinProphetProtein (
 	proteinProphetGroupID INT UNSIGNED NOT NULL,
     groupID INT UNSIGNED NOT NULL,
     probability DOUBLE UNSIGNED NOT NULL,
-    confidence DOUBLE UNSIGNED NOT NULL,
+    confidence DOUBLE UNSIGNED,
     subsumed TINYINT NOT NULL DEFAULT 0,
     totalSpectrumCount INT UNSIGNED NOT NULL,
     pctSpectrumCount DOUBLE UNSIGNED
@@ -711,6 +711,7 @@ CREATE TABLE ProteinProphetProteinIon (
     isContributingEvidence TINYINT NOT NULL DEFAULT 1
 );
 ALTER TABLE ProteinProphetProteinIon ADD PRIMARY KEY (piProteinID, piIonID);
+ALTER TABLE ProteinProphetProteinIon ADD INDEX (piIonID);
 
 CREATE TABLE ProteinProphetSubsumedProtein (
 	subsumedProteinID INT UNSIGNED NOT NULL ,
