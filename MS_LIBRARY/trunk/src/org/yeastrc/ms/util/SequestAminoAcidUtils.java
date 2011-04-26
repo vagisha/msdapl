@@ -26,6 +26,22 @@ public class SequestAminoAcidUtils extends BaseAminoAcidUtils {
     
     public SequestAminoAcidUtils() {}
     
+    public String getFullName(char aa) {
+    	
+    	switch(aa) {
+	    	case 'X':
+	    		return "LorI";
+	    	case 'B':
+	    		return "avg_NandD";
+	    	case 'Z': 
+	    		return "avg_QandE";
+	    	case 'O':
+	    		return "Ornithine";
+	    	default:
+	    		return super.getFullName(aa);
+    	}
+    }
+
     public char[] getAminoAcidChars() {
     	
     	if(aminoAcidsChars == null) {

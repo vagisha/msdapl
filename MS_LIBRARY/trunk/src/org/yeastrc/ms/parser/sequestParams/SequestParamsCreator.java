@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,8 @@ import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
+import org.yeastrc.ms.util.AminoAcidUtilsFactory;
+import org.yeastrc.ms.util.SequestAminoAcidUtils;
 
 /**
  * Takes as input a directory with .sqt files and produces a sequest.params file
@@ -106,7 +109,33 @@ public class SequestParamsCreator {
 				}
 				// match with what was read from the first file
 				else {
-					// TODO
+					
+					List<String> sMods = new ArrayList<String>();
+					List<String> dMods = new ArrayList<String>();
+					
+					for(SQTHeaderItem header: headers) {
+						if(header.getName().equals("Database")) 
+							match(this.databaseName,header.getValue());
+						else if(header.getName().equalsIgnoreCase("PrecursorMasses"))
+							match(this.parentMassType, header.getValue());
+						else if(header.getName().equalsIgnoreCase("FragmentMasses"))
+							match(this.fragmentMassType, header.getValue());
+						else if(header.getName().equalsIgnoreCase("Alg-PreMassTol"))
+							match(this.peptideMassTolerance,header.getValue());
+						else if(header.getName().equalsIgnoreCase("Alg-FragMassTol"))
+							match(this.fragmentIonTolerance,header.getValue());
+						else if(header.getName().equalsIgnoreCase("Alg-IonSeries"))
+							match(this.ionSeries,header.getValue());
+						else if(header.getName().equalsIgnoreCase("EnzymeSpec"))
+							match(this.enzyme,header.getValue());
+						else if(header.getName().equalsIgnoreCase("StaticMod"))
+							sMods.add(header.getValue());
+						else if(header.getName().equalsIgnoreCase("DiffMod"))
+							dMods.add(header.getValue());
+					}
+					
+					match(this.staticMods, sMods);
+					match(this.diffMods, dMods);
 				}
 				idx++;
 				
@@ -120,6 +149,31 @@ public class SequestParamsCreator {
 		
 		writeParamsFile(inputDirectory+File.separator+"my.params");
 	}
+	
+	private void match(String s1, String s2) throws SQTParseException {
+		
+		boolean match;
+		if(s1 == null)	    match = (s2 == null);
+		else if(s2 == null)	match = (s1 == null);
+		else				match = (s1.equals(s2));
+		
+		if(!match)
+			throw new SQTParseException("File headers do not match: "+s1+" and "+s2);
+	}
+	
+	private void match(List<String> list1, List<String> list2) throws SQTParseException {
+		
+		if(list1.size() != list2.size())
+			throw new SQTParseException("Modification headers do not match");
+		
+		Collections.sort(list1);
+		Collections.sort(list2);
+		for(int i = 0; i < list1.size(); i++) {
+			if( !list1.get(i).equals(list2.get(i)) )
+				throw new SQTParseException("Modification headers do not match");
+		}
+	}
+	
 	
 	private void writeParamsFile(String filePath) throws SQTParseException {
 		
@@ -254,7 +308,7 @@ public class SequestParamsCreator {
 		}
 		
 		/*
-		 
+		Example: 
 		add_C_terminus = 0.0000                ; added to C-terminus (peptide mass & all Y"-ions)
 		add_N_terminus = 0.0000                ; added to N-terminus (B-ions)
 		add_G_Glycine = 0.0000                 ; added to G - avg.  57.0519, mono.  57.02146
@@ -284,70 +338,31 @@ public class SequestParamsCreator {
 				 
 				 */
 		
-		Map<String, String> aminoAcidNames = new HashMap<String, String>();
-		Map<String, String> aminoAcidMasses = new HashMap<String, String>();
-		aminoAcidNames.put("G", "Glycine");
-		aminoAcidMasses.put("G", "added to G - avg.  57.0519, mono.  57.02146");
-		aminoAcidNames.put("A", "Alanine");
-		aminoAcidMasses.put("A", "added to A - avg.  71.0788, mono.  71.03711");
-		aminoAcidNames.put("S", "Serine");
-		aminoAcidMasses.put("S", "added to S - avg.  87.0782, mono.  87.02303");
-		aminoAcidNames.put("P", "Proline");
-		aminoAcidMasses.put("P", "added to P - avg.  97.1167, mono.  97.05276");
-		aminoAcidNames.put("V", "Valine");
-		aminoAcidMasses.put("V", "added to V - avg.  99.1326, mono.  99.06841");
-		aminoAcidNames.put("T", "Threonine");
-		aminoAcidMasses.put("T", "added to T - avg. 101.1051, mono. 101.04768");
-		aminoAcidNames.put("C", "Cysteine");
-		aminoAcidMasses.put("C", "added to C - avg. 103.1388, mono. 103.00919");
-		aminoAcidNames.put("L", "Leucine");
-		aminoAcidMasses.put("L", "added to L - avg. 113.1594, mono. 113.08406");
-		aminoAcidNames.put("I", "Isoleucine");
-		aminoAcidMasses.put("I", "added to I - avg. 113.1594, mono. 113.08406");
-		aminoAcidNames.put("X", "LorI");
-		aminoAcidMasses.put("X", "added to X - avg. 113.1594, mono. 113.08406");
-		aminoAcidNames.put("N", "Asparagine");
-		aminoAcidMasses.put("N", "added to N - avg. 114.1038, mono. 114.04293");
-		aminoAcidNames.put("O", "Ornithine");
-		aminoAcidMasses.put("O", "added to O - avg. 114.1472, mono  114.07931");
-		aminoAcidNames.put("B", "avg_NandD");
-		aminoAcidMasses.put("B", "added to B - avg. 114.5962, mono. 114.53494");
-		aminoAcidNames.put("D", "Aspartic_Acid");
-		aminoAcidMasses.put("D", "added to D - avg. 115.0886, mono. 115.02694");
-		aminoAcidNames.put("Q", "Glutamine");
-		aminoAcidMasses.put("Q", "added to Q - avg. 128.1307, mono. 128.05858");
-		aminoAcidNames.put("K", "Lysine");
-		aminoAcidMasses.put("K", "added to K - avg. 128.1741, mono. 128.09496");
-		aminoAcidNames.put("Z", "avg_QandE");
-		aminoAcidMasses.put("Z", "added to Z - avg. 128.6231, mono. 128.55059");
-		aminoAcidNames.put("E", "Glutamic_Acid");
-		aminoAcidMasses.put("E", "added to E - avg. 129.1155, mono. 129.04259");
-		aminoAcidNames.put("M", "Methionine");
-		aminoAcidMasses.put("M", "added to M - avg. 131.1926, mono. 131.04049");
-		aminoAcidNames.put("H", "Histidine");
-		aminoAcidMasses.put("H", "added to H - avg. 137.1411, mono. 137.05891");
-		aminoAcidNames.put("F", "Phenyalanine");
-		aminoAcidMasses.put("F", "added to F - avg. 147.1766, mono. 147.06841");
-		aminoAcidNames.put("R", "Arginine");
-		aminoAcidMasses.put("R", "added to R - avg. 156.1875, mono. 156.10111");
-		aminoAcidNames.put("Y", "Tyrosine");
-		aminoAcidMasses.put("Y", "added to Y - avg. 163.1760, mono. 163.06333");
-		aminoAcidNames.put("W", "Tryptophan");
-		aminoAcidMasses.put("W", "added to W - avg. 186.2132, mono. 186.07931");
-		
-		
-		
 		writer.write("add_C_terminus = 0.0000                ; added to C-terminus (peptide mass & all Y\"-ions)\n");
 		writer.write("add_N_terminus = 0.0000                ; added to N-terminus (B-ions)\n");
-		for(String aa: aminoAcidNames.keySet()) {
-			writer.write(aminoAcidNames.get(aa)+" = ");
-			String mod = modificationMap.get(aa);
-			if(mod == null)	writer.write("0.0000");
-			else			writer.write(mod);
-			writer.write(" ; "+aminoAcidMasses.get(aa));
+		
+		SequestAminoAcidUtils aaUtils = AminoAcidUtilsFactory.getSequestAminoAcidUtils();
+		char[] aminoAcids = aaUtils.getAminoAcidChars();
+		for(char aa: aminoAcids) {
+			
+			StringBuilder buf = new StringBuilder();
+			
+			buf.append("add_"+aa+"_"+aaUtils.getFullName(aa)+" = ");
+			String mod = modificationMap.get(String.valueOf(aa));
+			if(mod == null)	buf.append("0.0000");
+			else {
+			double massDiff = Double.parseDouble(mod) - aaUtils.avgMass(aa);  // static mod in SQT headers is mass of amino acid + modification mass
+				buf.append(String.format("%.4f", massDiff));
+			}
+			
+			int length = buf.length();
+			for (int i = length; i < 39; i++) {
+				buf.append(" ");
+			}
+			writer.write(buf.toString());
+			writer.write("; added to "+aa+" - avg. "+aaUtils.avgMass(aa)+", mono. "+aaUtils.monoMass(aa));
 			writer.newLine();
 		}
-		
 	}
 
 	private void writeDiffMods(BufferedWriter writer) throws SQTParseException, IOException {
@@ -422,11 +437,6 @@ public class SequestParamsCreator {
 	
 	private boolean isValidDynamicModificationSymbol(char modSymbol) {
 		return modSymbol == '*' || modSymbol == '@' || modSymbol == '#';
-    }
-	
-	private boolean isValidAminoAcidLetter(char letter) {
-        letter = Character.toUpperCase(letter);  
-        return (letter >= 'A' && letter <= 'Z');
     }
 	
 	private String removeSign(String massStr) {
@@ -505,7 +515,7 @@ public class SequestParamsCreator {
 
 	public static void main(String[] args) throws SQTParseException {
 		// String inputDir = args[0];
-		String inputDir = "/Users/silmaril/WORK/UW/JOB_QUEUE/jq_w_mslib_r722_fix/data_dir/parc";
+		String inputDir = "/Users/silmaril/WORK/UW/JOB_QUEUE/jq_w_mslib_r722_fix/data_dir/parc/";
 		
 		SequestParamsCreator spc = new SequestParamsCreator();
 		spc.create(inputDir);

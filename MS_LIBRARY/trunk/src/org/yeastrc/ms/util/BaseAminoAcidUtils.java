@@ -85,15 +85,15 @@ public class BaseAminoAcidUtils {
     	if(isAminoAcid(aa)) {
     		switch(aa) {
 	    		case 'A':
-	    			return "Ananine";
+	    			return "Alanine";
 	    		case 'C':
 	    			return "Cysteine";
 	    		case 'D': 
-	    			return "Aspartic Acid";
+	    			return "Aspartic_Acid";
 	    		case 'E':
-	    			return "Glutamic Acid";
+	    			return "Glutamic_Acid";
 	    		case 'F': 
-	    			return "Phenyl-ananine";
+	    			return "Phenyalanine";
 	    		case 'G':
 	    			return "Glycine";
 	    		case 'H': 
