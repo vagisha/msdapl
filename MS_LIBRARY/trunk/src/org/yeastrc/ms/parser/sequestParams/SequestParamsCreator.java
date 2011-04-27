@@ -248,6 +248,12 @@ public class SequestParamsCreator {
 				writeEnzymNumber(writer);
 			}
 			
+			// write the print_duplicate_references param
+			// This is a hack. We don't really know if this was set to 1 in the original Sequest run
+			// But we need this to be set to 1 to get the data uploaded.
+			writer.write("\nprint_duplicate_references = 1         ; 0=no, 1=yes\n");
+			
+			
 			writer.newLine();
 			// write the difff mods, if any
 			if(this.diffMods.size() > 0) {
