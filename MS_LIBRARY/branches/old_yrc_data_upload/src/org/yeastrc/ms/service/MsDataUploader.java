@@ -17,12 +17,12 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 public class MsDataUploader {
 
     private static final Logger log = Logger.getLogger(MsDataUploader.class);
-    
+
     private List<Integer> uploadedAnalysisIds = new ArrayList<Integer>();
     private int uploadedSearchId;
     private int uploadedExptId;
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
-    
+
     private String comments;
     private int instrumentId;
     private String remoteServer;
@@ -34,16 +34,16 @@ public class MsDataUploader {
     private String analysisDirectory;
     private String protinferDirectory;
     private boolean doScanChargeMassCheck = false; // For MacCoss lab data
-    
+
     private boolean uploadSearch = false;
     private boolean uploadAnalysis = false;
     private boolean uploadProtinfer = false;
-    
-    
+
+
     public void setComments(String comments) {
         this.comments = comments;
     }
-    
+
     public void setInstrumentId(int instrumentId) {
         this.instrumentId = instrumentId;
     }
@@ -89,7 +89,7 @@ public class MsDataUploader {
         if(analysisDirectory != null)
             this.uploadAnalysis = true;
     }
-    
+
     public void setProtinferDirectory(String protinferDirectory) {
     	if(protinferDirectory == null)
     		return;
@@ -97,15 +97,15 @@ public class MsDataUploader {
         if(protinferDirectory != null)
             this.uploadProtinfer = true;
     }
-    
+
     public void checkResultChargeMass(boolean doScanChargeMassCheck) {
         this.doScanChargeMassCheck = doScanChargeMassCheck;
     }
-    
+
     public List<UploadException> getUploadExceptionList() {
         return this.uploadExceptionList;
     }
-    
+
     public String getUploadWarnings() {
         StringBuilder buf = new StringBuilder();
         for (UploadException e: uploadExceptionList) {
@@ -113,21 +113,21 @@ public class MsDataUploader {
         }
         return buf.toString();
     }
-    
+
     public int getUploadedSearchId() {
         return this.uploadedSearchId;
     }
-    
+
     public int getUploadedExperimentId() {
         return this.uploadedExptId;
     }
-    
+
     public void uploadData() {
 
         log.info("INITIALIZING EXPERIMENT UPLOAD"+
                 "\n\tTime: "+(new Date().toString()));
-        
-        
+
+
         // ----- INITIALIZE THE EXPERIMENT UPLOADER
         MsExperimentUploader exptUploader = null;
         try {
@@ -138,7 +138,7 @@ public class MsDataUploader {
             log.error(e.getMessage(), e);
             return;
         }
-        
+
         // ----- CHECKS BEFORE BEGINNING UPLOAD -----
         log.info("Starting pre-upload checks..");
         if(!exptUploader.preUploadCheckPassed()) {
@@ -149,25 +149,25 @@ public class MsDataUploader {
             return;
         }
         log.info(exptUploader.getPreUploadCheckMsg());
-        
-        
+
+
         // ----- NOW WE CAN BEGIN THE UPLOAD -----
         logBeginExperimentUpload();
         long start = System.currentTimeMillis();
-        
+
         try {
             this.uploadedExptId = exptUploader.uploadSpectrumData();
         }
         catch (UploadException ex) {
             uploadExceptionList.add(ex);
-            log.error(ex.getMessage(), ex);
+            log.error( "Exception in call to exptUploader.uploadSpectrumData().  Message = " + ex.getMessage(), ex);
             log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
             return;
         }
-        
+
         // ----- UPLOAD SEARCH DATA
         if(uploadSearch) {
-            
+
             // disable keys
             try {
                 disableSearchTableKeys();
@@ -175,32 +175,35 @@ public class MsDataUploader {
             catch (SQLException e) {
                 UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
                 uploadExceptionList.add(ex);
-                log.error(ex.getMessage(), ex);
+                log.error( "Exception in call to disableSearchTableKeys().  Message = " + ex.getMessage(), ex);
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
                 return;
             }
-            
+
             log.info("BEGINNING upload of search results");
             try {
                 this.uploadedSearchId = exptUploader.uploadSearchData(this.uploadedExptId);
             }
             catch (UploadException ex) {
                 uploadExceptionList.add(ex);
-                log.error(ex.getMessage(), ex);
-                
+                log.error( "Exception in call to exptUploader.uploadSearchData(this.uploadedExptId).  this.uploadedExptId = "
+                		+ this.uploadedExptId + ", Message = " + ex.getMessage(), ex);
+
                 // If there was an error making a backup of the SQT files we still go forward.
                 if(ex.getErrorCode() != ERROR_CODE.SQT_BACKUP_ERROR) {
                     log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-                    
+
                     // enable keys
                     try {
                         enableSearchTableKeys();
                     }
-                    catch(SQLException e){log.error("Error enabling keys");}
+                    catch(SQLException e){
+                    	log.error("Error enabling keys");
+                    }
                     return;
                 }
             }
-            
+
             // enable keys
             try {
                 enableSearchTableKeys();
@@ -208,15 +211,15 @@ public class MsDataUploader {
             catch (SQLException e) {
                 UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
                 uploadExceptionList.add(ex);
-                log.error(ex.getMessage(), ex);
+                log.error( "Exception in call to enableSearchTableKeys().  Message = " + ex.getMessage(), ex);
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
                 return;
             }
         }
-        
+
         // ----- UPLOAD ANALYSIS DATA
         if(uploadAnalysis) {
-            
+
             // disable keys
             try {
                 disableAnalysisTableKeys();
@@ -224,28 +227,31 @@ public class MsDataUploader {
             catch (SQLException e) {
                 UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
                 uploadExceptionList.add(ex);
-                log.error(ex.getMessage(), ex);
+                log.error( "Exception in call to disableAnalysisTableKeys().  Message = " + ex.getMessage(), ex);
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
                 return;
             }
-            
+
             log.info("BEGINNING upload of analysis results");
             try {
                 this.uploadedAnalysisIds = exptUploader.uploadAnalysisData(this.uploadedSearchId);
             }
             catch (UploadException ex) {
                 uploadExceptionList.add(ex);
-                log.error(ex.getMessage(), ex);
+                log.error( "Exception in call to exptUploader.uploadAnalysisData(this.uploadedSearchId).  Message = " + ex.getMessage(), ex);
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-                
+
                 // enable keys
                 try {
                     enableAnalysisTableKeys();
                 }
-                catch(SQLException e){log.error("Error enabling keys");}
+                catch(SQLException e){
+                    log.error( "Error enabling keys.  Exception in call to enableAnalysisTableKeys().  Message = " + ex.getMessage(), ex);
+
+                }
                 return;
             }
-            
+
             // enable keys
             try {
                 enableAnalysisTableKeys();
@@ -253,12 +259,12 @@ public class MsDataUploader {
             catch (SQLException e) {
                 UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
                 uploadExceptionList.add(ex);
-                log.error(ex.getMessage(), ex);
+                log.error( "Error enabling keys.  Exception in call to enableAnalysisTableKeys().  Message = " + ex.getMessage(), ex);
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
                 return;
             }
         }
-        
+
         // ----- UPLOAD PROTEIN INFERENCE DATA
         if(uploadProtinfer) {
             log.info("BEGINNING upload of protein inference results");
@@ -267,108 +273,108 @@ public class MsDataUploader {
             }
             catch (UploadException ex) {
                 uploadExceptionList.add(ex);
-                log.error(ex.getMessage(), ex);
+                log.error( "Exception in call to exptUploader.uploadProtinferData(this.uploadedSearchId, this.uploadedAnalysisIds).  Message = " + ex.getMessage(), ex);
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
                 return;
             }
         }
-        
+
         long end = System.currentTimeMillis();
         logEndExperimentUpload(exptUploader, start, end);
-        
+
     }
-    
+
     private void disableSearchTableKeys() throws SQLException {
-        
+
         // disable keys on msRunSearchResult table
 //        log.info("Disabling keys on msRunSearchResult table");
 //        DAOFactory.instance().getMsSearchResultDAO().disableKeys();
-        
+
         // disable keys on SQTSearchResult
 //        log.info("Disabling keys on SQTSearchResult table");
 //        DAOFactory.instance().getSequestResultDAO().disableKeys();
-//        
+//
 //        // disable keys on SQTSpectrumData
 //        log.info("Disabling keys on SQTSpectrumData table");
 //        DAOFactory.instance().getSqtSpectrumDAO().disableKeys();
-//        
+//
 //        // disable keys on msProteinMatch
 //        log.info("Disabling keys on msProteinMatch table");
 //        DAOFactory.instance().getMsProteinMatchDAO().disableKeys();
-        
+
 //        log.info("Disabled keys");
     }
-    
+
     private void enableSearchTableKeys() throws SQLException {
-        
+
         // enable keys on msRunSearchResult table
 //        log.info("Enabling keys on msRunSearchResult table");
 //        DAOFactory.instance().getMsSearchResultDAO().enableKeys();
-        
+
 //        // enable keys on SQTSearchResult
 //        log.info("Enabling keys on SQTSearchResult table");
 //        DAOFactory.instance().getSequestResultDAO().enableKeys();
-//        
+//
 //        // enable keys on SQTSpectrumData
 //        log.info("Enabling keys on SQTSpectrumData table");
 //        DAOFactory.instance().getSqtSpectrumDAO().enableKeys();
-//        
+//
 //        // enable keys on msProteinMatch
 //        log.info("Enabling keys on msProteinMatch table");
 //        DAOFactory.instance().getMsProteinMatchDAO().enableKeys();
-        
+
 //        log.info("Enabled keys");
     }
-    
-    
+
+
     private void disableAnalysisTableKeys() throws SQLException {
-        
+
         // disable keys on msRunSearchResult table
 //        log.info("Disabling keys on PercolatorResult table");
 //        DAOFactory.instance().getPercolatorResultDAO().disableKeys();
-        
+
 //        log.info("Disabled keys");
     }
-    
+
     private void enableAnalysisTableKeys() throws SQLException {
-        
+
         // enable keys on msRunSearchResult table
 //        log.info("Enabling keys on PercolatorResult table");
 //        DAOFactory.instance().getPercolatorResultDAO().enableKeys();
-        
+
 //        log.info("Enabled keys");
     }
 
     private MsExperimentUploader initializeExperimentUploader() throws UploadException  {
-        
+
         MsExperimentUploader exptUploader = new MsExperimentUploader();
         exptUploader.setDirectory(spectrumDataDirectory);
         exptUploader.setRemoteDirectory(remoteSpectrumDataDirectory);
         exptUploader.setRemoteServer(remoteServer);
         exptUploader.setComments(comments);
         exptUploader.setInstrumentId(instrumentId);
-        
+
         // Get the spectrum data uploader
         log.info("Initializing SpectrumDataUploadService");
         log.info("\tDirectory: "+spectrumDataDirectory);
         SpectrumDataUploadService rdus = getSpectrumDataUploader(spectrumDataDirectory, remoteSpectrumDataDirectory);
         exptUploader.setSpectrumDataUploader(rdus);
         log.info(rdus.getClass().getName());
-        
-        
+
+
         // We cannot upload analysis data without uploading search data first.
         if(uploadAnalysis && !uploadSearch) {
             UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
             ex.appendErrorMessage("Cannot upload analysis results without serach results");
             throw ex;
         }
-        
+
         SearchDataUploadService sdus  = null;
         // Get the search data uploader
         if(uploadSearch) {
             log.info("Initializing SearchDataUploadService");
             log.info("\tDirectory: "+searchDirectory);
-             sdus = getSearchDataUploader(searchDirectory, 
+             sdus = getSearchDataUploader(searchDirectory,
                     remoteServer, remoteSearchDataDirectory, searchDate);
             exptUploader.setSearchDataUploader(sdus);
             log.info(sdus.getClass().getName());
@@ -389,7 +395,7 @@ public class MsDataUploader {
             exptUploader.setProtinferUploader(pidus);
             log.info(pidus.getClass().getName());
         }
-        
+
         return exptUploader;
     }
 
@@ -405,7 +411,7 @@ public class MsDataUploader {
         }
         return pidus;
     }
-    
+
     private AnalysisDataUploadService getAnalysisDataUploader(String dataDirectory,
             Program searchProgram) throws UploadException {
         AnalysisDataUploadService adus = null;
@@ -420,7 +426,7 @@ public class MsDataUploader {
         }
         return adus;
     }
-    
+
     private SearchDataUploadService getSearchDataUploader(String dataDirectory,
             String remoteServer, String remoteDirectory, Date searchDate) throws UploadException {
         SearchDataUploadService sdus = null;
@@ -441,7 +447,7 @@ public class MsDataUploader {
     }
 
     private SpectrumDataUploadService getSpectrumDataUploader(String dataDirectory, String remoteDirectory) throws UploadException {
-        
+
         SpectrumDataUploadService rdus = null;
         try {
             rdus = UploadServiceFactory.instance().getSpectrumDataUploadService(dataDirectory);
@@ -454,9 +460,9 @@ public class MsDataUploader {
         }
         return rdus;
     }
-    
+
     public void uploadData(int experimentId) {
-        
+
         MsExperimentDAO exptDao = DAOFactory.instance().getMsExperimentDAO();
         MsExperiment expt = exptDao.loadExperiment(experimentId);
         if (expt == null) {
@@ -469,12 +475,12 @@ public class MsDataUploader {
         }
         this.remoteServer = expt.getServerAddress();
         this.uploadedExptId = experimentId;
-        
-        
+
+
         log.info("INITIALIZING EXPERIMENT UPLOAD"+
                 "\n\tTime: "+(new Date().toString()));
-        
-        
+
+
         // ----- INITIALIZE THE EXPERIMENT UPLOADER
         MsExperimentUploader exptUploader = null;
         try {
@@ -482,10 +488,10 @@ public class MsDataUploader {
         }
         catch (UploadException e) {
             uploadExceptionList.add(e);
-            log.error(e.getMessage(), e);
+            log.error( "Exception in call to initializeExperimentUploader().  Message = " + e.getMessage(), e);
             return;
         }
-        
+
         // ----- CHECKS BEFORE BEGINNING UPLOAD -----
         log.info("Starting pre-upload checks..");
         if(!exptUploader.preUploadCheckPassed()) {
@@ -496,26 +502,26 @@ public class MsDataUploader {
             return;
         }
         log.info(exptUploader.getPreUploadCheckMsg());
-        
-        
+
+
         // ----- NOW WE CAN BEGIN THE UPLOAD -----
         logBeginExperimentUpload();
         long start = System.currentTimeMillis();
-        
+
         // ----- UPDATE THE LAST UPDATE DATE FOR THE EXPERIMENT
         updateLastUpdateDate(experimentId);
-        
+
         // ----- UPLOAD SCAN DATA
         try {
             exptUploader.uploadSpectrumData(experimentId);
         }
         catch (UploadException ex) {
             uploadExceptionList.add(ex);
-            log.error(ex.getMessage(), ex);
+            log.error( "Exception in call to exptUploader.uploadSpectrumData(experimentId).  Message = " + ex.getMessage(), ex);
             log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
             return;
         }
-        
+
         // ----- UPLOAD SEARCH DATA
         if(uploadSearch) {
             // If the search is already uploaded, don't re-upload it.
@@ -529,12 +535,12 @@ public class MsDataUploader {
                 UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
                 ex.appendErrorMessage(e.getMessage());
                 uploadExceptionList.add(ex);
-                log.error(ex.getMessage());
+                log.error( "Exception in call to getExperimentSearchId(this.uploadedExptId).  Message = " + ex.getMessage(), ex);
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
                 return;
             }
             if(searchId == 0) {
-                
+
                 // disable keys
                 try {
                     disableSearchTableKeys();
@@ -542,34 +548,35 @@ public class MsDataUploader {
                 catch (SQLException e) {
                     UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
                     uploadExceptionList.add(ex);
-                    log.error(ex.getMessage(), ex);
+                    log.error( "Exception in call to disableSearchTableKeys().  Message = " + ex.getMessage(), ex);
                     log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
                     return;
                 }
-                  
-                log.info("BEGINNING upload of search results"); 
+
+                log.info("BEGINNING upload of search results");
                 try {
                     this.uploadedSearchId = exptUploader.uploadSearchData(this.uploadedExptId);
                 }
                 catch (UploadException ex) {
                     uploadExceptionList.add(ex);
-                    log.error(ex.getMessage(), ex);
+                    log.error( "Exception in call to exptUploader.uploadSearchData(this.uploadedExptId).  Message = " + ex.getMessage(), ex);
                     log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-                    
+
                     // enable keys
                     try {
                         enableSearchTableKeys();
                     }
                     catch(SQLException e){log.error("Error enabling keys");}
-                    
+
                     return;
                 }
-                
+
                 // enable keys
                 try {
                     enableSearchTableKeys();
                 }
                 catch (SQLException e) {
+                    log.error( "Exception in call to enableSearchTableKeys().  Message = " + e.getMessage(), e);
                     UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
                     uploadExceptionList.add(ex);
                     log.error(ex.getMessage(), ex);
@@ -582,15 +589,16 @@ public class MsDataUploader {
                 log.info("Search was uploaded previously. SearchID: "+uploadedSearchId);
             }
         }
-        
+
         // ----- UPLOAD ANALYSIS DATA
         if(uploadAnalysis) {
-            
+
             // disable keys
             try {
             	disableAnalysisTableKeys();
             }
             catch (SQLException e) {
+                log.error( "Exception in call to disableAnalysisTableKeys().  Message = " + e.getMessage(), e);
             	UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
             	uploadExceptionList.add(ex);
             	log.error(ex.getMessage(), ex);
@@ -603,8 +611,8 @@ public class MsDataUploader {
             	this.uploadedAnalysisIds = exptUploader.uploadAnalysisData(this.uploadedSearchId);
             }
             catch (UploadException ex) {
+                log.error( "Exception in call to disableAnalysisTableKeys().  Message = " + ex.getMessage(), ex);
             	uploadExceptionList.add(ex);
-            	log.error(ex.getMessage(), ex);
             	log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
 
             	// enable keys
@@ -621,6 +629,7 @@ public class MsDataUploader {
             	enableAnalysisTableKeys();
             }
             catch (SQLException e) {
+                log.error( "Exception in call to enableAnalysisTableKeys().  Message = " + e.getMessage(), e);
             	UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
             	uploadExceptionList.add(ex);
             	log.error(ex.getMessage(), ex);
@@ -628,7 +637,7 @@ public class MsDataUploader {
             	return;
             }
         }
-        
+
         // ----- UPLOAD PROTEIN INFERENCE DATA
         if(uploadProtinfer) {
             log.info("BEGINNING upload of protein inference results");
@@ -636,40 +645,41 @@ public class MsDataUploader {
                 exptUploader.uploadProtinferData(this.uploadedSearchId, this.uploadedAnalysisIds);
             }
             catch (UploadException ex) {
+                log.error( "Exception in call to exptUploader.uploadProtinferData(this.uploadedSearchId, this.uploadedAnalysisIds).  Message = " + ex.getMessage(), ex);
                 uploadExceptionList.add(ex);
                 log.error(ex.getMessage(), ex);
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
                 return;
             }
         }
-        
+
         long end = System.currentTimeMillis();
         logEndExperimentUpload(exptUploader, start, end);
-       
+
     }
 
     private int getExperimentSearchId(int uploadedExptId2) throws Exception {
-       
+
         MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
         List<Integer> searchIds = searchDao.getSearchIdsForExperiment(uploadedExptId2);
-        
+
         if(searchIds.size() == 0)
             return 0;
-        
+
         if(searchIds.size() > 1) {
             throw new Exception("Multiple search ids found for experimentID: "+uploadedExptId2);
         }
-        
+
         return searchIds.get(0);
     }
 
     private void updateLastUpdateDate(int experimentId) {
         MsExperimentDAO experimentDao = DAOFactory.instance().getMsExperimentDAO();
         experimentDao.updateLastUpdateDate(experimentId);
-        
+
     }
 
-    
+
     private void logEndExperimentUpload(MsExperimentUploader uploader, long start, long end) {
         log.info("END EXPERIMENT UPLOAD: "+((end - start)/(1000L))+"seconds"+
                 "\n\tTime: "+(new Date().toString())+"\n"+
@@ -677,7 +687,7 @@ public class MsDataUploader {
     }
 
     private void logBeginExperimentUpload() {
-        
+
         StringBuilder msg = new StringBuilder();
         msg.append("BEGIN EXPERIMENT UPLOAD");
         msg.append("\n\tRemote server: "+remoteServer);
@@ -701,35 +711,35 @@ public class MsDataUploader {
         log.info(msg.toString());
     }
 
-    
+
     public static void main(String[] args) throws UploadException {
         long start = System.currentTimeMillis();
 
-        
+
 //        for(int i = 0; i < 10; i++) {
 //        String directory = args[0];
         String directory = "/Users/silmaril/WORK/UW/SQT_BKUP_TEST";
-        
+
         if(directory == null || directory.length() == 0 || !(new File(directory).exists()))
             System.out.println("Invalid directory: "+directory);
-        
+
 //        boolean maccossData = Boolean.parseBoolean(args[1]);
         boolean maccossData = true;
-        
+
         System.out.println("Directory: "+directory+"; Maccoss Data: "+maccossData);
-        
+
         MsDataUploader uploader = new MsDataUploader();
         uploader.setRemoteServer("local");
         uploader.setSpectrumDataDirectory(directory);
         uploader.setSearchDirectory(directory+File.separator+"pipeline"+File.separator+"sequest");
         uploader.setAnalysisDirectory(directory+File.separator+"pipeline"+File.separator+"percolator");
 //        uploader.setProtinferDirectory(directory);
-        
+
         uploader.setRemoteSpectrumDataDirectory(directory);
         uploader.setRemoteSearchDataDirectory(directory+File.separator+"pipeline"+File.separator+"sequest");
         uploader.setSearchDate(new Date());
         uploader.checkResultChargeMass(maccossData);
-        
+
 //        uploader.uploadData(1);
         uploader.uploadData();
 //        }
