@@ -147,7 +147,7 @@ public class SequestParamsCreator {
 			}
 		}
 		
-		writeParamsFile(inputDirectory+File.separator+"my.params");
+		writeParamsFile(inputDirectory+File.separator+"sequest.params");
 	}
 	
 	private void match(String s1, String s2) throws SQTParseException {
@@ -188,38 +188,45 @@ public class SequestParamsCreator {
 			writer.write("[SEQUEST]\n");
 			
 			// write the database name
+			if(this.databaseName == null || this.databaseName.trim().length() == 0) {
+				throw new SQTParseException("Database name cannot be empty");
+			}
 			writer.write("database_name = "+this.databaseName);
 			writer.write("\n\n");
 			
 			// write the parent mass type
-			if(this.parentMassType != null) {
-				// eg. mass_type_parent = 0                   ; 0=average masses, 1=monoisotopic masses
-				writer.write("mass_type_parent = ");
-				if(parentMassType.equalsIgnoreCase("AVG"))
-					writer.write("0");
-				else if(parentMassType.equalsIgnoreCase("MONO"))
-					writer.write("1");
-				else
-					throw new SQTParseException("unknown parent mass type: "+parentMassType);
-				
-				writer.write("\t; 0=average masses, 1=monoisotopic masses");
-				writer.newLine();
+			// eg. mass_type_parent = 0                   ; 0=average masses, 1=monoisotopic masses
+			if(this.parentMassType == null || this.parentMassType.trim().length() == 0) {
+				throw new SQTParseException("Could not get parent mass type");
 			}
+			writer.write("mass_type_parent = ");
+			if(parentMassType.equalsIgnoreCase("AVG"))
+				writer.write("0");
+			else if(parentMassType.equalsIgnoreCase("MONO"))
+				writer.write("1");
+			else
+				throw new SQTParseException("unknown parent mass type: "+parentMassType);
+
+			writer.write("\t; 0=average masses, 1=monoisotopic masses");
+			writer.newLine();
+			
 			
 			// write the fragment mass type
-			if(this.fragmentMassType != null) {
-				// e.g. mass_type_fragment = 1                 ; 0=average masses, 1=monoisotopic masses
-				writer.write("mass_type_fragment = ");
-				if(fragmentMassType.equalsIgnoreCase("AVG"))
-					writer.write("0");
-				else if(fragmentMassType.equalsIgnoreCase("MONO"))
-					writer.write("1");
-				else
-					throw new SQTParseException("unknown fragment mass type: "+fragmentMassType);
-				
-				writer.write("\t; 0=average masses, 1=monoisotopic masses");
-				writer.newLine();
+			// e.g. mass_type_fragment = 1                 ; 0=average masses, 1=monoisotopic masses
+			if(this.fragmentMassType == null || fragmentMassType.trim().length() == 0) {
+				throw new SQTParseException("Could not get fragment mass type");
 			}
+			writer.write("mass_type_fragment = ");
+			if(fragmentMassType.equalsIgnoreCase("AVG"))
+				writer.write("0");
+			else if(fragmentMassType.equalsIgnoreCase("MONO"))
+				writer.write("1");
+			else
+				throw new SQTParseException("unknown fragment mass type: "+fragmentMassType);
+
+			writer.write("\t; 0=average masses, 1=monoisotopic masses");
+			writer.newLine();
+			
 			
 			// write the parent mass tolerance
 			if(this.peptideMassTolerance != null) {
@@ -243,10 +250,12 @@ public class SequestParamsCreator {
 			}
 			
 			writer.newLine();
-			// write the enzyme number
-			if(this.enzyme != null) {
-				writeEnzymNumber(writer);
+			if(this.enzyme == null || this.enzyme.trim().length() == 0) {
+				throw new SQTParseException("No enzyme information found");
 			}
+			// write the enzyme number
+			writeEnzymNumber(writer);
+			
 			
 			// write the print_duplicate_references param
 			// This is a hack. We don't really know if this was set to 1 in the original Sequest run
@@ -266,7 +275,7 @@ public class SequestParamsCreator {
 			writeStaticMods(writer);
 			
 			writer.newLine();
-			// write the enzyme information, if present
+			// write the enzyme information
 			writeEnzymes(writer);
 			
 		}
@@ -357,7 +366,10 @@ public class SequestParamsCreator {
 			String mod = modificationMap.get(String.valueOf(aa));
 			if(mod == null)	buf.append("0.0000");
 			else {
-			double massDiff = Double.parseDouble(mod) - aaUtils.avgMass(aa);  // static mod in SQT headers is mass of amino acid + modification mass
+				double massDiff = Double.parseDouble(mod) - aaUtils.avgMass(aa);  // static mod in SQT headers is mass of amino acid + modification mass
+				if(massDiff <= 0) {
+					throw new RuntimeException("Static modification mass is negative!!");
+				}
 				buf.append(String.format("%.4f", massDiff));
 			}
 			
@@ -398,7 +410,7 @@ public class SequestParamsCreator {
 				throw new SQTParseException("No modification symbol found: "+modString);
 			char modSymbol = modChars.charAt(modChars.length() - 1);
 			if (!isValidDynamicModificationSymbol(modSymbol))
-				throw new SQTParseException("Invalid modification symbol: "+modString);
+				throw new SQTParseException("Invalid modification symbol: "+(modChars.charAt(modChars.length() - 1)));
 
 			// remove the modification symbol and convert modification chars to upper case 
 			modChars = modChars.substring(0, modChars.length()-1).toUpperCase();
@@ -445,11 +457,13 @@ public class SequestParamsCreator {
 		return modSymbol == '*' || modSymbol == '@' || modSymbol == '#';
     }
 	
-	private String removeSign(String massStr) {
+	private String removeSign(String massStr) throws SQTParseException {
         if (massStr.length() == 0)  return massStr;
         if (massStr.charAt(0) == '+' || massStr.charAt(0) == '-')
             return massStr.substring(1);
-        return massStr;
+        else
+        	throw new SQTParseException("Did not find a + or - with the dynamic modification mass");
+        //return massStr;
     }
 
 	private void writeEnzymNumber(BufferedWriter writer) throws SQTParseException, IOException {
@@ -475,6 +489,12 @@ public class SequestParamsCreator {
 			writer.write("13\n");
 		else
 			throw new SQTParseException("Unrecognized enzyme: "+this.enzyme);
+		
+		// If we are using an enzyme we need the enzymatic termini information.  
+		// I don't know what the SQT header for that looks like. 
+		if(!this.enzyme.equalsIgnoreCase("No_Enzyme")) {
+			throw new SQTParseException("Don't know how to get enzymatic termini information for the enzyme: "+this.enzyme);
+		}
 			
 	}
 
@@ -521,7 +541,7 @@ public class SequestParamsCreator {
 
 	public static void main(String[] args) throws SQTParseException {
 		// String inputDir = args[0];
-		String inputDir = "/Users/silmaril/WORK/UW/JOB_QUEUE/jq_w_mslib_r722_fix/data_dir/parc/";
+		String inputDir = "/Users/silmaril/WORK/UW/JOB_QUEUE/jq_w_mslib_r722_fix/data_dir/parc/test";
 		
 		SequestParamsCreator spc = new SequestParamsCreator();
 		spc.create(inputDir);
