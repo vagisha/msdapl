@@ -30,11 +30,11 @@ import org.yeastrc.ms.util.SequestAminoAcidUtils;
  */
 public class SequestParamsCreator {
 
-	
+
 	// These are the parameters we will read
 	private String databaseName = null;
 	// H	Database	/scratch/yates/SGD_S-cerevisiae_na_12-16-2005_con_reversed.fasta
-	
+
 	private String parentMassType = null;
 	// H	PrecursorMasses	AVG
 
@@ -43,49 +43,49 @@ public class SequestParamsCreator {
 
 	private String peptideMassTolerance = null;
 	// H	Alg-PreMassTol	3.000
-	
+
 	private String fragmentIonTolerance = null;
 	// H	Alg-FragMassTol	0.0
-	
+
 	private List<String> staticMods = new ArrayList<String>();
 	// H	StaticMod	C=160.139
 	// If there is more than 1 static residue modification we should see multiple headers
-	
+
 	private List<String> diffMods = new ArrayList<String>();
 	// H	DiffMod	STY*=+80.000
 	// If there is more than 1 dynamic residue modification we should see multiple headers
-	
+
 	private String ionSeries = null;
 	// H	Alg-IonSeries	0 1 1 0.0 1.0 0.0 0.0 0.0 0.0 0.0 1.0 0.0
-	
+
 	private String enzyme = null;
 	// H	EnzymeSpec	No_Enzyme
-	
-	
+
+
 	public void create(String inputDirectory) throws SQTParseException {
-		
+
 		File dir = new File(inputDirectory);
 		File[] sqtFiles = dir.listFiles(new FilenameFilter() {
-			
+
 			@Override
 			public boolean accept(File arg0, String arg1) {
 				return arg1.endsWith(".sqt");
 			}
 		});
-		
+
 		int idx = 0;
-		
+
 		for(File sqtFile: sqtFiles) {
-			
+
 			SequestSQTFileReader reader = new SequestSQTFileReader();
 			try {
 				reader.open(sqtFile.getAbsolutePath());
 				SQTHeader headerSection = reader.getSearchHeader();
 				List<SQTHeaderItem> headers = headerSection.getHeaders();
-				
+
 				// reading from the first file
 				if(idx == 0) {
-					
+
 					for(SQTHeaderItem header: headers) {
 						if(header.getName().equals("Database"))
 							this.databaseName = header.getValue();
@@ -109,12 +109,12 @@ public class SequestParamsCreator {
 				}
 				// match with what was read from the first file
 				else {
-					
+
 					List<String> sMods = new ArrayList<String>();
 					List<String> dMods = new ArrayList<String>();
-					
+
 					for(SQTHeaderItem header: headers) {
-						if(header.getName().equals("Database")) 
+						if(header.getName().equals("Database"))
 							match(this.databaseName,header.getValue());
 						else if(header.getName().equalsIgnoreCase("PrecursorMasses"))
 							match(this.parentMassType, header.getValue());
@@ -133,12 +133,12 @@ public class SequestParamsCreator {
 						else if(header.getName().equalsIgnoreCase("DiffMod"))
 							dMods.add(header.getValue());
 					}
-					
+
 					match(this.staticMods, sMods);
 					match(this.diffMods, dMods);
 				}
 				idx++;
-				
+
 			} catch (DataProviderException e) {
 				throw new SQTParseException("Error parsing file: "+sqtFile, e);
 			}
@@ -146,26 +146,28 @@ public class SequestParamsCreator {
 				reader.close();
 			}
 		}
-		
-		writeParamsFile(inputDirectory+File.separator+"my.params");
+
+
+		writeParamsFile(inputDirectory+File.separator + "sequest.params");
+//		writeParamsFile(inputDirectory+File.separator + "my.params");
 	}
-	
+
 	private void match(String s1, String s2) throws SQTParseException {
-		
+
 		boolean match;
 		if(s1 == null)	    match = (s2 == null);
 		else if(s2 == null)	match = (s1 == null);
 		else				match = (s1.equals(s2));
-		
+
 		if(!match)
 			throw new SQTParseException("File headers do not match: "+s1+" and "+s2);
 	}
-	
+
 	private void match(List<String> list1, List<String> list2) throws SQTParseException {
-		
+
 		if(list1.size() != list2.size())
 			throw new SQTParseException("Modification headers do not match");
-		
+
 		Collections.sort(list1);
 		Collections.sort(list2);
 		for(int i = 0; i < list1.size(); i++) {
@@ -173,24 +175,24 @@ public class SequestParamsCreator {
 				throw new SQTParseException("Modification headers do not match");
 		}
 	}
-	
-	
+
+
 	private void writeParamsFile(String filePath) throws SQTParseException {
-		
+
 		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(new FileWriter(filePath));
-			
+
 			// write a dummy parameter so that we know this file was generated from the SQT headers
 			writer.write("FILE_GENERATOR = SequestParamsCreator  ; File was generated from the SQT headers in the experiment");
 			writer.write("\n\n");
-			
+
 			writer.write("[SEQUEST]\n");
-			
+
 			// write the database name
 			writer.write("database_name = "+this.databaseName);
 			writer.write("\n\n");
-			
+
 			// write the parent mass type
 			if(this.parentMassType != null) {
 				// eg. mass_type_parent = 0                   ; 0=average masses, 1=monoisotopic masses
@@ -201,11 +203,11 @@ public class SequestParamsCreator {
 					writer.write("1");
 				else
 					throw new SQTParseException("unknown parent mass type: "+parentMassType);
-				
+
 				writer.write("\t; 0=average masses, 1=monoisotopic masses");
 				writer.newLine();
 			}
-			
+
 			// write the fragment mass type
 			if(this.fragmentMassType != null) {
 				// e.g. mass_type_fragment = 1                 ; 0=average masses, 1=monoisotopic masses
@@ -216,59 +218,59 @@ public class SequestParamsCreator {
 					writer.write("1");
 				else
 					throw new SQTParseException("unknown fragment mass type: "+fragmentMassType);
-				
+
 				writer.write("\t; 0=average masses, 1=monoisotopic masses");
 				writer.newLine();
 			}
-			
+
 			// write the parent mass tolerance
 			if(this.peptideMassTolerance != null) {
 				// e.g. peptide_mass_tolerance = 3.000
 				writer.write("peptide_mass_tolerance = "+peptideMassTolerance);
 				writer.newLine();
 			}
-			
+
 			// write the fragment mass tolerance
 			if(this.fragmentIonTolerance != null) {
 				// e.g. fragment_ion_tolerance = 0.0
 				writer.write("fragment_ion_tolerance = "+fragmentIonTolerance);
 				writer.newLine();
 			}
-			
+
 			// write the ion series
 			if(this.ionSeries != null) {
 				// e.g. ion_series = 0 1 1 0.0 1.0 0.0 0.0 0.0 0.0 0.0 1.0 0.0
 				writer.write("ion_series = "+this.ionSeries);
 				writer.newLine();
 			}
-			
+
 			writer.newLine();
 			// write the enzyme number
 			if(this.enzyme != null) {
 				writeEnzymNumber(writer);
 			}
-			
+
 			// write the print_duplicate_references param
 			// This is a hack. We don't really know if this was set to 1 in the original Sequest run
 			// But we need this to be set to 1 to get the data uploaded.
 			writer.write("\nprint_duplicate_references = 1         ; 0=no, 1=yes\n");
-			
-			
+
+
 			writer.newLine();
 			// write the difff mods, if any
 			if(this.diffMods.size() > 0) {
-				
+
 				writeDiffMods(writer);
 			}
-			
+
 			writer.newLine();
 			// write the static mods, if any
 			writeStaticMods(writer);
-			
+
 			writer.newLine();
 			// write the enzyme information, if present
 			writeEnzymes(writer);
-			
+
 		}
 		catch(IOException e) {
 			throw new SQTParseException("Error parsing file: "+filePath, e);
@@ -279,42 +281,42 @@ public class SequestParamsCreator {
 	}
 
 	private void writeStaticMods(BufferedWriter writer) throws SQTParseException, IOException {
-		
+
 		// Static mods from the SQT file header should look like this:
 		// C=160.139
-		
+
 		// key = modified residue (e.g. C, K, R);  value = mass of the modification
 		Map<String, String> modificationMap = new HashMap<String, String>();
-		
+
 		for(String modString: this.staticMods) {
 			String[] tokens = modString.split("=");
-			
+
 	        if (tokens.length < 2)
 	            throw new SQTParseException("Invalid static modification string: "+modString);
 	        if (tokens.length > 2)
 	            throw new SQTParseException("Invalid static modification string (appears to have > 1 static modification): "+modString);
-		
-		
-	        // convert modification chars to upper case 
+
+
+	        // convert modification chars to upper case
 	        String modChars = tokens[0].trim().toUpperCase();
 	        String modMass = tokens[1].trim();
-	        
+
 	        try {
 	            Double.parseDouble(modMass);
 	        }
 	        catch(NumberFormatException e) {
 	            throw new SQTParseException("Error parsing static modification mass: "+modMass);
 	        }
-	        
-	        // this modification may be for multiple residues; 
+
+	        // this modification may be for multiple residues;
 	        // add one for each residue character
 	        for (int i = 0; i < modChars.length(); i++) {
 	        	modificationMap.put(String.valueOf(modChars.charAt(i)), modMass);
 	        }
 		}
-		
+
 		/*
-		Example: 
+		Example:
 		add_C_terminus = 0.0000                ; added to C-terminus (peptide mass & all Y"-ions)
 		add_N_terminus = 0.0000                ; added to N-terminus (B-ions)
 		add_G_Glycine = 0.0000                 ; added to G - avg.  57.0519, mono.  57.02146
@@ -341,26 +343,32 @@ public class SequestParamsCreator {
 		add_R_Arginine = 0.0000                ; added to R - avg. 156.1875, mono. 156.10111
 		add_Y_Tyrosine = 0.0000                ; added to Y - avg. 163.1760, mono. 163.06333
 		add_W_Tryptophan = 0.0000              ; added to W - avg. 186.2132, mono. 186.07931
-				 
+
 				 */
-		
+
 		writer.write("add_C_terminus = 0.0000                ; added to C-terminus (peptide mass & all Y\"-ions)\n");
 		writer.write("add_N_terminus = 0.0000                ; added to N-terminus (B-ions)\n");
-		
+
 		SequestAminoAcidUtils aaUtils = AminoAcidUtilsFactory.getSequestAminoAcidUtils();
 		char[] aminoAcids = aaUtils.getAminoAcidChars();
 		for(char aa: aminoAcids) {
-			
+
 			StringBuilder buf = new StringBuilder();
-			
+
 			buf.append("add_"+aa+"_"+aaUtils.getFullName(aa)+" = ");
 			String mod = modificationMap.get(String.valueOf(aa));
 			if(mod == null)	buf.append("0.0000");
 			else {
-			double massDiff = Double.parseDouble(mod) - aaUtils.avgMass(aa);  // static mod in SQT headers is mass of amino acid + modification mass
+				double massDiff = Double.parseDouble(mod) - aaUtils.avgMass(aa);  // static mod in SQT headers is mass of amino acid + modification mass
+				if ( massDiff < 0 ) {
+
+					throw new RuntimeException( "Computed Mass diff less than zero, is = " + massDiff );
+
+				}
+
 				buf.append(String.format("%.4f", massDiff));
 			}
-			
+
 			int length = buf.length();
 			for (int i = length; i < 39; i++) {
 				buf.append(" ");
@@ -376,16 +384,16 @@ public class SequestParamsCreator {
 		// Diff mods string from the SQT file header should look like this
 		// STY*=+80.000
 	    // Multiple dynamic modifications should be present on separate DiffMod lines in a SQT file
-		
+
 		String asteriskMods = null; // modifications with symbol *
 		String atMods = null; // modifications with symbol @
 		String hashMods = null; // modifications with symbol #
-		
-		
+
+
 		for(String modString: diffMods) {
-			
+
 			String[] tokens = modString.split("=");
-			
+
 			if (tokens.length < 2)
 				throw new SQTParseException("Invalid dynamic modification string: "+modString);
 			if (tokens.length > 2)
@@ -400,11 +408,11 @@ public class SequestParamsCreator {
 			if (!isValidDynamicModificationSymbol(modSymbol))
 				throw new SQTParseException("Invalid modification symbol: "+modString);
 
-			// remove the modification symbol and convert modification chars to upper case 
+			// remove the modification symbol and convert modification chars to upper case
 			modChars = modChars.substring(0, modChars.length()-1).toUpperCase();
 			if (modChars.length() < 1)
 				throw new SQTParseException("No residues found for dynamic modification: "+modString);
-			
+
 
 			String modMass = tokens[1].trim();
 			modMass = removeSign(modMass); // removes a + or - sign
@@ -424,7 +432,7 @@ public class SequestParamsCreator {
 			else if(modSymbol == '#')
 				hashMods = modMass+" "+modChars;
 		}
-		
+
 		writer.write("diff_search_options = ");
 		if(asteriskMods != null)
 			writer.write(asteriskMods);
@@ -440,11 +448,11 @@ public class SequestParamsCreator {
 			writer.write(" 0.0 X");
 		writer.newLine();
 	}
-	
+
 	private boolean isValidDynamicModificationSymbol(char modSymbol) {
 		return modSymbol == '*' || modSymbol == '@' || modSymbol == '#';
     }
-	
+
 	private String removeSign(String massStr) {
         if (massStr.length() == 0)  return massStr;
         if (massStr.charAt(0) == '+' || massStr.charAt(0) == '-')
@@ -453,7 +461,7 @@ public class SequestParamsCreator {
     }
 
 	private void writeEnzymNumber(BufferedWriter writer) throws SQTParseException, IOException {
-		
+
 		// TODO these are the common enzymes that I know of.  Should I add others?
 		// Most SQT files will have "No_Enzyme" or "Trypsin" as the enzyme
 		// If the input SQT files have an enzyme other than the ones below we will
@@ -475,13 +483,13 @@ public class SequestParamsCreator {
 			writer.write("13\n");
 		else
 			throw new SQTParseException("Unrecognized enzyme: "+this.enzyme);
-			
+
 	}
 
 	private void writeEnzymes(BufferedWriter writer) throws IOException {
-		
+
 		/*
-		 
+
 		 [SEQUEST_ENZYME_INFO]
 0.  No_Enzyme              0      -           -
 1.  Trypsin                1      KR          P
@@ -500,7 +508,7 @@ public class SequestParamsCreator {
 
 
 		 */
-		
+
 		writer.write("[SEQUEST_ENZYME_INFO]\n");
 		writer.write("0.  No_Enzyme              0      -           -\n");
 		writer.write("1.  Trypsin                1      KR          P\n");
@@ -516,13 +524,13 @@ public class SequestParamsCreator {
 		writer.write("11. Cymotryp/Modified      1      FWYL        P\n");
 		writer.write("12. Elastase               1      ALIV        P\n");
 		writer.write("13. Elastase/Tryp/Chymo    1      ALIVKRWFY   P\n");
-		
+
 	}
 
 	public static void main(String[] args) throws SQTParseException {
 		// String inputDir = args[0];
 		String inputDir = "/Users/silmaril/WORK/UW/JOB_QUEUE/jq_w_mslib_r722_fix/data_dir/parc/";
-		
+
 		SequestParamsCreator spc = new SequestParamsCreator();
 		spc.create(inputDir);
 	}
