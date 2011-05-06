@@ -442,14 +442,15 @@ public class SequestParamsCreator {
 			writer.write(asteriskMods);
 		else
 			writer.write("0.0 X");
-		if(atMods != null)
-			writer.write(" "+atMods);
-		else
-			writer.write(" 0.0 X");
 		if(hashMods != null)
 			writer.write(" "+hashMods);
 		else
 			writer.write(" 0.0 X");
+		if(atMods != null)
+			writer.write(" "+atMods);
+		else
+			writer.write(" 0.0 X");
+		
 		writer.newLine();
 	}
 	
@@ -541,8 +542,8 @@ public class SequestParamsCreator {
 
 	public static void main(String[] args) throws SQTParseException {
 		// String inputDir = args[0];
-		String inputDir = "/Users/silmaril/WORK/UW/JOB_QUEUE/jq_w_mslib_r722_fix/data_dir/parc/test";
-		
+		// String inputDir = "/Users/silmaril/WORK/UW/JOB_QUEUE/jq_w_mslib_r722_fix/data_dir/parc/test";
+		String inputDir = "./test_resources/EE-normalized_SEQUEST/1217/1129";
 		SequestParamsCreator spc = new SequestParamsCreator();
 		spc.create(inputDir);
 	}
