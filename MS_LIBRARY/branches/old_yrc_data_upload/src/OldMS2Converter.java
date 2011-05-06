@@ -7,12 +7,13 @@
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 
@@ -29,14 +30,17 @@ public class OldMS2Converter {
 		return instance;
 	}
 	
-	public void convert (String inputFilePath, String outputFilePath) throws IOException {
+	public void convert (String inputFilePath, String outputFilePath, boolean forPeptipedia) throws IOException {
 		
 		
-		File infile = new File(inputFilePath);
+		if(!inputFilePath.endsWith(".ms2")) {
+			System.out.println("Not a MS2 file: "+inputFilePath);
+			return;
+		}
 		
-		if(isValidMs2(infile)) {
-			System.out.println("File: "+infile.getAbsolutePath()+" is a valid MS2 file. Copying as is...");
-			copyFile(inputFilePath, outputFilePath);
+		
+		if(isValidMs2(inputFilePath)) {
+			System.out.println("File is already in a valid MS2 format: "+inputFilePath+". Skipping...");
 			return;
 		}
 		
@@ -45,7 +49,7 @@ public class OldMS2Converter {
 		BufferedWriter writer = null;
 		
 		try {
-			reader = new BufferedReader(new FileReader(infile));
+			reader = new BufferedReader(new FileReader(inputFilePath));
 			writer = new BufferedWriter(new FileWriter(outputFilePath));
 			
 			// write the header
@@ -55,10 +59,12 @@ public class OldMS2Converter {
 			String line = null;
 			double mz = -1.0;
 			
+			Set<Integer> scanNumbers = new HashSet<Integer>();
+			
 			int scanNum = 1;
 			while((line = reader.readLine()) != null) {
 				
-				if(line.startsWith(":")) {
+				if(line.startsWith(":")) { // this line has the scan number and charge
 					// Example:
 					// :0002.0002.2
 					// 1894.72 2
@@ -69,6 +75,11 @@ public class OldMS2Converter {
 					String scanNumE = tokens1[1];
 					String chgline1 = tokens1[2]; // charge string from the first line
 					
+					if(!scanNumS.equals(scanNumE)) {
+						System.out.println("Start scan number not the same as the end scan number: "+line);
+						return;
+					}
+					
 					// read the next line
 					String line2 = reader.readLine();
 					String[] tokens2 = line2.split("\\s+");
@@ -76,29 +87,53 @@ public class OldMS2Converter {
 					String chgline2 = tokens2[1];
 					
 					if(!(chgline1.equals(chgline2))) {
-						System.err.println("Charge not the same");
-						System.err.println("\t"+line);
-						System.err.println("\t"+line2);
-						System.exit(-1);
+						System.out.println("Charge not the same");
+						System.out.println("\t"+line);
+						System.out.println("\t"+line2);
+						return;
 					}
 					
-					// m/z = ( neutralMass + (charge * MASS_PROTON) ) / charge;
 					int chg = Integer.parseInt(chgline2);
 					if(mz == -1.0) {
+						// m/z = ( neutralMass + (charge * MASS_PROTON) ) / charge;
 						mz = MzMplusHConverter.toMz(Double.parseDouble(mplusH), chg);
-						writer.write("S\t"+scanNum+"\t"+scanNum+"\t"+format.format(mz)+"\n");
-						writer.write("I\tOriginalScan\t"+scanNumS+"-"+scanNumE+"\n");
-						scanNum++;
+						
+						// Scan numbers can be repeated in the old ms2 files
+						// This is a problem.  For the Peptipedia project, since the data
+						// is being re-searched with Tide, I renumbered the scans.
+						// For the old YRC data conversion project we need to keep the original scan numbers.
+						// However, duplicate scan numbers will cause errors while uploading search results 
+						// so we will throw an error
+						if(forPeptipedia) {
+							writer.write("S\t"+scanNum+"\t"+scanNum+"\t"+format.format(mz)+"\n");
+							writer.write("I\tOriginalScan\t"+scanNumS+"-"+scanNumE+"\n");
+							scanNum++;
+						}
+						else {
+							Integer snum = Integer.parseInt(scanNumS);
+							if(scanNumbers.contains(snum)) {
+								throw new RuntimeException("Duplicate scan number found: "+scanNumS);
+							}
+							scanNumbers.add(snum);
+							writer.write("S\t"+scanNumS+"\t"+scanNumE+"\t"+format.format(mz)+"\n");
+							
+						}
 					}
 					
-					if(mz != -1.0) {
+					// In some old files the MH+ values for the two charge states do not correspond to the same 
+					// m/z value.  For the Peptipedia project the MH+ value for the first charge state is 
+					// used to calculate the m/z reported in the 'S' line. And, the MH+ for the second charge
+					// state (if present) is re-calculated based on this m/z value.
+					// We will not do this for the YEC data conversion project since the MH+ in the 'Z' lines 
+					// will have to match the 'observedMass' in the sqt files. 
+					if(forPeptipedia && mz != -1.0) {
 						mplusH = getMplusH(mz, chg);
 					}
 					
 					writer.write("Z\t"+chg+"\t"+mplusH+"\n");
 					
 				}
-				else {
+				else { // this is the peak line (m/z and intensity)
 					mz = -1.0;
 					writer.write(line+"\n");
 				}
@@ -112,20 +147,18 @@ public class OldMS2Converter {
 		System.out.println("\tConverted file: "+outputFilePath);
 	}
 
-	private boolean isValidMs2(File f) throws IOException {
+	private boolean isValidMs2(String inputFilePath) throws IOException {
 		
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new FileReader(f));
+			reader = new BufferedReader(new FileReader(inputFilePath));
 			String line = reader.readLine();
 			if(line.startsWith(":"))
 				return false;
 			else if(line.startsWith("H"))
 				return true;
 			else {
-				System.err.println("Cannot recognize file: "+f.getAbsolutePath());
-				System.exit(-1);
-				return true;
+				throw new RuntimeException("Cannot recognize file: "+inputFilePath+". First line is: "+line);
 			}
 		}
 		finally {
@@ -138,25 +171,16 @@ public class OldMS2Converter {
 		return format.format(mph);
 	}
 	
-	// Copy a file
-	public void copyFile(String infile, String outfile) throws IOException {
+	public static void main(String[] args) {
 		
-		BufferedReader reader = null;
-		BufferedWriter writer = null;
-		
+		OldMS2Converter converter = new OldMS2Converter();
+		String file = "./resources/old_ms2/cotesmmsrapa-01.ms2";
 		try {
-			reader = new BufferedReader(new FileReader(infile));
-			writer = new BufferedWriter(new FileWriter(outfile));
+			converter.convert(file, "./resources/old_ms2/cotesmmsrapa-01.converted.ms2",
+					/* Use false for the YRC old data conversion project */ false);
 			
-			String line = null;
-			while((line = reader.readLine()) != null) {
-				writer.write(line+"\n");
-			}
-			
-		}
-		finally {
-			if(reader != null) try {reader.close();} catch(IOException e){}
-			if(writer != null) try {writer.close();} catch(IOException e) {}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
