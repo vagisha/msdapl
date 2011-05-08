@@ -31,7 +31,6 @@ import org.yeastrc.ms.domain.search.MsResultTerminalModIds;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
-import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
@@ -193,7 +192,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         return numSearchesUploaded;
     }
 
-    int getScanId(int runId, int scanNumber)
+    final int getScanId(int runId, int scanNumber)
             throws UploadException {
 
         int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
@@ -205,7 +204,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         return scanId;
     }
 
-    void updateProgramVersion(int searchId, String programVersion) {
+    private void updateProgramVersion(int searchId, String programVersion) {
         try {
             searchDao.updateSearchProgramVersion(searchId, programVersion);
         }
@@ -356,7 +355,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     }
     
     // get the id of the search database used (will be used to look up protein ids later)
-    int getSearchDatabaseId(MsSearchDatabaseIn db) throws UploadException {
+    final int getSearchDatabaseId(MsSearchDatabaseIn db) throws UploadException {
         String searchDbName = null;
         int dbId = 0;
         if (db != null) {
@@ -393,14 +392,13 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
             // make sure the SQTGeneratorVersion value is same in all sqt headers
             if (programVersion == null) {
                 if (header.getSearchEngineVersion() != null)
-                    throw new DataProviderException("Value of SQTGeneratorVersion is not nulllthe same in all SQT files.");
+                    throw new DataProviderException("Value of SQTGeneratorVersion is not the same in all SQT files.");
             }
             else if (!programVersion.equals(header.getSearchEngineVersion())) {
                 throw new DataProviderException("Value of SQTGeneratorVersion is not the same in all SQT files.");
             }
         }
         // save the run search and return the database id
-//        SQTRunSearchDAO runSearchDao = daoFactory.getSqtRunSearchDAO();
         return runSearchDao.saveRunSearch(new SQTRunSearchWrap(search, searchId, runId));
     }
 
@@ -477,38 +475,17 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         uploadProteinMatches(result, resultId, sequenceDatabaseId);
         
         // upload dynamic mods for this result
-        uploadResultResidueMods(result, resultId, runSearchId);
+        uploadResultResidueMods(result, resultId);
         
-        // no dynamic terminal mods for sequest
-        uploadResultTerminalMods(result, resultId, searchId);
+        // upload dynamic terminal mods for this result
+        uploadResultTerminalMods(result, resultId);
         
         return resultId;
     }
     
-    final <T extends MsSearchResult> List<Integer> uploadBaseSearchResults(List<T> results) throws UploadException {
-        
-        
-        List<Integer> autoIncrIds = resultDao.saveResultsOnly(results);
-        for(int i = 0; i < results.size(); i++) {
-            MsSearchResult result = results.get(i);
-            int resultId = autoIncrIds.get(i);
-            
-            // upload the protein matches
-            uploadProteinMatches(result, resultId, sequenceDatabaseId);
-            
-            // upload dynamic mods for this result
-            uploadResultResidueMods(result, resultId, result.getRunSearchId());
-            
-            // no dynamic terminal mods for sequest
-            uploadResultTerminalMods(result, resultId, searchId);
-        }
-        
-        return autoIncrIds;
-    }
-
 
     // SEARCH SCAN
-    final void uploadSearchScan(SQTSearchScan searchScan) throws UploadException {
+    private void uploadSearchScan(SQTSearchScan searchScan) throws UploadException {
         // if the cache has enough entries upload 
         if(searchScanMap.size() >= BUF_SIZE) {
             uploadSearchScanBuffer();
@@ -529,7 +506,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     }
     
     // PROTEIN MATCHES
-    final void uploadProteinMatches(MsSearchResultIn result, final int resultId, int databaseId)
+    private void uploadProteinMatches(MsSearchResultIn result, final int resultId, int databaseId)
         throws UploadException {
         // upload the protein matches if the cache has enough entries
         if (proteinMatchList.size() >= BUF_SIZE) {
@@ -588,23 +565,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         }
     }
     
-    final void uploadProteinMatches(MsSearchResult result, final int resultId, int databaseId)
-    throws UploadException {
-        // upload the protein matches if the cache has enough entries
-        if (proteinMatchList.size() >= BUF_SIZE) {
-            uploadProteinMatchBuffer();
-        }
-        // add the protein matches for this result to the cache
-        Set<String> accSet = new HashSet<String>(result.getProteinMatchList().size());
-        for (MsSearchResultProtein match: result.getProteinMatchList()) {
-            // only UNIQUE accession strings for this result will be added.
-            if (accSet.contains(match.getAccession()))
-                continue;
-            accSet.add(match.getAccession());
-            proteinMatchList.add(new SearchResultProteinBean(resultId, match.getAccession()));
-        }
-    }
-    
     private void uploadProteinMatchBuffer() {
         
         List<MsSearchResultProtein> list = new ArrayList<MsSearchResultProtein>(proteinMatchList.size());
@@ -614,7 +574,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     }
 
     // RESIDUE DYNAMIC MODIFICATION
-    void uploadResultResidueMods(MsSearchResultIn result, int resultId, int searchId) throws UploadException {
+    private void uploadResultResidueMods(MsSearchResultIn result, int resultId) throws UploadException {
         // upload the result dynamic residue modifications if the cache has enough entries
         if (resultResidueModList.size() >= BUF_SIZE) {
             uploadResultResidueModBuffer();
@@ -638,37 +598,13 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         }
     }
     
-    void uploadResultResidueMods(MsSearchResult result, int resultId, int searchId) throws UploadException {
-        // upload the result dynamic residue modifications if the cache has enough entries
-        if (resultResidueModList.size() >= BUF_SIZE) {
-            uploadResultResidueModBuffer();
-        }
-        // add the dynamic residue modifications for this result to the cache
-        for (MsResultResidueMod mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
-            if (mod == null)
-                continue;
-            int modId = dynaModLookup.getDynamicResidueModificationId( 
-                    mod.getModifiedResidue(), mod.getModificationMass()); 
-            if (modId == 0) {
-                UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
-                ex.setErrorMessage("No matching dynamic residue modification found for: searchId: "+
-                        searchId+
-                        "; modResidue: "+mod.getModifiedResidue()+
-                        "; modMass: "+mod.getModificationMass().doubleValue());
-                throw ex;
-            }
-            ResultResidueModIds resultMod = new ResultResidueModIds(resultId, modId, mod.getModifiedPosition());
-            resultResidueModList.add(resultMod);
-        }
-    }
-
     private void uploadResultResidueModBuffer() {
         modDao.saveAllDynamicResidueModsForResult(resultResidueModList);
         resultResidueModList.clear();
     }
     
     // TERMINAL DYNAMIC MODIFICATION
-    void uploadResultTerminalMods(MsSearchResultIn result, int resultId, int searchId) throws UploadException {
+    private void uploadResultTerminalMods(MsSearchResultIn result, int resultId) throws UploadException {
         // upload the result dynamic terminal modifications if the cache has enough entries
         if (resultTerminalModList.size() >= BUF_SIZE) {
             uploadResultTerminalModBuffer();
@@ -692,29 +628,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         }
     }
     
-    void uploadResultTerminalMods(MsSearchResult result, int resultId, int searchId) throws UploadException {
-        // upload the result dynamic terminal modifications if the cache has enough entries
-        if (resultTerminalModList.size() >= BUF_SIZE) {
-            uploadResultTerminalModBuffer();
-        }
-        // add the dynamic terminal modifications for this result to the cache
-        for (MsTerminalModificationIn mod: result.getResultPeptide().getResultDynamicTerminalModifications()) {
-            if (mod == null)
-                continue;
-            int modId = dynaModLookup.getDynamicTerminalModificationId( 
-                    mod.getModifiedTerminal(), mod.getModificationMass()); 
-            if (modId == 0) {
-                UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
-                ex.setErrorMessage("No matching dynamic terminal modification found for: searchId: "+
-                        searchId+
-                        "; modTerminal: "+mod.getModifiedTerminal()+
-                        "; modMass: "+mod.getModificationMass().doubleValue());
-                throw ex;
-            }
-            ResultTerminalModIds resultMod = new ResultTerminalModIds(resultId, modId);
-            resultTerminalModList.add(resultMod);
-        }
-    }
 
     private void uploadResultTerminalModBuffer() {
         modDao.saveAllDynamicTerminalModsForResult(resultTerminalModList);
@@ -854,7 +767,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         return true;
     }
 
-    List<String> getSqtFiles(File dir) {
+    private List<String> getSqtFiles(File dir) {
     	
     	List<String> mySqtFiles = new ArrayList<String>();
     	

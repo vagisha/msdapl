@@ -3,10 +3,11 @@ package org.yeastrc.ms.domain.search;
 public enum Program {
 
     SEQUEST("SEQUEST"),
+    EE_NORM_SEQUEST("EE-normalized SEQUEST"),
+    NORM_SEQUEST("SEQUEST-NORM"),
     MASCOT("MASCOT"),
     XTANDEM("XTANDEM"),
     TIDE("Tide"),
-    //EE_NORM_SEQUEST("EE-normalized SEQUEST"),
     PERCOLATOR("Percolator"),
     PEPTIDE_PROPHET("PeptideProphet"),
     PROLUCID("ProLuCID"),
@@ -27,8 +28,10 @@ public enum Program {
     public static Program programForFileFormat(SearchFileFormat format) {
         if (SearchFileFormat.SQT_SEQ == format)
             return Program.SEQUEST;
-//        else if (SearchFileFormat.SQT_NSEQ == format)
-//            return Program.EE_NORM_SEQUEST;
+        else if (SearchFileFormat.SQT_EENSEQ == format)
+            return Program.EE_NORM_SEQUEST;
+        else if (SearchFileFormat.SQT_NSEQ == format)
+            return Program.NORM_SEQUEST;
         else if (SearchFileFormat.SQT_PLUCID == format)
             return Program.PROLUCID;
         else if (SearchFileFormat.SQT_TIDE == format)
@@ -52,31 +55,19 @@ public enum Program {
     }
     
     public static Program instance(String prog) {
-        if (Program.SEQUEST.name().equalsIgnoreCase(prog))
-            return Program.SEQUEST;
-//        else if (Program.EE_NORM_SEQUEST.name().equalsIgnoreCase(prog))
-//            return Program.EE_NORM_SEQUEST;
-        else if (Program.MASCOT.name().equalsIgnoreCase(prog))
-            return Program.MASCOT;
-        else if (Program.XTANDEM.name().equalsIgnoreCase(prog))
-            return Program.XTANDEM;
-        else if (Program.PROLUCID.name().equalsIgnoreCase(prog))
-            return Program.PROLUCID;
-        else if (Program.PEPPROBE.name().equalsIgnoreCase(prog))
-            return Program.PEPPROBE;
-        else if (Program.TIDE.name().equalsIgnoreCase(prog))
-            return Program.TIDE;
-        else if (Program.PERCOLATOR.name().equalsIgnoreCase(prog))
-            return Program.PERCOLATOR;
-        else if (Program.PEPTIDE_PROPHET.name().equalsIgnoreCase(prog))
-            return Program.PEPTIDE_PROPHET;
-        else if (Program.BIBLIOSPEC.name().equalsIgnoreCase(prog))
-            return Program.BIBLIOSPEC;
-        else return Program.UNKNOWN;
+    	
+    	Program[] programs = values();
+    	for(Program program: programs) {
+    		
+    		if(program.name().equalsIgnoreCase(prog))
+    			return program;
+    	}
+    	
+    	return Program.UNKNOWN;
     }
     
     public static boolean isSearchProgram(Program program) {
-        if(program == SEQUEST || // program == EE_NORM_SEQUEST ||
+        if(Program.isSequest(program) ||
            program == MASCOT ||
            program == XTANDEM ||
            program == PROLUCID || program == PEPPROBE||
@@ -89,5 +80,9 @@ public enum Program {
         if(program == PERCOLATOR || program == PEPTIDE_PROPHET)
             return true;
         return false;
+    }
+    
+    public static boolean isSequest(Program program) {
+    	return (program == SEQUEST || program == EE_NORM_SEQUEST || program == NORM_SEQUEST);
     }
 }

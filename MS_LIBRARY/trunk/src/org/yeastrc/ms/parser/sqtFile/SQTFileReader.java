@@ -26,14 +26,14 @@ public abstract class SQTFileReader <T extends SQTSearchScanIn<?>> extends Abstr
 
     private static final Pattern headerPattern = Pattern.compile("^H\\s+([\\S]+)\\s*(.*)");
     private static final Pattern locusPattern = Pattern.compile("^L\\s+([\\S]+)\\s*(.*)");
-//    private static final Pattern sqtGenPattern = Pattern.compile("^H\\s+SQTGenerator\\s+(.*)");
     
     public void init() {
         searchDynamicResidueMods.clear();
         searchDynamicTerminalMods.clear();
     }
     
-    public static SearchFileFormat getSearchFileType(String filePath) {
+    @SuppressWarnings("unchecked")
+	public static SearchFileFormat getSearchFileType(String filePath) {
         
         SQTFileReader reader = new SQTFileReader(){
             @Override
@@ -48,7 +48,7 @@ public abstract class SQTFileReader <T extends SQTSearchScanIn<?>> extends Abstr
                 return header.getSearchFileFormat();
             }
             catch (DataProviderException e) {
-                e.printStackTrace();
+                log.error("Error getting SQT file format", e);
             }
             finally {
                 reader.close();
@@ -56,7 +56,8 @@ public abstract class SQTFileReader <T extends SQTSearchScanIn<?>> extends Abstr
             return SearchFileFormat.UNKNOWN;
     }
     
-    public static SearchFileFormat getSearchFileType(String fileName, Reader input) {
+    @SuppressWarnings("unchecked")
+	public static SearchFileFormat getSearchFileType(String fileName, Reader input) {
         
         SQTFileReader reader = new SQTFileReader(){
             @Override
@@ -71,7 +72,7 @@ public abstract class SQTFileReader <T extends SQTSearchScanIn<?>> extends Abstr
                 return header.getSearchFileFormat();
             }
             catch (DataProviderException e) {
-                e.printStackTrace();
+            	log.error("Error getting SQT file format", e);
             }
             finally {
                 reader.close();

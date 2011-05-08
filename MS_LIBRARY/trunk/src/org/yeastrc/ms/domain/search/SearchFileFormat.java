@@ -12,7 +12,8 @@ public enum SearchFileFormat {
 
     SQT("SQT: GENERIC"),
     SQT_SEQ("SQT: "+Program.SEQUEST.displayName()), 
-    //SQT_NSEQ("SQT: "+Program.EE_NORM_SEQUEST.displayName()), 
+    SQT_EENSEQ("SQT: "+Program.EE_NORM_SEQUEST.displayName()), 
+    SQT_NSEQ("SQT: "+Program.NORM_SEQUEST.displayName()), 
     SQT_PLUCID("SQT: "+Program.PROLUCID.displayName()), 
     SQT_PPROBE("SQT: "+Program.PEPPROBE), 
     SQT_TIDE("SQT: "+Program.TIDE), 
@@ -38,31 +39,14 @@ public enum SearchFileFormat {
     }
     
     public static SearchFileFormat instance(String fmtString) {
-        if (SearchFileFormat.SQT_SEQ.name().equalsIgnoreCase(fmtString))
-            return SearchFileFormat.SQT_SEQ;
-//        else if (SearchFileFormat.SQT_NSEQ.name().equalsIgnoreCase(fmtString))
-//            return SearchFileFormat.SQT_NSEQ;
-        else if (SearchFileFormat.SQT_PLUCID.name().equalsIgnoreCase(fmtString))
-            return SearchFileFormat.SQT_PLUCID;
-        else if (SearchFileFormat.SQT_PERC.name().equalsIgnoreCase(fmtString))
-            return SearchFileFormat.SQT_PERC;
-        else if (SearchFileFormat.SQT_PPROBE.name().equalsIgnoreCase(fmtString))
-            return SearchFileFormat.SQT_PPROBE;
-        else if (SearchFileFormat.SQT_TIDE.name().equalsIgnoreCase(fmtString))
-            return SearchFileFormat.SQT_TIDE;
-        else if (SearchFileFormat.PEPXML.name().equalsIgnoreCase(fmtString))
-            return SearchFileFormat.PEPXML;
-        else if (SearchFileFormat.PEPXML_SEQ.name().equalsIgnoreCase(fmtString))
-            return SearchFileFormat.PEPXML_SEQ;
-        else if (SearchFileFormat.PEPXML_MASCOT.name().equalsIgnoreCase(fmtString))
-            return SearchFileFormat.PEPXML_MASCOT;
-        else if (SearchFileFormat.PEPXML_XTANDEM.name().equalsIgnoreCase(fmtString))
-            return SearchFileFormat.PEPXML_XTANDEM;
-        else if (SearchFileFormat.PROTXML.name().equalsIgnoreCase(fmtString))
-            return SearchFileFormat.PROTXML;
-        else if(SearchFileFormat.DTASELECT_FILTER.name().equalsIgnoreCase(fmtString))
-        	return SearchFileFormat.DTASELECT_FILTER;
-        else return SearchFileFormat.UNKNOWN;
+    	
+    	SearchFileFormat[] formats = values();
+    	for(SearchFileFormat format: formats) {
+    		if(format.name().equalsIgnoreCase(fmtString))
+    			return format;
+    	}
+    	
+    	return SearchFileFormat.UNKNOWN;
     }
     
     public static SearchFileFormat forFileExtension(String extString) {
@@ -98,5 +82,9 @@ public enum SearchFileFormat {
     	}
         
         return forFileExtension(ext);
+    }
+    
+    public static boolean isSequestFormat(SearchFileFormat format) {
+    	return (format == SQT_SEQ || format == SQT_EENSEQ || format == SQT_NSEQ);
     }
 }
