@@ -61,8 +61,25 @@ public class SequestParamsCreator {
 	private String enzyme = null;
 	// H	EnzymeSpec	No_Enzyme
 	
+	private String maxNumDiffAAPerMod = null;
+	// H       Alg-MaxDiffMod  4H      Alg-DisplayTop  5
+	// No idea what the 'H' means in 4H
 	
+	private String xcorrMode = null;
+	// H       Alg-XCorrMode   0
+	
+	private String displayTop = null;
+	// H       Alg-MaxDiffMod  4H      Alg-DisplayTop  5
+	// H       Alg-DisplayTop  5
+	// Equivalient to the following in sequest.params
+	// num_output_lines = 5                   ; # peptide results to show
+
+		
 	public void create(String inputDirectory) throws SQTParseException {
+		create(inputDirectory, true);
+	}
+		
+	public void create(String inputDirectory, boolean writeFile) throws SQTParseException {
 		
 		File dir = new File(inputDirectory);
 		File[] sqtFiles = dir.listFiles(new FilenameFilter() {
@@ -76,6 +93,15 @@ public class SequestParamsCreator {
 		int idx = 0;
 		
 		for(File sqtFile: sqtFiles) {
+			
+			// Dan is doing this check
+//			if(!isCurrentSqt(sqtFile.getAbsolutePath()))
+//				continue;
+//			
+//			if(!SearchFileFormat.isSequestFormat(SQTFileReader.getSearchFileType(sqtFile.getAbsolutePath()))) {
+//				continue;
+//			}
+			
 			
 			SequestSQTFileReader reader = new SequestSQTFileReader();
 			try {
@@ -105,6 +131,32 @@ public class SequestParamsCreator {
 							this.staticMods.add(header.getValue());
 						else if(header.getName().equalsIgnoreCase("DiffMod"))
 							this.diffMods.add(header.getValue());
+						else if(header.getName().equalsIgnoreCase("Alg-XCorrMode"))
+							this.xcorrMode = header.getValue();
+						else if(header.getName().equalsIgnoreCase("Alg-MaxDiffMod")) {
+							String[] tokens = header.getValue().split("\\s+");
+							this.maxNumDiffAAPerMod = tokens[0];
+							
+							if(tokens.length == 3) {
+								if(tokens[1].equals("Alg-DisplayTop")) {
+									this.displayTop = tokens[2];
+								}
+							}
+						}
+						else if(header.getName().equalsIgnoreCase("Alg-DisplayTop")) {
+							this.displayTop = header.getValue();
+						}
+						
+						else {
+							if(!header.getName().equals("Comment") && !header.getName().equals("DBSeqLength") &&
+							   !header.getName().equals("DBLocusCount") &&
+							   !header.getName().equals("SQTGenerator") &&
+							   !header.getName().equals("SQTGeneratorVersion") &&
+							   !header.getName().equals("StartTime") &&
+							   !header.getName().equals("EndTime")
+							   )
+								throw new RuntimeException("Unrecognized header "+header.getName()+" in file: "+sqtFile.getAbsolutePath());
+						}
 					}
 				}
 				// match with what was read from the first file
@@ -132,6 +184,31 @@ public class SequestParamsCreator {
 							sMods.add(header.getValue());
 						else if(header.getName().equalsIgnoreCase("DiffMod"))
 							dMods.add(header.getValue());
+						else if(header.getName().equalsIgnoreCase("Alg-XCorrMode"))
+							match(this.xcorrMode, header.getValue());
+						else if(header.getName().equalsIgnoreCase("Alg-MaxDiffMod")) {
+							String[] tokens = header.getValue().split("\\s+");
+							match(this.maxNumDiffAAPerMod, tokens[0]);
+							
+							if(tokens.length == 3) {
+								if(tokens[1].equals("Alg-DisplayTop")) {
+									match(this.displayTop, tokens[2]);
+								}
+							}
+						}
+						else if(header.getName().equalsIgnoreCase("Alg-DisplayTop")) {
+							match(this.displayTop, header.getValue());
+						}
+						else {
+							if(!header.getName().equals("Comment") && !header.getName().equals("DBSeqLength") &&
+							   !header.getName().equals("DBLocusCount") &&
+							   !header.getName().equals("SQTGenerator") &&
+							   !header.getName().equals("SQTGeneratorVersion") &&
+							   !header.getName().equals("StartTime") &&
+							   !header.getName().equals("EndTime")
+							   )
+								throw new RuntimeException("Unrecognized header "+header.getName()+" in file: "+sqtFile.getAbsolutePath());
+						}
 					}
 					
 					match(this.staticMods, sMods);
@@ -147,7 +224,13 @@ public class SequestParamsCreator {
 			}
 		}
 		
-		writeParamsFile(inputDirectory+File.separator+"sequest.params");
+		if(writeFile) {
+			writeParamsFile(inputDirectory+File.separator+"sequest.params");
+//			File mydir = new File(inputDirectory);
+//			String runIdDir = mydir.getName();
+//			String projectDir = mydir.getParentFile().getName();
+//			writeParamsFile("/Users/silmaril/Desktop/Old_YRC_Conversion/SEQUEST_PARAMS/"+projectDir+"_"+runIdDir+"_"+"sequest.params");
+		}
 	}
 	
 	private void match(String s1, String s2) throws SQTParseException {
@@ -242,12 +325,38 @@ public class SequestParamsCreator {
 				writer.newLine();
 			}
 			
+			
+			// write num_output_lines, if available
+			if(this.displayTop != null) {
+				writer.write("num_output_lines = "+this.displayTop+"\t; # peptide results to show");
+				writer.newLine();
+			}
+			
+			// write max_num_differential_AA_per_mod = 0    ; max # of modified AA per diff. mod in a peptide
+			if(this.maxNumDiffAAPerMod != null) {
+				writer.write("max_num_differential_AA_per_mod = "+
+						this.maxNumDiffAAPerMod+"\t; max # of modified AA per diff. mod in a peptide");
+				writer.newLine();
+			}
+			
+			// From Jimmy's email:
+			// The Yates lab version had options to modify the xcorr 
+			// such as normalizing the xcorr value by the autocorrelation (of input spectrum against itself).
+			// EE, ET, and TT must by the correlation value of experimental spectrum against experimental spectrum, 
+			// experimental vs theoretical, and theoretical vs theoretical.
+			if(this.xcorrMode != null) {
+				writer.write("\nxcorr_mode = "+xcorrMode.trim()+"     ; 0=regular xcorr (default), 1=EE, 2=ET, 3=TT\n");
+				writer.newLine();
+			}
+			
+			
 			// write the ion series
 			if(this.ionSeries != null) {
 				// e.g. ion_series = 0 1 1 0.0 1.0 0.0 0.0 0.0 0.0 0.0 1.0 0.0
 				writer.write("ion_series = "+this.ionSeries);
 				writer.newLine();
 			}
+			
 			
 			writer.newLine();
 			if(this.enzyme == null || this.enzyme.trim().length() == 0) {
@@ -261,6 +370,7 @@ public class SequestParamsCreator {
 			// This is a hack. We don't really know if this was set to 1 in the original Sequest run
 			// But we need this to be set to 1 to get the data uploaded.
 			writer.write("\nprint_duplicate_references = 1         ; 0=no, 1=yes\n");
+			
 			
 			
 			writer.newLine();
@@ -368,7 +478,7 @@ public class SequestParamsCreator {
 			else {
 				double massDiff = Double.parseDouble(mod) - aaUtils.avgMass(aa);  // static mod in SQT headers is mass of amino acid + modification mass
 				if(massDiff <= 0) {
-					throw new RuntimeException("Static modification mass is negative!!");
+					throw new RuntimeException("Calculated static modification mass is negative!!");
 				}
 				buf.append(String.format("%.4f", massDiff));
 			}
@@ -419,8 +529,7 @@ public class SequestParamsCreator {
 			
 
 			String modMass = tokens[1].trim();
-			modMass = removeSign(modMass); // removes a + or - sign
-			if (modMass.length() < 1)
+			if (removeSign(modMass).length() < 1)
 				throw new SQTParseException("No mass found for dynamic modification: "+modString);
 
 
@@ -430,11 +539,11 @@ public class SequestParamsCreator {
 			}
 
 			if(modSymbol == '*')
-				asteriskMods = modMass+" "+modChars;
+				asteriskMods = Double.parseDouble(modMass)+" "+modChars;
 			else if(modSymbol == '@')
-				atMods = modMass+" "+modChars;
+				atMods = Double.parseDouble(modMass)+" "+modChars;
 			else if(modSymbol == '#')
-				hashMods = modMass+" "+modChars;
+				hashMods = Double.parseDouble(modMass)+" "+modChars;
 		}
 		
 		writer.write("diff_search_options = ");
@@ -541,10 +650,61 @@ public class SequestParamsCreator {
 	}
 
 	public static void main(String[] args) throws SQTParseException {
-		// String inputDir = args[0];
-		// String inputDir = "/Users/silmaril/WORK/UW/JOB_QUEUE/jq_w_mslib_r722_fix/data_dir/parc/test";
-		String inputDir = "./test_resources/EE-normalized_SEQUEST/1217/1129";
+		String inputDir = args[0];
 		SequestParamsCreator spc = new SequestParamsCreator();
 		spc.create(inputDir);
+		//String inputDir = "/Users/silmaril/WORK/UW/JOB_QUEUE/jq_w_mslib_r722_fix/data_dir/parc/test";
+		//String inputDir = "./test_resources/EE-normalized_SEQUEST/1217/1129";
+		
+//		String baseDir = "/Volumes/FreeAgentDrive/Extracted_From_Prod_2011_05_02";
+//		File[] files = new File(baseDir).listFiles();
+//		for(File file: files) {
+//			if(!file.isDirectory())
+//				continue;
+//			
+//			File[] runIdDirs = file.listFiles();
+//			for(File runIdDir: runIdDirs) {
+//				if(!runIdDir.isDirectory())
+//					continue;
+//				
+//				//System.out.println("Reading: "+runIdDir.getAbsolutePath());
+//				SequestParamsCreator spc = new SequestParamsCreator();
+//				try {
+//					spc.create(runIdDir.getAbsolutePath(), true);
+//				}
+//				catch(SQTParseException e) {
+//					System.out.println("\tError: "+e.getMessage());
+//					continue;
+//				}
+//			}
+//		}
 	}
+	
+//	private boolean isCurrentSqt(String filePath) {
+//    	
+//		BufferedReader reader = null;
+//		try {
+//			
+//			reader = new BufferedReader(new FileReader(filePath));
+//			String line = null;
+//			while((line = reader.readLine()) != null) {
+//				if(line.startsWith("H")) {
+//					return true;
+//				}
+//				else
+//					return false;
+//			}
+//			
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		finally {
+//			if(reader != null) try {reader.close();} catch(IOException e){}
+//		}
+//		return false;
+//    }
 }
