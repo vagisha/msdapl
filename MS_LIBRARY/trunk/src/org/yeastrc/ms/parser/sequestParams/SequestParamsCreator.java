@@ -136,6 +136,8 @@ public class SequestParamsCreator {
 						else if(header.getName().equalsIgnoreCase("Alg-MaxDiffMod")) {
 							String[] tokens = header.getValue().split("\\s+");
 							this.maxNumDiffAAPerMod = tokens[0];
+							if(this.maxNumDiffAAPerMod.endsWith("H"))
+								this.maxNumDiffAAPerMod = this.maxNumDiffAAPerMod.substring(0, this.maxNumDiffAAPerMod.length() - 1);
 							
 							if(tokens.length == 3) {
 								if(tokens[1].equals("Alg-DisplayTop")) {
@@ -188,7 +190,10 @@ public class SequestParamsCreator {
 							match(this.xcorrMode, header.getValue());
 						else if(header.getName().equalsIgnoreCase("Alg-MaxDiffMod")) {
 							String[] tokens = header.getValue().split("\\s+");
-							match(this.maxNumDiffAAPerMod, tokens[0]);
+							String tmp = tokens[0];
+							if(tmp.endsWith("H"))
+								tmp = tmp.substring(0, tmp.length() - 1);
+							match(this.maxNumDiffAAPerMod, tmp);
 							
 							if(tokens.length == 3) {
 								if(tokens[1].equals("Alg-DisplayTop")) {
@@ -375,10 +380,7 @@ public class SequestParamsCreator {
 			
 			writer.newLine();
 			// write the difff mods, if any
-			if(this.diffMods.size() > 0) {
-				
-				writeDiffMods(writer);
-			}
+			writeDiffMods(writer);
 			
 			writer.newLine();
 			// write the static mods, if any
@@ -390,7 +392,7 @@ public class SequestParamsCreator {
 			
 		}
 		catch(IOException e) {
-			throw new SQTParseException("Error parsing file: "+filePath, e);
+			throw new SQTParseException("Error writing file: "+filePath, e);
 		}
 		finally {
 			if(writer != null) try {writer.close();} catch(IOException e){}
@@ -603,9 +605,14 @@ public class SequestParamsCreator {
 		// If we are using an enzyme we need the enzymatic termini information.  
 		// I don't know what the SQT header for that looks like. 
 		if(!this.enzyme.equalsIgnoreCase("No_Enzyme")) {
-			throw new SQTParseException("Don't know how to get enzymatic termini information for the enzyme: "+this.enzyme);
-		}
 			
+			if(this.enzyme.equalsIgnoreCase("Trypsin")) {
+				writer.write("num_enzyme_termini = 1\n");  // Assume semi-tryptic search
+			}
+			else {
+				throw new SQTParseException("Don't know how to get enzymatic termini information for the enzyme: "+this.enzyme);
+			}
+		}
 	}
 
 	private void writeEnzymes(BufferedWriter writer) throws IOException {
@@ -653,6 +660,8 @@ public class SequestParamsCreator {
 		String inputDir = args[0];
 		SequestParamsCreator spc = new SequestParamsCreator();
 		spc.create(inputDir);
+		
+		
 		//String inputDir = "/Users/silmaril/WORK/UW/JOB_QUEUE/jq_w_mslib_r722_fix/data_dir/parc/test";
 		//String inputDir = "./test_resources/EE-normalized_SEQUEST/1217/1129";
 		
