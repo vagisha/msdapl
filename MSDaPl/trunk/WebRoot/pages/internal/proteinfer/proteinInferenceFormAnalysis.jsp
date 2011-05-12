@@ -82,6 +82,7 @@ function addAnalyses(selectedAnalyses) {
 						toggleSelection($(this));
 					});
   				}
+  				$.unblockUI(); 
   			}
 		});
 	}
@@ -231,11 +232,31 @@ function validateFormForAnalysisInput() {
    </tbody>
    </table>
    <div style="; color:red; margin:10 30 5 30" align="left">
+   
    		<logic:equal name="proteinInferenceFormAnalysis" property="programParams.programName"  value="PROTINFER_PERC_PEPT">
+   		
+   			<!--
         	UPDATE (02/04/2011):  The default PSM-level qvalue cutoff has been changed from 1.0 to 0.01. 
         	If you used the old default options to run protein inference on Percolator v1.17 results you should re-run with the new defaults.
-        <br/>
-        <br/>
+        	<span id="morelink" class="clickable underline" onclick="$('#moreinfo').show(); $(this).hide(); return false";><b>More...</b></span>
+        	<div id="moreinfo" style="display:none">
+        	Applying a peptide qvalue cutoff but not a PSM qvalue cutoff will include all PSMs for a peptide
+        	even if they did not have a good qvalue.  This will lead to the following problems:
+        	<ol>
+        	<li>Percolator calculates a single qvalue for a peptide over all the input files.  This is usually all the files in an experiment. 
+       	   If you then run protein inference separately on each file in the experiment, using only a peptide qvalue cutoff,
+       	   a peptide will get included in the analysis for a particular file even if there are no good PSMs for that peptide in the file.
+       	   You should ideally run Percolator separately on each file first, before inferring proteins.
+        	</li>
+        	<li>Spectrum counts for a protein will include spectra from bad PSMs.</li> 
+        	<li>In combination with the "Remove Ambiguous Spectra" option this can lead to removal of peptides from the analysis that would not have been removed if a 
+        	PSM cutoff had been applied.</li>
+        	</ol>
+        	<span class="clickable underline" onclick="$('#moreinfo').hide(); $('#morelink').show(); return false;">Hide</span>
+        	</div>
+        	 <br/>
+        	<br/>
+        	-->
         </logic:equal>
    		NOTE: If your data was processed with Bullseye you should uncheck the "Remove Ambiguous Spectra" option
    </div>

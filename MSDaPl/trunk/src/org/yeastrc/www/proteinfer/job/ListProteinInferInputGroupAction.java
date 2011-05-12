@@ -33,7 +33,6 @@ import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.project.Project;
 import org.yeastrc.www.proteinfer.ExperimentSearcher;
-import org.yeastrc.www.proteinfer.ProteinInferInputSummary;
 import org.yeastrc.www.proteinfer.ProteinInferInputSummary.ProteinInferIputFile;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -207,7 +206,9 @@ public class ListProteinInferInputGroupAction extends Action {
         if(percolatorVersion == null || analysisProgramVersion == null)
             return false;
         float reqVer = Float.parseFloat(percolatorVersion);
-        float myVer = Float.parseFloat(analysisProgramVersion);
+        float myVer = 0;
+        try { myVer = Float.parseFloat(analysisProgramVersion); }
+        catch(NumberFormatException e) {return false;}
         
         if(reqVer < 1.06 && myVer >= 1.06)
             return false;

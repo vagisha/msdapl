@@ -602,15 +602,6 @@ function removeBookmark(imgElement, piRunId) {
 		</div>
 	</logic:empty>
 
-	<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!! TEMP  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
-	<logic:equal name="project" property="ID" value="29">
-	<center>
-	<%@ include file="/includes/unknown_orfs_summary.jsp" %>
-	</center>
-	</logic:equal>
-	<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!! TEMP  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
-
-
 	<!--  Experiment summaries -->
 	<logic:notEmpty name="experiments">
 		

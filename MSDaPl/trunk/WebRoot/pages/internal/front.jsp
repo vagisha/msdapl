@@ -20,6 +20,32 @@
 <!-- SHOW ALL PROJECTS, FOR WHICH THIS USER IS LISTED AS A RESEARCHER -->
 <p><yrcwww:contentbox title="Your Projects" centered="true" width="700">
 
+
+<!--
+<div style="color:red;margin:20px;">
+	<b><em>02/04/2011:</em></b> Please note that the default options for protein inference have been changed.  
+	If you've inferred proteins using results from Percolator 1.17 please re-run protein inference using the new default options.
+	<br/>
+	<span id="morelink" class="clickable underline" onclick="$('#moreinfo').show(); $(this).hide(); return false";><b>More...</b></span>
+       	<div id="moreinfo" style="display:none">
+       	The default PSM-level qvalue cutoff has been changed from 1.0 to 0.01. 
+       	Applying a peptide qvalue cutoff but not a PSM qvalue cutoff will include all PSMs for a peptide
+       	even if they did not have a good qvalue.  This will lead to the following problems:
+       	<ol>
+       	<li>Percolator calculates a single qvalue for a peptide over all the input files.  This is usually all the files in an experiment. 
+       	   If you then run protein inference separately on each file in the experiment, using only a peptide qvalue cutoff,
+       	   a peptide will get included in the analysis for a particular file even if there are no good PSMs for that peptide in the file.
+       	   You should ideally run Percolator separately on each file first, before inferring proteins.
+       	</li>
+       	<li>Spectrum counts for a protein will include spectra from bad PSMs.</li> 
+       	<li>In combination with the "Remove Ambiguous Spectra" option this can lead to removal of peptides from the analysis that would not have been removed if a 
+       	PSM cutoff had been applied.</li>
+       	</ol>
+       	<span class="clickable underline" onclick="$('#moreinfo').hide(); $('#morelink').show(); return false;">Hide</span>
+       	</div> 
+</div>
+-->
+
  <logic:empty name="userProjects">
  	<p>You do not have any projects at this time.  
  	Click <b><html:link action="newProject.do">here</html:link></b> to create a new project.</p>
