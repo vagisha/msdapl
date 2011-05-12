@@ -210,10 +210,18 @@ public class ListProteinInferInputGroupAction extends Action {
         try { myVer = Float.parseFloat(analysisProgramVersion); }
         catch(NumberFormatException e) {return false;}
         
-        if(reqVer < 1.06 && myVer >= 1.06)
+        if(reqVer < 1.06f && myVer >= 1.06f)
             return false;
-        if(reqVer >= 1.06 && myVer < 1.06)
+        if(reqVer >= 1.06f && myVer < 1.06f)
             return false;
+        
+        // Percolator pre v 1.15 did not calculate peptide-level q-values.
+        // TODO: There should a warning mechanism in the interface prompting users to use only PSM-level cutoffs 
+        // when mixing results from the old and new versions
+        // For now, older version experiments will not be listed as the options.
+        if(reqVer >= 1.15f && myVer < 1.15f) {
+        	return false;
+        }
         return true;
     }
 }
