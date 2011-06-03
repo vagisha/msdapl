@@ -114,6 +114,17 @@ public class MsDataUploader {
         return buf.toString();
     }
 
+
+    public List<String> getUploadWarningsStringList() {
+
+    	List<String> uploadWarningsStringList = new ArrayList<String>();
+
+    	for (UploadException e: uploadExceptionList) {
+    		uploadWarningsStringList.add( e.getMessage() );
+        }
+        return uploadWarningsStringList;
+    }
+
     public int getUploadedSearchId() {
         return this.uploadedSearchId;
     }
