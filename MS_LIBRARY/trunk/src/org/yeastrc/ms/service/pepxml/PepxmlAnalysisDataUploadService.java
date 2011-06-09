@@ -505,11 +505,14 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
 //            	log.error("MORE PROTEINS IN interact pepxml");
 //            }
             
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-    		ex.setErrorMessage("Number of protein matches stored: "+storedMatches.size()+
+            //UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+    		//ex.setErrorMessage("Number of protein matches stored: "+storedMatches.size()+
+    		//		" NOT EQUAL to the number of matches found in interact files: "+pepXmlMatches.size()+
+    		//		" for searchResultID: "+matchingSearchResultId+"; peptide: "+storedResult.getResultPeptide().getPeptideSequence());
+    		log.warn("Number of protein matches stored: "+storedMatches.size()+
     				" NOT EQUAL to the number of matches found in interact files: "+pepXmlMatches.size()+
-    				" for searchResultID: "+matchingSearchResultId);
-    		throw ex;
+    				" for searchResultID: "+matchingSearchResultId+"; peptide: "+storedResult.getResultPeptide().getPeptideSequence());
+    		//throw ex;
             
         }
         
