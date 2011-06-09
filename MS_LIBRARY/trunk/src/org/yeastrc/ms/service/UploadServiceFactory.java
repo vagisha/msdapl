@@ -167,14 +167,16 @@ public class UploadServiceFactory {
             throw new UploadServiceFactoryException("No valid search data file format found in directory: "+dataDirectory);
         }
         
-        
-        if(formats.contains(SearchFileFormat.XML) && formats.contains(SearchFileFormat.SQT)) {
-    		formats.remove(SearchFileFormat.XML);
-    	}
-    	else if(formats.contains(SearchFileFormat.XML) && formats.contains(SearchFileFormat.PEPXML)) {
-    		formats.remove(SearchFileFormat.XML);
-    		formats.remove(SearchFileFormat.PROTXML);
-    	}
+        if(formats.size() > 1) {
+        	if(formats.contains(SearchFileFormat.SQT)) {
+        		formats.clear();
+        		formats.add(SearchFileFormat.SQT);
+        	}
+        	else if(formats.contains(SearchFileFormat.XML) || formats.contains(SearchFileFormat.PEPXML)) {
+        		formats.clear();
+        		formats.add(SearchFileFormat.PEPXML);
+        	}
+        }
         
         if(formats.size() > 1) {
         	
