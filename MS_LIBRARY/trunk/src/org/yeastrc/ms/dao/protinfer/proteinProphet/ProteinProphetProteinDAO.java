@@ -233,8 +233,8 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
                                             sort, 
                                             sortOrder,
                                             filterCriteria.isGroupProteins(), 
-                                            filterCriteria.parsimoniousOnly()
-                                            );
+                                            filterCriteria.parsimoniousOnly(),
+                                            filterCriteria.getMinPeptideProbability());
         
         // Get a list of protein ids filtered by UNIQUE peptide count
         List<Integer> ids_uniq_pept = null;
@@ -255,7 +255,8 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
                                                sort,
                                                sortOrder,
                                                filterCriteria.isGroupProteins(),
-                                               filterCriteria.parsimoniousOnly());
+                                               filterCriteria.parsimoniousOnly(),
+                                               filterCriteria.getMinPeptideProbability());
         }
         
         
@@ -655,30 +656,32 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     // -----------------------------------------------------------------------------------------------
     public List<Integer> sortProteinIdsByPeptideCount(int pinferId, PeptideDefinition peptideDef, boolean groupProteins,
     		SORT_ORDER sortOrder) {
-        return proteinIdsByPeptideCount(pinferId, 1, Integer.MAX_VALUE, peptideDef, true, sortOrder, groupProteins, false, false);
+        return proteinIdsByPeptideCount(pinferId, 1, Integer.MAX_VALUE, peptideDef, true, sortOrder, groupProteins, false, false, 0.0);
     }
     
     public List<Integer> sortProteinIdsByUniquePeptideCount(int pinferId, PeptideDefinition peptideDef, 
     		boolean groupProteins, SORT_ORDER sortOrder) {
-        return proteinIdsByPeptideCount(pinferId, 0, Integer.MAX_VALUE, peptideDef, true, sortOrder, groupProteins, false, true);
+        return proteinIdsByPeptideCount(pinferId, 0, Integer.MAX_VALUE, peptideDef, true, sortOrder, groupProteins, false, true, 0.0);
     }
     
     private List<Integer> proteinIdsByUniquePeptideCount(int pinferId, 
             int minUniqPeptideCount, int maxUniqPeptideCount, 
             PeptideDefinition peptDef,
-            boolean sort, SORT_ORDER sortOrder, boolean groupProteins, boolean isParsimonious) {
+            boolean sort, SORT_ORDER sortOrder, boolean groupProteins, boolean isParsimonious,
+            double peptideProbability) {
         return proteinIdsByPeptideCount(pinferId, 
                 minUniqPeptideCount, maxUniqPeptideCount, 
-                peptDef, sort, sortOrder, groupProteins, isParsimonious, true);
+                peptDef, sort, sortOrder, groupProteins, isParsimonious, true, peptideProbability);
     }
     
     private List<Integer> proteinIdsByAllPeptideCount(int pinferId, 
             int minUniqPeptideCount, int maxUniqPeptideCount,
             PeptideDefinition peptDef,
-            boolean sort, SORT_ORDER sortOrder, boolean groupProteins, boolean isParsimonious) {
+            boolean sort, SORT_ORDER sortOrder, boolean groupProteins, boolean isParsimonious,
+            double peptideProbability) {
         return proteinIdsByPeptideCount(pinferId, 
                 minUniqPeptideCount, maxUniqPeptideCount,
-                peptDef, sort, sortOrder, groupProteins, isParsimonious, false);
+                peptDef, sort, sortOrder, groupProteins, isParsimonious, false, peptideProbability);
     }
     
     private List<Integer> nrseqIdsByUniquePeptideCount(int pinferId, 
@@ -702,17 +705,22 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     private List<Integer> proteinIdsByPeptideCount(int pinferId, int minPeptideCount, int maxPeptideCount,
             PeptideDefinition peptDef,
             boolean sort, SORT_ORDER sortOrder,
-            boolean groupProteins, boolean isParsimonious, boolean uniqueToProtein) {
+            boolean groupProteins, boolean isParsimonious, boolean uniqueToProtein,
+            double peptideProbability) {
         
         // If we are NOT filtering anything AND NOT sorting on peptide count just return all the protein Ids
         // for this protein inference run
         if(!uniqueToProtein) {
-            if(minPeptideCount <= 1 && maxPeptideCount == Integer.MAX_VALUE && !sort) {
+            if(minPeptideCount <= 1 && maxPeptideCount == Integer.MAX_VALUE 
+            		&& !sort
+            		&& peptideProbability <= 0.0) {
                 return getProteinferProteinIds(pinferId, isParsimonious);
             }
         }
         if(uniqueToProtein) {
-            if(minPeptideCount <= 0 && maxPeptideCount == Integer.MAX_VALUE && !sort) {
+            if(minPeptideCount <= 0 && maxPeptideCount == Integer.MAX_VALUE 
+            		&& !sort
+            		&& peptideProbability <= 0.0) {
                 return getProteinferProteinIds(pinferId, isParsimonious);
             }
         }
@@ -728,6 +736,10 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         	if(groupProteins) 
         		map.put("sort_pg", 1);
         	map.put("sort_ig", 1);
+        }
+        
+        if(peptideProbability > 0.0) {
+        	map.put("peptideProbability", peptideProbability);
         }
         
         List<Integer> peptideIds = null;

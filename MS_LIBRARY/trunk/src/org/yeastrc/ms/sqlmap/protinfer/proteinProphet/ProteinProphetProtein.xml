@@ -393,7 +393,15 @@
     
     
     <select id="filterByPeptideCount_SMC" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT prot.id, count(ion.id) AS cnt 
+    
+    	SELECT prot.id, 
+    	<isNotPropertyAvailable property="peptideProbability">
+    		count(ion.id) AS cnt 
+    	</isNotPropertyAvailable>
+    	<isPropertyAvailable property="peptideProbability">
+    		count(pIon.nspAdjProbability) AS cnt
+    	</isPropertyAvailable>
+    	
     	FROM (msProteinInferProtein AS prot, ProteinProphetProtein as ppProt, msProteinInferProteinPeptideMatch as m)
     	LEFT JOIN ( msProteinInferPeptide AS pept, msProteinInferIon AS ion )
     	ON  (m.piPeptideID = pept.id AND pept.id = ion.piPeptideID
@@ -401,9 +409,16 @@
     			AND pept.uniqueToProtein = #uniqueToProtein#
     		</isPropertyAvailable>
     	)
+    	<isPropertyAvailable property="peptideProbability">
+    	LEFT JOIN (ProteinProphetProteinIon AS pIon)
+    	ON (pIon.piProteinID = prot.id 
+    		AND pIon.piIonID = ion.id
+    		AND pIon.nspAdjProbability >= #peptideProbability#)
+    	</isPropertyAvailable>
+    	
     	WHERE prot.piRunID = #pinferId# 
-    	AND prot.id = ppProt.piProteinID 
-    	AND prot.id = m.piProteinID 
+    	AND ppProt.piProteinID  = prot.id 
+    	AND m.piProteinID = prot.id 
     	<isPropertyAvailable property="isSubsumed">
     		AND ppProt.subsumed = #isSubsumed#
     	</isPropertyAvailable>
@@ -423,7 +438,13 @@
     	SELECT prot.id AS proteinId,
     			ppProt.groupID AS proteinGroupId,
     			ppProt.proteinProphetGroupID AS proteinProphetGroupId,
-    	     	count(ion.id) AS peptideCount
+    			<isNotPropertyAvailable property="peptideProbability">
+    				count(ion.id) AS peptideCount
+    			</isNotPropertyAvailable>
+    			<isPropertyAvailable property="peptideProbability">
+    				count(pIon.nspAdjProbability) AS cnt
+    			</isPropertyAvailable>
+    	     	
     	FROM (msProteinInferProtein AS prot, ProteinProphetProtein as ppProt, msProteinInferProteinPeptideMatch as m)
     	LEFT JOIN ( msProteinInferPeptide AS pept, msProteinInferIon AS ion )
     	ON  (m.piPeptideID = pept.id AND pept.id = ion.piPeptideID
@@ -431,6 +452,14 @@
     			AND pept.uniqueToProtein = #uniqueToProtein#
     		</isPropertyAvailable>
     	)
+    	
+    	<isPropertyAvailable property="peptideProbability">
+    	LEFT JOIN (ProteinProphetProteinIon AS pIon)
+    	ON (pIon.piProteinID = prot.id 
+    		AND pIon.piIonID = ion.id
+    		AND pIon.nspAdjProbability >= #peptideProbability#)
+    	</isPropertyAvailable>
+    	
     	WHERE prot.piRunID = #pinferId# 
     	AND prot.id = ppProt.piProteinID 
     	AND prot.id = m.piProteinID 
@@ -456,7 +485,6 @@
     		count(ion.id) AS cnt 
     	</isNotPropertyAvailable>
     	<isPropertyAvailable property="peptideProbability">
-    		ion.id AS ionID,
     		count(pIon.nspAdjProbability) AS cnt
     	</isPropertyAvailable>
     	FROM (msProteinInferProtein AS prot, ProteinProphetProtein as ppProt, msProteinInferProteinPeptideMatch as m)
