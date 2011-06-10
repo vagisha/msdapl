@@ -34,7 +34,7 @@
 				<td style="border: 1px dotted #AAAAAA;">
 					<b><bean:write name="resultSummary" property="filteredProphetGroupCount" /></b>
 				</td>
-				<td style="border: 1px dotted #AAAAAA; color:red;">
+				<td style="border: 1px dotted #AAAAAA;">
 					<b><bean:write name="resultSummary" property="filteredParsimoniousProphetGroupCount" /></b>
 				</td>
 			</tr>
@@ -51,7 +51,7 @@
 				<td style="border: 1px dotted #AAAAAA;">
 					<b><bean:write name="resultSummary" property="filteredProteinGroupCount" /></b>
 				</td>
-				<td style="border: 1px dotted #AAAAAA; color:red">
+				<td style="border: 1px dotted #AAAAAA;">
 					<b><bean:write name="resultSummary" property="filteredParsimoniousProteinGroupCount" /></b>
 				</td>
 			</tr>
@@ -68,7 +68,7 @@
 				<td style="border: 1px dotted #AAAAAA;">
 					<b><bean:write name="resultSummary" property="filteredProteinCount" /></b>
 				</td>
-				<td style="border: 1px dotted #AAAAAA; color:red">
+				<td style="border: 1px dotted #AAAAAA;">
 					<b><bean:write name="resultSummary" property="filteredParsimoniousProteinCount" /></b>
 				</td>
 			</tr>
@@ -80,7 +80,11 @@
 		</tr>
 	</table>
 </div>
-
+<div style="font-weight:bold;font-size:8pt;text-align:center;margin:bottom:20px;">
+Displaying <span style="color:red;"><bean:write name="resultSummary" property="filteredProphetGroupCount" /></span> ProteinProphet groups, 
+<span style="color:red;"><bean:write name="resultSummary" property="filteredProteinGroupCount" /></span> indistinguishable groups 
+and <span style="color:red;"><bean:write name="resultSummary" property="filteredProteinCount" /> </span>proteins.
+</div>
 
 <bean:define name="proteinProphetFilterForm" property="joinProphetGroupProteins" id="groupProteins"></bean:define>
 			

@@ -141,6 +141,16 @@ function removeFromGoTermFilters(goTerm, warn) {
   		</nobr>
   	</td>
   </tr>
+  <tr>
+  		<td valign="bottom">Peptide<br>Probability:</td>
+  		<td valign="bottom">
+  		<nobr>Min: 
+  		<html:text name="proteinProphetFilterForm" property="minPeptideProbability" size="3"></html:text>
+  		</nobr>
+  		<br/>
+  		<span style="font-size:8pt;color:red;">NSP Adjusted Probability is used</span>
+  	</td>
+  </tr>
   </table></td>
   
   <td valign="top"><table>

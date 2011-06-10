@@ -23,6 +23,8 @@ public class ProteinProphetFilterForm extends ProteinInferFilterForm {
     private String minProteinProbability = "0.0";
     private String maxProteinProbability = "1.0";
     
+    private String minPeptideProbability = "0.0";
+    
     
 	public ProteinProphetFilterForm () {}
     
@@ -39,12 +41,29 @@ public class ProteinProphetFilterForm extends ProteinInferFilterForm {
         return errors;
     }
 
+	// MIN PEPTIDE_PROPHET PEPTIDE PROBABILITY
+    public String getMinPeptideProbability() {
+		return minPeptideProbability;
+	}
+
+    public double getMinPeptideProbabilityDouble() {
+        if(minPeptideProbability == null || minPeptideProbability.trim().length() == 0)
+            return 0.0;
+        else
+            return Double.parseDouble(minPeptideProbability);
+    }
+    
+	public void setMinPeptideProbability(String minPeptideProbability) {
+		this.minPeptideProbability = minPeptideProbability;
+	}
 	
+    
     // MIN PROTEIN PROPHET GROUP PROBABILITY
     public String getMinGroupProbability() {
         return minGroupProbability;
     }
-    public double getMinGroupProbabilityDouble() {
+
+	public double getMinGroupProbabilityDouble() {
         if(minGroupProbability == null || minGroupProbability.trim().length() == 0)
             return 0.0;
         else
@@ -119,6 +138,7 @@ public class ProteinProphetFilterForm extends ProteinInferFilterForm {
     	ProteinFilterCriteria pfc = super.getFilterCriteria(peptideDef);
     	ProteinProphetFilterCriteria filterCriteria = new ProteinProphetFilterCriteria(pfc);
     	
+    	filterCriteria.setMinPeptideProbability(getMinPeptideProbabilityDouble());
     	filterCriteria.setMinProteinProbability(getMinProteinProbabilityDouble());
     	filterCriteria.setMaxProteinProbability(getMaxProteinProbabilityDouble());
     	filterCriteria.setMinGroupProbability(getMinGroupProbabilityDouble());

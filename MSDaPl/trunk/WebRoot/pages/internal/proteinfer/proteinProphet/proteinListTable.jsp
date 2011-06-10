@@ -43,7 +43,11 @@
 <tr>
 <td><span class="underline clickable" style="font-size:8pt;color:red;" id="full_names" onclick="toggleFullNames()">[Full Names]</span>
 &nbsp;&nbsp;<span class="underline clickable" style="font-size:8pt;color:red;" id="full_descriptions" onclick="toggleFullDescriptions()">[Full Descriptions]</span></td>
-<td align="right"><span style="font-size:8pt;font-weight:bold;">* A peptide is a unique combination of sequence + modifications + charge</span></td>
+<td align="right">
+	<span style="font-size:8pt;font-weight:bold;">* A peptide is a unique combination of sequence + modifications + charge</span>
+	<br/>
+	<span style="font-size:8pt;font-weight:bold;">Subsumed proteins are displayed in <span style="color:#888888; font-size:10pt;">GRAY</span></span>
+</td>
 </tr>
 </table>
 </div>
