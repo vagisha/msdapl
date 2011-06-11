@@ -779,6 +779,7 @@ function validateInt(value, fieldName, min, max) {
 	if(!valid) {
 		if(max && min) alert("Value for "+fieldName+" should be between "+min+" and "+max);
 		else if (min) alert("Value for "+fieldName+" should be >= "+min);
+		else if (max) alert("Value for "+fieldName+" shoule be <= "+max);
 		else alert("Invalid value for "+fieldName);
 	}
 	return valid;
@@ -1171,7 +1172,7 @@ function hideAllDescriptionsForProtein(proteinId) {
 
 <CENTER>
 
-<yrcwww:contentbox title="ProteinProphet Results" centered="true" width="95" widthRel="true" scheme="pinfer" >
+<yrcwww:contentbox title="ProteinProphet Results" centered="true" width="98" widthRel="true" scheme="pinfer" >
   
   <div id="results" class="flora">
       <ul>

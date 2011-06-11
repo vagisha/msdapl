@@ -81,9 +81,9 @@
 	</table>
 </div>
 <div style="font-weight:bold;font-size:8pt;text-align:center;margin:bottom:20px;">
-Displaying <span style="color:red;"><bean:write name="resultSummary" property="filteredProphetGroupCount" /></span> ProteinProphet groups, 
-<span style="color:red;"><bean:write name="resultSummary" property="filteredProteinGroupCount" /></span> indistinguishable groups 
-and <span style="color:red;"><bean:write name="resultSummary" property="filteredProteinCount" /> </span>proteins.
+Displaying <span style="color:red;font-size:10pt;"><bean:write name="resultSummary" property="filteredProphetGroupCount" /></span> ProteinProphet groups, 
+<span style="color:red;font-size:10pt;"><bean:write name="resultSummary" property="filteredProteinGroupCount" /></span> indistinguishable groups 
+and <span style="color:red;font-size:10pt;"><bean:write name="resultSummary" property="filteredProteinCount" /> </span>proteins.
 </div>
 
 <bean:define name="proteinProphetFilterForm" property="joinProphetGroupProteins" id="groupProteins"></bean:define>

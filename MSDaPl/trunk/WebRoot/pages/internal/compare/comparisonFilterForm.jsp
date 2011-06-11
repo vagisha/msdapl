@@ -535,7 +535,11 @@ function showActionOptions() {
 	<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
 	<tr>
 		<td><b>Min. Peptide Probability: </b></td>
-		<td style="padding-left: 5px;"><html:text name="proteinSetComparisonForm" property="minPeptideProbability" size="8"></html:text></td>
+		<td style="padding-left: 5px;">
+			<html:text name="proteinSetComparisonForm" property="minPeptideProbability" size="8"></html:text>
+			<br/>
+  			<span style="font-size:8pt;color:red;">NSP Adjusted Probability is used</span>
+		</td>
 		<td colspan="2">Apply to: 
 			<html:checkbox name="proteinSetComparisonForm" property="applyProbToPept"># Peptides</html:checkbox>
 			<html:checkbox name="proteinSetComparisonForm" property="applyProbToUniqPept"># Uniq. Peptides</html:checkbox>

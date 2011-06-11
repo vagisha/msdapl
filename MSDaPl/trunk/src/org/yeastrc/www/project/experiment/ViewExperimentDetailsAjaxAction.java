@@ -9,6 +9,7 @@ package org.yeastrc.www.project.experiment;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -229,7 +230,7 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 	            
 		 // load protein prophet results, if any
 		 List<Integer> piRunIds = ProteinInferJobSearcher.getInstance().getProteinferIdsForMsExperiment(experimentId);
-		 Collections.sort(piRunIds);
+		 Collections.sort(piRunIds, Collections.reverseOrder());
          
          if(piRunIds.size() > 0)
          	pExpt.setHasProtinferRuns(true);
@@ -254,6 +255,14 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 
 				 prophetRunList.add(eppRun);
 			 }
+		 }
+		 if(prophetRunList != null && prophetRunList.size() > 0) {
+			 // sort by filename
+			 Collections.sort(prophetRunList, new Comparator<ExperimentProteinProphetRun>() {
+				 @Override
+				 public int compare(ExperimentProteinProphetRun o1, ExperimentProteinProphetRun o2) {
+					 return o1.getProteinProphetRun().getFilename().compareTo(o2.getProteinProphetRun().getFilename());
+				 }});
 		 }
 		 pExpt.setProteinProphetRun(prophetRunList);
 	            

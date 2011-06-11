@@ -11,6 +11,7 @@ package org.yeastrc.www.project;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -156,6 +157,15 @@ public class ViewProjectAction extends Action {
     	Collections.sort(bookmarked);
 		List<ExperimentProteinferRun> piRuns = getBookmarkedProteinferRuns(bookmarked);
 		List<ExperimentProteinProphetRun> prophetRuns = getBookmarkedProteinProphetRuns(bookmarked);
+		if(prophetRuns != null && prophetRuns.size() > 0) {
+			// sort by filename
+			Collections.sort(prophetRuns, new Comparator<ExperimentProteinProphetRun>() {
+				@Override
+				public int compare(ExperimentProteinProphetRun o1, ExperimentProteinProphetRun o2) {
+					return o1.getProteinProphetRun().getFilename().compareTo(o2.getProteinProphetRun().getFilename());
+				}});
+		}
+		
 		if(bookmarked.size() > 0) {
 			request.setAttribute("hasBookmarks", true);
 		}
@@ -292,6 +302,15 @@ public class ViewProjectAction extends Action {
             
             // loop over and see if any are ProteinProphet runs
             List<ExperimentProteinProphetRun> prophetRunList = getProteinProphetRuns(piRunIds);
+            // sort by filename
+            if(prophetRunList != null && prophetRunList.size() > 0) {
+    			// sort by filename
+    			Collections.sort(prophetRunList, new Comparator<ExperimentProteinProphetRun>() {
+    				@Override
+    				public int compare(ExperimentProteinProphetRun o1, ExperimentProteinProphetRun o2) {
+    					return o1.getProteinProphetRun().getFilename().compareTo(o2.getProteinProphetRun().getFilename());
+    				}});
+    		}
             pExpt.setProteinProphetRun(prophetRunList);
             
             

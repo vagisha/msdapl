@@ -41,7 +41,7 @@ public class GOSlimAjaxAction extends Action {
 			HttpServletResponse response )
 	throws Exception {
 
-		log.info("Got request for GO Slim analysis for protein inference");
+		log.info("Got request for GO Slim analysis for ProtenProphet protein inference");
 		
 		// form for filtering and display options
         ProteinProphetFilterForm filterForm = (ProteinProphetFilterForm)form;
