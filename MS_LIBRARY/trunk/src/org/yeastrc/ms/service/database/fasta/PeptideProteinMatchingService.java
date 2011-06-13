@@ -40,6 +40,8 @@ public class PeptideProteinMatchingService {
     private int numEnzymaticTermini = 0;
     private List<EnzymeRule> enzymeRules;
     private boolean doItoLSubstitution = false;
+    // If asterisks are not removed from the protein sequences, they are treated as the start or end of a protein.
+    private boolean removeAsterisks = false;
     
     private Map<String, List<Integer>> suffixMap;
     
@@ -47,21 +49,35 @@ public class PeptideProteinMatchingService {
     
     private static final Logger log = Logger.getLogger(PeptideProteinMatchingService.class.getName());
     
-    public PeptideProteinMatchingService(int databaseId) throws SQLException {
+    public PeptideProteinMatchingService(int databaseId) throws PeptideProteinMatchingServiceException {
         
         this.databaseId = databaseId;
+        this.enzymeRules = new ArrayList<EnzymeRule>();
         
         createSuffixTables = MsDataUploadProperties.useNrseqSuffixTables();
         createSuffixInMemory = MsDataUploadProperties.useNrseqSuffixInMemory();
         useSingleQuery = MsDataUploadProperties.useSingleQuery();
         
         if(createSuffixTables) {
-            createSuffixTable(databaseId);
+        	try {
+        		createSuffixTable(databaseId);
+        	}
+        	catch(SQLException e) {
+        		throw new PeptideProteinMatchingServiceException("Error creating suffix table in database.", e);
+        	}
         }
         else if(createSuffixInMemory) {
             buildInMemorySuffixes(databaseId);
         }
     }
+    
+    // Constructor used only for testing
+    PeptideProteinMatchingService() {
+    	createSuffixInMemory = false;
+    	createSuffixTables = false;
+    	useSingleQuery = false;
+    	databaseId = 0;
+	}
     
     public void clearMaps() {
     	if(suffixMap != null) {
@@ -72,6 +88,19 @@ public class PeptideProteinMatchingService {
     		suffixIdMap.clear();
     		suffixIdMap = null;
     	}
+    }
+    
+    public int getFastaDatabaseId() {
+    	return this.databaseId;
+    }
+    
+    public String getCriteria() {
+    	StringBuilder buf = new StringBuilder();
+    	buf.append("Fasta Database ID: "+getFastaDatabaseId());
+    	buf.append("; numEnzymaticTermini: "+getNumEnzymaticTermini());
+    	buf.append("; removeAsteriks: "+removeAsterisks);
+    	buf.append("; I&L Substitution: "+this.doItoLSubstitution);
+    	return buf.toString();
     }
     
     // --------------------------------------------------------------------------------
@@ -102,6 +131,10 @@ public class PeptideProteinMatchingService {
     public void setDoItoLSubstitution(boolean doItoLSubstitution) {
 		this.doItoLSubstitution = doItoLSubstitution;
 	}
+    
+    public void setRemoveAsterisks(boolean removeAsterisks) {
+    	this.removeAsterisks = removeAsterisks;
+    }
 
 	public int getNumEnzymaticTermini() {
         return this.numEnzymaticTermini;
@@ -117,15 +150,9 @@ public class PeptideProteinMatchingService {
             enzymeRules.add(new EnzymeRule(enzyme));
     }
 
-    public List<PeptideProteinMatch> getMatchingProteins(String peptide) {
+    public List<PeptideProteinMatch> getMatchingProteins(String peptide) throws PeptideProteinMatchingServiceException {
         
-        return getMatchingProteins(peptide, enzymeRules, numEnzymaticTermini);
-    }
-    
-    private List<PeptideProteinMatch> getMatchingProteins(String peptide, List<EnzymeRule> enzymeRules, 
-            int numEnzymaticTermini) {
-        
-        // find the matching database protein ids for the given peptide and fasta databases
+    	// find the matching database protein ids for the given peptide and fasta databases
         List<Integer> dbProtIds = getMatchingDbProteinIds(peptide);
         
         // find the best protein peptide match based on the given enzyme and num enzymatic termini criteria
@@ -133,34 +160,38 @@ public class PeptideProteinMatchingService {
         log.debug("Number of matching proteins for peptide : "+peptide+" before applying enzyme rules: "+dbProtIds.size());
         for(int dbProtId: dbProtIds) {
             NrDbProtein dbProt = NrSeqLookupUtil.getDbProtein(dbProtId);
-            PeptideProteinMatch match = getPeptideProteinMatch(dbProt, peptide, enzymeRules, numEnzymaticTermini);
+            PeptideProteinMatch match = getPeptideProteinMatch(dbProt, peptide);
             if(match != null) {
                 matchingProteins.add(match);
             }
         }
         log.debug("Number of matches after applying emzyme rules: "+matchingProteins.size());
+        if(matchingProteins.size() == 0) {
+        	log.error("No matches found for peptide "+peptide+" after applying enzyme rules");
+        	throw new PeptideProteinMatchingServiceException("No matches found for peptide "+peptide+" after applying enzyme rules. "+getCriteria());
+        }
         
         return matchingProteins;
     }
     
-    private PeptideProteinMatch getPeptideProteinMatch(NrDbProtein dbProt, String peptide,
-            List<EnzymeRule> enzymeRules, int minEnzymaticTermini) {
+    private PeptideProteinMatch getPeptideProteinMatch(NrDbProtein dbProt, String peptide) {
         
         String sequence = NrSeqLookupUtil.getProteinSequence(dbProt.getProteinId());
-        // Remove any '*' characters from the sequence
-        sequence = sequence.replaceAll("\\*", "");
         
-        return getPeptideProteinMatch(dbProt, peptide, enzymeRules,
-                minEnzymaticTermini, sequence);
+        return getPeptideProteinMatch(dbProt, peptide, sequence);
     }
     
-    PeptideProteinMatch getPeptideProteinMatch(
-            NrDbProtein dbProt, String peptide, List<EnzymeRule> enzymeRules,
-            int minEnzymaticTermini, String sequence) {
+    PeptideProteinMatch getPeptideProteinMatch(NrDbProtein dbProt, String peptide, String sequence) {
         
+    	if(removeAsterisks) {
+        	// Remove any '*' characters from the sequence
+        	sequence = FastaInMemorySuffixCreator.removeAsterisks(sequence);
+        	peptide = FastaInMemorySuffixCreator.removeAsterisks(peptide);
+        }
+    	
     	if(doItoLSubstitution) {
-    		peptide = FastaInMemorySuffixCreator.format(peptide);
-    		sequence = FastaInMemorySuffixCreator.format(sequence);
+    		peptide = FastaInMemorySuffixCreator.doIAndLSubstitution(peptide);
+    		sequence = FastaInMemorySuffixCreator.doIAndLSubstitution(sequence);
     	}
     	
         int idx = sequence.indexOf(peptide);
@@ -168,7 +199,17 @@ public class PeptideProteinMatchingService {
         while(idx != -1) {
             
             char nterm = idx == 0 ? '-' : sequence.charAt(idx - 1);
+            // With the update to Sequest we can have '*' characters in the middle of sequences
+            // We will treat them as the start  and end of a protein sequence.
+            // So If the peptide sequence matches *.PEPTR.X  we will treat this as a fully tryptic 
+            // peptide, or num enzymatic termini = 2;
+            if(!removeAsterisks) {
+            	nterm = nterm == '*' ? '-' : nterm;
+            }
             char cterm = idx + peptide.length() == sequence.length() ? '-' : sequence.charAt(idx + peptide.length());
+            if(!removeAsterisks) {
+            	cterm = cterm == '*' ? '-' : cterm;
+            }
             
             PeptideProteinMatch match = new PeptideProteinMatch();
             match.setPeptide(peptide);
@@ -182,7 +223,7 @@ public class PeptideProteinMatchingService {
             // look at each enzyme rule and return the first match
             for(EnzymeRule rule: enzymeRules) {
                 int net = rule.getNumEnzymaticTermini(peptide, nterm, cterm);
-                if(net >= minEnzymaticTermini) {
+                if(net >= numEnzymaticTermini) {
                     match.setNumEnzymaticTermini(net);
                     return match;
                 }
@@ -193,7 +234,7 @@ public class PeptideProteinMatchingService {
         return null;
     }
     
-    private List<Integer> getMatchingDbProteinIds(String peptide) {
+    private List<Integer> getMatchingDbProteinIds(String peptide) throws PeptideProteinMatchingServiceException {
         
         if(this.createSuffixTables) {
             return getMatchingDbProteinIdsForPeptideFromDatabase(peptide, useSingleQuery);
@@ -376,10 +417,10 @@ public class PeptideProteinMatchingService {
     	return new ArrayList<String>(suffixList);
     }
     
-    private List<Integer> getMatchingDbProteinIdsForPeptideFromMemory(String peptide) {
+    private List<Integer> getMatchingDbProteinIdsForPeptideFromMemory(String peptide) throws PeptideProteinMatchingServiceException {
         
     	
-    	peptide = FastaInMemorySuffixCreator.format(peptide);
+    	peptide = FastaInMemorySuffixCreator.format(peptide); // removes asterisks and replaces 'L' and 'I' with '1'
     	
         int SUFFIX_LENGTH = FastaDatabaseSuffixCreator.SUFFIX_LENGTH;
         
@@ -412,9 +453,8 @@ public class PeptideProteinMatchingService {
         for(String suffix: suffixList) {
         	List<Integer> matchingProteins = suffixMap.get(suffix);
         	if(matchingProteins == null || matchingProteins.isEmpty()) {
-        		// This can happen since we are looking for I<->L substitutions also
         		log.error("No protein matches found for suffix: "+suffix+" for peptide: "+peptide);
-        		continue;	
+        		throw new PeptideProteinMatchingServiceException("No protein matches found for suffix: "+suffix+" for peptide: "+peptide);
         	}
         	if(idx == 0) {
         		for(Integer proteinId: matchingProteins)
@@ -442,6 +482,11 @@ public class PeptideProteinMatchingService {
         
         if(allMatches.size() > 10)
             log.debug("!!!# matches found: "+allMatches.size()+" for peptide: "+peptide);
+        
+        if(allMatches.size() == 0) {
+        	log.error("No protein matches found for suffix set for peptide: "+peptide);
+        	throw new PeptideProteinMatchingServiceException("No protein matches found for suffix set for peptide: "+peptide+". "+getCriteria());
+        }
         
         return new ArrayList<Integer>(allMatches);
     }

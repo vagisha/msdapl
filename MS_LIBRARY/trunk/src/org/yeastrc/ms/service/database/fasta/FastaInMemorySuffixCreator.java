@@ -74,7 +74,7 @@ public class FastaInMemorySuffixCreator {
         int SUFFIX_LENGTH = FastaDatabaseSuffixCreator.SUFFIX_LENGTH;
         
         
-        sequence = format(sequence);
+        sequence = format(sequence); // removes any '*' and replaces 'I' and 'L' with '1'
         
         Integer idObj = Integer.valueOf(dbProteinId);
         for(int i = 0; i < sequence.length(); i++) {
@@ -93,16 +93,30 @@ public class FastaInMemorySuffixCreator {
         }
     }
     
+    /**
+     * Removes '*' characters from the sequence and replaces 'L' and 'I' with '1'. 
+     * @param sequence
+     * @return
+     */
     public static String format(String sequence) {
     	
     	// Remove any '*' characters from the sequence
-    	sequence = sequence.replaceAll("\\*", "");
-    	// Replace all 'L' with '1'
-    	sequence = sequence.replaceAll("L", "1");
-        // Replace all "I" with "1"
-    	sequence = sequence.replaceAll("I", "1");
+    	sequence = removeAsterisks(sequence);
+    	sequence = doIAndLSubstitution(sequence);
     	
     	return sequence;
    
     }
+
+	public static String removeAsterisks(String sequence) {
+		return sequence.replaceAll("\\*", "");
+	}
+
+	public static String doIAndLSubstitution(String sequence) {
+		// Replace all 'L' with '1'
+    	sequence = sequence.replaceAll("L", "1");
+        // Replace all "I" with "1"
+    	sequence = sequence.replaceAll("I", "1");
+		return sequence;
+	}
 }

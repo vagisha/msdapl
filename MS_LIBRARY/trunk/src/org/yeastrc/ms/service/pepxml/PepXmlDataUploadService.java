@@ -2,7 +2,6 @@ package org.yeastrc.ms.service.pepxml;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,6 +53,7 @@ import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.service.database.fasta.PeptideProteinMatch;
 import org.yeastrc.ms.service.database.fasta.PeptideProteinMatchingService;
+import org.yeastrc.ms.service.database.fasta.PeptideProteinMatchingServiceException;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
@@ -491,8 +491,14 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                         String peptideSeq = sres.getResultPeptide().getPeptideSequence();
                         List<PeptideProteinMatch> matches = proteinMatches.get(peptideSeq);
                         if(matches == null) {
-                            matches = matchService.getMatchingProteins(peptideSeq);
-                            if(matches.size() == 0) {
+                            try {
+								matches = matchService.getMatchingProteins(peptideSeq);
+							} catch (PeptideProteinMatchingServiceException e) {
+								log.error("Error finding protein matches. ", e); // we are not propagating this up because the cause of the  
+																				 // exception may be that no matches were found. We will give it
+																				 // one more shot. 
+							}
+                            if(matches == null || matches.size() == 0) {
 
                                 // This can happen if no matching protein was found with the search 
                                 // constraints used. Mascot still reports the hit. 
@@ -501,12 +507,22 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                                 if(oldNet > 0) {
                                     log.info("No protein match found for peptide: "+peptideSeq+"; relaxing NET and searching again...");
                                     matchService.setNumEnzymaticTermini(0);
-                                    matches = matchService.getMatchingProteins(peptideSeq);
-                                    matchService.setNumEnzymaticTermini(oldNet);
+                                    
+                                    try {
+										matches = matchService.getMatchingProteins(peptideSeq);
+									} catch (PeptideProteinMatchingServiceException e) {
+										log.error("Error finding protein matches. ", e);
+										 UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
+										 ex.setErrorMessage("No protein matches found for peptide: "+peptideSeq);
+										 ex.appendErrorMessage(e.getMessage());
+										 throw ex;
+									}
+                                    
+                                    matchService.setNumEnzymaticTermini(oldNet); // set it back
                                 }
 
                                 // If we still did not find any matches
-                                if(matches.size() == 0) {
+                                if(matches == null || matches.size() == 0) {
                                     UploadException ex = new UploadException(ERROR_CODE.GENERAL);
                                     ex.setErrorMessage("No protein matches found for peptide: "+peptideSeq);
                                     throw ex;
@@ -622,7 +638,7 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         try {
             this.matchService = new PeptideProteinMatchingService(databases.get(0).getSequenceDatabaseId());
         }
-        catch (SQLException e) {
+        catch (PeptideProteinMatchingServiceException e) {
             UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
             ex.setErrorMessage("Error initializing PeptideProteinMatchingService for databaseID: "+
                     databases.get(0).getSequenceDatabaseId());
@@ -632,6 +648,8 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
 
         matchService.setNumEnzymaticTermini(numEnzymaticTermini);
         matchService.setEnzymes(enzymes);
+        matchService.setDoItoLSubstitution(false);
+        matchService.setRemoveAsterisks(false); // '*' in a protein sequence will be treated as protein ends.
     }
 
     protected void flush() {

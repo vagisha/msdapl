@@ -3,7 +3,6 @@ package org.yeastrc.ms.service.sqtfile;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,6 +55,7 @@ import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.service.database.fasta.PeptideProteinMatch;
 import org.yeastrc.ms.service.database.fasta.PeptideProteinMatchingService;
+import org.yeastrc.ms.service.database.fasta.PeptideProteinMatchingServiceException;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
 public abstract class AbstractSQTDataUploadService implements SearchDataUploadService {
@@ -528,7 +528,17 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         	
         	List<PeptideProteinMatch> matches = proteinMatches.get(peptideSeq);
             if(matches == null) {
-                matches = matchService.getMatchingProteins(peptideSeq);
+                try {
+					matches = matchService.getMatchingProteins(peptideSeq);
+					
+				} catch (PeptideProteinMatchingServiceException e) {
+					
+					log.error("Error getting matching proteins for peptide "+peptideSeq, e);
+					UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+                    ex.setErrorMessage("Error getting matching proteins for peptide "+peptideSeq+
+                    		". Error was: "+e.getMessage());
+                    throw ex;
+				}
                 if(matches.size() == 0) {
 
                 	UploadException ex = new UploadException(ERROR_CODE.GENERAL);
@@ -833,7 +843,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         try {
             this.matchService = new PeptideProteinMatchingService(databases.get(0).getSequenceDatabaseId());
         }
-        catch (SQLException e) {
+        catch (PeptideProteinMatchingServiceException e) {
             UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
             ex.setErrorMessage("Error initializing PeptideProteinMatchingService for databaseID: "+
                     databases.get(0).getSequenceDatabaseId());
@@ -843,6 +853,8 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
 
         matchService.setNumEnzymaticTermini(numEnzymaticTermini);
         matchService.setEnzymes(enzymes);
+        matchService.setDoItoLSubstitution(false);
+        matchService.setRemoveAsterisks(false); // '*' in a protein sequence will be treated as protein ends.
     }
 
 }
