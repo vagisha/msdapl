@@ -1,6 +1,5 @@
 package edu.uwpr.protinfer.idpicker;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +28,7 @@ import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.ms.service.database.fasta.PeptideProteinMatch;
 import org.yeastrc.ms.service.database.fasta.PeptideProteinMatchingService;
+import org.yeastrc.ms.service.database.fasta.PeptideProteinMatchingServiceException;
 
 import edu.uwpr.protinfer.PeptideKeyCalculator;
 import edu.uwpr.protinfer.infer.Peptide;
@@ -169,10 +169,17 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         	
         	if(protMatches == null) {
         		
-        		List<PeptideProteinMatch> matches = matchService.getMatchingProteins(peptide);
+        		List<PeptideProteinMatch> matches = null;
+				try {
+					matches = matchService.getMatchingProteins(peptide);
+				} catch (PeptideProteinMatchingServiceException e1) {
+					log.error("Error finding protein matches found for peptide: "+peptide);
+            		throw new ResultGetterException("Error finding protein matches found for peptide: "+peptide, e1);
+				}
             	
-        		if(matches.size() == 0) {
+        		if(matches == null || matches.size() == 0) {
             		log.error("No protein matches found for peptide: "+peptide);
+            		throw new ResultGetterException("No protein matches found for peptide: "+peptide+" "+matchService.getCriteria());
             	}
         		
         		protMatches = new ArrayList<Protein>(matches.size());
@@ -251,7 +258,8 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         PeptideProteinMatchingService matchService = null;
         try {
 			matchService = new PeptideProteinMatchingService(fastaDatabaseIds.get(0));
-		} catch (SQLException e1) {
+			
+		} catch (PeptideProteinMatchingServiceException e1) {
 			throw new ResultGetterException("Error initializing PeptideProteinMatchingService", e1);
 		}
 
@@ -259,6 +267,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         matchService.setEnzymes(enzymes);
         
         matchService.setDoItoLSubstitution(percParams.getIdPickerParams().isDoItoLSubstitution());
+        matchService.setRemoveAsterisks(false);
         
         log.info("Initialized peptide protein matching service");
         return matchService;
