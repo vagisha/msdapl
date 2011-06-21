@@ -295,7 +295,21 @@ public final class ProlucidResultPeptideBuilder implements PeptideResultBuilder 
     }
 
     static String getOnlyPeptideSequence(String sequence) throws SQTParseException {
-        String origSequence = sequence;
+
+        char[] residueChars = new char[sequence.length()];
+        int j = 0;
+        for (int i = 0; i < sequence.length(); i++) {
+            char x = sequence.charAt(i);
+            if (isResidue(x))
+                residueChars[j++] = x;
+        }
+        sequence = String.valueOf(residueChars).trim();
+        if (sequence.length() == 0)
+            throw new SQTParseException("No residues found: "+sequence);
+        return sequence;
+    	
+        /*
+    	String origSequence = sequence;
         // remove any modifiation strings
         Matcher m = singleMod.matcher(sequence);
         sequence = m.replaceAll("");
@@ -306,6 +320,11 @@ public final class ProlucidResultPeptideBuilder implements PeptideResultBuilder 
             throw new SQTParseException("Peptide sequence has invalid character(s): "+origSequence);
         
         return sequence;
+        */
+    }
+    
+    static private boolean isResidue(char residue) {
+        return residue >= 'A' && residue <= 'Z';
     }
 
     public static String getOnlyPeptide(String peptideAndExtras) throws SQTParseException {
