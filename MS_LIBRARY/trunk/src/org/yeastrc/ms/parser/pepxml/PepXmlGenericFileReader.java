@@ -341,7 +341,7 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
         // search_engine="MASCOT" precursor_mass_type="monoisotopic" fragment_mass_type="monoisotopic"
         String value = reader.getAttributeValue(null,"search_engine");
         if(value != null) {
-            this.searchProgram = parseProgram(value);
+            this.searchProgram = PepXmlUtils.parseProgram(value);
         }
         value = reader.getAttributeValue(null,"precursor_mass_type");
         if(value != null) {
@@ -963,82 +963,5 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
         locus.setNumEnzymaticTermini(numEnzymaticTermini);
         return locus;
     }
-    
-    
-    // ---------------------------------------------------------------------------------
-    // static method to get the search program used.  Looks in the first search_summary 
-    // element
-    // ---------------------------------------------------------------------------------
-    public static Program getSearchProgram(String filePath) throws DataProviderException {
-        
-        // open the file read the name of the search program and close the file
-        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-        InputStream inputStr = null;
-        XMLStreamReader reader = null;
-        Program program = null;
-        try {
-            inputStr = new FileInputStream(filePath);
-            reader = inputFactory.createXMLStreamReader(inputStr);
-            
-            while(reader.hasNext()) {
-                int evtType = reader.next();
-                if(evtType == XMLStreamReader.END_ELEMENT && reader.getLocalName().equalsIgnoreCase("search_summary")){
-                        break;
-                }
-                if(evtType == XMLStreamReader.START_ELEMENT && reader.getLocalName().equalsIgnoreCase("search_summary")) {
-                    String value = reader.getAttributeValue(null,"search_engine");
-                    if(value != null) {
-                        program = parseProgram(value);
-                    }
-                }
-            }
-        }
-        catch (FileNotFoundException e) {
-            throw new DataProviderException("File not found: "+filePath, e);
-        }
-        catch (XMLStreamException e) {
-            throw new DataProviderException("Error reading file: "+filePath, e);
-        }
-        finally {
-            // close the file
-            if (reader != null) {
-                try {reader.close();}
-                catch (XMLStreamException e) {}
-            }
-
-            if(inputStr != null) {
-                try {inputStr.close();}
-                catch(IOException e){}
-            }
-        }
-        return program;
-    }
-
-    private static Program parseProgram(String value) {
-        if("SEQUEST".equalsIgnoreCase(value))           return Program.SEQUEST;
-        else if("MASCOT".equalsIgnoreCase(value))       return Program.MASCOT;
-        else if ("X! Tandem".equalsIgnoreCase(value))   return Program.XTANDEM;
-        return null;
-    }
-    
-    // ---------------------------------------------------------------------------------
-    // static method to get the search file format used.  Looks in the first search_summary 
-    // element
-    // ---------------------------------------------------------------------------------
-    public static SearchFileFormat getSearchFileType(String filePath) throws DataProviderException {
-        Program program = getSearchProgram(filePath);
-        if(program == Program.SEQUEST)
-            return SearchFileFormat.PEPXML_SEQ;
-        else if(program == Program.MASCOT)
-            return SearchFileFormat.PEPXML_MASCOT;
-        else if(program == Program.XTANDEM)
-            return SearchFileFormat.PEPXML_XTANDEM;
-        else
-            return SearchFileFormat.UNKNOWN;
-    }
-    
-    public static void main(String[] args) throws DataProviderException {
-        String filePath = "/Users/silmaril/WORK/UW/FLINT/mascot_test/090715_EPO-iT_80mM_HCD.pep.xml";
-        System.out.println(PepXmlGenericFileReader.getSearchFileType(filePath));
-    }
+   
 }

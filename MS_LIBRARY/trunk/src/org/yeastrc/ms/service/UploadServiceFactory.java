@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.parser.pepxml.PepXmlGenericFileReader;
+import org.yeastrc.ms.parser.pepxml.PepXmlUtils;
 import org.yeastrc.ms.parser.percolator.PercolatorXmlFileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadService;
@@ -413,7 +413,7 @@ public class UploadServiceFactory {
             
             SearchFileFormat myType = null;
             try {
-                myType = PepXmlGenericFileReader.getSearchFileType(pepxmlFile);
+                myType = PepXmlUtils.getInstance().getSearchFileType(pepxmlFile);
             }
             catch (DataProviderException e) {
                 throw new UploadServiceFactoryException("Exception getting file type: "+e.getErrorMessage());
