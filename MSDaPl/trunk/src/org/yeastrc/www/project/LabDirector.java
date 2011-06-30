@@ -10,10 +10,12 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.db.DBConnectionManager;
-import org.yeastrc.project.Projects;
 import org.yeastrc.www.user.Groups;
 
 
@@ -26,114 +28,58 @@ public class LabDirector {
 	
 	private static final Logger log = Logger.getLogger(LabDirector.class.getName());
 	
-	private static int MACCOSS = 0;
-	private static int GOODLETT = 0;
-	private static int BRUCE = 0;
-	private static int VILLEN = 0;
+	// key = group name; value = Lab Director's researcherID
+	private static Map<String, Integer> groupLabDirectorMap = new HashMap<String, Integer>();
 	
-	public static int getMacCoss() {
-		if(MACCOSS == 0) {
-			int groupId;
-			try {
-				groupId = Groups.getInstance().getGroupID(Projects.MACCOSS);
-			} catch (SQLException e) {
-				log.error("Error getting groupID form : "+Projects.MACCOSS, e);
-				return 0;
-			}
-			int userId = getLabDirector(groupId);
-			if(userId == 0) {
-				log.error("No Lab Director found for group MacCoss");
-			}
-			else {
-				if (Groups.getInstance().isMember(userId, Projects.MACCOSS)) {
-					MACCOSS = userId;
-				}
-				else {
-					log.error("Lab director for MacCoss group not a member of MacCoss group");
-				}
-			}
-		}
-		return MACCOSS;
-	}
-	
-	public static int getGoodlett() {
+	/**
+	 * Returns the ID of the lab director of first group in the list that has a lab director. 
+	 * "administrators" group is not considered. 
+	 * Return value is 0 if none of the groups have a lab director.
+	 * @param groupNames
+	 * @return
+	 */
+	public static int get(List<String> groupNames) {
 		
-		if(GOODLETT == 0) {
-			int groupId;
-			try {
-				groupId = Groups.getInstance().getGroupID(Projects.GOODLETT);
-			} catch (SQLException e) {
-				log.error("Error getting groupID form : "+Projects.GOODLETT, e);
-				return 0;
-			}
-			int userId = getLabDirector(groupId);
-			if(userId == 0) {
-				log.error("No Lab Director found for group Goodlett");
-			}
-			else {
-				if (Groups.getInstance().isMember(userId, Projects.GOODLETT)) {
-					GOODLETT = userId;
-				}
-				else {
-					log.error("Lab director for Goodlett group not a member of Goodlett group");
-				}
+		if(groupNames == null || groupNames.size() == 0)
+			return 0;
+		
+		groupNames.remove("administrators");  // remove "administrators" group.
+		
+		
+		if(groupNames.size() > 0) {
+			for(String groupName: groupNames) {
+				
+				int labDirectorId = get(groupName);
+				if(labDirectorId != 0)
+					return labDirectorId;
 			}
 		}
-		return GOODLETT;
+		return 0;
 	}
-	
-	public static int getBruce() {
-		if(BRUCE == 0) {
-			int groupId;
-			try {
-				groupId = Groups.getInstance().getGroupID(Projects.BRUCE);
-			} catch (SQLException e) {
-				log.error("Error getting groupID form : "+Projects.BRUCE, e);
-				return 0;
-			}
-			int userId = getLabDirector(groupId);
-			if(userId == 0) {
-				log.error("No Lab Director found for group Bruce");
-			}
-			else {
-				if (Groups.getInstance().isMember(userId, Projects.BRUCE)) {
-					BRUCE = userId;
-				}
-				else {
-					log.error("Lab director for Bruce group not a member of Bruce group");
-				}
-			}
+
+	public static int get(String groupName) {
+		
+		Integer groupId = groupLabDirectorMap.get(groupName);
+		
+		if(groupId != null)
+			return groupId;
+		
+		try {
+			groupId = Groups.getInstance().getGroupID(groupName);
+		} catch (SQLException e) {
+			log.error("Error getting groupID for group: "+groupName, e);
+			return 0;
 		}
-		return BRUCE;
-	}
-	
-	public static int getVillen() {
-		if(VILLEN == 0) {
-			int groupId;
-			try {
-				groupId = Groups.getInstance().getGroupID(Projects.VILLEN);
-			} catch (SQLException e) {
-				log.error("Error getting groupID form : "+Projects.VILLEN, e);
-				return 0;
-			}
-			int userId = getLabDirector(groupId);
-			if(userId == 0) {
-				log.error("No Lab Director found for group Villen");
-			}
-			else {
-				if (Groups.getInstance().isMember(userId, Projects.VILLEN)) {
-					VILLEN = userId;
-				}
-				else {
-					log.error("Lab director for Villen group not a member of Villen group");
-				}
-			}
+		if(groupId != 0) {
+			int labDirectorId = get(groupId);
+			groupLabDirectorMap.put(groupName, labDirectorId);
+			return labDirectorId;
 		}
-		return VILLEN;
+		else
+			return 0;
 	}
 	
-	
-	private static int getLabDirector(int groupId) {
+	private static int get(int groupId) {
 		
 		// Get our connection to the database.
 		Connection conn = null;

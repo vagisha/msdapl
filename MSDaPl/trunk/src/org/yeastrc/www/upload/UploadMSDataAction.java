@@ -85,7 +85,7 @@ public class UploadMSDataAction extends Action {
 		
 		MSUploadJobSaver jobSaver = new MSUploadJobSaver();
         
-		int jobGroupId = JobGroupIdGetter.get(user);
+		int jobGroupId = UserGroupIdGetter.getOneGroupId(user);
         jobSaver.setGroupID(jobGroupId);
         
 		

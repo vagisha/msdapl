@@ -19,7 +19,6 @@ import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.ProteinUserValidation;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
-import org.yeastrc.project.Projects;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -46,9 +45,7 @@ public class SaveProteinAnnotationAjaxAction extends Action {
 
         // Restrict access to yrc members
         Groups groupMan = Groups.getInstance();
-        if (!groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS) &&
-          !groupMan.isMember( user.getResearcher().getID(), Projects.YATES) &&
-          !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
+        if (!groupMan.isInAGroup(user.getResearcher().getID())) {
             ActionErrors errors = new ActionErrors();
             errors.add("access", new ActionMessage("error.access.invalidgroup"));
             saveErrors( request, errors );

@@ -1,5 +1,5 @@
 /*
- * UploadMacCossFormAction.java
+ * UploadMSDataFormAction.java
  * Created on May 18, 2005
  * Created by Michael Riffle <mriffle@u.washington.edu>
  */
@@ -23,7 +23,6 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.domain.general.MsInstrument;
 import org.yeastrc.project.ProjectLite;
 import org.yeastrc.project.ProjectLiteDAO;
-import org.yeastrc.project.Projects;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -46,7 +45,7 @@ public class UploadMSDataFormAction extends Action {
 			return mapping.findForward("authenticate");
 		}
 
-		// Restrict access to researchers who are members of a grop
+		// Restrict access to researchers who are members of a group
 		Groups groupMan = Groups.getInstance();
 		if (!groupMan.isInAGroup(user.getResearcher().getID())) {
 			ActionErrors errors = new ActionErrors();
@@ -60,17 +59,17 @@ public class UploadMSDataFormAction extends Action {
 		    newForm.setPipeline(Pipeline.TPP);
 		    newForm.setDataServer("local");
 		}
-		else if(groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS)) {
+		else if(groupMan.isMember(user.getResearcher().getID(), "MacCoss")) {
 		    newForm.setPipeline(Pipeline.MACOSS);
 		    newForm.setDataServer("local");
 		}
-		else if (groupMan.isMember(user.getResearcher().getID(), Projects.GOODLETT)){
+		else if (groupMan.isMember(user.getResearcher().getID(), "Goodlett")){
 		    newForm.setPipeline(Pipeline.TPP);
-		    newForm.setDataServer(Projects.GOODLETT);
+		    newForm.setDataServer("Goodlett");
 		}
-		else if (groupMan.isMember(user.getResearcher().getID(), Projects.BRUCE)){
+		else if (groupMan.isMember(user.getResearcher().getID(), "Bruce")){
 		    newForm.setPipeline(Pipeline.TPP);
-		    newForm.setDataServer(Projects.BRUCE);
+		    newForm.setDataServer("Bruce");
 		}
 		else {
 		    newForm.setPipeline(Pipeline.TPP);

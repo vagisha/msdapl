@@ -22,7 +22,6 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
-import org.yeastrc.project.Projects;
 import org.yeastrc.www.proteinfer.ProteinInferToProjectMapper;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
@@ -53,11 +52,9 @@ public class ViewProteinInferenceJob extends Action {
             return mapping.findForward("authenticate");
         }
 
-        // Restrict access to yrc members
+        // Restrict access to users that are members of a group
         Groups groupMan = Groups.getInstance();
-        if (!groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS) &&
-          !groupMan.isMember( user.getResearcher().getID(), Projects.YATES) &&
-          !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
+        if (!groupMan.isInAGroup(user.getResearcher().getID())) {
             ActionErrors errors = new ActionErrors();
             errors.add("access", new ActionMessage("error.access.invalidgroup"));
             saveErrors( request, errors );

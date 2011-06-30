@@ -51,27 +51,11 @@ public class NewProjectAction extends Action {
 		EditProjectForm newForm = new EditProjectForm();
 		request.setAttribute("editProjectForm", newForm);
 		
-		// Set the default PI to this user.
-		if(groupMan.isMember(user.getResearcher().getID(),  "MacCoss")) {
-			int piId = LabDirector.getMacCoss();
-			if(piId != 0)
-				newForm.setPI(piId);
-		}
-		else if(groupMan.isMember(user.getResearcher().getID(), "Goodlett")) {
-			int piId = LabDirector.getGoodlett();
-			if(piId != 0)
-				newForm.setPI(piId);
-		}
-		else if(groupMan.isMember(user.getResearcher().getID(), "Bruce")) {
-			int piId = LabDirector.getBruce();
-			if(piId != 0)
-				newForm.setPI(piId);
-		}
-		else if(groupMan.isMember(user.getResearcher().getID(), "Villen")) {
-			int piId = LabDirector.getVillen();
-			if(piId != 0)
-				newForm.setPI(piId);
-		}
+		// Set the default PI.
+		List<String> userGroups = Groups.getInstance().getUserGroups(user.getResearcher().getID());
+		int piId = LabDirector.get(userGroups);
+		if(piId != 0)
+			newForm.setPI(piId);
 		
 		List<Researcher> researcherIds = new ArrayList<Researcher>();
 		Researcher tempR = new Researcher();

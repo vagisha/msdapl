@@ -15,12 +15,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.db.DBConnectionManager;
@@ -41,56 +39,56 @@ public class Projects {
 	 * will have to be present int this array, or no guarantees are made as to method behavior!
 	 * This array MUST BE SORTED alphabetically, for binary search purposes
 	 */
-	public static final String[] GROUPS = {"Aebersold", "Core", "Informatics", "MacCoss", "Microscopy", "Noble", "PSP","TwoHybrid","Yates"};
-	public static final String[] GROUPS_LONG = {"Mass Spectrometry (Aebersold)", "YRC Core", "Informatics", "Mass Spectrometry (MacCoss)", "Microscopy", "Computational Biology", "Protein Structure Prediction", "Yeast Two-Hybrid", "Mass Spectrometry (Yates)"};
-	
-	/** The defintion for the abersold group */
-	public static final String AEBERSOLD = "Aebersold";
-	
-	/** The defintion for the informatics group */
-	public static final String INFORMATICS = "Informatics";
-
-	/** The defintion for the abersold group */
-	public static final String MICROSCOPY = "Microscopy";
-
-	/** The defintion for the abersold group */
-	public static final String PSP = "PSP";
-
-	/** The defintion for the abersold group */
-	public static final String TWOHYBRID = "TwoHybrid";
-
-	/** The defintion for the abersold group */
-	public static final String YATES = "Yates";
-	
-	/** The definition for the MacCoss group */
-	public static final String MACCOSS = "MacCoss";
-	
-	/** The definition for the Goodlett group */
-    public static final String GOODLETT = "Goodlett";
-    
-    /** The definition for the Bruce group */
-    public static final String BRUCE = "Bruce";
-    
-    /** The definition for the Villen group */
-    public static final String VILLEN = "Villen";
-
-	/** The definitioni for the Noble group */
-	public static final String NOBLE = "Noble";
-
-	/** The definition for a Collaboration **/
-	public static final String COLLABORATION = "C";
-	
-	/** The definition for a Technology Development **/
-	public static final String TECHNOLOGY = "Tech";
-	
-	/** The definition for a Training **/
-	public static final String TRAINING = "T";
-	
-	/** The definition for a Dissemination **/
-	public static final String DISSEMINATION = "D";
-	
-	/** The definition for the core group */
-	public static final String CORE = "Core";
+//	public static final String[] GROUPS = {"Aebersold", "Core", "Informatics", "MacCoss", "Microscopy", "Noble", "PSP","TwoHybrid","Yates"};
+//	public static final String[] GROUPS_LONG = {"Mass Spectrometry (Aebersold)", "YRC Core", "Informatics", "Mass Spectrometry (MacCoss)", "Microscopy", "Computational Biology", "Protein Structure Prediction", "Yeast Two-Hybrid", "Mass Spectrometry (Yates)"};
+//	
+//	/** The defintion for the abersold group */
+//	public static final String AEBERSOLD = "Aebersold";
+//	
+//	/** The defintion for the informatics group */
+//	public static final String INFORMATICS = "Informatics";
+//
+//	/** The defintion for the abersold group */
+//	public static final String MICROSCOPY = "Microscopy";
+//
+//	/** The defintion for the abersold group */
+//	public static final String PSP = "PSP";
+//
+//	/** The defintion for the abersold group */
+//	public static final String TWOHYBRID = "TwoHybrid";
+//
+//	/** The defintion for the abersold group */
+//	public static final String YATES = "Yates";
+//	
+//	/** The definition for the MacCoss group */
+//	//public static final String MACCOSS = "MacCoss";
+//	
+//	/** The definition for the Goodlett group */
+//    public static final String GOODLETT = "Goodlett";
+//    
+//    /** The definition for the Bruce group */
+//    public static final String BRUCE = "Bruce";
+//    
+//    /** The definition for the Villen group */
+//    public static final String VILLEN = "Villen";
+//
+//	/** The definitioni for the Noble group */
+//	public static final String NOBLE = "Noble";
+//
+//	/** The definition for a Collaboration **/
+//	public static final String COLLABORATION = "C";
+//	
+//	/** The definition for a Technology Development **/
+//	public static final String TECHNOLOGY = "Tech";
+//	
+//	/** The definition for a Training **/
+//	public static final String TRAINING = "T";
+//	
+//	/** The definition for a Dissemination **/
+//	public static final String DISSEMINATION = "D";
+//	
+//	/** The definition for the core group */
+//	public static final String CORE = "Core";
 	
 	
 	/**
@@ -197,31 +195,31 @@ public class Projects {
 	 * @param groups a Set of groups, as defined in this document (e.g. Projects.TWOHYBRID)
 	 * @return A string consisting of a long hand, comma delimited version of that Set
 	 */
-	public static String getGroupsString(Set groups) {
-		if (groups == null) return "None";
-		if (groups.size() < 1) return "None";
-		
-		boolean pastFirst = false;
-		String retString = "";
-		
-		Iterator iter = groups.iterator();
-		while (iter.hasNext()) {
-			String group = (String)(iter.next());
-
-			// Add a comma before all but the first item
-			if (pastFirst) retString += ", ";
-			pastFirst = true;
-			
-			// Get the long version of the group name, and add it to the list
-			int indexOfGroup = Arrays.binarySearch(Projects.GROUPS, group);
-			if (indexOfGroup >= 0)
-				retString += Projects.GROUPS_LONG[indexOfGroup];
-			else
-				retString += group;		
-		}
-
-		return retString;
-	}
+//	public static String getGroupsString(Set groups) {
+//		if (groups == null) return "None";
+//		if (groups.size() < 1) return "None";
+//		
+//		boolean pastFirst = false;
+//		String retString = "";
+//		
+//		Iterator iter = groups.iterator();
+//		while (iter.hasNext()) {
+//			String group = (String)(iter.next());
+//
+//			// Add a comma before all but the first item
+//			if (pastFirst) retString += ", ";
+//			pastFirst = true;
+//			
+//			// Get the long version of the group name, and add it to the list
+//			int indexOfGroup = Arrays.binarySearch(Projects.GROUPS, group);
+//			if (indexOfGroup >= 0)
+//				retString += Projects.GROUPS_LONG[indexOfGroup];
+//			else
+//				retString += group;		
+//		}
+//
+//		return retString;
+//	}
 
 
 	/**

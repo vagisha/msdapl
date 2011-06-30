@@ -797,15 +797,6 @@
 	  <forward name="Success" path="/listUploadJobs.do" redirect="true"/>
 	</action>
 	
-	<action
-	  path="/uploadRedirect"
-	  type="org.yeastrc.www.misc.UploadRedirectAction"
-	  validate="false">
-	  <forward name="Yates" path="uploadYatesFormAction.do" redirect="true"/>
-	  <forward name="MacCoss" path="uploadMSDataAction.do" redirect="true"/>
-	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
-	</action>
-
 	<action path="/listUploadJobs"
 		type="org.yeastrc.www.jobqueue.ListJobsAction" validate="false">
 		<forward name="Success" path="/pages/admin/upload/listJobs.jsp"
