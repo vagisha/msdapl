@@ -103,8 +103,11 @@
 			<div>
 			&nbsp;&nbsp;
 			<html:link action="percolatorUploadForm.do" paramId="experimentId" paramName="experiment" paramProperty="id"><span style="color:red; font-weight:bold;">[Add Percolator Results]</span></html:link>
-			&nbsp;&nbsp;
-			<html:link action="percolatorRunForm.do" paramId="searchId" paramName="search" paramProperty="id"><span style="color:red; font-weight:bold;">[Run Percolator]</span></html:link>
+			<logic:present name="canRunPercolator">
+				&nbsp;&nbsp;
+				<html:link action="percolatorRunForm.do" paramId="searchId" paramName="search" paramProperty="id"><span style="color:red; font-weight:bold;">[Run Percolator]</span></html:link>
+			</logic:present>
+			
 			</div>
 		</logic:equal>
 

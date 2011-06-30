@@ -6,6 +6,8 @@ package org.yeastrc.www.compare;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.properties.ApplicationProperties;
+
 /**
  * ComparisonAction.java
  * @author Vagisha Sharma
@@ -47,7 +49,9 @@ public enum ComparisonCommand {
 	public static List<ComparisonCommand> getCommands() {
 		List<ComparisonCommand> commands = new ArrayList<ComparisonCommand>();
 		commands.add(FILTER);
-		commands.add(CLUSTER);
+		// We can run clustering only if we know the location of the R executable
+		if(ApplicationProperties.hasPathToR())
+			commands.add(CLUSTER);
 		return commands;
 	}
 }

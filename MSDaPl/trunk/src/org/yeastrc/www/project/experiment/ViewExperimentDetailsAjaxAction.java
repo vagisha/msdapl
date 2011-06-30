@@ -55,6 +55,7 @@ import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
+import org.yeastrc.properties.ApplicationProperties;
 import org.yeastrc.www.proteinfer.job.ProteinInferJobSearcher;
 import org.yeastrc.www.proteinfer.job.ProteinferJob;
 import org.yeastrc.www.user.User;
@@ -173,6 +174,10 @@ public class ViewExperimentDetailsAjaxAction extends Action {
 
 		request.setAttribute("experiment", experiment);
 
+		// Is the option to run Percolator available
+		if(ApplicationProperties.canRunPercolator())
+			request.setAttribute("canRunPercolator", "true");
+		
 		// Forward them on to the happy success view page!
 		return mapping.findForward("Success");
 

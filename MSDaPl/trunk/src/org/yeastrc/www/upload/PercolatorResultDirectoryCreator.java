@@ -16,6 +16,7 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.util.FileUtils;
+import org.yeastrc.properties.ApplicationProperties;
 import org.yeastrc.www.upload.PercolatorRunForm.PercolatorInputFile;
 
 /**
@@ -38,7 +39,7 @@ public class PercolatorResultDirectoryCreator {
 		
 		
 		// create the directory (proj<projectId>_expt<exptId>_<timestamp?)
-		String baseResultDir = MsDataUploadProperties.getPercolatorRunDirectory();
+		String baseResultDir = ApplicationProperties.getPercolatorResultDir();
 		String resultDir = baseResultDir+File.separator+"proj"+job.getProjectID()+"_expt"+job.getExperimentID()+"_"+String.valueOf((new Date()).getTime());
 		job.setResultDirectory(resultDir);
 		
