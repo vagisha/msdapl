@@ -16,11 +16,11 @@
       		<property name="JDBC.Driver" 
                 value="${db.driver}"/> 
       		<property name="JDBC.ConnectionURL" 
-                value="${db.proteinfer.url}"/> 
+                value="${db.url}"/> 
       		<property name="JDBC.Username" 
-                value="${db.proteinfer.user}"/> 
+                value="${db.user}"/> 
       		<property name="JDBC.Password" 
-                value="${db.proteinfer.password}"/>
+                value="${db.password}"/>
                 
             <property name="JDBC.DefaultAutoCommit" value="true" />
                 
