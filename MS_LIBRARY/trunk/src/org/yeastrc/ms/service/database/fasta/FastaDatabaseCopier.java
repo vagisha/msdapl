@@ -28,36 +28,37 @@ import org.yeastrc.nrseq.domain.NrDbProtein;
  */
 public class FastaDatabaseCopier {
 
-    private static FastaDatabaseCopier instance;
     
     private final String nrseqDbName;
     private final String nrseqTmpDbName;
     private DataSource nrseqTmpDs;
     private final DataSource nrseqDs;
     
-//    private final PreparedStatement tblProteinDatabaseStmt;
+    private final String dbhost;
+    private final String dbUser;
+    private final String dbPasswd;
     
-    public static FastaDatabaseCopier getInstance() throws SQLException {
-        if (instance == null) {
-            instance = new FastaDatabaseCopier();
-        }
-        return instance;
-    }
-    
-    private FastaDatabaseCopier () throws SQLException {
+	
+    private FastaDatabaseCopier (String dbHost, String dbUser, String dbPasswd) throws SQLException {
+    	
+    	this.dbhost = dbHost;
+        this.dbUser = dbUser;
+        this.dbPasswd = dbPasswd;
+        
         nrseqDbName = ConnectionFactory.nrseqDbName();
         nrseqTmpDbName = nrseqDbName+"_temp";
-        nrseqDs = ConnectionFactory.getDataSource(nrseqDbName);
+        nrseqDs = ConnectionFactory.getDataSource(dbHost, nrseqDbName, dbUser, dbPasswd);
     }
     
     
     public void copyDatabase(int databaseId) throws DatabaseCopyException {
         
         // make a copy of the YRC_NRSEQ database
-        DatabaseCopier copier = DatabaseCopier.getInstance();
+        DatabaseCopier copier = new DatabaseCopier(this.dbhost, this.dbUser, this.dbPasswd);
+        
         copier.copyDatabase(nrseqDbName, nrseqTmpDbName, true);
         
-        nrseqTmpDs = ConnectionFactory.getDataSource(nrseqTmpDbName);
+        nrseqTmpDs = ConnectionFactory.getDataSource(this.dbhost, nrseqTmpDbName, this.dbUser, this.dbPasswd);
         
         // if the database was copied successfully, copy the entries for the given databaseIDs
         // these are my tables
@@ -249,7 +250,7 @@ public class FastaDatabaseCopier {
     
     public static void main(String[] args) throws DatabaseCopyException, SQLException, IOException {
         
-        FastaDatabaseCopier copier = FastaDatabaseCopier.getInstance();
+        FastaDatabaseCopier copier = new FastaDatabaseCopier("localhost", "root", "");
         copier.copyDatabase(123);
         
     }

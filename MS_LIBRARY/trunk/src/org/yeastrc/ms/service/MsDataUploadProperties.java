@@ -20,20 +20,16 @@ import com.ibatis.common.resources.Resources;
  */
 public class MsDataUploadProperties {
 
-    private static final Logger log = Logger.getLogger(MsDataUploadProperties.class.getName());
+    private static final Logger log = Logger.getLogger(MsDataUploadProperties.class);
     
     private static boolean doSqtBackup;
     private static String backupDirectory;
     
-    private static String percRunDirectory;
-    
     private static PeakStorageType peakStorageType;
     
-    private static boolean checkPeptideProteinMatches = false;
+    private static boolean useIbatisDAO = true;
     
-    private static boolean useNrseqSuffixTables = true;
-    private static boolean useNrseqSuffixInMemory = false;
-    private static boolean useSingleQuery = false; // TEMPORARY
+    private static boolean checkPeptideProteinMatches = false;
     
     static {
         Properties props = new Properties();
@@ -45,22 +41,17 @@ public class MsDataUploadProperties {
             peakStorageType = PeakStorageType.instance(value);
             log.info("PeakStorageType is "+peakStorageType.name());
             
+            value = props.getProperty("dao.ibatis");
+            if(value != null) {
+            	useIbatisDAO = Boolean.parseBoolean(value);
+            }
+            log.info("Use Ibatis DAO classes: "+useIbatisDAO);
+            
             backupDirectory = props.getProperty("backup.dir");
             doSqtBackup = Boolean.parseBoolean(props.getProperty("backup.sqt"));
             
-            percRunDirectory = props.getProperty("perc.run.dir");
-            
             value = props.getProperty("interact.pepxml.checkpeptideproteinmatches");
             checkPeptideProteinMatches = Boolean.parseBoolean(value);
-            
-            value = props.getProperty("use.nrseq.suffix.tables");
-            useNrseqSuffixTables = Boolean.parseBoolean(value);
-            
-            value = props.getProperty("use.nrseq.suffix.in.memory");
-            useNrseqSuffixInMemory = Boolean.parseBoolean(value);
-            
-            value = props.getProperty("use.single.query");
-            useSingleQuery = Boolean.parseBoolean(value);
             
         }
         catch (IOException e) {
@@ -78,6 +69,10 @@ public class MsDataUploadProperties {
         return peakStorageType;
     }
     
+    public static boolean useIbatisDAO() {
+    	return useIbatisDAO;
+    }
+    
     public static String getBackupDirectory() {
         return backupDirectory;
     }
@@ -86,23 +81,8 @@ public class MsDataUploadProperties {
     	return doSqtBackup;
     }
     
-    public static String getPercolatorRunDirectory() {
-        return percRunDirectory;
-    }
-    
     public static boolean getCheckPeptideProteinMatches() {
         return checkPeptideProteinMatches;
     }
     
-    public static boolean useNrseqSuffixTables() {
-        return useNrseqSuffixTables;
-    }
-    
-    public static boolean useNrseqSuffixInMemory() {
-        return useNrseqSuffixInMemory;
-    }
-    
-    public static boolean useSingleQuery() {
-        return useSingleQuery;
-    }
 }

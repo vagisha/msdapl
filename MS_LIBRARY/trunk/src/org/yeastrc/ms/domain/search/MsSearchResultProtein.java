@@ -17,6 +17,8 @@ public interface MsSearchResultProtein {
      */
     public abstract int getResultId();
     
+    public abstract void setResultId(int resultId);
+    
     /**
      * @return accession string
      */

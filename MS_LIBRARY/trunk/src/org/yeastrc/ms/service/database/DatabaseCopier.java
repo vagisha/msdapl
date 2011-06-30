@@ -24,15 +24,18 @@ public class DatabaseCopier {
 
     private static final Logger log = Logger.getLogger(DatabaseCopier.class.getName());
     
-    private static final DatabaseCopier instance = new DatabaseCopier();
+    private final String dbhost;
+    private final String dbUser;
+    private final String dbPasswd;
     
-    private DatabaseCopier() {}
-    
-    public static DatabaseCopier getInstance() {
-        return instance;
+    public DatabaseCopier(String dbHost, String dbUser, String dbPasswd) {
+    	this.dbhost = dbHost;
+        this.dbUser = dbUser;
+        this.dbPasswd = dbPasswd;
     }
     
-    public void copyDatabase(String originalDatabase, String copyDatabase, boolean dropCopyDbIfExists) 
+
+	public void copyDatabase(String originalDatabase, String copyDatabase, boolean dropCopyDbIfExists) 
     throws DatabaseCopyException {
 
         log.info("Original database: "+originalDatabase+"; Copy database: "+copyDatabase);
@@ -66,7 +69,7 @@ public class DatabaseCopier {
         Connection conn = null;
         Statement stmt = null;
         try {
-            conn = ConnectionFactory.getConnection(originalDatabase);
+            conn = ConnectionFactory.getConnection(this.dbhost, originalDatabase, this.dbUser, this.dbPasswd);
             stmt = conn.createStatement();
             if(dropCopyDbIfExists)
                 stmt.execute("DROP DATABASE IF EXISTS "+copyDatabase);
@@ -96,7 +99,7 @@ public class DatabaseCopier {
         List<String> tableNames;
         Connection conn = null;
         try {
-            conn = ConnectionFactory.getConnection(databaseName);
+            conn = ConnectionFactory.getConnection(this.dbhost, databaseName, this.dbUser, this.dbPasswd);
             tableNames = getTableNames(conn);
         }
         catch (SQLException e) {
@@ -142,7 +145,7 @@ public class DatabaseCopier {
         ResultSet rs = null;
         
         try {
-            conn = ConnectionFactory.getConnection(copyDatabase);
+            conn = ConnectionFactory.getConnection(this.dbhost, copyDatabase, this.dbUser, this.dbPasswd);
             stmt = conn.createStatement();
             
             for(String tableName: tableNames) {
@@ -210,7 +213,7 @@ public class DatabaseCopier {
         List<String> tableNames;
         Connection conn = null;
         try {
-            conn = ConnectionFactory.getConnection(databaseName);
+            conn = ConnectionFactory.getConnection(this.dbhost, databaseName, this.dbUser, this.dbPasswd);
             tableNames = getTriggerNames(conn);
         }
         catch (SQLException e) {
@@ -256,7 +259,7 @@ public class DatabaseCopier {
         ResultSet rs = null;
         
         try {
-            conn = ConnectionFactory.getConnection(copyDatabase);
+            conn = ConnectionFactory.getConnection(this.dbhost, copyDatabase, this.dbUser, this.dbPasswd);
             stmt = conn.createStatement();
             
             for(String triggerName: triggerNames) {
@@ -312,7 +315,8 @@ public class DatabaseCopier {
         // create a copy of the YRC_NRSEQ database
         String originalDb = "yrc_nrseq";
         String testDb = "yrc_nrseq_test";
-        DatabaseCopier copier = DatabaseCopier.getInstance();
+        DatabaseCopier copier = new DatabaseCopier("localhost", "root", "");
+        
         try {
             copier.copyDatabase(originalDb, testDb);
         }

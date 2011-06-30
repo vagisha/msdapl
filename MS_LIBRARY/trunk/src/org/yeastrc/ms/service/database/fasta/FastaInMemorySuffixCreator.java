@@ -20,6 +20,8 @@ import org.yeastrc.nrseq.domain.NrDbProteinFull;
 
 public class FastaInMemorySuffixCreator {
 
+	public static final int SUFFIX_LENGTH = 4;
+	
     private Map<String, List<Integer>> suffixMap;
     
     private static final Logger log = Logger.getLogger(FastaInMemorySuffixCreator.class.getName());
@@ -63,16 +65,13 @@ public class FastaInMemorySuffixCreator {
         long e = System.currentTimeMillis();
         
         log.info("Created suffix map with "+suffixMap.size()+" entries");
-        log.info("Total time to create "+FastaDatabaseSuffixCreator.SUFFIX_LENGTH+"-mer suffix map for databaseID: "+databaseId+" was "
+        log.info("Total time to create "+SUFFIX_LENGTH+"-mer suffix map for databaseID: "+databaseId+" was "
                 +TimeUtils.timeElapsedSeconds(s, e)+"\n\n");
         
         return suffixMap;
     }
     
     private void createSuffixes(String sequence, int sequenceId, int dbProteinId) {
-        
-        int SUFFIX_LENGTH = FastaDatabaseSuffixCreator.SUFFIX_LENGTH;
-        
         
         sequence = format(sequence); // removes any '*' and replaces 'I' and 'L' with '1'
         

@@ -24,19 +24,12 @@ import com.ibatis.common.resources.Resources;
  */
 public class ConnectionFactory {
 
-    
-    private static String mainDbName;
-    private static String tempDbName;
-    
-    private static DataSource mainMsData = null;
-    private static DataSource tempMsData = null;
+    private static String msDataDbName;
+    private static DataSource msDataDataSource = null;
     
     private static String nrseqDbName;
+    private static DataSource nrseqDataSource = null;
     
-    private static DataSource nrseq = null;
-    
-    private static String user;
-    private static String password;
     
     private static final Logger log = Logger.getLogger(ConnectionFactory.class.getName());
     
@@ -46,20 +39,20 @@ public class ConnectionFactory {
         try {
             reader = Resources.getResourceAsReader("msDataDB.properties");
             props.load(reader);
+            
+            String msDataUser = props.getProperty("db.user");
+            String msDataPassword = props.getProperty("db.password");
             String mainDbUrl = props.getProperty("db.url");
-            mainDbName = props.getProperty("db.name");
-            user = props.getProperty("db.user");
-            password = props.getProperty("db.password");
+            msDataDbName = props.getProperty("db.name");
+            msDataDataSource = setupDataSource(mainDbUrl, msDataUser, msDataPassword);
             
-            String tempDbUrl = props.getProperty("db.temp.url");
-            tempDbName = props.getProperty("db.temp.name");
             
-            mainMsData = setupDataSource(mainDbUrl, user, password);
-            tempMsData = setupDataSource(tempDbUrl, user, password);
-            
-            nrseqDbName = props.getProperty("db.nrseq.name");
+            String nrseqUser = props.getProperty("db.nrseq.user");
+            String nrseqPassword = props.getProperty("db.nrseq.password");
             String nrseqUrl = props.getProperty("db.nrseq.url");
-            nrseq = setupDataSource(nrseqUrl, user, password);
+            nrseqDbName = props.getProperty("db.nrseq.name");
+            nrseqDataSource = setupDataSource(nrseqUrl, nrseqUser, nrseqPassword);
+            
         }
         catch (IOException e) {
             log.error("Error reading properties file msDataDB.properties", e);
@@ -71,26 +64,12 @@ public class ConnectionFactory {
     }
     private ConnectionFactory() {}
     
-    public static Connection getMainMsDataConnection() throws SQLException {
-//        return UploadDAOFactory.getInstance().getConnection();
-        return mainMsData.getConnection();
-    }
-    
-//    public static Connection getTempMsDataConnection() throws SQLException {
-////        return UploadDAOFactory.getInstance().getTempDbConnection();
-//        return tempMsData.getConnection();
-//    }
-    
     public static Connection getNrseqConnection() throws SQLException {
-//      return UploadDAOFactory.getInstance().getConnection();
-      return nrseq.getConnection();
-  }
+    	return nrseqDataSource.getConnection();
+    }
   
     public static Connection getMsDataConnection() throws SQLException {
-//        if(MsDataUploadProperties.uploadToTempTables())
-//            return getTempMsDataConnection();
-//        else
-        return getMainMsDataConnection();
+    	return msDataDataSource.getConnection();
     }
     
     private static DataSource setupDataSource(String dbUrl, String user, String password) {
@@ -109,25 +88,25 @@ public class ConnectionFactory {
     }
     
     public static String masterDbName() {
-        return mainDbName;
-    }
-    
-    public static String tempDbName() {
-        return tempDbName;
+        return msDataDbName;
     }
     
     public static String nrseqDbName() {
         return nrseqDbName;
     }
     
-    public static DataSource getDataSource(String dbName) {
-        String dbUrl = "jdbc:mysql://localhost/"+dbName;
+    public static DataSource getNrseqDataSource() {
+    	return nrseqDataSource;
+    }
+    
+    public static DataSource getDataSource(String host, String dbName, String user, String password) {
+    	String dbUrl = "jdbc:mysql://"+host+"/"+dbName;
         DataSource ds = setupDataSource(dbUrl, user, password);
         return ds;
     }
     
-    public static Connection getConnection(String dbName) throws SQLException {
-        String dbUrl = "jdbc:mysql://localhost/"+dbName;
+    public static Connection getConnection(String host, String dbName, String user, String password) throws SQLException {
+        String dbUrl = "jdbc:mysql://"+host+"/"+dbName;
         DataSource ds = setupDataSource(dbUrl, user, password);
         return ds.getConnection();
     }

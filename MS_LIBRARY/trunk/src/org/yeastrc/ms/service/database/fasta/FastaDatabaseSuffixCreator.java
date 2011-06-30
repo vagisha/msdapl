@@ -29,12 +29,12 @@ import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 import org.yeastrc.nrseq.domain.NrDbProteinFull;
 
 /**
- * 
+ * NOTE: This class is no longer used.
  */
 public class FastaDatabaseSuffixCreator {
 
     public static final int SUFFIX_LENGTH = 4;
-    private String nrseqDbName;
+    //private String nrseqDbName;
     private DataSource nrseqDs;
     
     private String dbTableName;
@@ -53,8 +53,7 @@ public class FastaDatabaseSuffixCreator {
         log.info("\n\nCreating suffix table for databaseID: "+databaseId);
         
         // set up our datasource
-        nrseqDbName = ConnectionFactory.nrseqDbName();
-        nrseqDs = ConnectionFactory.getDataSource(nrseqDbName);
+        nrseqDs = ConnectionFactory.getNrseqDataSource();
         
         suffixCache = new ArrayList<Suffix>();
         

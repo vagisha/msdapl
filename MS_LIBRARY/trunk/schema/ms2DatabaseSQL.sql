@@ -226,7 +226,7 @@ ALTER TABLE msRunSearchResult add index (runSearchID, scanID);
 
 CREATE TABLE msProteinMatch (
     resultID INT UNSIGNED NOT NULL,
-    accession VARCHAR(255) NOT NULL
+    accession VARCHAR(500) NOT NULL
 )
 PARTITION BY KEY(resultID)
 PARTITIONS 100;
@@ -248,7 +248,6 @@ CREATE TABLE SQTSpectrumData (
 );
 ALTER TABLE SQTSpectrumData ADD INDEX(scanID, runSearchID);
 ALTER TABLE SQTSpectrumData ADD INDEX (runSearchID);
-# ALTER TABLE SQTSpectrumData ADD INDEX (charge);
 
 CREATE TABLE SQTFileHeader (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
