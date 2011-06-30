@@ -39,9 +39,10 @@ public class MsDataUploadProperties {
             props.load(reader);
             String value = props.getProperty("db.peakdata.storage");
             peakStorageType = PeakStorageType.instance(value);
-            log.info("PeakStorageType is "+peakStorageType.name());
+            if(peakStorageType != null)
+            	log.info("PeakStorageType is "+peakStorageType.name());
             
-            value = props.getProperty("dao.ibatis");
+            value = props.getProperty("dao.ibatis", "true");
             if(value != null) {
             	useIbatisDAO = Boolean.parseBoolean(value);
             }
