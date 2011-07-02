@@ -22,7 +22,7 @@ fi
 # Make sure we get all the required parameters
 if [ $# -lt 4 ] ; then
 	
-	echo "Usage: $0 base_dir mysql_host mysql_username [mysql_password]";
+	echo "Usage: $0 java_exe_location javac_exe_location base_dir mysql_host mysql_username [mysql_password]";
 	exit 1; 
 fi
 

@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -201,7 +202,11 @@ public class MainDbInitializer {
 				rs.moveToInsertRow();
 				rs.updateInt("researcherID", researcherId);
 				rs.updateString("username", login);
-				rs.updateString("password", password);
+				MessageDigest md5 = MessageDigest.getInstance("MD5");
+				md5.reset();
+				md5.update(password.getBytes());
+				byte[] digest = md5.digest();
+				rs.updateString("password", toHex(digest));
 				rs.insertRow();
 			}
 			
@@ -212,6 +217,40 @@ public class MainDbInitializer {
 			if(rs != null) try {rs.close();} catch(SQLException e){}
 		}
 		
+	}
+	
+	/**
+	 * Turns array of bytes into string representing each byte as
+	 * a two digit unsigned hex number.
+	 * 
+	 * @param hash Array of bytes to convert to hex-string
+	 * @return  Generated hex string
+	 */
+	private static String toHex(byte byte_arr[]){
+		
+//		StringBuffer hexString = new StringBuffer();
+//		for (int i=0;i<byte_arr.length;i++) {
+//			String hex = Integer.toHexString(0xFF & byte_arr[i]);
+//			if(hex.length()==1)
+//				hexString.append('0');
+//
+//			hexString.append(hex);
+//		}
+//		System.out.println(hexString.toString());
+//		return hexString.toString();
+		
+		StringBuffer buf = new StringBuffer(byte_arr.length * 2);
+		for (int i=0; i<byte_arr.length; i++){
+			int intVal = byte_arr[i] & 0xff;
+			if (intVal < 0x10){
+				// append a zero before a one digit hex 
+				// number to make it two digits.
+				buf.append("0");
+			}
+			buf.append(Integer.toHexString(intVal));
+		}
+		//System.out.println(buf.toString());
+		return buf.toString();
 	}
 
 	private int createGroup(String groupName, String groupDesc) throws SQLException {
