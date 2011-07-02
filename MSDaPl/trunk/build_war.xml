@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." name="MSDaPl context.xml Writer" default="package_war">
+<project basedir="." name="MSDaPl package maker" default="package_war">
 
+	<property name="target" value="1.6"/>
+	<property name="source" value="1.6"/>
+	
 	<property name="war_file_name" value="msdapl.war" />
 	<property name="war_file" value="${basedir}${file.separator}${war_file_name}"/>
 	
@@ -14,15 +17,21 @@
 	
 	<property name="web_xml" value="${webinf_dir}${file.separator}web.xml" />
 	
+	<!-- ================================================================================== -->
+	<!-- jars required only for compiling. Should not be packaged with the .war -->
+	<!-- ================================================================================== -->
+	<property name="libs_for_compile" value="${basedir}${file.separator}lib" />
+	
+	
+	
+	<!-- ================================================================================== -->
 	<!-- Package the war -->
+	<!-- ================================================================================== -->
 	<target name="package_war" depends="compile"
 		description="Packages the project as a deployable war file">
 		
 		<war destfile="${war_file}" webxml="${web_xml}">
-			<lib dir="${lib_dir}">
-				<exclude name="ant-contrib-1.0b3.jar"/>
-				<exclude name="ant.jar"/>
-			</lib>
+			<lib dir="${lib_dir}"></lib>
 			<classes dir="${classes_dir}" />
 			<metainf dir="${metainf_dir}" />
 			<webinf dir="${webinf_dir}" />
@@ -32,35 +41,45 @@
 	
 	</target>
 
+	<!-- ================================================================================== -->
 	<!-- Remove classes directory for clean build -->
+	<!-- ================================================================================== -->
     <target name="clean" description="Prepare for clean build">
       <delete dir="${classes_dir}"/>
       <mkdir  dir="${classes_dir}"/>
     </target>
 
+	
+
+	<!-- ================================================================================== -->
+	<!-- Normal build of application -->
+	<!-- ================================================================================== -->
+    <target name="compile" depends="clean,prepare,resources">
+    	<echo message="${toString:compile.classpath}"/>
+        <javac debug="on" srcdir="${src_dir}" destdir="${classes_dir}" source="${source}" target="${target}">
+            <classpath refid="compile.classpath"/>
+        </javac>
+    </target>
+	
 	<!-- classpath  -->
     <path id="compile.classpath">
     	<fileset dir="${lib_dir}">
         	<include name="**/*.jar"/>
       	</fileset>
+    	<fileset dir="${libs_for_compile}">
+    		<include name="**/*.jar"/>
+    	</fileset>
         <pathelement path ="${classes_dir}"/>
-        <pathelement path ="${classpath}"/>
     </path>
-
-	<!-- Normal build of application -->
-    <target name="compile" depends="prepare,resources">
-    	<echo>"${classpath}"</echo>
-        <javac srcdir="src" destdir="classes">
-            <classpath refid="compile.classpath"/>
-        </javac>
-    </target>
 	
 	<!-- Check timestamp on files -->
     <target name="prepare">
         <tstamp/>
     </target>
 	
+	<!-- ================================================================================== -->
 	<!-- Copy any resource or configuration files -->
+	<!-- ================================================================================== -->
     <target name="resources">
         <copy todir="${classes_dir}" includeEmptyDirs="no">
             <fileset dir="${src_dir}">
@@ -71,8 +90,6 @@
             </fileset>
         </copy>
     </target>
-
-
 
 	
 </project>

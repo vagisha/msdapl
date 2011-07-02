@@ -7,37 +7,6 @@
 <struts-config>
 
 
-<!--
-<data-sources>
-	<data-source type="org.apache.commons.dbcp.BasicDataSource">
-	    <set-property
-	      property="driverClassName"
-	      value="com.mysql.jdbc.Driver" />
-	    <set-property
-	      property="url"
-	      value="jdbc:mysql://localhost/yrc?autoReconnect=true" />
-	    <set-property
-	      property="username"
-	      value="mriffle" />
-	    <set-property
-	      property="password"
-	      value="gh13*zX" />
-	    <set-property
-	      property="maxActive"
-	      value="10" />
-	    <set-property
-	      property="maxWait"
-	      value="5000" />
-	    <set-property
-	      property="defaultAutoCommit"
-	      value="false" />
-	    <set-property
-	      property="defaultReadOnly"
-	      value="false" />
-	</data-source>
-</data-sources>
--->
-
 
 <!-- ======================================== Form Bean Definitions -->
     <form-beans>
