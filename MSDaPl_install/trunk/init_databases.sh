@@ -34,11 +34,10 @@ sh init_yrc_nrseq.sh $java_location $base_dir $db_host $db_user $db_passwd
 # sh init_mygo.sh $base_dir $db_host $db_user $db_passwd 
 
 # Initialize species specific databases
-# sh init_biodb.sh $db_user $use_db_passwd $base_dir
-# sh create_biodb.sh $base_dir $db_host $db_user $db_passwd 
+sh create_biodb.sh $base_dir $db_host $db_user $db_passwd 
 
 # Create the MSDaPl databases
-sh init_msdapl_databases.sh $java_location $javac_location $base_dir $db_host $db_user $db_passwd 
+sh init_msdapl_databases.sh $java $javac $base_dir $db_host $db_user $db_passwd 
 
 
 exit 0
