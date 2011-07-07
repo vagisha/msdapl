@@ -10,7 +10,7 @@
 	<!-- Add the ant-contrib task definitions -->
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
   		<classpath>
-    		<pathelement location="${basedir}${file.separator}WebRoot${file.separator}WEB-INF${file.separator}lib${file.separator}ant-contrib-1.0b3.jar"/>
+    		<pathelement location="${basedir}${file.separator}lib${file.separator}ant-contrib-1.0b3.jar"/>
   		</classpath>
 	</taskdef>
 	

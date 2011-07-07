@@ -9,12 +9,19 @@
 
 package org.yeastrc.www.user;
 
-import java.util.*;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.List;
 
-import org.yeastrc.data.*;
-import org.yeastrc.db.*;
-import org.yeastrc.project.*;
+import org.yeastrc.data.IData;
+import org.yeastrc.data.InvalidIDException;
+import org.yeastrc.db.DBConnectionManager;
+import org.yeastrc.project.Project;
+import org.yeastrc.project.Projects;
+import org.yeastrc.project.Researcher;
 
 import com.Ostermiller.util.MD5;
 
@@ -101,7 +108,7 @@ public class User implements IData {
 				if (this.password != null) { rs.updateString("password", this.password); }
 				
 				if (this.lastLoginTime == null) { rs.updateNull("lastLoginTime"); }
-				else { rs.updateDate("lastLoginTime", this.lastLoginTime); }
+				else { rs.updateTimestamp("lastLoginTime", new Timestamp(this.lastLoginTime.getTime())); }
 
 				if (this.lastPasswordChange == null) { rs.updateNull("lastPasswordChange"); }
 				else { rs.updateDate("lastPasswordChange", this.lastPasswordChange); }
@@ -126,7 +133,7 @@ public class User implements IData {
 				if (this.password != null) { rs.updateString("password", this.password); }
 				
 				if (this.lastLoginTime == null) { rs.updateNull("lastLoginTime"); }
-				else { rs.updateDate("lastLoginTime", this.lastLoginTime); }
+				else { rs.updateTimestamp("lastLoginTime", new Timestamp(this.lastLoginTime.getTime())); }
 
 				if (this.lastPasswordChange == null) { rs.updateNull("lastPasswordChange"); }
 				else { rs.updateDate("lastPasswordChange", this.lastPasswordChange); }
@@ -207,7 +214,7 @@ public class User implements IData {
 			this.id = rs.getInt("researcherID");
 			this.username = rs.getString("username");
 			this.password = rs.getString("password");
-			this.lastLoginTime = rs.getDate("lastLoginTime");
+			this.lastLoginTime = rs.getTimestamp("lastLoginTime");
 			this.lastLoginIP = rs.getString("lastLoginIP");
 			this.lastPasswordChange = rs.getDate("lastPasswordChange");
 			
@@ -421,7 +428,7 @@ public class User implements IData {
 	private Researcher researcher;
 	
 	// The last time they logged in
-	private java.sql.Date lastLoginTime;
+	private java.util.Date lastLoginTime;
 	
 	// The last time they changed their password
 	private java.sql.Date lastPasswordChange;
