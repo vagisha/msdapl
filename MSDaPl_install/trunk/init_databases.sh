@@ -24,20 +24,35 @@ fi
 
 base_dir=`pwd`
 
-# Write properties file
-sh create_properties_files.sh $base_dir $db_host $db_user $db_passwd 
+# Initialize species specific databases
+echo "init_biodb.sh $java $base_dir $db_host $db_user "
+# sh init_biodb.sh $java $base_dir $db_host $db_user $db_passwd
+STATUS=$?
+if [ $STATUS -gt 0 ] ; then
+	echo "There was an error initializing databases"
+	exit 1;
+fi
+echo ""
 
 # Initialize YRC_NRSEQ
-sh init_yrc_nrseq.sh $java_location $base_dir $db_host $db_user $db_passwd 
+echo "sh init_yrc_nrseq.sh $java $base_dir $db_host $db_user"
+# sh init_yrc_nrseq.sh $java $base_dir $db_host $db_user $db_passwd 
+STATUS=$?
+if [ $STATUS -gt 0 ] ; then
+	echo "There was an error initializing YRC_NRSEQ database"
+	exit 1;
+fi
+echo ""
+
 
 # Initialize GO database
 # sh init_mygo.sh $base_dir $db_host $db_user $db_passwd 
 
-# Initialize species specific databases
-sh create_biodb.sh $base_dir $db_host $db_user $db_passwd 
+# Initialize the philiusData database
+# sh init_philiusData.sh $java $javac $base_dir $db_host $db_user $db_passwd
 
 # Create the MSDaPl databases
-sh init_msdapl_databases.sh $java $javac $base_dir $db_host $db_user $db_passwd 
+# sh init_msdapl_databases.sh $java $javac $base_dir $db_host $db_user $db_passwd 
 
 
 exit 0

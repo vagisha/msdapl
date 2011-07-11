@@ -40,21 +40,32 @@ fi
 
 mysqldumpdir=$base_dir/mysqldump
 
-databases=(SangerPombe flybase wormbase sgd_static_201005 hgnc_static_200708 cgd_static_200704 go_human)
+databases=(SangerPombe flybase wormbase sgd hgnc cgd NCBI)
 # echo ${databases[@]}
 
 for database in "${databases[@]}"
 do
 	echo "Creating database $database"
-	gunzip $mysqldumpdir/$database.sql.gz
-	# echo "mysql $mysql_str < $mysqldumpdir/$database.sql"
-	mysql $mysql_str < $mysqldumpdir/$database.sql
-	gzip $mysqldumpdir/$database.sql
-	STATUS=$?
-	if [ $STATUS -gt 0 ] ; then
-		echo "There was an error create the database $database"
-		exit 1;
+	
+	if [ -f $mysqldumpdir/$database.sql.gz ] ; then
+		gunzip $mysqldumpdir/$database.sql.gz
 	fi
+	
+	if [ -f $mysqldumpdir/$database.sql ] ; then
+		
+		mysql $mysql_str < $mysqldumpdir/$database.sql
+		
+		STATUS=$?
+		if [ $STATUS -gt 0 ] ; then
+			echo "There was an error in creating the database $database"
+			exit 1;
+		fi
+		
+	else
+		echo "File not found: $mysqldumpdir/$database.sql"
+		exit 1
+	fi	
+		
 	echo ""
 done
 

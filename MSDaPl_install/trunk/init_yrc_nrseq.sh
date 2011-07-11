@@ -34,6 +34,20 @@ log_dir="$base_dir/logs"
 
 # java=/usr/bin/java
 
+#
+# CREATE THE PROPERTIES FILE
+#
+sh create_yrc_nrseq_db_properties.sh $base_dir $mysql_host $mysql_user $mysql_passwd
+STATUS=$?
+if [ $STATUS -gt 0 ] ; then
+	echo "There was an error creating file $props_file"
+        exit 1;
+fi
+
+
+# 
+# CREATE YRC_NRSEQ DATABASE
+# 
 mysql_str=""
 if [ "$mysql_passwd" != "" ] ; then
 	mysql_str="--host=$mysql_host --user=$mysql_user --password=$mysql_passwd"
@@ -43,10 +57,6 @@ else
 fi
 # echo "$mysql_str"
 
-
-# 
-# CREATE YRC_NRSEQ DATABASE
-# 
 echo "Creating YRC_NRSEQ"
 mysql $mysql_str < $schema_dir/YRC_NRSEQ.sql
 
@@ -62,57 +72,94 @@ echo ""
 # UPLOAD THE STANDARD FASTA FILES
 # 
 
-#-------------------------------------------------
-# SDG fasta file
-#-------------------------------------------------
-echo "Uploading SGD fasta file"
-echo "$java -classpath $base_dir -jar $java_dir/fastaparser.jar SGD $fasta_dir/SGD.fasta"
+# databases=(SGD WormBase FlyBase IPI_HUMAN HGNC SwissProt)
+databases=(SGD WormBase FlyBase IPI_HUMAN SwissProt)
 
-$java -jar $java_dir/fastaparser.jar SGD $fasta_dir/SGD.fasta > $log_dir/SGD.fastaparser.out
-STATUS=$?
-if [ $STATUS -gt 0 ] ; then
-	echo "There was an error uploading SGD.fasta. Please look at $log_dir/SGD.fastaparser.out for more details."
-        exit 1;
-fi
-echo "Done uploading SGD fasta file."
+# echo ${databases[@]}
+
+jar="$java_dir/fastaparser.jar"
+
+
+# uncompress all fasta files in the firectory
+echo "gunzip $fasta_dir/*.gz"
+gunzip $fasta_dir/*.gz
 echo ""
 
-#-------------------------------------------------
-# WormBase fasta file
-#-------------------------------------------------
-echo "Uploading Wormbase fasta file"
-echo "$java -jar $java_dir/fastaparser.jar Wormbase $fasta_dir/WormBase.fasta"
-$java -classpath $base_dir -jar $java_dir/fastaparser.jar Wormbase $fasta_dir/WormBase.fasta > $log_dir/WormBase.fastaparser.out
-STATUS=$?
-if [ $STATUS -gt 0 ] ; then
-        echo "There was an error uploading WormBase.fasta. Please look at $log_dir/WormBase.fastaparser.out for details."
-        exit 1;
-fi
+for database in "${databases[@]}"
+do
+	echo "Uploading $database fasta file"
+	
+	
+	myfile="$fasta_dir/$database.fasta"
+	mylog="$log_dir/$database.fastaparser.out"
+	
+	
+	# if [ -f $myfile.gz ] ; then
+	# 	gunzip $myfile.gz
+	# fi
+	
+	if [ ! -f $myfile ] ; then
+		echo "File does not exist: $myfile"
+		exit 1;
+	fi
+	
+	
+	if [ $database = 'SGD' ] ; then
+		echo "$java -jar $jar --parser SGD --file $myfile > $mylog"
+	  	$java -jar $jar --parser SGD --file $myfile > $mylog
+		
+		# species='--species yeast'
+		# description="Saccharomyces Genome Database"
+	fi
+	if [ $database = 'WormBase' ] ; then
+		
+		echo "$java -jar $jar --parser Wormbase --file $myfile > $mylog"
+	  	$java -jar $jar --parser Wormbase --file $myfile > $mylog
+	
+		# species='--species worm'
+		# description="WormBase Database"
+	fi
+	if [ $database = 'FlyBase' ] ; then
+		
+		echo "$java -jar $jar --parser FlyBase --file $myfile > $mylog"
+	  	$java -jar $jar --parser FlyBase --file $myfile > $mylog
+	
+		# species='--species fly'
+		# description="FlyBase Database"	
+	fi
+	if [ $database = 'IPI_HUMAN' ] ; then
+		species='--species human'
+		description="Human IPI Database"
+		
+		echo "$java -jar $jar $species --name $database --description \"$description\" --file $myfile > $mylog"
+		$java -jar $jar $species --name $database --description "$description" --file $myfile > $mylog
+		
+	fi
+	if	 [ $database = 'SwissProt' ] ; then
+		
+		echo "$java -jar $jar --parser SwissProt --file $myfile > $mylog"
+	  	$java -jar $jar --parser SwissProt --file $myfile > $mylog
+	
+		# description="Swiss-Prot Database"
+	fi
+	
+	# if [ $database = 'HGNC' ] ; then
+	# 	species='--species human'
+	# 	description="HGNC(HUGO) Database"
+	# fi		
+	
+	
+	STATUS=$?
+	if [ $STATUS -gt 0 ] ; then
+		echo "There was an error uploading $database.fasta. Please look at $log_dir/$database.fastaparser.out for more details."
+	        exit 1;
+	fi
+	
+	# gzip $fasta_dir/$database.fasta
+	echo "Done uploading $database fasta file."
+	echo ""
+	
+done
 
-echo "Done uploading WormBase fasta file."
-echo ""
-
-
-#-------------------------------------------------
-# FlyBase fasta file
-#-------------------------------------------------
-echo "Uploading Flybase fasta file"
-echo "$java -jar $java_dir/fastaparser.jar FlyBase $fasta_dir/FlyBase.fasta"
-$java -classpath $base_dir -jar $java_dir/fastaparser.jar FlyBase $fasta_dir/FlyBase.fasta > $log_dir/FlyBase.fastaparser.out
-STATUS=$?
-if [ $STATUS -gt 0 ] ; then
-        echo "There was an error uploading FlyBase.fasta. Please look at $log_dir/FlyBase.fastaparser.out for details."
-        exit 1;
-fi
-
-echo "Done uploading FlyBase fasta file."
-echo ""
-
-
-echo "Uploading Human IPI fasta file"
-
-echo "Uploading HGNC fasta file"
-
-echo "Uploading SwissProt file"
 
 exit 0
