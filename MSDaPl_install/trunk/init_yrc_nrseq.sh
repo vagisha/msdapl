@@ -73,7 +73,7 @@ echo ""
 # 
 
 # databases=(SGD WormBase FlyBase IPI_HUMAN HGNC SwissProt)
-databases=(SGD WormBase FlyBase IPI_HUMAN SwissProt)
+databases=(SGD WormBase FlyBase IPI_HUMAN)
 
 # echo ${databases[@]}
 

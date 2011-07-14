@@ -30,5 +30,8 @@ echo "db.password=$mysql_passwd" >> $props_file
 echo "db.sgd.name=sgd" >> $props_file
 echo "db.wormbase.name=wormbase" >> $props_file
 echo "db.flybase.name=flybase" >> $props_file
+echo "db.hgnc.name=hgnc" >> $props_file
+echo "db.go.name=mygo" >> $props_file
+echo "db.nrseq.name=YRC_NRSEQ" >> $props_file
 
 exit 0

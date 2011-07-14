@@ -52,8 +52,8 @@ fi
 # echo "$mysql_str"
 
 
-databases=(sgd wormbase flybase hgnc)
-# databases=(hgnc)
+# databases=(sgd wormbase flybase hgnc uniprot)
+databases=(uniprot)
 # ---------------------------------------------------------------------------------
 # Create empty databases
 # ---------------------------------------------------------------------------------
@@ -111,11 +111,19 @@ do
 		$java -classpath $classpath org.yeastrc.flybase.FlyBaseAnnotationsTablesBuilder $synonymfile $genesummaryfile  $mapfile > $logfile
 		
 	fi
+	
 	if [ $database = 'hgnc' ] ; then
 		
 		# build hgnc_names
 		echo "$java -classpath $classpath org.yeastrc.hgnc.HGNCTableBuilder $dbdir/hgnc_downloads.cgi > $logfile"
 		$java -classpath $classpath org.yeastrc.hgnc.HGNCTableBuilder $dbdir/hgnc_downloads.cgi > $logfile
+	fi
+	
+	if [ $database = 'uniprot' ] ; then
+		
+		# build uniprot_name 
+		echo "$java -classpath $classpath org.yeastrc.uniprot.UniprotNameTableBuilder $dbdir/uniprot_sprot.dat > $logfile"
+	$java -classpath $classpath org.yeastrc.uniprot.UniprotNameTableBuilder $dbdir/uniprot_sprot.dat > $logfile
 	fi
 	
 	STATUS=$?

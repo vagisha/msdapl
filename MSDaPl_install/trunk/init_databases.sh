@@ -26,7 +26,7 @@ base_dir=`pwd`
 
 # Initialize species specific databases
 echo "init_biodb.sh $java $base_dir $db_host $db_user "
-# sh init_biodb.sh $java $base_dir $db_host $db_user $db_passwd
+sh init_biodb.sh $java $base_dir $db_host $db_user $db_passwd
 STATUS=$?
 if [ $STATUS -gt 0 ] ; then
 	echo "There was an error initializing databases"
@@ -46,7 +46,8 @@ echo ""
 
 
 # Initialize GO database
-# sh init_mygo.sh $base_dir $db_host $db_user $db_passwd 
+# echo "sh init_mygo.sh $java $base_dir $db_host $db_user"
+# sh init_mygo.sh $java $base_dir $db_host $db_user $db_passwd 
 
 # Initialize the philiusData database
 # sh init_philiusData.sh $java $javac $base_dir $db_host $db_user $db_passwd
