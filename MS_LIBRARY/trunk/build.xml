@@ -163,6 +163,12 @@
         <javac debug="on" srcdir="src" destdir="bin" source="${source}" target="${target}">
             <classpath refid="compile.classpath"/>
         </javac>
+    	<!-- copy the sqlmap xml files -->
+    	<copy todir="bin">
+    	    <fileset dir="src"
+    	             includes="**/*.xml" />
+    	</copy>
+
     </target>
 	
 	<!-- classpath  -->
