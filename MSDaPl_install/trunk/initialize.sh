@@ -36,8 +36,8 @@ echo ""
 # ---------------------------------------------------------------------------------
 # 2. Create all the databases required for MSDaPl
 # ---------------------------------------------------------------------------------
-# echo 'Creating MSDaPl databases'
-# sh init_msdapl_databases.sh
+echo 'Creating MSDaPl databases'
+sh init_msdapl_databases.sh
 STATUS=$?
 if [ $STATUS -gt 0 ] ; then
 	echo "There was an error in creating MSDaPl databases"
@@ -45,8 +45,8 @@ if [ $STATUS -gt 0 ] ; then
 fi
 echo ""
 
-# echo 'Creating protein database and other biological databases'
-# sh create_biodb.sh
+echo 'Creating protein database and other biological databases'
+sh create_biodb.sh
 STATUS=$?
 if [ $STATUS -gt 0 ] ; then
 	echo "There was an error in creating the protein and other biological databases"
