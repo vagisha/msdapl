@@ -37,7 +37,7 @@ cp log4j.properties $fastaparserdir
 #
 # CREATE THE PROPERTIES FILE
 #
-sh create_yrc_nrseq_db_properties.sh $fastaparserdir
+sh create_fasta_parser_properties.sh $fastaparserdir
 STATUS=$?
 if [ $STATUS -gt 0 ] ; then
 	echo "There was an error creating properties file"

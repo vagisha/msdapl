@@ -2,13 +2,19 @@ DROP DATABASE IF EXISTS mainDb;
 CREATE DATABASE mainDb;
 USE mainDb;
 
-# DROP TABLE IF EXISTS NCBI_Taxonomy;
-# CREATE TABLE NCBI_Taxonomy (
-#   id int(10) unsigned NOT NULL DEFAULT '0',
-#   name varchar(255) NOT NULL DEFAULT '',
-#   PRIMARY KEY (id),
-#   KEY name (name)
-# );
+DROP TABLE IF EXISTS NCBI_Taxonomy;
+CREATE TABLE NCBI_Taxonomy (
+  id int(10) unsigned NOT NULL DEFAULT '0',
+  name varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (id),
+  KEY name (name)
+);
+
+
+CREATE TABLE tblLabDirector (
+  groupID int(10) unsigned NOT NULL,
+  researcherID int(10) unsigned NOT NULL
+);
 
 
 DROP TABLE IF EXISTS grants;

@@ -5,7 +5,6 @@
 # ---------------------------------------------------------------------------------
 
 # source the properties
-# Don't use shell-hostile constructs in the shell-readable properties file!
 . config.properties
 
 host=$db_host
@@ -36,15 +35,15 @@ echo "db.mainDb.dbname=mainDb" >> msdapl_db.properties
 echo "db.mainDb.jndiname=yrc" >> msdapl_db.properties
 echo "db.YRC_NRSEQ.dbname=YRC_NRSEQ" >> msdapl_db.properties
 echo "db.YRC_NRSEQ.jndiname=nrseq" >> msdapl_db.properties
-echo "db.sgd.dbname=sgd_static_201005" >> msdapl_db.properties
+echo "db.sgd.dbname=sgd" >> msdapl_db.properties
 echo "db.sgd.jndiname=sgd" >> msdapl_db.properties
-echo "db.go.dbname=mygo_201005" >> msdapl_db.properties
+echo "db.go.dbname=mygo" >> msdapl_db.properties
 echo "db.go.jndiname=go" >> msdapl_db.properties
 echo "db.wormbase.dbname=wormbase" >> msdapl_db.properties
 echo "db.wormbase.jndiname=wormbase" >> msdapl_db.properties
 echo "db.flybase.dbname=flybase" >> msdapl_db.properties
 echo "db.flybase.jndiname=flybase" >> msdapl_db.properties
-echo "db.hgnc.dbname=hgnc_static_200708" >> msdapl_db.properties
+echo "db.hgnc.dbname=hgnc" >> msdapl_db.properties
 echo "db.hgnc.jndiname=hgnc" >> msdapl_db.properties
 echo "db.philiusData.dbname=philiusData" >> msdapl_db.properties
 echo "db.go_human.dbname=go_human" >> msdapl_db.properties

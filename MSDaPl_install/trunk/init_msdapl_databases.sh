@@ -7,26 +7,16 @@
 # 3. jobQueue (this database stores information related to upload jobs)
 # ---------------------------------------------------------------------------------
 
-java=$1;
-javac=$2
-base_dir=$3;
-mysql_host=$4; # host name
-mysql_user=$5; # MySQL username
-mysql_passwd=$6; # MySQL password
+# source the properties
+. config.properties
 
 
-if [ $# -lt 6 ] ; then
-	mysql_passwd=""
-fi
+base_dir="."
 
-# Make sure we get all the required parameters
-if [ $# -lt 5 ] ; then
-	
-	echo "Usage: $0 java_exe_location javac_exe_location base_dir mysql_host mysql_username [mysql_password]";
-	exit 1; 
-fi
+mysql_host=$db_host; # host name
+mysql_user=$db_user; # MySQL username
+mysql_passwd=$db_passwd; # MySQL password
 
-schema_dir=${base_dir}/schema
 
 mysql_str=""
 if [ "$mysql_passwd" != "" ] ; then
@@ -38,6 +28,8 @@ fi
 # echo "$mysql_str"
 
 
+schema_dir=$base_dir/schema
+mysqldump_dir=$base_dir/mysqldump
 
 databases=(msData mainDb jobQueue)
 # echo ${databases[@]}
@@ -50,19 +42,46 @@ do
 
 	STATUS=$?
 	if [ $STATUS -gt 0 ] ; then
-		echo "There was an error create the database $database"
+		echo "There was an error in creating the database $database"
 		exit 1;
 	fi
+	
+	if [ $database = 'msData' ] ; then
+		echo "creating msData summary tables"
+		mysql $mysql_str  $database < $schema_dir/msData_summary_tables.sql
+		
+		STATUS=$?
+		if [ $STATUS -gt 0 ] ; then
+			echo "There was an error in creating msData summary tables"
+			exit 1;
+		fi
+	fi
+	
+	if [ $database = 'mainDb' ] ; then	
+		echo "creating NCBI_Taxonomy table in mainDb"
+		mysql $mysql_str  $database < $mysqldump_dir/NCBI_Taxonomy.sql
+		
+		STATUS=$?
+		if [ $STATUS -gt 0 ] ; then
+			echo "There was an error in creating NCBI_Taxonomy table in mainDb"
+			exit 1;
+		fi
+		
+	fi
+	
 	echo ""
+	
 done
 
 # Initialize the mainDb database
 # Create "administrators" group and one group for the lab
 # Create one admin user and one normal user
 java_dir="$base_dir/java"
-cd $java_dir
 echo "Initializing mainDb database"
+cd $java_dir
 $javac MainDbInitializer.java
-$java -classpath .:./mysql-connector-java-5.1.6-bin.jar:/Users/silmaril/WORK/UW/MSDaPl_install/ MainDbInitializer
+cd ../
+echo "$java -classpath .:.$java_dir:$java_dir/lib/mysql-connector-java-5.1.6-bin.jar MainDbInitializer"
+$java -classpath .:$java_dir:$java_dir/lib/mysql-connector-java-5.1.6-bin.jar MainDbInitializer
 
 exit 0

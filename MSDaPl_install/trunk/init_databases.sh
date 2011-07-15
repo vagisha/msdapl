@@ -7,7 +7,6 @@
 # ---------------------------------------------------------------------------------
 
 # source the properties
-# Don't use shell-hostile constructs in the shell-readable properties file!
 . config.properties
 
 echo "MySQL host: $db_host"

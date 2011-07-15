@@ -2,31 +2,29 @@
 
 # ---------------------------------------------------------------------------------
 # A script to create the following databases from mysqldumps:
-# 1. SangerPombe
-# 2. flybase
+# 1. NCBI
+# 2. sgd
 # 3. wormbase
-# 4. sgd_static_201005
-# 5. hgnc_static_200708
-# 6. cgd_static_200704
-# 7. go_human
+# 4. flybase
+# 5. SangerPombe
+# 6. cgd
+# 7. hgnc
+# 8. go_human
+# 9. philiusData
+# 10. YRC_NRSEQ
+# 11. mygo
 # ---------------------------------------------------------------------------------
 
-base_dir=$1;
-mysql_host=$2; # host name
-mysql_user=$3; # MySQL username
-mysql_passwd=$4; # MySQL password
+# source the properties
+. config.properties
 
 
-if [ $# -lt 4 ] ; then
-	mysql_passwd=""
-fi
+base_dir="."
 
-# Make sure we get all the required parameters
-if [ $# -lt 3 ] ; then
-	
-	echo "Usage: $0 base_dir mysql_host mysql_username [mysql_password]";
-	exit 1; 
-fi
+mysql_host=$db_host; # host name
+mysql_user=$db_user; # MySQL username
+mysql_passwd=$db_passwd; # MySQL password
+
 
 mysql_str=""
 if [ "$mysql_passwd" != "" ] ; then
@@ -40,7 +38,7 @@ fi
 
 mysqldumpdir=$base_dir/mysqldump
 
-databases=(SangerPombe flybase wormbase sgd hgnc cgd NCBI)
+databases=(NCBI sgd wormbase flybase SangerPombe cgd hgnc go_human philiusData YRC_NRSEQ mygo)
 # echo ${databases[@]}
 
 for database in "${databases[@]}"

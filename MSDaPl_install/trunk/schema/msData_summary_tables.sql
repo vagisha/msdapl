@@ -81,22 +81,6 @@ CREATE TABLE proteinProphetRunSummary (
   minSpectrumCount INT unsigned NOT NULL,
   maxSpectrumCount INT unsigned NOT NULL
 ); 
-
- CREATE TABLE proteinInferProteinSummary (
-  piRunID INT unsigned NOT NULL,
-  piProteinID INT UNSIGNED NOT NULL PRIMARY KEY,
-  nrseqProteinID INT UNSIGNED NOT NULL PRIMARY KEY,
-  peptideCount INT UNSIGNED NOT NULL,
-  uniqPeptideCount INT UNSIGNED NOT NULL,
-  ionCount INT UNSIGNED NOT NULL,
-  uniqueIonCount INT UNSIGNED NOT NULL,
-  psmCount INT UNSIGNED NOT NULL,
-  spectrumCount INT UNSIGNED NOT NULL,
-  peptDef_peptideCount INT UNSIGNED NOT NULL,
-  peptDef_uniqPeptideCount INT UNSIGNED NOT NULL
- );
- ALTER TABLE proteinInferProteinSummary ADD INDEX (piRunID);
- ALTER TABLE proteinInferProteinSummary ADD INDEX (nrseqProteinID, piRunID);
  
 # --------------------------------------------------------------------------------------------
 # ADD TRIGGERS

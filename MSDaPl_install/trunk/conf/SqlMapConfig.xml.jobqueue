@@ -15,7 +15,7 @@
 	<typeHandler jdbcType="CHAR" javaType="java.lang.Character" callback="CharTypeHandler"/>
 	
 	<transactionManager type="JDBC">
-		<dataSource type="DBCP"> 
+		<dataSource type="SIMPLE"> 
       		<property name="JDBC.Driver" 
                 value="${db.driver}"/> 
       		<property name="JDBC.ConnectionURL" 

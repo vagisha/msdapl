@@ -26,7 +26,13 @@ cp java/lib/mslib.jar $jobqueuedir/lib
 cp java/lib/commons-dbcp-1.2.2.jar $jobqueuedir/lib
 cp java/lib/commons-pool-1.4.jar $jobqueuedir/lib
 cp java/lib/commons-collections-3.2.1.jar $jobqueuedir/lib
+cp java/lib/commons-codec-1.4.jar $jobqueuedir/lib
+cp java/lib/ibatis-2.3.0.677.jar $jobqueuedir/lib
 cp java/lib/log4j-1.2.15.jar $jobqueuedir/lib
+cp java/lib/mail.jar $jobqueuedir/lib
+cp java/lib/yrc_utils.jar $jobqueuedir/lib
+cp java/lib/yrc_nrseq.jar $jobqueuedir/lib
+cp java/lib/protinfer.jar $jobqueuedir/lib
 
 # create log4j.properties file
 sh create_jobqueue_log4j_properties.sh $jobqueuedir
