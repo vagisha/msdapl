@@ -240,18 +240,14 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
     		log.warn("Multiple search Ids found for protein inference ID: "+pinferId);
     	}
          
-    	// TODO If we have multiple searches for this protein inference make sure they all have the 
+    	// If we have multiple searches for this protein inference make sure they all have the 
     	// same enzyme and numEnzymaticTermini
         // get the search
-        MsSearch msSearch = searchDao.loadSearch(searchIds.get(0));
-        List<MsEnzyme> enzymes = msSearch.getEnzymeList();
+        List<MsEnzyme> enzymes = getSearchEnzymes(searchIds, pinferId);
         
-        int numEnzymaticTermini = 0; 
-        if(msSearch.getSearchProgram() == Program.SEQUEST) {
-        	numEnzymaticTermini = DAOFactory.instance().getSequestSearchDAO().getNumEnzymaticTermini(msSearch.getId());
-        }
-        else if(msSearch.getSearchProgram() == Program.MASCOT)
-        	numEnzymaticTermini = DAOFactory.instance().getMascotSearchDAO().getNumEnzymaticTermini(msSearch.getId());
+        int numEnzymaticTermini = getNumEnzymaticTermini(searchIds, pinferId);
+        
+        boolean clipNtermMet = getClipNtermMetionine(searchIds, pinferId);
 
         
         // Initialize the peptide protein matching service
@@ -268,9 +264,113 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         
         matchService.setDoItoLSubstitution(percParams.getIdPickerParams().isDoItoLSubstitution());
         matchService.setRemoveAsterisks(false);
+        matchService.setClipNtermMet(clipNtermMet);
         
         log.info("Initialized peptide protein matching service");
         return matchService;
+    }
+    
+    private boolean getClipNtermMetionine(List<Integer> searchIds, int pinferId) throws ResultGetterException {
+    	
+    	MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+    	
+    	
+    	boolean clipNtermMet = false;
+    	boolean first = true;
+    	
+    	for(int searchId: searchIds) {
+    		
+    		MsSearch msSearch = searchDao.loadSearch(searchId);
+    		
+    		boolean clip;
+    		
+    		if(msSearch.getSearchProgram() == Program.SEQUEST) {
+    			clip = DAOFactory.instance().getSequestSearchDAO().getClipNterMethionine(searchId);
+            }
+    		else
+    			clip = false;
+    		
+    		if(!first) {
+    			
+    			if(clipNtermMet != clip)
+    				throw new ResultGetterException("Value of clip_nterm_methionine was not the same for all searches. Protein inference ID: "+pinferId);
+    		}
+    		else {
+    			first = false;
+    			clipNtermMet = clip;
+    		}
+    	}
+        
+    	return clipNtermMet;
+    }
+
+    private int getNumEnzymaticTermini(List<Integer> searchIds, int pinferId) throws ResultGetterException {
+    	
+    	MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+    	
+    	int numEnzymaticTermini = -1; 
+    	
+    	for(int searchId: searchIds) {
+    		
+    		MsSearch msSearch = searchDao.loadSearch(searchId);
+    		
+    		int net = -1;
+    		
+    		if(msSearch.getSearchProgram() == Program.SEQUEST) {
+    			net = DAOFactory.instance().getSequestSearchDAO().getNumEnzymaticTermini(searchId);
+            }
+            else if(msSearch.getSearchProgram() == Program.MASCOT)
+            	net = DAOFactory.instance().getMascotSearchDAO().getNumEnzymaticTermini(searchId);
+    		
+            else {
+            	throw new ResultGetterException("Unknown search program: "+msSearch.getSearchProgram()+". Protein inference ID: "+pinferId);
+            }
+    		
+    		if(numEnzymaticTermini != -1) {
+    			
+    			if(numEnzymaticTermini != net)
+    				throw new ResultGetterException("Number of enzymatic termini used for searches is not the same. Protein inference ID: "+pinferId);
+    		}
+    		else {
+    			numEnzymaticTermini = net;
+    		}
+    		
+    	}
+        
+    	return numEnzymaticTermini;
+    }
+    
+    private List<MsEnzyme> getSearchEnzymes(List<Integer> searchIds, int pinferId) throws ResultGetterException {
+    	
+    	MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+    	
+    	List<MsEnzyme> enzymes = null;
+    	
+    	
+    	for(int searchId: searchIds) {
+    		
+    		MsSearch msSearch = searchDao.loadSearch(searchId);
+            List<MsEnzyme> searchEnzList = msSearch.getEnzymeList();
+            
+            if(enzymes != null) {
+            	
+            	if(enzymes.size() != searchEnzList.size()) {
+            		throw new ResultGetterException("Enzymes used for "+searchIds.size()+" searches do not match. Protein inference ID: "+pinferId);
+            	}
+            	
+            	for(MsEnzyme enzyme: searchEnzList) {
+            		
+            		if(!enzymes.contains(enzyme)) {
+            			throw new ResultGetterException("Enzyme "+enzyme.getName()+" used for searchID: "+searchId+" is not common to all searches. Protein inference ID: "+pinferId);
+            		}
+            	}
+            	
+            }
+            else
+            	enzymes = searchEnzList;
+    	}
+    	
+    	return enzymes;
     }
     
     private List<Integer> getDatabaseIdsForProteinInference(int pinferId) {
