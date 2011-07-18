@@ -33,6 +33,13 @@ public class PeptideProteinMatchingService {
     // If asterisks are not removed from the protein sequences, they are treated as the start or end of a protein.
     private boolean removeAsterisks = false;
     
+    // There is a new parameter in Sequest -- clip_nterm_methionine
+    // From Jimmy's email (July 14, 2011)
+    // In the latest version, there is a new parameter "clip_nterm_methionine" which will analyze a protein 
+    // with and w/o the n-term methionine. ÊSo two forms of the protein are analyzed independently presuming 
+    // two different n-termini. ÊWas a feature requested by the Villen lab.
+    private boolean clipNtermMethionine = false;
+    
     private Map<String, List<Integer>> suffixMap;
     
     private Map<String, Integer> suffixIdMap;
@@ -103,6 +110,10 @@ public class PeptideProteinMatchingService {
     public void setRemoveAsterisks(boolean removeAsterisks) {
     	this.removeAsterisks = removeAsterisks;
     }
+    
+    public void setClipNtermMet(boolean clipNtermMethionine) {
+    	this.clipNtermMethionine = clipNtermMethionine;
+    }
 
 	public int getNumEnzymaticTermini() {
         return this.numEnzymaticTermini;
@@ -126,6 +137,7 @@ public class PeptideProteinMatchingService {
         // find the best protein peptide match based on the given enzyme and num enzymatic termini criteria
         List<PeptideProteinMatch> matchingProteins = new ArrayList<PeptideProteinMatch>(dbProtIds.size());
         log.debug("Number of matching proteins for peptide : "+peptide+" before applying enzyme rules: "+dbProtIds.size());
+        
         for(int dbProtId: dbProtIds) {
             NrDbProtein dbProt = NrSeqLookupUtil.getDbProtein(dbProtId);
             PeptideProteinMatch match = getPeptideProteinMatch(dbProt, peptide);
@@ -133,6 +145,7 @@ public class PeptideProteinMatchingService {
                 matchingProteins.add(match);
             }
         }
+        
         log.debug("Number of matches after applying emzyme rules: "+matchingProteins.size());
         if(matchingProteins.size() == 0) {
         	log.error("No matches found for peptide "+peptide+" after applying enzyme rules");
@@ -167,39 +180,70 @@ public class PeptideProteinMatchingService {
         while(idx != -1) {
             
             char nterm = idx == 0 ? '-' : sequence.charAt(idx - 1);
-            // With the update to Sequest we can have '*' characters in the middle of sequences
-            // We will treat them as the start  and end of a protein sequence.
-            // So If the peptide sequence matches *.PEPTR.X  we will treat this as a fully tryptic 
-            // peptide, or num enzymatic termini = 2;
-            if(!removeAsterisks) {
-            	nterm = nterm == '*' ? '-' : nterm;
-            }
-            char cterm = idx + peptide.length() == sequence.length() ? '-' : sequence.charAt(idx + peptide.length());
-            if(!removeAsterisks) {
-            	cterm = cterm == '*' ? '-' : cterm;
-            }
             
-            PeptideProteinMatch match = new PeptideProteinMatch();
-            match.setPeptide(peptide);
-            match.setPreResidue(nterm);
-            match.setPostResidue(cterm);
-            match.setProtein(dbProt);
+            char cterm = idx + peptide.length() == sequence.length() ? '-' : sequence.charAt(idx + peptide.length());
             
             if(enzymeRules.size() == 0) {
-                return match;
+                return makeMatch(peptide, nterm, cterm, 0, dbProt);
             }
+            
+            char ntermForCalcEnzTerm = nterm;
+            // Update to Sequest (May, 2011): Sequest no longer ignores '*' characters in the middle of protein sequences
+            // '*' characters are now treated as the start  and end of a protein sequence by Sequest.
+            // With this change, the protein substring that matches a peptide "PEPTR" can be "*PEPTR*",
+            // where the nterm and cterm characters are '*'.
+            // We will treat this (*.PEPTR.*) as a fully tryptic 
+            // peptide, or num enzymatic termini = 2;
+            if(!removeAsterisks) {
+            	ntermForCalcEnzTerm = nterm == '*' ? '-' : nterm;
+            }
+            
+            char ctermForCalcEnzTerm = cterm;
+            if(!removeAsterisks) {
+            	ctermForCalcEnzTerm = cterm == '*' ? '-' : cterm;
+            }
+            
+            
             // look at each enzyme rule and return the first match
             for(EnzymeRule rule: enzymeRules) {
-                int net = rule.getNumEnzymaticTermini(peptide, nterm, cterm);
+                int net = rule.getNumEnzymaticTermini(peptide, ntermForCalcEnzTerm, ctermForCalcEnzTerm);
                 if(net >= numEnzymaticTermini) {
-                    match.setNumEnzymaticTermini(net);
-                    return match;
+                    return makeMatch(peptide, nterm, cterm, net, dbProt);
                 }
             }
+            
+            // If we are here it means the match starting at the index "idx" did not satisfy the enzyme rules
+            // If the match index is 1, try again after clipping the nterm Methionine, if that option is 
+            // set to true
+            if(this.clipNtermMethionine && sequence.startsWith("M") && idx == 1) {
+            	
+
+            	// look at each enzyme rule again and return the first match
+            	for(EnzymeRule rule: enzymeRules) {
+            		// set nterm (pre-residue) to '-' so that it is treated as the beginning of the 
+            		// protein sequence.
+            		int net = rule.getNumEnzymaticTermini(peptide, '-', ctermForCalcEnzTerm);
+            		if(net >= numEnzymaticTermini) {
+            			return makeMatch(peptide, nterm, cterm, net, dbProt);
+            		}
+            	}
+            }
+            
             idx = sequence.indexOf(peptide, idx+1);
         }
         
         return null;
+    }
+    
+    private PeptideProteinMatch makeMatch(String peptide, char nterm, char cterm, int net, NrDbProtein dbProtein) {
+    	
+    	PeptideProteinMatch match = new PeptideProteinMatch();
+        match.setPeptide(peptide);
+        match.setPreResidue(nterm);
+        match.setPostResidue(cterm);
+        match.setProtein(dbProtein);
+        match.setNumEnzymaticTermini(net);
+        return match;
     }
     
     private List<Integer> getMatchingDbProteinIds(String peptide) throws PeptideProteinMatchingServiceException {

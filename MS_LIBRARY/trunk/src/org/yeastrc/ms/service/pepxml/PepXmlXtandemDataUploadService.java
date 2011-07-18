@@ -100,6 +100,11 @@ public class PepXmlXtandemDataUploadService extends PepXmlDataUploadService<PepX
     }
     
     @Override
+    protected boolean getClipNtermMethionine(int searchId) {
+        return false;
+    }
+    
+    @Override
     protected SearchFileFormat getSearchFileFormat() {
         return SearchFileFormat.PEPXML_MASCOT;
     }

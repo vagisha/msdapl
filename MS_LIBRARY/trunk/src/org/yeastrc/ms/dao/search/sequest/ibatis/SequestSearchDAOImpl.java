@@ -104,6 +104,21 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements SequestSearch
         return Integer.valueOf(val);
     }
     
+    @Override
+    public boolean getClipNterMethionine(int searchId) {
+    	
+    	String val = getSearchParamValue(searchId, "clip_nterm_methionine");
+        if(val == null)
+            return false;
+        
+        //  0=leave sequences as-is; 1=also consider sequence w/o N-term methionine
+        int intVal = Integer.valueOf(val);
+        if(intVal == 1)
+        	return true;
+        else
+        	return false;
+    }
+    
     
     @Override
     public int updateSearchProgramVersion(int searchId,

@@ -9,6 +9,7 @@ import junit.framework.TestCase;
 
 import org.yeastrc.ms.domain.general.EnzymeRule;
 import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.nrseq.domain.NrDbProtein;
 
 public class PeptideProteinMatchingServiceTest extends TestCase {
@@ -26,32 +27,7 @@ public class PeptideProteinMatchingServiceTest extends TestCase {
     	String proteinSequence = "PNWVKTYIKFLQNSNLGGIIPTVNGKPVRQITDDELTFLYNTFQIFAPSQFLPTWVKDILSVDYTDIMKILSKSIEK*MQSDT*QEANDIVTLANLQYNGSTPADAFETKVTNIIDR";
         String peptide = "MQSDTQEANDIVTLANLQYNGSTPADAFETK";
         
-        MsEnzyme enzyme = new MsEnzyme() {
-            @Override
-            public int getId() {
-                return 0;
-            }
-            @Override
-            public String getCut() {
-                return "KR";
-            }
-            @Override
-            public String getDescription() {
-                return null;
-            }
-            @Override
-            public String getName() {
-                return "Trypsin_K";
-            }
-            @Override
-            public String getNocut() {
-                return "P";
-            }
-
-            @Override
-            public Sense getSense() {
-                return Sense.CTERM;
-            }};
+        MsEnzyme enzyme = makeEnzyme();
             
         EnzymeRule rule = new EnzymeRule(enzyme);
         List<EnzymeRule> rules = new ArrayList<EnzymeRule>(1);
@@ -69,9 +45,9 @@ public class PeptideProteinMatchingServiceTest extends TestCase {
         dbProt.setDatabaseId(194);
         dbProt.setProteinId(532712);
         
+        PeptideProteinMatch match = null;
         // We are not removing asterisks. We should NOT find a match
         service.setRemoveAsterisks(false); 
-        PeptideProteinMatch match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
         match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
         assertNull(match);
         
@@ -139,32 +115,7 @@ public class PeptideProteinMatchingServiceTest extends TestCase {
         int minEnzymaticTermini = 1;
         String peptide = "MQSDTQEANDIVTLANLQYNGSTPADAFETK";
         
-        MsEnzyme enzyme = new MsEnzyme() {
-            @Override
-            public int getId() {
-                return 0;
-            }
-            @Override
-            public String getCut() {
-                return "KR";
-            }
-            @Override
-            public String getDescription() {
-                return null;
-            }
-            @Override
-            public String getName() {
-                return "Trypsin_K";
-            }
-            @Override
-            public String getNocut() {
-                return "P";
-            }
-
-            @Override
-            public Sense getSense() {
-                return Sense.CTERM;
-            }};
+        MsEnzyme enzyme = makeEnzyme();
             
         EnzymeRule rule = new EnzymeRule(enzyme);
         List<EnzymeRule> rules = new ArrayList<EnzymeRule>(1);
@@ -205,6 +156,251 @@ public class PeptideProteinMatchingServiceTest extends TestCase {
         assertNotNull(match);
         assertEquals(2, match.getNumEnzymaticTermini());
         
+	}
+    
+    public void testGetPeptideProteinMatch_clipntermM1() throws PeptideProteinMatchingServiceException {
+    	
+		String proteinSequence = "MEEEIAALVVDNGSGMCKAGFAGDDAPRAVFPSIVGRPRHQGVMVGMGQKDSYVGD";
+        int minEnzymaticTermini = 1;
+        String peptide = "EEEIAALVVDNGSGM";
+        
+        MsEnzyme enzyme = makeEnzyme();
+            
+        EnzymeRule rule = new EnzymeRule(enzyme);
+        List<EnzymeRule> rules = new ArrayList<EnzymeRule>(1);
+        rules.add(rule);
+        
+        PeptideProteinMatchingService service = new PeptideProteinMatchingService();
+        service.setEnzymeRules(rules);
+        service.setNumEnzymaticTermini(minEnzymaticTermini);
+        service.setDoItoLSubstitution(false);
+        service.setRemoveAsterisks(false);
+        
+        NrDbProtein dbProt = new NrDbProtein();
+        dbProt.setAccessionString("Dummy");
+        dbProt.setDatabaseId(0);
+        dbProt.setProteinId(0);
+        
+        PeptideProteinMatch match = null;
+        
+        // We are not clipping nterm 'M' we should NOT find a match
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNull(match);
+        
+        // We are clipping nterm 'M' we should fina a match
+        service.setClipNtermMet(true);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNotNull(match);
+	}
+    
+    public void testGetPeptideProteinMatch_clipntermM2() throws PeptideProteinMatchingServiceException {
+    	
+		String proteinSequence = "MEEEIAALVVDNGSGMCKAGFAGDDAPRAVFPSIVGRPRHQGVMVGMGEEEIAALVVDNGSGMQKDSYVGD";
+        String peptide = "EEEIAALVVDNGSGM";
+        
+        MsEnzyme enzyme = makeEnzyme();
+            
+        EnzymeRule rule = new EnzymeRule(enzyme);
+        List<EnzymeRule> rules = new ArrayList<EnzymeRule>(1);
+        rules.add(rule);
+        
+        PeptideProteinMatchingService service = new PeptideProteinMatchingService();
+        service.setEnzymeRules(rules);
+        service.setDoItoLSubstitution(false);
+        service.setRemoveAsterisks(false);
+        
+        NrDbProtein dbProt = new NrDbProtein();
+        dbProt.setAccessionString("Dummy");
+        dbProt.setDatabaseId(0);
+        dbProt.setProteinId(0);
+        
+        PeptideProteinMatch match = null;
+        
+        // Peptide is present twice in the protein sequence, once after the nterm Met, and once in the 
+        // middle of the sequence (non-tryptic)
+        
+        // Look for non-tryptic matches; we should find one
+        service.setNumEnzymaticTermini(0);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNotNull(match);
+        
+        // Look for semi-tryptic matches; We are not clipping nterm 'M'
+        // we should NOT find any matches
+        service.setNumEnzymaticTermini(1);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNull(match);
+        
+        // Look for semi-tryptic matches; 
+        // We are clipping nterm 'M' we should find a match
+        service.setClipNtermMet(true);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNotNull(match);
+        
+        // Look for fully tryptic matches;
+        // We are clipping nterm 'M'; we should NOT find any matches
+        service.setNumEnzymaticTermini(2);
+        service.setClipNtermMet(true);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNull(match);
+	}
+    
+    public void testGetPeptideProteinMatch_clipntermM3() throws PeptideProteinMatchingServiceException {
+    	
+		String proteinSequence = "MEEEI*AALVVDNGSGM*CKAGFAGDDAPRAVFPSIVGRPRHQGVMVGMGEEEIAALVVDNGSGM*QKDSYVGD";
+        String peptide = "EEEIAALVVDNGSGM";
+        
+        MsEnzyme enzyme = makeEnzyme();
+            
+        EnzymeRule rule = new EnzymeRule(enzyme);
+        List<EnzymeRule> rules = new ArrayList<EnzymeRule>(1);
+        rules.add(rule);
+        
+        PeptideProteinMatchingService service = new PeptideProteinMatchingService();
+        service.setEnzymeRules(rules);
+        service.setDoItoLSubstitution(false);
+        service.setRemoveAsterisks(false);
+        
+        NrDbProtein dbProt = new NrDbProtein();
+        dbProt.setAccessionString("Dummy");
+        dbProt.setDatabaseId(0);
+        dbProt.setProteinId(0);
+        
+        PeptideProteinMatch match = null;
+        
+        // Peptide is present twice in the protein sequence, once after the nterm Met, and once in the 
+        // middle of the sequence (non-tryptic)
+        
+        // Look for non-tryptic matches; we should find one
+        service.setNumEnzymaticTermini(0);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNotNull(match);
+        
+        // Look for semi-tryptic matches; We are not clipping nterm 'M'
+        // we should find a match (the one in the middle of the protein sequence since
+        // the residue at cterm is a '*' it will be treated as the end of the protein.  
+        service.setNumEnzymaticTermini(1);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNotNull(match);
+        
+        
+        // Look for semi-tryptic matches; We are not clipping nterm 'M'; We are removing '*'
+        // we should NOT find a match as neither match is semi-tryptic  
+        service.setNumEnzymaticTermini(1);
+        service.setRemoveAsterisks(true);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNull(match);
+        
+        // Look for semi-tryptic matches; We are clipping nterm 'M'; We are removing '*';
+        // we should  find a match  
+        service.setNumEnzymaticTermini(1);
+        service.setRemoveAsterisks(true);
+        service.setClipNtermMet(true);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNotNull(match);
+        
+	}
+    
+    public void testGetPeptideProteinMatch_clipntermM4() throws PeptideProteinMatchingServiceException {
+    	
+		String proteinSequence = "MEEEI*AALVVDNGSGR*CKAGFAGDDAPRAVFPSIVGRPRHQGVMVGMGEEEIAALVVDNGSGR*QKDSYVGD";
+        String peptide = "EEEIAALVVDNGSGR";
+        
+        MsEnzyme enzyme = makeEnzyme();
+            
+        EnzymeRule rule = new EnzymeRule(enzyme);
+        List<EnzymeRule> rules = new ArrayList<EnzymeRule>(1);
+        rules.add(rule);
+        
+        PeptideProteinMatchingService service = new PeptideProteinMatchingService();
+        service.setEnzymeRules(rules);
+        service.setDoItoLSubstitution(false);
+        service.setRemoveAsterisks(false);
+        
+        NrDbProtein dbProt = new NrDbProtein();
+        dbProt.setAccessionString("Dummy");
+        dbProt.setDatabaseId(0);
+        dbProt.setProteinId(0);
+        
+        PeptideProteinMatch match = null;
+        
+        // Peptide is present twice in the protein sequence, once after the nterm Met, and once in the 
+        // middle of the sequence (non-tryptic)
+        
+        // Look for non-tryptic matches; we should find one
+        service.setNumEnzymaticTermini(0);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNotNull(match);
+        
+        // Look for semi-tryptic matches; We are not clipping nterm 'M'
+        // we should find a match (the one in the middle of the protein sequence 
+        service.setNumEnzymaticTermini(1);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNotNull(match);
+        
+        
+        // Look for semi-tryptic matches; We are not clipping nterm 'M'; We are removing '*'
+        // we should find a match (the first one)  
+        service.setNumEnzymaticTermini(1);
+        service.setRemoveAsterisks(true);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNotNull(match);
+        
+        // Look for fully-tryptic matches; We are not clipping nterm 'M'; We are not removing '*';
+        // we should NOT find a match  
+        service.setNumEnzymaticTermini(2);
+        service.setRemoveAsterisks(false);
+        service.setClipNtermMet(false);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNull(match);
+        
+        // Look for fully-tryptic matches; We are clipping nterm 'M'; We are not removing '*';
+        // we should NOT find a match  
+        service.setNumEnzymaticTermini(2);
+        service.setRemoveAsterisks(false);
+        service.setClipNtermMet(true);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNull(match);
+        
+        // Look for fully-tryptic matches; We are clipping nterm 'M'; We are not removing '*';
+        // we should  find a match  
+        service.setNumEnzymaticTermini(2);
+        service.setRemoveAsterisks(true);
+        service.setClipNtermMet(true);
+        match = service.getPeptideProteinMatch(dbProt, peptide, proteinSequence);
+        assertNotNull(match);
+        
+	}
+
+
+	private MsEnzyme makeEnzyme() {
+		MsEnzyme enzyme = new MsEnzyme() {
+            @Override
+            public int getId() {
+                return 0;
+            }
+            @Override
+            public String getCut() {
+                return "KR";
+            }
+            @Override
+            public String getDescription() {
+                return null;
+            }
+            @Override
+            public String getName() {
+                return "Trypsin_K";
+            }
+            @Override
+            public String getNocut() {
+                return "P";
+            }
+
+            @Override
+            public Sense getSense() {
+                return Sense.CTERM;
+            }
+			};
+		return enzyme;
 	}
 
     // NOTE: COMMENTED OUT BECAUSE CREATING SUFFIX MAP TAKES A LONG TIME

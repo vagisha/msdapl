@@ -311,6 +311,8 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
     
     protected abstract int getNumEnzymaticTermini(int searchId);
     
+    protected abstract boolean getClipNtermMethionine(int searchId);
+    
     protected abstract SearchFileFormat getSearchFileFormat();
     
     // ----------------------------------------------------------------------------------------------------
@@ -622,12 +624,16 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
 
         
         int numEnzymaticTermini = 0; 
+        
+        
         // Sequest pepXML files have all protein matches regardless of NET
         if(search.getSearchProgram() == Program.SEQUEST)
         	numEnzymaticTermini = 0;
         else if(search.getSearchProgram() == Program.MASCOT)
         	numEnzymaticTermini = getNumEnzymaticTermini(searchId);
 
+        boolean clipNterMet = getClipNtermMethionine(searchId);
+        
         if(databases.size() != 1) {
             UploadException ex = new UploadException(ERROR_CODE.GENERAL);
             ex.setErrorMessage("Multiple search databases found for search: "+
@@ -649,6 +655,7 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         matchService.setNumEnzymaticTermini(numEnzymaticTermini);
         matchService.setEnzymes(enzymes);
         matchService.setDoItoLSubstitution(false);
+        matchService.setClipNtermMet(clipNterMet);
         matchService.setRemoveAsterisks(false); // '*' in a protein sequence will be treated as protein ends.
     }
 

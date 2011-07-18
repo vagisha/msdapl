@@ -235,6 +235,12 @@ public class PepXmlSequestDataUploadService extends PepXmlDataUploadService<PepX
         SequestSearchDAO seqDao = DAOFactory.instance().getSequestSearchDAO();
         return seqDao.getNumEnzymaticTermini(searchId);
     }
+    
+    @Override
+    protected boolean getClipNtermMethionine(int searchId) {
+        SequestSearchDAO seqDao = DAOFactory.instance().getSequestSearchDAO();
+        return seqDao.getClipNterMethionine(searchId);
+    }
 
     @Override
     protected PepXmlGenericFileReader<PepXmlSequestSearchScanIn, SequestPeptideProphetResultIn, SequestSearchResultIn, SequestSearchIn> getPepXmlReader() {

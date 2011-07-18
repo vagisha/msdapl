@@ -80,5 +80,19 @@ public class Enzyme implements MsEnzymeIn {
     public void setDescription(String description) {
         this.description = description;
     }
+    
+	@Override
+	public boolean equals(Object object) {
+		
+		if(object == null || !(object instanceof MsEnzymeIn))
+			return false;
+		
+		MsEnzymeIn that = (MsEnzymeIn) object;
+		
+		String mine = this.name+"_"+this.cut+"_"+this.nocut+"_"+this.sense.name()+"_"+this.description;
+		String other = that.getName()+"_"+that.getCut()+"_"+that.getNocut()+"_"+that.getSense().name()+"_"+that.getDescription();
+		
+		return mine.equals(other);
+	}
 
 }

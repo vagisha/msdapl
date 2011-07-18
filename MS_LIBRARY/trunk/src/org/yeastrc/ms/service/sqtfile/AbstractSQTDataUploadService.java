@@ -75,7 +75,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
 
     private DynamicModLookupUtil dynaModLookup;
 
-    static final int BUF_SIZE = 500;
+    static final int BUF_SIZE = 1000;
     static final int RESULT_BUF_SIZE = BUF_SIZE;
     
     // these are the things we will cache and do bulk-inserts
@@ -521,7 +521,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     		accSet.add(match.getAccession());
     	}
     	
-        // Find additional protein matches if required
+        // Do peptide to protein mapping now, if required
         if(doRefreshPeptideProteinMatches()) {
         	
         	String peptideSeq = result.getResultPeptide().getPeptideSequence();
@@ -533,9 +533,9 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
 					
 				} catch (PeptideProteinMatchingServiceException e) {
 					
-					log.error("Error getting matching proteins for peptide "+peptideSeq, e);
+					log.error("Error mapping peptides to proteins "+peptideSeq, e);
 					UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-                    ex.setErrorMessage("Error getting matching proteins for peptide "+peptideSeq+
+                    ex.setErrorMessage("Error mapping peptides to proteins "+peptideSeq+
                     		". Error was: "+e.getMessage());
                     throw ex;
 				}
@@ -829,10 +829,9 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         MsSearch search = DAOFactory.instance().getMsSearchDAO().loadSearch(searchId);
         List<MsEnzyme> enzymes = search.getEnzymeList();
         List<MsSearchDatabase> databases = search.getSearchDatabases();
+        
 
         
-        int numEnzymaticTermini = 0; 
-        // TODO What is the Tide parameter for this option? 
         if(databases.size() != 1) {
             UploadException ex = new UploadException(ERROR_CODE.GENERAL);
             ex.setErrorMessage("Multiple search databases found for search: "+
@@ -851,9 +850,19 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
             throw ex; 
         }
 
+        boolean clipNterMet = false;
+        // if this is a sequest search look for the clip_nterm_methionine parameter
+        if(search.getSearchProgram() == Program.SEQUEST) {
+        	clipNterMet = DAOFactory.instance().getSequestSearchDAO().getClipNterMethionine(searchId);
+        }
+        
+        int numEnzymaticTermini = 0; 
+        // TODO What is the Tide parameter for this option? 
+        
         matchService.setNumEnzymaticTermini(numEnzymaticTermini);
         matchService.setEnzymes(enzymes);
         matchService.setDoItoLSubstitution(false);
+        matchService.setClipNtermMet(clipNterMet);
         matchService.setRemoveAsterisks(false); // '*' in a protein sequence will be treated as protein ends.
     }
 

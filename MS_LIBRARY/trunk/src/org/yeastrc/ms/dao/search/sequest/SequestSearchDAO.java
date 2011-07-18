@@ -43,4 +43,12 @@ public interface SequestSearchDAO extends GenericSearchDAO <SequestSearchIn, Seq
      * @return
      */
     public abstract int getNumEnzymaticTermini(int searchId);
+    
+    /**
+     * Returns true if the search was done with the "clip_nterm_methionine" parameter set to 1.
+     * @param searchId
+     * @return
+     */
+    public abstract boolean getClipNterMethionine(int searchId);
+    	
 }
