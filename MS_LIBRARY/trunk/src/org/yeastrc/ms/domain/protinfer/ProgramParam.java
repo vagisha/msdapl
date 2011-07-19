@@ -190,6 +190,13 @@ public final class ProgramParam {
               "false", null,
               "If checked, I/L substitution will be allowed when determining protein matches for peptides. Ignored if \"Refresh Peptide Protein Matches\" is unchecked.");
         }
+        
+        public static ProgramParam makeRemoveAsterisksParam() {
+            return new ProgramParam(TYPE.BOOLEAN, 
+              "removeAsterisks", "Remove Asterisks (*)", 
+              "false", null,
+              "If checked, '*' characters are removed from sequences before determining protein matches for peptides. This option should be checked for data searched with versions of Sequest that ignored '*' characters in protein sequences");
+        }
     }
     
     public static abstract class ParamValidator {
