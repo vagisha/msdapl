@@ -100,6 +100,9 @@ public class IdPickerParamsMaker {
             else if(param.getName().equals("doItoLSubstitution")) {
             	idpParams.setDoItoLSubstitution(Boolean.parseBoolean(param.getValue()));
             }
+            else if(param.getName().equals("removeAsterisks")) {
+            	idpParams.setRemoveAsterisks(Boolean.parseBoolean(param.getValue()));
+            }
             else {
                 moreFilters.add(param);
             }

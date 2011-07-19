@@ -29,6 +29,7 @@ public class IDPickerParams {
     private boolean removeAmbiguousSpectra = true;
     private boolean refreshPeptideProteinMatches = false;
     private boolean doItoLSubstitution = false;
+    private boolean removeAsterisks = false;
     
     List<IdPickerParam> moreFilters = new ArrayList<IdPickerParam>();
     
@@ -51,6 +52,7 @@ public class IDPickerParams {
         buf.append("Remove Ambiguous Spectra: "+removeAmbiguousSpectra+"\n");
         buf.append("Refresh Protein Matches: "+refreshPeptideProteinMatches+"\n");
         buf.append("Allow I/L substitutions: "+doItoLSubstitution+"\n");
+        buf.append("Remove asterisks: "+removeAsterisks+"\n");
         buf.append("MORE PARAMS: \n");
         for(IdPickerParam param: moreFilters) {
             buf.append(param.toString()+"\n");
@@ -164,6 +166,12 @@ public class IDPickerParams {
 	}
 	public void setDoItoLSubstitution(boolean doItoLSubstitution) {
 		this.doItoLSubstitution = doItoLSubstitution;
+	}
+	public boolean isRemoveAsterisks() {
+		return removeAsterisks;
+	}
+	public void setRemoveAsterisks(boolean removeAsterisks) {
+		this.removeAsterisks = removeAsterisks;
 	}
 
 
