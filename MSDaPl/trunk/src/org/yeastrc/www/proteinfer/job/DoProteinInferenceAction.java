@@ -114,6 +114,24 @@ public class DoProteinInferenceAction extends Action {
             params.addParam(myParam);
         }
         
+        // If "Remove Asterisks (*)" was unchecked it may not be in the parameters list
+        // or its value will be empty. Set it to false.
+        boolean foundRemoveAsterisksParam = false;
+        ProgramParam removeAsterisksParam = ParamMaker.makeRemoveAsterisksParam();
+        for(Param param: params.getParamList()) {
+            if(param.getName().equals(removeAsterisksParam.getName())) {
+                if(param.getValue() == null || param.getValue().trim().length() == 0)
+                    param.setValue("false");
+                foundRemoveAsterisksParam = true;
+                break;
+            }
+        }
+        if(!foundRemoveAsterisksParam) {
+            Param myParam = new Param(removeAsterisksParam);
+            myParam.setValue("false");
+            params.addParam(myParam);
+        }
+        
         if(prinferForm.isIndividualRuns()) {
             ProteinferJobSaver.instance().saveMultiJobToDatabase(user.getID(), inputSummary, params, 
                     prinferForm.getInputType(), prinferForm.getComments());

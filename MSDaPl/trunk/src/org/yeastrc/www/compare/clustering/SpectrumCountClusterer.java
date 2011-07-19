@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.util.FileUtils;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nr_seq.listing.ProteinListing;
+import org.yeastrc.properties.ApplicationProperties;
 import org.yeastrc.www.compare.ComparisonProtein;
 import org.yeastrc.www.compare.DisplayColumns;
 import org.yeastrc.www.compare.ProteinComparisonDataset;
@@ -664,10 +665,10 @@ public class SpectrumCountClusterer {
 			writer.write("#!/bin/sh\n");
 			// read this: http://www.uni-koeln.de/rrzk/server/documentation/modules.html
 			// writer.write(". /etc/profile.d/modules.sh\n");
-			//writer.write("module load modules modules-init modules-gs R\n");
-			writer.write("/net/gs/vol3/software/bin/R --vanilla --slave --file="+pathToRScript+"\n");
-			//writer.write("R --vanilla --slave --file="+pathToRScript+"\n");
-			//writer.write(ApplicationProperties.getRPath()+" --vanilla --slave --file="+pathToRScript+"\n");
+			// writer.write("module load modules modules-init modules-gs R\n");
+			// writer.write("/net/gs/vol3/software/bin/R --vanilla --slave --file="+pathToRScript+"\n");
+			// writer.write("R --vanilla --slave --file="+pathToRScript+"\n");
+			writer.write(ApplicationProperties.getPathToR()+" --vanilla --slave --file="+pathToRScript+"\n");
 		}
 		finally {
 			if(writer != null) try{writer.close();}catch(IOException e){}
