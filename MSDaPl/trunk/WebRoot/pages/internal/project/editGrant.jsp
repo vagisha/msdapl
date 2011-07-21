@@ -144,4 +144,3 @@
 	 	</center>
 	 	</div>
 	 	</center>
-<%@ include file="/includes/footer.jsp" %>

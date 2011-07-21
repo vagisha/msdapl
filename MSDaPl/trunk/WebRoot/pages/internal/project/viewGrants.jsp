@@ -119,4 +119,3 @@
 
 </center> 	
     
-<%@ include file="/includes/footer.jsp" %>
