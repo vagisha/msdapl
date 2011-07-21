@@ -69,7 +69,7 @@
     <logic:notEmpty name="protein" property="bestReferences">
     
      <logic:iterate name="protein" property="bestReferences" id="reference">
-       <li><bean:write name="reference" property="descriptionEscaped"/>
+       <li><bean:write name="reference" property="description"/>
       <font style="font-size:8pt;">[<bean:write name="reference" property="databaseName"/>]</font>
       <br>
      </logic:iterate>

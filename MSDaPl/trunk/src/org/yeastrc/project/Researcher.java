@@ -493,7 +493,14 @@ public class Researcher implements Comparable, IData {
 	 * Get the researcher's formal string representation in the form of Lastname, Firstname
 	 * @return A String representation of this researcher, appropriate for listing
 	 */
-	public String getListing() { return this.lastName + ", " + this.firstName + " <" + this.organization + ">"; }
+	public String getListing() { 
+		StringBuilder buf = new StringBuilder();
+		buf.append(this.lastName + ", " + this.firstName);
+		if(this.organization != null && this.organization.trim().length() > 0) {
+			buf.append(" <"+this.organization+">");
+		}
+		return buf.toString();
+	}
 
 	/**
 	 * Get the researcher's organization.

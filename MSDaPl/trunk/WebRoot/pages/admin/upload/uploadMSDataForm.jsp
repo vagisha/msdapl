@@ -98,6 +98,8 @@ function onCancel(projectId) {
    	<td valign="top">
    	
    		<html:radio property="dataServer" value="local"><b>Local</b></html:radio>
+   		
+   		<!-- 
    		<yrcwww:member group="administrators">
 			<html:radio property="dataServer" value="Goodlett"><b>Goodlett</b></html:radio>
 			<html:radio property="dataServer" value="Bruce"><b>Bruce</b></html:radio>  
@@ -111,6 +113,8 @@ function onCancel(projectId) {
 				<html:radio property="dataServer" value="Bruce"><b>Bruce</b></html:radio>
 			</yrcwww:member>
    		</yrcwww:notmember>
+   		
+   		-->
    	</td>
    </tr>
 

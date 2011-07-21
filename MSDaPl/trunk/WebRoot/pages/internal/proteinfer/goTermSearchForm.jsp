@@ -168,7 +168,7 @@ function addSelected() {
 			</b></td>
 			<td class="highlightable" >
 				<bean:write name="node" property="name"/>
-				<logic:notEmpty name="node" property="synonymsE">
+				<logic:notEmpty name="node" property="synonyms">
 					<div style="width:96%; border: 1px dotted #DDDDDD; font-size:8pt;padding:5px;">
 						<b>Synonyms:</b>
 						<ul style="list-style-type:none;padding-left:10px; margin-top:2px; margin-bottom: 2px;">

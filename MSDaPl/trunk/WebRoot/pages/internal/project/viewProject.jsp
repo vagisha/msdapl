@@ -54,7 +54,11 @@
 		<TD valign="top" width="25%">PI:</TD>
 		<TD valign="top" width="75%">
 		<html:link action="viewResearcher.do" paramId="id" paramName="pi" paramProperty="ID">
-		    <bean:write name="pi" property="firstName"/> <bean:write name="pi" property="lastName"/>, <bean:write name="pi" property="degree"/></html:link>
+		    <bean:write name="pi" property="firstName"/> <bean:write name="pi" property="lastName"/>
+		    <logic:notEmpty name="pi" property="degree">
+		    	, <bean:write name="pi" property="degree"/>
+		    </logic:notEmpty>
+		 </html:link>
 		</TD>
 	</yrcwww:colorrow>
 	
@@ -63,7 +67,11 @@
 			<TD valign="top" width="25%">Researcher :</TD>
 			<TD valign="top" width="75%">
 			<html:link action="viewResearcher.do" paramId="id" paramName="researcher" paramProperty="ID">
-				<bean:write name="researcher" property="firstName"/> <bean:write name="researcher" property="lastName"/>, <bean:write name="researcher" property="degree"/></html:link>
+				<bean:write name="researcher" property="firstName"/> <bean:write name="researcher" property="lastName"/>
+				<logic:notEmpty name="researcher" property="degree">
+				, <bean:write name="researcher" property="degree"/>
+				</logic:notEmpty>
+			</html:link>
 			</TD>
 		</yrcwww:colorrow>
 	</logic:iterate>

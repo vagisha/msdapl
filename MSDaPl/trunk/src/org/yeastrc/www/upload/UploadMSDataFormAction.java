@@ -63,14 +63,6 @@ public class UploadMSDataFormAction extends Action {
 		    newForm.setPipeline(Pipeline.MACOSS);
 		    newForm.setDataServer("local");
 		}
-		else if (groupMan.isMember(user.getResearcher().getID(), "Goodlett")){
-		    newForm.setPipeline(Pipeline.TPP);
-		    newForm.setDataServer("Goodlett");
-		}
-		else if (groupMan.isMember(user.getResearcher().getID(), "Bruce")){
-		    newForm.setPipeline(Pipeline.TPP);
-		    newForm.setDataServer("Bruce");
-		}
 		else {
 		    newForm.setPipeline(Pipeline.TPP);
 		    newForm.setDataServer("local");
