@@ -57,7 +57,13 @@ do
 		fi
 	fi
 	
-	if [ $database = 'mainDb' ] ; then	
+	if [ $database = 'mainDb' ] ; then
+
+		if [ -f $mysqldump_dir/NCBI_Taxonomy.sql.gz ] ; then
+                	gunzip $mysqldump_dir/NCBI_Taxonomy.sql.gz
+        	fi
+
+	
 		echo "creating NCBI_Taxonomy table in mainDb"
 		mysql $mysql_str  $database < $mysqldump_dir/NCBI_Taxonomy.sql
 		
