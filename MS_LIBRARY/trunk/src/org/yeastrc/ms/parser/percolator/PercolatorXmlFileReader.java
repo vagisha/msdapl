@@ -239,14 +239,12 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 				int evtType = reader.next();
                 
                 if (evtType == XMLStreamReader.END_ELEMENT) {
-                    // this is the end of one msms_run_summary
                     if (reader.getLocalName().equals("psms"))  {
                         return false;
                     }
                 }
                 
                 if (evtType == XMLStreamReader.START_ELEMENT) {
-                    // this is the end of one msms_run_summary
                     if (reader.getLocalName().equals("psm"))  {
                     	
                     	// Skip over if this is a decoy result and we are not reading decoys
