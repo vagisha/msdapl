@@ -5,5 +5,5 @@
 // Generated on: 2011.08.01 at 02:54:01 PM PDT 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://psidev.info/psi/pi/mzIdentML/1.1", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+// @javax.xml.bind.annotation.XmlSchema(namespace = "http://psidev.info/psi/pi/mzIdentML/1.1", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.yeastrc.ms.writer.mzidentml.jaxb;

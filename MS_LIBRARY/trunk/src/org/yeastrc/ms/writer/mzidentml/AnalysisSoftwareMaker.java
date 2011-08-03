@@ -5,7 +5,6 @@ package org.yeastrc.ms.writer.mzidentml;
 
 import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisSoftwareType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.CVParamType;
-import org.yeastrc.ms.writer.mzidentml.jaxb.CvType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.ParamType;
 
 /**
@@ -16,7 +15,7 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.ParamType;
  */
 public class AnalysisSoftwareMaker {
 
-	public AnalysisSoftwareType makeSequestAnalysisSoftware(CvType psiCv, String version) {
+	public AnalysisSoftwareType makeSequestAnalysisSoftware(String version) {
 		
 		/*
 		  
@@ -41,7 +40,13 @@ public class AnalysisSoftwareMaker {
 		software.setVersion(version);
 		
 		CvParamMaker cvparamMaker = CvParamMaker.getInstance();
-		CVParamType cvParam = cvparamMaker.make("MS:1001208", sequest, psiCv);
+		/*
+		 	[Term]
+			id: MS:1001208
+			name: Sequest
+			is_a: MS:1001456 ! analysis software
+		 */
+		CVParamType cvParam = cvparamMaker.make("MS:1001208", "Sequest", CvConstants.PSI_CV);
 		ParamType paramType = new ParamType();
 		paramType.setCvParam(cvParam);
 		

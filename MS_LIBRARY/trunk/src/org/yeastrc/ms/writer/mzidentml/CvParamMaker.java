@@ -44,4 +44,24 @@ public class CvParamMaker {
         
         return cvParam;
 	}
+	
+	public CVParamType make(String accession, String name, String value, CvType cv) {
+		
+		CVParamType cvParam = new CVParamType();
+        cvParam.setAccession(accession);
+        cvParam.setName(name);
+        cvParam.setValue(value);
+        
+        if(cv == null) {
+        	throw new IllegalArgumentException("CvType cannot be null");
+        }
+        String id = cv.getId();
+        if(id == null) {
+        	throw new IllegalArgumentException("CvType does not have an id");
+        }
+        
+        cvParam.setCvRef(id);
+        
+        return cvParam;
+	}
 }

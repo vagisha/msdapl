@@ -128,18 +128,16 @@ public class Sequest2MzidWriter {
 
 	private CVListType getCVlist(){
 
-		CvMaker cvMaker = new CvMaker();
-		
         CVListType cvListType = new CVListType();
         List<CvType> cvList = cvListType.getCv();
         
-        psiCv = cvMaker.makePsiCv();
+        psiCv = CvConstants.PSI_CV;
         cvList.add(psiCv);
         
-        unitOntologyCv = cvMaker.makeUnitOntologyCv();
+        unitOntologyCv = CvConstants.UNIT_ONTOLOGY_CV;
         cvList.add(unitOntologyCv);
         
-        unimodCv = cvMaker.makeUnimodCv();
+        unimodCv = CvConstants.UNIMOD_CV;
         cvList.add(unimodCv);
         
         return cvListType;
@@ -152,7 +150,7 @@ public class Sequest2MzidWriter {
 		
 		List<AnalysisSoftwareType> swList = listType.getAnalysisSoftware();
 		
-		AnalysisSoftwareType sequestSw = new AnalysisSoftwareMaker().makeSequestAnalysisSoftware(psiCv, "TODO");
+		AnalysisSoftwareType sequestSw = new AnalysisSoftwareMaker().makeSequestAnalysisSoftware("TODO");
 		swList.add(sequestSw);
 		
 		return listType;
