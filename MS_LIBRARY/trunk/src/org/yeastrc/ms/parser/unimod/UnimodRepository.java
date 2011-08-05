@@ -23,6 +23,8 @@ public class UnimodRepository {
 
 	private List<ModT> modsList;
 	
+	public final static double DELTA_MASS_TOLERANCE_001 = 0.001; 
+	
 	public void initialize() throws UnimodRepositoryException {
 		
 		UnimodParser parser = new UnimodParser();

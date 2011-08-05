@@ -15,6 +15,8 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.ParamType;
  */
 public class AnalysisSoftwareMaker {
 
+	public static String SEQUEST_SW_ID = "SEQUEST";
+	
 	public AnalysisSoftwareType makeSequestAnalysisSoftware(String version) {
 		
 		/*
@@ -34,9 +36,8 @@ public class AnalysisSoftwareMaker {
  
 		 */
 		AnalysisSoftwareType software = new AnalysisSoftwareType();
-		String sequest = "SEQUEST";
-		software.setName(sequest);
-		software.setId(sequest);
+		software.setName(SEQUEST_SW_ID);
+		software.setId(SEQUEST_SW_ID);
 		software.setVersion(version);
 		
 		CvParamMaker cvparamMaker = CvParamMaker.getInstance();

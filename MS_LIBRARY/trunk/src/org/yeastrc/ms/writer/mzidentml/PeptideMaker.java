@@ -26,7 +26,6 @@ public class PeptideMaker {
 	private String sequence;
 	private List<ModificationType> modifications;
 	
-	private final double unimodDeltaMassTolerance = 0.001;
 	private final UnimodRepository unimodRepository;
 	
 	public PeptideMaker(UnimodRepository unimodRepository) {
@@ -55,7 +54,7 @@ public class PeptideMaker {
 		modType.setMonoisotopicMassDelta(modMass);
 		
 		// get the Unimod entry for this modification
-		ModT unimod_mod = unimodRepository.getModification(sequence.charAt(zero_based_index), modMass, unimodDeltaMassTolerance, true);
+		ModT unimod_mod = unimodRepository.getModification(sequence.charAt(zero_based_index), modMass, UnimodRepository.DELTA_MASS_TOLERANCE_001, true);
 		
 		if(unimod_mod != null) {
 			

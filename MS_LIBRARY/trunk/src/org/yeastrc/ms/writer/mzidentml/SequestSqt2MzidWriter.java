@@ -29,11 +29,13 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.parser.DataProviderException;
+import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
 import org.yeastrc.ms.parser.unimod.UnimodRepository;
 import org.yeastrc.ms.parser.unimod.UnimodRepositoryException;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
+import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisCollectionType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisSoftwareListType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisSoftwareType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.CVListType;
@@ -42,6 +44,8 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.DBSequenceType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.MzIdentMLType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideEvidenceType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationResultType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationType;
 
 /**
  * SequestSqt2MzidWriter.java
@@ -63,14 +67,24 @@ public class SequestSqt2MzidWriter {
 	private BufferedWriter writer = null;
 	private Marshaller marshaller = null;
 	
+	private SequestParamsParser seqParamsparser;
+	private String sequestParamsDir = null;
+	
 	private String sqtFilePath = null;
+	private String filename = null;
 	
 	// modifications
 	private List<MsResidueModificationIn> dynamicResidueMods;
 	private List<MsResidueModificationIn> staticResidueMods;
 	
+	// fasta database
+	private String fastaFilePath;
+	private String fastaFileName;
+	
 	// unimod repository
 	private final UnimodRepository unimodRepository;
+
+	
 	
 	public SequestSqt2MzidWriter() throws MzIdentMlWriterException {
 		
@@ -93,12 +107,21 @@ public class SequestSqt2MzidWriter {
 		}
 	}
 	
+	public void setSequestParamsDir(String sequestParamsDir) throws MzIdentMlWriterException {
+		
+		this.sequestParamsDir = sequestParamsDir;
+	}
+	
 	public void setSqtFilePath(String sqtFilePath) throws MzIdentMlWriterException {
 		
 		if(!(new File(sqtFilePath).exists())) {
 			throw new MzIdentMlWriterException("SQT file does not exist: "+sqtFilePath);
 		}
 		this.sqtFilePath = sqtFilePath;
+		
+		this.filename = new File(sqtFilePath).getName();
+		if(filename.toLowerCase().endsWith(".sqt"));
+		this.filename = filename.substring(0, filename.length() - 4);
 	}
 
 	public void setWriter(BufferedWriter writer) throws MzIdentMlWriterException {
@@ -149,12 +172,17 @@ public class SequestSqt2MzidWriter {
 	        marshaller.marshal(cvl, writer);
 	        writer.newLine();
 	        
+	        // read the sequest params file
+	        readSequestParams();
 	        
 	        AnalysisSoftwareListType swlist = getAnalysisSoftware();
 	        marshaller.marshal(swlist, writer);
 	        writer.newLine();
 	        
 	        writeSequenceCollection();
+	        writer.newLine();
+	        
+	        writeAnalysisData();
 	        writer.newLine();
 	        
 	        
@@ -166,6 +194,81 @@ public class SequestSqt2MzidWriter {
 		}
 	}
 	
+	private void readSequestParams() {
+		
+		seqParamsparser = new SequestParamsParser();
+		
+		try {
+			
+			seqParamsparser.parseParams(null, this.sequestParamsDir);
+			this.dynamicResidueMods = seqParamsparser.getDynamicResidueMods();
+			this.staticResidueMods = seqParamsparser.getStaticResidueMods();
+			
+		} catch (DataProviderException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	private void writeAnalysisData() throws IOException, MzIdentMlWriterException {
+		
+		AnalysisDataWriter adataWriter = new AnalysisDataWriter();
+		adataWriter.setMarshaller(marshaller);
+		adataWriter.setWriter(writer);
+		
+		adataWriter.start();
+		adataWriter.startSpectrumIdentificationList(this.filename);
+		
+		writeSearchResults();
+		
+		adataWriter.endSpectrumIdentificationList();
+		adataWriter.end();
+		
+	}
+
+	private void writeSearchResults() throws MzIdentMlWriterException, IOException {
+		
+		
+		// start reading the sqt file
+        SequestSQTFileReader sqtReader = new SequestSQTFileReader();
+        
+        try {
+        	
+        	sqtReader.open(this.sqtFilePath);
+        	sqtReader.getSearchHeader();
+        	
+        	// read the PSMs
+        	while(sqtReader.hasNextSearchScan()) {
+        		
+        		SequestSearchScan scanResult = sqtReader.getNextSearchScan();
+        		List<SequestSearchResultIn> psmList = scanResult.getScanResults();
+        		
+        		SpectrumIdentificationResultMaker specResultMaker = new SpectrumIdentificationResultMaker();
+        		specResultMaker.initSpectrumResult(filename, scanResult.getScanNumber());
+        		
+        		for(SequestSearchResultIn psm: psmList) {
+        			
+        			specResultMaker.addSequestResult(psm);
+        		}
+        		
+        		SpectrumIdentificationResultType result = specResultMaker.getSpectrumResult();
+        		marshaller.marshal(result, writer);
+        		writer.newLine();
+        	}
+        }
+        catch(DataProviderException e) {
+        	throw new MzIdentMlWriterException("Error getting data from sqt file", e);
+        } catch (JAXBException e) {
+        	throw new MzIdentMlWriterException("Error marshalling SpectrumIdentificationResultType", e);
+		}catch (ModifiedSequenceBuilderException e) {
+        	throw new MzIdentMlWriterException("Error building modified peptide sequence for psm", e);
+		}
+        finally {
+        	sqtReader.close(); // close the file handle
+        }
+		
+	}
+
 	protected void writeSequenceCollection() throws IOException, MzIdentMlWriterException {
 		
 		SequenceCollectionWriter seqCollWriter = new SequenceCollectionWriter();
@@ -175,8 +278,6 @@ public class SequestSqt2MzidWriter {
         seqCollWriter.startCollection();
         writer.newLine();
         
-        readSqtModifications();
-        
         writeDbSequences(seqCollWriter);
         
         writePeptideSequences(seqCollWriter);
@@ -184,29 +285,6 @@ public class SequestSqt2MzidWriter {
         writePeptideEvidences(seqCollWriter);
         
         seqCollWriter.endCollection();
-        writer.newLine();
-	}
-	
-	private void readSqtModifications() throws MzIdentMlWriterException {
-		
-		SequestSQTFileReader sqtReader = new SequestSQTFileReader();
-		
-		try {
-        	
-        	sqtReader.open(this.sqtFilePath);
-        	SQTHeader sqtHeaders = sqtReader.getSearchHeader();
-        	
-        	// read modifications from the header
-        	readModificationsFromSqtHeader(sqtHeaders);
-		}
-		
-		catch(DataProviderException e) {
-        	throw new MzIdentMlWriterException("Error getting data from sqt file", e);
-        } 
-        finally {
-        	sqtReader.close(); // close the file handle
-        }
-        	
 	}
 	
 	private void writeDbSequences(SequenceCollectionWriter seqCollWriter) throws IOException, MzIdentMlWriterException {
@@ -221,21 +299,21 @@ public class SequestSqt2MzidWriter {
         	sqtReader.open(this.sqtFilePath);
         	SQTHeader sqtHeaders = sqtReader.getSearchHeader();
         	
-        	String databaseName = null; // name of the fasta file used for search
-        	
         	for(SQTHeaderItem header: sqtHeaders.getHeaders()) {
         		
         		if(header.getName().equalsIgnoreCase("Database")) {
-        			databaseName = header.getValue();
+        			String databaseName = header.getValue();
         			
         			if(!(StringUtils.isBlank(databaseName))) {
         				
-        				databaseName = new File(databaseName).getName();
+        				this.fastaFilePath = databaseName;
+        				
+        				this.fastaFileName = new File(databaseName).getName();
         			}
         		}
         	}
         	
-        	if(StringUtils.isBlank(databaseName)) {
+        	if(StringUtils.isBlank(this.fastaFileName)) {
         		throw new MzIdentMlWriterException("Could not find database name in the sqt file");
         	}
 
@@ -258,7 +336,7 @@ public class SequestSqt2MzidWriter {
         					DbSequenceMaker seqMaker = new DbSequenceMaker();
         					seqMaker.setAccession(accession);
         					seqMaker.setId(accession);
-        					seqMaker.setSearchDatabase(databaseName);
+        					seqMaker.setSearchDatabase(this.fastaFileName);
         					
         					// if we have a description for this protein in the sqt file add it
         					if(!StringUtils.isBlank(protein.getDescription())) {
@@ -286,115 +364,6 @@ public class SequestSqt2MzidWriter {
         }
 	}
 	
-	private void readModificationsFromSqtHeader(SQTHeader sqtHeaders) throws MzIdentMlWriterException {
-		
-		this.dynamicResidueMods = new ArrayList<MsResidueModificationIn>();
-		this.staticResidueMods = new ArrayList<MsResidueModificationIn>();
-		
-		for(SQTHeaderItem headerItem: sqtHeaders.getHeaders()) {
-			
-			if(headerItem.getName().equals("StaticMod")) {
-				
-				readStaticMod(headerItem);
-				
-			}
-			
-			else if(headerItem.getName().equals("DiffMod")) {
-				
-				readDynamicMod(headerItem);
-				
-			}
-		}
-	}
-
-	private void readDynamicMod(SQTHeaderItem headerItem) throws MzIdentMlWriterException {
-		
-		// Diff mods string from the SQT file header should look like this
-		// STY*=+80.000
-		// Multiple dynamic modifications should be present on separate DiffMod lines in a SQT file
-		
-		String modString = headerItem.getValue();
-		
-			
-		String[] tokens = modString.split("=");
-
-		if (tokens.length < 2)
-			throw new MzIdentMlWriterException("Invalid dynamic modification string in sqt file: "+modString);
-		if (tokens.length > 2)
-			throw new MzIdentMlWriterException("Invalid dynamic modification string in sqt file (appears to have > 1 dynamic modification): "+modString);
-
-		String modChars = tokens[0].trim();
-		// get the modification symbol (this character should follow the modification residue characters)
-		// example S* -- S is the modified residue; * is the modification symbol
-		if (modChars.length() < 2)
-			throw new MzIdentMlWriterException("No modification symbol found: "+modString);
-
-		// remove the modification symbol and convert modification chars to upper case 
-		modChars = modChars.substring(0, modChars.length()-1).toUpperCase();
-		if (modChars.length() < 1)
-			throw new MzIdentMlWriterException("No residues found for dynamic modification: "+modString);
-
-
-		String modMass = tokens[1].trim();
-		BigDecimal modMassBd;
-
-
-		try { modMassBd = new BigDecimal(modMass); }
-		catch(NumberFormatException e) {
-			throw new MzIdentMlWriterException("Error parsing dynamic modification mass in sqt file: "+modMass);
-		}
-
-		// this modification may be for multiple residues; 
-		// add one for each residue character
-		for (int i = 0; i < modChars.length(); i++) {
-
-			ResidueModification mod = new ResidueModification();
-			mod.setModificationMass(modMassBd);
-			mod.setModifiedResidue(modChars.charAt(i));
-
-			dynamicResidueMods.add(mod);
-		}
-		
-	}
-
-	private void readStaticMod(SQTHeaderItem headerItem) throws MzIdentMlWriterException {
-		
-		
-		// Example: C=160.139
-		
-		String modString = headerItem.getValue();
-		
-		String[] tokens = modString.split("=");
-		
-		if (tokens.length < 2)
-		    throw new MzIdentMlWriterException("Invalid static modification string in sqt file: "+modString);
-		if (tokens.length > 2)
-		    throw new MzIdentMlWriterException("Invalid static modification string in sqt file (appears to have > 1 static modification): "+modString);
-
-
-		// convert modification chars to upper case 
-		String modChars = tokens[0].trim().toUpperCase();
-		String modMass = tokens[1].trim();
-		BigDecimal modMassBd;
-		
-		try {
-		    modMassBd = new BigDecimal(modMass);
-		}
-		catch(NumberFormatException e) {
-		    throw new MzIdentMlWriterException("Error parsing static modification mass in sqt file: "+modMass);
-		}
-		
-		// this modification may be for multiple residues; 
-		// add one for each residue character
-		for (int i = 0; i < modChars.length(); i++) {
-			
-			ResidueModification mod = new ResidueModification();
-			mod.setModificationMass(modMassBd);
-			mod.setModifiedResidue(modChars.charAt(i));
-			
-			staticResidueMods.add(mod);
-		}
-	}
 
 	private void writePeptideSequences(SequenceCollectionWriter seqCollWriter) throws IOException, MzIdentMlWriterException {
 		
@@ -584,6 +553,27 @@ public class SequestSqt2MzidWriter {
         
     }
 	
+	private AnalysisCollectionType getAnalysisCollection() {
+		
+		AnalysisCollectionType acType = new AnalysisCollectionType();
+//		List<SpectrumIdentificationType> specIdList = acType.getSpectrumIdentification();
+//		
+//		SpectrumIdentificationType specId = new SpectrumIdentificationType();
+//		specId.setId(value);
+//		
+//		specId.setSpectrumIdentificationListRef(value);
+//		
+//		specId.setName(value);
+//		specId.setSpectrumIdentificationProtocolRef(AnalysisSoftwareMaker.SEQUEST_SW_ID);
+//		
+//		List<AnalysisSoftwareType> swList = listType.getAnalysisSoftware();
+//		
+//		AnalysisSoftwareType sequestSw = new AnalysisSoftwareMaker().makeSequestAnalysisSoftware("TODO");
+//		swList.add(sequestSw);
+//		
+		return acType;
+	}
+
 	private AnalysisSoftwareListType getAnalysisSoftware() {
 		
 		AnalysisSoftwareListType listType = new AnalysisSoftwareListType();
@@ -601,8 +591,10 @@ public class SequestSqt2MzidWriter {
 		SequestSqt2MzidWriter writer = new SequestSqt2MzidWriter();
 		
 		String sqtFile = "/Users/vagisha/WORK/MSDaPl_data/chemostat_addLoci/sequest/09Sep10-chemostat-PP-02.sqt";
+		String sqparamsDir = "/Users/vagisha/WORK/MSDaPl_data/chemostat_addLoci/sequest";
 		
 		writer.setSqtFilePath(sqtFile);
+		writer.setSequestParamsDir(sqparamsDir);
 		
 		writer.setWriter(new BufferedWriter(new OutputStreamWriter((System.out))));
 		writer.start();
