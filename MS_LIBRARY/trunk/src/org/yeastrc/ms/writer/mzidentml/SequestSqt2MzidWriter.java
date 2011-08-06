@@ -7,9 +7,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +21,6 @@ import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
-import org.yeastrc.ms.domain.search.impl.ResidueModification;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
@@ -36,16 +32,27 @@ import org.yeastrc.ms.parser.unimod.UnimodRepository;
 import org.yeastrc.ms.parser.unimod.UnimodRepositoryException;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisCollectionType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisProtocolCollectionType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisSoftwareListType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisSoftwareType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.CVListType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.CvType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.DBSequenceType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.FileFormatType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.InputSpectraType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.InputsType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.MzIdentMLType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.ParamType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideEvidenceType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.SearchDatabaseRefType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.SearchDatabaseType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.SpectraDataType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIDFormatType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationResultType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.UserParamType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.InputsType.SourceFile;
 
 /**
  * SequestSqt2MzidWriter.java
@@ -182,7 +189,13 @@ public class SequestSqt2MzidWriter {
 	        writeSequenceCollection();
 	        writer.newLine();
 	        
-	        writeAnalysisData();
+	        writeAnalysisCollection();
+	        writer.newLine();
+	       
+	        writeAnalysisProtocolCollection();
+	        writer.newLine();
+	        
+	        writeDataCollection();
 	        writer.newLine();
 	        
 	        
@@ -203,12 +216,86 @@ public class SequestSqt2MzidWriter {
 			seqParamsparser.parseParams(null, this.sequestParamsDir);
 			this.dynamicResidueMods = seqParamsparser.getDynamicResidueMods();
 			this.staticResidueMods = seqParamsparser.getStaticResidueMods();
+			this.fastaFilePath = seqParamsparser.getSearchDatabase().getServerPath();
+			this.fastaFileName = new File(this.fastaFilePath).getName();
 			
 		} catch (DataProviderException e) {
 			e.printStackTrace();
 		}
 		
 	}
+
+	private void writeAnalysisProtocolCollection() throws IOException, MzIdentMlWriterException, JAXBException {
+		
+		AnalysisProtocolCollectionMaker collMaker = new AnalysisProtocolCollectionMaker(this.unimodRepository);
+		
+		AnalysisProtocolCollectionType collection = collMaker.getSequestAnalysisProtocol(this.seqParamsparser);
+		
+		marshaller.marshal(collection, writer);
+	}
+	
+	private void writeDataCollection() throws IOException, MzIdentMlWriterException {
+		
+		writer.write("<DataCollection>");
+		writer.newLine();
+		
+		writeInputs();
+		writer.newLine();
+		
+		writeAnalysisData();
+		writer.newLine();
+		
+		writer.write("</DataCollection>");
+		writer.newLine();
+	}
+	
+	private void writeInputs() throws IOException, MzIdentMlWriterException {
+		
+		InputsType inputs = new InputsType();
+		
+		// Source file (the sqt file)
+		SourceFile srcFile = new SourceFile();
+		inputs.getSourceFile().add(srcFile);
+		srcFile.setId(this.filename);
+		srcFile.setLocation(this.sqtFilePath);
+		FileFormatType fileFormat = new FileFormatType();
+		fileFormat.setCvParam(CvParamMaker.getInstance().make("MS:1001563", "Sequest SQT", CvConstants.PSI_CV));
+		srcFile.setFileFormat(fileFormat);
+		
+		// Database (fasta)
+		SearchDatabaseType searchDbType = new SearchDatabaseType();
+		inputs.getSearchDatabase().add(searchDbType);
+		searchDbType.setId(this.fastaFileName);
+		ParamType dbName = new ParamType();
+		UserParamType userParam = new UserParamType();
+		userParam.setName(this.fastaFileName);
+		dbName.setUserParam(userParam);
+		searchDbType.setDatabaseName(dbName);
+		searchDbType.setLocation(this.fastaFilePath);
+		
+		// Spectra file (.cms2 file)
+		SpectraDataType spectraData = new SpectraDataType();
+		inputs.getSpectraData().add(spectraData);
+		spectraData.setId(this.filename);
+		
+		SpectrumIDFormatType specIdFmt = new SpectrumIDFormatType();
+		specIdFmt.setCvParam(CvParamMaker.getInstance().make("MS:1000776", "scan number only nativeID format", CvConstants.PSI_CV));
+		spectraData.setSpectrumIDFormat(specIdFmt);
+		
+		String cms2file = this.sqtFilePath.replace(".sqt", ".cms2");
+		spectraData.setLocation(cms2file);
+		fileFormat = new FileFormatType();
+		fileFormat.setCvParam(CvParamMaker.getInstance().make("MS:1001466", "MS2 file", CvConstants.PSI_CV));
+		spectraData.setFileFormat(fileFormat);
+		
+		
+		try {
+			marshaller.marshal(inputs, writer);
+		} catch (JAXBException e) {
+			throw new MzIdentMlWriterException("Error marshalling InputsType element", e);
+		}
+	}
+	
 
 	private void writeAnalysisData() throws IOException, MzIdentMlWriterException {
 		
@@ -252,8 +339,11 @@ public class SequestSqt2MzidWriter {
         		}
         		
         		SpectrumIdentificationResultType result = specResultMaker.getSpectrumResult();
-        		marshaller.marshal(result, writer);
-        		writer.newLine();
+        		
+        		if(result.getSpectrumIdentificationItem().size() > 0) {
+        			marshaller.marshal(result, writer);
+        			writer.newLine();
+        		}
         	}
         }
         catch(DataProviderException e) {
@@ -553,24 +643,34 @@ public class SequestSqt2MzidWriter {
         
     }
 	
+	
+	private void writeAnalysisCollection() throws JAXBException {
+		
+		AnalysisCollectionType acType = getAnalysisCollection();
+		marshaller.marshal(acType, writer);
+	}
+	
 	private AnalysisCollectionType getAnalysisCollection() {
 		
 		AnalysisCollectionType acType = new AnalysisCollectionType();
-//		List<SpectrumIdentificationType> specIdList = acType.getSpectrumIdentification();
-//		
-//		SpectrumIdentificationType specId = new SpectrumIdentificationType();
-//		specId.setId(value);
-//		
-//		specId.setSpectrumIdentificationListRef(value);
-//		
-//		specId.setName(value);
-//		specId.setSpectrumIdentificationProtocolRef(AnalysisSoftwareMaker.SEQUEST_SW_ID);
-//		
-//		List<AnalysisSoftwareType> swList = listType.getAnalysisSoftware();
-//		
-//		AnalysisSoftwareType sequestSw = new AnalysisSoftwareMaker().makeSequestAnalysisSoftware("TODO");
-//		swList.add(sequestSw);
-//		
+		
+		SpectrumIdentificationType specId = new SpectrumIdentificationType();
+		specId.setId("SpecIdent1");
+		acType.getSpectrumIdentification().add(specId);
+		
+		specId.setSpectrumIdentificationListRef(this.filename);
+		
+		specId.setSpectrumIdentificationProtocolRef(AnalysisProtocolCollectionMaker.SEQUEST_PROTOCOL_ID);
+		
+		InputSpectraType spectra = new InputSpectraType();
+		spectra.setSpectraDataRef(this.filename);
+		specId.getInputSpectra().add(spectra);
+		
+		
+		SearchDatabaseRefType searchDbRef = new SearchDatabaseRefType();
+		searchDbRef.setSearchDatabaseRef(this.fastaFileName);
+		specId.getSearchDatabaseRef().add(searchDbRef);
+		
 		return acType;
 	}
 
@@ -590,13 +690,17 @@ public class SequestSqt2MzidWriter {
 		
 		SequestSqt2MzidWriter writer = new SequestSqt2MzidWriter();
 		
-		String sqtFile = "/Users/vagisha/WORK/MSDaPl_data/chemostat_addLoci/sequest/09Sep10-chemostat-PP-02.sqt";
-		String sqparamsDir = "/Users/vagisha/WORK/MSDaPl_data/chemostat_addLoci/sequest";
+		//String sqtFile = "/Users/vagisha/WORK/MSDaPl_data/chemostat_addLoci/sequest/09Sep10-chemostat-PP-02.sqt";
+		//String sqparamsDir = "/Users/vagisha/WORK/MSDaPl_data/chemostat_addLoci/sequest";
+		
+		String sqtFile = "/Users/silmaril/WORK/UW/MSDaPl_data/jeckels_data/ecoli/sequest/wormy4raw-1.sqt";
+		String sqparamsDir = "/Users/silmaril/WORK/UW/MSDaPl_data/jeckels_data/ecoli/sequest";
 		
 		writer.setSqtFilePath(sqtFile);
 		writer.setSequestParamsDir(sqparamsDir);
 		
-		writer.setWriter(new BufferedWriter(new OutputStreamWriter((System.out))));
+		writer.setOutputFilePath("/Users/silmaril/WORK/UW/MSDaPl_data/jeckels_data/ecoli/sequest/wormy4raw-1.mzid");
+		// writer.setWriter(new BufferedWriter(new OutputStreamWriter((System.out))));
 		writer.start();
 		writer.end();
 	}

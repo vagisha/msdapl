@@ -16,6 +16,7 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.CVParamType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.EnzymeType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.EnzymesType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.ModificationParamsType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.ParamListType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.ParamType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SearchModificationType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpecificityRulesType;
@@ -39,14 +40,13 @@ public class AnalysisProtocolCollectionMaker {
 		this.unimodRepository = unimodRepository;
 	}
 	
-	public AnalysisProtocolCollectionType getSequestAnalysisProtocol (SequestParamsParser parser) throws UnimodRepositoryException {
+	public AnalysisProtocolCollectionType getSequestAnalysisProtocol (SequestParamsParser parser) 
+			throws MzIdentMlWriterException {
 		
 		AnalysisProtocolCollectionType protocolColl = new AnalysisProtocolCollectionType();
 		
-		List<SpectrumIdentificationProtocolType> specIdProtocols = protocolColl.getSpectrumIdentificationProtocol();
-		
 		SpectrumIdentificationProtocolType specIdProtocol = new SpectrumIdentificationProtocolType();
-		specIdProtocols.add(specIdProtocol);
+		protocolColl.getSpectrumIdentificationProtocol().add(specIdProtocol);
 		
 		
 		specIdProtocol.setId(SEQUEST_PROTOCOL_ID);
@@ -59,12 +59,16 @@ public class AnalysisProtocolCollectionMaker {
 		
 		
 		// modifications
-		ModificationParamsType modParams = specIdProtocol.getModificationParams();
-		specIdProtocol.setModificationParams(modParams);
+		ModificationParamsType modParams = new ModificationParamsType();
+		
 		// dynamic modifications
 		addDynamicResidueModifications(parser, modParams);
 		// static modifications
 		addStaticResidueModifications(parser, modParams);
+		
+		if(modParams.getSearchModification().size() > 0) {
+			specIdProtocol.setModificationParams(modParams);
+		}
 		
 		
 		// Enzyme
@@ -76,21 +80,53 @@ public class AnalysisProtocolCollectionMaker {
 		// Mass table
 		
 		// Fragment tolerance
-		ToleranceType tolType = makeFragmentTolerance(parser.get)
-		specIdProtocol.setFragmentTolerance(tolType);
+		specIdProtocol.setFragmentTolerance(makeFragmentTolerance(parser));
 		
 		// Parent tolerance
-		
+		specIdProtocol.setParentTolerance(makeParentTolerance(parser));
 		
 		// threshold
-		
+		ParamListType paramList = new ParamListType();
+		paramList.getParamGroup().add(CvParamMaker.getInstance().make("MS:1001494", "no threshold", CvConstants.PSI_CV));
+		specIdProtocol.setThreshold(paramList);
 		
 		
 		return protocolColl;
 		
 	}
 
-	private ToleranceType makeFragmentTolerance(SequestParamsParser parser) {
+	private ToleranceType makeParentTolerance(SequestParamsParser parser) throws MzIdentMlWriterException {
+		
+		double tolerance = -1.0;
+		boolean unitIsDaltons = true;
+		
+		for(Param param: parser.getParamList()) {
+			
+			if(param.getParamName().equalsIgnoreCase("peptide_mass_tolerance")) {
+				tolerance = Double.parseDouble(param.getParamValue());
+			}
+			
+			if(param.getParamName().equalsIgnoreCase("peptide_mass_units")) {
+				
+				// peptide_mass_units = 0                  ; 0=amu, 1=mmu, 2=ppm
+				String val = param.getParamValue();
+				if("0".equals(val)) {
+					unitIsDaltons = true;
+				}
+				else if("1".equals(val) || "2".equals(val)) {
+					unitIsDaltons = false;
+				}
+			}
+		}
+		
+		if(tolerance == -1.0) {
+			throw new MzIdentMlWriterException("Did not find peptide_mass_tolerance param in sequest.params file");
+		}
+		
+		return makeTolerance(tolerance, unitIsDaltons);
+	}
+
+	private ToleranceType makeFragmentTolerance(SequestParamsParser parser) throws MzIdentMlWriterException {
 		
 		double tolerance = -1.0;
 		
@@ -102,11 +138,14 @@ public class AnalysisProtocolCollectionMaker {
 			}
 		}
 		
+		if(tolerance == -1.0) {
+			throw new MzIdentMlWriterException("Did not find fragment_ion_tolerance param in sequest.params file");
+		}
 		
-		return makeTolerance(tolerance);
+		return makeTolerance(tolerance, true);
 	}
 	
-	private ToleranceType makeTolerance(double tolerance) {
+	private ToleranceType makeTolerance(double tolerance, boolean unitIsDalton) {
 		
 		ToleranceType tolType = new ToleranceType();
 		
@@ -116,28 +155,35 @@ public class AnalysisProtocolCollectionMaker {
 
 		CVParamType param = CvParamMaker.getInstance().make("MS:1001412", "search tolerance plus value", String.valueOf(tolerance), CvConstants.PSI_CV);
 		param.setUnitCvRef(CvConstants.UNIT_ONTOLOGY_CV.getId());
-		param.setUnitAccession("UO:0000221");
-		param.setUnitName("dalton");
+		tolType.getCvParam().add(param);
+		
+		if(unitIsDalton) {
+			param.setUnitAccession("UO:0000221");
+			param.setUnitName("dalton");
+		}
+		else {
+			param.setUnitAccession("UO:0000166");
+			param.setUnitName("parts per notation unit");
+		}
 		return tolType;
 	}
 	
 	private void addDynamicResidueModifications(SequestParamsParser parser,
-			ModificationParamsType modParams) throws UnimodRepositoryException {
+			ModificationParamsType modParams) throws MzIdentMlWriterException {
 		
 		List<MsResidueModificationIn> mods = parser.getDynamicResidueMods();
 		addResidueModifications(modParams, mods);
 	}
 	
 	private void addStaticResidueModifications(SequestParamsParser parser,
-			ModificationParamsType modParams) throws UnimodRepositoryException {
+			ModificationParamsType modParams) throws MzIdentMlWriterException {
 		
 		List<MsResidueModificationIn> mods = parser.getStaticResidueMods();
 		addResidueModifications(modParams, mods);
 	}
 
 	private void addResidueModifications(ModificationParamsType modParams,
-			List<MsResidueModificationIn> mods)
-			throws UnimodRepositoryException {
+			List<MsResidueModificationIn> mods) throws MzIdentMlWriterException {
 		
 		
 		for(MsResidueModificationIn mod: mods) { 
@@ -153,16 +199,23 @@ public class AnalysisProtocolCollectionMaker {
 			modType.setSpecificityRules(specRuleType);
 			
 			// get the Unimod entry for this modification
-			ModT unimod_mod = unimodRepository.getModification(mod.getModifiedResidue(), 
-					      mod.getModificationMass().doubleValue(), 
-					      UnimodRepository.DELTA_MASS_TOLERANCE_001, true);
-			
-			if(unimod_mod != null) {
+			try {
+				ModT unimod_mod = unimodRepository.getModification(mod.getModifiedResidue(), 
+						mod.getModificationMass().doubleValue(), 
+						UnimodRepository.DELTA_MASS_TOLERANCE_001, true);
+
+				if(unimod_mod != null) {
+
+					CvParamMaker paramMaker = CvParamMaker.getInstance();
+					CVParamType param = paramMaker.make("UNIMOD:" + unimod_mod.getRecordId(), unimod_mod.getTitle(), CvConstants.UNIMOD_CV);
+
+					specRuleType.getCvParam().add(param);
+				}
+			}
+			catch(UnimodRepositoryException e) {
 				
-				CvParamMaker paramMaker = CvParamMaker.getInstance();
-				CVParamType param = paramMaker.make("UNIMOD:" + unimod_mod.getRecordId(), unimod_mod.getTitle(), CvConstants.UNIMOD_CV);
-				
-				specRuleType.getCvParam().add(param);
+				throw new MzIdentMlWriterException("Unimod repository lookup failed for modification  "+
+						mod.getModifiedResidue()+" with delta mass: "+mod.getModificationMass(), e);
 			}
 		}
 	}

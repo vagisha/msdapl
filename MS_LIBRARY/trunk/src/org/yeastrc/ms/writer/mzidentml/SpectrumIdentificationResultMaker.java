@@ -3,10 +3,6 @@
  */
 package org.yeastrc.ms.writer.mzidentml;
 
-import java.io.IOException;
-
-import javax.xml.bind.JAXBException;
-
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationItemType;

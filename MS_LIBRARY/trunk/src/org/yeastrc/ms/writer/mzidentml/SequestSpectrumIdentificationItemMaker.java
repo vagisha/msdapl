@@ -5,10 +5,12 @@ package org.yeastrc.ms.writer.mzidentml;
 
 import java.util.List;
 
+import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AbstractParamType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.CVParamType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideEvidenceRefType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationItemType;
 
 /**
@@ -50,6 +52,19 @@ public class SequestSpectrumIdentificationItemMaker {
 		specIdItem.setPeptideRef(result.getResultPeptide().getModifiedPeptide());
 		
 		specIdItem.setRank(result.getSequestResultData().getxCorrRank());
+		
+		
+		List<MsSearchResultProteinIn> proteins = result.getProteinMatchList();
+		String modifiedSeq = result.getResultPeptide().getModifiedPeptide();
+		int evidenceCount = 1;
+		
+		for(MsSearchResultProteinIn protein: proteins) {
+			
+			PeptideEvidenceRefType refType = new PeptideEvidenceRefType();
+			refType.setPeptideEvidenceRef(modifiedSeq+"_Ev"+evidenceCount++);
+			specIdItem.getPeptideEvidenceRef().add(refType);
+		}
+		
 		
 		List<AbstractParamType> params = specIdItem.getParamGroup();
 		
