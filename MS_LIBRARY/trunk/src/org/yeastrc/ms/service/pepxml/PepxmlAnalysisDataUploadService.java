@@ -43,6 +43,8 @@ import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.service.pepxml.stats.ProphetFilteredPsmStatsSaver;
+import org.yeastrc.ms.service.pepxml.stats.ProphetFilteredSpectraStatsSaver;
 import org.yeastrc.ms.util.TimeUtils;
 
 // This will upload the corresponding PeptideProphet results. 
@@ -356,6 +358,19 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
             
             uploadMsg.append("\n\t#Analyses in "+file+" : "+numAnalysisUploaded);
             this.analysisIds.add(analysisId);
+            
+            // Finally, save the filtered results stats
+        	try {
+        		ProphetFilteredPsmStatsSaver psmStatsSaver = ProphetFilteredPsmStatsSaver.getInstance();
+        		// apply error rate 0.01
+        		psmStatsSaver.save(analysisId, 0.01);
+        		ProphetFilteredSpectraStatsSaver spectraStatsSaver = ProphetFilteredSpectraStatsSaver.getInstance();
+        		// apply error rate 0.01
+        		spectraStatsSaver.save(analysisId,0.01);
+        	}
+        	catch(Exception ex) {
+        		log.error("Error saving filtered stats for analysisID: "+analysisId, ex);
+        	}
         }
     }
     

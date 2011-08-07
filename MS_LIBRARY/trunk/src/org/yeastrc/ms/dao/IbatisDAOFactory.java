@@ -14,8 +14,12 @@ import org.yeastrc.ms.dao.analysis.ibatis.MsSearchAnalysisDAOImpl;
 import org.yeastrc.ms.dao.analysis.ibatis.PeptideTerminiStatsDAOImpl;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.ProphetFilteredPsmResultDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.ProphetFilteredSpectraResultDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetResultDAOImpl;
 import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetRocDAOImpl;
+import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.ProphetFilteredPsmResultDAOImpl;
+import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.ProphetFilteredSpectraResultDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorFilteredPsmResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorFilteredSpectraResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorParamsDAO;
@@ -182,10 +186,14 @@ public class IbatisDAOFactory {
     private PeptideProphetRocDAO ppRocDAO;
     private PeptideProphetResultDAO pprophResultDAO;
     
-    // DAOs for stats tables
+    // DAOs for stats tables (Percolator)
     private PeptideTerminiStatsDAO peptideTerminiStatsDAO;
     private PercolatorFilteredPsmResultDAO percFiltersPsmDAO;
     private PercolatorFilteredSpectraResultDAO percFiltersSpectraDAO;
+    
+    // DAOs for stats tables (Percolator)
+    private ProphetFilteredPsmResultDAO prophetFiltersPsmDAO;
+    private ProphetFilteredSpectraResultDAO prophetFiltersSpectraDAO;
     
     private IbatisDAOFactory() {
         
@@ -253,10 +261,14 @@ public class IbatisDAOFactory {
         ppRocDAO = new PeptideProphetRocDAOImpl(sqlMap);
         pprophResultDAO = new PeptideProphetResultDAOImpl(sqlMap, rsAnalysisDAO);
         
-        // DAOs for stats tables;
+        // DAOs for stats tables (Percolator);
         percFiltersPsmDAO = new PercolatorFilteredPsmResultDAOImpl(sqlMap, rsAnalysisDAO);
 		percFiltersSpectraDAO = new PercolatorFilteredSpectraResultDAOImpl(sqlMap, rsAnalysisDAO);
 		peptideTerminiStatsDAO = new PeptideTerminiStatsDAOImpl(sqlMap);
+		
+		 // DAOs for stats tables (PeptideProphet);
+        prophetFiltersPsmDAO = new ProphetFilteredPsmResultDAOImpl(sqlMap, rsAnalysisDAO);
+        prophetFiltersSpectraDAO = new ProphetFilteredSpectraResultDAOImpl(sqlMap, rsAnalysisDAO);
         
     }
     
@@ -464,5 +476,13 @@ public class IbatisDAOFactory {
     
     public PercolatorFilteredSpectraResultDAO getPrecolatorFilteredSpectraResultDAO() {
     	return percFiltersSpectraDAO;
+    }
+    
+    public ProphetFilteredPsmResultDAO getProphetFilteredPsmResultDAO() {
+    	return prophetFiltersPsmDAO;
+    }
+    
+    public ProphetFilteredSpectraResultDAO getProphetFilteredSpectraResultDAO() {
+    	return prophetFiltersSpectraDAO;
     }
 }

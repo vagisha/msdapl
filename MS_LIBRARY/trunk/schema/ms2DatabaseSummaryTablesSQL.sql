@@ -57,6 +57,49 @@ CREATE TABLE PercolatorFilteredBinnedSpectraResult (
 ALTER TABLE PercolatorFilteredBinnedSpectraResult ADD INDEX (percScanResultID);
 
 # ##############################################################################################
+# ProteinProphet result stats
+# ##############################################################################################
+
+CREATE TABLE ProphetFilteredBinnedPsmResult (
+	prophetPsmResultID INT UNSIGNED NOT NULL,
+	binStart INT UNSIGNED NOT NULL,
+	binEnd INT UNSIGNED NOT NULL,
+	total INT UNSIGNED NOT NULL,
+	filtered INT UNSIGNED NOT NULL
+);
+ALTER TABLE ProphetFilteredBinnedPsmResult ADD INDEX (prophetPsmResultID);
+
+
+CREATE TABLE ProphetFilteredPsmResult (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	runSearchAnalysisID INT UNSIGNED NOT NULL,
+	probability DOUBLE UNSIGNED NOT NULL,
+	total INT UNSIGNED NOT NULL,
+	filtered INT UNSIGNED NOT NULL
+);
+ALTER TABLE ProphetFilteredPsmResult ADD INDEX (runSearchAnalysisID);
+ALTER TABLE ProphetFilteredPsmResult ADD UNIQUE INDEX (runSearchAnalysisID, probability);
+
+CREATE TABLE ProphetFilteredSpectraResult (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	runSearchAnalysisID INT UNSIGNED NOT NULL,
+	probability DOUBLE UNSIGNED NOT NULL,
+	total INT UNSIGNED NOT NULL,
+	filtered INT UNSIGNED NOT NULL
+);
+ALTER TABLE ProphetFilteredSpectraResult ADD INDEX (runSearchAnalysisID);
+ALTER TABLE ProphetFilteredSpectraResult ADD UNIQUE INDEX (runSearchAnalysisID, probability);
+
+CREATE TABLE ProphetFilteredBinnedSpectraResult (
+	prophetScanResultID INT UNSIGNED NOT NULL,
+	binStart INT UNSIGNED NOT NULL,
+	binEnd INT UNSIGNED NOT NULL,
+	total INT UNSIGNED NOT NULL,
+	filtered INT UNSIGNED NOT NULL
+);
+ALTER TABLE ProphetFilteredBinnedSpectraResult ADD INDEX (prophetScanResultID);
+
+# ##############################################################################################
 # Protein Inference results stats
 # ##############################################################################################
 CREATE TABLE proteinInferRunSummary (

@@ -1,10 +1,10 @@
 /**
- * PercolatorFilteredSpectraDistributionCalculator.java
+ * ProphetFilteredSpectraDistributionCalculator.java
  * @author Vagisha Sharma
- * Dec 31, 2009
+ * Aug 7, 2011
  * @version 1.0
  */
-package org.yeastrc.ms.service.percolator.stats;
+package org.yeastrc.ms.service.pepxml.stats;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -16,12 +16,12 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
-import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
-import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
-import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorBinnedSpectraResult;
-import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorFilteredSpectraResult;
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
+import org.yeastrc.ms.domain.analysis.peptideProphet.impl.ProphetBinnedSpectraResult;
+import org.yeastrc.ms.domain.analysis.peptideProphet.impl.ProphetFilteredSpectraResult;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.util.TimeUtils;
@@ -30,7 +30,7 @@ import org.yeastrc.ms.util.TimeUtils;
 /**
  * 
  */
-public class PercolatorFilteredSpectraDistributionCalculator {
+public class ProphetFilteredSpectraDistributionCalculator {
 
     private int analysisId;
     private double scoreCutoff;
@@ -40,17 +40,17 @@ public class PercolatorFilteredSpectraDistributionCalculator {
     public static double BIN_SIZE = 1.0;
     private int numBins;
     
-    private List<PercolatorFilteredSpectraResult> filteredResults;
+    private List<ProphetFilteredSpectraResult> filteredResults;
     
-    private static final Logger log = Logger.getLogger(PercolatorFilteredSpectraDistributionCalculator.class.getName());
+    private static final Logger log = Logger.getLogger(ProphetFilteredSpectraDistributionCalculator.class.getName());
     
-    public PercolatorFilteredSpectraDistributionCalculator(int analysisId, double scoreCutoff) {
+    public ProphetFilteredSpectraDistributionCalculator(int analysisId, double scoreCutoff) {
         this.analysisId = analysisId;
         this.scoreCutoff = scoreCutoff;
-        filteredResults = new ArrayList<PercolatorFilteredSpectraResult>();
+        filteredResults = new ArrayList<ProphetFilteredSpectraResult>();
     }
     
-    public List<PercolatorFilteredSpectraResult> getFilteredResults() {
+    public List<ProphetFilteredSpectraResult> getFilteredResults() {
         return filteredResults;
     }
     
@@ -64,7 +64,7 @@ public class PercolatorFilteredSpectraDistributionCalculator {
         Program analysisProgram = DAOFactory.instance().getMsSearchAnalysisDAO().load(analysisId).getAnalysisProgram();
         
         
-        if(analysisProgram == Program.PERCOLATOR) {
+        if(analysisProgram == Program.PEPTIDE_PROPHET) {
             
         	if(!initBins()) {
         		log.error("There was an error iniitalizing bins for searchAnalysisID: "+analysisId);
@@ -116,7 +116,7 @@ public class PercolatorFilteredSpectraDistributionCalculator {
         
         DAOFactory daoFactory = DAOFactory.instance();
         MsScanDAO scanDao = daoFactory.getMsScanDAO();
-        PercolatorResultDAO percResDao = daoFactory.getPercolatorResultDAO();
+        PeptideProphetResultDAO prophetResDao = daoFactory.getPeptideProphetResultDAO();
         
             
         List<Integer> scanIds = scanDao.loadScanIdsForRun(runId);
@@ -127,12 +127,12 @@ public class PercolatorFilteredSpectraDistributionCalculator {
         	scanCnt++;
 
         	boolean filtered = false;
-        	List<Integer> percResultIds = percResDao.loadIdsForRunSearchAnalysisScan(runSearchAnalysisId, scanId);
-        	if(percResultIds != null && percResultIds.size() > 0) {
+        	List<Integer> prophetResultIds = prophetResDao.loadIdsForRunSearchAnalysisScan(runSearchAnalysisId, scanId);
+        	if(prophetResultIds != null && prophetResultIds.size() > 0) {
 
-        		for(Integer percResultId: percResultIds) {
-        			PercolatorResult pres = percResDao.loadForPercolatorResultId(percResultId);
-        			if(pres.getQvalue() <= scoreCutoff) {
+        		for(Integer prophetResultId: prophetResultIds) {
+        			PeptideProphetResult pres = prophetResDao.loadForProphetResultId(prophetResultId);
+        			if(pres.getProbability() >= scoreCutoff) {
         				filtered = true;
         				goodScanCnt++;
         				break;
@@ -153,14 +153,14 @@ public class PercolatorFilteredSpectraDistributionCalculator {
         
         
         // add to list
-    	PercolatorFilteredSpectraResult stat = new PercolatorFilteredSpectraResult();
+    	ProphetFilteredSpectraResult stat = new ProphetFilteredSpectraResult();
     	stat.setRunSearchAnalysisId(runSearchAnalysisId);
     	stat.setTotal(scanCnt);
     	stat.setFiltered(goodScanCnt);
-    	stat.setQvalue(scoreCutoff);
-    	List<PercolatorBinnedSpectraResult> binnedResults = new ArrayList<PercolatorBinnedSpectraResult>();
+    	stat.setProbability(scoreCutoff);
+    	List<ProphetBinnedSpectraResult> binnedResults = new ArrayList<ProphetBinnedSpectraResult>();
     	for(int i = 0; i < numBins; i++) {
-    		PercolatorBinnedSpectraResult bin = new PercolatorBinnedSpectraResult();
+    		ProphetBinnedSpectraResult bin = new ProphetBinnedSpectraResult();
     		bin.setBinStart(i*BIN_SIZE);
     		bin.setBinEnd(bin.getBinStart() + BIN_SIZE);
     		bin.setTotal(allSpectraCounts[i]);
@@ -192,10 +192,10 @@ public class PercolatorFilteredSpectraDistributionCalculator {
             conn = DAOFactory.instance().getConnection();
             String sql = "SELECT scan.id, scan.retentionTime, pres.qvalue "+
                          "FROM msScan AS scan "+
-                         "LEFT JOIN (msRunSearchResult AS res, PercolatorResult AS pres) "+
+                         "LEFT JOIN (msRunSearchResult AS res, PeptideProphetResult AS pres) "+
                          "ON (scan.id = res.scanID AND res.id = pres.resultID AND pres.runSearchAnalysisID="+runSearchAnalysisId+") "+
                          "WHERE scan.runID = "+runId+" "+
-                         "ORDER BY scan.id,qvalue ASC";
+                         "ORDER BY scan.id,probability ASC";
             
             log.info(sql);
             
@@ -240,14 +240,14 @@ public class PercolatorFilteredSpectraDistributionCalculator {
         
         
         // add to list
-    	PercolatorFilteredSpectraResult stat = new PercolatorFilteredSpectraResult();
+    	ProphetFilteredSpectraResult stat = new ProphetFilteredSpectraResult();
     	stat.setRunSearchAnalysisId(runSearchAnalysisId);
     	stat.setTotal(scanCnt);
     	stat.setFiltered(goodScanCnt);
-    	stat.setQvalue(scoreCutoff);
-    	List<PercolatorBinnedSpectraResult> binnedResults = new ArrayList<PercolatorBinnedSpectraResult>();
+    	stat.setProbability(scoreCutoff);
+    	List<ProphetBinnedSpectraResult> binnedResults = new ArrayList<ProphetBinnedSpectraResult>();
     	for(int i = 0; i < numBins; i++) {
-    		PercolatorBinnedSpectraResult bin = new PercolatorBinnedSpectraResult();
+    		ProphetBinnedSpectraResult bin = new ProphetBinnedSpectraResult();
     		bin.setBinStart(i*BIN_SIZE);
     		bin.setBinEnd(bin.getBinStart() + BIN_SIZE);
     		bin.setTotal(allSpectraCounts[i]);
@@ -270,7 +270,7 @@ public class PercolatorFilteredSpectraDistributionCalculator {
         return BIN_SIZE;
     }
     
-    public List<PercolatorFilteredSpectraResult> getResult() {
+    public List<ProphetFilteredSpectraResult> getResult() {
     	return this.filteredResults;
     }
     

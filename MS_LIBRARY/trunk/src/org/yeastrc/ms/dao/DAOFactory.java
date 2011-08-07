@@ -10,6 +10,8 @@ import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.PeptideTerminiStatsDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.ProphetFilteredPsmResultDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.ProphetFilteredSpectraResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorFilteredPsmResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorFilteredSpectraResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorParamsDAO;
@@ -268,5 +270,13 @@ public class DAOFactory {
     
     public PercolatorFilteredSpectraResultDAO getPrecolatorFilteredSpectraResultDAO() {
     	return ibatisDaoFactory.getPrecolatorFilteredSpectraResultDAO();
+    }
+    
+    public ProphetFilteredPsmResultDAO getProphetFilteredPsmResultDAO() {
+    	return ibatisDaoFactory.getProphetFilteredPsmResultDAO();
+    }
+    
+    public ProphetFilteredSpectraResultDAO getProphetFilteredSpectraResultDAO() {
+    	return ibatisDaoFactory.getProphetFilteredSpectraResultDAO();
     }
 }

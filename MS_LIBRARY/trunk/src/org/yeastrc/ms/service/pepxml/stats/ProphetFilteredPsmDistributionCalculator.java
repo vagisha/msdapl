@@ -1,10 +1,10 @@
 /**
- * PercolatorFilteredPsmDistributionCalculator.java
+ * ProphetFilteredPsmDistributionCalculator.java
  * @author Vagisha Sharma
- * Nov 5, 2009
+ * Aug 6, 2011
  * @version 1.0
  */
-package org.yeastrc.ms.service.percolator.stats;
+package org.yeastrc.ms.service.pepxml.stats;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,15 +16,15 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
-import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorBinnedPsmResult;
-import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorFilteredPsmResult;
+import org.yeastrc.ms.domain.analysis.peptideProphet.impl.ProphetBinnedPsmResult;
+import org.yeastrc.ms.domain.analysis.peptideProphet.impl.ProphetFilteredPsmResult;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.util.TimeUtils;
 
 /**
  * 
  */
-public class PercolatorFilteredPsmDistributionCalculator {
+public class ProphetFilteredPsmDistributionCalculator {
 
     
     private int analysisId;
@@ -35,17 +35,17 @@ public class PercolatorFilteredPsmDistributionCalculator {
     public static double BIN_SIZE = 1.0;
     private int numBins;
     
-    private List<PercolatorFilteredPsmResult> filteredResults;
+    private List<ProphetFilteredPsmResult> filteredResults;
     
-    private static final Logger log = Logger.getLogger(PercolatorFilteredPsmDistributionCalculator.class.getName());
+    private static final Logger log = Logger.getLogger(ProphetFilteredPsmDistributionCalculator.class.getName());
     
-    public PercolatorFilteredPsmDistributionCalculator(int analysisId, double scoreCutoff) {
+    public ProphetFilteredPsmDistributionCalculator(int analysisId, double scoreCutoff) {
         this.analysisId = analysisId;
         this.scoreCutoff = scoreCutoff;
-        filteredResults = new ArrayList<PercolatorFilteredPsmResult>();
+        filteredResults = new ArrayList<ProphetFilteredPsmResult>();
     }
     
-    public List<PercolatorFilteredPsmResult> getFilteredResults() {
+    public List<ProphetFilteredPsmResult> getFilteredResults() {
         return filteredResults;
     }
     
@@ -57,7 +57,7 @@ public class PercolatorFilteredPsmDistributionCalculator {
         
         Program analysisProgram = DAOFactory.instance().getMsSearchAnalysisDAO().load(analysisId).getAnalysisProgram();
         
-        if(analysisProgram == Program.PERCOLATOR) {
+        if(analysisProgram == Program.PEPTIDE_PROPHET) {
             
         	if(!initBins()) {
         		log.error("There was an error iniitalizing bins for searchAnalysisID: "+analysisId);
@@ -65,8 +65,8 @@ public class PercolatorFilteredPsmDistributionCalculator {
         	}
         	
             // we will calculate two things: 
-            // 1. RT distribution of all Percolator PSMs
-            // 2. RT distribution of filtered Percolator PSM's (with given qvalue cutoff)
+            // 1. RT distribution of all PeptideProphet PSMs
+            // 2. RT distribution of filtered PeptideProphet PSM's (with given probability cutoff)
             
             binUsingJDBC(analysisId, scoreCutoff);
         }
@@ -89,8 +89,8 @@ public class PercolatorFilteredPsmDistributionCalculator {
         
         try {
             conn = DAOFactory.instance().getConnection();
-            String sql = "SELECT scan.retentionTime, pres.qValue "+
-                         "FROM msScan AS scan, PercolatorResult AS pres, msRunSearchResult AS res "+
+            String sql = "SELECT scan.retentionTime, pres.probability "+
+                         "FROM msScan AS scan, PeptideProphetResult AS pres, msRunSearchResult AS res "+
                          "WHERE pres.runSearchAnalysisID = ? "+
                          "AND pres.resultID = res.id "+
                          "AND res.scanID = scan.id ";
@@ -107,10 +107,10 @@ public class PercolatorFilteredPsmDistributionCalculator {
             	
             	while(rs.next()) {
             		
-            		double qvalue = rs.getDouble("qvalue");
+            		double probability = rs.getDouble("probability");
             		
             		psmCnt++;
-            		if(qvalue <= scoreCutoff)
+            		if(probability >= scoreCutoff)
             			goodPsmCnt++;
 
             		// If we don't have retention time for a scan skip the whole runSearchAnalysis
@@ -119,19 +119,19 @@ public class PercolatorFilteredPsmDistributionCalculator {
             		}
             		else {
             			double rt = rs.getBigDecimal("retentionTime").doubleValue();
-            			putInBin(rt, qvalue, scoreCutoff);
+            			putInBin(rt, probability, scoreCutoff);
             		}
             	}
 
             	// add to list
-            	PercolatorFilteredPsmResult stat = new PercolatorFilteredPsmResult();
+            	ProphetFilteredPsmResult stat = new ProphetFilteredPsmResult();
             	stat.setRunSearchAnalysisId(runSearchAnalysisId);
             	stat.setTotal(psmCnt);
             	stat.setFiltered(goodPsmCnt);
-            	stat.setQvalue(scoreCutoff);
-            	List<PercolatorBinnedPsmResult> binnedResults = new ArrayList<PercolatorBinnedPsmResult>();
+            	stat.setProbability(scoreCutoff);
+            	List<ProphetBinnedPsmResult> binnedResults = new ArrayList<ProphetBinnedPsmResult>();
             	for(int i = 0; i < numBins; i++) {
-            		PercolatorBinnedPsmResult bin = new PercolatorBinnedPsmResult();
+            		ProphetBinnedPsmResult bin = new ProphetBinnedPsmResult();
             		bin.setBinStart(i*BIN_SIZE);
             		bin.setBinEnd(bin.getBinStart() + BIN_SIZE);
             		bin.setTotal(allPsmCounts[i]);
@@ -169,16 +169,16 @@ public class PercolatorFilteredPsmDistributionCalculator {
         return BIN_SIZE;
     }
     
-    public List<PercolatorFilteredPsmResult> getResult() {
+    public List<ProphetFilteredPsmResult> getResult() {
     	return this.filteredResults;
     }
     
-    private void putInBin(double rt, double qvalue, double scoreCutoff) {
+    private void putInBin(double rt, double probability, double scoreCutoff) {
         
     	int binIndex = (int)(rt / BIN_SIZE);
         allPsmCounts[binIndex]++;
         
-        if(qvalue <= scoreCutoff) {
+        if(probability >= scoreCutoff) {
             filteredPsmCounts[binIndex]++;
         }
     }
