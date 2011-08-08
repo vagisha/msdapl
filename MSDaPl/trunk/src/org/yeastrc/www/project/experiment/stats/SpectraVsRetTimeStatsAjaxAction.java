@@ -8,7 +8,12 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.experiment.stats.PercolatorQCStatsGetter;
+import org.yeastrc.experiment.stats.QCStatsGetter;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetROC;
+import org.yeastrc.ms.domain.search.Program;
 
 public class SpectraVsRetTimeStatsAjaxAction extends Action {
 
@@ -39,25 +44,46 @@ public class SpectraVsRetTimeStatsAjaxAction extends Action {
             return null;
         }
 
-        Double qvalue = null;
+        Double scoreCutoff = null;
         try {
-        	strVal = request.getParameter("qvalue");
+        	strVal = request.getParameter("scoreCutoff");
         	if(strVal != null) {
-        		qvalue = Double.parseDouble(strVal);
+        		scoreCutoff = Double.parseDouble(strVal);
         	}
         }
-        catch(Exception e) {qvalue = null;}
-        if(qvalue == null) {
+        catch(Exception e) {scoreCutoff = null;}
+        if(scoreCutoff == null) {
             response.setContentType("text/html");
             response.getWriter().write("<b>Invalid qvalue: "+strVal+"</b>");
             return null;
         }
-        request.setAttribute("qvalue", qvalue);
+        // request.setAttribute("scoreCutoff", scoreCutoff);
         
         
-        PercolatorQCStatsGetter statsGetter = new PercolatorQCStatsGetter();
+        QCStatsGetter statsGetter = new QCStatsGetter();
         statsGetter.setGetSpectraRtStats(true);
-        statsGetter.getStats(analysisId, qvalue);
+        statsGetter.getStats(analysisId, scoreCutoff);
+        
+        MsSearchAnalysis analysis = DAOFactory.instance().getMsSearchAnalysisDAO().load(analysisId);
+        
+        if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
+        	
+        	PeptideProphetRocDAO rocDao = DAOFactory.instance().getPeptideProphetRocDAO();
+    		PeptideProphetROC roc = rocDao.loadRoc(analysisId);
+    		double errRate = roc.getClosestError(scoreCutoff);
+    		double probability = roc.getMinProbabilityForError(errRate);
+    		log.info("Probability for error rate of "+errRate+" is: "+probability);
+    		
+    		request.setAttribute("scorecutoff_string", "PeptideProphet Error rate: "+errRate+
+    				" (probability "+probability+")");
+    		
+        }
+        else if(analysis.getAnalysisProgram() == Program.PERCOLATOR) {
+        	
+        	request.setAttribute("scorecutoff_string", "Percolator q-value: "+QCStatsGetter.PERC_QVAL_DEFAULT);
+        	
+        	request.setAttribute("is_percolator", true);
+        }
         
         // -----------------------------------------------------------------------------
         // Spectra-RT plot

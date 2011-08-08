@@ -51,7 +51,7 @@ function updatePsmRetTimeResults() {
 	$.blockUI();
 	$("#psmrtplot").load("<yrcwww:link path='viewPsmVsRetTimeResults.do'/>", 	//url
 						{'analysisId': analysisId, 		// data
-						 'qvalue': qval
+						 'scoreCutoff': qval
 						 },
 						 function(responseText, status, xhr) {						// callback
 						 	$.unblockUI();
@@ -67,7 +67,7 @@ function updateSpectraRetTimeResults() {
 	$.blockUI();
 	$("#spectrartplot").load("<yrcwww:link path='viewSpectraVsRetTimeResults.do'/>", 	//url
 						{'analysisId': analysisId, 		// data
-						 'qvalue': qval
+						 'scoreCutoff': qval
 						 },
 						 function(responseText, status, xhr) {						// callback
 						 	$.unblockUI();
@@ -124,17 +124,22 @@ function updatePsmDeltaMassResults() {
 		<a href="#psm_vs_rt">Retention Time vs Peptide Spectrum Matches</a>
 		<br/><br/>
 		<a href="#spectra_vs_rt">Retention Time vs MS/MS Spectra</a>
-		<br/><br/>
-		Delta precursor mass historgram:
-		&nbsp;
-		<span class="underline clickable" onclick="getPsmDeltaMassResults(false);return false;">[Da]</span>
-		&nbsp;
-		<span class="underline clickable" onclick="getPsmDeltaMassResults(true);return false;">[ppm]</span>
 		<br/>
+		
+		<logic:present name="is_percolator">
+			<br/>
+			Delta precursor mass historgram:
+			&nbsp;
+			<span class="underline clickable" onclick="getPsmDeltaMassResults(false);return false;">[Da]</span>
+			&nbsp;
+			<span class="underline clickable" onclick="getPsmDeltaMassResults(true);return false;">[ppm]</span>
+			<br/>
+		</logic:present>
+		
 		<logic:present name="peptideTerminalAAResult">
-		<br/>
-		<a href="#peptide_termini_aa_result">Amino Acid Frequency at Peptide Termini</a>
-		<br/>
+			<br/>
+			<a href="#peptide_termini_aa_result">Amino Acid Frequency at Peptide Termini</a>
+			<br/>
 		</logic:present>
 	</div>
 	

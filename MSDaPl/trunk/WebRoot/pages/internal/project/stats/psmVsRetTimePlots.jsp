@@ -11,9 +11,13 @@
 	
 	<div style="padding:10 7 10 7; margin-bottom:5; border: 1px dashed gray;background-color: #FFFFFF;" id="rt_psm_fold_target">
 	
+		<!--
 		<b>qvalue</b>: <input type="text" id="psmrt_qval_input" value="<bean:write name='qvalue'/>"/>
 		<input type="button" onclick="updatePsmRetTimeResults()" value="Update"/>
-	
+		-->
+		
+		<b><bean:write name='scorecutoff_string'/></b>
+		
 		<logic:present name="psmRTDistributionChart">
 		<table>
 			<tr>

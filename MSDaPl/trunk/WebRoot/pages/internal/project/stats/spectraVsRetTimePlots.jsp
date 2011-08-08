@@ -11,8 +11,11 @@
 	
 	<div style="padding:10 7 10 7; margin-bottom:5; border: 1px dashed gray;background-color: #FFFFFF;" id="rt_spectra_fold_target">
 	
+		<!-- 
 		<b>qvalue</b>: <input type="text" id="spectrart_qval_input" value="<bean:write name='qvalue'/>"/>
 		<input type="button" onclick="updateSpectraRetTimeResults()" value="Update"/>
+		-->
+		<b><bean:write name='scorecutoff_string'/></b>
 		
 		<logic:present name="spectraRTDistributionChart">
 		<table>

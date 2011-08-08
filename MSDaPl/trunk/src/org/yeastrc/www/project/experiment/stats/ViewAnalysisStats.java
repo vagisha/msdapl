@@ -16,8 +16,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.experiment.stats.PercolatorQCStatsGetter;
+import org.yeastrc.experiment.stats.QCStatsGetter;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.impl.PeptideTerminalAAResult;
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetROC;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -100,11 +105,37 @@ public class ViewAnalysisStats extends Action {
         //request.setAttribute("filterForm", myForm);
         
         
-        PercolatorQCStatsGetter statsGetter = new PercolatorQCStatsGetter();
+        QCStatsGetter statsGetter = new QCStatsGetter();
         statsGetter.setGetPsmRtStats(true);
         statsGetter.setGetSpectraRtStats(true);
         statsGetter.setGetPeptideTerminiStats(true);
-        statsGetter.getStats(analysisId, myForm.getQvalue());
+        
+        MsSearchAnalysis analysis = DAOFactory.instance().getMsSearchAnalysisDAO().load(analysisId);
+        
+        if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
+        	
+        	statsGetter.getStats(analysisId, QCStatsGetter.PEPPROPHET_ERR_RATE_DEFAULT);
+        	
+        	PeptideProphetRocDAO rocDao = DAOFactory.instance().getPeptideProphetRocDAO();
+    		PeptideProphetROC roc = rocDao.loadRoc(analysisId);
+    		double errRate = roc.getClosestError(QCStatsGetter.PEPPROPHET_ERR_RATE_DEFAULT);
+    		double probability = roc.getMinProbabilityForError(errRate);
+    		log.info("Probability for error rate of "+errRate+" is: "+probability);
+    		
+    		request.setAttribute("scorecutoff_string", "PeptideProphet Error rate: "+errRate+
+    				" (probability "+probability+")");
+    		
+        }
+        else if(analysis.getAnalysisProgram() == Program.PERCOLATOR) {
+        	
+        	statsGetter.getStats(analysisId, QCStatsGetter.PERC_QVAL_DEFAULT);
+        	
+        	request.setAttribute("scorecutoff_string", "Percolator q-value: "+QCStatsGetter.PERC_QVAL_DEFAULT);
+        	
+        	request.setAttribute("is_percolator", true);
+        }
+        
+        
         
         // -----------------------------------------------------------------------------
         // PSM-RT plot

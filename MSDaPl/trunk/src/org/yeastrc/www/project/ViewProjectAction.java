@@ -37,7 +37,7 @@ import org.yeastrc.experiment.ProjectProteinInferBookmarkDAO;
 import org.yeastrc.experiment.SearchAnalysis;
 import org.yeastrc.experiment.proteinfer.ProteinferRunSummaryLookup;
 import org.yeastrc.experiment.stats.FileStats;
-import org.yeastrc.experiment.stats.PercolatorQCStatsGetter;
+import org.yeastrc.experiment.stats.QCStatsGetter;
 import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
@@ -45,9 +45,11 @@ import org.yeastrc.jobqueue.MsAnalysisUploadJob;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetROC;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.general.MsInstrument;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
@@ -464,12 +466,33 @@ public class ViewProjectAction extends Action {
         
         // get QC results for this analysis
         if(analysis.getAnalysisProgram() == Program.PERCOLATOR) {
-        	PercolatorQCStatsGetter qcStatsGetter = new PercolatorQCStatsGetter();
+        	QCStatsGetter qcStatsGetter = new QCStatsGetter();
         	qcStatsGetter.setGetPsmRtStats(true);
         	qcStatsGetter.setGetSpectraRtStats(true);
-        	qcStatsGetter.getStats(searchAnalysisId, PercolatorQCStatsGetter.QVAL);
+        	qcStatsGetter.getStats(searchAnalysisId, QCStatsGetter.PERC_QVAL_DEFAULT);
         	FileStats analysisPsmStat = qcStatsGetter.getPsmAnalysisStats();
-        	String qcSummaryString = "% PSMs (qvalue <= 0.01) = "+analysisPsmStat.getPercentGoodCount();
+        	String qcSummaryString = analysisPsmStat.getPercentGoodCount()+"% PSMs at qvalue <= 0.01";
+        	sAnalysis.setQcSummaryString(qcSummaryString);
+        	
+        	List<QCPlot> qcPlots = new ArrayList<QCPlot>(2);
+        	qcPlots.add(new QCPlot(qcStatsGetter.getPsmDistrUrl(), "Retention Time vs # PSM"));
+        	qcPlots.add(new QCPlot(qcStatsGetter.getSpectraDistrUrl(), "Retention Time vs # Spectra"));
+        	sAnalysis.setQcPlots(qcPlots);
+        }
+        else if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
+        	
+        	QCStatsGetter qcStatsGetter = new QCStatsGetter();
+        	qcStatsGetter.setGetPsmRtStats(true);
+        	qcStatsGetter.setGetSpectraRtStats(true);
+        	qcStatsGetter.getStats(searchAnalysisId, QCStatsGetter.PEPPROPHET_ERR_RATE_DEFAULT);
+        	FileStats analysisPsmStat = qcStatsGetter.getPsmAnalysisStats();
+        	
+        	PeptideProphetRocDAO rocDao = DAOFactory.instance().getPeptideProphetRocDAO();
+    		PeptideProphetROC roc = rocDao.loadRoc(analysis.getId());
+    		double errRate = roc.getClosestError(QCStatsGetter.PEPPROPHET_ERR_RATE_DEFAULT);
+    		double probability = roc.getMinProbabilityForError(errRate);
+    		
+        	String qcSummaryString = analysisPsmStat.getPercentGoodCount()+"% PSMs at error rate "+errRate+" (probability "+probability+")";
         	sAnalysis.setQcSummaryString(qcSummaryString);
         	
         	List<QCPlot> qcPlots = new ArrayList<QCPlot>(2);

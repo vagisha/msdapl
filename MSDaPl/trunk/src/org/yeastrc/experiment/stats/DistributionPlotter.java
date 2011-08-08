@@ -25,12 +25,12 @@ public class DistributionPlotter {
 	
     public String plotGoogleChartForPSM_RTDistribution(int analysisId, double qValCutoff) {
         
-        PercolatorPsmRetTimeDistributionGetter dg = new PercolatorPsmRetTimeDistributionGetter(analysisId, qValCutoff);
-        PercolatorPsmRetTimeDistribution distr = dg.getDistribution();
+        PsmRetTimeDistributionGetter dg = new PsmRetTimeDistributionGetter(analysisId, qValCutoff);
+        PsmRetTimeDistribution distr = dg.getDistribution();
         return plotGoogleChartForPSM_RTDistribution(distr);
     }
     
-    public String plotGoogleChartForPSM_RTDistribution(PercolatorPsmRetTimeDistribution result) {
+    public String plotGoogleChartForPSM_RTDistribution(PsmRetTimeDistribution result) {
         
         int[] distr = result.getFilteredPsmDistribution();
         int[] allDistr = result.getAllPsmDistribution();
@@ -42,8 +42,9 @@ public class DistributionPlotter {
         url += "cht=bvs";                        // vertical stacked bar chart
         url += "&chbh=a";                        // adjust bar widths to fit in chart
         url += "&chs=500x325";                  // chart size
-        url += "&chdl="+"PSMs with qvalue<="+result.getScoreCutoff()+"|All Percolator PSMs"; // legend
-        url += "&chdlp=t";  // place the legent at the top
+        // url += "&chdl="+"PSMs with qvalue<="+result.getScoreCutoff()+"|All Percolator PSMs"; // legend
+        url += "&chdl="+result.getChartLegend();
+        url += "&chdlp=t";  // place the legend at the top
         url += "&chg=10,10"; // grid; x-axis and y-axis step size = 10
         url += "&chf=c,s,EFEFEF"; // fill chart area; solid fill gray
         url += "&chxt=x,y,x,y";                 // display both x and y labels
@@ -56,7 +57,7 @@ public class DistributionPlotter {
         url += "&chco=FF0000,0000FF";
         
         url += "&chd=t:";
-        // plot the percolator q-value filtered numbers first
+        // plot the filtered numbers first
         String series = "";
         for(int i = 0; i < distr.length; i++) {
             series+=","+distr[i];
@@ -70,7 +71,7 @@ public class DistributionPlotter {
         series = "";
         // now plot the rest of the numbers
         for(int i = 0; i < allDistr.length; i++) {
-            // we are drawing a stacked bar chart. subtract the percolator numbers first
+            // we are drawing a stacked bar chart. subtract the filtered numbers first
             series+=","+(allDistr[i] - distr[i]); 
         }
         if(series.length() > 0)
@@ -82,12 +83,12 @@ public class DistributionPlotter {
     
     public String plotGoogleChartForScan_RTDistribution(int analysisId, double qValCutoff) {
         
-    	PercolatorSpectraRetTimeDistributionGetter dg = new PercolatorSpectraRetTimeDistributionGetter(analysisId, qValCutoff);
-        PercolatorSpectraRetTimeDistribution distr = dg.getDistribution();
+    	SpectraRetTimeDistributionGetter dg = new SpectraRetTimeDistributionGetter(analysisId, qValCutoff);
+        SpectraRetTimeDistribution distr = dg.getDistribution();
         return plotGoogleChartForScan_RTDistribution(distr);
     }
     
-    public String plotGoogleChartForScan_RTDistribution(PercolatorSpectraRetTimeDistribution result) {
+    public String plotGoogleChartForScan_RTDistribution(SpectraRetTimeDistribution result) {
         
         int[] distr = result.getFilteredSpectraDistribution();
         int[] allDistr = result.getAllSpectraDistribution();
@@ -99,7 +100,8 @@ public class DistributionPlotter {
         url += "cht=bvs";                        // vertical stacked bar chart
         url += "&chbh=a";                        // adjust bar widths to fit in chart
         url += "&chs=500x325";                  // chart size
-        url += "&chdl="+"MS/MS scans with good results (qvalue<="+result.getScoreCutoff()+")|All MS/MS Scans"; // legend
+        // url += "&chdl="+"MS/MS scans with good results (qvalue<="+result.getScoreCutoff()+")|All MS/MS Scans"; // legend
+        url += "&chdl="+result.getChartLegend(); // legend
         url += "&chdlp=t";  // place the legent at the top
         url += "&chg=10,10"; // grid; x-axis and y-axis step size = 10
         url += "&chf=c,s,EFEFEF"; // fill chart area; solid fill gray
@@ -113,7 +115,7 @@ public class DistributionPlotter {
         url += "&chco=008000,800080";
         
         url += "&chd=t:";
-        // plot the percolator q-value filtered numbers first
+        // plot the filtered numbers first
         String series = "";
         for(int i = 0; i < distr.length; i++) {
             series+=","+distr[i];
@@ -127,7 +129,7 @@ public class DistributionPlotter {
         series = "";
         // now plot the rest of the numbers
         for(int i = 0; i < allDistr.length; i++) {
-            // we are drawing a stacked bar chart. subtract the percolator numbers first
+            // we are drawing a stacked bar chart. subtract the filtered numbers first
             series+=","+(allDistr[i] - distr[i]); 
         }
         if(series.length() > 0)
@@ -166,7 +168,8 @@ public class DistributionPlotter {
     
     public static void main(String[] args) throws IOException {
         
-        int analysisId = 91;
+        // int analysisId = 91;
+        int analysisId = 145;
         
         String googleUrl = new DistributionPlotter().plotGoogleChartForPSM_RTDistribution(analysisId, 0.01);
         System.out.println(googleUrl);

@@ -170,7 +170,7 @@
 							</div>
 						</logic:present>
 						<b><a href="<yrcwww:link path='viewQCPlots.do?'/>analysisId=<bean:write name='analysis' property='id' />&experimentId=<bean:write name='experiment' property='id'/>"> 
-						[Statistics]</a></b>
+						[Details]</a></b>
 					</td>
 					<td>
 						<b><a href="<yrcwww:link path='newPercolatorProteinInference.do?'/>searchAnalysisId=<bean:write name='analysis' property='id' />&projectId=<bean:write name='experiment' property='projectId'/>"> 
@@ -273,11 +273,30 @@
 			<td valign="top">
 				<b><bean:write name="analysis" property="filename" /></b>
 			</td>
-			<td valign="top">
-				<b>
-					<html:link action="viewPeptideProphetResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link>
-				</b>
+			
+			<td valign="middle">
+				<logic:present name="analysis" property="qcSummaryString">
+					<span style="font-weight:bold;color:green;"><bean:write name="analysis" property="qcSummaryString"/></span>
+					<br/>
+				</logic:present>
+				<b><html:link action="viewPeptideProphetResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link></b>
 			</td>
+			<td align="left">
+				<logic:present name="analysis" property="qcPlots">
+					<div style="padding:5px;">
+					<logic:iterate name="analysis" property="qcPlots" id="plot">
+						<a  class="thumb" href="<bean:write name='plot' property='plotUrl'/>" title="<bean:write name='plot' property='plotTitle'/>">
+							<img style="width: 30px; height: 30px;text-decoration: none; border: 2px solid gray;" 
+							 	 src="<bean:write name='plot' property='plotUrl'/>" alt="<bean:write name='plot' property='plotTitle'/>"/>
+						</a>
+					</logic:iterate>
+					</div>
+				</logic:present>
+				<b><a href="<yrcwww:link path='viewQCPlots.do?'/>analysisId=<bean:write name='analysis' property='id' />&experimentId=<bean:write name='experiment' property='id'/>"> 
+				[Details]</a></b>
+			</td>
+					
+			
 		</tr>
 		</logic:iterate>
 		</table>
