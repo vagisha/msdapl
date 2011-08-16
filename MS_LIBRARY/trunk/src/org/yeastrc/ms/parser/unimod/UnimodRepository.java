@@ -23,7 +23,7 @@ public class UnimodRepository {
 
 	private List<ModT> modsList;
 	
-	public final static double DELTA_MASS_TOLERANCE_001 = 0.001; 
+	public final static double DELTA_MASS_TOLERANCE_1 = 0.1; 
 	
 	public void initialize() throws UnimodRepositoryException {
 		
@@ -74,12 +74,14 @@ public class UnimodRepository {
 				mass = mod.getDelta().getAvgeMass();
 			}
 			
-			if((mass - tolerance) < deltaMonoMass && (mass + tolerance) > deltaMonoMass) {
+			double diff = Math.abs(mass - deltaMonoMass);
+			if((diff <= tolerance)) {
 				return mod;
 			}
 		}
 		
-		return null;
+		// did not find a modification
+		throw new UnimodRepositoryException("No matching modification found for residue: "+modifiedResidue+"; mass: "+deltaMonoMass);
 	}
 	
 	

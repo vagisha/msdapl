@@ -3,6 +3,7 @@
  */
 package org.yeastrc.ms.writer.mzidentml;
 
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationItemType;
@@ -17,6 +18,7 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationResultType;
 public class SpectrumIdentificationResultMaker {
 
 	private String filename;
+	private int scanNumber;
 	private int resultIndex = 0;
 	private SpectrumIdentificationResultType spectrumResult;
 
@@ -25,6 +27,8 @@ public class SpectrumIdentificationResultMaker {
 		// Example: <SpectrumIdentificationResult id="SpIdLi1_Res1" spectrumID="file=DTA1" spectraData_ref="DTA1">
 		
 		this.filename = filename;
+		this.scanNumber = scanNumber;
+		
 		spectrumResult = new SpectrumIdentificationResultType();
 		
 		// id: An identifier is an unambiguous string that is unique within the scope 
@@ -53,7 +57,16 @@ public class SpectrumIdentificationResultMaker {
 		addSpectrumIdentificationItem(item);
 	}
 	
-	public void addSpectrumIdentificationItem(SpectrumIdentificationItemType item){
+	public void addSequestResult(SequestSearchResult result) 
+				throws ModifiedSequenceBuilderException {
+
+		SequestSpectrumIdentificationItemMaker itemmaker = new SequestSpectrumIdentificationItemMaker(filename);
+		SpectrumIdentificationItemType item = itemmaker.make(result, this.scanNumber, ++resultIndex);
+
+		addSpectrumIdentificationItem(item);
+	}
+	
+	private void addSpectrumIdentificationItem(SpectrumIdentificationItemType item){
 
 		spectrumResult.getSpectrumIdentificationItem().add(item);
 	}
