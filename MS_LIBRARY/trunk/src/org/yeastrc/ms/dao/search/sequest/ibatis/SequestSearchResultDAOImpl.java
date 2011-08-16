@@ -128,7 +128,9 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
             return loadResultIdsForRunSearch(runSearchId);
         }
         
-        boolean useScanTable = filterCriteria.hasScanFilter() || SORT_BY.isScanRelated(sortCriteria.getSortBy());
+        boolean useScanTable = filterCriteria.hasScanFilter()
+        						|| filterCriteria.hasRTFilter()
+        						|| SORT_BY.isScanRelated(sortCriteria.getSortBy());
         boolean useModsTable = filterCriteria.hasMofificationFilter();
         boolean useResultsTable = filterCriteria.superHasFilters() 
                                 || SORT_BY.isSearchRelated(sortCriteria.getSortBy())
@@ -291,7 +293,9 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
             return loadResultIdsForSearch(searchId);
         }
         
-        boolean useScanTable = filterCriteria.hasScanFilter() || SORT_BY.isScanRelated(sortCriteria.getSortBy());
+        boolean useScanTable = filterCriteria.hasScanFilter() 
+        						|| filterCriteria.hasRTFilter()
+        						|| SORT_BY.isScanRelated(sortCriteria.getSortBy());
         boolean useModsTable = filterCriteria.hasMofificationFilter();
         boolean useResultsTable = filterCriteria.superHasFilters() 
                                 || SORT_BY.isSearchRelated(sortCriteria.getSortBy())
