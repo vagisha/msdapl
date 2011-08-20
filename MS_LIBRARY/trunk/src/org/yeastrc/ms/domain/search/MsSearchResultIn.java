@@ -1,6 +1,5 @@
 package org.yeastrc.ms.domain.search;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -23,32 +22,3 @@ public interface MsSearchResultIn extends MsRunSearchResultBase {
 
 }
 
-interface MsRunSearchResultBase {
-    
-    /**
-     * @return the peptideResult
-     */
-    public abstract MsSearchResultPeptide getResultPeptide();
-    
-    public abstract void setResultPeptide(MsSearchResultPeptide resultPeptide);
-    
-    /**
-     * @return the charge
-     */
-    public abstract int getCharge();
-    
-    public abstract void setCharge(int charge);
-    
-    /**
-     * @return the observedMass
-     */
-    public abstract BigDecimal getObservedMass();
-    
-    public abstract void setObservedMass(BigDecimal mass);
-
-    /**
-     * @return the validationStatus
-     */
-    public abstract ValidationStatus getValidationStatus();
-    
-}

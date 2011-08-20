@@ -3,6 +3,9 @@
  */
 package org.yeastrc.ms.writer.mzidentml;
 
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
@@ -20,7 +23,15 @@ public class SpectrumIdentificationResultMaker {
 	private String filename;
 	private int scanNumber;
 	private int resultIndex = 0;
+	private Program searchProgram;
 	private SpectrumIdentificationResultType spectrumResult;
+
+	public void initSpectrumResult(String filename, int scanNumber, Program searchProgram) {
+		
+		this.initSpectrumResult(filename, scanNumber);
+		this.searchProgram = searchProgram;
+		
+	}
 
 	public void initSpectrumResult(String filename, int scanNumber) {
 		
@@ -61,6 +72,24 @@ public class SpectrumIdentificationResultMaker {
 				throws ModifiedSequenceBuilderException {
 
 		SequestSpectrumIdentificationItemMaker itemmaker = new SequestSpectrumIdentificationItemMaker(filename);
+		SpectrumIdentificationItemType item = itemmaker.make(result, this.scanNumber, ++resultIndex);
+
+		addSpectrumIdentificationItem(item);
+	}
+	
+	public void addPercolatorResult(PercolatorResult result) 
+			throws ModifiedSequenceBuilderException, MzidDataProviderException {
+
+		PercolatorSpectrumIdentificationItemMaker itemmaker = new PercolatorSpectrumIdentificationItemMaker(filename, searchProgram);
+		SpectrumIdentificationItemType item = itemmaker.make(result, this.scanNumber, ++resultIndex);
+
+		addSpectrumIdentificationItem(item);
+	}
+	
+	public void addPercolatorResult(PeptideProphetResult result) 
+			throws ModifiedSequenceBuilderException, MzidDataProviderException {
+
+		PeptideProphetSpectrumIdentificationItemMaker itemmaker = new PeptideProphetSpectrumIdentificationItemMaker(filename, searchProgram);
 		SpectrumIdentificationItemType item = itemmaker.make(result, this.scanNumber, ++resultIndex);
 
 		addSpectrumIdentificationItem(item);

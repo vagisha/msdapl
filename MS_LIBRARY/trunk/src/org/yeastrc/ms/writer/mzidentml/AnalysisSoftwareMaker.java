@@ -15,7 +15,6 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.ParamType;
  */
 public class AnalysisSoftwareMaker {
 
-	public static String SEQUEST_SW_ID = "SEQUEST";
 	
 	public AnalysisSoftwareType makeSequestAnalysisSoftware(String version) {
 		
@@ -36,8 +35,8 @@ public class AnalysisSoftwareMaker {
  
 		 */
 		AnalysisSoftwareType software = new AnalysisSoftwareType();
-		software.setName(SEQUEST_SW_ID);
-		software.setId(SEQUEST_SW_ID);
+		software.setName(MzidConstants.SEQUEST_SW_ID);
+		software.setId(MzidConstants.SEQUEST_SW_ID);
 		software.setVersion(version);
 		
 		CvParamMaker cvparamMaker = CvParamMaker.getInstance();
@@ -54,6 +53,54 @@ public class AnalysisSoftwareMaker {
 		software.setSoftwareName(paramType);
 		
 		return software;
-
 	}
+	
+	public AnalysisSoftwareType makePercolatorAnalysisSoftware(String version) {
+		
+		AnalysisSoftwareType software = new AnalysisSoftwareType();
+		software.setName(MzidConstants.PERCOLATOR_SW_ID);
+		software.setId(MzidConstants.PERCOLATOR_SW_ID);
+		software.setVersion(version);
+		
+		CvParamMaker cvparamMaker = CvParamMaker.getInstance();
+		/*
+	 	[Term]
+		id: MS:1001490
+		name: Percolator
+		def: "Percolator." [PSI:PI]
+		is_a: MS:1001456 ! analysis software
+
+		 */
+		CVParamType cvParam = cvparamMaker.make("MS:1001490", "Percolator", CvConstants.PSI_CV);
+		ParamType paramType = new ParamType();
+		paramType.setCvParam(cvParam);
+		
+		software.setSoftwareName(paramType);
+		
+		return software;
+	}
+	
+	public AnalysisSoftwareType makePeptideProphetAnalysisSoftware(String version) {
+		
+		AnalysisSoftwareType software = new AnalysisSoftwareType();
+		software.setName(MzidConstants.PEPTIDE_PROPHET_SW_ID);
+		software.setId(MzidConstants.PEPTIDE_PROPHET_SW_ID);
+		software.setVersion(version);
+		
+		CvParamMaker cvparamMaker = CvParamMaker.getInstance();
+		/*
+	 	id: MS:1001456
+		name: analysis software
+		def: "Analysis software." [PSI:MS]
+		is_a: MS:1000531 ! software
+		 */
+		CVParamType cvParam = cvparamMaker.make("MS:1001456", "analysis software", "PeptideProphet", CvConstants.PSI_CV);
+		ParamType paramType = new ParamType();
+		paramType.setCvParam(cvParam);
+		
+		software.setSoftwareName(paramType);
+		
+		return software;
+	}
+	
 }

@@ -376,9 +376,9 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
 	
 	AnalysisProtocolCollectionType getAnalysisProtocolCollection() throws MzIdentMlWriterException, JAXBException {
 		
-		AnalysisProtocolCollectionMaker collMaker = new AnalysisProtocolCollectionMaker_FromSequestParams(this.getUnimodRepository(), this.seqParamsparser);
+		SpectrumIdentificationProtocolMaker collMaker = new SequestProtocolMaker_FromSequestParams(this.getUnimodRepository(), this.seqParamsparser);
 		
-		return collMaker.getSequestAnalysisProtocol();
+		return collMaker.getProtocol();
 	}
 	
 	
@@ -482,6 +482,9 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
 		
 		writer.setOutputFilePath("/Users/silmaril/WORK/UW/MSDaPl_data/jeckels_data/ecoli/sequest/wormy4raw-1.mzid");
 		// writer.setWriter(new BufferedWriter(new OutputStreamWriter((System.out))));
+		
+		writer.initialize();
+		
 		writer.start();
 		writer.end();
 	}

@@ -3,23 +3,23 @@
  */
 package org.yeastrc.ms.writer.mzidentml;
 
-import java.io.IOException;
 import java.util.List;
 
+import org.yeastrc.ms.parser.unimod.UnimodRepository;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisSoftwareListType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisSoftwareType;
-import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationResultType;
 
 /**
- * SequestMzidWriter.java
+ * SequestMzidDataProvider.java
  * @author Vagisha Sharma
  * Aug 15, 2011
  * 
  */
-public abstract class SequestMzidWriter extends MzidWriter {
+public abstract class SequestMzidDataProvider implements MzidDataProvider {
 
+	private UnimodRepository unimodRepository;
 	
-	AnalysisSoftwareListType getAnalysisSoftware() {
+	public AnalysisSoftwareListType getAnalysisSoftware() {
 		
 		AnalysisSoftwareListType listType = new AnalysisSoftwareListType();
 		
@@ -31,41 +31,28 @@ public abstract class SequestMzidWriter extends MzidWriter {
 		return listType;
 	}
 
-	String getSpectrumIdentificationId() {
+	public String getSpectrumIdentificationId() {
 		return MzidConstants.SPEC_IDENT_ID_SEQ;
 	}
 	
-	String getSpectrumIdentificationListId() {
+	public String getSpectrumIdentificationListId() {
 		return MzidConstants.SPEC_ID_LIST_ID;
 	}
 	
-	String getSpectrumIdentificationProtocolId() {
+	public String getSpectrumIdentificationProtocolId() {
 		return MzidConstants.SEQUEST_PROTOCOL_ID;
 	}
 	
-	void writeAnalysisResults(AnalysisDataWriter adataWriter) throws MzIdentMlWriterException, IOException {
-		
-		adataWriter.startSpectrumIdentificationList(getSpectrumIdentificationListId());
-		
-		writeSearchResults();
-		
-		adataWriter.endSpectrumIdentificationList();
-		
-	}
-
-	void writeSearchResult(SpectrumIdentificationResultType result)
-			throws MzIdentMlWriterException {
-		
-		if(result.getSpectrumIdentificationItem().size() > 0) {
-			super.marshalElement(result);
-		}
+	public void setUnimodRepository(UnimodRepository repository) {
+		this.unimodRepository = repository;
 	}
 	
+	UnimodRepository getUnimodRepository() {
+		return this.unimodRepository;
+	}
 
 //	// --------------------------------------------------------------------------------------------
 //	// Abstract methods
 	abstract String getSequestVersion();
-	
-	abstract void writeSearchResults() throws MzIdentMlWriterException;
 //	// --------------------------------------------------------------------------------------------
 }
