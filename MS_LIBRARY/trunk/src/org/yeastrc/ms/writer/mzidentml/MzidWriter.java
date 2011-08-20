@@ -211,14 +211,18 @@ public class MzidWriter {
         
         // write <DBSequence> elements
         DBSequenceType seq = null;
-        while((seq = dataProvider.getNextSequence()) != null) {
-        	try {
-        		seqCollWriter.addSequence(seq);
-        	}
-        	catch (JAXBException e) {
-            	throw new MzIdentMlWriterException("Error marshalling DBSequenceType", e);
-    		}
-        }
+        try {
+	        while((seq = dataProvider.getNextSequence()) != null) {
+	        	try {
+	        		seqCollWriter.addSequence(seq);
+	        	}
+	        	catch (JAXBException e) {
+	            	throw new MzIdentMlWriterException("Error marshalling DBSequenceType", e);
+	    		}
+	        }
+        } catch (MzidDataProviderException e1) {
+			throw new MzIdentMlWriterException("Error getting data for DBSequenceType", e1);
+		}
         
         // write <Peptide> elements
         PeptideType peptide = null;
@@ -375,7 +379,7 @@ public class MzidWriter {
 	}
 
 	
-	void marshalElement(Object element) throws MzIdentMlWriterException {
+	protected void marshalElement(Object element) throws MzIdentMlWriterException {
 		
 		try {
 			marshaller.marshal(element, writer);

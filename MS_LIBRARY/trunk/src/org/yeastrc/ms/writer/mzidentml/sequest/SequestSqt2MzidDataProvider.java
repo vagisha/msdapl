@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.yeastrc.ms.writer.mzidentml;
+package org.yeastrc.ms.writer.mzidentml.sequest;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +26,14 @@ import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
 import org.yeastrc.ms.parser.unimod.UnimodRepositoryException;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
-import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisProtocolCollectionType;
+import org.yeastrc.ms.writer.mzidentml.CvConstants;
+import org.yeastrc.ms.writer.mzidentml.CvParamMaker;
+import org.yeastrc.ms.writer.mzidentml.DbSequenceMaker;
+import org.yeastrc.ms.writer.mzidentml.MzidDataProviderException;
+import org.yeastrc.ms.writer.mzidentml.PeptideEvidenceMaker;
+import org.yeastrc.ms.writer.mzidentml.PeptideMaker;
+import org.yeastrc.ms.writer.mzidentml.SequenceCollectionWriter;
+import org.yeastrc.ms.writer.mzidentml.SpectrumIdentificationResultMaker;
 import org.yeastrc.ms.writer.mzidentml.jaxb.DBSequenceType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.FileFormatType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.InputSpectraType;
@@ -37,17 +44,21 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SearchDatabaseType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectraDataType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIDFormatType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationProtocolType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationResultType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.UserParamType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.InputsType.SourceFile;
 
 /**
- * SequestSqt2MzidWriter.java
+ * SequestSqt2MzidDataProvider.java
  * @author Vagisha Sharma
  * Aug 1, 2011
  * 
  */
-public class SequestSqt2MzidWriter extends SequestMzidWriter {
+
+//!!! ------------- IMPORTANT --------------!!!
+// FIX THIS
+public class SequestSqt2MzidDataProvider extends AbstractSequestMzidDataProvider {
 	
 	private SequestParamsParser seqParamsparser;
 	private String sequestParamsDir = null;
@@ -66,15 +77,15 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
 	private String fastaFileName;
 	
 	
-	public void setSequestParamsDir(String sequestParamsDir) throws MzIdentMlWriterException {
+	public void setSequestParamsDir(String sequestParamsDir) throws MzidDataProviderException {
 		
 		this.sequestParamsDir = sequestParamsDir;
 	}
 	
-	public void setSqtFilePath(String sqtFilePath) throws MzIdentMlWriterException {
+	public void setSqtFilePath(String sqtFilePath) throws MzidDataProviderException {
 		
 		if(!(new File(sqtFilePath).exists())) {
-			throw new MzIdentMlWriterException("SQT file does not exist: "+sqtFilePath);
+			throw new MzidDataProviderException("SQT file does not exist: "+sqtFilePath);
 		}
 		this.sqtFilePath = sqtFilePath;
 		
@@ -83,20 +94,20 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
 		this.filename = filename.substring(0, filename.length() - 4);
 	}
 
-	void initializeFieldsBeforeWrite() throws MzIdentMlWriterException {
+	public void initializeFieldsBeforeWrite() throws MzidDataProviderException {
 		
 		// read the sequest params file
         try {
 			readSequestParams();
 		} catch (DataProviderException e) {
-			throw new MzIdentMlWriterException("Error reading sequest.params file", e);
+			throw new MzidDataProviderException("Error reading sequest.params file", e);
 		}
 		
 		// read the sequest version from the SQT header
 		try {
 			readSequestVersion();
 		} catch (DataProviderException e) {
-			throw new MzIdentMlWriterException("Error reading version of sequest from sqt file header", e);
+			throw new MzidDataProviderException("Error reading version of sequest from sqt file header", e);
 		}
 		
 	}
@@ -134,15 +145,19 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
 		return this.sequestVersion;
 	}
 	
-	String getFastaFilePath() {
+	public String getFastaFilePath() {
 		return this.fastaFilePath;
 	}
 	
-	String getFastaFileName() {
+	public String getFastaFileName() {
 		return this.fastaFileName;
 	}
 	
-	void writeDbSequences(SequenceCollectionWriter seqCollWriter) throws IOException, MzIdentMlWriterException {
+	// !!! ------------- IMPORTANT --------------!!!
+	// FIX THIS
+	@Override
+	public DBSequenceType getNextSequence() throws MzidDataProviderException {
+		
 		
 		Set<String> proteinAccessions = new HashSet<String>();
 		
@@ -155,7 +170,7 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
         	sqtReader.getSearchHeader(); // go past the file header
         	
         	if(StringUtils.isBlank(this.fastaFileName)) {
-        		throw new MzIdentMlWriterException("Could not find fasta database name");
+        		throw new MzidDataProviderException("Could not find fasta database name");
         	}
 
         	// read the PSMs
@@ -185,7 +200,6 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
         					}
         					
         					DBSequenceType seqType = seqMaker.make();
-        					seqCollWriter.addSequence(seqType);
         					
         					// add to our list
         					proteinAccessions.add(accession);
@@ -196,16 +210,15 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
         	}
         }
         catch(DataProviderException e) {
-        	throw new MzIdentMlWriterException("Error getting data from sqt file", e);
-        } catch (JAXBException e) {
-        	throw new MzIdentMlWriterException("Error marshalling DBSequenceType", e);
-		}
+        	throw new MzidDataProviderException("Error getting data from sqt file", e);
+        } 
         finally {
         	sqtReader.close(); // close the file handle
         }
+		return null;
 	}
 
-	void writePeptideSequences(SequenceCollectionWriter seqCollWriter) throws IOException, MzIdentMlWriterException {
+	void writePeptideSequences(SequenceCollectionWriter seqCollWriter) throws IOException, MzidDataProviderException {
 		
 		Set<String> peptideSequences = new HashSet<String>();
 		
@@ -248,7 +261,7 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
         					peptideMaker.addModification(mod.getModifiedPosition(), mod.getModificationMass().doubleValue());
         				}
         				catch(UnimodRepositoryException e) {
-        					throw new MzIdentMlWriterException("Unimod repository lookup failed for dynamic modification at position "+
+        					throw new MzidDataProviderException("Unimod repository lookup failed for dynamic modification at position "+
         							mod.getModifiedPosition()+" with delta mass: "+mod.getModificationMass()+" in peptide: "+resultPeptide.getPeptideSequence(), e);
         				}
         			}
@@ -265,7 +278,7 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
         					try {
 								peptideMaker.addModification(idx, smod.getModificationMass().doubleValue());
 							} catch (UnimodRepositoryException e) {
-								throw new MzIdentMlWriterException("Unimod repository lookup failed for static modification at position "+
+								throw new MzidDataProviderException("Unimod repository lookup failed for static modification at position "+
 	        							idx+" with delta mass: "+smod.getModificationMass()+" in peptide: "+resultPeptide.getPeptideSequence(), e);
 							}
         				}
@@ -283,18 +296,18 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
         	}
         }
         catch(DataProviderException e) {
-        	throw new MzIdentMlWriterException("Error getting data from sqt file", e);
+        	throw new MzidDataProviderException("Error getting data from sqt file", e);
         } catch (JAXBException e) {
-        	throw new MzIdentMlWriterException("Error marshalling DBSequenceType", e);
+        	throw new MzidDataProviderException("Error marshalling DBSequenceType", e);
 		} catch (ModifiedSequenceBuilderException e) {
-			throw new MzIdentMlWriterException("There was an error building modified sequence for a peptide", e);
+			throw new MzidDataProviderException("There was an error building modified sequence for a peptide", e);
 		}
         finally {
         	sqtReader.close(); // close the file handle
         }
 	}
 
-	void writePeptideEvidences(SequenceCollectionWriter seqCollWriter) throws IOException, MzIdentMlWriterException {
+	void writePeptideEvidences(SequenceCollectionWriter seqCollWriter) throws IOException, MzidDataProviderException {
 		
 		Set<String> peptideSequences = new HashSet<String>();
 		
@@ -351,18 +364,18 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
         	}
         }
         catch(DataProviderException e) {
-        	throw new MzIdentMlWriterException("Error getting data from sqt file", e);
+        	throw new MzidDataProviderException("Error getting data from sqt file", e);
         } catch (JAXBException e) {
-        	throw new MzIdentMlWriterException("Error marshalling DBSequenceType", e);
+        	throw new MzidDataProviderException("Error marshalling DBSequenceType", e);
 		} catch (ModifiedSequenceBuilderException e) {
-			throw new MzIdentMlWriterException("There was an error building modified sequence for a peptide", e);
+			throw new MzidDataProviderException("There was an error building modified sequence for a peptide", e);
 		}
         finally {
         	sqtReader.close(); // close the file handle
         }
 	}
 
-	List<InputSpectraType> getInputSpectraList() {
+	public List<InputSpectraType> getInputSpectraList() {
 		
 		InputSpectraType spectra = new InputSpectraType();
 		spectra.setSpectraDataRef(this.filename+".cms2");
@@ -374,15 +387,8 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
 	}
 	
 	
-	AnalysisProtocolCollectionType getAnalysisProtocolCollection() throws MzIdentMlWriterException, JAXBException {
-		
-		SpectrumIdentificationProtocolMaker collMaker = new SequestProtocolMaker_FromSequestParams(this.getUnimodRepository(), this.seqParamsparser);
-		
-		return collMaker.getProtocol();
-	}
 	
-	
-	InputsType getInputs() throws MzIdentMlWriterException {
+	public InputsType getInputs() throws MzidDataProviderException {
 		
 		InputsType inputs = new InputsType();
 		
@@ -424,7 +430,7 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
 		return inputs;
 	}
 	
-	void writeSearchResults() throws MzIdentMlWriterException {
+	void writeSearchResults() throws MzidDataProviderException {
 		
 		
 		// start reading the sqt file
@@ -451,41 +457,46 @@ public class SequestSqt2MzidWriter extends SequestMzidWriter {
         		
         		SpectrumIdentificationResultType result = specResultMaker.getSpectrumResult();
         		
-        		super.writeSearchResult(result);
         	}
         }
         catch(DataProviderException e) {
-        	throw new MzIdentMlWriterException("Error getting data from sqt file", e);
+        	throw new MzidDataProviderException("Error getting data from sqt file", e);
         } catch (ModifiedSequenceBuilderException e) {
-        	throw new MzIdentMlWriterException("Error building modified peptide sequence for psm", e);
+        	throw new MzidDataProviderException("Error building modified peptide sequence for psm", e);
 		}
         finally {
         	sqtReader.close(); // close the file handle
         }
 		
 	}
-	
-	
-	
-	public static void main(String[] args) throws MzIdentMlWriterException {
-		
-		SequestSqt2MzidWriter writer = new SequestSqt2MzidWriter();
-		
-		//String sqtFile = "/Users/vagisha/WORK/MSDaPl_data/chemostat_addLoci/sequest/09Sep10-chemostat-PP-02.sqt";
-		//String sqparamsDir = "/Users/vagisha/WORK/MSDaPl_data/chemostat_addLoci/sequest";
-		
-		String sqtFile = "/Users/silmaril/WORK/UW/MSDaPl_data/jeckels_data/ecoli/sequest/wormy4raw-1.sqt";
-		String sqparamsDir = "/Users/silmaril/WORK/UW/MSDaPl_data/jeckels_data/ecoli/sequest";
-		
-		writer.setSqtFilePath(sqtFile);
-		writer.setSequestParamsDir(sqparamsDir);
-		
-		writer.setOutputFilePath("/Users/silmaril/WORK/UW/MSDaPl_data/jeckels_data/ecoli/sequest/wormy4raw-1.mzid");
-		// writer.setWriter(new BufferedWriter(new OutputStreamWriter((System.out))));
-		
-		writer.initialize();
-		
-		writer.start();
-		writer.end();
+
+	@Override
+	public PeptideType getNextPeptide() throws MzidDataProviderException {
+		// TODO Auto-generated method stub
+		return null;
 	}
+
+	@Override
+	public List<PeptideEvidenceType> getNextPeptideEvidenceSet()
+			throws MzidDataProviderException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+
+	@Override
+	public SpectrumIdentificationResultType getNextSpectrumIdentificationResult()
+			throws MzidDataProviderException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SpectrumIdentificationProtocolType getSpectrumIdentificationProtocol()
+			throws MzidDataProviderException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }

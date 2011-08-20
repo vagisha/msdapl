@@ -1,21 +1,24 @@
 /**
  * 
  */
-package org.yeastrc.ms.writer.mzidentml;
+package org.yeastrc.ms.writer.mzidentml.sequest;
 
 import java.util.List;
 
 import org.yeastrc.ms.parser.unimod.UnimodRepository;
+import org.yeastrc.ms.writer.mzidentml.AnalysisSoftwareMaker;
+import org.yeastrc.ms.writer.mzidentml.MzidConstants;
+import org.yeastrc.ms.writer.mzidentml.MzidDataProvider;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisSoftwareListType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisSoftwareType;
 
 /**
- * SequestMzidDataProvider.java
+ * AbstractSequestMzidDataProvider.java
  * @author Vagisha Sharma
  * Aug 15, 2011
  * 
  */
-public abstract class SequestMzidDataProvider implements MzidDataProvider {
+public abstract class AbstractSequestMzidDataProvider implements MzidDataProvider {
 
 	private UnimodRepository unimodRepository;
 	

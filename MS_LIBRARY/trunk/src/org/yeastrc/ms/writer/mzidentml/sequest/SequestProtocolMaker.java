@@ -1,16 +1,24 @@
 /**
  * 
  */
-package org.yeastrc.ms.writer.mzidentml;
+package org.yeastrc.ms.writer.mzidentml.sequest;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.Param;
-import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.parser.unimod.UnimodRepository;
 import org.yeastrc.ms.parser.unimod.UnimodRepositoryException;
 import org.yeastrc.ms.parser.unimod.jaxb.ModT;
+import org.yeastrc.ms.writer.mzidentml.CvConstants;
+import org.yeastrc.ms.writer.mzidentml.CvParamMaker;
+import org.yeastrc.ms.writer.mzidentml.EnzymeTypeMaker;
+import org.yeastrc.ms.writer.mzidentml.MzidConstants;
+import org.yeastrc.ms.writer.mzidentml.MzidDataProviderException;
+import org.yeastrc.ms.writer.mzidentml.SpectrumIdentificationProtocolMaker;
 import org.yeastrc.ms.writer.mzidentml.jaxb.CVParamType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.EnzymeType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.EnzymesType;
@@ -22,32 +30,36 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationProtocolType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.ToleranceType;
 
 /**
- * SequestProtocolMaker_FromSequestParams.java
+ * SequestProtocolMaker.java
  * @author Vagisha Sharma
  * Aug 4, 2011
  * 
  */
-public class SequestProtocolMaker_FromSequestParams implements SpectrumIdentificationProtocolMaker {
+public class SequestProtocolMaker implements SpectrumIdentificationProtocolMaker {
 
 	private final UnimodRepository unimodRepository;
-	private final SequestParamsParser parser;
+	private final MsSearch search;
 	
-	public SequestProtocolMaker_FromSequestParams(UnimodRepository unimodRepository,
-			SequestParamsParser parser) {
+	public SequestProtocolMaker(UnimodRepository unimodRepository,
+			MsSearch search) {
 		
 		this.unimodRepository = unimodRepository;
-		this.parser = parser;
+		this.search = search;
 	}
 	
-	public SpectrumIdentificationProtocolType getProtocol () 
-			throws MzidDataProviderException {
-		
+	public SpectrumIdentificationProtocolType getProtocol() throws MzidDataProviderException {
 		
 		SpectrumIdentificationProtocolType specIdProtocol = new SpectrumIdentificationProtocolType();
 		
-		specIdProtocol.setId(MzidConstants.SEQUEST_PROTOCOL_ID);
 		
-		specIdProtocol.setAnalysisSoftwareRef(MzidConstants.SEQUEST_SW_ID);
+		if(Program.isSequest(search.getSearchProgram())) {
+			specIdProtocol.setId(MzidConstants.SEQUEST_PROTOCOL_ID);
+
+			specIdProtocol.setAnalysisSoftwareRef(MzidConstants.SEQUEST_SW_ID);
+		}
+		else {
+			throw new MzidDataProviderException("Do not know how to make AnalysisProtocolCollectionType for program: "+search.getSearchProgram());
+		}
 		
 		ParamType searchType = new ParamType();
 		searchType.setCvParam(CvParamMaker.getInstance().make("MS:1001083", "ms-ms search", CvConstants.PSI_CV));
@@ -58,28 +70,34 @@ public class SequestProtocolMaker_FromSequestParams implements SpectrumIdentific
 		ModificationParamsType modParams = new ModificationParamsType();
 		
 		// dynamic modifications
-		addDynamicResidueModifications(parser, modParams);
+		addDynamicResidueModifications(search, modParams);
 		// static modifications
-		addStaticResidueModifications(parser, modParams);
+		addStaticResidueModifications(search, modParams);
 		
 		if(modParams.getSearchModification().size() > 0) {
 			specIdProtocol.setModificationParams(modParams);
 		}
 		
+		// TODO add other search params in the <AdditionalSearchParams>
+		
 		
 		// Enzyme
 		EnzymesType enzymesType = new EnzymesType();
 		specIdProtocol.setEnzymes(enzymesType);
-		EnzymeType enzymeType = EnzymeTypeMaker.makeEnzymeType(parser.getSearchEnzyme());
+		List<MsEnzyme> searchEnzymes = search.getEnzymeList();
+		if(searchEnzymes.size() > 1) {
+			throw new MzidDataProviderException("Multiple enzymes found for search with ID: "+search.getId());
+		}
+		EnzymeType enzymeType = EnzymeTypeMaker.makeEnzymeType(searchEnzymes.get(0));
 		enzymesType.getEnzyme().add(enzymeType);
 		
 		// TODO Mass table
 		
 		// Fragment tolerance
-		specIdProtocol.setFragmentTolerance(makeFragmentTolerance(parser));
+		specIdProtocol.setFragmentTolerance(makeFragmentTolerance());
 		
 		// Parent tolerance
-		specIdProtocol.setParentTolerance(makeParentTolerance(parser));
+		specIdProtocol.setParentTolerance(makeParentTolerance());
 		
 		// threshold
 		ParamListType paramList = new ParamListType();
@@ -88,54 +106,58 @@ public class SequestProtocolMaker_FromSequestParams implements SpectrumIdentific
 		
 		
 		return specIdProtocol;
-		
 	}
 
-	private ToleranceType makeParentTolerance(SequestParamsParser parser) throws MzidDataProviderException {
+	private ToleranceType makeParentTolerance() throws MzidDataProviderException {
 		
 		double tolerance = -1.0;
 		boolean unitIsDaltons = true;
 		
-		for(Param param: parser.getParamList()) {
+		if(Program.isSequest(search.getSearchProgram())) {
 			
-			if(param.getParamName().equalsIgnoreCase(SequestParamsConstants.PEPTIDE_MASS_TOLERANCE)) {
-				tolerance = Double.parseDouble(param.getParamValue());
+			String val = DAOFactory.instance().getSequestSearchDAO().getSearchParamValue(search.getId(), SequestParamsConstants.PEPTIDE_MASS_TOLERANCE);
+			if(val != null) {
+				tolerance = Double.parseDouble(val);
 			}
 			
-			if(param.getParamName().equalsIgnoreCase(SequestParamsConstants.PEPTIDE_MASS_UNITS)) {
-				
-				// peptide_mass_units = 0                  ; 0=amu, 1=mmu, 2=ppm
-				String val = param.getParamValue();
-				if("0".equals(val)) {
-					unitIsDaltons = true;
-				}
-				else if("1".equals(val) || "2".equals(val)) {
-					unitIsDaltons = false;
-				}
+			// peptide_mass_units = 0                  ; 0=amu, 1=mmu, 2=ppm
+			val = DAOFactory.instance().getSequestSearchDAO().getSearchParamValue(search.getId(), SequestParamsConstants.PEPTIDE_MASS_UNITS);
+			if("0".equals(val)) {
+				unitIsDaltons = true;
+			}
+			else if("1".equals(val) || "2".equals(val)) {
+				unitIsDaltons = false;
 			}
 		}
-		
+		else {
+			throw new MzidDataProviderException("Do not know how to get parent tolerance for program: "+search.getSearchProgram());
+		}
+
 		if(tolerance == -1.0) {
-			throw new MzidDataProviderException("Did not find peptide_mass_tolerance param in sequest.params file");
+			throw new MzidDataProviderException("Did not find parent  tolerance for search ID "+search.getId());
 		}
 		
 		return makeTolerance(tolerance, unitIsDaltons);
 	}
 
-	private ToleranceType makeFragmentTolerance(SequestParamsParser parser) throws MzidDataProviderException {
+	private ToleranceType makeFragmentTolerance() throws MzidDataProviderException {
 		
 		double tolerance = -1.0;
 		
-		for(Param param: parser.getParamList()) {
+		if(Program.isSequest(search.getSearchProgram())) {
 			
-			if(param.getParamName().equalsIgnoreCase(SequestParamsConstants.FRAGMENT_ION_TOLERANCE)) {
-				tolerance = Double.parseDouble(param.getParamValue());
-				break;
+			String val = DAOFactory.instance().getSequestSearchDAO().getSearchParamValue(search.getId(), SequestParamsConstants.FRAGMENT_ION_TOLERANCE);
+			if(val != null) {
+				tolerance = Double.parseDouble(val);
 			}
 		}
+		else {
+			throw new MzidDataProviderException("Do not know how to get fragment tolerance for program: "+search.getSearchProgram());
+		}
+		
 		
 		if(tolerance == -1.0) {
-			throw new MzidDataProviderException("Did not find fragment_ion_tolerance param in sequest.params file");
+			throw new MzidDataProviderException("Did not find fragment tolerance for search ID "+search.getId());
 		}
 		
 		return makeTolerance(tolerance, true);
@@ -164,25 +186,25 @@ public class SequestProtocolMaker_FromSequestParams implements SpectrumIdentific
 		return tolType;
 	}
 	
-	private void addDynamicResidueModifications(SequestParamsParser parser,
+	private void addDynamicResidueModifications(MsSearch search,
 			ModificationParamsType modParams) throws MzidDataProviderException {
 		
-		List<MsResidueModificationIn> mods = parser.getDynamicResidueMods();
+		List<MsResidueModification> mods = search.getDynamicResidueMods();
 		addResidueModifications(modParams, mods);
 	}
 	
-	private void addStaticResidueModifications(SequestParamsParser parser,
+	private void addStaticResidueModifications(MsSearch search,
 			ModificationParamsType modParams) throws MzidDataProviderException {
 		
-		List<MsResidueModificationIn> mods = parser.getStaticResidueMods();
+		List<MsResidueModification> mods = search.getStaticResidueMods();
 		addResidueModifications(modParams, mods);
 	}
 
 	private void addResidueModifications(ModificationParamsType modParams,
-			List<MsResidueModificationIn> mods) throws MzidDataProviderException {
+			List<MsResidueModification> mods) throws MzidDataProviderException {
 		
 		
-		for(MsResidueModificationIn mod: mods) { 
+		for(MsResidueModification mod: mods) { 
 			
 			SearchModificationType modType = new SearchModificationType();
 			modParams.getSearchModification().add(modType);

@@ -11,6 +11,9 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationItemType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationResultType;
+import org.yeastrc.ms.writer.mzidentml.peptideprophet.PeptideProphetSpectrumIdentificationItemMaker;
+import org.yeastrc.ms.writer.mzidentml.percolator.PercolatorSpectrumIdentificationItemMaker;
+import org.yeastrc.ms.writer.mzidentml.sequest.SequestSpectrumIdentificationItemMaker;
 
 /**
  * SpectrumIdentificationResultMaker.java

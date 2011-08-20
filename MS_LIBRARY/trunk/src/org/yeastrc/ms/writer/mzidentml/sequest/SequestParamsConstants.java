@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.yeastrc.ms.writer.mzidentml;
+package org.yeastrc.ms.writer.mzidentml.sequest;
 
 /**
  * SequestParamsConstants.java

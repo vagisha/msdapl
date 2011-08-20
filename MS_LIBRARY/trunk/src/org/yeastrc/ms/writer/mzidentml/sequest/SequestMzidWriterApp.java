@@ -1,28 +1,29 @@
 /**
  * 
  */
-package org.yeastrc.ms.writer.mzidentml;
+package org.yeastrc.ms.writer.mzidentml.sequest;
+
+import org.yeastrc.ms.writer.mzidentml.MzIdentMlWriterException;
+import org.yeastrc.ms.writer.mzidentml.MzidWriter;
 
 /**
- * PercolatorMzidWriterApp.java
+ * SequestMzidWriterApp.java
  * @author Vagisha Sharma
  * Aug 16, 2011
  * 
  */
-public class PercolatorMzidWriterApp {
+public class SequestMzidWriterApp {
 
 	public static void main(String[] args) throws MzIdentMlWriterException {
 		
 		// int experimentId = Integer.parseInt(args[0]);
 		int experimentId = 105;
-		int searchAnalysisId = 112;
 		
-		PercolatorMzidDataProvider dataProvider = new PercolatorMzidDataProvider();
+		SequestMzidDataProvider dataProvider = new SequestMzidDataProvider();
 		dataProvider.setExperimentId(experimentId);
-		dataProvider.setSearchAnalysisId(searchAnalysisId);
 		
 		MzidWriter writer = new MzidWriter();
-		writer.setOutputFilePath("/Users/vagisha/WORK/MSDaPl_data/two-ms2/sequest/expt105_perc.mzid");
+		writer.setOutputFilePath("/Users/vagisha/WORK/MSDaPl_data/two-ms2/sequest/expt105_again.mzid");
 		writer.setDataProvider(dataProvider);
 		
 		writer.start();

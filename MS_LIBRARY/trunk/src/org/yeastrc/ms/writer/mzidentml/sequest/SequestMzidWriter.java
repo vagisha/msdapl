@@ -1,11 +1,16 @@
 /**
  * 
  */
-package org.yeastrc.ms.writer.mzidentml;
+package org.yeastrc.ms.writer.mzidentml.sequest;
 
 import java.io.IOException;
 import java.util.List;
 
+import org.yeastrc.ms.writer.mzidentml.AnalysisDataWriter;
+import org.yeastrc.ms.writer.mzidentml.AnalysisSoftwareMaker;
+import org.yeastrc.ms.writer.mzidentml.MzIdentMlWriterException;
+import org.yeastrc.ms.writer.mzidentml.MzidConstants;
+import org.yeastrc.ms.writer.mzidentml.MzidWriter;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisSoftwareListType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisSoftwareType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationResultType;

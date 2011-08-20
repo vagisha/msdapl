@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.yeastrc.ms.writer.mzidentml;
+package org.yeastrc.ms.writer.mzidentml.sequest;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,6 +37,14 @@ import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.parser.unimod.UnimodRepositoryException;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
+import org.yeastrc.ms.writer.mzidentml.CvConstants;
+import org.yeastrc.ms.writer.mzidentml.CvParamMaker;
+import org.yeastrc.ms.writer.mzidentml.DbSequenceMaker;
+import org.yeastrc.ms.writer.mzidentml.MsDataMzidDataProvider;
+import org.yeastrc.ms.writer.mzidentml.MzidDataProviderException;
+import org.yeastrc.ms.writer.mzidentml.PeptideEvidenceMaker;
+import org.yeastrc.ms.writer.mzidentml.PeptideMaker;
+import org.yeastrc.ms.writer.mzidentml.SpectrumIdentificationResultMaker;
 import org.yeastrc.ms.writer.mzidentml.jaxb.DBSequenceType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.FileFormatType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.InputSpectraType;
@@ -53,12 +61,12 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.UserParamType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.InputsType.SourceFile;
 
 /**
- * SequestSqt2MzidWriter.java
+ * SequestMzidDataProvider.java
  * @author Vagisha Sharma
  * Aug 1, 2011
  * 
  */
-public class SequestMsDataMzidDataProvider extends SequestMzidDataProvider implements MsDataMzidDataProvider {
+public class SequestMzidDataProvider extends AbstractSequestMzidDataProvider implements MsDataMzidDataProvider {
 	
 	private DAOFactory daoFactory = DAOFactory.instance();
 	private MsSearchResultProteinDAO proteinDao = daoFactory.getMsProteinMatchDAO();

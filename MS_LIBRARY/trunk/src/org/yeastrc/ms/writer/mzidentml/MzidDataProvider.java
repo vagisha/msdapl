@@ -27,7 +27,7 @@ public interface MzidDataProvider {
 	
 	public void initializeFieldsBeforeWrite() throws MzidDataProviderException;
 	
-	public DBSequenceType getNextSequence();
+	public DBSequenceType getNextSequence() throws MzidDataProviderException;
 	
 	public PeptideType getNextPeptide() throws MzidDataProviderException;
 	

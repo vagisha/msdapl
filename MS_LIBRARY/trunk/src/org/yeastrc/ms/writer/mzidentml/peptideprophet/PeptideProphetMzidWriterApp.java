@@ -1,7 +1,10 @@
 /**
  * 
  */
-package org.yeastrc.ms.writer.mzidentml;
+package org.yeastrc.ms.writer.mzidentml.peptideprophet;
+
+import org.yeastrc.ms.writer.mzidentml.MzIdentMlWriterException;
+import org.yeastrc.ms.writer.mzidentml.MzidWriter;
 
 /**
  * PercolatorMzidWriterApp.java

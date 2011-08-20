@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.yeastrc.ms.writer.mzidentml;
+package org.yeastrc.ms.writer.mzidentml.peptideprophet;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,15 +14,13 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
-import org.yeastrc.ms.dao.analysis.percolator.PercolatorParamsDAO;
-import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
-import org.yeastrc.ms.domain.analysis.percolator.PercolatorParam;
-import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsScan;
@@ -42,6 +40,17 @@ import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.parser.unimod.UnimodRepository;
 import org.yeastrc.ms.parser.unimod.UnimodRepositoryException;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
+import org.yeastrc.ms.writer.mzidentml.AnalysisSoftwareMaker;
+import org.yeastrc.ms.writer.mzidentml.CvConstants;
+import org.yeastrc.ms.writer.mzidentml.CvParamMaker;
+import org.yeastrc.ms.writer.mzidentml.DbSequenceMaker;
+import org.yeastrc.ms.writer.mzidentml.MsDataMzidDataProvider;
+import org.yeastrc.ms.writer.mzidentml.MzidConstants;
+import org.yeastrc.ms.writer.mzidentml.MzidDataProvider;
+import org.yeastrc.ms.writer.mzidentml.MzidDataProviderException;
+import org.yeastrc.ms.writer.mzidentml.PeptideEvidenceMaker;
+import org.yeastrc.ms.writer.mzidentml.PeptideMaker;
+import org.yeastrc.ms.writer.mzidentml.SpectrumIdentificationResultMaker;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisSoftwareListType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AnalysisSoftwareType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.CVParamType;
@@ -49,7 +58,6 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.DBSequenceType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.FileFormatType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.InputSpectraType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.InputsType;
-import org.yeastrc.ms.writer.mzidentml.jaxb.ParamListType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.ParamType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideEvidenceType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideType;
@@ -60,18 +68,18 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationProtocolType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationResultType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.UserParamType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.InputsType.SourceFile;
+import org.yeastrc.ms.writer.mzidentml.sequest.SequestMzidDataProvider;
 
 /**
- * PercolatorMzidWriter.java
+ * PeptideProphetMzidDataProvider.java
  * @author Vagisha Sharma
- * Aug 16, 2011
+ * Aug 19, 2011
  * 
  */
-public class PercolatorMzidDataProvider implements MzidDataProvider {
+public class PeptideProphetMzidDataProvider implements MzidDataProvider {
 
-	
 	private DAOFactory daoFactory = DAOFactory.instance();
-	private PercolatorResultDAO percResDao = daoFactory.getPercolatorResultDAO();
+	private PeptideProphetResultDAO prophetResDao = daoFactory.getPeptideProphetResultDAO();
 	private MsSearchResultProteinDAO proteinDao = daoFactory.getMsProteinMatchDAO();
 	
 	private int experimentId;
@@ -91,7 +99,7 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 	// files
 	private Map<Integer, String> runSearchAnalysisIdFileNameMap;
 	
-	// file format (for Percolator analysis)
+	// file format (for PeptideProphet analysis)
 	private SearchFileFormat analysisFileFormat;
 	private String analysisFileExtension;
 	
@@ -103,7 +111,7 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 	// resultIds
 	// !-- IMPORTANT --!
 	// Result IDs are sorted by scan IDs
-	private List<Integer> percolatorResultIds;
+	private List<Integer> prophetResultIds;
 	
 	private int index = 0;
 	// flags to indicate if we have started iterating over the protein or peptide list
@@ -169,25 +177,25 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 		// load the search
 		this.search = daoFactory.getMsSearchDAO().loadSearch(searchId);
 		if((Program.isSequest(this.search.getSearchProgram()))) {
-			this.dataProvider = new SequestMsDataMzidDataProvider();
+			this.dataProvider = new SequestMzidDataProvider();
 		}
 		else {
 			throw new MzidDataProviderException("Do not know how to handle search program: "+this.search.getSearchProgram());
 		}
 		
 		
-		// get the Percolator analysis
+		// get the PeptideProphet analysis
 		List<Integer> analysisIds = daoFactory.getMsSearchAnalysisDAO().getAnalysisIdsForSearch(searchId);
 		if(analysisIds.size() == 0) {
-			throw new MzidDataProviderException("Experiment with ID: "+experimentId+" does not have any Percolator analyses");
+			throw new MzidDataProviderException("Experiment with ID: "+experimentId+" does not have any PeptideProphet analyses");
 		}
 		if(this.searchAnalysisId != 0) {
 			if(!analysisIds.contains(this.searchAnalysisId)) {
-				throw new MzidDataProviderException("Given Percolator analysis ID is not found for experiment ID: "+experimentId);
+				throw new MzidDataProviderException("Given PeptideProphet analysis ID is not found for experiment ID: "+experimentId);
 			}
 		}
 		if(analysisIds.size() > 1 && this.searchAnalysisId == 0) {
-			throw new MzidDataProviderException("Experiment with ID: "+experimentId+" has multiple Percolator analyses");
+			throw new MzidDataProviderException("Experiment with ID: "+experimentId+" has multiple PeptideProphet analyses");
 		}
 		this.searchAnalysisId = analysisIds.get(0);
 		
@@ -226,10 +234,10 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 		ResultSortCriteria sortCriteria = new ResultSortCriteria(SORT_BY.SCAN, SORT_ORDER.ASC);
 		// get the runSearchAnalysisIds for this experiment
     	List<Integer> runSearchAnalysisIds = daoFactory.getMsRunSearchAnalysisDAO().getRunSearchAnalysisIdsForAnalysis(this.analysis.getId());
-    	this.percolatorResultIds = new ArrayList<Integer>();
+    	this.prophetResultIds = new ArrayList<Integer>();
     	for(int runSearchAnalysisId: runSearchAnalysisIds) {
-    		List<Integer> idsForRunSearchAnalysis = daoFactory.getPercolatorResultDAO().loadIdsForRunSearchAnalysis(runSearchAnalysisId, null, sortCriteria);
-    		percolatorResultIds.addAll(idsForRunSearchAnalysis);
+    		List<Integer> idsForRunSearchAnalysis = prophetResDao.loadIdsForRunSearchAnalysis(runSearchAnalysisId, null, sortCriteria);
+    		prophetResultIds.addAll(idsForRunSearchAnalysis);
     	}
     	
     	dataProvider.setExperimentId(experimentId);
@@ -245,8 +253,7 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 		
 		this.runSearchAnalysisIdFileNameMap = new HashMap<Integer, String>();
 		
-		// get the runSearchAnalysisIds for this Percolator analysis;
-		// There is one runSearchAnalysisId for each input file (.sqt) analysed through Percolator in this experiment
+		// get the runSearchAnalysisIds for this PeptideProphet analysis;
 		List<Integer> runSearchAnalysisIds = rsaDao.getRunSearchAnalysisIdsForAnalysis(this.analysis.getId());
 		
         	
@@ -260,12 +267,10 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 			
 			this.analysisFileFormat = runSearchAnalysis.getAnalysisFileFormat();
 			
-			if(this.analysisFileFormat == SearchFileFormat.SQT_PERC) {
-				this.analysisFileExtension = ".sqt";
+			if(this.analysisFileFormat == SearchFileFormat.PEPXML_SEQ) {
+				this.analysisFileExtension = ".pepXML";
 			}
-			else if(analysisFileFormat == SearchFileFormat.XML_PERC) {
-				this.analysisFileExtension = ".xml";
-			}
+			
 			
 			int runSearchId = runSearchAnalysis.getRunSearchId();
 			MsRunSearch runSearch = rsDao.loadRunSearch(runSearchId);
@@ -292,35 +297,19 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 		
 		AnalysisSoftwareMaker softwareMaker = new AnalysisSoftwareMaker();
 		
-		// Add Percolator to the analysis software list
-		AnalysisSoftwareType software = softwareMaker.makePercolatorAnalysisSoftware(this.analysis.getAnalysisProgramVersion());
+		// Add PeptideProphet to the analysis software list
+		AnalysisSoftwareType software = softwareMaker.makePeptideProphetAnalysisSoftware(this.analysis.getAnalysisProgramVersion());
 		listType.getAnalysisSoftware().add(software);
 		
 		return listType;
 	}
 
-	
 	public SpectrumIdentificationProtocolType getSpectrumIdentificationProtocol() throws MzidDataProviderException {
 		
 		SpectrumIdentificationProtocolType protocol = dataProvider.getSpectrumIdentificationProtocol();
 		
-		// Any Percolator options
-		PercolatorParamsDAO paramDao = DAOFactory.instance().getPercoltorParamsDAO();
-		List<PercolatorParam> params = paramDao.loadParams(this.analysis.getId());
-		
-		ParamListType paramList = protocol.getAdditionalSearchParams();
-		if(paramList == null) {
-			paramList = new ParamListType();
-			protocol.setAdditionalSearchParams(paramList);
-		}
-		for(PercolatorParam param: params) {
-			
-			UserParamType userParam = new UserParamType();
-			userParam.setName("Percolator_"+param.getParamName());
-			userParam.setValue(param.getParamValue());
-			
-			paramList.getParamGroup().add(userParam);
-		}
+		// TODO Any PeptideProphet options
+		// We don't store PeptideProphet option in the database
 		
 		return protocol;
 	}
@@ -356,7 +345,7 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 		
 		InputsType inputs = new InputsType();
 		
-		// We may have had a single file with all the Percolator results
+		// We may have had a single file with all the PeptideProphet results (such as an interact.pep.xml file)
 		MsSearchAnalysis analysis = DAOFactory.instance().getMsSearchAnalysisDAO().load(this.analysis.getId());
 		if(!StringUtils.isBlank(analysis.getFilename())) {
 			
@@ -372,20 +361,20 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 			 is_a: MS:1001459 ! file format
 			*/
 			FileFormatType format = new FileFormatType();
-			CVParamType param = CvParamMaker.getInstance().make("MS:1001040", "intermediate analysis format", "Percolator XML", CvConstants.PSI_CV);
+			CVParamType param = CvParamMaker.getInstance().make("MS:1001040", "intermediate analysis format", "PeptideProphet pepXML", CvConstants.PSI_CV);
 			format.setCvParam(param);
 			srcFile.setFileFormat(format);
+			
 			
 			// TODO the location is not stored in the database! 
 			srcFile.setLocation(analysis.getFilename());
 		}
-		// Otherwise .sqt files (one per Sequest .sqt) were uploaded
+		// Otherwise
 		else {
 			// Source files(s)
 			for(String filename: this.runSearchAnalysisIdFileNameMap.values()) {
 				SourceFile srcFile = new SourceFile();
 				inputs.getSourceFile().add(srcFile);
-
 
 				srcFile.setId(filename+this.analysisFileExtension);
 				
@@ -393,10 +382,9 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 				srcFile.setLocation(filename+this.analysisFileExtension);
 
 				FileFormatType format = new FileFormatType();
-				CVParamType param = CvParamMaker.getInstance().make("MS:1001040", "intermediate analysis format", "Percolator SQT", CvConstants.PSI_CV);
+				CVParamType param = CvParamMaker.getInstance().make("MS:1001040", "intermediate analysis format", "PeptideProphet pepXML", CvConstants.PSI_CV);
 				format.setCvParam(param);
 				srcFile.setFileFormat(format);
-				
 			}
 		}
 		
@@ -457,9 +445,9 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 			
 			Set<String> uniqAccessions = new HashSet<String>();
 			
-			for(int percResultId: percolatorResultIds) {
+			for(int prophetResultId: prophetResultIds) {
 				
-				PercolatorResult psm = percResDao.loadForPercolatorResultId(percResultId);
+				PeptideProphetResult psm = prophetResDao.loadForProphetResultId(prophetResultId);
 				
 				List<MsSearchResultProtein> proteins = proteinDao.loadResultProteins(psm.getId());
 				
@@ -507,14 +495,14 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 			this.index = 0; // set the index to 0
 			this.peptideIterationStarted = true;
 			
-			this.peptideSequences = new HashSet<String>(percolatorResultIds.size());
+			this.peptideSequences = new HashSet<String>(prophetResultIds.size());
 		}
 		
-		for(;index < this.percolatorResultIds.size(); index++) {
+		for(;index < this.prophetResultIds.size(); index++) {
 			
-			int percResultId = percolatorResultIds.get(index);
+			int prophetResultId = prophetResultIds.get(index);
 			
-			PercolatorResult psm = percResDao.loadForPercolatorResultId(percResultId);
+			PeptideProphetResult psm = prophetResDao.loadForProphetResultId(prophetResultId);
 			
 			MsSearchResultPeptide resultPeptide = psm.getResultPeptide();
 			
@@ -603,14 +591,14 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 			this.index = 0; // set the index to 0
 			this.peptideEvidenceIterationStarted = true;
 			
-			this.peptideSequences = new HashSet<String>(percolatorResultIds.size());
+			this.peptideSequences = new HashSet<String>(prophetResultIds.size());
 		}
 
-		for(; index < this.percolatorResultIds.size(); index++) {
+		for(; index < this.prophetResultIds.size(); index++) {
 			
-			int percResultId = percolatorResultIds.get(index);
+			int prophetResultId = prophetResultIds.get(index);
 			
-			PercolatorResult psm = percResDao.loadForPercolatorResultId(percResultId);
+			PeptideProphetResult psm = prophetResDao.loadForProphetResultId(prophetResultId);
 			
 			MsSearchResultPeptide resultPeptide = psm.getResultPeptide();
 			
@@ -678,32 +666,32 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 		}
 		
 		int lastScanId = -1;  // used for grouping search results into <SpectrumIdentificationResult> elements
-		List<PercolatorResult> sequestResults = new ArrayList<PercolatorResult>();
+		List<PeptideProphetResult> prophetResults = new ArrayList<PeptideProphetResult>();
 		
-		for(; index < this.percolatorResultIds.size(); index++) {
+		for(; index < this.prophetResultIds.size(); index++) {
     		
 			// read the PSMs
-			int percResultId = percolatorResultIds.get(index);
+			int percResultId = prophetResultIds.get(index);
 			
-			PercolatorResult psm = percResDao.loadForPercolatorResultId(percResultId);
+			PeptideProphetResult psm = prophetResDao.loadForProphetResultId(percResultId);
 			
 			if(psm.getScanId() != lastScanId) {
 
 				if(lastScanId != -1) {
 
-					SpectrumIdentificationResultType spectrumResult = makeSpectrumIdentificationResult(sequestResults);
+					SpectrumIdentificationResultType spectrumResult = makeSpectrumIdentificationResult(prophetResults);
 					
 					return spectrumResult;
 				}
 			}
 
 			lastScanId = psm.getScanId();
-			sequestResults.add(psm);
+			prophetResults.add(psm);
 		}
     			
-		if(sequestResults.size() > 0) {
+		if(prophetResults.size() > 0) {
 			
-			SpectrumIdentificationResultType spectrumResult = makeSpectrumIdentificationResult(sequestResults);
+			SpectrumIdentificationResultType spectrumResult = makeSpectrumIdentificationResult(prophetResults);
 			
 			return spectrumResult;
 			
@@ -714,20 +702,20 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 		}
 	}
 	
-	SpectrumIdentificationResultType makeSpectrumIdentificationResult(List<PercolatorResult> percolatorResults) throws MzidDataProviderException {
+	SpectrumIdentificationResultType makeSpectrumIdentificationResult(List<PeptideProphetResult> prophetResults) throws MzidDataProviderException {
 		
-		if(percolatorResults.size() == 0)
+		if(prophetResults.size() == 0)
 			return null;
 		
-		String filename = getFileNameForRunSearchAnalysisId(percolatorResults.get(0).getRunSearchAnalysisId());
+		String filename = getFileNameForRunSearchAnalysisId(prophetResults.get(0).getRunSearchAnalysisId());
 		filename += this.runFileExtension;
 		
-		int scanNumber = getScanNumber(percolatorResults.get(0).getScanId());
+		int scanNumber = getScanNumber(prophetResults.get(0).getScanId());
 		
 		SpectrumIdentificationResultMaker specResultMaker = new SpectrumIdentificationResultMaker();
 		specResultMaker.initSpectrumResult(filename, scanNumber, this.search.getSearchProgram());
 		
-		for(PercolatorResult psm: percolatorResults) {
+		for(PeptideProphetResult psm: prophetResults) {
 			
 			try {
 				specResultMaker.addPercolatorResult(psm);
@@ -756,7 +744,8 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 	@Override
 	public String getSpectrumIdentificationId() {
 		
-		return dataProvider.getSpectrumIdentificationId()+"_"+MzidConstants.SPEC_IDENT_ID_PERC;
+		return dataProvider.getSpectrumIdentificationId()+"_"+MzidConstants.SPEC_IDENT_ID_PROPHET;
+		
 	}
 
 	@Override
@@ -770,5 +759,4 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 		
 		return dataProvider.getSpectrumIdentificationProtocolId(); // +"_"+MzidConstants.PERCOLATOR_PROTOCOL_ID;
 	}
-
 }

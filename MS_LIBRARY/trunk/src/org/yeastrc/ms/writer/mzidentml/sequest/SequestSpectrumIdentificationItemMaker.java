@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.yeastrc.ms.writer.mzidentml;
+package org.yeastrc.ms.writer.mzidentml.sequest;
 
 import java.util.List;
 
@@ -11,6 +11,8 @@ import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
+import org.yeastrc.ms.writer.mzidentml.CvConstants;
+import org.yeastrc.ms.writer.mzidentml.CvParamMaker;
 import org.yeastrc.ms.writer.mzidentml.jaxb.AbstractParamType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.CVParamType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideEvidenceRefType;
