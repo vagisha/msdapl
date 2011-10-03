@@ -421,21 +421,29 @@ public class PercolatorXmlDataUploadService implements
 
         		PercolatorXmlResult result = (PercolatorXmlResult) reader.getNextPsm();
         		String sourceFileName = result.getFileName();
+        		
+        		// !! --------- IMPORTANT ---------------------------!
+        		// THIS IS TO GET THE PEPTIPEDIA DATA UPLOADED
+        		// PERCOLATOR CONSIDERS EVERYTHING AFTER THE FIRST DOT IN THE FILNAME AS THE EXTENSION
+        		// sourceFileName += ".renum";
+        		// !! -----------------------------------------------!
+        		
         		Integer runSearchId = runSearchIdMap.get(sourceFileName);
 
         		if (runSearchId == null) {
         			UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_ANALYSIS_FILE);
+        			ex.appendErrorMessage("File was: "+sourceFileName);
         			ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
         			deleteAnalysis(analysisId);
         			throw ex;
         		}
 
-        		Integer runSearchAnalysisId = runSearchAnalysisIdMap.get(result.getFileName());
+        		Integer runSearchAnalysisId = runSearchAnalysisIdMap.get(sourceFileName);
         		if(runSearchAnalysisId == null) {
         			runSearchAnalysisId = uploadRunSearchAnalysis(analysisId, runSearchId);
         			log.info("Created new msRunSearchAnalysis entry for file: "+result.getFileName()+"; runSearchID: "+runSearchId+
         					" (runSearchAnalysisId: "+runSearchAnalysisId+")");
-        			runSearchAnalysisIdMap.put(result.getFileName(), runSearchAnalysisId);
+        			runSearchAnalysisIdMap.put(sourceFileName, runSearchAnalysisId);
         		}
 
         		// get the runID. Will be needed to get the scan ID
@@ -497,10 +505,18 @@ public class PercolatorXmlDataUploadService implements
 				for(PercolatorXmlPsmId psmId: peptide.getPsmIds()) {
 					// get a PercolatorResult ID for this psm;
 					String sourceFileName = psmId.getFileName();
+					
+					// !! --------- IMPORTANT ---------------------------!
+	        		// THIS IS TO GET THE PEPTIPEDIA DATA UPLOADED
+	        		// PERCOLATOR CONSIDERS EVERYTHING AFTER THE FIRST DOT IN THE FILNAME AS THE EXTENSION
+	        		// sourceFileName += ".renum";
+	        		// !! -----------------------------------------------!
+	        		
 	        		Integer runSearchId = runSearchIdMap.get(sourceFileName);
 
 	        		if (runSearchId == null) {
 	        			UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_ANALYSIS_FILE);
+	        			ex.appendErrorMessage("File was: "+sourceFileName);
 	        			ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
 	        			deleteAnalysis(analysisId);
 	        			throw ex;
@@ -529,6 +545,7 @@ public class PercolatorXmlDataUploadService implements
 					Integer runSearchAnalysisId = runSearchAnalysisIdMap.get(sourceFileName);
 					if(runSearchAnalysisId == null) {
 						UploadException ex = new UploadException(ERROR_CODE.NO_RSANALYSISID_FOR_ANALYSIS_FILE);
+						ex.appendErrorMessage("File was: "+sourceFileName);
 	        			ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
 	        			deleteAnalysis(analysisId);
 	        			throw ex;
