@@ -777,7 +777,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         return true;
     }
 
-    private List<String> getSqtFiles(File dir) {
+    List<String> getSqtFiles(File dir) {
     	
     	List<String> mySqtFiles = new ArrayList<String>();
     	
