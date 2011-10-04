@@ -57,9 +57,14 @@ import org.yeastrc.ms.service.percolator.stats.PercolatorFilteredSpectraStatsSav
 import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
 
 /**
- * 
+ * !!!! ---------------------------------------------------------------------------
+ * !!!! This file is only to be used for uploading Percolator results for the 
+ * !!!! YRC's Peptipedia project.
+ * !!!! Search for "PEPTIPEDIA" to find places where code had to be added to 
+ * !!!! get the Percolator files to upload.
+ * !!!! ---------------------------------------------------------------------------
  */
-public class PercolatorXmlDataUploadService implements
+class PercolatorXmlDataUploadService_ForPeptipedia implements
 		AnalysisDataUploadService {
 
 
@@ -111,7 +116,7 @@ public class PercolatorXmlDataUploadService implements
 	private int numPsmUploaded;
 	private int numPeptUploaded;
     
-    public PercolatorXmlDataUploadService() {
+    public PercolatorXmlDataUploadService_ForPeptipedia() {
     	
         this.percolatorResultDataList = new ArrayList<PercolatorResultDataWId>(BUF_SIZE);
         this.percolatorPeptideResultList = new ArrayList<PercolatorPeptideResult>(BUF_SIZE);
@@ -425,7 +430,7 @@ public class PercolatorXmlDataUploadService implements
         		// !! --------- IMPORTANT ---------------------------!
         		// THIS IS TO GET THE PEPTIPEDIA DATA UPLOADED
         		// PERCOLATOR CONSIDERS EVERYTHING AFTER THE FIRST DOT IN THE FILNAME AS THE EXTENSION
-        		// sourceFileName += ".renum";
+        		sourceFileName += ".renum";
         		// !! -----------------------------------------------!
         		
         		Integer runSearchId = runSearchIdMap.get(sourceFileName);
@@ -433,10 +438,10 @@ public class PercolatorXmlDataUploadService implements
         		// !! --------- IMPORTANT ---------------------------!
         		// THIS IS TO GET THE PEPTIPEDIA DATA UPLOADED
         		// PERCOLATOR CONSIDERS EVERYTHING AFTER THE FIRST DOT IN THE FILNAME AS THE EXTENSION
-        		// if(runSearchId == null) {
-        		//	sourceFileName = result.getFileName()+".ms3.renum";
-        		//	runSearchId = runSearchIdMap.get(sourceFileName);
-        		// }
+        		if(runSearchId == null) {
+        			sourceFileName = result.getFileName()+".ms3.renum";
+        			runSearchId = runSearchIdMap.get(sourceFileName);
+        		}
         		// !! -----------------------------------------------!
         		
         		
@@ -519,7 +524,7 @@ public class PercolatorXmlDataUploadService implements
 					// !! --------- IMPORTANT ---------------------------!
 	        		// THIS IS TO GET THE PEPTIPEDIA DATA UPLOADED
 	        		// PERCOLATOR CONSIDERS EVERYTHING AFTER THE FIRST DOT IN THE FILNAME AS THE EXTENSION
-	        		// sourceFileName += ".renum";
+	        		sourceFileName += ".renum";
 	        		// !! -----------------------------------------------!
 	        		
 	        		Integer runSearchId = runSearchIdMap.get(sourceFileName);
@@ -527,10 +532,10 @@ public class PercolatorXmlDataUploadService implements
 	        		// !! --------- IMPORTANT ---------------------------!
 	        		// THIS IS TO GET THE PEPTIPEDIA DATA UPLOADED
 	        		// PERCOLATOR CONSIDERS EVERYTHING AFTER THE FIRST DOT IN THE FILNAME AS THE EXTENSION
-	        		// if(runSearchId == null) {
-	        		//	sourceFileName = psmId.getFileName()+".ms3.renum";
-	        		//	runSearchId = runSearchIdMap.get(sourceFileName);
-	        		// }
+	        		if(runSearchId == null) {
+	        			sourceFileName = psmId.getFileName()+".ms3.renum";
+	        			runSearchId = runSearchIdMap.get(sourceFileName);
+	        		}
 	        		// !! -----------------------------------------------!
 	        		
 	        		
@@ -676,20 +681,20 @@ public class PercolatorXmlDataUploadService implements
         			
         			// !----------------- IMPORTANT -----------------------------------
         			// TODO Remove this later
-        			// This is for the Peptipedia data
-//        			else {
-//        				
-//        				UploadException ex = new UploadException(ERROR_CODE.MULTI_MATCHING_SEARCH_RESULT);
-//            			ex.setErrorMessage("Multiple matching search results were found for Percolator result with runSearchId: "+runSearchId+
-//            					" scanId: "+scanId+"; charge: "+charge+"; mass: "+observedMass+
-//            					"; peptide: "+peptide.getPeptideSequence()+
-//            					"; modified peptide: "+peptide.getModifiedPeptidePS());
-//            			
-//        				log.error(ex.getMessage());
-//        				
-//        				bestRes = matchingResults3.get(0);
-//        				
-//        			}
+        			// This is for the PEPTIPEDIA data
+        			else {
+        				
+        				UploadException ex = new UploadException(ERROR_CODE.MULTI_MATCHING_SEARCH_RESULT);
+            			ex.setErrorMessage("Multiple matching search results were found for Percolator result with runSearchId: "+runSearchId+
+            					" scanId: "+scanId+"; charge: "+charge+"; mass: "+observedMass+
+            					"; peptide: "+peptide.getPeptideSequence()+
+            					"; modified peptide: "+peptide.getModifiedPeptidePS());
+            			
+        				log.error(ex.getMessage());
+        				
+        				bestRes = matchingResults3.get(0);
+        				
+        			}
         			// !----------------- IMPORTANT -----------------------------------
         			
         		}
