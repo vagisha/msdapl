@@ -646,6 +646,8 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable, Seriali
         				if(this.spectrumCountColors == null) {
         					bgColor = getScaledColor(scaledCount);
         					cell.setBackgroundColor(bgColor);
+        					//cell.setTextColor("#000000");
+        					
         				}
         				else {
         					bgColor = getHeatMapColor(dpi.getHeatMapSpectrumCount());

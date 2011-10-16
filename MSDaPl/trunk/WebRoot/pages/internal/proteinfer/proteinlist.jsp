@@ -13,9 +13,6 @@
 			<tr>
 				<td style="border: 1px dotted #AAAAAA;" align="center">
 				
-				<a href="" onclick="openInformationPopup('pages/internal/docs/proteinInference.jsp#PI_PARSIM_SUBSET'); return false;">
-   				<img src="<yrcwww:link path="images/new_21.gif"/>" align="bottom" border="2" style="background:yellow; border-color:orange;"/></a>
-   				
    				<a href="" onclick="openInformationPopup('pages/internal/docs/proteinInference.jsp#PI_PARSIM_SUBSET'); return false;">
    				<img src="<yrcwww:link path="images/info_16.png"/>" align="bottom" border="0"/></a>
    				
@@ -64,6 +61,10 @@
 	</table>
 </div>
 
+<div align="center" style="color:green; margin:5px;font-size:10pt;">
+Displaying <span style="color:red; font-weight:bold;"><bean:write name="resultSummary" property="filteredProteinGroupCount" /></span> protein groups 
+and <span style="color:red; font-weight:bold;"><bean:write name="resultSummary" property="filteredProteinCount" /></span> proteins
+</div>
 
 <bean:define name="proteinInferFilterForm" property="joinGroupProteins" id="groupProteins"></bean:define>
 			

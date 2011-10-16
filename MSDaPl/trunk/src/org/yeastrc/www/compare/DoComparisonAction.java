@@ -6,7 +6,6 @@
  */
 package org.yeastrc.www.compare;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -22,7 +21,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.bio.taxonomy.Species;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
 import org.yeastrc.ms.dao.DAOFactory;
@@ -44,7 +42,6 @@ import org.yeastrc.www.compare.dataset.ProteinferDataset;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.compare.graph.GraphBuilder;
 import org.yeastrc.www.compare.util.VennDiagramCreator;
-import org.yeastrc.www.proteinfer.GOSupportUtils;
 
 import edu.uwpr.protinfer.infer.graph.BipartiteGraph;
 import edu.uwpr.protinfer.infer.graph.GraphCollapser;
@@ -235,6 +232,9 @@ public class DoComparisonAction extends Action {
                 request.setAttribute("chart", googleChartUrl);
             }
             
+            // Enable filtering on GO terms
+            request.setAttribute("goSupported", true);
+            
             // create a list of the dataset ids being compared
             request.setAttribute("datasetIds", StringUtils.makeCommaSeparated(allRunIds));
             
@@ -352,6 +352,11 @@ public class DoComparisonAction extends Action {
             long end = System.currentTimeMillis();
             log.info("DoComparisonAction finished in: "+TimeUtils.timeElapsedSeconds(start, end)+" seconds");
             
+            
+            // Enable filtering on GO terms
+            request.setAttribute("goSupported", true);
+            
+            
             // create a list of the dataset ids being compared
             request.setAttribute("datasetIds", StringUtils.makeCommaSeparated(allRunIds));
             
@@ -382,23 +387,23 @@ public class DoComparisonAction extends Action {
 		return new ArrayList<Integer>(species);
 	}
 	
-	private List<Species> getSpeciesList(List<Integer> mySpeciesIds) throws SQLException {
-		List<Species> speciesList = GOSupportUtils.getSpeciesList();
-
-		if(mySpeciesIds.size() == 1) {
-			int sid = mySpeciesIds.get(0);
-			boolean found = false;
-			for(Species sp: speciesList) {
-				if(sp.getId() == sid) {
-					found = true; break;
-				}
-			}
-			if(!found) {
-				Species species = new Species();
-				species.setId(sid);
-				speciesList.add(species);
-			}
-		}
-		return speciesList;
-	}
+//	private List<Species> getSpeciesList(List<Integer> mySpeciesIds) throws SQLException {
+//		List<Species> speciesList = GOSupportUtils.getSpeciesList();
+//
+//		if(mySpeciesIds.size() == 1) {
+//			int sid = mySpeciesIds.get(0);
+//			boolean found = false;
+//			for(Species sp: speciesList) {
+//				if(sp.getId() == sid) {
+//					found = true; break;
+//				}
+//			}
+//			if(!found) {
+//				Species species = new Species();
+//				species.setId(sid);
+//				speciesList.add(species);
+//			}
+//		}
+//		return speciesList;
+//	}
 }

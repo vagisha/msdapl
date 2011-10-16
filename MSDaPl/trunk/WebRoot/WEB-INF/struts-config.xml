@@ -1299,7 +1299,14 @@
 		
 	</action>
 	
-	
+	<action
+		path="/listExperimentsWithProtein"
+		type="org.yeastrc.www.protein.ListRunsWithProteinAction"
+	>
+		<forward name="Success" path="/pages/internal/data/protein/runListWithProtein.jsp" redirect="false" />
+		<forward name="Failure" path="/viewFrontPage.do" redirect="false" />
+		
+	</action>
 	
 	<!-- ================================================================================== -->
 	<!-- Actions related to comparing protein datasets -->

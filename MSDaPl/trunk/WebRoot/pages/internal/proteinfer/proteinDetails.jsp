@@ -184,7 +184,7 @@
 
 <tr>
 <td colspan="2" style="font-size: 8pt; color: red;" align="center">
-<a  style="color:red;"   href="<yrcwww:link path='viewProtein.do?id'/>=<bean:write name='protein' property='protein.nrseqProteinId'/>">[List experiments with this protein]</a>
+<a  style="color:red;"   href="<yrcwww:link path='listExperimentsWithProtein.do?id'/>=<bean:write name='protein' property='protein.nrseqProteinId'/>">[List experiments with this protein]</a>
 </td>
 </tr>
 </table>

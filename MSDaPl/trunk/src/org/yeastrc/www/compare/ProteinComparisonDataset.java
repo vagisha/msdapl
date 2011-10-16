@@ -468,9 +468,12 @@ public class ProteinComparisonDataset implements Tabular, Pageable, Serializable
 					cell.setClassName(className);
 					cell.setData(dpi.getSpectrumCount()+"("+dpi.getNormalizedSpectrumCountRounded()+")");
 					cell.setTextColor("#FFFFFF");
+					
 					float scaledCount = getScaledSpectrumCount(dpi.getNormalizedSpectrumCount());
-					if(this.spectrumCountColors == null)
+					if(this.spectrumCountColors == null) {
     					cell.setBackgroundColor(getScaledColor(scaledCount));
+    					// cell.setTextColor("#000000");
+					}
     				else
     					cell.setBackgroundColor(getHeatMapColor(dpi.getHeatMapSpectrumCount()));
 					row.addCell(cell);
