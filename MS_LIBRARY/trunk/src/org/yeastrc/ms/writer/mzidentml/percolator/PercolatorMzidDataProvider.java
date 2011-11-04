@@ -64,6 +64,7 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.ParamListType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.ParamType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideEvidenceType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.ProteinAmbiguityGroupType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SearchDatabaseType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectraDataType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIDFormatType;
@@ -781,6 +782,17 @@ public class PercolatorMzidDataProvider implements MzidDataProvider {
 	public String getSpectrumIdentificationProtocolId() {
 		
 		return dataProvider.getSpectrumIdentificationProtocolId(); // +"_"+MzidConstants.PERCOLATOR_PROTOCOL_ID;
+	}
+	
+	@Override
+	public ProteinAmbiguityGroupType getNextProteinAmbiguityGroup()
+			throws MzidDataProviderException {
+		throw new UnsupportedOperationException("Percolator results do not contains protein-level analysis");
+	}
+
+	@Override
+	public boolean hasProteinAnalysis() {
+		return false;
 	}
 
 }

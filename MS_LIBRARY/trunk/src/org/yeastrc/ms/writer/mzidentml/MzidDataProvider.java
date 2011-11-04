@@ -12,6 +12,7 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.InputSpectraType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.InputsType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideEvidenceType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.ProteinAmbiguityGroupType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationProtocolType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationResultType;
 
@@ -52,4 +53,9 @@ public interface MzidDataProvider {
 	public InputsType getInputs() throws MzidDataProviderException;
 	
 	public SpectrumIdentificationResultType getNextSpectrumIdentificationResult() throws MzidDataProviderException;
+	
+	public boolean hasProteinAnalysis();
+	
+	public ProteinAmbiguityGroupType getNextProteinAmbiguityGroup() throws MzidDataProviderException;
+	
 }

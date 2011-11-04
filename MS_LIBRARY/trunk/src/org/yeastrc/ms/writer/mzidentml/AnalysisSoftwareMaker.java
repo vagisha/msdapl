@@ -103,4 +103,27 @@ public class AnalysisSoftwareMaker {
 		return software;
 	}
 	
+	public AnalysisSoftwareType makeProteinProphetAnalysisSoftware(String version) {
+		
+		AnalysisSoftwareType software = new AnalysisSoftwareType();
+		software.setName(MzidConstants.PROTEIN_PROPHET_SW_ID);
+		software.setId(MzidConstants.PROTEIN_PROPHET_SW_ID);
+		software.setVersion(version);
+		
+		CvParamMaker cvparamMaker = CvParamMaker.getInstance();
+		/*
+	 	id: MS:1001456
+		name: analysis software
+		def: "Analysis software." [PSI:MS]
+		is_a: MS:1000531 ! software
+		 */
+		CVParamType cvParam = cvparamMaker.make("MS:1001456", "analysis software", "ProteinProphet", CvConstants.PSI_CV);
+		ParamType paramType = new ParamType();
+		paramType.setCvParam(cvParam);
+		
+		software.setSoftwareName(paramType);
+		
+		return software;
+	}
+	
 }

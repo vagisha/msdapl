@@ -20,6 +20,7 @@ public class MzidConstants {
 	public static String SEQUEST_SW_ID = "SEQUEST";
 	public static String PERCOLATOR_SW_ID = "Percolator";
 	public static String PEPTIDE_PROPHET_SW_ID = "PeptideProphet";
+	public static String PROTEIN_PROPHET_SW_ID = "ProteinProphet";
 	
 	
 	public static final String SPEC_ID_LIST_ID = "Analysis_Results";

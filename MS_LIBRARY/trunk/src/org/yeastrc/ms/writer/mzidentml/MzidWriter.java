@@ -25,6 +25,7 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.InputsType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.MzIdentMLType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideEvidenceType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.ProteinAmbiguityGroupType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SearchDatabaseRefType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationProtocolType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationResultType;
@@ -300,6 +301,7 @@ public class MzidWriter {
 			protocolColl.getSpectrumIdentificationProtocol().add(specIdProtocol);
 		}
 		
+		
 		marshaller.marshal(protocolColl, writer);
 	}
 
@@ -360,6 +362,27 @@ public class MzidWriter {
 		
 		// end <SpectrumIdentificationList> element
 		adataWriter.endSpectrumIdentificationList();
+		
+		// Write ProteinDetectionList, if available
+		if(dataProvider.hasProteinAnalysis()) {
+			
+			// start <<ProteinDetectionList> element
+			adataWriter.startProteinDetectionList("PDL");
+			
+			ProteinAmbiguityGroupType proteinGrp = null;
+			
+			try {
+				while((proteinGrp = dataProvider.getNextProteinAmbiguityGroup()) != null) {
+					
+					marshalElement(proteinGrp);
+				}
+			} catch (MzidDataProviderException e) {
+				throw new MzIdentMlWriterException("Error getting data for ProteinAmbiguityGroupType", e);
+			}
+			
+			// end <<ProteinDetectionList> element
+			adataWriter.endProteinDetectionList();
+		}
 		
 		adataWriter.end();
 	}

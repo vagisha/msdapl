@@ -10,6 +10,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.commons.lang.StringUtils;
+import org.yeastrc.ms.writer.mzidentml.jaxb.ProteinAmbiguityGroupType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIdentificationResultType;
 
 /**
@@ -62,6 +63,27 @@ public class AnalysisDataWriter {
 	public void end() throws IOException {
 		
 		writer.write("</AnalysisData>");
+		writer.newLine();
+	}
+	
+	public void startProteinDetectionList(String id) throws IOException {
+		if(StringUtils.isBlank(id)) {
+			throw new IllegalArgumentException("id given for ProteinDetectionList cannot be blank");
+		}
+		
+		writer.write("<ProteinDetectionList id=\""+id+"\">");
+		writer.newLine();
+	}
+	
+	public void addProteinAmbiguityGroup(ProteinAmbiguityGroupType proteinGroup) throws JAXBException, IOException {
+		
+		marshaller.marshal(proteinGroup, writer);
+		writer.newLine();
+	}
+
+	public void endProteinDetectionList() throws IOException {
+		
+		writer.write("</ProteinDetectionList>");
 		writer.newLine();
 	}
 }

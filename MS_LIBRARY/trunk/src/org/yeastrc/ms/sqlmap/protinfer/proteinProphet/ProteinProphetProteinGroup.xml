@@ -22,6 +22,10 @@
     	SELECT * FROM ProteinProphetProteinGroup WHERE id = #id#
     </select>
     
+    <select id="selectGroupIds" resultClass="Integer" parameterClass="Integer">
+    	SELECT id FROM ProteinProphetProteinGroup WHERE piRunID = #id#
+    </select>
+    
     <insert id="insert" parameterMap="groupParam">
     	INSERT INTO ProteinProphetProteinGroup (
     	piRunID,

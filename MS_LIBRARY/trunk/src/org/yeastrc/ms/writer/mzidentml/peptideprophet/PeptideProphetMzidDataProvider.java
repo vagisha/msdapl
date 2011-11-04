@@ -61,6 +61,7 @@ import org.yeastrc.ms.writer.mzidentml.jaxb.InputsType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.ParamType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideEvidenceType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.PeptideType;
+import org.yeastrc.ms.writer.mzidentml.jaxb.ProteinAmbiguityGroupType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SearchDatabaseType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectraDataType;
 import org.yeastrc.ms.writer.mzidentml.jaxb.SpectrumIDFormatType;
@@ -240,9 +241,9 @@ public class PeptideProphetMzidDataProvider implements MzidDataProvider {
     		prophetResultIds.addAll(idsForRunSearchAnalysis);
     	}
     	
-    	dataProvider.setExperimentId(experimentId);
-    	dataProvider.setUnimodRepository(this.getUnimodRepository());
-    	dataProvider.initializeFieldsBeforeWrite();
+    	getDataProvider().setExperimentId(experimentId);
+    	getDataProvider().setUnimodRepository(this.getUnimodRepository());
+    	getDataProvider().initializeFieldsBeforeWrite();
 	}
 	
 	private void initializeFileNamesAndFileFormats() {
@@ -290,10 +291,9 @@ public class PeptideProphetMzidDataProvider implements MzidDataProvider {
 	}
 	
 	@Override
-	public
-	AnalysisSoftwareListType getAnalysisSoftware() throws MzidDataProviderException {
+	public AnalysisSoftwareListType getAnalysisSoftware() throws MzidDataProviderException {
 		
-		AnalysisSoftwareListType listType = dataProvider.getAnalysisSoftware();
+		AnalysisSoftwareListType listType = getDataProvider().getAnalysisSoftware();
 		
 		AnalysisSoftwareMaker softwareMaker = new AnalysisSoftwareMaker();
 		
@@ -306,7 +306,7 @@ public class PeptideProphetMzidDataProvider implements MzidDataProvider {
 
 	public SpectrumIdentificationProtocolType getSpectrumIdentificationProtocol() throws MzidDataProviderException {
 		
-		SpectrumIdentificationProtocolType protocol = dataProvider.getSpectrumIdentificationProtocol();
+		SpectrumIdentificationProtocolType protocol = getDataProvider().getSpectrumIdentificationProtocol();
 		
 		// TODO Any PeptideProphet options
 		// We don't store PeptideProphet option in the database
@@ -744,7 +744,7 @@ public class PeptideProphetMzidDataProvider implements MzidDataProvider {
 	@Override
 	public String getSpectrumIdentificationId() {
 		
-		return dataProvider.getSpectrumIdentificationId()+"_"+MzidConstants.SPEC_IDENT_ID_PROPHET;
+		return getDataProvider().getSpectrumIdentificationId()+"_"+MzidConstants.SPEC_IDENT_ID_PROPHET;
 		
 	}
 
@@ -757,6 +757,24 @@ public class PeptideProphetMzidDataProvider implements MzidDataProvider {
 	@Override
 	public String getSpectrumIdentificationProtocolId() {
 		
-		return dataProvider.getSpectrumIdentificationProtocolId(); // +"_"+MzidConstants.PERCOLATOR_PROTOCOL_ID;
+		return getDataProvider().getSpectrumIdentificationProtocolId(); // +"_"+MzidConstants.PERCOLATOR_PROTOCOL_ID;
+	}
+
+	/**
+	 * @return the dataProvider
+	 */
+	public MsDataMzidDataProvider getDataProvider() {
+		return dataProvider;
+	}
+
+	@Override
+	public ProteinAmbiguityGroupType getNextProteinAmbiguityGroup()
+			throws MzidDataProviderException {
+		throw new UnsupportedOperationException("PeptideProphet results do not contains protein-level analysis");
+	}
+
+	@Override
+	public boolean hasProteinAnalysis() {
+		return false;
 	}
 }

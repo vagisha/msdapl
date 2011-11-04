@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.dao.protinfer.proteinProphet;
 
+import java.util.List;
+
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetGroup;
 
@@ -28,5 +30,9 @@ public class ProteinProphetProteinGroupDAO extends BaseSqlMapDAO {
     
     public ProteinProphetGroup load(int proteinProphetGroupId) {
         return (ProteinProphetGroup) super.queryForObject(sqlMapNameSpace+".select", proteinProphetGroupId);
+    }
+    
+    public List<Integer> loadProphetGroupIds(int pinferId) {
+    	return queryForList(sqlMapNameSpace+".selectGroupIds", pinferId);
     }
 }
