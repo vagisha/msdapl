@@ -69,4 +69,9 @@ public class ProteinProphetRunDAO extends BaseSqlMapDAO implements GenericProtei
     public int getMaxProteinHitCount(int proteinferId) {
         return runDao.getMaxProteinHitCount(proteinferId);
     }
+    
+    @Override
+	public List<Integer> loadProteinferIdsForExperiment(int experimentId) {	
+		return runDao.loadProteinferIdsForExperiment(experimentId);
+	}
 }

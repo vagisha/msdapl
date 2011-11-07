@@ -1,6 +1,9 @@
 package org.yeastrc.ms.dao.protinfer.idpicker.ibatis;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.protinfer.GenericProteinferRunDAO;
@@ -35,13 +38,43 @@ public class IdPickerRunDAO extends BaseSqlMapDAO implements GenericProteinferRu
 
     @Override
     public List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds) {
-        return runDao.loadProteinferIdsForInputIds(inputIds);
+    	
+    	if(inputIds.size() == 0) 
+            return new ArrayList<Integer>(0);
+        
+        StringBuilder buf = new StringBuilder();
+        buf.append("(");
+        for(Integer id: inputIds) {
+            buf.append(id+",");
+        }
+        buf.deleteCharAt(buf.length() - 1);
+        buf.append(")");
+        
+        return super.queryForList(sqlMapNameSpace+".selectIdpickerIdsForInputIds", buf.toString());
     }
+    
     
     @Override
     public List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds, Program inputGenerator) {
-        return runDao.loadProteinferIdsForInputIds(inputIds, inputGenerator);
+    	
+    	if(inputIds.size() == 0) 
+            return new ArrayList<Integer>(0);
+        
+        StringBuilder buf = new StringBuilder();
+        buf.append("(");
+        for(Integer id: inputIds) {
+            buf.append(id+",");
+        }
+        buf.deleteCharAt(buf.length() - 1);
+        buf.append(")");
+        
+        Map<String, String> map = new HashMap<String, String>(4);
+        map.put("inputGenerator", inputGenerator.name());
+        map.put("inputIds", buf.toString());
+        
+        return super.queryForList(sqlMapNameSpace+".selectIdpickerIdsForInputIdsProgram", map);
     }
+    
 
     @Override
     public List<Integer> loadSearchIdsForProteinferRun(int pinferId) {
@@ -62,4 +95,9 @@ public class IdPickerRunDAO extends BaseSqlMapDAO implements GenericProteinferRu
     public int getMaxProteinHitCount(int proteinferId) {
         return runDao.getMaxProteinHitCount(proteinferId);
     }
+
+	@Override
+	public List<Integer> loadProteinferIdsForExperiment(int experimentId) {
+		return runDao.loadProteinferIdsForExperiment(experimentId);
+	}
 }

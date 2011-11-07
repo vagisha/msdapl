@@ -3,16 +3,25 @@ package org.yeastrc.ms.dao.protinfer.ibatis;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.protinfer.GenericProteinferRunDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferRun;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.ProteinferStatus;
+import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -99,6 +108,82 @@ public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinfer
         else {
             throw new IllegalArgumentException("Unknown input genrator for protein inference: "+program.name());
         }
+    }
+    
+    @Override
+	public List<Integer> loadProteinferIdsForExperiment(int experimentId) {
+		
+		Set<Integer> pinferRunIds = new HashSet<Integer>();
+		
+		MsSearchAnalysisDAO analysisDao = DAOFactory.instance().getMsSearchAnalysisDAO();
+		
+        // Get the searchIds for this experiment
+        List<Integer> searchIds = DAOFactory.instance().getMsSearchDAO().getSearchIdsForExperiment(experimentId);
+        
+        for(int searchId: searchIds) {
+        	
+            List<Integer> piRunIds = getPinferRunIdsForSearch(searchId);
+            pinferRunIds.addAll(piRunIds);
+            
+            // for each search get the analysis (e.g. Percolator or PeptideProphet results)
+            List<Integer> analysisIds = analysisDao.getAnalysisIdsForSearch(searchId);
+
+            
+            // get the protein inference IDs associated with each analysis
+            for(int analysisId: analysisIds) {
+
+            	pinferRunIds.addAll(getProteinferIdsForMsSearchAnalysis(analysisId));
+            }
+
+        }
+        
+        if(pinferRunIds == null || pinferRunIds.size() == 0)
+            return new ArrayList<Integer>(0);
+        
+        return new ArrayList<Integer>(pinferRunIds);
+		
+	}
+	
+
+    private List<Integer> getPinferRunIdsForSearch(int msSearchId) {
+        
+    	MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+    	MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
+        
+        // load the search
+        MsSearch search = searchDao.loadSearch(msSearchId);
+        
+        Set<Integer> pinferIdsSet = new HashSet<Integer>();
+        
+        // first get all the runSearchIds for this search
+        List<Integer> msRunSearchIds = runSearchDao.loadRunSearchIdsForSearch(msSearchId);
+        
+        // load protein inference results for the runSearchIDs where the input generator was 
+        // the search program
+        List<Integer> searchPinferIds = loadProteinferIdsForInputIds(msRunSearchIds, search.getSearchProgram());
+        pinferIdsSet.addAll(searchPinferIds);
+        
+        return new ArrayList<Integer>(pinferIdsSet);
+    }
+    
+    public List<Integer> getProteinferIdsForMsSearchAnalysis(int msSearchAnalysisId) {
+
+    	MsSearchAnalysisDAO analysisDao = DAOFactory.instance().getMsSearchAnalysisDAO();
+    	MsRunSearchAnalysisDAO rsanalysisDao = DAOFactory.instance().getMsRunSearchAnalysisDAO();
+    	
+    	 // load the analysis
+        MsSearchAnalysis analysis = analysisDao.load(msSearchAnalysisId);
+        // get all the runSearchAnalysisIds for each analysis done on the search
+        List<Integer> runSearchAnalysisIds = rsanalysisDao.getRunSearchAnalysisIdsForAnalysis(msSearchAnalysisId);
+        
+        // load protein inference results for the runSearchAnalysisIDs where the input generator was 
+        // the analysis program
+        List<Integer> piRunIds = loadProteinferIdsForInputIds(runSearchAnalysisIds, analysis.getAnalysisProgram());
+
+    	Set<Integer> pinferRunIds = new HashSet<Integer>();
+    	pinferRunIds.addAll(piRunIds);
+
+    	return new ArrayList<Integer>(pinferRunIds);
     }
     
     public void delete(int pinferId) {

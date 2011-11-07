@@ -22,6 +22,8 @@ public interface GenericProteinferRunDAO <S extends ProteinferInput, T extends G
 
     public abstract List<Integer> loadSearchIdsForProteinferRun(int pinferId);
     
+    public abstract List<Integer> loadProteinferIdsForExperiment(int experimentId);
+    
     public abstract void delete(int pinferId);
 
 }
