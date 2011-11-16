@@ -193,7 +193,26 @@ public class IDPickerExecutor {
                if(nrDbProt == null) {
                    
                    // look for an exact match
-                   nrDbProt  = NrSeqLookupUtil.getDbProtein(nrseqDbId, pr.getAccession());
+            	   // If there were multiple entries in the database for the same accession
+            	   // look for only the current ones
+            	   List<NrDbProtein> nrDbProteins  = NrSeqLookupUtil.getDbProteins(nrseqDbId, pr.getAccession());
+            	   Iterator<NrDbProtein> iter = nrDbProteins.iterator();
+            	   while(iter.hasNext()) {
+            		   if(!iter.next().isCurrent()) { // If this is not a current protein remove it
+            			   iter.remove();
+            		   }
+            	   }
+            	   if(nrDbProteins.size() == 1) {
+            		   nrDbProt = nrDbProteins.get(0);
+            	   }
+            	   else if(nrDbProteins.size() > 1) {
+            		   log.error("Found multiple current nrseq ids for protein: "+pr.getAccession()+
+                               "; database: "+nrseqDbId);
+                       throw new Exception("Found multiple current nrseq ids for protein: "+pr.getAccession()+
+                               "; database: "+nrseqDbId);
+            	   }
+            	   
+            	   
                    
                    // exact match not found
                    if(nrDbProt == null) {
