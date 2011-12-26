@@ -24,16 +24,18 @@ import org.yeastrc.ms.parser.DataProviderException;
  */
 public class PercolatorXmlFileChecker {
 
-	public static void main(String[] args) throws DataProviderException {
+	public Set<String> getDuplicatePeptides(String filepath) throws DataProviderException {
 		
-		String filepath = args[0];
+		Set<String> duplicates = new HashSet<String>();
 		
 		PercolatorXmlFileReader reader = new PercolatorXmlFileReader();
 		reader.setSearchProgram(Program.SEQUEST);
-		reader.setReadDecoyResults(true);
+		reader.setReadDecoyResults(false);
+		reader.setParseModifications(false); // we will not parse the modifications
 		
 		reader.open(filepath);
-		
+
+		// skip over the psms
 		while(reader.hasNextPsm()) {
 			PercolatorXmlResult result = (PercolatorXmlResult) reader.getNextPsm();
 			if(result.isDecoy()) {
@@ -52,7 +54,8 @@ public class PercolatorXmlFileChecker {
 			
 			String peptideIdString = result.getResultPeptide().getModifiedPeptidePS();
 			if(peptides.contains(peptideIdString)) {
-				System.out.println("Found duplicate peptide: "+peptideIdString);
+				duplicates.add(peptideIdString);
+				//System.out.println("Found duplicate peptide: "+peptideIdString);
 			}
 			
 			else {
@@ -61,5 +64,19 @@ public class PercolatorXmlFileChecker {
 		}
 		
 		reader.close();
+		
+		return duplicates;
+	}
+	
+	public static void main(String[] args) throws DataProviderException {
+		
+		String filepath = "resources/percolator_duplicate_peptide/combined-results.perc.xml"; // args[0];
+		
+		PercolatorXmlFileChecker fileChecker = new PercolatorXmlFileChecker();
+		Set<String> duplicates = fileChecker.getDuplicatePeptides(filepath);
+		
+		for(String duplicate: duplicates) {
+			System.out.println("Found duplicate peptide: "+duplicate);
+		}
 	}
 }

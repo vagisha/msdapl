@@ -45,6 +45,7 @@ import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.parser.DataProviderException;
+import org.yeastrc.ms.parser.percolator.PercolatorXmlFileChecker;
 import org.yeastrc.ms.parser.percolator.PercolatorXmlFileReader;
 import org.yeastrc.ms.parser.percolator.PercolatorXmlPeptideResult;
 import org.yeastrc.ms.parser.percolator.PercolatorXmlPsmId;
@@ -55,6 +56,7 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.service.percolator.stats.PercolatorFilteredPsmStatsSaver;
 import org.yeastrc.ms.service.percolator.stats.PercolatorFilteredSpectraStatsSaver;
 import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
+import org.yeastrc.utils.StringUtils;
 
 /**
  * 
@@ -110,6 +112,10 @@ public class PercolatorXmlDataUploadService implements
 
 	private int numPsmUploaded;
 	private int numPeptUploaded;
+	
+	private Map<String, List<PercolatorXmlPeptideResult>> duplicatePeptides = new HashMap<String, List<PercolatorXmlPeptideResult>>();
+	
+	
     
     public PercolatorXmlDataUploadService() {
     	
@@ -247,6 +253,22 @@ public class PercolatorXmlDataUploadService implements
         		throw e;
         	}
 
+        	// NOTE: 12/16/11; Added to deal with duplicate peptide_ids in the <peptides> section of Percolator output
+            // Read the file once and get a list of all the duplicate peptides in the file
+            PercolatorXmlFileChecker checker = new PercolatorXmlFileChecker();
+            Set<String> duplicates = null;
+			try {
+				duplicates = checker.getDuplicatePeptides(filePath);
+				for (String duplicate : duplicates) {
+					this.duplicatePeptides.put(duplicate, new ArrayList<PercolatorXmlPeptideResult>());
+				}
+			} catch (DataProviderException e1) {
+				log.error("Error reading file while looking for duplicate peptides.", e1);
+			}
+			if(duplicatePeptides.size() > 0) {
+				log.error("DUPLICATE PEPTIDES: "+duplicatePeptides.size()+"\n"+StringUtils.makeCommaSeparated(duplicates));
+			}
+            
 
         	int numRunSearchAnalysisUploaded = 0;
         	try {
@@ -402,6 +424,9 @@ public class PercolatorXmlDataUploadService implements
         // Now read peptide-level results, if any
     	uploadPeptideResults(reader, analysisId);
         
+    	// If there were any duplicate peptides upload them now. 
+    	uploadDuplicatePeptides(analysisId);
+    	
         long endTime = System.currentTimeMillis();
         
         log.info("END PERCOLATOR XML FILE UPLOAD; SEARCH_ANALYSIS_ID: "+analysisId+ " in "+(endTime - startTime)/(1000L)+"seconds\n");
@@ -409,7 +434,45 @@ public class PercolatorXmlDataUploadService implements
         return numRunSearchAnalysesUploaded;
     }
 
-    private int uploadPsms(PercolatorXmlFileReader reader, int analysisId) throws UploadException {
+    private void uploadDuplicatePeptides(int analysisId) throws UploadException {
+		
+    	if(duplicatePeptides.size() == 0)
+    		return;
+    	
+    	StringBuilder buf = new StringBuilder();
+    	
+    	for(String key: this.duplicatePeptides.keySet()) {
+    		
+    		List<PercolatorXmlPeptideResult> results = this.duplicatePeptides.get(key);
+    		Set<PercolatorXmlPsmId> uniqPsmIds = new HashSet<PercolatorXmlPsmId>();
+    		
+    		PercolatorXmlPeptideResult bestResult = results.get(0);
+    		buf.append(key+" -- qvalues: ");
+    		buf.append(bestResult.getQvalue());
+    		
+    		uniqPsmIds.addAll(bestResult.getPsmIds());
+    		
+    		for(int i = 1; i < results.size(); i++) {
+    			buf.append(", ");
+    			buf.append(results.get(i).getQvalue());
+    			uniqPsmIds.addAll(results.get(i).getPsmIds());
+    		}
+    		
+    		bestResult.getPsmIds().clear();
+    		bestResult.getPsmIds().addAll(uniqPsmIds);
+    		
+    		PercolatorPeptideResultBean peptRes = makePeptideResult(analysisId, bestResult);
+			uploadPercolatorPeptideResult(peptRes);
+			
+			buf.append("\n");
+    	}
+		
+    	flushPeptideBuffer();
+        log.info("Uploaded duplicate peptides");
+        log.error("------------------ DUPLICATE Peptides ---------------\n"+buf.toString());
+	}
+
+	private int uploadPsms(PercolatorXmlFileReader reader, int analysisId) throws UploadException {
 		
 		runSearchAnalysisIdMap = new HashMap<String, Integer>(); // key = filename; value runSearchAnalysisId
         runIdMap = new HashMap<Integer, Integer>(); // key = runSearchId; value = runId
@@ -502,93 +565,15 @@ public class PercolatorXmlDataUploadService implements
 			while(reader.hasNextPeptide()) {
 				PercolatorXmlPeptideResult peptide = (PercolatorXmlPeptideResult) reader.getNextPeptide();
 				
-				PercolatorPeptideResultBean peptRes = new PercolatorPeptideResultBean();
-				peptRes.setSearchAnalysisId(analysisId);
-				peptRes.setResultPeptide(peptide.getResultPeptide());
-				peptRes.setQvalue(peptide.getQvalue());
-				peptRes.setPosteriorErrorProbability(peptide.getPosteriorErrorProbability());
-				peptRes.setPvalue(peptide.getPvalue());
-				peptRes.setDiscriminantScore(peptide.getDiscriminantScore());
-				Set<Integer> psmIds = new HashSet<Integer>(peptide.getPsmIds().size());
-				
-				
-				for(PercolatorXmlPsmId psmId: peptide.getPsmIds()) {
-					// get a PercolatorResult ID for this psm;
-					String sourceFileName = psmId.getFileName();
-					
-					// !! --------- IMPORTANT ---------------------------!
-	        		// THIS IS TO GET THE PEPTIPEDIA DATA UPLOADED
-	        		// PERCOLATOR CONSIDERS EVERYTHING AFTER THE FIRST DOT IN THE FILNAME AS THE EXTENSION
-	        		// sourceFileName += ".renum";
-	        		// !! -----------------------------------------------!
-	        		
-	        		Integer runSearchId = runSearchIdMap.get(sourceFileName);
-
-	        		// !! --------- IMPORTANT ---------------------------!
-	        		// THIS IS TO GET THE PEPTIPEDIA DATA UPLOADED
-	        		// PERCOLATOR CONSIDERS EVERYTHING AFTER THE FIRST DOT IN THE FILNAME AS THE EXTENSION
-	        		// if(runSearchId == null) {
-	        		//	sourceFileName = psmId.getFileName()+".ms3.renum";
-	        		//	runSearchId = runSearchIdMap.get(sourceFileName);
-	        		// }
-	        		// !! -----------------------------------------------!
-	        		
-	        		
-	        		if (runSearchId == null) {
-	        			UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_ANALYSIS_FILE);
-	        			ex.appendErrorMessage("File was: "+sourceFileName);
-	        			ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
-	        			deleteAnalysis(analysisId);
-	        			throw ex;
-	        		}
-					
-	        		List<Integer> runSearchResultIds = null;
-					try {
-						// We may have multiple matching results for the same scan, charge and peptide sequence
-						// due to Bullseye.  Add them all
-						runSearchResultIds = this.getMatchingSearchResultIds(runSearchId, psmId.getScanNumber(), 
-								psmId.getCharge(),peptide.getResultPeptide());
-					}
-					catch(UploadException e) {
-						// TODO -- This is probably because this PSM had XCorrRank > 1 in the sequest results
-						// We only upload XCorrRank = 1 results. Chances are there is no matching Percolator PSM
-						// (in the <psms></psms> list) either.  Ignore it for now.
-						if(e.getErrorCode() == ERROR_CODE.NO_MATCHING_SEARCH_RESULT) {
-							log.warn(e.getErrorMessage());
-							log.error("runSearchId: "+runSearchId+"; scan number: "+psmId.getScanNumber()+"; charge: "+psmId.getCharge()+"; peptide: "+peptide.getResultPeptide().getPeptideSequence());
-							continue;
-						}
-						else
-							throw e;
-					}
-							
-					Integer runSearchAnalysisId = runSearchAnalysisIdMap.get(sourceFileName);
-					if(runSearchAnalysisId == null) {
-						UploadException ex = new UploadException(ERROR_CODE.NO_RSANALYSISID_FOR_ANALYSIS_FILE);
-						ex.appendErrorMessage("File was: "+sourceFileName);
-	        			ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
-	        			deleteAnalysis(analysisId);
-	        			throw ex;
-					}
-					
-					// get the PercolatorResult ID for this runSearchResultId;
-					for(Integer runSearchResultId: runSearchResultIds) {
-						PercolatorResult percolatorResult = percResultDao.loadForRunSearchAnalysis(runSearchResultId, runSearchAnalysisId);
-						if(percolatorResult == null) {
-							UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-							ex.appendErrorMessage("NO MATCHING PERCOLATOR RESULT FOUND FOR runSearchResultId: "+runSearchResultId+" and runSearchAnalysisId: "+runSearchAnalysisId);
-							ex.appendErrorMessage("scan number: "+psmId.getScanNumber()+"; charge: "+psmId.getCharge()+"; peptide: "+peptide.getResultPeptide().getPeptideSequence());
-		        			//ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
-		        			//deleteAnalysis(analysisId);
-		        			//numAnalysisUploaded = 0;
-		        			//throw ex;
-		        			log.error(ex.getMessage());
-		        			continue;
-						}
-						psmIds.add(percolatorResult.getPercolatorResultId());
-					}
+				// NOTE: 12/16/11; Added to deal with duplicate peptide_ids in the <peptides> section of Percolator output
+				// If this peptide is present more than once in the peptides section, save it later
+				String seq = peptide.getResultPeptide().getModifiedPeptidePS();
+				if(this.duplicatePeptides.containsKey(seq)) {
+					duplicatePeptides.get(seq).add(peptide);
+					continue;
 				}
-				peptRes.setPsmIdList(new ArrayList<Integer>(psmIds));
+				
+				PercolatorPeptideResultBean peptRes = makePeptideResult(analysisId, peptide);
 				uploadPercolatorPeptideResult(peptRes);
 			}
 			
@@ -605,6 +590,100 @@ public class PercolatorXmlDataUploadService implements
         
         flushPeptideBuffer();
         log.info("Uploaded peptides");
+	}
+
+	private PercolatorPeptideResultBean makePeptideResult(int analysisId,
+			PercolatorXmlPeptideResult peptide) throws UploadException {
+		
+		PercolatorPeptideResultBean peptRes = new PercolatorPeptideResultBean();
+		peptRes.setSearchAnalysisId(analysisId);
+		peptRes.setResultPeptide(peptide.getResultPeptide());
+		peptRes.setQvalue(peptide.getQvalue());
+		peptRes.setPosteriorErrorProbability(peptide.getPosteriorErrorProbability());
+		peptRes.setPvalue(peptide.getPvalue());
+		peptRes.setDiscriminantScore(peptide.getDiscriminantScore());
+		
+		Set<Integer> psmIds = new HashSet<Integer>(peptide.getPsmIds().size());
+		
+		
+		for(PercolatorXmlPsmId psmId: peptide.getPsmIds()) {
+			// get a PercolatorResult ID for this psm;
+			String sourceFileName = psmId.getFileName();
+			
+			// !! --------- IMPORTANT ---------------------------!
+			// THIS IS TO GET THE PEPTIPEDIA DATA UPLOADED
+			// PERCOLATOR CONSIDERS EVERYTHING AFTER THE FIRST DOT IN THE FILNAME AS THE EXTENSION
+			// sourceFileName += ".renum";
+			// !! -----------------------------------------------!
+			
+			Integer runSearchId = runSearchIdMap.get(sourceFileName);
+
+			// !! --------- IMPORTANT ---------------------------!
+			// THIS IS TO GET THE PEPTIPEDIA DATA UPLOADED
+			// PERCOLATOR CONSIDERS EVERYTHING AFTER THE FIRST DOT IN THE FILNAME AS THE EXTENSION
+			// if(runSearchId == null) {
+			//	sourceFileName = psmId.getFileName()+".ms3.renum";
+			//	runSearchId = runSearchIdMap.get(sourceFileName);
+			// }
+			// !! -----------------------------------------------!
+			
+			
+			if (runSearchId == null) {
+				UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_ANALYSIS_FILE);
+				ex.appendErrorMessage("File was: "+sourceFileName);
+				ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
+				deleteAnalysis(analysisId);
+				throw ex;
+			}
+			
+			List<Integer> runSearchResultIds = null;
+			try {
+				// We may have multiple matching results for the same scan, charge and peptide sequence
+				// due to Bullseye.  Add them all
+				runSearchResultIds = this.getMatchingSearchResultIds(runSearchId, psmId.getScanNumber(), 
+						psmId.getCharge(),peptide.getResultPeptide());
+			}
+			catch(UploadException e) {
+				// TODO -- This is probably because this PSM had XCorrRank > 1 in the sequest results
+				// We only upload XCorrRank = 1 results. Chances are there is no matching Percolator PSM
+				// (in the <psms></psms> list) either.  Ignore it for now.
+				if(e.getErrorCode() == ERROR_CODE.NO_MATCHING_SEARCH_RESULT) {
+					log.warn(e.getErrorMessage());
+					log.error("runSearchId: "+runSearchId+"; scan number: "+psmId.getScanNumber()+"; charge: "+psmId.getCharge()+"; peptide: "+peptide.getResultPeptide().getPeptideSequence());
+					continue;
+				}
+				else
+					throw e;
+			}
+					
+			Integer runSearchAnalysisId = runSearchAnalysisIdMap.get(sourceFileName);
+			if(runSearchAnalysisId == null) {
+				UploadException ex = new UploadException(ERROR_CODE.NO_RSANALYSISID_FOR_ANALYSIS_FILE);
+				ex.appendErrorMessage("File was: "+sourceFileName);
+				ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
+				deleteAnalysis(analysisId);
+				throw ex;
+			}
+			
+			// get the PercolatorResult ID for this runSearchResultId;
+			for(Integer runSearchResultId: runSearchResultIds) {
+				PercolatorResult percolatorResult = percResultDao.loadForRunSearchAnalysis(runSearchResultId, runSearchAnalysisId);
+				if(percolatorResult == null) {
+					UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+					ex.appendErrorMessage("NO MATCHING PERCOLATOR RESULT FOUND FOR runSearchResultId: "+runSearchResultId+" and runSearchAnalysisId: "+runSearchAnalysisId);
+					ex.appendErrorMessage("scan number: "+psmId.getScanNumber()+"; charge: "+psmId.getCharge()+"; peptide: "+peptide.getResultPeptide().getPeptideSequence());
+					//ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
+					//deleteAnalysis(analysisId);
+					//numAnalysisUploaded = 0;
+					//throw ex;
+					log.error(ex.getMessage());
+					continue;
+				}
+				psmIds.add(percolatorResult.getPercolatorResultId());
+			}
+		}
+		peptRes.setPsmIdList(new ArrayList<Integer>(psmIds));
+		return peptRes;
 	}
 
 	

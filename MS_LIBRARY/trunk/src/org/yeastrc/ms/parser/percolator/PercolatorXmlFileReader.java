@@ -21,12 +21,15 @@ import org.yeastrc.ms.domain.analysis.percolator.PercolatorPeptideResultIn;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultIn;
 import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorParamBean;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
+import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.PercolatorXmlDataProvider;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 
 public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 
@@ -40,6 +43,7 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
     private Program searchProgram;
     
     private boolean skipDecoyResults = true;
+    private boolean parseModifications = true;
     
     //private static final String namespace = "http://github.com/percolator/percolator/raw/master/src/xml/percolator_out";
     //public static final String namespace = "http://per-colator.com/percolator_out/11";
@@ -60,6 +64,10 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
     
     public void setReadDecoyResults(boolean readDecoys) {
     	this.skipDecoyResults = !readDecoys;
+    }
+    
+    public void setParseModifications(boolean parseModifications) {
+    	this.parseModifications = parseModifications;
     }
     
 	public void open(String filePath) throws DataProviderException {
@@ -366,13 +374,21 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
         try {
 
             MsSearchResultPeptide resultPeptide = null;
-            
-            if(searchProgram == Program.SEQUEST )//|| searchProgram == Program.EE_NORM_SEQUEST)
-                resultPeptide = SequestResultPeptideBuilder.instance().build(
-                        nterm+"."+seq+"."+cterm, this.searchDynamicResidueMods, null);
-            
-            else
-                throw new DataProviderException("Cannot parse peptide string for search program: "+searchProgram);
+             
+            if(this.parseModifications) {
+            	if(searchProgram == Program.SEQUEST )
+            		resultPeptide = SequestResultPeptideBuilder.instance().build(
+            				nterm+"."+seq+"."+cterm, this.searchDynamicResidueMods, null);
+
+            	else
+            		throw new DataProviderException("Cannot parse peptide string for search program: "+searchProgram);
+            }
+            else {
+            	resultPeptide = new PeptideUnparsedModifications();
+            	resultPeptide.setPreResidue(nterm);
+            	resultPeptide.setPostResidue(cterm);
+            	resultPeptide.setPeptideSequence(seq);
+            }
             
             result.setResultPeptide(resultPeptide);
         }
@@ -461,13 +477,21 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 
             MsSearchResultPeptide resultPeptide = null;
             
-            if(searchProgram == Program.SEQUEST )//|| searchProgram == Program.EE_NORM_SEQUEST)
-                resultPeptide = SequestResultPeptideBuilder.instance().build(
-                        "-."+sequence+".-",  // NOTE: we don't have n and c term residue information for peptides
-                        this.searchDynamicResidueMods, null);
-            
-            else
-                throw new DataProviderException("Cannot parse peptide string for search program: "+searchProgram);
+            if(this.parseModifications) {
+            	if(searchProgram == Program.SEQUEST )
+                    resultPeptide = SequestResultPeptideBuilder.instance().build(
+                            "-."+sequence+".-",  // NOTE: we don't have n and c term residue information for peptides
+                            this.searchDynamicResidueMods, null);
+                
+                else
+                    throw new DataProviderException("Cannot parse peptide string for search program: "+searchProgram);
+            }
+            else {
+            	resultPeptide = new PeptideUnparsedModifications();
+            	resultPeptide.setPreResidue('-'); // NOTE: we don't have n and c term residue information for peptides
+            	resultPeptide.setPostResidue('-');
+            	resultPeptide.setPeptideSequence(sequence);
+            }
             
             result.setResultPeptide(resultPeptide);
         }
@@ -576,5 +600,108 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
             try {inputStr.close();}
             catch(IOException e){}
         }
+	}
+	
+	private static final class PeptideUnparsedModifications implements MsSearchResultPeptide {
+
+		private String sequence;
+		private char nterm;
+		private char cterm;
+		
+		@Override
+		public void setPeptideSequence(String sequence) {
+			this.sequence = sequence;
+		}
+
+		@Override
+		public void setPostResidue(char postResidue) {
+			this.cterm = postResidue;
+		}
+
+		@Override
+		public void setPreResidue(char preResidue) {
+			this.nterm = preResidue;
+		}
+		
+		@Override
+		public String getPeptideSequence() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public char getPostResidue() {
+			return this.cterm;
+		}
+
+		@Override
+		public char getPreResidue() {
+			return this.nterm;
+		}
+		
+		@Override
+		public String getFullModifiedPeptidePS() {
+			return nterm+"."+sequence+"."+cterm;
+		}
+		
+		@Override
+		public String getModifiedPeptidePS() {
+			return sequence;
+		}
+		
+		@Override
+		public String getFullModifiedPeptide()
+				throws ModifiedSequenceBuilderException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String getFullModifiedPeptide(boolean massDiffOnly)
+				throws ModifiedSequenceBuilderException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String getModifiedPeptide()
+				throws ModifiedSequenceBuilderException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String getModifiedPeptide(boolean massDiffOnly)
+				throws ModifiedSequenceBuilderException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public List<MsResultResidueMod> getResultDynamicResidueModifications() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public List<MsResultTerminalMod> getResultDynamicTerminalModifications() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int getSequenceLength() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean hasDynamicModification() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setDynamicResidueModifications(
+				List<MsResultResidueMod> dynaMods) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setDynamicTerminalModifications(
+				List<MsResultTerminalMod> termDynaMods) {
+			throw new UnsupportedOperationException();
+		}
 	}
 }

@@ -48,4 +48,20 @@ public class PercolatorXmlPsmId {
 		return fileName+"_"+scanNumber+"_"+charge;
 	}
 	
+	public boolean equals(Object obj) {
+		if(!(obj instanceof PercolatorXmlPsmId))
+			return false;
+		
+		PercolatorXmlPsmId that = (PercolatorXmlPsmId) obj;
+		
+		if(this == that)
+			return true;
+		
+		return (this.toString().equals(that.toString()));
+	}
+	
+	public int hashCode() {
+		return this.toString().hashCode();
+	}
+	
 }
