@@ -85,7 +85,12 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         
         // 1. Get ALL the PercolatorResults (filtered by score(s) and peptide length
         //    Ambiguous spectra are also removed
-        List<PercolatorResult> allResults = getAllPercolatorResults(inputList, inputGenerator, percParams);
+        List<PercolatorResult> allResults;
+		try {
+			allResults = getAllPercolatorResults(inputList, inputGenerator, percParams);
+		} catch (ModifiedSequenceBuilderException e) {
+			throw new ResultGetterException("Error while getting Percolator results", e);
+		}
 
         // 2. Convert list of PercolatorResult to PeptideSpectrumMatchNoFDR
         //    Rank the results for each peptide.
@@ -462,7 +467,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
     // min. peptide length.
     private List<PercolatorResult> getAllPercolatorResults(List<IdPickerInput> inputList, 
             Program inputGenerator,
-            PercolatorParams percParams) {
+            PercolatorParams percParams) throws ModifiedSequenceBuilderException {
         
         PercolatorResultDAO resultDao = DAOFactory.instance().getPercolatorResultDAO();
         
@@ -533,7 +538,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
     }
     
     
-    protected void removeSpectraWithMultipleResults(List<PercolatorResult> psmList) {
+    protected void removeSpectraWithMultipleResults(List<PercolatorResult> psmList) throws ModifiedSequenceBuilderException {
         AmbiguousSpectraFilter specFilter = AmbiguousSpectraFilter.instance();
         specFilter.filterSpectraWithMultipleResults(psmList);
     }

@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 
 import edu.uwpr.protinfer.infer.PeptideSpectrumMatch;
 import edu.uwpr.protinfer.util.TimeUtils;
@@ -51,9 +52,10 @@ public class AmbiguousSpectraFilter {
             T psm = psmList.get(i);
             if(lastScanId != -1){
                 if(lastScanId == psm.getScanId()) {
-                    scanIdsToRemove.add(lastScanId);
-                }
+            		scanIdsToRemove.add(lastScanId);
+            	}
             }
+            
             lastScanId = psm.getScanId();
         }
         
@@ -71,7 +73,7 @@ public class AmbiguousSpectraFilter {
                 "Remaining results: "+psmList.size()+". Time: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds\n");
     }
     
-    public <T extends MsSearchResult> void filterSpectraWithMultipleResults(List<T> psmList) {
+    public <T extends MsSearchResult> void filterSpectraWithMultipleResults(List<T> psmList) throws ModifiedSequenceBuilderException {
         
         long s = System.currentTimeMillis();
         // sort by scanID
@@ -86,6 +88,7 @@ public class AmbiguousSpectraFilter {
         int lastScanId = -1;
         for (int i = 0; i < psmList.size(); i++) {
             T psm = psmList.get(i);
+            
             if(lastScanId != -1){
                 if(lastScanId == psm.getScanId()) {
                     scanIdsToRemove.add(lastScanId);
@@ -94,11 +97,42 @@ public class AmbiguousSpectraFilter {
             lastScanId = psm.getScanId();
         }
         
+        // We don't want to remove scans that have multiple PSMs that identifed the same peptide. 
+        // This may happen with Bullseye results.
+        // We do this in a separate look so that we do a modified sequence lookup only for
+        // spectra that have multiple PSMs.
+        lastScanId = -1;
+        Set<String> scanPeptides = null;
+        for(int i = 0; i < psmList.size(); i++)
+        {
+        	T psm = psmList.get(i);
+        	if(lastScanId != psm.getScanId()) {
+
+            	if(scanIdsToRemove.contains(lastScanId) && scanPeptides.size() <= 1) 
+            	{
+            		scanIdsToRemove.remove(lastScanId);
+            	}
+
+            	scanPeptides = new HashSet<String>();
+            }
+        	
+        	lastScanId = psm.getScanId();
+        	if(!scanIdsToRemove.contains(psm.getScanId()))
+        		continue;
+        	
+        	scanPeptides.add(psm.getResultPeptide().getModifiedPeptide());
+        }
+        // check the last one
+        if(scanIdsToRemove.contains(lastScanId) && scanPeptides.size() <= 1) 
+    	{
+        	scanIdsToRemove.remove(lastScanId);
+    	}
+        
         Iterator<T> iter = psmList.iterator();
         while(iter.hasNext()) {
             T psm = iter.next();
             if(scanIdsToRemove.contains(psm.getScanId())) {
-//                log.info("Removing for scanID: "+psm.getScanId()+"; resultID: "+psm.getHitId());
+                log.info("Removing for scanID: "+psm.getScanId()+"; resultID: "+psm.getId()+"; peptide: "+psm.getResultPeptide().getModifiedPeptide());
                 iter.remove();
             }
         }
