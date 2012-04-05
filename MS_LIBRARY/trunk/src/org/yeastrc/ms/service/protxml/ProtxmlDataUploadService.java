@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -772,36 +773,51 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     }
 
     private int getNrseqProteinId(String accession, int nrseqDatabaseId) {
+    	
     	// We have a limit on size of accession strings in YRC_NRSEQ
     	if(accession.length() > 500)
     		accession = accession.substring(0, 500);
-        NrDbProtein protein = null;
-        try {
-        	protein = NrSeqLookupUtil.getDbProtein(nrseqDatabaseId, accession);
-        }
-        catch(Exception e) { // TODO accessions for a particular database may not be unique
-        					 // the method above will throw an exception if > 1 matches are found
-        	log.error("Exception looking up YRC_NRSEQ match for dbID: "+nrseqDatabaseId+" and accession: "+accession, e);
-        }
-        if(protein != null)
-            return protein.getProteinId();
-        else if(accession.length() == 500) {
-        	// this could be an older protein only 255 chars long
-        	try {
-        		protein = NrSeqLookupUtil.getDbProtein(nrseqDatabaseId, accession.substring(0, 255));
+        
+        // Get all the proteins in this fasta database that match the accession string
+        List<NrDbProtein> proteins = NrSeqLookupUtil.getDbProteins(nrseqDatabaseId, accession);
+        // If there are multiple matching proteins remove the non-current ones
+        Iterator<NrDbProtein> iter = proteins.iterator();
+        while(iter.hasNext()) {
+        	if(!iter.next().isCurrent()) {
+        		iter.remove();
         	}
-        	catch(Exception e) {
-        		// TODO accessions for a particular database may not be unique
-				 // the method above will throw an exception if > 1 matches are found
-            	log.error("Exception looking up YRC_NRSEQ match for dbID: "+nrseqDatabaseId+
-            			" and accession substring: "+accession.substring(0, 255), e);
+        }
+        
+        if(proteins.size() == 1)
+            return proteins.get(0).getProteinId();
+        else if(proteins.size() > 1){
+        	log.error("Multiple matches found for dbID: "+nrseqDatabaseId+" and accession: "+accession);
+        }
+        
+        
+        if(accession.length() == 500) {
+        	// this could be an older protein only 255 chars long
+        	
+        	proteins = NrSeqLookupUtil.getDbProteins(nrseqDatabaseId, accession.substring(0, 255));
+        	// If there are multiple matching proteins remove the non-current ones
+            iter = proteins.iterator();
+            while(iter.hasNext()) {
+            	if(!iter.next().isCurrent()) {
+            		iter.remove();
+            	}
             }
-        	if(protein != null)
-        		return protein.getProteinId();
+        	
+        	
+        	if(proteins.size() == 1)
+        		return proteins.get(0).getProteinId();
+        	else if(proteins.size() > 1){
+        		log.error("Multiple matches found for dbID: "+nrseqDatabaseId+" and accession substring: "+accession.substring(0, 255));
+        	}
+        	
         	
         }
         else {
-        	List<NrDbProtein> proteins = NrSeqLookupUtil.getDbProteinsPartialAccession(nrseqDatabaseId, accession);
+        	proteins = NrSeqLookupUtil.getDbProteinsPartialAccession(nrseqDatabaseId, accession);
         	if(proteins.size() == 1)
         		return proteins.get(0).getProteinId();
         }
