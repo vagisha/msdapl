@@ -13,9 +13,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
 import org.yeastrc.ms.dao.analysis.peptideProphet.ProphetFilteredSpectraResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorFilteredSpectraResultDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetROC;
 import org.yeastrc.ms.domain.analysis.peptideProphet.impl.ProphetBinnedSpectraResult;
 import org.yeastrc.ms.domain.analysis.peptideProphet.impl.ProphetFilteredSpectraResult;
 import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorBinnedSpectraResult;
@@ -65,7 +67,12 @@ public class SpectraRetTimeDistributionGetter {
 		if(filteredResults == null || filteredResults.size() == 0) {
 			
 			// Results were not found in the database; calculate now
-			ProphetFilteredSpectraDistributionCalculator calc = new ProphetFilteredSpectraDistributionCalculator(analysisId, scoreCutoff);
+			PeptideProphetRocDAO rocDao = DAOFactory.instance().getPeptideProphetRocDAO();
+			PeptideProphetROC roc = rocDao.loadRoc(analysisId);
+			double probability = roc.getMinProbabilityForError(0.01);
+			log.info("Probability for error rate of "+scoreCutoff+" is: "+probability);
+			
+			ProphetFilteredSpectraDistributionCalculator calc = new ProphetFilteredSpectraDistributionCalculator(analysisId, probability);
 			calc.calculate();
 			filteredResults = calc.getFilteredResults();
 		}

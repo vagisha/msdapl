@@ -31,7 +31,7 @@ public class SearchAnalysis implements MsSearchAnalysis {
     private MsAnalysisUploadJob job;
     
     private List<QCPlot> qcPlots;
-    private String qcSummaryString;
+    private List<String> qcSummaryStringList;
     
     private YatesRun dtaSelect;
     private List<ExperimentProteinProphetRun> prophetRuns;
@@ -41,6 +41,7 @@ public class SearchAnalysis implements MsSearchAnalysis {
     
     public SearchAnalysis(MsSearchAnalysis analysis) {
         this.analysis = analysis;
+        qcSummaryStringList = new ArrayList<String>();
     }
     
     public void setJob(MsAnalysisUploadJob job) {
@@ -154,12 +155,12 @@ public class SearchAnalysis implements MsSearchAnalysis {
     	this.qcPlots = plots;
     }
     
-	public String getQcSummaryString() {
-		return qcSummaryString;
+	public List<String> getQcSummaryStrings() {
+		return qcSummaryStringList;
 	}
 
-	public void setQcSummaryString(String qcSummaryString) {
-		this.qcSummaryString = qcSummaryString;
+	public void addQcSummaryString(String qcSummaryString) {
+		this.qcSummaryStringList.add(qcSummaryString);
 	}
 
 	@Override

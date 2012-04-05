@@ -152,9 +152,11 @@
 				</td>
 				<logic:equal name="analysis" property="complete" value="true">
 					<td valign="middle">
-						<logic:present name="analysis" property="qcSummaryString">
-							<span style="font-weight:bold;color:green;"><bean:write name="analysis" property="qcSummaryString"/></span>
-							<br/>
+						<logic:present name="analysis" property="qcSummaryStrings">
+							<logic:iterate name="analysis" property="qcSummaryStrings" id="qcSummaryString">
+								<span style="font-weight:bold;color:green;"><bean:write name="qcSummaryString"/></span>
+								<br/>
+							</logic:iterate>
 						</logic:present>
 						<b><html:link action="viewPercolatorResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link></b>
 					</td>
@@ -274,14 +276,8 @@
 				<b><bean:write name="analysis" property="filename" /></b>
 			</td>
 			
-			<td valign="middle">
-				<logic:present name="analysis" property="qcSummaryString">
-					<span style="font-weight:bold;color:green;"><bean:write name="analysis" property="qcSummaryString"/></span>
-					<br/>
-				</logic:present>
-				<b><html:link action="viewPeptideProphetResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link></b>
-			</td>
-			<td align="left">
+			
+			<td align="right" valign="top">
 				<logic:present name="analysis" property="qcPlots">
 					<div style="padding:5px;">
 					<logic:iterate name="analysis" property="qcPlots" id="plot">
@@ -292,8 +288,19 @@
 					</logic:iterate>
 					</div>
 				</logic:present>
+				<!-- 
 				<b><a href="<yrcwww:link path='viewQCPlots.do?'/>analysisId=<bean:write name='analysis' property='id' />&experimentId=<bean:write name='experiment' property='id'/>"> 
 				[Details]</a></b>
+				-->
+			</td>
+			<td valign="middle" align="left">
+				<logic:present name="analysis" property="qcSummaryStrings">
+					<logic:iterate name="analysis" property="qcSummaryStrings" id="qcSummaryString">
+						<span style="font-weight:bold;color:green;"><bean:write name="qcSummaryString"/></span>
+						<br/>
+					</logic:iterate>
+				</logic:present>
+				<b><html:link action="viewPeptideProphetResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link></b>
 			</td>
 					
 			

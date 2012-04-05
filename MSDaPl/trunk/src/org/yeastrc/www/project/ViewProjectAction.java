@@ -472,8 +472,11 @@ public class ViewProjectAction extends Action {
         	qcStatsGetter.getStats(searchAnalysisId, QCStatsGetter.PERC_QVAL_DEFAULT);
         	FileStats analysisPsmStat = qcStatsGetter.getPsmAnalysisStats();
         	String qcSummaryString = analysisPsmStat.getPercentGoodCount()+"% PSMs at qvalue <= 0.01";
-        	sAnalysis.setQcSummaryString(qcSummaryString);
-        	
+        	sAnalysis.addQcSummaryString(qcSummaryString);
+        	FileStats analysisSpectraRtStats = qcStatsGetter.getSpectraAnalysisStats();
+        	qcSummaryString = analysisSpectraRtStats.getPercentGoodCount()+"% spectra with results at qvalue <= 0.01";
+        	sAnalysis.addQcSummaryString(qcSummaryString);
+			 
         	List<QCPlot> qcPlots = new ArrayList<QCPlot>(2);
         	qcPlots.add(new QCPlot(qcStatsGetter.getPsmDistrUrl(), "Retention Time vs # PSM"));
         	qcPlots.add(new QCPlot(qcStatsGetter.getSpectraDistrUrl(), "Retention Time vs # Spectra"));
@@ -482,21 +485,22 @@ public class ViewProjectAction extends Action {
         else if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
         	
         	QCStatsGetter qcStatsGetter = new QCStatsGetter();
-        	qcStatsGetter.setGetPsmRtStats(true);
+        	qcStatsGetter.setGetPsmRtStats(false); // TODO This doesn't look right. Ask Jimmy.
         	qcStatsGetter.setGetSpectraRtStats(true);
         	qcStatsGetter.getStats(searchAnalysisId, QCStatsGetter.PEPPROPHET_ERR_RATE_DEFAULT);
-        	FileStats analysisPsmStat = qcStatsGetter.getPsmAnalysisStats();
+        	// FileStats analysisPsmStat = qcStatsGetter.getPsmAnalysisStats();
         	
         	PeptideProphetRocDAO rocDao = DAOFactory.instance().getPeptideProphetRocDAO();
     		PeptideProphetROC roc = rocDao.loadRoc(analysis.getId());
     		double errRate = roc.getClosestError(QCStatsGetter.PEPPROPHET_ERR_RATE_DEFAULT);
     		double probability = roc.getMinProbabilityForError(errRate);
     		
-        	String qcSummaryString = analysisPsmStat.getPercentGoodCount()+"% PSMs at error rate "+errRate+" (probability "+probability+")";
-        	sAnalysis.setQcSummaryString(qcSummaryString);
+    		FileStats analysisSpectraRtStat = qcStatsGetter.getSpectraAnalysisStats();
+        	String qcSummaryString = analysisSpectraRtStat.getPercentGoodCount()+"% spectra with results at error rate "+errRate+" (prob. "+probability+")";
+        	sAnalysis.addQcSummaryString(qcSummaryString);
         	
         	List<QCPlot> qcPlots = new ArrayList<QCPlot>(2);
-        	qcPlots.add(new QCPlot(qcStatsGetter.getPsmDistrUrl(), "Retention Time vs # PSM"));
+        	// qcPlots.add(new QCPlot(qcStatsGetter.getPsmDistrUrl(), "Retention Time vs # PSM"));
         	qcPlots.add(new QCPlot(qcStatsGetter.getSpectraDistrUrl(), "Retention Time vs # Spectra"));
         	sAnalysis.setQcPlots(qcPlots);
         }

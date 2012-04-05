@@ -112,7 +112,7 @@ public class HeatMapData {
 		
 		boolean allDatasetsHaveNames = true;
 		for(Dataset ds: datasets) {
-			if(ds.getDatasetName() == null && ds.getDatasetName().length() == 0) {
+			if(ds.getDatasetName() == null || ds.getDatasetName().length() == 0) {
 				allDatasetsHaveNames = false;
 				break;
 			}
