@@ -62,12 +62,12 @@ public class ParsimProtRunner {
         	printUsageAndExit();
         }
         
-        if(psmsFile != null & !(new File(psmsFile).exists())) {
+        if(psmsFile != null && !(new File(psmsFile).exists())) {
         	System.err.println("PSMs file does not exist: "+psmsFile);
         	printUsageAndExit();
         }
         
-        if(percFile != null & !(new File(percFile).exists())) {
+        if(percFile != null && !(new File(percFile).exists())) {
         	System.err.println("Percolator file does not exist: "+percFile);
         	printUsageAndExit();
         }

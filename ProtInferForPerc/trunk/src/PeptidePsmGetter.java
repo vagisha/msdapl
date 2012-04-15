@@ -121,8 +121,8 @@ public class PeptidePsmGetter {
 	
 	public static void main(String[] args) throws IOException, DataProviderException {
 		
-		String percFile = "/Users/silmaril/Desktop/genn_worm_data/PES-WS229/TEST/combined-results.perc.xml";
-		String outFile = "/Users/silmaril/Desktop/genn_worm_data/PES-WS229/TEST/PeptidePsmGetter.out";
+		String percFile = args[0]; // "/Users/silmaril/Desktop/genn_worm_data/PES-WS229/TEST/combined-results.perc.xml";
+		String outFile = args[1]; // "/Users/silmaril/Desktop/genn_worm_data/PES-WS229/TEST/PeptidePsmGetter.out";
 		
 		PeptidePsmGetter getter = new PeptidePsmGetter();
 		getter.setQvalueCutoff(0.01);
