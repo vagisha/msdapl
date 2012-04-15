@@ -32,6 +32,8 @@ public class PeptidePsmGetter {
 	
 	public Set<String> getPeptides(String percFile) throws DataProviderException {
 		
+		System.out.println("Reading peptides...");
+		
 		Set<String> peptides = new HashSet<String>();
 		
 		PercolatorXmlFileReader percReader = new PercolatorXmlFileReader();
@@ -67,6 +69,7 @@ public class PeptidePsmGetter {
 	
 	public void getPsmsForPeptides(String percFile, Set<String> peptides, String outputFile) throws IOException, DataProviderException {
 		
+		System.out.println("Reading PSMs...");
 		
 		// Read the percolator file and print all PSMs for the given peptides, above the given score thresholds
 		PercolatorXmlFileReader percReader = new PercolatorXmlFileReader();

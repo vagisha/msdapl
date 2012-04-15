@@ -8,7 +8,6 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,6 +46,9 @@ public class PeptideProteinMapper {
 			String line = null;
 			int count = 0;
 			while((line = reader.readLine()) != null) {
+				
+				if(line.toLowerCase().startsWith("peptide"))
+					continue;
 				
 				String peptide = line.split("\\s+")[0].trim();
 				

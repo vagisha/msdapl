@@ -33,33 +33,26 @@ public class ProteinInferInputMaker {
 				
 				String peptide = tokens[0];
 				int charge = Integer.parseInt(tokens[1]);
-				String psmid = tokens[3];
-				Matcher match = psmPattern.matcher(psmid);
-				if(match.matches()) {
 					
-					List<Ion> ions = peptideIonMap.get(peptide);
-					if(ions == null) {
-						ions = new ArrayList<Ion>();
-						peptideIonMap.put(peptide, ions);
-					}
-					
-					boolean found = false;
-					for(Ion ion: ions) {
-						if(ion.charge == charge) {
-							ion.spectrumCount++;
-							found = true;
-							break;
-						}
-					}
-					if(!found) {
-						Ion ion = new Ion();
-						ion.charge = charge;
-						ion.spectrumCount = 1;
-						ions.add(ion);
+				List<Ion> ions = peptideIonMap.get(peptide);
+				if(ions == null) {
+					ions = new ArrayList<Ion>();
+					peptideIonMap.put(peptide, ions);
+				}
+
+				boolean found = false;
+				for(Ion ion: ions) {
+					if(ion.charge == charge) {
+						ion.spectrumCount++;
+						found = true;
+						break;
 					}
 				}
-				else {
-					throw new Exception("Pattern matching failed for "+psmid);
+				if(!found) {
+					Ion ion = new Ion();
+					ion.charge = charge;
+					ion.spectrumCount = 1;
+					ions.add(ion);
 				}
 			}
 		}
