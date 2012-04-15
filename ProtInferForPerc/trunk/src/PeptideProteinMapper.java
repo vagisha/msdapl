@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,10 +23,16 @@ public class PeptideProteinMapper {
 
 	private Map<String, IdProtein> seqProteinNameMap = new HashMap<String, IdProtein>();
 	
-	
-	public void map(String peptideFilePath) throws IOException {
+	public void map(String peptideFilePath) throws Exception {
+		map(peptideFilePath, false);
+	}
+	public void map(String peptideFilePath, boolean findUniq) throws Exception {
 		
 		System.out.println("Mapping peptides...");
+		
+		Set<String> uniqPeptides = null;
+		if(findUniq)
+			uniqPeptides = new HashSet<String>();
 		
 		BufferedReader reader = null;
 		BufferedWriter writer = null;
@@ -34,7 +41,7 @@ public class PeptideProteinMapper {
 			reader = new BufferedReader(new FileReader(peptideFilePath));
 			writer = new BufferedWriter(new FileWriter(peptideFilePath+".peptide_to_protein_map.txt"));
 			
-			writer.write("Peptide\tProtein");
+			writer.write("Peptide\tProtein\tUnique");
 			writer.newLine();
 			
 			String line = null;
@@ -42,6 +49,13 @@ public class PeptideProteinMapper {
 			while((line = reader.readLine()) != null) {
 				
 				String peptide = line.split("\\s+")[0].trim();
+				
+				if(findUniq && uniqPeptides.contains(peptide))
+					continue;
+				
+				if(findUniq)
+					uniqPeptides.add(peptide);
+				
 				count++;
 				if(count%100 == 0)
 					System.out.println("peptides mapped: "+count);
@@ -51,7 +65,7 @@ public class PeptideProteinMapper {
 				
 				if(proteins.size() == 0) {
 					System.out.println("No matches found for peptide "+peptide);
-					System.exit(1);
+					throw new Exception("No matches found for peptide "+peptide);
 				}
 				
 				int uniq = proteins.size() == 1 ? 1 : 0;
@@ -61,6 +75,7 @@ public class PeptideProteinMapper {
 					writer.newLine();
 				}
 			}
+			System.out.println("peptides mapped: "+count);
 		}
 		finally {
 			if(reader != null) try {reader.close();} catch(IOException e){}
@@ -146,7 +161,7 @@ public class PeptideProteinMapper {
 		}
 	}
 
-	public static void main(String[] args) throws SQLException, IOException {
+	public static void main(String[] args) throws Exception {
 		
 		String fastaFilePath = "/Users/silmaril/Desktop/genn_worm_data/PES-WS229/wormpep229-AG1201-phg-orf-LaDeana-ecoli-contam-gennfix-vsharma.fasta.nr"; // args[0];
 		String peptideFilePath = "/Users/silmaril/Desktop/genn_worm_data/PES-WS229/peptides.uniq.txt"; // args[1];

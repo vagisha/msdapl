@@ -3,7 +3,6 @@ import jargs.gnu.CmdLineParser.IllegalOptionValueException;
 import jargs.gnu.CmdLineParser.UnknownOptionException;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * ParsimProtRunner.java
@@ -14,9 +13,9 @@ import java.io.IOException;
 /**
  * 
  */
-public class ParsimProtRunner {
+public class ParsimProtRunnerForPepInput {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		
 		CmdLineParser parser = new CmdLineParser();
 		
