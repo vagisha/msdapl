@@ -7,13 +7,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class ProteinInferInputMaker {
 
-	private static final Pattern psmPattern = Pattern.compile("^(.+)_(\\d+)$");
+	// private static final Pattern psmPattern = Pattern.compile("^(.+)_(\\d+)$");
 	
 	public void makeProtInferInput(String psmFile, String peptideProtMapFile, String outputFile, boolean separateIons) throws IOException, Exception {
 		
@@ -28,6 +26,9 @@ public class ProteinInferInputMaker {
 			//         LGEHNIDVLEGNEQFINAAK    2       0.0     12Oct2011-PES-fract12-GF5G12-SPE9-YA-01_16080
 			String line = null;
 			while((line = reader.readLine()) != null) {
+				
+				if(line.toLowerCase().startsWith("peptide"))
+					continue;
 				
 				String[] tokens = line.split("\\s+");
 				

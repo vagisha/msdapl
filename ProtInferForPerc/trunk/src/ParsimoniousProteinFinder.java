@@ -12,10 +12,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import edu.uwpr.protinfer.idpicker.SubsetProteinFinder;
 import edu.uwpr.protinfer.infer.GraphBuilder;
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;
@@ -62,7 +65,7 @@ public class ParsimoniousProteinFinder {
 		this.minPept = minPept;
 	}
 
-	public void getParsimoniousList() {
+	public void getParsimoniousList() throws Exception {
 		
 		// read the file 
 		proteinMap = new HashMap<String, InferredProtein<DummySpectrumMatch>>();
@@ -98,12 +101,28 @@ public class ParsimoniousProteinFinder {
 		} catch (InvalidVertexException e) {
 			System.err.println("Error Collapsing graph");
 			e.printStackTrace();
-			System.exit(1);
+			throw e;
 		}
 		System.out.println("\tAfter merging indistinguishable proteins: "+graph.getLeftVertices().size()+" protein groups");
 		
 		// mark unique peptides
         markUniquePeptides(graph);
+        
+        // set the protein and peptide group ids.
+        int groupId = 1;
+        for(ProteinVertex vertex: graph.getLeftVertices()) {
+            for(Protein prot: vertex.getProteins()) {
+                prot.setProteinGroupLabel(groupId);
+            }
+            groupId++;
+        }
+        groupId = 1;
+        for(PeptideVertex vertex: graph.getRightVertices()) {
+            for(Peptide pept: vertex.getPeptides()) {
+                pept.setPeptideGroupLabel(groupId);
+            }
+            groupId++;
+        }
         
 		// get connected components
 		ConnectedComponentFinder compFinder = new ConnectedComponentFinder();
@@ -114,12 +133,46 @@ public class ParsimoniousProteinFinder {
 		SetCoverFinder<ProteinVertex, PeptideVertex> coverFinder = new SetCoverFinder<ProteinVertex, PeptideVertex>();
 		List<ProteinVertex> cover = coverFinder.getGreedySetCover(graph);
 		
+		for (ProteinVertex vertex: cover) 
+            vertex.setAccepted(true);
+		
 		int numParsimProt = 0;
-		for(ProteinVertex v: cover) {
-			numParsimProt += v.getMemberCount();
-		}
+        for(InferredProtein<DummySpectrumMatch> prot: proteinList) 
+            if(prot.getProtein().isAccepted())  numParsimProt++;
+        
+//		int numParsimProt = 0;
+//		for(ProteinVertex v: cover) {
+//			numParsimProt += v.getMemberCount();
+//		}
 		System.out.println("\tFound "+cover.size()+" parsimonious protein groups ("+numParsimProt+" proteins)");
 		
+		
+		// Mark subset proteins
+		System.out.println("Marking subset proteins...");
+		SubsetProteinFinder subsetFinder = new SubsetProteinFinder();
+		subsetFinder.markSubsetProteins(proteinList);
+        
+        int subsetCount = 0;
+        int subsetGrpCount = 0;
+        Set<Integer> grpIdSeen = new HashSet<Integer>();
+        for(InferredProtein<DummySpectrumMatch> prot: proteinList) {
+        	if(prot.getProtein().isSubset()) {
+        		if(prot.getProtein().isAccepted()) {
+        			throw new Exception("Protein cannot be both parsimonious and subset!. "+prot.getAccession());
+        		}
+        		subsetCount++;
+        	}
+//        	else if(!prot.getProtein().isAccepted()) {
+//        		log.info("NOT parsimonious AND NOT subset: "+prot.getAccession());
+//        	}
+        	if(grpIdSeen.contains(prot.getProteinGroupLabel()))
+        		continue;
+        	grpIdSeen.add(prot.getProteinGroupLabel());
+        	if(prot.getProtein().isSubset())
+        		subsetGrpCount++;
+        }
+        System.out.println("\tSubset Groups: "+subsetGrpCount+"; Subset Proteins: "+subsetCount);
+        
 		
 		//print
 		printCover(cover, outputFile);
@@ -266,7 +319,7 @@ public class ParsimoniousProteinFinder {
 	}
 	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		
 		CmdLineParser parser = new CmdLineParser();
 		

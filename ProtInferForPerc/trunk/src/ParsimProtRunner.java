@@ -38,12 +38,12 @@ public class ParsimProtRunner {
         
         // Fasta file
         String fastaFile = (String) parser.getOptionValue(fastaFileOpt);
-        if(fastaFile == null) {
-        	System.err.println("Please specify an fasta file with the -f option.");
-        	printUsageAndExit();
-        }
+//        if(fastaFile == null) {
+//        	System.err.println("Please specify an fasta file with the -f option.");
+//        	printUsageAndExit();
+//        }
         
-        if(!(new File(fastaFile).exists())) {
+        if(fastaFile != null && !(new File(fastaFile).exists())) {
         	System.err.println("Fasta file does not exist: "+fastaFile);
         	printUsageAndExit();
         }
@@ -80,7 +80,7 @@ public class ParsimProtRunner {
         }
        
         // min peptides per protein
-        int minPept = Integer.parseInt((String)parser.getOptionValue(minPeptOpt, 1));
+        int minPept = Integer.parseInt((String)parser.getOptionValue(minPeptOpt, "1"));
         
         
         // Step 1. If we are given a Percolator file read the PSMs first.
@@ -95,9 +95,11 @@ public class ParsimProtRunner {
         
         // Step 2. Read the PSMs file and create a file with peptide to protein mapping 
         //         for the unique peptide sequences in the input file
-        PeptideProteinMapper mapper = new PeptideProteinMapper();
-        mapper.setFastaFile(fastaFile);
-        mapper.map(psmsFile, true /*filter unique peptides*/); // This will create a file <psmsFile>.peptide_to_protein_map.txt
+        if(fastaFile != null) {
+        	PeptideProteinMapper mapper = new PeptideProteinMapper();
+        	mapper.setFastaFile(fastaFile);
+        	mapper.map(psmsFile, true /*filter unique peptides*/); // This will create a file <psmsFile>.peptide_to_protein_map.txt
+        }
         
         String pepProtMapFile = psmsFile+".peptide_to_protein_map.txt";
         String pinferInputFile = psmsFile+".pinfer_input.txt";
