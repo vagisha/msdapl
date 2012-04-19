@@ -21,14 +21,14 @@
     </select>
     
     <insert id="insert" parameterMap="msResultProteinParam">
-    	INSERT INTO msProteinMatch (
+    	INSERT IGNORE INTO msProteinMatch (
     	resultID,
     	accession)
     	VALUES (?,?)
     </insert>
     
     <insert id="insertAll" parameterClass="String">
-    	INSERT INTO msProteinMatch (resultID, accession) VALUES $values$
+    	INSERT IGNORE INTO msProteinMatch (resultID, accession) VALUES $values$
     </insert>
     
     <delete id="deleteForResultId" parameterClass="Integer">
