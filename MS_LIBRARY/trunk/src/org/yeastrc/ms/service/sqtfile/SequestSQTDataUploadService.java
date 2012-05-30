@@ -98,11 +98,13 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         db = parser.getSearchDatabase();
         dynaResidueMods = parser.getDynamicResidueMods();
         dynaTermMods = parser.getDynamicTerminalMods();
-        if(!parser.printDuplicateReferences()) {
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-            ex.appendErrorMessage("print_duplicate_references in sequest.params should be set to 1");
-            throw ex; 
-        }
+        // 05/30/2012 -- Commented out check for print_duplicate_references.  We no longer rely on 
+        // peptide to protein matches reported in SQT files. 
+//        if(!parser.printDuplicateReferences()) {
+//            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+//            ex.appendErrorMessage("print_duplicate_references in sequest.params should be set to 1");
+//            throw ex; 
+//        }
         
         // get the id of the search database used (will be used to look up protein ids later)
         sequenceDatabaseId = getSearchDatabaseId(parser.getSearchDatabase());

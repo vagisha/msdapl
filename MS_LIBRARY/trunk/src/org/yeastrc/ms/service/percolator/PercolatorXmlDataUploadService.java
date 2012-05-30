@@ -732,7 +732,10 @@ public class PercolatorXmlDataUploadService implements
         		List<MsSearchResult> matchingResults2 = new ArrayList<MsSearchResult>();
         		
         		for(MsSearchResult res: matchingResults) {
-        			if(res.getObservedMass().doubleValue() == observedMass) {
+        			// <exp_mass> in Percolator's xml output is rounded to the 4th decimal place,
+        			// observed mass in Sequest's SQT output is not. Do a mass match after rounding.
+        			double roundedToFourth = (int)(10000 * res.getObservedMass().doubleValue() + 0.5) / 10000;
+        			if(roundedToFourth == observedMass) {
         				matchingResults2.add(res);
         			}
         		}
@@ -752,25 +755,6 @@ public class PercolatorXmlDataUploadService implements
         			
         			if(matchingResults3.size() == 1)
             			bestRes = matchingResults3.get(0);
-        			
-        			// !----------------- IMPORTANT -----------------------------------
-        			// TODO Remove this later
-        			// This is for the Peptipedia data
-//        			else {
-//        				
-//        				UploadException ex = new UploadException(ERROR_CODE.MULTI_MATCHING_SEARCH_RESULT);
-//            			ex.setErrorMessage("Multiple matching search results were found for Percolator result with runSearchId: "+runSearchId+
-//            					" scanId: "+scanId+"; charge: "+charge+"; mass: "+observedMass+
-//            					"; peptide: "+peptide.getPeptideSequence()+
-//            					"; modified peptide: "+peptide.getModifiedPeptidePS());
-//            			
-//        				log.error(ex.getMessage());
-//        				
-//        				bestRes = matchingResults3.get(0);
-//        				
-//        			}
-        			// !----------------- IMPORTANT -----------------------------------
-        			
         		}
         		
         		

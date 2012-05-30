@@ -62,7 +62,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
     static final Pattern modCharsPattern = Pattern.compile("[A-Z]+");
 
 
-    private static final char[] modSymbols = {'*', '#', '@'};
+    private static final char[] modSymbols = {'*', '#', '@', '^', '~', '$'};
 
     
     public MsSearchDatabaseIn getSearchDatabase() {
@@ -285,7 +285,8 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         dynamicResidueModifications.clear();
         // e.g. diff_search_options = 0.0000 S 9.0 C 16.0 M 0.0000 X 0.0000 T 0.0000 Y
         // modString is: 0.0000 S 9.0 C 16.0 M 0.0000 X 0.0000 T 0.0000 Y
-        // SEQUEST assigns 3 symbols (*, #, @) to the first, second, and third modification, respectively
+        // SEQUEST assigns modification symbols in the following order:
+        // '*', '#', '@', '^', '~', '$'
         final String[] tokens = modString.split("\\s+");
 
         // expect an even number of tokens.
@@ -311,9 +312,9 @@ public class SequestParamsParser implements SearchParamsDataProvider {
                 throw new DataProviderException(currentLineNum, "Invalid char(s) for modified residue: "+tokens[i+1], currentLine);
 
             // if we have already used up all the modifications characters throw an exception.
-            // We should have had only 3 dynamic residue modifications
+            // We should have had only 6 dynamic residue modifications
             if (modCharIdx == modSymbols.length)
-                throw new DataProviderException(currentLineNum, "Only three modifications are supported", currentLine);
+                throw new DataProviderException(currentLineNum, "Only "+modSymbols.length+" modifications are supported", currentLine);
             
             
             for (int j = 0; j < modChars.length(); j++) {
