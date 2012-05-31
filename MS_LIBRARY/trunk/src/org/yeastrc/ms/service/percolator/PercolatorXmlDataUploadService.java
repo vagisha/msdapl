@@ -734,7 +734,7 @@ public class PercolatorXmlDataUploadService implements
         		for(MsSearchResult res: matchingResults) {
         			// <exp_mass> in Percolator's xml output is rounded to the 4th decimal place,
         			// observed mass in Sequest's SQT output is not. Do a mass match after rounding.
-        			double roundedToFourth = (int)(10000 * res.getObservedMass().doubleValue() + 0.5) / 10000;
+        			double roundedToFourth = ((int)((10000 * res.getObservedMass().doubleValue()) + 0.5)) / 10000.0;
         			if(roundedToFourth == observedMass) {
         				matchingResults2.add(res);
         			}
