@@ -188,7 +188,7 @@ public class ProteinDetailsAjaxAction extends Action {
             }
 
             // We will return the best filtered search hit for each peptide ion (along with terminal residues in the protein).
-            List<WIdPickerIonForProtein> ionsWAllSpectra = IdPickerResultsLoader.getPeptideIonsForProtein(pinferId, pinferProtId);
+            List<WIdPickerIonForProtein> ionsWAllSpectra = IdPickerResultsLoader.getPeptideIonsWithTermResiduesForProtein(pinferId, pinferProtId);
             request.setAttribute("ionList", ionsWAllSpectra);
             
             // Get the peptides for this protein (for building the protein sequence HTML)

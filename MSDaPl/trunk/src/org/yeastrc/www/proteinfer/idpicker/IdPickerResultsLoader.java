@@ -720,12 +720,16 @@ public class IdPickerResultsLoader {
     //---------------------------------------------------------------------------------------------------
     public static List<WIdPickerIon> getPeptideIonsForProteinGroup(int pinferId, int pinferProteinGroupLabel) {
         
+        // get the id of one of the proteins in the group. All proteins in a group match the same peptides
+        int proteinId = idpProtBaseDao.getIdPickerGroupProteinIds(pinferId, pinferProteinGroupLabel).get(0);
+        return getPeptideIonsForProtein(pinferId, proteinId);
+    }
+    
+    public static List<WIdPickerIon> getPeptideIonsForProtein(int pinferId, int proteinId) {
+        
         long s = System.currentTimeMillis();
         
         List<WIdPickerIon> ionList = new ArrayList<WIdPickerIon>();
-        
-        // get the id of one of the proteins in the group. All proteins in a group match the same peptides
-        int proteinId = idpProtBaseDao.getIdPickerGroupProteinIds(pinferId, pinferProteinGroupLabel).get(0);
         
         IdPickerRun run = idpRunDao.loadProteinferRun(pinferId);
         
@@ -769,7 +773,7 @@ public class IdPickerResultsLoader {
         
         long e = System.currentTimeMillis();
         log.info("Time to get peptide ions for pinferID: "+pinferId+
-                ", proteinGroupLabel: "+pinferProteinGroupLabel+
+                ", proteinId: "+proteinId+
                 " -- "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
         return ionList;
@@ -803,9 +807,9 @@ public class IdPickerResultsLoader {
     
     
     //---------------------------------------------------------------------------------------------------
-    // Peptide ions for a protein (sorted by sequence, modification state and charge
+    // Peptide ions for a protein (sorted by sequence, modification state and charge)
     //---------------------------------------------------------------------------------------------------
-    public static List<WIdPickerIonForProtein> getPeptideIonsForProtein(int pinferId, int proteinId) {
+    public static List<WIdPickerIonForProtein> getPeptideIonsWithTermResiduesForProtein(int pinferId, int proteinId) {
         
         long s = System.currentTimeMillis();
         

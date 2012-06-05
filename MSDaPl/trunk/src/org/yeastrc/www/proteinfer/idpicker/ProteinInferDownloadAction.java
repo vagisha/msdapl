@@ -4,7 +4,9 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,14 +17,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferPeptideDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
-import org.yeastrc.ms.domain.protinfer.ProteinferPeptide;
 import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerParam;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProtein;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.util.StringUtils;
 import org.yeastrc.ms.util.TimeUtils;
@@ -369,11 +370,28 @@ public class ProteinInferDownloadAction extends Action {
     }
 
     private String getPeptides(int proteinId) {
-        ProteinferPeptideDAO peptDao = ProteinferDAOFactory.instance().getProteinferPeptideDao();
-        List<ProteinferPeptide> peptides = peptDao.loadPeptidesForProteinferProtein(proteinId);
+    	
+    	IdPickerProtein protein = ProteinferDAOFactory.instance().getIdPickerProteinDao().loadProtein(proteinId);
+    	
+    	List<WIdPickerIon> ionList = IdPickerResultsLoader.getPeptideIonsForProtein(protein.getProteinferId(), 
+    			proteinId);
+    	
+    	Set<String> uniqModifiedPeptides = new HashSet<String>();
+    	for(WIdPickerIon ion: ionList) {
+    		uniqModifiedPeptides.add(ion.getIonSequence());
+    	}
+    	
+        // ProteinferPeptideDAO peptDao = ProteinferDAOFactory.instance().getProteinferPeptideDao();
+        // List<ProteinferPeptide> peptides = peptDao.loadPeptidesForProteinferProtein(proteinId);
+    	
         StringBuilder buf = new StringBuilder();
-        for(ProteinferPeptide pept: peptides) 
-            buf.append(","+pept.getSequence());
+//        for(ProteinferPeptide pept: peptides) {
+//            buf.append(","+pept.getSequence());
+//        }
+        
+        for(String seq: uniqModifiedPeptides) {
+        	buf.append(","+seq);
+        }
         if(buf.length() > 0)
             buf.deleteCharAt(0); // remove first comma
         return buf.toString();
