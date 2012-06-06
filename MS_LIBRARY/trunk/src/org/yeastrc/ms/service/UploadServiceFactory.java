@@ -75,6 +75,11 @@ public class UploadServiceFactory {
         }
         
         File[] files = dir.listFiles();
+        if(files == null)
+        {
+        	throw new UploadServiceFactoryException(dataDirectory+" is not accessible");
+        }
+        
         Set<RunFileFormat> formats = new HashSet<RunFileFormat>();
         for (int i = 0; i < files.length; i++) {
             if(files[i].isDirectory())
