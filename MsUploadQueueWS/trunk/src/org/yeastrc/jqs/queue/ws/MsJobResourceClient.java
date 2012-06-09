@@ -99,12 +99,15 @@ public class MsJobResourceClient {
 		client.addFilter(authFilter);
 		
 		WebResource webRes = client.resource(BASE_URI);
+		// String data = "{\"projectId\":\"24\", \"dataDirectory\":\"test\", \"pipeline\":\"MACCOSS\", \"date\":\"2010-03-29\"}";
+		
 		ClientResponse response = webRes.path("add").type("application/xml").accept("text/plain").post(ClientResponse.class, job);
 		Status status = response.getClientResponseStatus();
 		if(status == Status.OK) {
 			String jobId = response.getEntity(String.class);
 			System.out.println(jobId);
-			return Integer.parseInt(jobId);
+			int idx = jobId.lastIndexOf("ID: ");
+			return Integer.parseInt(jobId.substring(idx+4).trim());
 		}
 		else {
 			System.err.println(status.getStatusCode()+": "+status.getReasonPhrase());
@@ -134,12 +137,12 @@ public class MsJobResourceClient {
 		//HttpHeaders.AUTHORIZATION
 		
 		WebResource webRes = client.resource(BASE_URI);
-		ClientResponse response = webRes.path("add").queryParams(queryParams).
-			type("application/xml").accept("text/plain").
+		ClientResponse response = webRes.path("add").queryParams(queryParams)
+			// .accept("text/plain").
 //			header(HttpHeaders.AUTHORIZATION, "Basic " 
 //			        + new String(Base64.encode("user:password"), 
 //			        Charset.forName("ASCII"))).
-			post(ClientResponse.class);
+			.post(ClientResponse.class);
 		Status status = response.getClientResponseStatus();
 		if(status == Status.OK) {
 			String jobId = response.getEntity(String.class);
