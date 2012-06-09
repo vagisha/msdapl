@@ -10,9 +10,9 @@ import java.sql.SQLException;
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
-import org.yeastrc.www.upload.JobGroupIdGetter;
 import org.yeastrc.www.upload.MSUploadJobSaver;
 import org.yeastrc.www.upload.Pipeline;
+import org.yeastrc.www.upload.UserGroupIdGetter;
 import org.yeastrc.www.user.User;
 
 /**
@@ -114,8 +114,18 @@ public class MsJobSubmitter {
 			jobSaver.setServerDirectory("local:"+job.getDataDirectory());
 		else
 			jobSaver.setServerDirectory(job.getRemoteServer()+":"+job.getDataDirectory());
-		int jobGroupId = JobGroupIdGetter.get(submitter);
-		jobSaver.setGroupID(jobGroupId);
+		
+		try {
+			int jobGroupId = UserGroupIdGetter.getOneGroupId(submitter);
+			jobSaver.setGroupID(jobGroupId);
+		}
+		catch(SQLException e) {
+			// The groupID column is no longer being used. 
+			// We will set it to 1
+			// TODO: Get rid of the groupID column from the table
+			jobSaver.setGroupID(1);
+		}
+		
 		jobSaver.setPipeline(pipeline);
 		jobSaver.setRunDate(job.getDate());
 		

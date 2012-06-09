@@ -5,9 +5,9 @@
  */
 package org.yeastrc.jqs.queue.ws;
 
+import org.yeastrc.jobqueue.Job;
 import org.yeastrc.jobqueue.JobDeleter;
 import org.yeastrc.jobqueue.JobUtils;
-import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
@@ -29,7 +29,7 @@ public class MsJobDeleter {
 	
 	public int delete(int jobId, User user, Messenger messenger) {
 		
-		MSJob msJob = null;
+		Job msJob = null;
 		try {
 			msJob = MSJobFactory.getInstance().getJob(jobId);
 			

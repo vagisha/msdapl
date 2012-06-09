@@ -14,6 +14,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 
+import org.yeastrc.project.Project;
 import org.yeastrc.www.user.NoSuchUserException;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -49,6 +50,37 @@ public class MsJobResource {
 			return job;
 		else
 			throw new NotFoundException("Job with ID: "+jobId+" was not found in the database\n");
+	}
+	
+	@GET
+	@Path("project/{id}")
+	@Produces({"application/xml", "application/json"})
+	public MsProject getProject(@PathParam("id") int projectId) {
+		
+		Project project = ProjectSearcher.getInstance().search(projectId);
+		if(project != null)
+			return MsProject.create(project);
+		else
+			throw new NotFoundException("Project not found. ID: "+projectId+"\n");
+	}
+	
+	@GET
+	@Path("checkAccess")
+	public String checkProjectAccess(@QueryParam("projectId") int projectId, @QueryParam("userEmail") String userEmail) {
+		
+		Project project = ProjectSearcher.getInstance().search(projectId);
+		if(project == null)
+			return "Project not found. ID: "+projectId+"\n";
+		
+		User user = getUserWithEmail(userEmail);
+		if(user == null)
+			return "User not found. Email: "+userEmail+"\n";
+		
+		boolean access = project.checkAccess(user.getResearcher());
+		if(access)
+			return "Access Allowed";
+		else
+			return "Access Denied";
 	}
 	
 	@GET
@@ -197,5 +229,16 @@ public class MsJobResource {
 		} catch (SQLException e) {
 			throw new ServerErrorException("There was an error during user lookup. The error message was: "+e.getMessage());
 		}
+	}
+	
+	private User getUserWithEmail(String email) {
+		try {
+			return  UserUtils.getUserWithEmail(email);
+		} catch (NoSuchUserException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

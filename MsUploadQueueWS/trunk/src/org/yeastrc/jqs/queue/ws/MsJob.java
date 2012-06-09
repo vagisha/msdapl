@@ -64,6 +64,9 @@ public class MsJob {
 	@XmlElement
 	private String remoteServer;
 	
+	@XmlElement
+	private String log; 
+	
 	
 	public MsJob() {}
 	
@@ -146,6 +149,14 @@ public class MsJob {
 		this.remoteServer = remoteServer;
 	}
 
+	public String getLog() {
+		return log;
+	}
+
+	public void setLog(String log) {
+		this.log = log;
+	}
+
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append("ID: "+this.getId()+"\n");
@@ -168,6 +179,8 @@ public class MsJob {
 			buf.append("Species: "+this.getTargetSpecies()+"\n");
 		if(this.getComments() != null)
 			buf.append("Comments: "+this.getComments()+"\n");
+		if(this.getLog() != null)
+			buf.append("Log: "+this.getLog()+"\n");
 		return buf.toString();
 	}
 	
