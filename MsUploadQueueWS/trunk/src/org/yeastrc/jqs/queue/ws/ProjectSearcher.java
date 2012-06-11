@@ -43,7 +43,7 @@ public class ProjectSearcher {
 			
 		} catch (InvalidIDException e1) {
 			log.error("Project not found. ID: "+projectId, e1);
-			throw new NotFoundException("Project not found. ID: "+projectId+"\n");
+			throw new NotFoundException("Project not found. ID: "+projectId);
 		}
 	}
 	

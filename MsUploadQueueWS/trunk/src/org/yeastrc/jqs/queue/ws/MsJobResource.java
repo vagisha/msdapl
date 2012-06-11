@@ -191,7 +191,7 @@ public class MsJobResource {
 		
 		// Make sure the project exists.  NotFoundException will be throws if the project does
 		// not exist;
-		Project project = loadProject(job.getProjectId());
+		Project project = ProjectSearcher.getInstance().getMsDaPlProject(job.getProjectId());
 		
 		
 		// Make sure the project exists and the reseacher is a member or an administrator
@@ -221,21 +221,6 @@ public class MsJobResource {
 			emailer.emailJobQueued(job, user);
 		}
 		return jobId;
-	}
-
-	private Project loadProject(int projectId) {
-		try {
-			Project project = ProjectDAO.instance().load(projectId);
-			if(project == null)
-				throw new NotFoundException("Project not found. ID: "+projectId);
-			return project;
-		}
-		catch (InvalidIDException e) {
-			throw new NotFoundException("Project not found. ID: "+projectId);
-		}
-		catch(SQLException e) {
-			throw new ServerErrorException("There was an error during project lookup. The error message was: "+e.getMessage());
-		}
 	}
 	
 
