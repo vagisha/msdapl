@@ -6,11 +6,13 @@ package org.yeastrc.jobqueue;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.db.DBConnectionManager;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.www.proteinfer.job.ProgramParameters;
@@ -45,7 +47,7 @@ public class MSJobFactory {
 	 * @return
 	 * @throws Exception
 	 */
-	public Job getJob( int jobID) throws Exception {
+	public Job getJob( int jobID) throws SQLException, InvalidIDException {
 		return getJob(jobID, true);
 	}
 	
@@ -55,11 +57,11 @@ public class MSJobFactory {
 	 * @return
 	 * @throws Exception
 	 */
-	public Job getJobLite( int jobID) throws Exception {
+	public Job getJobLite( int jobID) throws SQLException, InvalidIDException {
 		return getJob(jobID, false);
 	}
 	
-	private Job getJob( int jobID, boolean fullJob ) throws Exception {
+	private Job getJob( int jobID, boolean fullJob ) throws SQLException, InvalidIDException {
 		
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -74,7 +76,7 @@ public class MSJobFactory {
 			rs = stmt.executeQuery();
 			
 			if ( !rs.next() )
-				throw new Exception( "Invalid Job ID: " + jobID );
+				throw new InvalidIDException( "Invalid Job ID: " + jobID );
 			
 			if(rs.getInt("type") == JobUtils.TYPE_MASS_SPEC_UPLOAD) {
 				return getMSJob(jobID, conn, stmt, rs);
@@ -108,7 +110,7 @@ public class MSJobFactory {
 		}
 	}
 
-	private MSJob getMSJob(int jobID, Connection conn, PreparedStatement stmt, ResultSet rs) throws Exception {
+	private MSJob getMSJob(int jobID, Connection conn, PreparedStatement stmt, ResultSet rs) throws SQLException, InvalidIDException {
 		
 		MSJob job;
 		job = new MSJob();
@@ -131,7 +133,7 @@ public class MSJobFactory {
 		rs = stmt.executeQuery();
 
 		if (!rs.next())
-			throw new Exception( "Invalid job ID on MSJob.getJob().  Job ID: " + jobID );
+			throw new InvalidIDException( "Invalid job ID on MSJob.getJob().  Job ID: " + jobID );
 
 		job.setProjectID( rs.getInt( "projectID" ) );
 		job.setServerDirectory( rs.getString( "serverDirectory" ) );
@@ -149,7 +151,7 @@ public class MSJobFactory {
 		return job;
 	}
 	
-	private MsAnalysisUploadJob getMsAnalysisUploadJob(int jobID, Connection conn, PreparedStatement stmt, ResultSet rs) throws Exception {
+	private MsAnalysisUploadJob getMsAnalysisUploadJob(int jobID, Connection conn, PreparedStatement stmt, ResultSet rs) throws SQLException, InvalidIDException {
 	
 		MsAnalysisUploadJob job;
 		job = new MsAnalysisUploadJob();
@@ -172,7 +174,7 @@ public class MSJobFactory {
 		rs = stmt.executeQuery();
 
 		if (!rs.next())
-			throw new Exception( "Invalid job ID on MSJob.getJob().  Job ID: " + jobID );
+			throw new InvalidIDException( "Invalid job ID on MSJob.getMsAnalysisUploadJob().  Job ID: " + jobID );
 
 		job.setProjectID( rs.getInt( "projectID" ) );
 		job.setExperimentID( rs.getInt( "experimentID" ) );
@@ -183,7 +185,7 @@ public class MSJobFactory {
 		return job;
 	}
 	
-	private PercolatorJob getPercolatorJobLite(int jobID, Connection conn, PreparedStatement stmt, ResultSet rs) throws Exception {
+	private PercolatorJob getPercolatorJobLite(int jobID, Connection conn, PreparedStatement stmt, ResultSet rs) throws SQLException, InvalidIDException {
 		
 		PercolatorJob job;
 		job = new PercolatorJob();
@@ -206,7 +208,7 @@ public class MSJobFactory {
 		rs = stmt.executeQuery();
 
 		if (!rs.next())
-			throw new Exception( "Invalid job ID on MSJob.getJob().  Job ID: " + jobID );
+			throw new InvalidIDException( "Invalid job ID on MSJob.getPercolatorJobLite().  Job ID: " + jobID );
 
 		job.setProjectID( rs.getInt( "projectID" ) );
 		job.setExperimentID( rs.getInt( "experimentID" ) );
@@ -222,7 +224,7 @@ public class MSJobFactory {
 		return job;
 	}
 	
-	private PercolatorJob getPercolatorJob(int jobID, Connection conn, PreparedStatement stmt, ResultSet rs) throws Exception {
+	private PercolatorJob getPercolatorJob(int jobID, Connection conn, PreparedStatement stmt, ResultSet rs) throws SQLException, InvalidIDException {
 		
 		PercolatorJob job;
 		job = new PercolatorJob();
@@ -245,7 +247,7 @@ public class MSJobFactory {
 		rs = stmt.executeQuery();
 
 		if (!rs.next())
-			throw new Exception( "Invalid job ID on MSJob.getJob().  Job ID: " + jobID );
+			throw new InvalidIDException( "Invalid job ID on MSJob.getPercolatorJob().  Job ID: " + jobID );
 
 		job.setProjectID( rs.getInt( "projectID" ) );
 		job.setExperimentID( rs.getInt( "experimentID" ) );
