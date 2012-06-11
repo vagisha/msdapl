@@ -68,7 +68,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		String authentication = request.getHeaderValue(ContainerRequest.AUTHORIZATION); 
 		
 		if(authentication == null) {
-			throw new BadRequestException("No authentication headers found");
+			throw new UnauthorizedException("No authentication headers found");
 		}
 		
 		// We only support HTTP Basic authentication
@@ -79,7 +79,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		authentication = authentication.substring("Basic ".length());
 		String[] values = new String(Base64.base64Decode(authentication)).split(":");
 		if (values.length < 2) { 
-            throw new BadRequestException("Error reading username and/or password"); 
+            throw new UnauthorizedException("Error reading username and/or password"); 
             // "Invalid syntax for username and password" 
         } 
 		
@@ -87,7 +87,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         String password = values[1]; 
         if ((username == null) || (password == null)) { 
         	// "Missing username or password" 
-        	throw new BadRequestException("Either username of password was missing"); 
+        	throw new UnauthorizedException("Either username of password was missing"); 
         } 
         
         try {
@@ -97,12 +97,24 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 				return user;
 			}
 			else {
-				throw new BadRequestException("Incorrect password. Authentication failed"); 
+				throw new UnauthorizedException("Incorrect password. Authentication failed"); 
 			}
 		} catch (NoSuchUserException e) {
-			throw new BadRequestException("No user with username: "+username);
+			throw new UnauthorizedException("No user with username: "+username);
 		} catch (SQLException e) {
 			throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	private static final class UnauthorizedException extends WebApplicationException {
+		
+		/**
+		 * Create a HTTP 401 (Unauthorized) exception.
+		 * @param message the String that is the entity of the 401 response.
+		 */
+		public UnauthorizedException(String message) {
+			super(Response.status(Response.Status.UNAUTHORIZED).
+					entity(message).type("text/plain").build());
 		}
 	}
 }

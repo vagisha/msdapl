@@ -7,11 +7,12 @@ package org.yeastrc.jqs.queue.ws;
 
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
-import org.yeastrc.project.Researcher;
-import org.yeastrc.www.user.User;
+
+import com.sun.jersey.api.NotFoundException;
 
 /**
  * 
@@ -22,6 +23,8 @@ public class ProjectSearcher {
 	
 	private static ProjectSearcher instance = null;
 	
+	private static final Logger log = Logger.getLogger(ProjectSearcher.class);
+	
 	public static synchronized ProjectSearcher getInstance() {
 		if(instance == null)
 			instance = new ProjectSearcher();
@@ -29,19 +32,23 @@ public class ProjectSearcher {
 		return instance;
 	}
 	
-	public Project search(int projectId) {
-		
-		if (projectId == 0)
-			return null;
+	public Project getMsDaPlProject(int projectId) {
 		
 		try {
 			return ProjectFactory.getProject(projectId);
 			
 		} catch (SQLException e1) {
-			e1.printStackTrace();
+			log.error("Error searching for project ID "+projectId, e1);
+			throw new ServerErrorException("Error searching for project ID "+projectId+"\n"+e1.getMessage());
+			
 		} catch (InvalidIDException e1) {
-			e1.printStackTrace();
+			log.error("Project not found. ID: "+projectId, e1);
+			throw new NotFoundException("Project not found. ID: "+projectId+"\n");
 		}
-		return null;
+	}
+	
+	public MsProject search(int projectId) {
+		Project project = getMsDaPlProject(projectId);
+		return MsProject.create(project);
 	}
 }

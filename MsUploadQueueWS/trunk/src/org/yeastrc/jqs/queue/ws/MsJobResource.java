@@ -14,10 +14,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 
+import org.yeastrc.data.InvalidIDException;
+import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.project.Project;
-import org.yeastrc.www.user.NoSuchUserException;
+import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.www.user.User;
-import org.yeastrc.www.user.UserUtils;
 
 import com.sun.jersey.api.NotFoundException;
 
@@ -34,10 +35,7 @@ public class MsJobResource {
 	public String getJobAsText(@PathParam("id") int jobId) {
 	
 		MsJob job = MsJobSearcher.getInstance().search(jobId);
-		if(job != null)
-			return job.toString();
-		else
-			throw new NotFoundException("Job with ID: "+jobId+" was not found in the database\n");
+		return job.toString();
 	}
 	
 	@GET
@@ -45,11 +43,7 @@ public class MsJobResource {
 	@Produces({"application/xml", "application/json"})
 	public MsJob getJobAsXmlOrJson(@PathParam("id") int jobId) {
 	
-		MsJob job = MsJobSearcher.getInstance().search(jobId);
-		if(job != null)
-			return job;
-		else
-			throw new NotFoundException("Job with ID: "+jobId+" was not found in the database\n");
+		return MsJobSearcher.getInstance().search(jobId);
 	}
 	
 	@GET
@@ -57,24 +51,16 @@ public class MsJobResource {
 	@Produces({"application/xml", "application/json"})
 	public MsProject getProject(@PathParam("id") int projectId) {
 		
-		Project project = ProjectSearcher.getInstance().search(projectId);
-		if(project != null)
-			return MsProject.create(project);
-		else
-			throw new NotFoundException("Project not found. ID: "+projectId+"\n");
+		return ProjectSearcher.getInstance().search(projectId);
 	}
 	
 	@GET
 	@Path("checkAccess")
 	public String checkProjectAccess(@QueryParam("projectId") int projectId, @QueryParam("userEmail") String userEmail) {
 		
-		Project project = ProjectSearcher.getInstance().search(projectId);
-		if(project == null)
-			return "Project not found. ID: "+projectId+"\n";
-		
-		User user = getUserWithEmail(userEmail);
-		if(user == null)
-			return "User not found. Email: "+userEmail+"\n";
+		Project project = ProjectSearcher.getInstance().getMsDaPlProject(projectId);
+	
+		User user = UserSearcher.getInstance().getUserWithEmail(userEmail);
 		
 		boolean access = project.checkAccess(user.getResearcher());
 		if(access)
@@ -89,10 +75,7 @@ public class MsJobResource {
 	public String getStatus(@PathParam("id") int jobId) {
 	
 		MsJob job = MsJobSearcher.getInstance().search(jobId);
-		if(job != null)
-			return job.getStatus();
-		else
-			throw new NotFoundException("Job with ID: "+jobId+" was not found in the database\n");
+		return job.getStatus();
 	}
 	
 	
@@ -101,7 +84,9 @@ public class MsJobResource {
 	@Produces ({"text/plain"})
 	@Consumes ({"application/xml", "application/json"})
 	public String add(MsJob job) {
-		return "Queued job. ID: "+String.valueOf(submitJob(job)+"\n");
+		
+		int jobId = submitJob(job);
+		return "Queued job. ID: "+jobId+"\n";
 	}
 
 	@POST
@@ -119,10 +104,37 @@ public class MsJobResource {
 		
 		// If a submitterName is not part of the request, the submitter will be set to "hermie". 
 		// We will not do project access check in this case.
-		if(job.getSubmitterName() == null)
-			return "Queued job. ID: "+String.valueOf(submitJob(job, false, false)+"\n");
+		int jobId;
+		if(job.getSubmitterName() == null && job.getUserEmail() == null)
+			jobId = submitJob(job, false, false);
 		else
-			return "Queued job. ID: "+String.valueOf(submitJob(job, true, true)+"\n");
+			jobId = submitJob(job, true, true);
+		
+		return "Queued job. ID: "+jobId+"\n";	
+	}
+	
+	@POST
+	@Path("labkey/add")
+	@Produces ({"text/plain"})
+	@Consumes ({"application/json"})
+	/*
+	 * This method is only to be used by the labkey pipeline.
+	 * cURL example:
+	 * curl -u labkey:<labkey_password> -X POST  -H 'Content-Type: application/json' -d '{"projectId":"24", "dataDirectory":"/test/data", "targetSpecies":"6239", "instrument":"LTQ", "comments":"upload test", "submitterName":"vsharma"}' http://localhost:8080/msdapl_queue/services/msjob/hermie/add
+	 */
+	public String addLabkeyJob(MsJob job) {
+		job.setPipeline("MACCOSS");
+		job.setDate(new Date());
+		
+		// If a submitterName is not part of the request, the submitter will be set to "labkey". 
+		// We will not do project access check in this case.
+		int jobId;
+		if(job.getSubmitterName() == null && job.getUserEmail() == null)
+			jobId = submitJob(job, false, false);
+		else
+			jobId = submitJob(job, true, true);
+		
+		return "Queued job. ID: "+jobId+"\n";	
 	}
 	
 	@POST
@@ -150,7 +162,12 @@ public class MsJobResource {
 		job.setComments(comments);
 		System.out.println(job);
 		
-		return "Queued job. ID: "+String.valueOf(submitJob(job)+"\n");
+		Messenger messenger = new Messenger();
+		int jobId = submitJob(job);
+		if(jobId <= 0)
+			return messenger.getMessagesString();
+		else
+			return "Queued job. ID: "+jobId+"\n";
 	}
 
 	private int submitJob(MsJob job) {
@@ -159,26 +176,42 @@ public class MsJobResource {
 	
 	private int submitJob(MsJob job, boolean checkAccess, boolean sendEmailOnSuccess) {
 		
-		String username = job.getSubmitterName();
-		if(username == null)
-			username = security.getUserPrincipal().getName();
+		User user = null;
 		
-		User user = getUser(username);
+		// NotFoundException will be thrown if a user is not found
+		if(job.getUserEmail() != null) {
+			user = UserSearcher.getInstance().getUserWithEmail(job.getUserEmail());
+		}
+		else if(job.getSubmitterName() != null) {
+			user = UserSearcher.getInstance().getUser(job.getSubmitterName());
+		}
+		else {
+			user = UserSearcher.getInstance().getUser(security.getUserPrincipal().getName());
+		}
+		
+		// Make sure the project exists.  NotFoundException will be throws if the project does
+		// not exist;
+		Project project = loadProject(job.getProjectId());
+		
+		
+		// Make sure the project exists and the reseacher is a member or an administrator
+		if(checkAccess) {
+		
+			if(!project.checkAccess(user.getResearcher())) {
+				throw new AccessDeniedException("Access Denied. Researcher ("+user.getUsername()+") does not have access to project ID: "+job.getProjectId());
+			}
+		}
 		
 		Messenger messenger = new Messenger();
-		
 		MsJobSubmitter submitter = MsJobSubmitter.getInstance();
 		int jobId = submitter.submit(job, user, messenger, checkAccess);
-		if(jobId == -1) { // data provided by the user was incorrect or incomplete
-			String err = messenger.getMessagesString();
-			// 400 error
-			throw new BadRequestException(err);
+		if(jobId == MsJobSubmitter.BAD_REQUEST) { // data provided by the user was incorrect or incomplete
+			throw new BadRequestException(messenger.getMessagesString());
 		}
-		else if(jobId == -2) { // there was an error saving the job to database
+		else if(jobId == MsJobSubmitter.SAVE_ERROR) { // there was an error saving the job to database
 			String err = messenger.getMessagesString();
 			// 500 error
 			throw new ServerErrorException(err);
-			//WebApplicationException ex = new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("hola").type("text/plain").build());
 		}
 		
 		// all went well, return the database ID of the newly created job.
@@ -189,7 +222,21 @@ public class MsJobResource {
 		}
 		return jobId;
 	}
-	
+
+	private Project loadProject(int projectId) {
+		try {
+			Project project = ProjectDAO.instance().load(projectId);
+			if(project == null)
+				throw new NotFoundException("Project not found. ID: "+projectId);
+			return project;
+		}
+		catch (InvalidIDException e) {
+			throw new NotFoundException("Project not found. ID: "+projectId);
+		}
+		catch(SQLException e) {
+			throw new ServerErrorException("There was an error during project lookup. The error message was: "+e.getMessage());
+		}
+	}
 	
 
 	@DELETE
@@ -198,22 +245,26 @@ public class MsJobResource {
 	public String delete(@PathParam("id") Integer jobId) {
 		
 		String username = security.getUserPrincipal().getName();
-		User user = getUser(username);
+		// NotFoundException will be thrown if a user is not found
+		User user = UserSearcher.getInstance().getUser(username);
+		
+		// NotFoundException will be throws if the job is not found, or the job is not a MSJob.
+		MSJob job = MsJobSearcher.getInstance().getMsDaPlJob(jobId);
 		
 		Messenger messenger = new Messenger();
-		int status = MsJobDeleter.getInstance().delete(jobId, user, messenger);
+		int status = MsJobDeleter.getInstance().delete(job, user, messenger);
 		
 		if(status == jobId)
 			return "Job deleted. ID: "+jobId+"\n";
 		
 		else {
-			if(status == -1) // job not found
-				throw new NotFoundException(messenger.getMessagesString());
+			if(status == MsJobDeleter.ACCESS_DENIED) // user does not have permissions to delete the job
+				throw new AccessDeniedException(messenger.getMessagesString());
 
-			else if(status == -2) // job could not be deleted (either the user does not have authority or job is not in a deletion-friendly state
-				throw new BadRequestException(messenger.getMessagesString());
+			else if(status == MsJobDeleter.COMPLETE_OR_RUNNING) // job is not in a deletion-friendly state
+				throw new ConflictException(messenger.getMessagesString());
 
-			else if(status == -3) // error deleting the job
+			else if(status == MsJobDeleter.DELETE_ERROR) // error deleting the job
 				throw new ServerErrorException(messenger.getMessagesString());
 			
 			else 
@@ -221,24 +272,69 @@ public class MsJobResource {
 		}
 	}
 	
-	private User getUser(String username) {
-		try {
-			return  UserUtils.getUser(username);
-		} catch (NoSuchUserException e) {
-			throw new BadRequestException("No user with username: "+username);
-		} catch (SQLException e) {
-			throw new ServerErrorException("There was an error during user lookup. The error message was: "+e.getMessage());
+	@POST
+	@Path("retry/{id}")
+	@Produces("text/plain")
+	public String retry(@PathParam("id") Integer jobId) {
+		
+		String username = security.getUserPrincipal().getName();
+		// NotFoundException will be thrown if a user is not found
+		User user = UserSearcher.getInstance().getUser(username);
+		
+		// NotFoundException will be throws if the job is not found, or the job is not a MSJob.
+		MSJob job = MsJobSearcher.getInstance().getMsDaPlJob(jobId);
+		
+		Messenger messenger = new Messenger();
+		int status = MsJobUpdater.getInstance().retry(job, user, messenger);
+		
+		if(status == jobId)
+			return "Job restarted. ID: "+jobId+"\n";
+		
+		else {
+			if(status == MsJobUpdater.ACCESS_DENIED) // user does not have permissions to update the job
+				throw new AccessDeniedException(messenger.getMessagesString());
+
+			else if(status == MsJobUpdater.COMPLETE_OR_RUNNING) // job is either running or complete
+				throw new ConflictException(messenger.getMessagesString());
+
+			else if(status == MsJobUpdater.UPDATE_ERROR) // error re-queuing the job
+				throw new ServerErrorException(messenger.getMessagesString());
+			
+			else 
+				throw new ServerErrorException(messenger.getMessagesString());
 		}
 	}
 	
-	private User getUserWithEmail(String email) {
-		try {
-			return  UserUtils.getUserWithEmail(email);
-		} catch (NoSuchUserException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
+	@POST
+	@Path("labkey/retry/{id}")
+	@Produces("text/plain")
+	public String labkeyRetry(@PathParam("id") Integer jobId) {
+		
+		String username = security.getUserPrincipal().getName();
+		// NotFoundException will be thrown if a user is not found
+		User user = UserSearcher.getInstance().getUser(username);
+		
+		// NotFoundException will be throws if the job is not found, or the job is not a MSJob.
+		MSJob job = MsJobSearcher.getInstance().getMsDaPlJob(jobId);
+		
+		Messenger messenger = new Messenger();
+		int status = MsJobUpdater.getInstance().retry(job, user, messenger, false); // do not do user access check
+		
+		if(status == jobId)
+			return "Job restarted. ID: "+jobId+"\n";
+		
+		else {
+			if(status == MsJobUpdater.ACCESS_DENIED) // user does not have permissions to update the job (SHOULD NOT HAPPEN)
+				throw new AccessDeniedException(messenger.getMessagesString());
+
+			else if(status == MsJobUpdater.COMPLETE_OR_RUNNING) // job is either running or complete
+				throw new ConflictException(messenger.getMessagesString());
+
+			else if(status == MsJobUpdater.UPDATE_ERROR) // error re-queuing the job
+				throw new ServerErrorException(messenger.getMessagesString());
+			
+			else 
+				throw new ServerErrorException(messenger.getMessagesString());
 		}
-		return null;
 	}
 }

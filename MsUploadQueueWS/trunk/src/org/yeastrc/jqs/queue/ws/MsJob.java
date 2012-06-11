@@ -21,6 +21,14 @@ public class MsJob {
 	 */
 	private String submitterName;
 	
+	private int submitterId;
+	
+	@XmlElement
+	/**
+	 * The submitter's email in MSDaPl
+	 */
+	private String userEmail;
+	
 	@XmlElement(required = true)
 	/**
 	 * ID of the project this upload job should be assigned
@@ -84,6 +92,22 @@ public class MsJob {
 		this.submitterName = submitterName;
 	}
 	
+	public int getSubmitterId() {
+		return submitterId;
+	}
+
+	public void setSubmitterId(int submitterId) {
+		this.submitterId = submitterId;
+	}
+
+	public String getUserEmail() {
+		return userEmail;
+	}
+
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
+	}
+
 	public Integer getProjectId() {
 		return projectId;
 	}
@@ -160,7 +184,10 @@ public class MsJob {
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append("ID: "+this.getId()+"\n");
-		buf.append("Submitter: "+this.getSubmitterName()+"\n");
+		if(getSubmitterName() != null)
+			buf.append("Submitter: "+this.getSubmitterName()+"\n");
+		if(getUserEmail() != null)
+			buf.append("User Email: "+this.getUserEmail()+"\n");
 		buf.append("ProjectID: "+this.getProjectId()+"\n");
 		buf.append("Directory: "+this.getDataDirectory()+"\n");
 		if(this.getRemoteServer() != null)

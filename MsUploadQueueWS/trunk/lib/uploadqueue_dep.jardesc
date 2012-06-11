@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="MacRoman" standalone="no"?>
 <jardesc>
-    <jar path="MsUploadQueueWS/lib/uploadqueue_dep.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/MsUploadQueueWS/lib/uploadqueue_dep.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <jar path="MSUploadQueueWS(trunk_gc)/lib/uploadqueue_dep.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/MSUploadQueueWS(trunk_gc)/lib/uploadqueue_dep.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
@@ -26,13 +26,14 @@
         <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.www.user{UserUtils.java"/>
         <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.jobqueue{JobUtils.java"/>
         <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.www.user{NoSuchUserException.java"/>
-        <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.grant{FundingSource.java"/>
         <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.group"/>
+        <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.grant{FundingSource.java"/>
+        <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.jobqueue{JobResetter.java"/>
         <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.www.user{Groups.java"/>
         <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.project{ProjectFactory.java"/>
-        <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.www.upload{MSUploadJobSaver.java"/>
-        <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.jobqueue{MSJobFactory.java"/>
         <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.grant{IsSelectable.java"/>
+        <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.jobqueue{MSJobFactory.java"/>
+        <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.www.upload{MSUploadJobSaver.java"/>
         <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.project{Researcher.java"/>
         <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.www.user{User.java"/>
         <javaElement handleIdentifier="=MSDaPl\(trunk)/src&lt;org.yeastrc.www.upload{UserGroupIdGetter.java"/>
