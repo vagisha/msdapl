@@ -1,6 +1,5 @@
 package org.yeastrc.jqs.queue.ws;
 
-import java.sql.SQLException;
 import java.util.Date;
 
 import javax.ws.rs.Consumes;
@@ -14,13 +13,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 
-import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.project.Project;
-import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.www.user.User;
-
-import com.sun.jersey.api.NotFoundException;
 
 
 @Path("msjob")
@@ -64,9 +59,9 @@ public class MsJobResource {
 		
 		boolean access = project.checkAccess(user.getResearcher());
 		if(access)
-			return "Access Allowed";
+			return "Access allowed";
 		else
-			return "Access Denied";
+			return "Access denied";
 	}
 	
 	@GET
@@ -198,7 +193,7 @@ public class MsJobResource {
 		if(checkAccess) {
 		
 			if(!project.checkAccess(user.getResearcher())) {
-				throw new AccessDeniedException("Access Denied. Researcher ("+user.getUsername()+") does not have access to project ID: "+job.getProjectId());
+				throw new AccessDeniedException("Access denied. User ("+user.getUsername()+") does not have access to project ID "+job.getProjectId());
 			}
 		}
 		

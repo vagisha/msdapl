@@ -46,7 +46,7 @@ public class MsJobUpdater {
 			else if (user.getResearcher().getID() == msJob.getSubmitter()) 
 				access = true;
 			if(!access) {
-				messenger.addError("User does not have permissions to re-queue job with ID: "+msJob.getId());
+				messenger.addError("User does not have permissions to resubmit job with ID: "+msJob.getId());
 				return ACCESS_DENIED;
 			}
 		}
@@ -66,7 +66,7 @@ public class MsJobUpdater {
 			JobResetter.getInstance().resetJob(msJob);
 			return msJob.getId();
 		} catch (Exception e) {
-			messenger.addError("Job with ID "+msJob.getId()+" could not be re-queued. The error message was: "+e.getMessage());
+			messenger.addError("Job with ID "+msJob.getId()+" could not be resubmitted. The error message was: "+e.getMessage());
 			return UPDATE_ERROR;
 		}
 	}
