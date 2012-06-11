@@ -71,7 +71,7 @@ public class Emailer {
 	private String getEmailBody(MsJob job) {
 		
 		StringBuilder buf = new StringBuilder();
-		buf.append("A MSDaPl data upload request has been submitted for you from hermie.\n");
+		buf.append("A MSDaPl data upload request has been submitted for you.\n");
 		buf.append("If you did not make this request please contact the MSDaPl team.\n\n");
 		
 		buf.append("Job Details:\n");
