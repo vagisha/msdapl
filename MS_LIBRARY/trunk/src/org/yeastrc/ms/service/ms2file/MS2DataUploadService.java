@@ -113,6 +113,13 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
             }
         }
         for (String filename: filenames) {
+        	
+        	// Upload only those files we are required to upload.
+        	if(filesToUpload != null && !filesToUpload.contains(FileUtils.removeExtension(filename))) {
+        		log.info("Skipping file "+filename);
+        		continue;
+        	}
+        	
             try {
                 String filepath = dataDirectory+File.separator+filename;
                 
