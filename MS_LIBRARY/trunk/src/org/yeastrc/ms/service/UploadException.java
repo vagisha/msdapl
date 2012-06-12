@@ -65,7 +65,7 @@ public class UploadException extends Exception {
         NO_RUN_SEARCHES_UPLOADED("No run searches were uploaded", ERROR),
         AMBIG_PROG_VERSION      ("Ambiguous analysis program version in sqt files", ERROR),
         
-        SEARCHDB_NOT_FOUND      ("No matching search database found", ERROR),
+        SEARCHDB_NOT_FOUND      ("Fasta file not found", ERROR),
         PROTEIN_NOT_FOUND       ("Protein not found in database", ERROR),
         
         SCAN_CHARGE_NOT_FOUND   ("MS2 scan charge information not found", ERROR),

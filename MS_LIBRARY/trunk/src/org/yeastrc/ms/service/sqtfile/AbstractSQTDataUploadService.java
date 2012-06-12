@@ -369,7 +369,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         }
         if (dbId == 0) {
             UploadException ex = new UploadException(ERROR_CODE.SEARCHDB_NOT_FOUND);
-            ex.setErrorMessage("No database ID found for: "+searchDbName);
+            ex.setErrorMessage(searchDbName+" was not found in the protein database. Please contact the MSDaPl team to add it to the database.");
             throw ex;
         }
         return dbId;
