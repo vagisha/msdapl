@@ -133,6 +133,9 @@
 			<tr>
 				<td valign="middle" width="1%"><b><nobr>ID <bean:write name="analysis" property="id"/></nobr></b></td>
 				<td  valign="middle" width="10%"><b>Percolator <bean:write name="analysis" property="analysisProgramVersionShort"/></b></td>
+				<td valign="top">
+					<b><bean:write name="analysis" property="filename" /></b>
+				</td>
 				<td valign="middle">
 					<span id="analysis_<bean:write name='analysis' property='id'/>_text"><bean:write name="analysis" property="comments"/></span>
 					<logic:equal name="writeAccess" value="true">
