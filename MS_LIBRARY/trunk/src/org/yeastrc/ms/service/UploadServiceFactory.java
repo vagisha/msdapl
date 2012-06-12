@@ -92,14 +92,14 @@ public class UploadServiceFactory {
         }
         
         if(formats.size() == 0) {
-            throw new UploadServiceFactoryException("No valid spectrum data file format found in directory: "+dataDirectory);
+            throw new UploadServiceFactoryException("No valid spectrum files found in directory: "+dataDirectory);
         }
         
         if(formats.size() > 1) {
             // If multiple formats are found it may be that we have a combination of .ms2 and .cms2 files in the 
             // same directory.  In that case, we don't throw an exception.
             if(!isMs2Format(formats))
-                throw new UploadServiceFactoryException("Multiple spectrum data file formats found in directory: "+dataDirectory);
+                throw new UploadServiceFactoryException("Multiple types of spectrum files found in directory: "+dataDirectory);
         }
         
         RunFileFormat format = formats.iterator().next();
@@ -114,7 +114,7 @@ public class UploadServiceFactory {
             return service;
         }
         else {
-            throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
+            throw new UploadServiceFactoryException("We do not currently have support for the spectrum file format: "+format.toString());
         }
     }
     
@@ -169,7 +169,7 @@ public class UploadServiceFactory {
         }
         
         if(formats.size() == 0) {
-            throw new UploadServiceFactoryException("No valid search data file format found in directory: "+dataDirectory);
+            throw new UploadServiceFactoryException("No valid search result files found in directory: "+dataDirectory);
         }
         
         if(formats.size() > 1) {
@@ -190,7 +190,7 @@ public class UploadServiceFactory {
         		formatsFound += ", "+format.name();
         	if(formatsFound.length() > 0)
         		formatsFound = formatsFound.substring(1);
-            throw new UploadServiceFactoryException("Multiple search data file formats found in directory: "+dataDirectory+"; Found: "+formatsFound);
+            throw new UploadServiceFactoryException("Multiple types of search result files found in directory: "+dataDirectory+"; Found: "+formatsFound);
         }
         
         SearchFileFormat format = formats.iterator().next();
@@ -217,7 +217,7 @@ public class UploadServiceFactory {
                 return service;
             }
             else {
-                throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
+                throw new UploadServiceFactoryException("We do not currently have support for the search result file format: "+format.toString());
             }
         }
         else if(format == SearchFileFormat.PEPXML) {
@@ -241,11 +241,11 @@ public class UploadServiceFactory {
                 return service;
             }
             else {
-                throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
+                throw new UploadServiceFactoryException("We do not currently have support for the search result file format: "+format.toString());
             }
         }
         else {
-            throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
+            throw new UploadServiceFactoryException("We do not currently have support for the search result file format: "+format.toString());
         }
     }
     
@@ -304,7 +304,7 @@ public class UploadServiceFactory {
         }
         
         if(formats.size() == 0) {
-            throw new UploadServiceFactoryException("No valid search analysis data file format found in directory: "+dataDirectory);
+            throw new UploadServiceFactoryException("No valid analysis result file types found in directory: "+dataDirectory);
         }
         
         if(formats.size() > 1) {
@@ -318,7 +318,7 @@ public class UploadServiceFactory {
         	}
         	
         	if(formats.size() > 1)
-        		throw new UploadServiceFactoryException("Multiple search analysis data file formats found in directory: "+dataDirectory);
+        		throw new UploadServiceFactoryException("Multiple analysis result file types found in directory: "+dataDirectory);
         }
         
         SearchFileFormat format = formats.iterator().next();
@@ -332,7 +332,7 @@ public class UploadServiceFactory {
                 return service;
             }
             else {
-                throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
+                throw new UploadServiceFactoryException("We do not currently have support for the analysis result file format: "+format.toString());
             }
         }
         else if(format == SearchFileFormat.XML_PERC) {
@@ -347,7 +347,7 @@ public class UploadServiceFactory {
             return service;
         }
         else {
-            throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
+            throw new UploadServiceFactoryException("We do not currently have support for the analysis result file format: "+format.toString());
         }
     }
     

@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -37,6 +38,7 @@ import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.service.SpectrumDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.util.FileUtils;
 import org.yeastrc.ms.util.Sha1SumCalculator;
 
 /**
@@ -65,6 +67,8 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     private List<String> filenames; // filenames WITH extension
     private List<RunFileFormat> fileFormats;
     private boolean preUploadCheckDone = false;
+    
+    private Set<String> filesToUpload;
     
     public MS2DataUploadService() {
         dAnalysisList = new ArrayList<MS2ChargeDependentAnalysis>();
@@ -136,7 +140,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
         if (runId > 0) {
             // If this run was uploaded from a different location, upload the location
             saveRunLocation(serverDirectory, runId);
-            log.info("Run with name: "+removeExtension(fileName)+" and sha1Sum: "+sha1Sum+
+            log.info("Run with name: "+FileUtils.removeExtension(fileName)+" and sha1Sum: "+sha1Sum+
                     " found in the database; runID: "+runId);
             log.info("END MS2/CMS2 FILE UPLOAD: "+fileName+"\n");
             return runId;
@@ -207,19 +211,11 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     
     int getMatchingRunId(String fileName, String sha1Sum) {
 
-        fileName = removeExtension(fileName);
+        fileName = FileUtils.removeExtension(fileName);
         MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
         return runDao.loadRunIdForFileNameAndSha1Sum(fileName, sha1Sum);
     }
     
-    private String removeExtension(String filename) {
-        if(filename == null)
-            return null;
-        int idx = filename.lastIndexOf('.');
-        if (idx != -1)
-            filename = filename.substring(0, idx);
-        return filename;
-    }
     /**
      * provider should be closed after this method returns
      * @param provider
@@ -389,7 +385,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
             return false;
         }
         
-        // 2. valid and supported raw data format
+        // 2. Get a list of files
         File[] files = dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -397,6 +393,8 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
                 return name_uc.endsWith("."+RunFileFormat.MS2) || name_uc.endsWith("."+RunFileFormat.CMS2);
             }});
         
+        
+        // 3. valid and supported raw data format
         Set<RunFileFormat> formats = new HashSet<RunFileFormat>();
         for (int i = 0; i < files.length; i++) {
             if(files[i].isDirectory())
@@ -415,10 +413,24 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
         }
         this.fileFormats = new ArrayList<RunFileFormat>(formats);
         
-        // 3. Make sure we do not have a .ms2 and a .cms2 file with the same name
+        
+        // 4. If we were given a set of file names, keep only those
+        if(this.filesToUpload != null && this.filesToUpload.size() > 0) {
+        	
+        	Iterator<String> filenameIter = filenames.iterator();
+        	while(filenameIter.hasNext()) {
+        		String noExtName = FileUtils.removeExtension(filenameIter.next());
+        		if(!filesToUpload.contains(noExtName)) {
+        			filenameIter.remove();
+        		}
+        	}
+        }
+        
+        
+        // 5. Make sure we do not have a .ms2 and a .cms2 file with the same name
         Set<String> uniqFiles = new HashSet<String>(filenames.size());
         for(String filename: filenames) {
-            String fileNoExt = removeExtension(filename);
+            String fileNoExt = FileUtils.removeExtension(filename);
             if(uniqFiles.contains(fileNoExt)) {
                 appendToMsg("Found two files with the same name: "+fileNoExt);
                 return false;
@@ -460,7 +472,12 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     public List<String> getFileNames() {
         List<String> filesNoExt = new ArrayList<String>(filenames.size());
         for(String filename: filenames)
-            filesNoExt.add(removeExtension(filename));
+            filesNoExt.add(FileUtils.removeExtension(filename));
         return filesNoExt;
     }
+
+	@Override
+	public void setUploadFileNames(Set<String> fileNames) {
+		this.filesToUpload = fileNames;
+	}
 }

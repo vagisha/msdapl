@@ -23,7 +23,6 @@ import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultResidueModIds;
 import org.yeastrc.ms.domain.search.MsResultTerminalModIds;
@@ -788,7 +787,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
             @Override
             public boolean accept(File dir, String name) {
                 String name_lc = name.toLowerCase();
-                return name_lc.endsWith(".sqt");
+                return name_lc.endsWith(".sqt") && !name_lc.endsWith(".decoy.sqt");
             }});
         for (int i = 0; i < files.length; i++) {
             mySqtFiles.add(files[i].getName());

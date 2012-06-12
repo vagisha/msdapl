@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
@@ -39,6 +40,7 @@ public class MsDataUploader {
     private boolean uploadAnalysis = false;
     private boolean uploadProtinfer = false;
     
+    private Set<String> filesToUpload;
     
     public void setComments(String comments) {
         this.comments = comments;
@@ -64,7 +66,15 @@ public class MsDataUploader {
         this.remoteSpectrumDataDirectory = remoteRawDataDirectory.trim();
     }
 
-    public void setSearchDirectory(String searchDirectory) {
+    public Set<String> getFilesToUpload() {
+		return filesToUpload;
+	}
+
+	public void setFilesToUpload(Set<String> filesToUpload) {
+		this.filesToUpload = filesToUpload;
+	}
+
+	public void setSearchDirectory(String searchDirectory) {
     	if(searchDirectory == null)
     		return;
         this.searchDirectory = searchDirectory.trim();
@@ -358,6 +368,7 @@ public class MsDataUploader {
         exptUploader.setRemoteServer(remoteServer);
         exptUploader.setComments(comments);
         exptUploader.setInstrumentId(instrumentId);
+        exptUploader.setFilesToUpload(filesToUpload);
         
         // Get the spectrum data uploader
         log.info("Initializing SpectrumDataUploadService");
@@ -370,7 +381,7 @@ public class MsDataUploader {
         // We cannot upload analysis data without uploading search data first.
         if(uploadAnalysis && !uploadSearch) {
             UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
-            ex.appendErrorMessage("Cannot upload analysis results without serach results");
+            ex.appendErrorMessage("Cannot upload analysis results without search results");
             throw ex;
         }
         

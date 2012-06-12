@@ -8,12 +8,14 @@ package org.yeastrc.ms.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.domain.general.impl.ExperimentBean;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.service.ms2file.MS2DataUploadService;
 import org.yeastrc.ms.service.percolator.PercolatorXmlDataUploadService;
 import org.yeastrc.ms.service.sqtfile.AbstractSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
@@ -36,7 +38,6 @@ public class MsExperimentUploader {
     private AnalysisDataUploadService adus;
     private ProtinferUploadService pidus;
     
-    private boolean do_rdupload = true;
     private boolean do_sdupload = false;
     private boolean do_adupload = false;
     private boolean do_piupload = false;
@@ -45,6 +46,8 @@ public class MsExperimentUploader {
     private StringBuilder preUploadCheckMsg;
     
     private int experimentId = 0; // uploaded experimentId
+    
+    private Set<String> filesToUpload;
     
     public MsExperimentUploader () {
         this.preUploadCheckMsg = new StringBuilder();
@@ -93,7 +96,11 @@ public class MsExperimentUploader {
         this.uploadDirectory = directory;
     }
     
-    public boolean preUploadCheckPassed() {
+    public void setFilesToUpload(Set<String> filesToUpload) {
+		this.filesToUpload = filesToUpload;
+	}
+
+	public boolean preUploadCheckPassed() {
         boolean passed = true;
         
         log.info("Doing pre-upload check for spectrum data uploader....");
@@ -241,8 +248,11 @@ public class MsExperimentUploader {
         
         this.experimentId = experimentId;
         
-        // upload raw data
+        // upload spectrum data
         rdus.setExperimentId(experimentId);
+        if(filesToUpload != null && rdus instanceof MS2DataUploadService)
+        	rdus.setUploadFileNames(filesToUpload);
+        
         try {
             rdus.upload();
         }

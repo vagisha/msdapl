@@ -7,6 +7,7 @@
 package org.yeastrc.ms.service;
 
 import java.util.List;
+import java.util.Set;
 
 public interface SpectrumDataUploadService extends UploadService {
 
@@ -17,6 +18,9 @@ public interface SpectrumDataUploadService extends UploadService {
      * @return
      */
     public List<String> getFileNames();
+    
+    // File names without extensions.
+    public void setUploadFileNames(Set<String> fileNames);
     
 //    public RunFileFormat getFileFormat();
 }

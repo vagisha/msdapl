@@ -279,23 +279,52 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         
         String destDir = exptDir+File.separator+"sequest";
         createDirectory(destDir);
+        
         String srcDir = getDataDirectory();
-        backupSqt(srcDir, destDir, exptDir);
+        List<String> filePaths = new ArrayList<String>();
+        for(String file: getFileNames()) {
+        	filePaths.add(srcDir+File.separator+file);
+        }
+        backupSqt(filePaths, destDir, exptDir);
     }
     
     private void backupDecoySqt(String exptDir) throws UploadException {
+    	
         String destDir = exptDir+File.separator+"sequest"+File.separator+"decoy";
         createDirectory(destDir);
         String srcDir = getDataDirectory()+File.separator+"decoy";
-        backupSqt(srcDir, destDir, exptDir);
+        File srcDirFile = new File(srcDir);
+        
+        List<String> filePaths = new ArrayList<String>();
+        
+        if(srcDirFile.exists()) {
+        	for(String file: getFileNames()) {
+        		String path = srcDir+File.separator+file;
+        		if(new File(path).exists())
+        			filePaths.add(path);
+            }
+        }
+        else {
+        	// LabKey pipeline puts the decoy and target SQT files in the same directory
+        	// Decoy files have .decoy.sqt extension.
+        	srcDir = getDataDirectory();
+        	for(String file: getFileNames()) {
+        		String filenoext = FileUtils.removeExtension(file);
+        		String path = srcDir+File.separator+filenoext+".decoy.sqt";
+        		if(new File(path).exists())
+        			filePaths.add(path);
+            }
+        }
+        
+        backupSqt(filePaths, destDir, exptDir);
     }
     
-    private void backupSqt(String srcDir, String destDir, String exptDir) throws UploadException {
+    private void backupSqt(List<String> filePaths, String destDir, String exptDir) throws UploadException {
         // copy sqt files from the source to target directory
         
-        for(String file: getFileNames()) {
-             File src = new File(srcDir+File.separator+file);
-             File dest = new File(destDir+File.separator+file);
+        for(String filePath: filePaths) {
+             File src = new File(filePath);
+             File dest = new File(destDir+File.separator+src.getName());
              try {
                 FileUtils.copyFile(src, dest);
             }
@@ -303,7 +332,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
                 log.error("Error copying file: "+src.getAbsolutePath());
                 deleteBackupDirectory(exptDir);
                 UploadException ex = new UploadException(ERROR_CODE.SQT_BACKUP_ERROR, e);
-                ex.appendErrorMessage("Error copying file: "+getDataDirectory()+File.separator+file);
+                ex.appendErrorMessage("Error copying file: "+filePath);
                 throw ex;
             }
         }

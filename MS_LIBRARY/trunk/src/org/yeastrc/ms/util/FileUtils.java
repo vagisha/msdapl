@@ -59,4 +59,13 @@ public class FileUtils {
         }
         file.delete();
     }
+    
+    public static String removeExtension(String filename) {
+        if(filename == null)
+            return null;
+        int idx = filename.lastIndexOf('.');
+        if (idx != -1)
+            filename = filename.substring(0, idx);
+        return filename;
+    }
 }

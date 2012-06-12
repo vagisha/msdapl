@@ -28,6 +28,7 @@ import org.yeastrc.ms.parser.mzxml.MzXmlFileReader;
 import org.yeastrc.ms.service.SpectrumDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.util.FileUtils;
 import org.yeastrc.ms.util.Sha1SumCalculator;
 
 /**
@@ -85,7 +86,7 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
     public List<String> getFileNames() {
         List<String> filesNoExt = new ArrayList<String>(filenames.size());
         for(String filename: filenames)
-            filesNoExt.add(removeExtension(filename));
+            filesNoExt.add(FileUtils.removeExtension(filename));
         return filesNoExt;
     }
 
@@ -212,7 +213,7 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
         if (runId > 0) {
             // If this run was uploaded from a different location, upload the location
             saveRunLocation(serverDirectory, runId);
-            log.info("Run with name: "+removeExtension(fileName)+" and sha1Sum: "+sha1Sum+
+            log.info("Run with name: "+FileUtils.removeExtension(fileName)+" and sha1Sum: "+sha1Sum+
                     " found in the database; runID: "+runId);
             log.info("END mzXML FILE UPLOAD: "+fileName+"\n");
             return runId;
@@ -269,18 +270,9 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
     
     int getMatchingRunId(String fileName, String sha1Sum) {
 
-        fileName = removeExtension(fileName);
+        fileName = FileUtils.removeExtension(fileName);
         MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
         return runDao.loadRunIdForFileNameAndSha1Sum(fileName, sha1Sum);
-    }
-    
-    private String removeExtension(String filename) {
-        if(filename == null)
-            return null;
-        int idx = filename.lastIndexOf('.');
-        if (idx != -1)
-            filename = filename.substring(0, idx);
-        return filename;
     }
     
     private void saveRunLocation(String serverDirectory, int runId) {
@@ -396,4 +388,9 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
 //        service.setRemoteServer("remote.server");
         service.upload();
     }
+
+	@Override
+	public void setUploadFileNames(Set<String> fileNames) {
+		throw new UnsupportedOperationException();
+	}
 }
