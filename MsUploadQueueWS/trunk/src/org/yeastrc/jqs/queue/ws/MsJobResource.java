@@ -75,7 +75,7 @@ public class MsJobResource {
 		try {
 			int fastaDbId = NrSeqLookupUtil.getDatabaseId(name);
 			if(fastaDbId == 0) {
-				return "Not Found";
+				return "Not found";
 			}
 			else {
 				return "Found";
