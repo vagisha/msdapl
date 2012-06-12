@@ -14,6 +14,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 
 import org.yeastrc.jobqueue.MSJob;
+import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 import org.yeastrc.project.Project;
 import org.yeastrc.www.user.User;
 
@@ -62,6 +63,27 @@ public class MsJobResource {
 			return "Access allowed";
 		else
 			return "Access denied";
+	}
+	
+	@GET
+	@Path("checkFasta")
+	public String checkFasta(@QueryParam("name") String name) {
+		
+		if(name == null || name.trim().length() == 0)
+			throw new BadRequestException("Fasta file name not found in the request");
+		
+		try {
+			int fastaDbId = NrSeqLookupUtil.getDatabaseId(name);
+			if(fastaDbId == 0) {
+				return "Not Found";
+			}
+			else {
+				return "Found";
+			}
+		}
+		catch(Exception e) {
+			throw new ServerErrorException("Fasta file lookup threw an error.  The error message was: "+e.getMessage());
+		}
 	}
 	
 	@GET
