@@ -95,11 +95,18 @@ public class UploadServiceFactory {
             throw new UploadServiceFactoryException("No valid spectrum files found in directory: "+dataDirectory);
         }
         
+        // With the LabKey pipeline, the directory containing spectra may have spectra for multiple experiments, 
+        // and they can be different formats.
         if(formats.size() > 1) {
+        	// TODO: Fix this.  Get the format only for the files we are trying to upload.
             // If multiple formats are found it may be that we have a combination of .ms2 and .cms2 files in the 
             // same directory.  In that case, we don't throw an exception.
-            if(!isMs2Format(formats))
-                throw new UploadServiceFactoryException("Multiple types of spectrum files found in directory: "+dataDirectory);
+            if(hasMs2Format(formats)) {
+                // throw new UploadServiceFactoryException("Multiple types of spectrum files found in directory: "+dataDirectory);
+            	SpectrumDataUploadService service = new MS2DataUploadService();
+                service.setDirectory(dataDirectory);
+                return service;
+            }
         }
         
         RunFileFormat format = formats.iterator().next();
@@ -118,12 +125,12 @@ public class UploadServiceFactory {
         }
     }
     
-    private boolean isMs2Format(Set<RunFileFormat> formats) {
+    private boolean hasMs2Format(Set<RunFileFormat> formats) {
         for(RunFileFormat fmt: formats) {
-            if(fmt != RunFileFormat.MS2 && fmt != RunFileFormat.CMS2)
-                return false;
+            if(fmt == RunFileFormat.MS2 || fmt == RunFileFormat.CMS2)
+                return true;
         }
-        return true;
+        return false;
     }
     
     // ------------------------------------------------------------------------------------------------------
