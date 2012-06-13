@@ -373,7 +373,8 @@ public class MsDataUploader {
         // Get the spectrum data uploader
         log.info("Initializing SpectrumDataUploadService");
         log.info("\tDirectory: "+spectrumDataDirectory);
-        SpectrumDataUploadService rdus = getSpectrumDataUploader(spectrumDataDirectory, remoteSpectrumDataDirectory);
+        SpectrumDataUploadService rdus = getSpectrumDataUploader(spectrumDataDirectory, remoteSpectrumDataDirectory,
+        		                                                 filesToUpload);
         exptUploader.setSpectrumDataUploader(rdus);
         log.info(rdus.getClass().getName());
         
@@ -462,11 +463,12 @@ public class MsDataUploader {
         return sdus;
     }
 
-    private SpectrumDataUploadService getSpectrumDataUploader(String dataDirectory, String remoteDirectory) throws UploadException {
+    private SpectrumDataUploadService getSpectrumDataUploader(String dataDirectory, String remoteDirectory, 
+    		Set<String> filesToUpload) throws UploadException {
         
         SpectrumDataUploadService rdus = null;
         try {
-            rdus = UploadServiceFactory.instance().getSpectrumDataUploadService(dataDirectory);
+            rdus = UploadServiceFactory.instance().getSpectrumDataUploadService(dataDirectory, filesToUpload);
             rdus.setRemoteDirectory(remoteDirectory);
         }
         catch(UploadServiceFactoryException e1) {
