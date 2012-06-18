@@ -68,7 +68,7 @@
 	
 		<thead>
 		<tr>
-			<th width="10px">ID</th>
+			<th width="30px">ID</th>
 			<th width="20px">&nbsp;</th>
 			<th width="40px">Status</th>
 			<th width="30px">Type</th>
