@@ -7,7 +7,7 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
-<yrcwww:contentbox title="List MS Upload Jobs" centered="true" width="1000" scheme="upload">
+<yrcwww:contentbox title="List MS Upload Jobs" centered="true" width="100" scheme="upload" widthRel="true">
 
 <logic:notPresent name="jobs" scope="request">
   <logic:forward name="listUploadJobs" />
@@ -64,20 +64,20 @@
 		</logic:present>
 	</p>
 		
-	<table border="0" cellpadding="3" cellspacing="2" width="95%" class="table_basic" align="center">
+	<table border="0" cellpadding="3" cellspacing="2" width="95%" class="table_basic" align="center" style="table-layout:fixed;">
 	
 		<thead>
 		<tr>
-			<th width="1%">ID</th>
-			<th width="1%">&nbsp;</th>
-			<th width="8%">Status</th>
-			<th width="1%">Type</th>
-			<th width="8%">Submitter</th>
-			<th width="8%">Sub. Date</th>
-			<th width="8%">Directory</th>
-			<th width="8%">PI</th>
-			<th width="8%">Instrument</th>
-			<th width="8%">Comments</th>
+			<th width="10px">ID</th>
+			<th width="20px">&nbsp;</th>
+			<th width="40px">Status</th>
+			<th width="30px">Type</th>
+			<th width="60px">Submitter</th>
+			<th width="70px">Sub. Date</th>
+			<th width="60%">Directory</th>
+			<th width="60px">PI</th>
+			<th width="60px">Instrument</th>
+			<th width="40%">Comments</th>
 		</tr>
 		</thead>
 	
@@ -107,7 +107,7 @@
 				</td>
 				
 				<td align="left" valign="top" style="width:10%;font-size:8pt;">
-					<div style="width:100%;height:auto;overflow:auto;">
+					<div style="width:100%;height:auto;">
 						<a href="<yrcwww:link path='viewResearcher.do?'/>id=<bean:write name="job" property="submitter" />">
 							<bean:write name="job" property="researcher.lastName" />, <bean:write name="job" property="researcher.firstName" />
 						</a>
@@ -116,20 +116,20 @@
 					
 				<td align="left" valign="top" style="width:10%;font-size:8pt;"><bean:write name="job" property="submitDate" /></td>
 
-				<td align="left" valign="top" style="width:32%;font-size:8pt;" class="left_align">
-					<div style="width:100%;height:auto;overflow:auto;">
+				<td align="left" valign="top" style="width:32%;font-size:8pt;" class="left_align hardBreak">
+					<div style="width:100%;height:auto;">
 						<bean:write name="job" property="serverDirectory" />
 					</div>
 				</td>
 				
 				<td align="left" valign="top" style="width:7%;font-size:8pt;">
-					<div style="width:100%;height:auto;overflow:auto;">
+					<div style="width:100%;height:auto;">
 						<bean:write name="job" property="project.PI.lastName" />
 					</div>
 				</td>
 
 				<td align="left" valign="top" style="width:7%;font-size:8pt;" class="left_align">
-					<div style="width:100%;height:auto;overflow:auto;">
+					<div style="width:100%;height:auto;">
 					<logic:present name="job" property="instrument">
 						<bean:write name="job" property="instrument.name" />
 					</logic:present>
@@ -139,8 +139,8 @@
 					</div>
 				</td>
 				
-				<td align="left" valign="top" style="width:15%;font-size:8pt;" class="left_align">
-					<div style="width:100%;height:auto;overflow:auto;">
+				<td align="left" valign="top" style="width:15%;font-size:8pt;" class="left_align hardBreak">
+					<div style="width:100%;height:auto;">
 						<bean:write name="job" property="comments" />
 					</div>
 				</td>
