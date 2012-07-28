@@ -71,7 +71,7 @@ Tomcat 6.0.x
 # -------------------------------------------------------------------------------
 1. Check out installation code into "test_install" directory:
 
-   svn co http://subversion.assembla.com/svn/msdapl/MSDaPl_install/trunk test_install
+   svn co http://msdapl.googlecode.com/svn/MSDaPl_install/trunk test_install
    cd test_install
    
 2. Copy the database dumps into test_install/mysqldump directory.
@@ -80,7 +80,7 @@ Tomcat 6.0.x
    
 3. Edit config.properties
 
-4. Run initilize.sh 
+4. Run initialize.sh 
    This script will:
    
    1. create directories for the following programs:
