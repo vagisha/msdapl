@@ -51,7 +51,8 @@ do
 	
 	if [ -f $mysqldumpdir/$database.sql ] ; then
 		
-		mysql $mysql_str < $mysqldumpdir/$database.sql
+		mysql $mysql_str -e "CREATE DATABASE IF NOT EXISTS $database"
+		mysql $mysql_str $database < $mysqldumpdir/$database.sql
 		
 		STATUS=$?
 		if [ $STATUS -gt 0 ] ; then
