@@ -61,7 +61,7 @@ public class GenericIdPickerProtein <T extends GenericIdPickerPeptide<?,?>> exte
         this.nsaf = nsaf;
     }
     public String getNsafFormatted() {
-    	if(isParsimonious)
+    	if(nsaf != -1)
     		return df.format(nsaf);
     	else
     		return "-1";

@@ -197,6 +197,14 @@ public final class ProgramParam {
               "false", null,
               "If checked, '*' characters are removed from sequences before determining protein matches for peptides. This option should be checked for data searched with versions of Sequest that ignored '*' characters in protein sequences");
         }
+        
+        public static ProgramParam makeCalculateAllNsafParam() {
+            return new ProgramParam(TYPE.BOOLEAN, 
+              "calculateAllNsaf", "Calculate NSAF for all proteins", 
+              "false", null,
+              "If checked, NSAF will be calculated for both parsimonious and non-parsimonious proteins. " +
+              "By default, NSAF is calculated only for parsimonious proteins, and a value of -1 is reported for non-parsimonious proteins.");
+        }
     }
     
     public static abstract class ParamValidator {
