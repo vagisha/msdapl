@@ -111,8 +111,8 @@ public class IdPickerExecutorNoFDR {
             ProteinInferrerIdPicker inferrer = new ProteinInferrerIdPicker();
             iProteins =  inferrer.inferProteins(iProteins, params);
             
-            // calculate normalized spectrum counts
-            NSAFCalculator.instance().calculateNSAF(iProteins);
+            // calculate normalized spectrum abundance factor
+            NSAFCalculator.instance().calculateNSAF(iProteins, params.isCalculateAllNsaf());
             
             
             new IdPickerResultSaver().updateResults(idpRun.getId(), iProteins, idpRun.getInputGenerator(), params);

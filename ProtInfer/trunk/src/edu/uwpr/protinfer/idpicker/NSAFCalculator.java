@@ -30,14 +30,19 @@ public class NSAFCalculator {
         return instance;
     }
     
-    public <S extends SpectrumMatch> void calculateNSAF(List<InferredProtein<S>> proteins) throws Exception {
+    public <S extends SpectrumMatch> void calculateNSAF(List<InferredProtein<S>> proteins, boolean calculateForAll) throws Exception {
         double totalSpC_L = 0;
+        
+        if(calculateForAll)
+        	log.info("Calculating NSAF for all proteins");
+        else
+        	log.info("Calculating NSAF for parsimonious proteins only");
         
         long s = System.currentTimeMillis();
         for(InferredProtein<S> protein: proteins) {
             
-            // calculate this only for parsimonious proteins
-            if(!protein.getIsAccepted())
+            // calculate this only for parsimonious proteins, unless we are calculating NSAF for all proteins
+            if(!protein.getIsAccepted() && !calculateForAll)
                 continue;
                 
             
@@ -62,7 +67,13 @@ public class NSAFCalculator {
         }
         
         for(InferredProtein<S> protein: proteins) {
-            protein.setNSAF(protein.getNSAF() / totalSpC_L);
+        	
+        	// If we are not calculating NSAF for non-parsimonious proteins, set the NSAF to -1
+        	if(!protein.getIsAccepted() && !calculateForAll) {
+        		protein.setNSAF(-1);
+        	}
+        	else	
+        		protein.setNSAF(protein.getNSAF() / totalSpC_L);
         }
         long e = System.currentTimeMillis();
         log.info("Time to calculate NSAF: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");

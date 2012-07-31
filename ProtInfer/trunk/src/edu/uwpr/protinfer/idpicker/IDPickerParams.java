@@ -31,6 +31,9 @@ public class IDPickerParams {
     private boolean doItoLSubstitution = false;
     private boolean removeAsterisks = false;
     
+    // If true, NSAF will be calculated for both parsimonious and non-parsimonious proteins
+    private boolean calculateAllNsaf = false;  
+    
     List<IdPickerParam> moreFilters = new ArrayList<IdPickerParam>();
     
     
@@ -53,6 +56,7 @@ public class IDPickerParams {
         buf.append("Refresh Protein Matches: "+refreshPeptideProteinMatches+"\n");
         buf.append("Allow I/L substitutions: "+doItoLSubstitution+"\n");
         buf.append("Remove asterisks: "+removeAsterisks+"\n");
+        buf.append("Calculate NSAF for all proteins: "+calculateAllNsaf+"\n");
         buf.append("MORE PARAMS: \n");
         for(IdPickerParam param: moreFilters) {
             buf.append(param.toString()+"\n");
@@ -174,6 +178,13 @@ public class IDPickerParams {
 		this.removeAsterisks = removeAsterisks;
 	}
 
+	public boolean isCalculateAllNsaf() {
+		return calculateAllNsaf;
+	}
+
+	public void setCalculateAllNsaf(boolean calculateAllNsaf) {
+		this.calculateAllNsaf = calculateAllNsaf;
+	}
 
 	public boolean isUseIdPickerFDRFormula() {
         return useIdPickerFDRFormula;

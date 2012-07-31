@@ -327,9 +327,9 @@ public class IDPickerExecutor {
         allProteins =  inferrer.inferProteins(allProteins, params);
         
         
-        // calculate normalized spectrum counts
+        // calculate normalized spectrum abundance factor
         if(calculateCoverage)
-            NSAFCalculator.instance().calculateNSAF(allProteins);
+            NSAFCalculator.instance().calculateNSAF(allProteins, params.isCalculateAllNsaf());
         
         
 //        log.info("Number of proteins remaining after removing \"duplicate\" proteins: "+allProteins.size());
