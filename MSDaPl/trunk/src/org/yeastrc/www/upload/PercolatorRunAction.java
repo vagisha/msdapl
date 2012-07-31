@@ -171,6 +171,24 @@ public class PercolatorRunAction extends Action {
             myParam.setValue("false");
             params.addParam(myParam);
         }
+        
+        // If "Calculate NSAF for all proteins" was unchecked it may not be in the parameters list
+        // or its value will be empty. Set it to false.
+        boolean foundCalcNsafForAll = false;
+        ProgramParam calcNsafForAllParam = ParamMaker.makeCalculateAllNsafParam();
+        for(Param param: params.getParamList()) {
+            if(param.getName().equals(calcNsafForAllParam.getName())) {
+                if(param.getValue() == null || param.getValue().trim().length() == 0)
+                    param.setValue("false");
+                foundCalcNsafForAll = true;
+                break;
+            }
+        }
+        if(!foundCalcNsafForAll) {
+            Param myParam = new Param(calcNsafForAllParam);
+            myParam.setValue("false");
+            params.addParam(myParam);
+        }
 	}
 
 	private List<PercolatorJob> createPercolatorJobs(User user,PercolatorRunForm myForm) {
