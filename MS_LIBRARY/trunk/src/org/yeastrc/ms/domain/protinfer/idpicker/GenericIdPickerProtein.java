@@ -14,7 +14,10 @@ public class GenericIdPickerProtein <T extends GenericIdPickerPeptide<?,?>> exte
     private boolean isParsimonious;
     private boolean isSubset;
     
-    private double nsaf = -1.0; // normalized spectrum abundance factor
+    // normalized spectrum abundance factor
+    private double nsaf = 2.0; // NSAF ranges from 0 to 1. 
+                               // We set the default to an impossible value.
+    	                       // This value means that NSAF was not calculated for this protein.
     
     private List<Integer> superProteinIds;
     private List<Integer> subsetProteinIds;
@@ -61,10 +64,10 @@ public class GenericIdPickerProtein <T extends GenericIdPickerPeptide<?,?>> exte
         this.nsaf = nsaf;
     }
     public String getNsafFormatted() {
-    	if(nsaf != -1)
+    	if(nsaf != 2)
     		return df.format(nsaf);
     	else
-    		return "-1";
+    		return "-1"; // Display -1 if NSAF was not calculated
     }
     
     public List<Integer> getSuperProteinIds() {
