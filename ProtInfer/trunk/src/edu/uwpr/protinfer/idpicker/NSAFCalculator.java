@@ -68,9 +68,12 @@ public class NSAFCalculator {
         
         for(InferredProtein<S> protein: proteins) {
         	
-        	// If we are not calculating NSAF for non-parsimonious proteins, set the NSAF to -1
+        	// If we are not calculating NSAF for non-parsimonious proteins, set the NSAF to 2
+        	// Update: NSAF ranges from 0 to 1. We set NSAF of non-parsimonious proteins to 2
+        	//         instead of -1 since the "nsaf" column in IDPickerProtein table is 
+        	//         "double unsigned"
         	if(!protein.getIsAccepted() && !calculateForAll) {
-        		protein.setNSAF(-1);
+        		protein.setNSAF(2);
         	}
         	else	
         		protein.setNSAF(protein.getNSAF() / totalSpC_L);
