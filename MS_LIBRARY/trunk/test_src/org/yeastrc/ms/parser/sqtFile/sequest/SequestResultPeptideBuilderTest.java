@@ -16,8 +16,12 @@ import junit.framework.TestCase;
 
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
+import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
+import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.impl.ResidueModification;
+import org.yeastrc.ms.domain.search.impl.TerminalModification;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
 /**
@@ -54,6 +58,15 @@ public class SequestResultPeptideBuilderTest extends TestCase {
             fail("Valid peptide sequence");
         }
         assertEquals('A', preRes);
+        
+        sequence = "-]ABC[D";
+        try {
+            preRes = builder.getPreResidue(sequence);
+        }
+        catch (SQTParseException e) {
+            fail("Valid peptide sequence");
+        }
+        assertEquals('-', preRes);
     }
     
     public void testGetPostResidue() {
@@ -75,8 +88,17 @@ public class SequestResultPeptideBuilderTest extends TestCase {
             fail("Valid peptide sequence");
         }
         assertEquals('F', postRes);
+        
+        sequence = "-]ABC[D";
+        try {
+            postRes = builder.getPostResidue(sequence);
+        }
+        catch (SQTParseException e) {
+            fail("Valid peptide sequence");
+        }
+        assertEquals('D', postRes);
     }
-
+    
     public void testRemoveDots() {
         
         String sequence = "A.BC#DE@F.G";
@@ -89,34 +111,47 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         }
         assertEquals("BC#DE@F", dotless);
         
+        sequence = "-]ABC[-";
+        try {
+            dotless = SequestResultPeptideBuilder.removeDots(sequence);
+        }
+        catch (SQTParseException e1) {
+            fail("Valid peptide sequence");
+        }
+        assertEquals("ABC", dotless);
+        
         sequence = "ABCD";
-        try{SequestResultPeptideBuilder.removeDots(sequence);fail("No dots");}
-        catch(SQTParseException e){assertEquals("Sequence does not have .(dots) in the expected position: "+sequence, e.getMessage());}
+        String exceptionMsg = "Sequence does not have .(dots) or terminam modification characters (']', '[') in the expected position: ";
+		try{SequestResultPeptideBuilder.removeDots(sequence);fail("No dots");}
+        catch(SQTParseException e){assertEquals(exceptionMsg+sequence, e.getMessage());}
         
         sequence = ".ABCD";
         try{SequestResultPeptideBuilder.removeDots(sequence);fail("Only 1 dot");}
-        catch(SQTParseException e){assertEquals("Sequence does not have .(dots) in the expected position: "+sequence, e.getMessage());}
+        catch(SQTParseException e){assertEquals(exceptionMsg+sequence, e.getMessage());}
         
         sequence = "A.BCD";
         try{SequestResultPeptideBuilder.removeDots(sequence);fail("Only 1 dot");}
-        catch(SQTParseException e){assertEquals("Sequence does not have .(dots) in the expected position: "+sequence, e.getMessage());}
+        catch(SQTParseException e){assertEquals(exceptionMsg+sequence, e.getMessage());}
         
         sequence = "ABCD.";
         try{SequestResultPeptideBuilder.removeDots(sequence);fail("Only 1 dot");}
-        catch(SQTParseException e){assertEquals("Sequence does not have .(dots) in the expected position: "+sequence, e.getMessage());}
+        catch(SQTParseException e){assertEquals(exceptionMsg+sequence, e.getMessage());}
         
         sequence = "ABC.D";
         try{SequestResultPeptideBuilder.removeDots(sequence);fail("Only 1 dot");}
-        catch(SQTParseException e){assertEquals("Sequence does not have .(dots) in the expected position: "+sequence, e.getMessage());}
+        catch(SQTParseException e){assertEquals(exceptionMsg+sequence, e.getMessage());}
         
-        try {SequestResultPeptideBuilder.removeDots("A.BCD.EF"); fail("Dot in the wrong position");}
-        catch(SQTParseException e) {assertEquals("Sequence does not have .(dots) in the expected position: A.BCD.EF", e.getMessage());}
+        sequence = "A.BCD.EF";
+        try {SequestResultPeptideBuilder.removeDots(sequence); fail("Dot in the wrong position");}
+        catch(SQTParseException e) {assertEquals(exceptionMsg+sequence, e.getMessage());}
         
-        try {SequestResultPeptideBuilder.removeDots("AB.CD.F"); fail("Dot in the wrong position");}
-        catch(SQTParseException e) {assertEquals("Sequence does not have .(dots) in the expected position: AB.CD.F", e.getMessage());}
+        sequence = "AB.CD.F";
+        try {SequestResultPeptideBuilder.removeDots(sequence); fail("Dot in the wrong position");}
+        catch(SQTParseException e) {assertEquals(exceptionMsg+sequence, e.getMessage());}
         
-        try {SequestResultPeptideBuilder.removeDots("AB.CD"); fail("Dot in the wrong position");}
-        catch(SQTParseException e) {assertEquals("Sequence does not have .(dots) in the expected position: AB.CD", e.getMessage());}
+        sequence = "AB.CD";
+        try {SequestResultPeptideBuilder.removeDots(sequence); fail("Dot in the wrong position");}
+        catch(SQTParseException e) {assertEquals(exceptionMsg+sequence, e.getMessage());}
     }
     
     public void testGetOnlyPeptideSequence() {
@@ -186,6 +221,95 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         seq = "S*M@C*AB";
         try{builder.getResultMods(seq, dynaMods); fail("Invalid mod char");}
         catch(SQTParseException e) {assertEquals("No matching modification found: M@; sequence: "+seq, e.getMessage());}
+    }
+    
+    public void testGetResultTerminalMods() {
+        List<ResidueModification> dynaMods = new ArrayList<ResidueModification>(4);
+        dynaMods.add(new ResidueModification('S', '*', "80.0"));
+        dynaMods.add(new ResidueModification('T', '*', "80.0"));
+        dynaMods.add(new ResidueModification('Y', '*', "80.0"));
+        dynaMods.add(new ResidueModification('M', '#', "16.0"));
+        
+        List<TerminalModification> dynaTermMods = new ArrayList<TerminalModification>(2);
+        dynaTermMods.add(new TerminalModification(Terminal.NTERM, MsTerminalModificationIn.NTERM_MOD_CHAR_SEQUEST, new BigDecimal(100.0)));
+        dynaTermMods.add(new TerminalModification(Terminal.CTERM, MsTerminalModificationIn.CTERM_MOD_CHAR_SEQUEST, new BigDecimal(150.0)));
+   
+        String seq = "A]S*M#[Z";
+        List<MsResultTerminalMod> resultTermMods = new ArrayList<MsResultTerminalMod>();
+        try {
+        	resultTermMods = builder.getTerminalMods(seq, dynaTermMods);
+        }
+        catch(SQTParseException e) {
+        	fail("Valid terminal mods in sequence");
+        }
+        assertEquals(2, resultTermMods.size());
+        assertEquals(Terminal.NTERM, resultTermMods.get(0).getModifiedTerminal());
+        assertEquals(100.0, resultTermMods.get(0).getModificationMass().doubleValue());
+        assertEquals(Terminal.CTERM, resultTermMods.get(1).getModifiedTerminal());
+        assertEquals(150.0, resultTermMods.get(1).getModificationMass().doubleValue());
+        
+        
+        seq = "A]S*M#.Z";
+        // get the terminal mods
+        resultTermMods = new ArrayList<MsResultTerminalMod>();
+        try {
+        	resultTermMods = builder.getTerminalMods(seq, dynaTermMods);
+        }
+        catch(SQTParseException e) {
+        	fail("Valid terminal mods in sequence");
+        }
+        assertEquals(1, resultTermMods.size());
+        assertEquals(Terminal.NTERM, resultTermMods.get(0).getModifiedTerminal());
+        
+        
+        // get the residue mods
+        try{builder.getResultMods(seq, dynaMods); fail("Sequence still has dots");}
+        catch(SQTParseException e) {assertEquals("No matching modification found: A]; sequence: "+seq, e.getMessage());}
+        
+        try {
+            seq = SequestResultPeptideBuilder.removeDots(seq);
+        }
+        catch (SQTParseException e) {
+            fail("Valid sequence");
+        }
+        List<MsResultResidueMod> resultMods = new ArrayList<MsResultResidueMod>(0);
+        try {
+            resultMods = builder.getResultMods(seq, dynaMods);
+        }
+        catch (SQTParseException e) {
+            fail("Valid sequence");
+        }
+        assertEquals(2, resultMods.size());
+        Collections.sort(resultMods, new Comparator<MsResultResidueMod>() {
+            public int compare(MsResultResidueMod o1,
+                    MsResultResidueMod o2) {
+                return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
+            }});
+        MsResultResidueMod mod = resultMods.get(0);
+        assertEquals('S', mod.getModifiedResidue());
+        assertEquals('*', mod.getModificationSymbol());
+        assertEquals(0, mod.getModifiedPosition());
+        assertEquals(BigDecimal.valueOf(80.0), mod.getModificationMass());
+        
+        mod = resultMods.get(1);
+        assertEquals('M', mod.getModifiedResidue());
+        assertEquals('#', mod.getModificationSymbol());
+        assertEquals(1, mod.getModifiedPosition());
+        assertEquals(BigDecimal.valueOf(16.0), mod.getModificationMass());
+    }
+    
+    public void testGetResultTermModsInvalid() {
+    	
+    	List<TerminalModification> dynaTermMods = new ArrayList<TerminalModification>(2);
+        
+        String seq = "A]S*M#.Z";;
+        try{builder.getTerminalMods(seq, dynaTermMods); fail("No terminal mods in settings");}
+        catch(SQTParseException e) {assertEquals("No variable N-terminus modification found for peptide "+seq, e.getMessage());}
+        
+        seq = "A.S*M#[Z";;
+        try{builder.getTerminalMods(seq, dynaTermMods); fail("No terminal mods in settings");}
+        catch(SQTParseException e) {assertEquals("No variable C-terminus modification found for peptide "+seq, e.getMessage());}
+   
     }
     
     
@@ -271,6 +395,61 @@ public class SequestResultPeptideBuilderTest extends TestCase {
             assertEquals(errMsg.length(), e.getMessage().length());
             assertEquals(errMsg, e.getMessage());
         }
+    }
+    
+    public void testBuild5() {
+    	
+        List<ResidueModification> dynaMods = new ArrayList<ResidueModification>(4);
+        dynaMods.add(new ResidueModification('S', '*', "80.0"));
+        dynaMods.add(new ResidueModification('T', '*', "80.0"));
+        dynaMods.add(new ResidueModification('Y', '*', "80.0"));
+        dynaMods.add(new ResidueModification('M', '#', "16.0"));
+        
+        List<TerminalModification> dynaTermMods = new ArrayList<TerminalModification>(2);
+        dynaTermMods.add(new TerminalModification(Terminal.NTERM, MsTerminalModificationIn.NTERM_MOD_CHAR_SEQUEST, new BigDecimal(100.0)));
+        dynaTermMods.add(new TerminalModification(Terminal.CTERM, MsTerminalModificationIn.CTERM_MOD_CHAR_SEQUEST, new BigDecimal(150.0)));
+   
+        
+        String seq = "I]QKLRNY*FEAFEM#PG[S";
+        MsSearchResultPeptide resultPeptide = null;
+        try {
+            resultPeptide = builder.build(seq, dynaMods, dynaTermMods);
+        }
+        catch (SQTParseException e) {
+            fail("Valid peptide sequence");
+        }
+        assertEquals('I', resultPeptide.getPreResidue());
+        assertEquals('S', resultPeptide.getPostResidue());
+        assertEquals("QKLRNYFEAFEMPG", resultPeptide.getPeptideSequence());
+        
+        // dynamic residue modifications
+        List<MsResultResidueMod> resultMods = (List<MsResultResidueMod>) resultPeptide.getResultDynamicResidueModifications();
+        assertEquals(2, resultMods.size());
+        Collections.sort(resultMods, new Comparator<MsResultResidueMod>() {
+            public int compare(MsResultResidueMod o1,
+                    MsResultResidueMod o2) {
+                return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
+            }});
+        MsResultResidueMod mod = resultMods.get(0);
+        assertEquals('Y', mod.getModifiedResidue());
+        assertEquals('*', mod.getModificationSymbol());
+        assertEquals(5, mod.getModifiedPosition());
+        assertEquals(BigDecimal.valueOf(80.0), mod.getModificationMass());
+        
+        mod = resultMods.get(1);
+        assertEquals('M', mod.getModifiedResidue());
+        assertEquals('#', mod.getModificationSymbol());
+        assertEquals(11, mod.getModifiedPosition());
+        assertEquals(BigDecimal.valueOf(16.0), mod.getModificationMass());
+        
+        // dynamic terminal modifications
+        List<MsResultTerminalMod> resultTermMods = resultPeptide.getResultDynamicTerminalModifications();
+        assertEquals(2, resultTermMods.size());
+        assertEquals(Terminal.NTERM, resultTermMods.get(0).getModifiedTerminal());
+        assertEquals(100.0, resultTermMods.get(0).getModificationMass().doubleValue());
+        assertEquals(Terminal.CTERM, resultTermMods.get(1).getModifiedTerminal());
+        assertEquals(150.0, resultTermMods.get(1).getModificationMass().doubleValue());
+        
     }
     
     public void testUpperCase() {

@@ -16,8 +16,10 @@ import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
+import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
+import org.yeastrc.ms.domain.search.impl.ResultTerminalModBean;
+import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.parser.sqtFile.PeptideResultBuilder;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
@@ -45,6 +47,9 @@ public final class SequestResultPeptideBuilder implements PeptideResultBuilder {
         if (dynaResidueMods == null)
             dynaResidueMods = new ArrayList<MsResidueModificationIn>(0);
         
+        if(dynaTerminalMods == null)
+        	dynaTerminalMods = new ArrayList<MsTerminalModificationIn>(0);
+        
         if (resultSequence.length() < 5)
             throw new SQTParseException("sequence appears to be invalid: "+resultSequence);
 //        resultSequence = resultSequence.toUpperCase();
@@ -52,6 +57,8 @@ public final class SequestResultPeptideBuilder implements PeptideResultBuilder {
         final char postResidue = getPostResidue(resultSequence);
         String dotless = removeDots(resultSequence);
         final List<MsResultResidueMod> resultMods = getResultMods(dotless, dynaResidueMods);
+        final List<MsResultTerminalMod> terminalMods = getTerminalMods(resultSequence, dynaTerminalMods);
+        
         final String justPeptide = getOnlyPeptideSequence(dotless);
         
         SearchResultPeptideBean resultPeptide = new SearchResultPeptideBean();
@@ -59,22 +66,76 @@ public final class SequestResultPeptideBuilder implements PeptideResultBuilder {
         resultPeptide.setPreResidue(preResidue);
         resultPeptide.setPostResidue(postResidue);
         resultPeptide.setDynamicResidueModifications(resultMods);
-        resultPeptide.setDynamicTerminalModifications(new ArrayList<MsResultTerminalMod>(0));
+        resultPeptide.setDynamicTerminalModifications(terminalMods);
         
         return resultPeptide;
     }
 
-    char getPreResidue(String sequence) throws SQTParseException {
-        if (sequence.charAt(1) == '.')
+	char getPreResidue(String sequence) throws SQTParseException {
+        if (hasNtermSeparator(sequence))
             return sequence.charAt(0);
         throw new SQTParseException("Invalid peptide sequence; cannot get PRE residue: "+sequence);
     }
     
+    private static boolean hasNtermSeparator(String sequence) {
+    	return (sequence.charAt(1) == '.' ||
+                sequence.charAt(1) == MsTerminalModificationIn.NTERM_MOD_CHAR_SEQUEST);
+    }
+    
     char getPostResidue(String sequence) throws SQTParseException {
-        if (sequence.charAt(sequence.length() - 2) == '.')
+        if (hasCtermSeparater(sequence))
             return sequence.charAt(sequence.length() -1);
         throw new SQTParseException("Invalid peptide sequence; cannot get POST residue: "+sequence);
     }
+    
+    private static boolean hasCtermSeparater(String sequence) {
+    	return (sequence.charAt(sequence.length() - 2) == '.' ||
+            	sequence.charAt(sequence.length() - 2) == MsTerminalModificationIn.CTERM_MOD_CHAR_SEQUEST);
+    }
+    
+    List<MsResultTerminalMod> getTerminalMods(String resultSequence,
+			List<? extends MsTerminalModificationIn> dynaTerminalMods) throws SQTParseException {
+		
+    	MsTerminalModificationIn ntermMod = null;
+    	MsTerminalModificationIn ctermMod = null;
+    	
+    	for(MsTerminalModificationIn mod: dynaTerminalMods) {
+    		if(mod.getModifiedTerminal() == Terminal.NTERM) {
+    			ntermMod = mod;
+    		}
+    		else if(mod.getModifiedTerminal() == Terminal.CTERM) {
+    			ctermMod = mod;
+    		}
+    	}
+    	
+    	List<MsResultTerminalMod> resultTermMods = new ArrayList<MsResultTerminalMod>();
+    	if(resultSequence.charAt(1) == MsTerminalModificationIn.NTERM_MOD_CHAR_SEQUEST) {
+    		
+    		// make sure we have a variable N-terminal modification in the search settings
+    		if(ntermMod == null) {
+    			throw new SQTParseException("No variable N-terminus modification found for peptide "+resultSequence);
+    		}
+    		ResultTerminalModBean rmod = new ResultTerminalModBean();
+    		rmod.setModificationMass(ntermMod.getModificationMass());
+            rmod.setModificationSymbol(ntermMod.getModificationSymbol());
+            rmod.setModifiedTerminal(ntermMod.getModifiedTerminal());
+            resultTermMods.add(rmod);
+    	}
+    	if(resultSequence.charAt(resultSequence.length() - 2) == MsTerminalModificationIn.CTERM_MOD_CHAR_SEQUEST) {
+    		
+    		// make sure we have a variable C-terminal modification in the search settings
+    		if(ctermMod == null) {
+    			throw new SQTParseException("No variable C-terminus modification found for peptide "+resultSequence);
+    		}
+    		ResultTerminalModBean rmod = new ResultTerminalModBean();
+    		rmod.setModificationMass(ctermMod.getModificationMass());
+            rmod.setModificationSymbol(ctermMod.getModificationSymbol());
+            rmod.setModifiedTerminal(ctermMod.getModifiedTerminal());
+            resultTermMods.add(rmod);
+    	}
+    	
+    	return resultTermMods;
+	}
     
     List<MsResultResidueMod> getResultMods(String peptide, List<? extends MsResidueModificationIn> dynaMods) throws SQTParseException {
         
@@ -111,8 +172,8 @@ public final class SequestResultPeptideBuilder implements PeptideResultBuilder {
     }
 
     static String removeDots(String sequence) throws SQTParseException {
-        if (sequence.charAt(1) != '.' || sequence.charAt(sequence.length() - 2) != '.')
-            throw new SQTParseException("Sequence does not have .(dots) in the expected position: "+sequence);
+        if (!hasNtermSeparator(sequence) || !hasCtermSeparater(sequence))
+            throw new SQTParseException("Sequence does not have .(dots) or terminam modification characters (']', '[') in the expected position: "+sequence);
         return sequence.substring(2, sequence.length() - 2);
     }
 

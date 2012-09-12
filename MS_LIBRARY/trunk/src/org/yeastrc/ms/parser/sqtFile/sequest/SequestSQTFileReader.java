@@ -145,7 +145,7 @@ public class SequestSQTFileReader extends SQTFileReader<SequestSearchScan> {
         // parse the peptide sequence
         try {
             MsSearchResultPeptide resultPeptide = SequestResultPeptideBuilder.instance().build(
-                    result.getOriginalPeptideSequence(), getDynamicResidueMods(), null);
+                    result.getOriginalPeptideSequence(), getDynamicResidueMods(), getDynamicTerminalMods());
             result.setResultPeptide(resultPeptide);
         }
         catch(SQTParseException e) {

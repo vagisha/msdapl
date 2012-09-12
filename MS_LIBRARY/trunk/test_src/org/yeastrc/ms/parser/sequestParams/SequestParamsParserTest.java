@@ -10,9 +10,12 @@ import junit.framework.TestCase;
 
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
+import org.yeastrc.ms.domain.search.MsModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.Param;
+import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.parser.DataProviderException;
 
 public class SequestParamsParserTest extends TestCase {
@@ -103,8 +106,15 @@ public class SequestParamsParserTest extends TestCase {
     }
 
     public void testStaticTerminalModPattern() {
-        String param = "add_N_terminus";
+        String param = "add_Nterm_peptide";
         Matcher m = SequestParamsParser.staticTermModPattern.matcher(param);
+        assertTrue(m.matches());
+        assertEquals("N", m.group(1));
+    }
+    
+    public void testDynamicTerminalModPattern() {
+        String param = "variable_N_terminus";
+        Matcher m = SequestParamsParser.dynamicTermModPattern.matcher(param);
         assertTrue(m.matches());
         assertEquals("N", m.group(1));
     }
@@ -126,12 +136,12 @@ public class SequestParamsParserTest extends TestCase {
             assertEquals("Invalid char(s) for modified residue: @#", e.getErrorMessage());
         }
 
-        modString = "1.0 A 2.0 B 80.0 STY 3.0 C";
+        modString = "1.0 A 2.0 B 80.0 STY 3.0 C 4.0 D 5.0 E 6.0 F";
         try {parser.parseDynamicResidueMods(modString);
             fail("Invalid modString");
         }
         catch(DataProviderException e) {
-            assertEquals("Only three modifications are supported", e.getErrorMessage());
+            assertEquals("Only 6 modifications are supported", e.getErrorMessage());
         }
 
         modString = "79.7663 STY 15.999 M 58.055 C";
@@ -232,27 +242,50 @@ public class SequestParamsParserTest extends TestCase {
             MsSearchDatabaseIn db = parser.getSearchDatabase();
             assertNotNull(db);
             assertEquals("remote.server", db.getServerAddress());
-            assertEquals("/net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta", db.getServerPath());
+            assertEquals("/net/pr/vol1/ProteomicsResource/search/engj/20120727-sequest-debug/yeast-200209-contam.fasta", db.getServerPath());
 
             // enzyme
             MsEnzymeIn enzyme = parser.getSearchEnzyme();
             assertNotNull(enzyme);
-            assertEquals("No_Enzyme", enzyme.getName());
+            assertEquals("Trypsin", enzyme.getName());
             assertNull(enzyme.getDescription());
-            assertEquals(Sense.NTERM, enzyme.getSense());
-            assertEquals("-", enzyme.getCut());
-            assertEquals("-", enzyme.getNocut());
+            assertEquals(Sense.CTERM, enzyme.getSense());
+            assertEquals("KR", enzyme.getCut());
+            assertEquals("P", enzyme.getNocut());
 
             // modifications
-            assertEquals(0, parser.getStaticTerminalMods().size());
-            assertEquals(0, parser.getDynamicResidueMods().size());
+            // static terminal modifications
+            List<MsTerminalModificationIn> staticTermMods = parser.getStaticTerminalMods();
+            assertEquals(1, staticTermMods.size());
+            assertEquals(Terminal.CTERM, staticTermMods.get(0).getModifiedTerminal());
+            assertEquals(50.0, staticTermMods.get(0).getModificationMass().doubleValue());
+            assertEquals(MsModification.EMPTY_CHAR, staticTermMods.get(0).getModificationSymbol());
+            // dynamic terminal modifications
+            List<MsTerminalModificationIn> dynamicTermMods = parser.getDynamicTerminalMods();
+            assertEquals(1, dynamicTermMods.size());
+            assertEquals(Terminal.NTERM, dynamicTermMods.get(0).getModifiedTerminal());
+            assertEquals(100.0, dynamicTermMods.get(0).getModificationMass().doubleValue());
+            assertEquals(MsTerminalModificationIn.NTERM_MOD_CHAR_SEQUEST, dynamicTermMods.get(0).getModificationSymbol());
+            
+            // dynamic residue modifications
+            List<MsResidueModificationIn> dynamicResidueMods = parser.getDynamicResidueMods();
+            assertEquals(1, dynamicResidueMods.size());
+            MsResidueModificationIn dmod = dynamicResidueMods.get(0);
+            assertEquals('M', dmod.getModifiedResidue());
+            assertEquals('*', dmod.getModificationSymbol());
+            assertEquals(15.9949, dmod.getModificationMass().doubleValue());
 
-            List<MsResidueModificationIn> resMods = parser.getStaticResidueMods();
-            assertEquals(1, resMods.size());
-            MsResidueModificationIn mod = resMods.get(0);
-            assertEquals('C', mod.getModifiedResidue());
-            assertTrue(57.0 == mod.getModificationMass().doubleValue());
-            assertEquals('\u0000', mod.getModificationSymbol());
+            // static residue modifications
+            List<MsResidueModificationIn> staticResidueMods = parser.getStaticResidueMods();
+            assertEquals(2, staticResidueMods.size());
+            MsResidueModificationIn smod1 = staticResidueMods.get(0);
+            assertEquals('C', smod1.getModifiedResidue());
+            assertTrue(57.021464 == smod1.getModificationMass().doubleValue());
+            assertEquals('\u0000', smod1.getModificationSymbol());
+            MsResidueModificationIn smod2 = staticResidueMods.get(1);
+            assertEquals('X', smod2.getModifiedResidue());
+            assertTrue(9000.0 == smod2.getModificationMass().doubleValue());
+            assertEquals('\u0000', smod2.getModificationSymbol());
 
         }
         catch (DataProviderException e) {

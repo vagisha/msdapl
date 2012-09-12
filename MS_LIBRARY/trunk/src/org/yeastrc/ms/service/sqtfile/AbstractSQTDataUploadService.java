@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
-import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
@@ -65,7 +64,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     private final MsScanDAO scanDao;
     private final MsSearchDatabaseDAO sequenceDbDao;
     private final SQTRunSearchDAO runSearchDao;
-    private final MS2ScanChargeDAO ms2ScanChargeDao;
     private final MsSearchResultProteinDAO proteinMatchDao;
     private final MsSearchModificationDAO modDao;
     private final MsSearchResultDAO resultDao;
@@ -127,7 +125,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         
         this.runDao = daoFactory.getMsRunDAO(); 
         this.scanDao = daoFactory.getMsScanDAO();
-        this.ms2ScanChargeDao = daoFactory.getMS2FileScanChargeDAO();
         this.sequenceDbDao = daoFactory.getMsSequenceDatabaseDAO();
         this.searchDao = daoFactory.getMsSearchDAO();
         this.runSearchDao = daoFactory.getSqtRunSearchDAO();

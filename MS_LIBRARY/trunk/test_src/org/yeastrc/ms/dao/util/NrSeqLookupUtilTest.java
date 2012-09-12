@@ -64,7 +64,7 @@ public class NrSeqLookupUtilTest extends TestCase {
         int databaseId = NrSeqLookupUtil.getDatabaseId(databaseName);
         assertEquals(2, databaseId);
         accession = "accession_string_4";
-        dbProt = NrSeqLookupUtil.getDbProtein(databaseId, accession);
+        dbProt = NrSeqLookupUtil.getDbProtein(databaseName, accession);
         assertEquals(28, dbProt.getProteinId());
         assertEquals(2, dbProt.getDatabaseId());
         assertEquals("accession_string_4", dbProt.getAccessionString());

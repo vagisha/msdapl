@@ -14,6 +14,9 @@ import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
  */
 public interface MsTerminalModificationIn extends MsModification {
 
+	public static final char NTERM_MOD_CHAR_SEQUEST = ']';
+	public static final char CTERM_MOD_CHAR_SEQUEST = '[';
+	
     public abstract Terminal getModifiedTerminal();
     
     public abstract void setModifiedTerminal(Terminal modTerminal);

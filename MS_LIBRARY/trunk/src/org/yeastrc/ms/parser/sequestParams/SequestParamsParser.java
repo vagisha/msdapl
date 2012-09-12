@@ -51,12 +51,14 @@ public class SequestParamsParser implements SearchParamsDataProvider {
     private List<MsResidueModificationIn> staticResidueModifications;
     private List<MsTerminalModificationIn> staticTerminalModifications;
     private List<MsResidueModificationIn> dynamicResidueModifications;
+    private List<MsTerminalModificationIn> dynamicTerminalModifications;
 
     private int currentLineNum = 0;
     private String currentLine;
 
     static final Pattern paramLinePattern = Pattern.compile("^([\\S&&[^=]]+)\\s*=\\s*([^;]*)\\s*;?(.*)");
-    static final Pattern staticTermModPattern = Pattern.compile("^add\\_([N|C])\\_terminus$");
+    static final Pattern staticTermModPattern = Pattern.compile("^add\\_([N|C])term\\_peptide$");
+    static final Pattern dynamicTermModPattern = Pattern.compile("^variable\\_([N|C])\\_terminus");
     static final Pattern staticResidueModPattern = Pattern.compile("add\\_([A-Z])\\_[\\w]+");
     static final Pattern enzymePattern = Pattern.compile("^(\\d+)\\.\\s+(\\S+)\\s+([0|1])\\s+([[\\-]|[A-Z]]+)\\s+([[\\-]|[A-Z]]+)$");
     static final Pattern modCharsPattern = Pattern.compile("[A-Z]+");
@@ -86,7 +88,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
     }
 
     public List<MsTerminalModificationIn> getDynamicTerminalMods() {
-        return new ArrayList<MsTerminalModificationIn>(0);
+        return dynamicTerminalModifications;
     }
     
     // NOTE: sequest.params does not tell us if the algorithm used was sequest
@@ -124,6 +126,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         staticResidueModifications = new ArrayList<MsResidueModificationIn>();
         staticTerminalModifications = new ArrayList<MsTerminalModificationIn>();
         dynamicResidueModifications = new ArrayList<MsResidueModificationIn>();
+        dynamicTerminalModifications = new ArrayList<MsTerminalModificationIn>();
     }
 
     private void init(String remoteServer) {
@@ -132,6 +135,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         staticResidueModifications.clear();
         staticTerminalModifications.clear();
         dynamicResidueModifications.clear();
+        dynamicTerminalModifications.clear();
     }
     
     public void parseParams(String remoteServer, String paramsFileDir) throws DataProviderException {
@@ -233,6 +237,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         }
         else if (parsedStaticTerminalModParam(param.getParamName(), param.getParamValue())) return;
         else if (parsedStaticResidueModParam(param.getParamName(), param.getParamValue()))  return;
+        else if (parsedDynamicTerminalModParam(param.getParamName(), param.getParamValue()))  return;
         
         // print_duplicate_references
         if (param.getParamName().equalsIgnoreCase("print_duplicate_references")) {
@@ -260,7 +265,31 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         }
         return true;
     }
+    
+    boolean parsedDynamicTerminalModParam(String paramName, String paramValue) throws DataProviderException {
+        Matcher m = dynamicTermModPattern.matcher(paramName);
+        if (!m.matches())
+            return false;
 
+        Terminal term = Terminal.instance(m.group(1).charAt(0));
+
+        BigDecimal modMass = null;
+        try {modMass = new BigDecimal(paramValue);}
+        catch(NumberFormatException e) {throw new DataProviderException("Error parsing modification mass: "+paramValue);}
+
+        if (modMass.doubleValue() != 0.0) {
+            TerminalModification mod = new TerminalModification();
+            mod.setModificationMass(modMass);
+            mod.setModifiedTerminal(term);
+            if(term == Terminal.NTERM)
+            	mod.setModificationSymbol(MsTerminalModificationIn.NTERM_MOD_CHAR_SEQUEST);
+            else if(term == Terminal.CTERM)
+            	mod.setModificationSymbol(MsTerminalModificationIn.CTERM_MOD_CHAR_SEQUEST);
+            dynamicTerminalModifications.add(mod);
+        }
+        return true;
+    }
+    
     boolean parsedStaticResidueModParam (String paramName, String paramValue) throws DataProviderException {
         Matcher m = staticResidueModPattern.matcher(paramName);
         if (!m.matches())

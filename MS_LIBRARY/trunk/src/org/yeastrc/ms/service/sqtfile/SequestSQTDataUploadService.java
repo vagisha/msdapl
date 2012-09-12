@@ -155,6 +155,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         try {
             provider.open(filePath, usesEvalue);
             provider.setDynamicResidueMods(this.dynaResidueMods);
+            provider.setDynamicTerminalMods(this.dynaTermMods);
         }
         catch (DataProviderException e) {
             provider.close();

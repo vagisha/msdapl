@@ -103,7 +103,8 @@ public class ModifiedSequenceBuilder {
                 for(MsResultTerminalMod mod: ntermMods)
                 	ntermmod += mod.getModificationMass().doubleValue();
                 if(ntermmod > 0) {
-                	ntermmod += BaseAminoAcidUtils.NTERM_MASS;
+                	if(!diffMassOnly)
+                		ntermmod += BaseAminoAcidUtils.NTERM_MASS;
                 	buf.append("n["+getNumber(format, ntermmod)+"]");
                 }
             }
@@ -159,7 +160,8 @@ public class ModifiedSequenceBuilder {
                 for(MsResultTerminalMod mod: ctermMods)
                 	ctermmod += mod.getModificationMass().doubleValue();
                 if(ctermmod > 0) {
-                	ctermmod += BaseAminoAcidUtils.CTERM_MASS;
+                	if(!diffMassOnly)
+                		ctermmod += BaseAminoAcidUtils.CTERM_MASS;
                 	buf.append("c["+getNumber(format, ctermmod)+"]");
                 }
             }

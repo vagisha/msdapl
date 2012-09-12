@@ -213,7 +213,7 @@ public class PercolatorSQTFileReader extends SQTFileReader<PercolatorSearchScan>
             
             if(searchProgram == Program.SEQUEST )//|| searchProgram == Program.EE_NORM_SEQUEST)
                 resultPeptide = SequestResultPeptideBuilder.instance().build(
-                        result.getOriginalPeptideSequence(), getDynamicResidueMods(), null);
+                        result.getOriginalPeptideSequence(), getDynamicResidueMods(), getDynamicTerminalMods());
             
             else if (searchProgram == Program.PROLUCID)
                 resultPeptide = ProlucidResultPeptideBuilder.instance().build(

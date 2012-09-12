@@ -20,10 +20,18 @@ public class TerminalModification implements MsTerminalModificationIn {
     private char modificationSymbol = EMPTY_CHAR;
     private Terminal modTerminal;
     
+    public TerminalModification(){}
+    
+    public TerminalModification(Terminal modTerminal, char modSymbol, BigDecimal modMass) {
+    	this.modTerminal = modTerminal;
+    	this.modificationSymbol = modSymbol;
+    	this.modificationMass = modMass;
+    }
+    
     public BigDecimal getModificationMass() {
         return modificationMass;
     }
-
+    
     /**
      * @param modificationMass the modificationMass to set
      */
