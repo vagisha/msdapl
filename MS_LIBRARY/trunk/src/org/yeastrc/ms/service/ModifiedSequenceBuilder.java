@@ -30,12 +30,14 @@ public class ModifiedSequenceBuilder {
     public static String build(String sequence, List<MsResultResidueMod> dynamicResidueMods,
             List<MsResultTerminalMod> dynamicTerminalMods) throws ModifiedSequenceBuilderException {
     	
+    	// no static mods; diffMassOnly = false
     	return build(sequence, dynamicResidueMods, dynamicTerminalMods, null, false, 0);
     }
     
     public static String buildWithDiffMass(String sequence, List<MsResultResidueMod> dynamicResidueMods,
             List<MsResultTerminalMod> dynamicTerminalMods) throws ModifiedSequenceBuilderException {
     	
+    	// no static mods; diffMassOnly = true
     	return build(sequence, dynamicResidueMods, dynamicTerminalMods, null, true, 0);
     }
     
@@ -94,22 +96,25 @@ public class ModifiedSequenceBuilder {
         
         // build the modified sequence
         StringBuilder buf = new StringBuilder();
-        for(int i = 0; i < sequence.length(); i++) {
-            
-        	
-        	// add any dynamic N-terminal modifications
-            if(i == 0 && ntermMods.size() > 0) {
-            	double ntermmod = 0;
-                for(MsResultTerminalMod mod: ntermMods)
-                	ntermmod += mod.getModificationMass().doubleValue();
-                if(ntermmod > 0) {
-                	if(!diffMassOnly)
-                		ntermmod += BaseAminoAcidUtils.NTERM_MASS;
-                	buf.append("n["+getNumber(format, ntermmod)+"]");
-                }
+        
+        // add any dynamic N-terminal modifications
+        if(ntermMods.size() > 0) {
+        	double ntermmod = 0;
+            for(MsResultTerminalMod mod: ntermMods)
+            	ntermmod += mod.getModificationMass().doubleValue();
+            if(ntermmod != 0) {
+            	if(!diffMassOnly)
+            		ntermmod += BaseAminoAcidUtils.NTERM_MASS;
+            	buf.append("n[");
+            	if(ntermmod > 0 && diffMassOnly) 
+            		buf.append("+"); // positive mass diff
+            	buf.append(getNumber(format, ntermmod)).append("]");
             }
-            
-            // add the amino acid char
+        }
+        
+        for(int i = 0; i < sequence.length(); i++) {
+           
+        	// add the amino acid char
             buf.append(sequence.charAt(i));
             
             double mass = 0;
@@ -148,22 +153,23 @@ public class ModifiedSequenceBuilder {
                 if(diffMassOnly) {
                 	if(mass > 0) 
                 		modStr = "+"+modStr; // positive mass diff
-                	else
-                		modStr = "-"+modStr; // negative mass diff
                 }
                 buf.append("["+modStr+"]");
             }
-            
-            // add any dynamic C-term modification
-            if(i == sequence.length() - 1 && ctermMods.size() > 0) {
-            	double ctermmod = 0;
-                for(MsResultTerminalMod mod: ctermMods)
-                	ctermmod += mod.getModificationMass().doubleValue();
-                if(ctermmod > 0) {
-                	if(!diffMassOnly)
-                		ctermmod += BaseAminoAcidUtils.CTERM_MASS;
-                	buf.append("c["+getNumber(format, ctermmod)+"]");
-                }
+        }
+        
+        // add any dynamic C-term modification
+        if(ctermMods.size() > 0) {
+        	double ctermmod = 0;
+            for(MsResultTerminalMod mod: ctermMods)
+            	ctermmod += mod.getModificationMass().doubleValue();
+            if(ctermmod != 0) {
+            	if(!diffMassOnly)
+            		ctermmod += BaseAminoAcidUtils.CTERM_MASS;
+            	buf.append("c[");
+            	if(ctermmod > 0 && diffMassOnly) 
+            		buf.append("+"); // positive mass diff
+            	buf.append(getNumber(format, ctermmod)).append("]");
             }
         }
         

@@ -1,5 +1,5 @@
 /**
- * MsSearchResultPeptideDb.java
+ * MsSearchResultPeptide.java
  * @author Vagisha Sharma
  * Jul 11, 2008
  * @version 1.0

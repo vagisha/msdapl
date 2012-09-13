@@ -9,9 +9,11 @@ import org.yeastrc.ms.domain.search.MsModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.service.ModifiedSequenceBuilder;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.ms.util.AminoAcidUtilsFactory;
+import org.yeastrc.ms.util.BaseAminoAcidUtils;
 
 public class SearchResultPeptideBean  implements MsSearchResultPeptide {
 
@@ -105,7 +107,7 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
     public String getModifiedPeptidePS() {
         
         
-        if (dynaResidueMods.size() == 0) {
+        if (dynaResidueMods.size() == 0 && dynaTerminalMods.size() == 0) {
 //            modifiedSequence = preResidue+"."+String.valueOf(sequence)+"."+postResidue;
             return String.valueOf(sequence);
         }
@@ -113,11 +115,25 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
             String origseq = String.valueOf(sequence);
             int lastIdx = 0;
             StringBuilder seq = new StringBuilder();
+            
+            // Add any N-term modification
+            for(MsResultTerminalMod termMod: dynaTerminalMods) {
+            	if(termMod.getModifiedTerminal() == Terminal.NTERM) {
+            		char modSymbol = termMod.getModificationSymbol();
+                    if(modSymbol == MsModification.EMPTY_CHAR) {
+                        seq.append("["+Math.round(termMod.getModificationMass().doubleValue() + BaseAminoAcidUtils.NTERM_MASS)+"]");
+                    }
+                    else {
+                        seq.append(modSymbol);
+                    }
+            	}
+            }
+            
             sortDynaResidueModifications();
             for (MsResultResidueMod mod: dynaResidueMods) {
                 seq.append(origseq.subSequence(lastIdx, mod.getModifiedPosition()+1)); // get sequence up to an including the modified position.
                 char modSymbol = mod.getModificationSymbol();
-                if(modSymbol == '\u0000') {
+                if(modSymbol == MsModification.EMPTY_CHAR) {
                     seq.append("["+Math.round(mod.getModificationMass().doubleValue() +
                             AminoAcidUtilsFactory.getAminoAcidUtils().monoMass(origseq.charAt(mod.getModifiedPosition())))+"]");
                 }
@@ -129,6 +145,19 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
             }
             if (lastIdx < origseq.length())
                 seq.append(origseq.subSequence(lastIdx, origseq.length()));
+            
+            // Add any C-term modification
+            for(MsResultTerminalMod termMod: dynaTerminalMods) {
+            	if(termMod.getModifiedTerminal() == Terminal.CTERM) {
+            		char modSymbol = termMod.getModificationSymbol();
+                    if(modSymbol == MsModification.EMPTY_CHAR) {
+                        seq.append("["+Math.round(termMod.getModificationMass().doubleValue() + BaseAminoAcidUtils.CTERM_MASS)+"]");
+                    }
+                    else {
+                        seq.append(modSymbol);
+                    }
+            	}
+            }
             
             return seq.toString();
         }
@@ -169,10 +198,14 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
      */
     public String getModifiedPeptide(boolean massDiffOnly) throws ModifiedSequenceBuilderException {
     	
+    	if(!massDiffOnly) {
+    		return getModifiedPeptide();
+    	}
+    	
     	if (modifiedSequence_massDiffOnly != null)
             return modifiedSequence_massDiffOnly;
         
-        if (dynaResidueMods.size() == 0) {
+        if (dynaResidueMods.size() == 0 && dynaTerminalMods.size() == 0) {
             modifiedSequence_massDiffOnly = String.valueOf(sequence);
         }
         else {
