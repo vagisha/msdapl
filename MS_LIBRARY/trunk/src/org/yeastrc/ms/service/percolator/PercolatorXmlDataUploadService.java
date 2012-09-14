@@ -563,9 +563,10 @@ public class PercolatorXmlDataUploadService implements
 			while(reader.hasNextPeptide()) {
 				PercolatorXmlPeptideResult peptide = (PercolatorXmlPeptideResult) reader.getNextPeptide();
 				
+				// log.info("Found peptide: "+peptide.getResultPeptide().getModifiedPeptidePS(false));
 				// NOTE: 12/16/11; Added to deal with duplicate peptide_ids in the <peptides> section of Percolator output
 				// If this peptide is present more than once in the peptides section, save it later
-				String seq = peptide.getResultPeptide().getModifiedPeptidePS();
+				String seq = peptide.getResultPeptide().getModifiedPeptidePS(false);
 				if(this.duplicatePeptides.containsKey(seq)) {
 					duplicatePeptides.get(seq).add(peptide);
 					continue;
@@ -645,12 +646,12 @@ public class PercolatorXmlDataUploadService implements
 				// TODO -- This is probably because this PSM had XCorrRank > 1 in the sequest results
 				// We only upload XCorrRank = 1 results. Chances are there is no matching Percolator PSM
 				// (in the <psms></psms> list) either.  Ignore it for now.
-				if(e.getErrorCode() == ERROR_CODE.NO_MATCHING_SEARCH_RESULT) {
-					log.warn(e.getErrorMessage());
-					log.error("runSearchId: "+runSearchId+"; scan number: "+psmId.getScanNumber()+"; charge: "+psmId.getCharge()+"; peptide: "+peptide.getResultPeptide().getPeptideSequence());
-					continue;
-				}
-				else
+//				if(e.getErrorCode() == ERROR_CODE.NO_MATCHING_SEARCH_RESULT) {
+//					log.warn(e.getErrorMessage());
+//					log.error("runSearchId: "+runSearchId+"; scan number: "+psmId.getScanNumber()+"; charge: "+psmId.getCharge()+"; peptide: "+peptide.getResultPeptide().getPeptideSequence());
+//					continue;
+//				}
+//				else
 					throw e;
 			}
 					
@@ -711,7 +712,7 @@ public class PercolatorXmlDataUploadService implements
                 ex.setErrorMessage("No matching search result was found for runSearchId: "+runSearchId+
                 		" scanId: "+scanId+"; charge: "+charge+"; mass: "+observedMass+
                 		"; peptide: "+peptide.getPeptideSequence()+
-                		"; modified peptide: "+peptide.getModifiedPeptidePS());
+                		"; modified peptide: "+peptide.getModifiedPeptidePS(false));
                 throw ex;
                 //log.warn(ex.getErrorMessage());
             }
@@ -742,11 +743,11 @@ public class PercolatorXmlDataUploadService implements
         			bestRes = matchingResults2.get(0);
         		else {
         		
-        			String modifiedPeptideSeq = peptide.getModifiedPeptidePS();
+        			String modifiedPeptideSeq = peptide.getModifiedPeptidePS(false);
         			// check for exact modified sequence
         			List<MsSearchResult> matchingResults3 = new ArrayList<MsSearchResult>();
         			for(MsSearchResult res: matchingResults2) {
-        				if(res.getResultPeptide().getModifiedPeptidePS().equals(modifiedPeptideSeq)) {
+        				if(res.getResultPeptide().getModifiedPeptidePS(false).equals(modifiedPeptideSeq)) {
         					matchingResults3.add(res);
         				}
         			}
@@ -762,7 +763,7 @@ public class PercolatorXmlDataUploadService implements
         			ex.setErrorMessage("Multiple matching search results were found for Percolator result with runSearchId: "+runSearchId+
         					" scanId: "+scanId+"; charge: "+charge+"; mass: "+observedMass+
         					"; peptide: "+peptide.getPeptideSequence()+
-        					"; modified peptide: "+peptide.getModifiedPeptidePS());
+        					"; modified peptide: "+peptide.getModifiedPeptidePS(false));
         			throw ex;
         		}
         		else
@@ -793,7 +794,7 @@ public class PercolatorXmlDataUploadService implements
            
         try {
         	
-        	String modifiedPeptideSeq = peptide.getModifiedPeptidePS();
+        	String modifiedPeptideSeq = peptide.getModifiedPeptidePS(false);
         	
         	List<Integer> matchingResultIds = new ArrayList<Integer>();
         	
@@ -807,15 +808,24 @@ public class PercolatorXmlDataUploadService implements
                 ex.setErrorMessage("No matching search result was found for runSearchId: "+runSearchId+
                 		" scanId: "+scanId+"; charge: "+charge+//"; mass: "+observedMass+
                 		"; peptide: "+peptide.getPeptideSequence()+
-                		"; modified peptide: "+peptide.getModifiedPeptidePS());
+                		"; modified peptide: "+peptide.getModifiedPeptidePS(false));
                 throw ex;
                 //log.warn(ex.getErrorMessage());
             }
             
             for(MsSearchResult mRes: matchingResults) {
             	// make sure the modified sequence is the same
-            	if(mRes.getResultPeptide().getModifiedPeptidePS().equals(modifiedPeptideSeq))
+            	if(mRes.getResultPeptide().getModifiedPeptidePS(false).equals(modifiedPeptideSeq))
             		matchingResultIds.add(mRes.getId());
+            }
+            
+            if(matchingResultIds.size() == 0) {
+            	UploadException ex = new UploadException(ERROR_CODE.NO_MATCHING_SEARCH_RESULT);
+                ex.setErrorMessage("No matching search results found after matching modified sequences for runSearchId: "+runSearchId+
+                		" scanId: "+scanId+"; charge: "+charge+//"; mass: "+observedMass+
+                		"; peptide: "+peptide.getPeptideSequence()+
+                		"; modified peptide: "+peptide.getModifiedPeptidePS(false));
+                throw ex;
             }
         	
         	return matchingResultIds;

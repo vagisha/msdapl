@@ -640,11 +640,21 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 		
 		@Override
 		public String getFullModifiedPeptidePS() {
+			return getFullModifiedPeptidePS(true);
+		}
+		
+		@Override
+		public String getFullModifiedPeptidePS(boolean includeTermMods) {
 			return nterm+"."+sequence+"."+cterm;
 		}
 		
 		@Override
 		public String getModifiedPeptidePS() {
+			return getModifiedPeptidePS(true);
+		}
+		
+		@Override
+		public String getModifiedPeptidePS(boolean includeTermMods) {
 			return sequence;
 		}
 		

@@ -63,7 +63,9 @@ public class SearchResultPeptideBeanTest extends TestCase {
         
 		SearchResultPeptideBean resBean = new SearchResultPeptideBean();
 		String fullModifiedSequencePS = "R.]EY*AFRS*LVT*AM#EK[.Y";
+		String fullModifiedSequencePSNoTermMods = "R.EY*AFRS*LVT*AM#EK.Y";
 		String modifiedSequencePS = "]EY*AFRS*LVT*AM#EK[";
+		String modifiedSequencePSNoTermMods = "EY*AFRS*LVT*AM#EK";
 		String fullModifiedSequenceMassDiffOnly = "R.n[-100]EY[+80]AFRS[+80]LVT[-80]AM[+16]EKc[+150].Y";
 		String fullModifiedSequence = "R.n[-99]EY[243]AFRS[167]LVT[21]AM[147]EKc[167].Y";
 		String modifiedSequenceMassDiffOnly = "n[-100]EY[+80]AFRS[+80]LVT[-80]AM[+16]EKc[+150]";
@@ -78,7 +80,13 @@ public class SearchResultPeptideBeanTest extends TestCase {
 		
 		assertEquals(sequence, resBean.getPeptideSequence());
 		assertEquals(fullModifiedSequencePS, resBean.getFullModifiedPeptidePS());
+		assertEquals(fullModifiedSequencePS, resBean.getFullModifiedPeptidePS(true));
+		assertEquals(fullModifiedSequencePSNoTermMods, resBean.getFullModifiedPeptidePS(false));
 		assertEquals(modifiedSequencePS, resBean.getModifiedPeptidePS());
+		assertEquals(modifiedSequencePSNoTermMods, resBean.getModifiedPeptidePS(false));
+		assertEquals(modifiedSequencePS, resBean.getModifiedPeptidePS(true));
+		
+		
 		try {
 			assertEquals(fullModifiedSequenceMassDiffOnly, resBean.getFullModifiedPeptide(true));
 		} catch (ModifiedSequenceBuilderException e) {

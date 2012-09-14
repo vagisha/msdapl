@@ -101,10 +101,19 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
     }
     
     /**
-     * Returns the modified peptide in a program specific format
+     * Returns the modified peptide in a program specific format. Terminal modifications are included
      * @return
      */
     public String getModifiedPeptidePS() {
+    	
+    	return getModifiedPeptidePS(true);
+    }
+    
+    /**
+     * Returns the modified peptide in a program specific format
+     * @return
+     */
+    public String getModifiedPeptidePS(boolean includeTermMods) {
         
         
         if (dynaResidueMods.size() == 0 && dynaTerminalMods.size() == 0) {
@@ -116,17 +125,19 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
             int lastIdx = 0;
             StringBuilder seq = new StringBuilder();
             
-            // Add any N-term modification
-            for(MsResultTerminalMod termMod: dynaTerminalMods) {
-            	if(termMod.getModifiedTerminal() == Terminal.NTERM) {
-            		char modSymbol = termMod.getModificationSymbol();
-                    if(modSymbol == MsModification.EMPTY_CHAR) {
-                        seq.append("["+Math.round(termMod.getModificationMass().doubleValue() + BaseAminoAcidUtils.NTERM_MASS)+"]");
-                    }
-                    else {
-                        seq.append(modSymbol);
-                    }
-            	}
+            if(includeTermMods) {
+	            // Add any N-term modification
+	            for(MsResultTerminalMod termMod: dynaTerminalMods) {
+	            	if(termMod.getModifiedTerminal() == Terminal.NTERM) {
+	            		char modSymbol = termMod.getModificationSymbol();
+	                    if(modSymbol == MsModification.EMPTY_CHAR) {
+	                        seq.append("["+Math.round(termMod.getModificationMass().doubleValue() + BaseAminoAcidUtils.NTERM_MASS)+"]");
+	                    }
+	                    else {
+	                        seq.append(modSymbol);
+	                    }
+	            	}
+	            }
             }
             
             sortDynaResidueModifications();
@@ -146,17 +157,19 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
             if (lastIdx < origseq.length())
                 seq.append(origseq.subSequence(lastIdx, origseq.length()));
             
-            // Add any C-term modification
-            for(MsResultTerminalMod termMod: dynaTerminalMods) {
-            	if(termMod.getModifiedTerminal() == Terminal.CTERM) {
-            		char modSymbol = termMod.getModificationSymbol();
-                    if(modSymbol == MsModification.EMPTY_CHAR) {
-                        seq.append("["+Math.round(termMod.getModificationMass().doubleValue() + BaseAminoAcidUtils.CTERM_MASS)+"]");
-                    }
-                    else {
-                        seq.append(modSymbol);
-                    }
-            	}
+            if(includeTermMods) {
+	            // Add any C-term modification
+	            for(MsResultTerminalMod termMod: dynaTerminalMods) {
+	            	if(termMod.getModifiedTerminal() == Terminal.CTERM) {
+	            		char modSymbol = termMod.getModificationSymbol();
+	                    if(modSymbol == MsModification.EMPTY_CHAR) {
+	                        seq.append("["+Math.round(termMod.getModificationMass().doubleValue() + BaseAminoAcidUtils.CTERM_MASS)+"]");
+	                    }
+	                    else {
+	                        seq.append(modSymbol);
+	                    }
+	            	}
+	            }
             }
             
             return seq.toString();
@@ -253,7 +266,12 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
     
     @Override
     public String getFullModifiedPeptidePS() {
-        String pept = getModifiedPeptidePS();
+        return getFullModifiedPeptidePS(true);
+    }
+    
+    @Override
+    public String getFullModifiedPeptidePS(boolean includeTermMods) {
+        String pept = getModifiedPeptidePS(includeTermMods);
         return preResidue+"."+pept+"."+postResidue;
     }
 

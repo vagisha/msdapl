@@ -83,11 +83,16 @@ public interface MsSearchResultPeptide {
      */
     public abstract String getModifiedPeptidePS();
     
+    public abstract String getModifiedPeptidePS(boolean includeTermMods);
+    
     /**
      * Returns the modified peptide along with the pre and post residues
      * @return
      */
     public abstract String getFullModifiedPeptidePS();
+    
+    public abstract String getFullModifiedPeptidePS(boolean includeTermMods);
+    
     
     public abstract char getPreResidue();
     
