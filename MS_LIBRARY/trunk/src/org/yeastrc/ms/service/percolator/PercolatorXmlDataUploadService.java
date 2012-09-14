@@ -67,8 +67,6 @@ public class PercolatorXmlDataUploadService implements
 
 	private static final Logger log = Logger.getLogger(PercolatorSQTDataUploadService.class);
 
-	//public static final String PERC_XML = "combined-results.xml";
-	
 	private List<String> percXmlFiles;
 	
     private final MsSearchResultDAO resultDao;
@@ -990,8 +988,8 @@ public class PercolatorXmlDataUploadService implements
         File[] files = dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                String name_uc = name.toLowerCase();
-                return name_uc.endsWith(".xml");
+                String name_lc = name.toLowerCase();
+                return (name_lc.endsWith(".xml") && !(name_lc.endsWith("presubperc.xml")));
             }});
         for (int i = 0; i < files.length; i++) {
         	
