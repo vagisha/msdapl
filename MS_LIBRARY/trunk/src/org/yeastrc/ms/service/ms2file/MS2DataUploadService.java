@@ -31,6 +31,7 @@ import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
 import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeDependentAnalysisDb;
 import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeIndependentAnalysisDb;
+import org.yeastrc.ms.domain.run.ms2file.impl.MS2Header;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MS2RunDataProvider;
 import org.yeastrc.ms.parser.ms2File.Cms2FileReader;
@@ -69,6 +70,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     private boolean preUploadCheckDone = false;
     
     private Set<String> filesToUpload;
+    private boolean hasLabkeyBullseyeOutput = false;
     
     public MS2DataUploadService() {
         dAnalysisList = new ArrayList<MS2ChargeDependentAnalysis>();
@@ -115,10 +117,11 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
         for (String filename: filenames) {
         	
         	// Upload only those files we are required to upload.
-        	if(filesToUpload != null && !filesToUpload.contains(FileUtils.removeExtension(filename))) {
-        		log.info("Skipping file "+filename);
-        		continue;
-        	}
+        	// filenames already contain only those files that we should upload.
+//        	if(filesToUpload != null && !filesToUpload.contains(FileUtils.removeExtension(filename))) {
+//        		log.info("Skipping file "+filename);
+//        		continue;
+//        	}
         	
             try {
                 String filepath = dataDirectory+File.separator+filename;
@@ -135,6 +138,18 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
         }
     }
     
+    private String getBaseFileName(String filename, boolean removeExt) {
+    	
+    	String name = FileUtils.removeExtension(filename);
+    	if(this.hasLabkeyBullseyeOutput && name.endsWith(".matches")) {
+    		name = FileUtils.removeExtension(name);
+    	}
+    	return name;	
+    }
+    
+    private String getBaseFileName(String filename) {
+    	return getBaseFileName(filename, true);
+    }
     
     private int uploadMS2Run(int experimentId, String filePath, String serverDirectory) throws UploadException {
         
@@ -143,11 +158,11 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
         // database we will not upload it
         String sha1Sum = calculateSha1Sum(filePath);
         String fileName = new File(filePath).getName();
-        int runId = getMatchingRunId(fileName, sha1Sum);
+        int runId = getMatchingRunId(getBaseFileName(fileName), sha1Sum);
         if (runId > 0) {
             // If this run was uploaded from a different location, upload the location
             saveRunLocation(serverDirectory, runId);
-            log.info("Run with name: "+FileUtils.removeExtension(fileName)+" and sha1Sum: "+sha1Sum+
+            log.info("Run with name: "+getBaseFileName(fileName)+" and sha1Sum: "+sha1Sum+
                     " found in the database; runID: "+runId);
             log.info("END MS2/CMS2 FILE UPLOAD: "+fileName+"\n");
             return runId;
@@ -245,6 +260,15 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
         MS2RunIn header;
         try {
             header = provider.getRunHeader();
+            
+            // Support for LabKey pipeline. Bullseye generates two files: <filename>.matches.cms2 and <filename>.nomatches.cms2.
+            // <filename>.matches.cms2 is used as input to Sequest but the output SQT file is called <filename>.sqt. 
+            // To avoid this file name mismatch we will remove the ".matches" string when saving the filename for the run.
+            if(header instanceof MS2Header)
+            {
+            	String fileName = getBaseFileName(header.getFileName(), false);
+            	((MS2Header)header).setFileName(fileName);
+            }
         }
         catch (DataProviderException e) { // this should only happen if there was an IOException while reading the file
             UploadException ex = new UploadException(ERROR_CODE.READ_ERROR_MS2);
@@ -397,7 +421,10 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
             @Override
             public boolean accept(File dir, String name) {
                 String name_uc = name.toUpperCase();
-                return name_uc.endsWith("."+RunFileFormat.MS2) || name_uc.endsWith("."+RunFileFormat.CMS2);
+                if(hasLabkeyBullseyeOutput) // Support for LabKey pipeline
+                	return name_uc.endsWith(".MATCHES."+RunFileFormat.MS2) || name_uc.endsWith(".MATCHES."+RunFileFormat.CMS2);
+                else
+                	return name_uc.endsWith("."+RunFileFormat.MS2) || name_uc.endsWith("."+RunFileFormat.CMS2);
             }});
         
         
@@ -426,9 +453,11 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
         	
         	Iterator<String> filenameIter = filenames.iterator();
         	while(filenameIter.hasNext()) {
-        		String noExtName = FileUtils.removeExtension(filenameIter.next());
+        		String name = filenameIter.next();
+        		String noExtName = getBaseFileName(name);
         		if(!filesToUpload.contains(noExtName)) {
         			filenameIter.remove();
+        			log.info("Skipping file: "+name);
         		}
         	}
         }
@@ -478,13 +507,22 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     @Override
     public List<String> getFileNames() {
         List<String> filesNoExt = new ArrayList<String>(filenames.size());
-        for(String filename: filenames)
-            filesNoExt.add(FileUtils.removeExtension(filename));
+        for(String filename: filenames) {
+            filesNoExt.add(getBaseFileName(filename));
+        }
         return filesNoExt;
     }
 
 	@Override
 	public void setUploadFileNames(Set<String> fileNames) {
 		this.filesToUpload = fileNames;
+	}
+
+	public boolean isHasLabkeyBullseyeOutput() {
+		return hasLabkeyBullseyeOutput;
+	}
+
+	public void setHasLabkeyBullseyeOutput(boolean hasLabkeyBullseyeOutput) {
+		this.hasLabkeyBullseyeOutput = hasLabkeyBullseyeOutput;
 	}
 }

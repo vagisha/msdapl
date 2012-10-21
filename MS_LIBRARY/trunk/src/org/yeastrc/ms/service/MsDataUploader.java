@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +15,7 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.service.ms2file.MS2DataUploadService;
 
 public class MsDataUploader {
 
@@ -41,6 +43,7 @@ public class MsDataUploader {
     private boolean uploadProtinfer = false;
     
     private Set<String> filesToUpload;
+    private boolean hasLabkeyBullseyeData = false;
     
     public void setComments(String comments) {
         this.comments = comments;
@@ -72,6 +75,14 @@ public class MsDataUploader {
 
 	public void setFilesToUpload(Set<String> filesToUpload) {
 		this.filesToUpload = filesToUpload;
+	}
+	
+	public boolean isHasLabkeyBullseyeData() {
+		return hasLabkeyBullseyeData;
+	}
+
+	public void setHasLabkeyBullseyeData(boolean hasLabkeyBullseyeData) {
+		this.hasLabkeyBullseyeData = hasLabkeyBullseyeData;
 	}
 
 	public void setSearchDirectory(String searchDirectory) {
@@ -468,8 +479,23 @@ public class MsDataUploader {
         
         SpectrumDataUploadService rdus = null;
         try {
-            rdus = UploadServiceFactory.instance().getSpectrumDataUploadService(dataDirectory, filesToUpload);
+        	// Support for LabKey pipeline
+        	if(hasLabkeyBullseyeData) {
+        		Set<String> bullseyeFilesToUpload = new HashSet<String>();
+        		for(String file: filesToUpload) {
+        			bullseyeFilesToUpload.add(file+".matches");
+        		}
+        		rdus = UploadServiceFactory.instance().getSpectrumDataUploadService(dataDirectory, bullseyeFilesToUpload);
+        		if(rdus instanceof MS2DataUploadService) {
+        			((MS2DataUploadService)rdus).setHasLabkeyBullseyeOutput(hasLabkeyBullseyeData);
+        		}
+        			
+        	}
+        	else {
+        		rdus = UploadServiceFactory.instance().getSpectrumDataUploadService(dataDirectory, filesToUpload);
+        	}
             rdus.setRemoteDirectory(remoteDirectory);
+            rdus.setUploadFileNames(filesToUpload);
         }
         catch(UploadServiceFactoryException e1) {
             UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);

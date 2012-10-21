@@ -250,8 +250,6 @@ public class MsExperimentUploader {
         
         // upload spectrum data
         rdus.setExperimentId(experimentId);
-        if(filesToUpload != null && rdus instanceof MS2DataUploadService)
-        	rdus.setUploadFileNames(filesToUpload);
         
         try {
             rdus.upload();

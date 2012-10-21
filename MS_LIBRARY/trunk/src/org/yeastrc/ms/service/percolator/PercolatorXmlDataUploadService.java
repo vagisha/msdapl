@@ -999,7 +999,7 @@ public class PercolatorXmlDataUploadService implements
             @Override
             public boolean accept(File dir, String name) {
                 String name_lc = name.toLowerCase();
-                return (name_lc.endsWith(".xml") && !(name_lc.endsWith("presubperc.xml")));
+                return (name_lc.endsWith(".xml") && !(name_lc.endsWith("presubperc.xml") && !(name_lc.endsWith(".pin.xml"))));
             }});
         for (int i = 0; i < files.length; i++) {
         	
