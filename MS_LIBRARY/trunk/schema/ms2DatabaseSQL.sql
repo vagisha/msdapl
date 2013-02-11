@@ -242,7 +242,7 @@ CREATE TABLE SQTSpectrumData (
    observedMass DECIMAL(18,9) NOT NULL,
    processTime INT UNSIGNED,
    serverName VARCHAR(50),
-   totalIntensity DECIMAL(18,9),
+   totalIntensity DOUBLE,
    lowestSp DECIMAL(10,5),
    sequenceMatches INT UNSIGNED
 );

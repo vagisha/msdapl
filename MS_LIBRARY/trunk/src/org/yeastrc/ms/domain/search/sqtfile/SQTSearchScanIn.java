@@ -36,7 +36,7 @@ interface SQTSearchScanBase {
     /**
      * @return the totalIntensity
      */
-    public abstract BigDecimal getTotalIntensity();
+    public abstract Double getTotalIntensity();
 
     /**
      * @return the lowestSp

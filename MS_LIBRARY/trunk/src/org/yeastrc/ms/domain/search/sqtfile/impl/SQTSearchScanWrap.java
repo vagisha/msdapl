@@ -67,7 +67,7 @@ public class SQTSearchScanWrap implements SQTSearchScan {
     }
 
     @Override
-    public BigDecimal getTotalIntensity() {
+    public Double getTotalIntensity() {
         return scan.getTotalIntensity();
     }
 }

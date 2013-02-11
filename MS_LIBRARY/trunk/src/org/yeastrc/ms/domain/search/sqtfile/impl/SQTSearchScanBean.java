@@ -20,7 +20,7 @@ public class SQTSearchScanBean implements SQTSearchScan {
     private int runSearchId;
     private int processTime;
     private String serverName;
-    private BigDecimal totalIntensity;
+    private Double totalIntensity;
     private BigDecimal observedMass;
     private BigDecimal lowestSp;
     private int sequenceMatches = -1;
@@ -89,13 +89,13 @@ public class SQTSearchScanBean implements SQTSearchScan {
     /**
      * @return the totalIntensity
      */
-    public BigDecimal getTotalIntensity() {
+    public Double getTotalIntensity() {
         return totalIntensity;
     }
     /**
      * @param totalIntensity the totalIntensity to set
      */
-    public void setTotalIntensity(BigDecimal totalIntensity) {
+    public void setTotalIntensity(Double totalIntensity) {
         this.totalIntensity = totalIntensity;
     }
     

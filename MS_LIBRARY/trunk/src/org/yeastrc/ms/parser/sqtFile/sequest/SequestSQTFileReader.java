@@ -190,7 +190,7 @@ public class SequestSQTFileReader extends SQTFileReader<SequestSearchScan> {
         public String getServerName() {
             return scan.getServerName();
         }
-        public BigDecimal getTotalIntensity() {
+        public Double getTotalIntensity() {
             return scan.getTotalIntensity();
         }
     }

@@ -13,7 +13,7 @@ public class SearchScan {
     private int processingTime; // seconds
     private String server; // server handling this scan
     private BigDecimal observedMass; // Observed M+H+ value (calculated from m/z) 
-    private BigDecimal totalIntensity; 
+    private Double totalIntensity; 
     private BigDecimal lowestSp; // Lowest Sp value for top 500 spectra
     private int numMatching; // Number of sequences matching this precursor ion
     
@@ -111,14 +111,14 @@ public class SearchScan {
     /**
      * @return the totalIntensity
      */
-    public BigDecimal getTotalIntensity() {
+    public Double getTotalIntensity() {
         return totalIntensity;
     }
 
     /**
      * @param totalIntensity the totalIntensity to set
      */
-    public void setTotalIntensity(BigDecimal totalIntensity) {
+    public void setTotalIntensity(Double totalIntensity) {
         this.totalIntensity = totalIntensity;
     }
 
@@ -169,7 +169,7 @@ public class SearchScan {
         buf.append("\t");
         buf.append(observedMass);
         buf.append("\t");
-        buf.append(totalIntensity.stripTrailingZeros());
+        buf.append(String.format("%.5.f",totalIntensity));
         buf.append("\t");
         buf.append(lowestSp.stripTrailingZeros());
         buf.append("\t");

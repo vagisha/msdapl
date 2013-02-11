@@ -176,7 +176,7 @@ public class ProlucidSQTFileReader extends SQTFileReader<ProlucidSearchScan> {
         public String getServerName() {
             return scan.getServerName();
         }
-        public BigDecimal getTotalIntensity() {
+        public Double getTotalIntensity() {
             return scan.getTotalIntensity();
         }
     }

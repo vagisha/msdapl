@@ -27,7 +27,7 @@
 		<parameter property="observedMass" jdbcType="DECIMAL"/>
 		<parameter property="processTime" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="serverName" jdbcType="VARCHAR" />
-		<parameter property="totalIntensity" jdbcType="DECIMAL"/>
+		<parameter property="totalIntensity" jdbcType="DOUBLE"/>
 		<parameter property="lowestSp" jdbcType="DECIMAL"/>
 		<parameter property="sequenceMatches" jdbcType="INTEGER" nullValue="-1"/>
 	</parameterMap>
@@ -52,7 +52,7 @@
     	totalIntensity,
     	lowestSp,
     	sequenceMatches) 
-    	VALUES (?,?,?,?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?,?,?,?)
     </insert>
     
     <insert id="insertAll" parameterClass="String">

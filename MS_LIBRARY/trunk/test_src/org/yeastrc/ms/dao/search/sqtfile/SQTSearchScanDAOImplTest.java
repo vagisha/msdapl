@@ -88,8 +88,8 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
                 return "pumice.gs.washington.edu";
             }
 
-            public BigDecimal getTotalIntensity() {
-                return new BigDecimal("12345.12345");
+            public Double getTotalIntensity() {
+                return new Double("12345.12345");
             }
 
             @Override
