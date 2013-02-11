@@ -212,6 +212,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
     public static final class SequestSearchResultTest extends MsSearchResultTest implements SequestSearchResultIn {
 
         private BigDecimal deltaCN;
+        private BigDecimal deltaCNStar;
         private int spRank;
         private BigDecimal xCorr;
         private int xCorrRank;
@@ -280,7 +281,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
                 }
 				@Override
 				public BigDecimal getDeltaCNstar() {
-					throw new UnsupportedOperationException();
+					return deltaCNStar;
 				}
 				@Override
 				public void setCalculatedMass(BigDecimal mass) {

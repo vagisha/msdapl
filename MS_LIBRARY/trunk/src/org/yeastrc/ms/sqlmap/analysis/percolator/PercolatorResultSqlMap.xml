@@ -114,8 +114,9 @@
     	pep,
     	discriminantScore,
     	pvalue,
-    	predictedRetentionTime) 
-    	VALUES (?,?,?,?,?,?,?)
+    	predictedRetentionTime,
+    	peptideResultID) 
+    	VALUES (?,?,?,?,?,?,?,?)
     </insert>
     
     <insert id="insertAll" parameterClass="String">

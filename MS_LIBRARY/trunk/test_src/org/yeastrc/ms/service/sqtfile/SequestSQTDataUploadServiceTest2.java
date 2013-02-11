@@ -421,7 +421,6 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
         MsSearchDatabase db = dbs.get(0);
         assertEquals("/net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta", db.getServerPath());
         assertEquals("remoteServer", db.getServerAddress());
-        assertEquals(3, db.getSequenceDatabaseId());
         assertEquals("mouse-contam.fasta", db.getDatabaseFileName());
     }
 

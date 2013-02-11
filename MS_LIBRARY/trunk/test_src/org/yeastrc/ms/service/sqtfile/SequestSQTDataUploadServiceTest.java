@@ -85,9 +85,8 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         // check search databases
         List<MsSearchDatabase> dbs = search.getSearchDatabases();
         assertEquals(1, dbs.size());
-        assertEquals("/net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta", dbs.get(0).getServerPath());
+        assertEquals("/net/maccoss/vol2/software/pipeline/dbase/mouse-ipi-250309-contam.fasta", dbs.get(0).getServerPath());
         assertEquals("remoteServer", dbs.get(0).getServerAddress());
-        assertEquals(3, dbs.get(0).getSequenceDatabaseId());
         
         // check search enzymes
         List<MsEnzyme> enzymes = search.getEnzymeList();
@@ -152,7 +151,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         // check sequest params
         List<Param> params = search.getSequestParams();
         String[] paramArr = new String[] {
-                "database_name = /net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta",
+                "database_name = /net/maccoss/vol2/software/pipeline/dbase/mouse-ipi-250309-contam.fasta",
                 "peptide_mass_tolerance = 3.000",
                 "create_output_files = 1",
                 "ion_series = 0 1 1 0.0 1.0 0.0 0.0 0.0 0.0 0.0 1.0 0.0",

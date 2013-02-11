@@ -58,8 +58,9 @@ public class SequestParamsParser implements SearchParamsDataProvider {
 
     static final Pattern paramLinePattern = Pattern.compile("^([\\S&&[^=]]+)\\s*=\\s*([^;]*)\\s*;?(.*)");
     static final Pattern staticTermModPattern = Pattern.compile("^add\\_([N|C])term\\_peptide$");
+    static final Pattern staticTermModPattern_old = Pattern.compile("^add\\_([N|C])_terminus$");
     static final Pattern dynamicTermModPattern = Pattern.compile("^variable\\_([N|C])\\_terminus");
-    static final Pattern staticResidueModPattern = Pattern.compile("add\\_([A-Z])\\_[\\w]+");
+    static final Pattern staticResidueModPattern = Pattern.compile("^add\\_([A-Z])\\_[\\w]+");
     static final Pattern enzymePattern = Pattern.compile("^(\\d+)\\.\\s+(\\S+)\\s+([0|1])\\s+([[\\-]|[A-Z]]+)\\s+([[\\-]|[A-Z]]+)$");
     static final Pattern modCharsPattern = Pattern.compile("[A-Z]+");
 
@@ -248,8 +249,11 @@ public class SequestParamsParser implements SearchParamsDataProvider {
 
     boolean parsedStaticTerminalModParam(String paramName, String paramValue) throws DataProviderException {
         Matcher m = staticTermModPattern.matcher(paramName);
-        if (!m.matches())
-            return false;
+        if (!m.matches()) {
+        	m = staticTermModPattern_old.matcher(paramName);
+        	if(!m.matches())
+        		return false;
+        }
 
         Terminal term = Terminal.instance(m.group(1).charAt(0));
 
@@ -295,6 +299,9 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         if (!m.matches())
             return false;
 
+        if(staticTermModPattern_old.matcher(paramName).matches())
+        	return false;
+        
         char modResidue = m.group(1).charAt(0);
         BigDecimal modMass = null;
         try {modMass = new BigDecimal(paramValue);}

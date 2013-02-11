@@ -30,8 +30,9 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
             uploader.setSearchDate(new Date());
             uploader.setRemoteServer("remoteServer");
             uploader.uploadData();
-            assertEquals(1, uploader.getUploadExceptionList().size());
-            assertEquals(ERROR_CODE.INVALID_SQT_SCAN, uploader.getUploadExceptionList().get(0).getErrorCode());
+            // This does not cause exception anymore.
+            assertEquals(0, uploader.getUploadExceptionList().size());
+            // assertEquals(ERROR_CODE.INVALID_SQT_SCAN, uploader.getUploadExceptionList().get(0).getErrorCode());
 //        }
 //        catch(UploadException e) {
 //            fail("Invalid scan+charge in 1.sqt (it does not have any M or L lines; but we don't care");
@@ -69,7 +70,10 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
 //        catch(UploadException e) {
             assertEquals(1, uploader.getUploadExceptionList().size());
             UploadException e = uploader.getUploadExceptionList().get(0);
-            assertEquals(ERROR_CODE.DIRECTORY_NOT_FOUND, e.getErrorCode());
+            assertEquals(ERROR_CODE.PREUPLOAD_CHECK_FALIED, e.getErrorCode());
+            String warning = "ERROR: Pre-upload check failed"+
+	                         "\n\tError getting SpectrumDataUploadService: dataDirectory does not exist: dummy/directory";
+            assertEquals(warning, uploader.getUploadWarnings().trim());
 //        }
     }
 
@@ -88,7 +92,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
 //        catch (UploadException e) {
             assertEquals(1, uploader.getUploadExceptionList().size());
             UploadException e = uploader.getUploadExceptionList().get(0);
-            assertEquals(ERROR_CODE.EMPTY_DIRECTORY, e.getErrorCode());
+            assertEquals(ERROR_CODE.PREUPLOAD_CHECK_FALIED, e.getErrorCode());
 //        }
         assertEquals(0, expId);
     }
@@ -109,7 +113,11 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
 //        catch (UploadException e) {
             assertEquals(1, uploader.getUploadExceptionList().size());
             UploadException e = uploader.getUploadExceptionList().get(0);
-            assertEquals(ERROR_CODE.MISSING_SCAN_DATA_FILE, e.getErrorCode());
+            assertEquals(ERROR_CODE.PREUPLOAD_CHECK_FALIED, e.getErrorCode());
+            String warning = "ERROR: Pre-upload check failed"+  
+            	             "\n\tNo corresponding spectrum data file found for: two";
+            assertEquals(warning, uploader.getUploadWarnings().trim());
+            
 //        }
         assertEquals(0, expId);
     }
@@ -190,23 +198,18 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
       uploader.uploadData();
       List<UploadException> exceptionList = uploader.getUploadExceptionList();
       assertEquals(1, exceptionList.size());
-      assertEquals(ERROR_CODE.UNSUPPORTED_SQT, exceptionList.get(0).getErrorCode());
-      String warnings = "ERROR: Unsupported sqt file found"+
-                          "\n\tFile: test_resources/invalid_sqt_dir/pepprobe.sqt"+
-                          "\n\t\n\tSEARCH WILL NOT BE UPLOADED.";
+      assertEquals(ERROR_CODE.PREUPLOAD_CHECK_FALIED, exceptionList.get(0).getErrorCode());
+      String warnings = "ERROR: Pre-upload check failed"+
+                          "\n\tError getting SearchDataUploadService: We do not currently have support for the SQT format: UNKNOWN";
       
       assertEquals(warnings, uploader.getUploadWarnings().trim());
-      // the ms2 files should still be there but no searches should have been uploaded. 
+      // Error happened at the pre-upload check. No files should been uploaded. 
       List<Integer> runIds = runDao.loadRunIdsForFileName("percolator.ms2");
-      assertEquals(1, runIds.size());
-      assertEquals(0, runSearchDao.loadRunSearchIdsForRun(runIds.get(0)).size());
+      assertEquals(0, runIds.size());
       runIds = runDao.loadRunIdsForFileName("pepprobe.ms2");
-      assertEquals(1, runIds.size());
-      assertEquals(0, runSearchDao.loadRunSearchIdsForRun(runIds.get(0)).size());
+      assertEquals(0, runIds.size());
       runIds = runDao.loadRunIdsForFileName("prolucid.ms2");
-      assertEquals(1, runIds.size());
-      assertEquals(0, runSearchDao.loadRunSearchIdsForRun(runIds.get(0)).size());
-      
+      assertEquals(0, runIds.size());
     }
     
     public void testUploadSequestData() throws DataProviderException {
