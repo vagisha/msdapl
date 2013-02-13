@@ -278,4 +278,26 @@
 
 </tag>
 
+<tag>
+<name>projectLink</name>
+<tagclass>org.yeastrc.www.taglib.ProjectLinkTag</tagclass>
+<bodycontent>empty</bodycontent>
+<attribute>
+<name>projectId</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>researcherLink</name>
+<tagclass>org.yeastrc.www.taglib.ResearcherLinkTag</tagclass>
+<bodycontent>empty</bodycontent>
+<attribute>
+<name>researcherId</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
 </taglib>

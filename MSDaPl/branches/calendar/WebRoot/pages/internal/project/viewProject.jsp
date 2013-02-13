@@ -45,6 +45,11 @@
    <TD valign="top" width="25%">Title:</TD>
    <TD valign="top" width="75%"><bean:write name="project" property="title"/></TD>
   </yrcwww:colorrow>
+  
+  <yrcwww:colorrow>
+   <TD valign="top" width="25%">Affiliation:</TD>
+   <TD valign="top" width="75%"><bean:write name="project" property="affiliation"/></TD>
+  </yrcwww:colorrow>
 
   <!-- List the Researchers here: -->
 
@@ -80,6 +85,16 @@
 	<!-- ========================================================================================= -->
 	<!-- List Grants here -->
 	<%@ include file="grantList.jsp" %>
+	<!-- ========================================================================================= -->
+	
+	<!-- ========================================================================================= -->
+	<!-- List Payment methods here -->
+	<yrcwww:colorrow>
+	<TD valign="top" width="25%" style="padding-top:10px;">Payment Methods:</TD>
+	<TD valign="top" width="75%" style="padding-top:10px;">
+		<%@ include file="paymentMethods.jsp" %>
+	</td>
+	</yrcwww:colorrow>
 	<!-- ========================================================================================= -->
 	
   <yrcwww:colorrow>

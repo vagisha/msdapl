@@ -46,6 +46,15 @@
 	<form-bean name="rerunProtInferencesForm" type="org.yeastrc.www.proteinfer.job.RerunProteinInferenceForm"></form-bean>
 	<form-bean name="deleteProtInferencesForm" type="org.yeastrc.www.proteinfer.job.DeleteProteinInferenceForm"></form-bean>
 	
+	<forward name="viewAllInstrumentCalendar" path="/viewAllInstrumentCalendar.do"/>
+	
+	<form-bean name="exportBillingInformationForm" type="org.uwpr.www.costcenter.ExportBillingInformationForm" />
+	<form-bean name="timeBlockForm" type="org.uwpr.www.costcenter.TimeBlockForm" />
+	<form-bean name="instrumentRateForm" type="org.uwpr.www.costcenter.InstrumentRateForm" />
+    <form-bean name="editInstrumentTimeForm" type="org.uwpr.www.scheduler.EditProjectInstrumentTimeForm" />
+  	<form-bean name="viewInstrumentRatesForm" type="org.uwpr.www.costcenter.ViewInstrumentRatesForm"></form-bean>
+  	<form-bean name="paymentMethodForm" type="org.yeastrc.www.project.payment.PaymentMethodForm" />
+	
     </form-beans>
 
 
@@ -70,6 +79,7 @@
 	<forward name="viewRegister" path="/viewRegister.do" />
 	<forward name="manageGroups" path="/manageGroups.do" />
 	<forward name="manageInstruments" path="/manageInstruments.do" />
+	<forward name="manageBilling" path="/manageBilling.do" />
 	<forward name="manageGroupMembers" path="/manageGroupMembers.do" />
 	<forward name="adminHome" path="/pages/admin/search/searchProjects.jsp"/>
 	<forward name="projectSearchForm" path="/pages/admin/search/searchProjects.jsp"/>
@@ -103,6 +113,10 @@
 	<forward name="percolatorUploadForm" path="/percolatorUploadForm.do" />
 	<forward name="percolatorRunForm" path="/percolatorRunForm.do" />
 	<forward name="uploadMSDataForm" path="/uploadMSDataFormAction.do" />
+	
+	<forward name="viewInstrumentRates" path="/viewInstrumentRates.do" />
+	<forward name="viewPaymentMethod" path="/viewPaymentMethod.do" />
+	<forward name="viewScheduler" path="/viewScheduler.do" />
     </global-forwards>
 
 
@@ -1506,12 +1520,321 @@
 	
 	<!-- ================================================================================== -->
 	
-    </action-mappings>
+	
+    
+    <!-- ================================================================================== -->
+	<!-- Actions related to time blocks  -->
+	<!-- ================================================================================== -->
+    <action
+      path="/viewTimeBlocks"
+      type="org.uwpr.www.costcenter.ViewTimeBlocksAction"
+      >
+      <forward name="Success" path="/pages/admin/billing/viewTimeBlocks.jsp" redirect="false" />
+      <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+    </action>
+    
+    <action
+      path="/viewTimeBlockForm"
+      type="org.uwpr.www.costcenter.ViewTimeBlockFormAction"
+      name="timeBlockForm"
+      validate="false"
+      >
+      <forward name="Success" path="/pages/admin/billing/timeBlockForm.jsp" redirect="false" />
+      <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+    </action>
+    
+    <action
+      path="/addTimeBlock"
+      type="org.uwpr.www.costcenter.SaveNewTimeBlockAction"
+      input="/pages/admin/billing/timeBlockForm.jsp"
+      name="timeBlockForm"
+      validate="true"
+      >
+      <forward name="Success" path="/viewTimeBlocks.do" redirect="true" />
+      <forward name="Failure" path="/pages/admin/billing/timeBlockForm.jsp" redirect="false"/>
+    </action>
+    
+    <action
+      path="/deleteTimeBlock"
+      type="org.uwpr.www.costcenter.DeleteTimeBlockAction"
+      >
+      <forward name="Success" path="/viewTimeBlocks.do" redirect="true" />
+      <forward name="Failure" path="/viewTimeBlocks.do" redirect="false" />
+    </action>
+    <!-- ================================================================================== -->
+    <!-- ================================================================================== -->
+    
+    
+    <!-- ================================================================================== -->
+	<!-- Actions related to instrument rates  -->
+	<!-- ================================================================================== -->
+    <action
+      path="/viewInstrumentRates"
+      type="org.uwpr.www.costcenter.ViewInstrumentRatesAction"
+      input="/pages/admin/billing/viewInstrumentRates.jsp"
+      name="viewInstrumentRatesForm"
+      validate="true"
+      >
+      <forward name="Success" path="/pages/admin/billing/viewInstrumentRates.jsp" redirect="false" />
+      <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+    </action>
+    
+    <action
+      path="/viewCurrentInstrumentRates"
+      type="org.uwpr.www.costcenter.ViewCurrentInstrumentRatesAction"
+      >
+      <forward name="Success" path="/pages/internal/viewCurrentInstrumentRates.jsp" redirect="false" />
+      <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+    </action>
+    
+    <action
+      path="/viewInstrumentRateForm"
+      type="org.uwpr.www.costcenter.ViewInstrumentRateFormAction"
+      name="instrumentRateForm"
+      validate="false"
+      >
+      <forward name="Success" path="/pages/admin/billing/instrumentRateForm.jsp" redirect="false" />
+      <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+    </action>
+    
+    <action
+      path="/addInstrumentRate"
+      type="org.uwpr.www.costcenter.SaveNewInstrumentRateAction"
+      input="/pages/admin/billing/instrumentRateForm.jsp"
+      name="instrumentRateForm"
+      validate="true"
+      >
+      <forward name="Success" path="/viewInstrumentRates.do" redirect="true" />
+      <forward name="Failure" path="/pages/admin/billing/instrumentRateForm.jsp" redirect="false"/>
+    </action>
+    
+    <action
+      path="/editInstrumentRateForm"
+      type="org.uwpr.www.costcenter.EditInstrumentRateAction"
+      name="instrumentRateForm"
+      validate="false"
+      >
+      <forward name="Success" path="/pages/admin/billing/editInstrumentRate.jsp" redirect="false" />
+      <forward name="Failure" path="/viewInstrumentRates.do" redirect="false"/>
+    </action>
+    
+    <action
+      path="/saveInstrumentRate"
+      type="org.uwpr.www.costcenter.SaveInstrumentRateAction"
+      input="/pages/admin/costcenter/editInstrumentRate.jsp"
+      name="instrumentRateForm"
+      validate="true"
+      >
+      <forward name="Success" path="/viewInstrumentRates.do" redirect="true" />
+      <forward name="Failure" path="/pages/admin/billing/editInstrumentRate.jsp" redirect="false"/>
+    </action>
+    
+    <action
+      path="/changeInstrumentRateForm"
+      type="org.uwpr.www.costcenter.ChangeInstrumentRateFormAction"
+      name="instrumentRateForm"
+      validate="false"
+      >
+      <forward name="Success" path="/pages/admin/billing/changeInstrumentRate.jsp" redirect="false" />
+      <forward name="Failure" path="/viewInstrumentRates.do" redirect="false"/>
+    </action>
+    
+    <action
+      path="/saveChangeInstrumentRate"
+      type="org.uwpr.www.costcenter.SaveChangeInstrumentRateAction"
+      input="/pages/admin/costcenter/changeInstrumentRate.jsp"
+      name="instrumentRateForm"
+      validate="true"
+      >
+      <forward name="Success" path="/viewInstrumentRates.do" redirect="true" />
+      <forward name="Failure" path="/pages/admin/billing/changeInstrumentRate.jsp" redirect="false"/>
+    </action>
+    
+    <action
+      path="/deleteInstrumentRate"
+      type="org.uwpr.www.costcenter.DeleteInstrumentRateAction"
+      >
+      <forward name="Success" path="/viewInstrumentRates.do" redirect="true" />
+      <forward name="Failure" path="/viewInstrumentRates.do" redirect="false" />
+    </action>
+	
+    
+	<!-- ================================================================================== -->
+    <!-- ================================================================================== -->
 
 
+	<!-- ================================================================================== -->
+	<!-- Actions related to billing -->
+	<!-- ================================================================================== -->
+	<action
+	  path="/manageBilling"
+	  type="org.uwpr.www.costcenter.ViewCostCenterHomeAction"
+	  name="exportBillingInformationForm"
+      validate="false"
+	 >
+	  <forward name="Success" path="/pages/admin/billing/billingHome.jsp" redirect="false" />
+	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+	</action>
+	
+	<action
+      path="/exportBillingInformation"
+      type="org.uwpr.www.costcenter.ExportBillingInformationAction"
+      input="/pages/admin/costcenter/billingHome.jsp"
+      name="exportBillingInformationForm"
+      validate="true"
+      >
+      <forward name="Success" path="/pages/admin/costcenter/billingHome.jsp" redirect="false"/>
+      <forward name="Failure" path="/pages/admin/costcenter/billingHome.jsp" redirect="false"/>
+    </action>
+    <!-- ================================================================================== -->
+    <!-- ================================================================================== -->
 
 
-
+	<!-- ================================================================================== -->
+    <!-- Actions related to creating and editing payment methods -->
+    <!-- ================================================================================== -->
+        <action
+      path="/newPaymentMethod"
+      type="org.yeastrc.www.project.payment.NewPaymentMethodAction"
+      name="paymentMethodForm"
+      validate="false"
+      >
+      <forward name="Success" path="/pages/internal/project/payment/newPaymentMethod.jsp" redirect="false" />
+      <forward name="Failure" path="/viewProject.do" redirect="false"/>
+    </action>
+    
+    <action
+      path="/saveNewPaymentMethod"
+      type="org.yeastrc.www.project.payment.SaveNewPaymentMethodAction"
+      name="paymentMethodForm"
+      input="/pages/internal/project/payment/newPaymentMethod.jsp"
+      validate="true"
+      >
+      <forward name="Success" path="/viewProject.do" redirect="true" />
+      <forward name="Failure" path="/viewProject.do" redirect="false"/>
+    </action>
+    
+    <action
+      path="/viewPaymentMethod"
+      type="org.yeastrc.www.project.payment.ViewPaymentMethodAction"
+      >
+      <forward name="Success" path="/pages/internal/project/payment/viewPaymentMethod.jsp" redirect="false" />
+      <forward name="Failure" path="/viewProject.do" redirect="false"/>
+    </action>
+    
+    <action
+      path="/editPaymentMethod"
+      type="org.yeastrc.www.project.payment.EditPaymentMethodAction"
+      name="paymentMethodForm"
+      validate="false"
+      >
+      <forward name="Success" path="/pages/internal/project/payment/editPaymentMethod.jsp" redirect="false" />
+      <forward name="Failure" path="/viewProject.do" redirect="false"/>
+    </action>
+    
+    <action
+      path="/savePaymentMethod"
+      type="org.yeastrc.www.project.payment.SavePaymentMethodAction"
+      name="paymentMethodForm"
+      input="/pages/internal/project/payment/editPaymentMethod.jsp"
+      validate="true"
+      >
+      <forward name="Success" path="/pages/internal/project/payment/viewPaymentMethod.jsp" redirect="true" />
+      <forward name="Failure" path="/viewProject.do" redirect="false"/>
+    </action>
+    
+    <action
+      path="/deletePaymentMethod"
+      type="org.yeastrc.www.project.payment.DeletePaymentMethodAction"
+      >
+      <forward name="Success" path="/viewProject.do" redirect="true" />
+      <forward name="Failure" path="/viewProject.do" redirect="false"/>
+    </action>
+	<!-- ================================================================================== -->
+	<!-- ================================================================================== -->
+	
+	<!-- ================================================================================== -->
+	<!-- Actions related to viewing scheduler and requesting / editing / deleting instrument time -->
+	<!-- ================================================================================== -->
+	<action
+		path="/viewAllInstrumentCalendar"
+		type="org.uwpr.www.scheduler.ViewAllInstrumentsCalendarAction"
+		>
+		<forward name="Success" path="/pages/internal/scheduler/viewAllInstrumentSchedule.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/scheduler/viewAllInstrumentSchedule.jsp" redirect="false" />
+	</action>
+	
+	<action
+      path="/viewScheduler"
+      type="org.uwpr.www.scheduler.ViewSchedulerAction"
+      >
+      <forward name="Success" path="/pages/internal/scheduler/viewSchedulerForProject.jsp" redirect="false" />
+      <forward name="Failure" path="/viewProject.do" redirect="false"/>
+    </action>
+	
+	<action
+      path="/allInstrumentUsageBlocks"
+      type="org.uwpr.www.instrumentlog.AllInstrumentUsageJSONAction"
+      >
+    </action>
+    
+    <action
+      path="/instrumentUsageBlocks"
+      type="org.uwpr.www.instrumentlog.InstrumentUsageJSONAction"
+      >
+    </action>
+    
+    <action
+      path="/requestInstrumentTimeAjax"
+      type="org.uwpr.www.scheduler.RequestProjectInstrumentTimeAjaxAction"
+      >
+    </action>
+    
+    <action
+      path="/deleteInstrumentTimeAjax"
+      type="org.uwpr.www.scheduler.DeleteProjectInstrumentTimeAjaxAction"
+      >
+    </action>
+    
+    <action
+      path="/deleteInstrumentTime"
+      type="org.uwpr.www.scheduler.DeleteProjectInstrumentTimeAction"
+      >
+      <forward name="Success" path="/viewScheduledTimeDetails.do" redirect="true" />
+      <forward name="Failure" path="/viewScheduledTimeDetails.do" redirect="false"/>
+    </action>
+    
+    <action
+      path="/viewEditInstrumentTimeForm"
+      type="org.uwpr.www.scheduler.EditProjectInstrumentTimeFormAction"
+      >
+      <forward name="Success" path="/pages/internal/scheduler/editProjectInstrumentTimeForm.jsp" redirect="false" />
+    </action>
+    
+    <action
+      path="/editInstrumentTime"
+      type="org.uwpr.www.scheduler.EditProjectInstrumentTimeAction"
+      input="/pages/internal/scheduler/editProjectInstrumentTimeForm.jsp"
+      name="editInstrumentTimeForm"
+      validate="true"
+      >
+    </action>
+    
+    <action
+      path="/viewScheduledTimeDetails"
+      type="org.uwpr.www.scheduler.ViewTimeScheduledForProject"
+      >
+      <forward name="Success" path="/pages/internal/scheduler/viewTimeScheduledForProject.jsp" redirect="false" />
+      <forward name="Failure" path="/viewProject.do" redirect="false"/>
+    </action>
+   
+	
+	<!-- ================================================================================== -->
+	<!-- ================================================================================== -->
+	
+	
+	
+	</action-mappings>
 <!-- ===================================== Controller Configuration -->
 
 

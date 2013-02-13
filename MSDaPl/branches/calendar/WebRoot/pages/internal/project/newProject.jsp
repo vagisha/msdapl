@@ -82,6 +82,16 @@ Go <html:link action="newResearcher.do">here</html:link> to add a new researcher
   <P><html:form action="saveNewProject" method="post">
   <TABLE CELLPADDING="no" CELLSPACING="0" width="90%" align="center">
 
+	<tr>
+   		<td width="25%" valign="top"><b>Affiliation*</b></td>
+   		<td WIDTH="75%" VALIGN="top">
+   			<html:select property="affiliationName" styleId="affiliation">
+	            <html:options collection="affiliationTypes" property="name" labelProperty="longName"/>
+            </html:select>
+   		</td>
+   	</tr>
+   
+   
    <TR id="piRow">
     <TD WIDTH="25%" VALIGN="top">PI:</TD>
     <TD WIDTH="75%" VALIGN="top">

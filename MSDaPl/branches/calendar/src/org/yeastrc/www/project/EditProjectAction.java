@@ -9,6 +9,7 @@
 package org.yeastrc.www.project;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +20,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.project.Affiliation;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.Projects;
@@ -111,6 +113,8 @@ public class EditProjectAction extends Action {
 		newForm.setID(project.getID());
 		newForm.setSubmitDate(project.getSubmitDate());
 		
+		newForm.setAffiliation(project.getAffiliation());
+		
 		// Set the Researchers
 		Researcher res = project.getPI();
 		if (res != null) newForm.setPI(res.getID());
@@ -122,6 +126,9 @@ public class EditProjectAction extends Action {
 		request.getSession().setAttribute("researchers", researchers);
 
 
+		List<Affiliation> affiliationTypes = Affiliation.getList();
+        request.getSession().setAttribute("affiliationTypes", affiliationTypes);
+        
 		// Go!
 		return mapping.findForward("Success");
 

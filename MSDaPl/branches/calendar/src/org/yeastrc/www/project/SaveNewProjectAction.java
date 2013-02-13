@@ -24,6 +24,7 @@ import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.grant.Grant;
 import org.yeastrc.group.Group;
 import org.yeastrc.group.GroupDAO;
+import org.yeastrc.project.Affiliation;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.project.Researcher;
@@ -51,6 +52,7 @@ public class SaveNewProjectAction extends Action {
 		String progress = null;
 		String publications = null;
 		String comments;
+		Affiliation affiliation = null;
 
 		
 		// User making this request
@@ -70,6 +72,7 @@ public class SaveNewProjectAction extends Action {
 		progress = ((EditProjectForm)(form)).getProgress();
 		publications = ((EditProjectForm)(form)).getPublications();
 		comments = ((EditProjectForm)(form)).getComments();
+		affiliation = ((EditProjectForm)form).getAffiliation();
 		
 		// Set blank items to null
 		if (title.equals("")) title = null;
@@ -113,6 +116,7 @@ public class SaveNewProjectAction extends Action {
 		project.setProgress(progress);
 		project.setPublications(publications);
 		project.setComments(comments);
+		project.setAffiliation(affiliation);
 		
 		// Get a list of this user's groups
 		List<String> userGroupNames = Groups.getInstance().getUserGroups(user.getResearcher().getID());

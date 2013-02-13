@@ -17,6 +17,10 @@
 
 <yrcwww:contentbox title="MS Instruments" centered="true" width="700" scheme="groups">
 
+	<div style="text-align:center; margin: 20 auto;">
+	<html:link action="viewAllInstrumentCalendar.do">View Instrument Calendar</html:link>
+	</div>
+	
    <logic:empty name="instrumentList">
    		No instruments found in the database. Click <html:link action="addInstrument.do"><b>here</b></html:link> to add an instrument.
    </logic:empty>

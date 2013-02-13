@@ -69,6 +69,10 @@ public class NewProjectAction extends Action {
 		Collection researchers = Projects.getAllResearchers();
 		session.setAttribute("researchers", researchers);
 
+		List<Affiliation> affiliationTypes = Affiliation.getList();
+        request.getSession().setAttribute("affiliationTypes", affiliationTypes);
+        
+        
 		// remove any project, if it exists in the session.  Could have been placed in the session by EditProjectAction
         request.getSession().removeAttribute("project");
         

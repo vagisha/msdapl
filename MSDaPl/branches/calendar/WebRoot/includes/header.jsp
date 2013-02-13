@@ -130,6 +130,16 @@ $(document).ready(function() {
  <logic:equal name="dir" scope="request" value="admin">
  	<%admin_class = "current"; admin_menus = true;%>
  </logic:equal>
+ <logic:equal name="dir" scope="request" value="billing">
+ 	<%admin_class = "current"; admin_menus = true;%>
+ </logic:equal>
+<logic:equal name="dir" scope="request" value="payment">
+ 	<%home_class = "current"; home_menus = true;%>
+</logic:equal>
+<logic:equal name="dir" scope="request" value="scheduler">
+ 	<%home_class = "current"; home_menus = true;%>
+</logic:equal>
+ 
 		
 <div id="main_menu">
 	<ul>
@@ -176,6 +186,9 @@ $(document).ready(function() {
       </yrcwww:member>
       <yrcwww:member group="administrators">
         <li><html:link action="manageInstruments.do"><span>Instruments</span></html:link></li>
+      </yrcwww:member>
+      <yrcwww:member group="administrators">
+        <li><html:link action="manageBilling.do"><span>Billing</span></html:link></li>
       </yrcwww:member>
       <yrcwww:member group="administrators">
         <li><html:link action="manageProteinInferences.do"><span>Manage Protein Inferences</span></html:link></li>

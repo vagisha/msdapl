@@ -41,6 +41,7 @@ public class SaveProjectAction extends Action {
 		String progress = null;
 		String publications = null;
 		String comments;
+		Affiliation affiliation = null;
 
 		
 		// User making this request
@@ -106,6 +107,7 @@ public class SaveProjectAction extends Action {
 		progress = ((EditProjectForm)(form)).getProgress();
 		publications = ((EditProjectForm)(form)).getPublications();
 		comments = ((EditProjectForm)(form)).getComments();
+		affiliation = ((EditProjectForm)(form)).getAffiliation();
 		
 		// Set blank items to null
 		if (title.equals("")) title = null;
@@ -169,7 +171,7 @@ public class SaveProjectAction extends Action {
 		project.setPublications(publications);
 		project.setComments(comments);
 		project.setGrants(grants);
-		
+		project.setAffiliation(affiliation);
 		
 		// Save the project
 		ProjectDAO.instance().save(project);

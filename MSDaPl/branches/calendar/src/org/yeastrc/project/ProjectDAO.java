@@ -22,6 +22,7 @@ import org.yeastrc.grant.GrantDAO;
 import org.yeastrc.grant.ProjectGrantDAO;
 import org.yeastrc.group.Group;
 import org.yeastrc.group.GroupDAO;
+import org.yeastrc.project.payment.ProjectPaymentMethodDAO;
 
 /**
  * 
@@ -94,7 +95,8 @@ public class ProjectDAO {
             if (project.getProgressLastChange() == null) { rs.updateNull("progressLastChange"); }
             else { rs.updateDate("progressLastChange", project.getProgressLastChange()); }
             
-            
+            if (project.getAffiliation() == null) {rs.updateNull("affiliation");}
+            else rs.updateString("affiliation", project.getAffiliation().name());
             
             // See if we're updating a row or adding a new row.
             if (project.getID() > 0) {
@@ -209,6 +211,10 @@ public class ProjectDAO {
             project.setComments(rs.getString("projectComments"));
             project.lastChange = rs.getDate("lastChange");
             project.progressLastChange = rs.getDate("progressLastChange");
+            project.setAffiliation(Affiliation.forName(rs.getString("affiliation")));
+            
+            project.setPaymentMethods(ProjectPaymentMethodDAO.getInstance().getPaymentMethods(project.id));
+            
             
             rs.close();
             rs = null;

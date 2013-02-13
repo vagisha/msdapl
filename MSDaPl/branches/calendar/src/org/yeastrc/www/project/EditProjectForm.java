@@ -20,6 +20,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.grant.Grant;
+import org.yeastrc.project.Affiliation;
 import org.yeastrc.project.Researcher;
 
 /**
@@ -44,6 +45,8 @@ public class EditProjectForm extends ActionForm {
     private int ID = 0;
     
     private Date submitDate = null;
+    
+    private Affiliation affiliation;
     
 
 	/**
@@ -77,10 +80,11 @@ public class EditProjectForm extends ActionForm {
 //            errors.add("groups", new ActionMessage("error.collaboration.nogroups"));
 //        }
         
-		// we need atleast one grant
+		// we need at least one grant
         if (validGrantCount() < 1) {
                 errors.add("grants", new ActionMessage("error.grant.nogrants"));
         }
+        
 		return errors;
 	}
 	
@@ -226,4 +230,26 @@ public class EditProjectForm extends ActionForm {
 	public void setSubmitDate(Date date) {
 		this.submitDate = date;
 	}
+	
+	//----------------------------------------------------------------
+    // Affiliation
+    //----------------------------------------------------------------
+	public void setAffiliation(Affiliation affiliation) {
+        this.affiliation = affiliation;
+    }
+    
+    public Affiliation getAffiliation() {
+        return this.affiliation;
+    }
+    
+    public String getAffiliationName() {
+        if(affiliation == null)
+            return "None";
+        else
+            return this.affiliation.name();
+    }
+    
+    public void setAffiliationName(String name) {
+        this.affiliation = Affiliation.forName(name);
+    }
 }

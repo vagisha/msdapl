@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.yeastrc.grant.Grant;
 import org.yeastrc.group.Group;
+import org.yeastrc.project.payment.PaymentMethod;
 import org.yeastrc.www.user.Groups;
 
 
@@ -60,6 +61,10 @@ public class Project implements Comparable<Project> {
     
     // When the progress was last changed
     java.sql.Date progressLastChange;
+    
+    private Affiliation affiliation;
+    
+    private List<PaymentMethod> paymentMethods;
     
 	/**
 	 * Instantiate a new project.
@@ -409,6 +414,21 @@ public class Project implements Comparable<Project> {
 		return label;
 	}
 
+	public Affiliation getAffiliation() {
+		return affiliation;
+	}
+
+	public void setAffiliation(Affiliation affiliation) {
+		this.affiliation = affiliation;
+	}
+
+	public List<PaymentMethod> getPaymentMethods() {
+		return paymentMethods;
+	}
+
+	public void setPaymentMethods(List<PaymentMethod> paymentMethods) {
+		this.paymentMethods = paymentMethods;
+	}
 
 	/**
 	 * A string representation of a Project
