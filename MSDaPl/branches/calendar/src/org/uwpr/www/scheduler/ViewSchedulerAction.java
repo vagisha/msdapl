@@ -111,6 +111,16 @@ public class ViewSchedulerAction extends Action {
         	}
         }
         
+        if(instrument == null)
+        {
+        	ActionErrors errors = new ActionErrors();
+    		errors.add("scheduler", new ActionMessage("error.scheduler.load","No instruments found."));
+    		saveErrors( request, errors );
+    		ActionForward fwd = mapping.findForward("Failure");
+			ActionForward newFwd = new ActionForward(fwd.getPath()+"?ID="+projectId, fwd.getRedirect());
+        	return newFwd;
+        }
+        
         // Make sure the user has access to the project
         Project project = null;
         try {
@@ -155,6 +165,16 @@ public class ViewSchedulerAction extends Action {
         }
         
         List<InstrumentRate> rates = InstrumentRateDAO.getInstance().getInstrumentCurrentRates(instrumentId, rateType.getId());
+        if(rates.size() == 0)
+        {
+        	ActionErrors errors = new ActionErrors();
+			errors.add("scheduler", new ActionMessage("error.scheduler.load","No rates were found for instrument: "+instrument.getName()));
+			saveErrors( request, errors );
+			ActionForward fwd = mapping.findForward("Failure");
+			ActionForward newFwd = new ActionForward(fwd.getPath()+"?ID="+projectId, fwd.getRedirect());
+        	return newFwd;
+        }
+        
         List<TimeBlock> timeBlocks = new ArrayList<TimeBlock>(rates.size());
         for(InstrumentRate rate: rates) {
         	TimeBlock block = rate.getTimeBlock();

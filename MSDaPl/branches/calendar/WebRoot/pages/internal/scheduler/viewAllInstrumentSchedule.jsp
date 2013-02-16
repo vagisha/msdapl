@@ -128,7 +128,7 @@ function goToScheduler() {
 	var projectId = $("#projectSelector :selected").val();
 	var instrumentId = $("#instrumentSelector :selected").val();
 	// alert("instrumentID: "+instrumentId+"\nURL:"+"/pr/viewScheduler.do?instrumentId="+instrumentId+"&projectId="+projectId);
-	document.location.href="/pr/viewScheduler.do?instrumentId="+instrumentId+"&projectId="+projectId;
+	document.location.href="<yrcwww:link path='/viewScheduler.do'/>?instrumentId="+instrumentId+"&projectId="+projectId;
 }
 
 

@@ -289,7 +289,7 @@ function deleteCost(deleteThis) {
 function switchInstrument(projectId) {
 	var instrumentId = $("#instrumentSelector :selected").val();
 	//alert("instrumentID: "+instrumentId+"\nURL:"+"/pr/viewScheduler.do?instrumentId="+instrumentId+"&projectId="+projectId);
-	document.location.href="/viewScheduler.do?instrumentId="+instrumentId+"&projectId="+projectId;
+	document.location.href="<yrcwww:link path='/viewScheduler.do'/>?instrumentId="+instrumentId+"&projectId="+projectId;
 }
 
 function switchProject() {
