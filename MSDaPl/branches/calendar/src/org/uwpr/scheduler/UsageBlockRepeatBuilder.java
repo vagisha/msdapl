@@ -10,8 +10,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.uwpr.costcenter.TimeBlock;
-
 /**
  * 
  */
@@ -27,7 +25,7 @@ public class UsageBlockRepeatBuilder {
 		return instance;
 	}
 	
-	public List<UsageBlockBaseWithRate> repeatDaily(UsageBlockBaseWithRate block, Date endDate, TimeBlock timeBlock) throws SchedulerException {
+	public List<UsageBlockBaseWithRate> repeatDaily(UsageBlockBaseWithRate block, Date endDate) throws SchedulerException {
 		
 		
 		List<UsageBlockBaseWithRate> allBlocks = new ArrayList<UsageBlockBaseWithRate>();
@@ -49,7 +47,7 @@ public class UsageBlockRepeatBuilder {
 		end.set(Calendar.HOUR_OF_DAY, 0); // 12:00 am
 		end.add(Calendar.DAY_OF_MONTH, 1); // add 1 day (This will be 12:00 am the next day)
 		
-		long numHrs = timeBlock.getNumHoursAsMilis();
+		long numHrsAsMilis = block.getTimeInMillis();
 		
 		while(end.after(begin)) {
 			
@@ -58,7 +56,7 @@ public class UsageBlockRepeatBuilder {
 			newBlk.setID(0);
 			newBlk.setStartDate(begin.getTime());
 			
-			Date blkEnd = new Date(begin.getTimeInMillis() + numHrs);
+			Date blkEnd = new Date(begin.getTimeInMillis() + numHrsAsMilis);
 			newBlk.setEndDate(blkEnd);
 			
 			allBlocks.add(newBlk);

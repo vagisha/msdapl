@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.uwpr.costcenter.TimeBlock;
+import org.uwpr.instrumentlog.DateUtils;
 
 /**
  * TimeRangeSplitter.java
@@ -32,6 +33,11 @@ public class TimeRangeSplitter {
 	
 	public List<TimeBlock> split(Date startDate, Date endDate, List<TimeBlock> blocks) throws SchedulerException {
 		
+		if(startDate.after(endDate))
+		{
+			throw new SchedulerException("Start date cannot be after end date.");
+		}
+		
 		if(blocks == null || blocks.size() == 0) {
 			throw new SchedulerException("Cannot split date range into time blocks. No time blocks were given");
 		}
@@ -45,7 +51,7 @@ public class TimeRangeSplitter {
 		
 		while(newStartDate.before(endDate)) {
 			
-			double hoursInCurrentRange = getHoursInCurrentRange(newStartDate, endDate);
+			float hoursInCurrentRange = DateUtils.getNumHours(newStartDate, endDate);
 			
 			for(TimeBlock block: blocks) {
 				
@@ -86,12 +92,5 @@ public class TimeRangeSplitter {
 		int blockStartMin = calendar.get(Calendar.MINUTE);
 		
 		return (startHour == blockStartHour) && (startMin == blockStartMin);
-	}
-	
-	
-	private double getHoursInCurrentRange(Date start, Date end) {
-		
-		long differenceInMillis = end.getTime() - start.getTime();
-		return (double) differenceInMillis / ((double)(1000 * 60 * 60));
 	}
 }

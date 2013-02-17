@@ -9,9 +9,6 @@ public class DateUtils {
 	private static final long MILLSEC_IN_DAY = 1000*60*60*24;
 	private static final long MILLSEC_IN_HOUR = 1000*60*60;
 	private static final long MILLSEC_IN_MIN = 1000*60;
-//	private static final int USABLE_HRS_IN_DAY = 10;
-//	private static final int USABLE_START_HR = 8;
-//	private static final int USABLE_END_HR = 18;
 	
 	private DateUtils(){}
 	
@@ -178,10 +175,10 @@ public class DateUtils {
      * @param endDate
      * @return
      */
-    static float getNumHours(java.util.Date startDate, java.util.Date endDate) {
+    public static float getNumHours(java.util.Date startDate, java.util.Date endDate) {
         
         if(startDate.after(endDate))
-            return 0f;
+            return 0;
         
         long startTime = timePlusOffset(startDate);
         long endTime = timePlusOffset(endDate);
@@ -192,6 +189,18 @@ public class DateUtils {
         
         
         return (float)(numHours + ((float)numMin / (60.0)));
+        
+    }
+    
+    public static long getTimeDiffInMilis(java.util.Date startDate, java.util.Date endDate) {
+        
+        if(startDate.after(endDate))
+            return 0;
+        
+        long startTime = timePlusOffset(startDate);
+        long endTime = timePlusOffset(endDate);
+        
+        return endTime - startTime;
     }
 
     /**

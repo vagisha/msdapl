@@ -34,15 +34,11 @@ import org.uwpr.instrumentlog.MsInstrument;
 import org.uwpr.instrumentlog.MsInstrumentUtils;
 import org.uwpr.instrumentlog.UsageBlockBase;
 import org.uwpr.scheduler.InstrumentAvailabilityChecker;
-import org.uwpr.scheduler.ProjectInstrumentTimeApprover;
-import org.uwpr.scheduler.SchedulerException;
-import org.uwpr.scheduler.TimeRangeSplitter;
 import org.uwpr.scheduler.UsageBlockBaseWithRate;
 import org.uwpr.scheduler.UsageBlockDeletableDecider;
 import org.uwpr.scheduler.UsageBlockPaymentInformation;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
-import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -179,20 +175,12 @@ public class EditProjectInstrumentTimeAction extends Action {
         Date rangeEndDate = editForm.getEndDateDate();
         // Split the given range into time blocks
         List<TimeBlock> timeBlocks = TimeBlockDAO.getInstance().getAllTimeBlocks();
-        List<TimeBlock> rangeTimeBlocks = null;
-        try {
-        	rangeTimeBlocks = TimeRangeSplitter.getInstance().split(rangeStartDate, rangeEndDate, timeBlocks);
-        }
-        catch(SchedulerException e) {
+        if(timeBlocks.size() != 1)
+        {
         	return returnError(mapping, request, "scheduler", 
         			new ActionMessage("error.costcenter.invaliddata", 
-                			"Could not convert given time range into blocks. Error was: "+e.getMessage()),
-    						"viewScheduler", "?projectId="+projectId+"&instrumentId="+instrumentId);
-        }
-        if(rangeTimeBlocks == null || rangeTimeBlocks.size() == 0) {
-        	return returnError(mapping, request, "scheduler", 
-        			new ActionMessage("error.costcenter.invaliddata", "Could not convert given time range into blocks."),
-							"viewScheduler", "?projectId="+projectId+"&instrumentId="+instrumentId);
+        					"Expected 1 time block.  Found "+timeBlocks.size()),
+        					"viewScheduler", "?projectId="+projectId+"&instrumentId="+instrumentId);
         }
         
         
@@ -207,52 +195,33 @@ public class EditProjectInstrumentTimeAction extends Action {
         
         List<UsageBlockBaseWithRate> allBlocks = new ArrayList<UsageBlockBaseWithRate>();
     	
-    	boolean first = true;
-    	Calendar startCal = Calendar.getInstance();
-    	startCal.setTime(rangeStartDate);
-    	
     	UsageBlockBase oldBlock = blocksToDelete.get(0);
-    	for(TimeBlock timeBlock: rangeTimeBlocks) {
+    	TimeBlock timeBlock = timeBlocks.get(0);
+    	
     		
-    		// get the instrumentRateID
-            InstrumentRate rate = InstrumentRateDAO.getInstance().getInstrumentCurrentRate(instrumentId, timeBlock.getId(), rateType.getId());
-            if(rate == null) {
-            	return returnError(mapping, request, "scheduler", 
-            			new ActionMessage("error.costcenter.invaliddata", 
-            					"No rate information found for instrumentId: "+instrumentId+
-                    			" and timeBlockId: "+timeBlock.getId()+" and rateTypeId: "+rateType.getId()+" in request"),
-    							"viewScheduler", "?projectId="+projectId+"&instrumentId="+instrumentId);
-            }
-            
-            UsageBlockBaseWithRate usageBlock = new UsageBlockBaseWithRate();
-            usageBlock.setProjectID(projectId);
-            usageBlock.setInstrumentID(instrumentId);
-            usageBlock.setInstrumentRateID(rate.getId());
-            usageBlock.setResearcherID(oldBlock.getResearcherID());
-            usageBlock.setUpdaterResearcherID(user.getResearcher().getID());
-            usageBlock.setDateCreated(oldBlock.getDateCreated());
-            usageBlock.setStartDate(startCal.getTime());
-            startCal.add(Calendar.HOUR_OF_DAY, timeBlock.getNumHours());
-            usageBlock.setEndDate(startCal.getTime());
-            usageBlock.setRate(rate);
-            
-            
-            if(first) {
-            	// Make sure the start date is on or after the current date
-            	if(!ProjectInstrumentTimeApprover.getInstance().startDateApproved(usageBlock.getStartDate(), user)) {
-            		return returnError(mapping, request, "scheduler", 
-                			new ActionMessage("error.costcenter.invaliddata", 
-                					"Cannot schedule instrument time in the past!"),
-        							"viewScheduler", "?projectId="+projectId+"&instrumentId="+instrumentId);
-            	}
-            	
-            	first = false;
-            }
-            
-            allBlocks.add(usageBlock);
-            	
-    	}
+		// get the instrumentRateID
+        InstrumentRate rate = InstrumentRateDAO.getInstance().getInstrumentCurrentRate(instrumentId, timeBlock.getId(), rateType.getId());
+        if(rate == null) {
+        	return returnError(mapping, request, "scheduler", 
+        			new ActionMessage("error.costcenter.invaliddata", 
+        					"No rate information found for instrumentId: "+instrumentId+
+                			" and timeBlockId: "+timeBlock.getId()+" and rateTypeId: "+rateType.getId()+" in request"),
+							"viewScheduler", "?projectId="+projectId+"&instrumentId="+instrumentId);
+        }
         
+        UsageBlockBaseWithRate usageBlock = new UsageBlockBaseWithRate();
+        usageBlock.setProjectID(projectId);
+        usageBlock.setInstrumentID(instrumentId);
+        usageBlock.setInstrumentRateID(rate.getId());
+        usageBlock.setResearcherID(oldBlock.getResearcherID());
+        usageBlock.setUpdaterResearcherID(user.getResearcher().getID());
+        usageBlock.setDateCreated(oldBlock.getDateCreated());
+        usageBlock.setStartDate(rangeStartDate);
+        usageBlock.setEndDate(rangeEndDate);
+        usageBlock.setRate(rate);
+            
+            
+        allBlocks.add(usageBlock);
         
         
         // Check if the instrument is available
@@ -323,10 +292,10 @@ public class EditProjectInstrumentTimeAction extends Action {
 		
     	
     	// Delete the old blocks
-        for(UsageBlockBase usageBlock: blocksToDelete) {
+        for(UsageBlockBase blockToDelete: blocksToDelete) {
         	
         	try {
-        		InstrumentUsageDAO.getInstance().delete(usageBlock.getID());
+        		InstrumentUsageDAO.getInstance().delete(blockToDelete.getID());
         	}
         	catch(Exception e) {
         		return returnError(mapping, request, "scheduler", 
@@ -336,6 +305,7 @@ public class EditProjectInstrumentTimeAction extends Action {
         }
         
         // set the year and month so that the scheduler initializes at the correct year and month.
+        Calendar startCal = Calendar.getInstance();
     	startCal.setTime(rangeStartDate);
         request.getSession().setAttribute("scheduler_year", startCal.get(Calendar.YEAR));
         request.getSession().setAttribute("scheduler_month", startCal.get(Calendar.MONTH));
@@ -359,47 +329,5 @@ public class EditProjectInstrumentTimeAction extends Action {
 		saveErrors( request, errors );
 		ActionForward fwd = mapping.findForward(forward);
         return new ActionForward(fwd.getPath()+appendToFwdPath, fwd.getRedirect());
-	}
-	
-	public static class TimeOption {
-		private int value;
-		private String display = "";
-		public TimeOption(int value, String display) {
-			this.value = value;
-			this.display = display;
-		}
-		public int getValue() {
-			return value;
-		}
-		public String getDisplay() {
-			return display;
-		}
-	}
-	
-	private List<TimeOption> getTimeOptions(User user) {
-		
-		boolean isAdmin = false;
-		Groups groups = Groups.getInstance();
-		if(groups.isMember(user.getResearcher().getID(), "administrators")) {
-			isAdmin = true;
-		}
-		
-		List<TimeOption> options = new ArrayList<TimeOption>();
-		if(isAdmin) {
-			options.add(new TimeOption(0,"12:00 am"));
-			for(int i = 1; i <= 11; i++) {
-				options.add(new TimeOption(i,i+":00 am"));
-			}
-			options.add(new TimeOption(12, "12:00 pm"));
-			for(int i = 13; i <= 23; i++) {
-				options.add(new TimeOption(i,(i-12)+":00 pm"));
-			}
-		}
-		else {
-			options.add(new TimeOption(9, "9:00 am"));
-			options.add(new TimeOption(13, "1:00 pm"));
-			options.add(new TimeOption(17, "5:00 pm"));
-		}
-		return options;
 	}
 }

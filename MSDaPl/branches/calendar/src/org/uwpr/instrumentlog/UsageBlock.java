@@ -135,4 +135,9 @@ public class UsageBlock extends UsageBlockBase {
 	public UsageBlock newBlock() {
         return new UsageBlock();
     }
+	
+	public BigDecimal getFee()
+	{
+		return rate.multiply(new BigDecimal(getNumHours()));
+	}
 }

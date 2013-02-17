@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -35,6 +34,7 @@ import org.uwpr.costcenter.RateType;
 import org.uwpr.costcenter.RateTypeDAO;
 import org.uwpr.costcenter.TimeBlock;
 import org.uwpr.costcenter.TimeBlockDAO;
+import org.uwpr.instrumentlog.DateUtils;
 import org.uwpr.instrumentlog.InstrumentUsageDAO;
 import org.uwpr.instrumentlog.InstrumentUsagePayment;
 import org.uwpr.instrumentlog.InstrumentUsagePaymentDAO;
@@ -43,9 +43,7 @@ import org.uwpr.instrumentlog.MsInstrumentUtils;
 import org.uwpr.instrumentlog.UsageBlockBase;
 import org.uwpr.scheduler.InstrumentAvailabilityChecker;
 import org.uwpr.scheduler.PatternToDateConverter;
-import org.uwpr.scheduler.ProjectInstrumentTimeApprover;
 import org.uwpr.scheduler.SchedulerException;
-import org.uwpr.scheduler.TimeRangeSplitter;
 import org.uwpr.scheduler.UsageBlockBaseWithRate;
 import org.uwpr.scheduler.UsageBlockPaymentInformation;
 import org.uwpr.scheduler.UsageBlockRepeatBuilder;
@@ -163,79 +161,46 @@ public class RequestProjectInstrumentTimeAjaxAction extends Action{
         	return sendError(response,"Error reading end date. Error was: "+e.getMessage());
         }
         
+        double hoursInCurrentRange = DateUtils.getNumHours(rangeStartDate, rangeEndDate);
+        
+        
         // Split the given range into time blocks
         List<TimeBlock> timeBlocks = TimeBlockDAO.getInstance().getAllTimeBlocks();
-        List<TimeBlock> rangeTimeBlocks = null;
-        try {
-        	rangeTimeBlocks = TimeRangeSplitter.getInstance().split(rangeStartDate, rangeEndDate, timeBlocks);
-        }
-        catch(SchedulerException e) {
-        	return sendError(response,"Could not convert given time range into blocks. Error was: "+e.getMessage());
-        }
-        if(rangeTimeBlocks == null || rangeTimeBlocks.size() == 0) {
-        	if(!rangeEndDate.after(rangeStartDate)) {
-        		String msg = "End date has to be after start date. ";
-        		msg += "Selected start date was: "+format.format(rangeStartDate)+". ";
-        		msg += "Selected end date was: "+format.format(rangeEndDate);
-        		return sendError(response,msg);
-        	}
-        	else {
-        		return sendError(response,"Could not convert given time range into blocks.");
-        	}
+        if(timeBlocks.size() != 1)
+        {
+        	String msg = "Expected 1 time block.  Found "+timeBlocks.size();
+    		return sendError(response,msg);
         }
         
         
         // Has the user checked the "Repeat Daily" checkbox?
     	boolean repeatDaily = Boolean.parseBoolean(request.getParameter("repeatdaily"));
-    	if(repeatDaily && rangeTimeBlocks.size() > 1) {
-    		return sendError(response,"Selected time range cannot be repeated daily.");
-    	}
-    	if(repeatDaily && rangeTimeBlocks.get(0).getNumHours() > 24) {
+    	if(repeatDaily && hoursInCurrentRange > 24) {
     		return sendError(response,"Selected time range exceeds 24 hours and cannot be repeated daily.");
     	}
         
-        
     	
+    	// get the instrumentRateID
+    	TimeBlock timeBlock = timeBlocks.get(0);
+    	InstrumentRate rate = InstrumentRateDAO.getInstance().getInstrumentCurrentRate(instrumentId, timeBlock.getId(), rateType.getId());
+    	if(rate == null) {
+    		return sendError(response,"No rate information found for instrumentId: "+instrumentId+
+    				" and timeBlockId: "+timeBlock.getId()+" and rateTypeId: "+rateType.getId()+" in request");
+    	}
+
     	List<UsageBlockBaseWithRate> allBlocks = new ArrayList<UsageBlockBaseWithRate>();
     	
-    	boolean first = true;
-    	Calendar startCal = Calendar.getInstance();
-    	startCal.setTime(rangeStartDate);
-    	
-    	for(TimeBlock timeBlock: rangeTimeBlocks) {
-    		
-    		// get the instrumentRateID
-            InstrumentRate rate = InstrumentRateDAO.getInstance().getInstrumentCurrentRate(instrumentId, timeBlock.getId(), rateType.getId());
-            if(rate == null) {
-            	return sendError(response,"No rate information found for instrumentId: "+instrumentId+
-            			" and timeBlockId: "+timeBlock.getId()+" and rateTypeId: "+rateType.getId()+" in request");
-            }
-            
-            UsageBlockBaseWithRate usageBlock = new UsageBlockBaseWithRate();
-            usageBlock.setProjectID(projectId);
-            usageBlock.setInstrumentID(instrumentId);
-            usageBlock.setInstrumentRateID(rate.getId());
-            usageBlock.setResearcherID(user.getResearcher().getID());
-            usageBlock.setStartDate(startCal.getTime());
-            startCal.add(Calendar.HOUR_OF_DAY, timeBlock.getNumHours());
-            usageBlock.setEndDate(startCal.getTime());
-            usageBlock.setRate(rate);
-            
-            
-            if(first) {
-            	// Make sure the start date is on or after the current date
-            	if(!ProjectInstrumentTimeApprover.getInstance().startDateApproved(usageBlock.getStartDate(), user)) {
-            		return sendError(response, "Cannot schedule instrument time in the past!");
-            	}
+    	UsageBlockBaseWithRate usageBlock = new UsageBlockBaseWithRate();
+    	usageBlock.setProjectID(projectId);
+    	usageBlock.setInstrumentID(instrumentId);
+    	usageBlock.setInstrumentRateID(rate.getId());
+    	usageBlock.setResearcherID(user.getResearcher().getID());
+    	usageBlock.setStartDate(rangeStartDate);
+    	usageBlock.setEndDate(rangeEndDate);
+    	usageBlock.setRate(rate);
+
+    	allBlocks.add(usageBlock);
             	
-            	first = false;
-            }
-            
-            allBlocks.add(usageBlock);
-            	
-    	}
-       
-        
         
         // Is this block being repeated on a daily basis?
     	if(repeatDaily) {
@@ -254,7 +219,7 @@ public class RequestProjectInstrumentTimeAjaxAction extends Action{
     		
     		UsageBlockBaseWithRate block = allBlocks.get(0);
     		try {
-    			allBlocks = UsageBlockRepeatBuilder.getInstance().repeatDaily(block, repeatEndDate, rangeTimeBlocks.get(0));
+    			allBlocks = UsageBlockRepeatBuilder.getInstance().repeatDaily(block, repeatEndDate);
     		}
     		catch(SchedulerException e) {
     			return sendError(response, "Could not create repeating events. Error was:: "+e.getMessage());
@@ -321,7 +286,6 @@ public class RequestProjectInstrumentTimeAjaxAction extends Action{
         
         
         return saveUsageBlocksForProject(usageBlocks, paymentInfo);
-        
 	}
 
 
@@ -400,7 +364,7 @@ public class RequestProjectInstrumentTimeAjaxAction extends Action{
 		for(UsageBlockBaseWithRate block: usageBlocks) {
 			JSONObject obj = new JSONObject();
 			obj.put("id", String.valueOf(block.getID()));
-			obj.put("fee", String.valueOf(block.getRate().getRate()));
+			obj.put("fee", String.valueOf(block.getFee()));
 			obj.put("start_date", block.getStartDateFormated());
 			obj.put("end_date", block.getEndDateFormated());
 			array.add(obj);

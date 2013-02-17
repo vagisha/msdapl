@@ -40,7 +40,7 @@ $(document).ready(function() {
 function deleteTimeBlock(usageBlockId, projectId) {
 
 	if(confirm("Are you sure you want to delete this time block?")) {
-          document.location.href="/pr/deleteInstrumentTime.do?usageBlockId=" + usageBlockId+"&projectId="+projectId;
+          document.location.href="<yrcwww:link path='/deleteInstrumentTime.do'/>?usageBlockId=" + usageBlockId+"&projectId="+projectId;
           return true;
     }
 }
@@ -62,7 +62,7 @@ function getTotalCost() {
 	<logic:forward name="viewScheduledTimeDetails"/>
 </logic:notPresent>
 
-<yrcwww:contentbox title="Scheduled Instrument Time for Project">
+<yrcwww:contentbox title="Scheduled Instrument Time for Project" width="85" widthRel="true">
 <center>
 
 <logic:empty name="usageBlocks">
@@ -99,6 +99,8 @@ function getTotalCost() {
 			<th class="scheduler">Payment<br/>Method(s)</th>
 			<th class="scheduler">Start</th>
 			<th class="scheduler">End</th>
+			<th class="scheduler">Rate</th>
+			<th class="scheduler">Hours</th>
 			<th class="scheduler">Cost</th>
 			<th class="scheduler">Billed</th>
 			<th class="scheduler"></th>
@@ -130,6 +132,8 @@ function getTotalCost() {
 				<td><bean:write name="usageBlock" property="startDateFormated"/></td>
 				<td><bean:write name="usageBlock" property="endDateFormated"/></td>
 				<td align="right"><span class="costColumn"><bean:write name="usageBlock" property="rate"/></span></td>
+				<td align="right"><span class="costColumn"><bean:write name="usageBlock" property="numHours"/></span></td>
+				<td align="right"><span class="costColumn"><bean:write name="usageBlock" property="fee"/></span></td>
 				<td>
 					<logic:empty name="usageBlock" property="invoiceDate">
 					-

@@ -22,6 +22,8 @@ public class UsageBlockBase {
 	private Date dateChanged;
 	private String notes;
 	
+	private double numHours = -1.0;
+	
 	private static DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 	
 	public UsageBlockBase(int id, int instrumentID, int projectID) {
@@ -223,4 +225,14 @@ public class UsageBlockBase {
         // startDate of blk1 should be <= startDate of blk2
         return blk2.getStartDate().getTime() <= blk1.getEndDate().getTime();
     }
+    
+    public double getNumHours()
+	{
+		return numHours != -1.0 ? numHours : DateUtils.getNumHours(getStartDate(), getEndDate());
+	}
+	
+	public long getTimeInMillis()
+	{
+		return DateUtils.getTimeDiffInMilis(getStartDate(), getEndDate());
+	}
 }
