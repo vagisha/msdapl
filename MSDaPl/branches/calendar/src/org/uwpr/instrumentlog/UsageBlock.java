@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.uwpr.costcenter.CostCenterConstants;
+
 
 public class UsageBlock extends UsageBlockBase {
 
@@ -138,6 +140,9 @@ public class UsageBlock extends UsageBlockBase {
 	
 	public BigDecimal getFee()
 	{
-		return rate.multiply(new BigDecimal(getNumHours()));
+		BigDecimal fee = rate.multiply(new BigDecimal(getNumHours()));
+		if(CostCenterConstants.ADD_SETUP_COST)
+			fee.add(CostCenterConstants.SETUP_COST);
+		return fee;
 	}
 }

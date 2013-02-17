@@ -77,13 +77,13 @@ public class BillingInformationExporter {
 		this.listener = listener;
 	}
 	
-	public boolean isSummarize() {
+	private boolean isSummarize() {
 		return summarize;
 	}
-
-	public void setSummarize(boolean summarize) {
-		this.summarize = summarize;
-	}
+//
+//	public void setSummarize(boolean summarize) {
+//		this.summarize = summarize;
+//	}
 
 	public void export(Writer output) throws BillingInformationExporterException {
 
@@ -392,7 +392,9 @@ public class BillingInformationExporter {
 
 		// get the instrument rate
 		InstrumentRate rate = InstrumentRateDAO.getInstance().getInstrumentRate(block.getInstrumentRateID());
-		BigDecimal cost = rate.getRate();
+		BigDecimal fee = rate.getRate().multiply(new BigDecimal(block.getNumHours()));
+		if(CostCenterConstants.ADD_SETUP_COST)
+			fee.add(CostCenterConstants.SETUP_COST);
 
 		// get the name of the time block
 		TimeBlock timeBlock = rate.getTimeBlock();
@@ -405,7 +407,7 @@ public class BillingInformationExporter {
 		StringBuilder buffer = new StringBuilder();
 		for(InstrumentUsagePayment usagePayment: usagePayments) {
 
-			StringBuilder blockBuf = getBlockPaymentMethodDetails(project, labDirectorName, instrument, block, timeBlock, usagePayment, cost);
+			StringBuilder blockBuf = getBlockPaymentMethodDetails(project, labDirectorName, instrument, block, timeBlock, usagePayment, fee);
 			if(blockBuf != null) {
 				buffer.append(blockBuf.toString());
 				buffer.append("\n");

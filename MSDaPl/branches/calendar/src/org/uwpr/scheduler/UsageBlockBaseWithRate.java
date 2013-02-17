@@ -5,6 +5,7 @@ package org.uwpr.scheduler;
 
 import java.math.BigDecimal;
 
+import org.uwpr.costcenter.CostCenterConstants;
 import org.uwpr.costcenter.InstrumentRate;
 import org.uwpr.instrumentlog.UsageBlockBase;
 
@@ -36,6 +37,9 @@ public class UsageBlockBaseWithRate extends UsageBlockBase {
 	
 	public BigDecimal getFee()
 	{
-		return getRate().getRate().multiply(new BigDecimal(getNumHours()));
+		BigDecimal fee = getRate().getRate().multiply(new BigDecimal(getNumHours()));
+		if(CostCenterConstants.ADD_SETUP_COST)
+			fee.add(CostCenterConstants.SETUP_COST);
+		return fee;
 	}
 }

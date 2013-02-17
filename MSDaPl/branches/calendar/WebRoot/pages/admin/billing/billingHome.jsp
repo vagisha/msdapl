@@ -82,12 +82,15 @@
 				</html:select>
 			</td>
 		</tr>
+		
 		<tr>
 				<td colspan="4" align="center" style="padding:10px 10px 0 10px;">
-				Summarize <html:checkbox name="exportBillingInformationForm" property="summarize"></html:checkbox>
+				<!-- Summarize <html:checkbox name="exportBillingInformationForm" property="summarize"></html:checkbox>-->
 				<button type="submit" value="true" name="exportOnly">Export</button>
 				</td>
 		</tr>
+
+<!-- 
 		<tr>
 			<td colspan="4" style="padding:0 0 20px 0">
 				<span style="color:black; font-size:8pt;">
@@ -95,6 +98,7 @@
 				</span>
 			</td>
 		</tr>
+-->
 		<tr>
 			<td colspan="4" style="border-width:1px 1px 0 1px; border-style:dashed; border-color:black; padding:5px;" align="center">
 				<button type="submit" value="true" name="exportInvoice" onclick="return confirmExportInvoice();">Get Invoice</button>

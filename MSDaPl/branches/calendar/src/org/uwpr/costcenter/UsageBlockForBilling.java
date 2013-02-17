@@ -30,18 +30,20 @@ public class UsageBlockForBilling {
 	private BigDecimal percent;
 	private int totalHours;
 	private BigDecimal cost;
+	private BigDecimal rate;
 	
 	public UsageBlockForBilling() {
 		blocks = new ArrayList<UsageBlockBase>();
 		cost = BigDecimal.ZERO;
 	}
 	
-	public void add(UsageBlockBase block, TimeBlock timeBlock, InstrumentRate rate) {
+	public void add(UsageBlockBase block, InstrumentRate rate) {
 		
 		this.blocks.add(block);
 		
-		this.cost = cost.add(rate.getRate());
-		this.totalHours += timeBlock.getNumHours();
+		this.rate = rate.getRate();
+		this.cost = cost.add(rate.getRate().multiply(new BigDecimal(block.getNumHours())));
+		this.totalHours += block.getNumHours();
 		
 	}
 	
@@ -86,6 +88,11 @@ public class UsageBlockForBilling {
 
 	public BigDecimal getCost() {
 		return cost;
+	}
+	
+	public BigDecimal getRate()
+	{
+		return rate;
 	}
 
 	public PaymentMethod getPaymentMethod() {

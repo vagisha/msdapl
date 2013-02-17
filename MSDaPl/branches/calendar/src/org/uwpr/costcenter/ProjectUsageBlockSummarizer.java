@@ -69,7 +69,7 @@ public class ProjectUsageBlockSummarizer {
 				
 			}
 			
-			blockForKey.add(block, timeBlock, rate);
+			blockForKey.add(block, /*timeBlock, */rate);
 		}
 	}
 	

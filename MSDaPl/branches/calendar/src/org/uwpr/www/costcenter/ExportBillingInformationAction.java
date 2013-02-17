@@ -95,7 +95,7 @@ public class ExportBillingInformationAction extends Action {
         	endCal.set(Calendar.HOUR_OF_DAY, 24); // this will be 12:00 am of the next day
         	exporter.setEndDate(endCal.getTime());
         	
-        	exporter.setSummarize(exportForm.isSummarize());
+//        	exporter.setSummarize(exportForm.isSummarize());
         	
         	// Are we exporting an invoice -- blocks included in the invoice will be 
         	// marked.
