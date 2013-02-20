@@ -178,6 +178,7 @@ $(document).ready(function() {
    			<li><html:link action="listUploadJobs.do"><span>List Uploads</span></html:link></li>
    			<li><html:link action="availableFasta.do"><span>Available FASTA</span></html:link></li>
    			<li><a href="<yrcwww:link path='pages/admin/search/searchProjects.jsp'/>" title="Search Projects" class="<%=home_class %>"><span>Search Projects</span></a></li>
+   			<li><html:link action="viewAllInstrumentCalendar.do"><span>Instrument Calendar</span></html:link></li>
    		</yrcwww:member>
    <%} %>
    <%if(admin_menus) { %>

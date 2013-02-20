@@ -394,7 +394,7 @@ public class BillingInformationExporter {
 		InstrumentRate rate = InstrumentRateDAO.getInstance().getInstrumentRate(block.getInstrumentRateID());
 		BigDecimal fee = rate.getRate().multiply(new BigDecimal(block.getNumHours()));
 		if(CostCenterConstants.ADD_SETUP_COST)
-			fee.add(CostCenterConstants.SETUP_COST);
+			fee = fee.add(CostCenterConstants.SETUP_COST);
 
 		// get the name of the time block
 		TimeBlock timeBlock = rate.getTimeBlock();
@@ -496,12 +496,17 @@ public class BillingInformationExporter {
 	
 	BigDecimal getBilledCost(BigDecimal blockCost, BigDecimal percent, Date blockStartTime, Date blockEndTime) {
 		
-		// If this block extends beyond the requested end date it will be billed in the next cycle
-		if(blockEndTime.after(this.endDate)) {
-			return BigDecimal.ZERO;
-		}
-		
 		BigDecimal costForTimeUsed = blockCost;
+		
+		// If this block is within the given startDate and endDate return the original cost of the block
+		if(!blockInRange(blockStartTime, blockEndTime)) {
+			
+			long originalBlockDuration = blockEndTime.getTime() - blockStartTime.getTime();
+			
+			long blockUsedDuration = getDurationUsedInRange(blockStartTime,blockEndTime);
+			
+			costForTimeUsed = blockCost.multiply(new BigDecimal(blockUsedDuration)).divide(new BigDecimal(originalBlockDuration), 2, RoundingMode.HALF_UP);
+		}
 		
 		return getPercentCost(costForTimeUsed, percent).setScale(2, RoundingMode.HALF_UP);
 	}
@@ -528,6 +533,10 @@ public class BillingInformationExporter {
 		return blockUsedDuration;
 	}
 
+	private boolean blockInRange(Date blockStartTime, Date blockEndTime) {
+		return blockStartInRange(blockStartTime) && blockEndInRange(blockEndTime);
+	}
+	
 	protected boolean blockEndInRange(Date blockEndTime) {
 		return (blockEndTime.equals(this.endDate) || blockEndTime.before(this.endDate));
 	}

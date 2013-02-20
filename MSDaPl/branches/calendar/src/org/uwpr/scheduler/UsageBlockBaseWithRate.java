@@ -39,7 +39,7 @@ public class UsageBlockBaseWithRate extends UsageBlockBase {
 	{
 		BigDecimal fee = getRate().getRate().multiply(new BigDecimal(getNumHours()));
 		if(CostCenterConstants.ADD_SETUP_COST)
-			fee.add(CostCenterConstants.SETUP_COST);
+			fee = fee.add(CostCenterConstants.SETUP_COST);
 		return fee;
 	}
 }

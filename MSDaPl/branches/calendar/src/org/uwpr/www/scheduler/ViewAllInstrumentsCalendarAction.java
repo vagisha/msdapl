@@ -85,6 +85,13 @@ public class ViewAllInstrumentsCalendarAction extends Action {
         	List <Project> projects = projSearcher.search();
         	request.setAttribute("projects", projects);
         }
+        else
+        {
+        	ProjectsSearcher projSearcher = new ProjectsSearcher();
+        	projSearcher.setResearcher(user.getResearcher());
+        	List <Project> projects = projSearcher.search();
+        	request.setAttribute("projects", projects);
+        }
         
         return mapping.findForward("Success");
     }

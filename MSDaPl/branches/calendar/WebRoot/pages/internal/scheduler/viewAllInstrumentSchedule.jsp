@@ -193,7 +193,7 @@ function goToScheduler() {
 </table>
 
 <!-- Instrument and Project selector for scheduling instrument time -->
-<yrcwww:member group="administrators">
+<logic:notEmpty name="projects">
 
 <div class="ui-state-default" style="margin-top:20px;">
 <div align="center" style="margin:5px 0 5px 0;">Schedule Instrument Time</div>
@@ -233,7 +233,7 @@ function goToScheduler() {
 </tr>
 </table>
 </div>
-</yrcwww:member>
+</logic:notEmpty>
 </center>
 </yrcwww:contentbox>
 

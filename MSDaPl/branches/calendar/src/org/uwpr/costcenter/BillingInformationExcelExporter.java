@@ -16,6 +16,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.uwpr.instrumentlog.DateUtils;
 import org.uwpr.instrumentlog.InstrumentUsagePayment;
 import org.uwpr.instrumentlog.MsInstrument;
 import org.uwpr.instrumentlog.MsInstrumentUtils;
@@ -202,7 +203,7 @@ public class BillingInformationExcelExporter extends BillingInformationExporter 
 		sheet.createRow(rowNum++).createCell(cellnum).setCellValue("Billing information exported on "+new java.util.Date());
 		sheet.createRow(rowNum++).createCell(cellnum).setCellValue("Start Date: "+this.getStartDate()+"\n");
 		sheet.createRow(rowNum++).createCell(cellnum).setCellValue("End Date: "+this.getEndDate()+"\n");
-		sheet.createRow(rowNum++).createCell(cellnum).setCellValue("* Only blocks ending in a billing period are billed in that period.\n");
+		// sheet.createRow(rowNum++).createCell(cellnum).setCellValue("* Only blocks ending in a billing period are billed in that period.\n");
 
 		
 		Row row = sheet.createRow(rowNum++);
@@ -214,6 +215,7 @@ public class BillingInformationExcelExporter extends BillingInformationExporter 
 		row.createCell(cellnum++).setCellValue("Start");
 		row.createCell(cellnum++).setCellValue("End");
 		row.createCell(cellnum++).setCellValue("Hours");
+		row.createCell(cellnum++).setCellValue("HoursInRange");
 		row.createCell(cellnum++).setCellValue("Rate");
 		if(CostCenterConstants.ADD_SETUP_COST)
 		{
@@ -346,6 +348,10 @@ public class BillingInformationExcelExporter extends BillingInformationExporter 
 		
 		
 		row.createCell(cellnum++).setCellValue(block.getTotalHours());
+		
+		java.util.Date start = block.getStartDate().before(this.getStartDate()) ? this.getStartDate() : block.getStartDate();
+		java.util.Date end = block.getEndDate().after(this.getEndDate()) ? this.getEndDate() : block.getEndDate();
+		row.createCell(cellnum++).setCellValue(DateUtils.getNumHours(start, end));
 		
 		row.createCell(cellnum++).setCellValue(block.getRate().toString());
 		

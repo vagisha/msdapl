@@ -203,17 +203,17 @@ public class DateUtils {
         return endTime - startTime;
     }
 
-    /**
-     * Returns the number of hours used between the given start and end dates (inclusive). 
-     * Full days will be counted as USABLE_HRS_IN_DAY
-     * @param startDate
-     * @param endDate
-     * @return
-     */
-    public static float getNumHoursUsed(java.util.Date startDate, java.util.Date endDate) {
-        
-        if(startDate.after(endDate))
-            return 0.0f;
+//    /**
+//     * Returns the number of hours used between the given start and end dates (inclusive). 
+//     * Full days will be counted as USABLE_HRS_IN_DAY
+//     * @param startDate
+//     * @param endDate
+//     * @return
+//     */
+//    public static float getNumHoursUsed(java.util.Date startDate, java.util.Date endDate) {
+//        
+//        if(startDate.after(endDate))
+//            return 0.0f;
         
 //        Calendar calendar_s = GregorianCalendar.getInstance();
 //        calendar_s.setTimeInMillis(startDate.getTime());
@@ -225,7 +225,7 @@ public class DateUtils {
 //        if(calendar_s.get(Calendar.YEAR) == calendar_e.get(Calendar.YEAR)  && //same year
 //           calendar_s.get(Calendar.MONTH) == calendar_e.get(Calendar.MONTH) && // same month
 //           calendar_s.get(Calendar.DATE) == calendar_e.get(Calendar.DATE))  { // same date
-            return getNumHours(startDate, endDate); // do not limit to usable time
+//            return getNumHours(startDate, endDate); // do not limit to usable time
 //        }
         
 //        float hoursUsed = getNumHours(startDate, defaultEndTime(calendar_s)) + 
@@ -257,7 +257,7 @@ public class DateUtils {
 //        
 //        return hoursUsed;
         
-    }
+//    }
     
 	/**
      * Returns the number of usable hours between the given start and end dates (inclusive). 

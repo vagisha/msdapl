@@ -161,6 +161,11 @@ public class RequestProjectInstrumentTimeAjaxAction extends Action{
         	return sendError(response,"Error reading end date. Error was: "+e.getMessage());
         }
         
+        if(!rangeEndDate.after(rangeStartDate))
+        {
+        	return sendError(response,"Start date has to be before the end date.");
+        }
+        
         double hoursInCurrentRange = DateUtils.getNumHours(rangeStartDate, rangeEndDate);
         
         

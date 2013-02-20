@@ -90,8 +90,8 @@
 	<!-- ========================================================================================= -->
 	<!-- List Payment methods here -->
 	<yrcwww:colorrow>
-	<TD valign="top" width="25%" style="padding-top:10px;">Payment Methods:</TD>
-	<TD valign="top" width="75%" style="padding-top:10px;">
+	<TD valign="top" width="25%" style="padding:10px 0;">Payment Methods:</TD>
+	<TD valign="top" width="75%" style="padding:10px 0;">
 		<%@ include file="paymentMethods.jsp" %>
 	</td>
 	</yrcwww:colorrow>

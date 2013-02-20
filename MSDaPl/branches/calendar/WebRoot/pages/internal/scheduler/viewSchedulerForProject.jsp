@@ -123,36 +123,12 @@ function getRequestInformation() {
 
 function getStartTimes() {
 
-	<yrcwww:member group="administrators">
-	
-		return getAllTimes(9); // select 9am
-	
-	</yrcwww:member>
-	
-	<yrcwww:notmember group="administrators">
-		var stimes = [{ value: 9,display:  "9:00 am", selected:true },
-	   				  { value: 13,display: "1:00 pm", selected:false }
-	   			      ];
-	   return stimes;
-	</yrcwww:notmember>
-	
+	return getAllTimes(9); // select 9am
 }
 
 function getEndTimes() {
 
-	<yrcwww:member group="administrators">
-	
-		return getAllTimes(17); // select 5pm
-	
-	</yrcwww:member>
-	
-	<yrcwww:notmember group="administrators">
-		var stimes = [{ value: 9,display:  "9:00 am", selected:false },
-	   				  { value: 13,display: "1:00 pm", selected:false },
-	   			      { value: 17,display: "5:00 pm", selected:true }
-	   			      ];
-	   return stimes;
-	</yrcwww:notmember>
+	return getAllTimes(17); // select 5pm
 }
 
 function getAllTimes(select) {
@@ -384,6 +360,19 @@ Select Instrument:
 </logic:present>
 
 <!-- Payment Selector -->
+<logic:empty name="paymentMethods">
+	<div style="color:red;margin:10px 0px 10px 0px;">
+            There are no payment methods associated with this project.
+            <br/>
+            In order to schedule instrument time you must have at least one payment method.
+            <br/>  
+            Click <html:link action="newPaymentMethod.do" paramId="projectId" paramName="project" paramProperty="ID">here</html:link>
+            to add a payment method for this project.
+    </div>
+</logic:empty>
+
+<logic:notEmpty name="paymentMethods">
+
 <div style="margin:20px 0 20px 0; text-align:center;">
 Select Payment Method(s):
 <!-- User is allowed to use up to two payment methods -->
@@ -415,6 +404,7 @@ UW Budget # / PO Number:
 UW Budget # / PO Number:
 <select id="paymentMethodSelector_2">
 <option value='0'>Select</option>
+
 <logic:iterate name="paymentMethods" id="paymentMethod">
 	<option value='<bean:write name="paymentMethod" property="id" />'><bean:write name="paymentMethod" property="displayString" /></option>
 </logic:iterate>
@@ -431,6 +421,8 @@ UW Budget # / PO Number:
 </table>
 </div>
 </div>
+</logic:notEmpty>
+
 
 <!-- Calendar and Scheduled Time table -->
 <table style="width:1000px;">
