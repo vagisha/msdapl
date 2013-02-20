@@ -225,7 +225,7 @@
 					 if(hasEditableBlocks) {
 						 menudiv += "<span id='project_detail_tooltip_delete_"+event.id+"' style='color:red; font-weigt:bold; text-decoration:underline; cursor:pointer'>[Delete]</span>";
 						 menudiv += "&nbsp;&nbsp;";
-						 menudiv += "<span id='project_detail_tooltip_edit_"+event.id+"' style='color:red; font-weigt:bold; text-decoration:underline; cursor:pointer'>[Edit Range]</span>";
+						 menudiv += "<span id='project_detail_tooltip_edit_"+event.id+"' style='color:red; font-weigt:bold; text-decoration:underline; cursor:pointer'>[Edit]</span>";
 					 }
 					 
 					 menudiv += "</div>"

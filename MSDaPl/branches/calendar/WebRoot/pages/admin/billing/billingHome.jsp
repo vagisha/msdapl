@@ -99,11 +99,14 @@
 			</td>
 		</tr>
 -->
+<!-- 
 		<tr>
 			<td colspan="4" style="border-width:1px 1px 0 1px; border-style:dashed; border-color:black; padding:5px;" align="center">
 				<button type="submit" value="true" name="exportInvoice" onclick="return confirmExportInvoice();">Get Invoice</button>
 			</td>
 		</tr>
+		
+		
 		<tr>
 			<td colspan="4" style="border-width:0 1px 1px 1px; border-style:dashed; border-color:black; padding: 5px;" >
 				<span style="color:red; font-size:8pt; font-weight:bold;">
@@ -115,6 +118,8 @@
 			</td>
 			
 		</tr>
+-->
+		
 	</tbody>
 </table>
 </html:form>
