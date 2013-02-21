@@ -78,6 +78,9 @@ function getProjectUrl(projectId) {
 function getDeleteTimeBlockUrl() {
 	return "/msdapl/deleteInstrumentTimeAjax.do";
 }
+function getEditTimeBlockUrl() {
+	return "<yrcwww:link path='/viewEditInstrumentTimeForm.do'/>";
+}
 
 function initCalendar() {
 
@@ -92,6 +95,7 @@ function initCalendar() {
 			eventJSONSourceUrl: getEventSourceUrl(),
 			onAddEventSuccessFn: null,
 			eventDeleteUrl: getDeleteTimeBlockUrl(),
+			eventEditUrl: getEditTimeBlockUrl(),
 			onDeleteSuccessFn: null,
 			projectLinkUrlFn: getProjectUrl,
 			requestInformationFn: null,

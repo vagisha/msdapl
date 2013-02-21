@@ -86,7 +86,7 @@ public class ViewSchedulerAction extends Action {
         	instrumentId = 0;
         }
         // get a list of ms instruments
-        List <MsInstrument> instruments = MsInstrumentUtils.instance().getMsInstruments();
+        List <MsInstrument> instruments = MsInstrumentUtils.instance().getMsInstruments(true); // active only
         Collections.sort(instruments, new Comparator<MsInstrument>() {
             public int compare(MsInstrument o1, MsInstrument o2) {
                 return o1.getID() > o2.getID() ? 1 : (o1.getID() == o2.getID() ? 0 : -1);

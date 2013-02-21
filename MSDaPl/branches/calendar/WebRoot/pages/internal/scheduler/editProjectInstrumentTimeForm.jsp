@@ -18,6 +18,7 @@
 </yrcwww:notauthenticated>
 
 
+
 <yrcwww:contentbox title="Edit Instrument Time" centered="true">
 <center>
 <html:form name="editInstrumentTimeForm" type="org.uwpr.www.scheduler.EditProjectInstrumentTimeForm" action="editInstrumentTime" method="POST">
@@ -105,6 +106,7 @@
 <tr>
 	<td colspan="2" align="center" style="padding-top:20px;">
 		<html:submit>Update</html:submit>
+		<input type="button" onclick="document.location='<yrcwww:link path='viewScheduler.do'/>?instrumentId=<bean:write name='editInstrumentTimeForm' property='instrumentId'/>&projectId=<bean:write name='editInstrumentTimeForm' property='projectId'/>';" value="Cancel" />
 	</td>
 </tr>
 </tbody>

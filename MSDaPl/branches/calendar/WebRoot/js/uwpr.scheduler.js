@@ -281,7 +281,11 @@
 									}
 									
 									$(element).qtip("hide");
-									$("input[name='select_block_for_delete_"+event.id+"']").attr("checked", "");
+									var cboxes = $("input[name='select_block_for_delete_"+event.id+"']");
+									if(cboxes.length > 1)
+									{
+										cboxes.attr("checked", "");
+									}
 									
 								});
 								
