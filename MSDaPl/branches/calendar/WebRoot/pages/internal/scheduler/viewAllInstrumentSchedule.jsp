@@ -69,14 +69,14 @@ var currentEventSourceUrl;
 function getEventSourceUrl() {
 
 	var instruments = getSelectedInstrumentList();
-	return "/msdapl/allInstrumentUsageBlocks.do?instruments="+instruments;
+	return "<yrcwww:link path='/allInstrumentUsageBlocks.do'/>?instruments="+instruments;
 }
 
 function getProjectUrl(projectId) {
-	return "/msdapl/viewProject.do?ID="+projectId;
+	return "<yrcwww:link path='/viewProject.do'/>?ID="+projectId;
 }
 function getDeleteTimeBlockUrl() {
-	return "/msdapl/deleteInstrumentTimeAjax.do";
+	return "<yrcwww:link path='/deleteInstrumentTimeAjax.do'/>";
 }
 function getEditTimeBlockUrl() {
 	return "<yrcwww:link path='/viewEditInstrumentTimeForm.do'/>";
