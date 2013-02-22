@@ -397,7 +397,10 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
         }
         
 		if(!result.isComplete()) {
-			throw new DataProviderException("Incomplete Percolator psm result: "+result.toString());
+			throw new DataProviderException("Incomplete Percolator psm result.\n"
+					                        +"Required elements are q_value, pep, exp_mass, peptide_seq and at least one protein_id.\n"
+					                        +"Found PSM:\n"
+					                        +result.toString());
 		}
 		return result;
 	}
@@ -604,7 +607,7 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 	
 	private static final class PeptideUnparsedModifications implements MsSearchResultPeptide {
 
-		private String sequence;
+		private String sequence; // This is the modified sequence read directly from the Percolator XML file.
 		private char nterm;
 		private char cterm;
 		
@@ -625,6 +628,7 @@ public class PercolatorXmlFileReader implements PercolatorXmlDataProvider{
 		
 		@Override
 		public String getPeptideSequence() {
+			// Unsupported because "sequence" is the modified sequence read directly from the Percolator XML file.
 			throw new UnsupportedOperationException();
 		}
 

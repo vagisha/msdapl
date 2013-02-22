@@ -64,11 +64,14 @@ public class PercolatorXmlResult implements PercolatorResultIn {
 		buf.append("\tcharge: "+psmId.getCharge());
 		buf.append("\n");
 		if(resultPeptide != null) {
-			try {
-				buf.append("peptide: "+resultPeptide.getFullModifiedPeptide());
-			} catch (ModifiedSequenceBuilderException e) {
-				buf.append("ERROR building peptide sequence for: "+resultPeptide.getPeptideSequence());
-			}
+			
+//			try {
+			// 02.22.13 Changed from getFullModifiedPeptide to getFullModifiedPeptidePS because
+			//          PercolatorXmlFileReader$PeptideUnparsedModifications.getFullModifiedPeptide() is unsupported.
+				buf.append("peptide: "+resultPeptide.getFullModifiedPeptidePS());
+//			} catch (ModifiedSequenceBuilderException e) {
+//				buf.append("ERROR building peptide sequence for: "+resultPeptide.getPeptideSequence());
+//			}
 		}
 		else
 			buf.append("peptide: NULL");
