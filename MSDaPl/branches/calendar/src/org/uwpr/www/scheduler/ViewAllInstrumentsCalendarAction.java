@@ -14,6 +14,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
@@ -24,6 +25,7 @@ import org.uwpr.instrumentlog.InstrumentColors;
 import org.uwpr.instrumentlog.MsInstrument;
 import org.uwpr.instrumentlog.MsInstrumentUtils;
 import org.yeastrc.project.Project;
+import org.yeastrc.project.ProjectIDComparator;
 import org.yeastrc.project.ProjectsSearcher;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
@@ -83,13 +85,16 @@ public class ViewAllInstrumentsCalendarAction extends Action {
         	
         	ProjectsSearcher projSearcher = new ProjectsSearcher();
         	List <Project> projects = projSearcher.search();
+        	Collections.sort(projects, new ReverseComparator(new ProjectIDComparator()));
         	request.setAttribute("projects", projects);
         }
         else
         {
         	ProjectsSearcher projSearcher = new ProjectsSearcher();
         	projSearcher.setResearcher(user.getResearcher());
+        	projSearcher.setCheckWriteAccess(true); // only want projects where user is listed as a researcher.
         	List <Project> projects = projSearcher.search();
+        	Collections.sort(projects, new ReverseComparator(new ProjectIDComparator()));
         	request.setAttribute("projects", projects);
         }
         

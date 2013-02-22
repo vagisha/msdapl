@@ -49,7 +49,7 @@ public class JSONInstrumentUsageGetter {
 		
 		return getForInstrumentProject(instrumentId, projectId, startDate, endDate, 
 				true,   // blocks of other project will be gray in color
-				true    // details will be made available for projects with projectId = projectId
+				false    // details will be made available for all blocks.
 				);
 	}
 	
@@ -74,7 +74,7 @@ public class JSONInstrumentUsageGetter {
 		
 		return getForInstrumentProject(instrumentId, 0, startDate, endDate,
 				false,  // blocks of other project will NOT be gray in color
-				true    // details will NOT be made available for ALL blocks
+				false    // details will be made available for ALL blocks
 				);
 	}
 
@@ -203,25 +203,26 @@ public class JSONInstrumentUsageGetter {
 			while(iter.hasNext()) {
 				
 				UsageBlock block = iter.next();
-				if(contiguousBlocks.size() > 0) {
-					
-					UsageBlock lastAddedBlock = contiguousBlocks.get(contiguousBlocks.size() - 1);
-					
-					if(lastAddedBlock.getEndDate().equals(block.getStartDate())) {
-						contiguousBlocks.add(block);
-						iter.remove();
-					}
-					
-					else if(lastAddedBlock.getEndDate().after(block.getStartDate())) {
-						continue;
-					}
-					else
-						break;
-				}
-				else {
+//				if(contiguousBlocks.size() > 0) {
+//					
+//					UsageBlock lastAddedBlock = contiguousBlocks.get(contiguousBlocks.size() - 1);
+//					
+//					if(lastAddedBlock.getEndDate().equals(block.getStartDate())) {
+//						contiguousBlocks.add(block);
+//						iter.remove();
+//					}
+//					
+//					else if(lastAddedBlock.getEndDate().after(block.getStartDate())) {
+//						continue;
+//					}
+//					else
+//						break;
+//				}
+//				else {
 					contiguousBlocks.add(block);
 					iter.remove();
-				}
+					break;
+//				}
 			}
 			
 			JSONObject event = getForContiguousBlocks(contiguousBlocks, userProjectId, 

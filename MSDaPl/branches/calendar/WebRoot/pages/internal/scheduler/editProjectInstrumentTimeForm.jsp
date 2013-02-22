@@ -17,6 +17,9 @@
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>
 
+<logic:notPresent name="editInstrumentTimeForm" property="instrumentName">
+	<logic:forward name="viewEditInstrumentTimeForm"/>
+</logic:notPresent>
 
 
 <yrcwww:contentbox title="Edit Instrument Time" centered="true">

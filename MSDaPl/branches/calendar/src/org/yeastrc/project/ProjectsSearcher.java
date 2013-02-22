@@ -36,6 +36,8 @@ public class ProjectsSearcher {
     // The researcher requesting the list, or just the researcher who's access privledges are taken into account when making the list
     private Researcher researcher;
     
+    private boolean checkWriteAccess = false;
+    
     // The earliest submission date of included projects (project submitted before this date are not returned)
     private Date startDate;
     
@@ -170,8 +172,11 @@ public class ProjectsSearcher {
                 }
                 
                 // Don't add this project to the list if the Researcher doesn't have access
-                if (this.researcher != null && !p.checkReadAccess(this.researcher)) {
-                     continue;
+                if (this.researcher != null) {
+                	if((checkWriteAccess && !p.checkAccess(researcher)) ||
+                		!checkWriteAccess && !p.checkReadAccess(this.researcher)) {
+                		continue;
+                	}
                 }
 
                 retList.add(p);
@@ -255,4 +260,8 @@ public class ProjectsSearcher {
     public void setEndDate(Date date) {
         this.endDate = date;
     }
+
+	public void setCheckWriteAccess(boolean checkWriteAccess) {
+		this.checkWriteAccess = checkWriteAccess;
+	}
 }

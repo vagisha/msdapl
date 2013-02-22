@@ -46,8 +46,6 @@
 	<form-bean name="rerunProtInferencesForm" type="org.yeastrc.www.proteinfer.job.RerunProteinInferenceForm"></form-bean>
 	<form-bean name="deleteProtInferencesForm" type="org.yeastrc.www.proteinfer.job.DeleteProteinInferenceForm"></form-bean>
 	
-	<forward name="viewAllInstrumentCalendar" path="/viewAllInstrumentCalendar.do"/>
-	
 	<form-bean name="exportBillingInformationForm" type="org.uwpr.www.costcenter.ExportBillingInformationForm" />
 	<form-bean name="timeBlockForm" type="org.uwpr.www.costcenter.TimeBlockForm" />
 	<form-bean name="instrumentRateForm" type="org.uwpr.www.costcenter.InstrumentRateForm" />
@@ -117,6 +115,8 @@
 	<forward name="viewInstrumentRates" path="/viewInstrumentRates.do" />
 	<forward name="viewPaymentMethod" path="/viewPaymentMethod.do" />
 	<forward name="viewScheduler" path="/viewScheduler.do" />
+	<forward name="viewEditInstrumentTimeForm" path="/viewEditInstrumentTimeForm.do"/>
+	<forward name="viewAllInstrumentCalendar" path="/viewAllInstrumentCalendar.do"/>
     </global-forwards>
 
 
