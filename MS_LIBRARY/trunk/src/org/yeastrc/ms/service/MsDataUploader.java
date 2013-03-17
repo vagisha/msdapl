@@ -379,7 +379,6 @@ public class MsDataUploader {
         exptUploader.setRemoteServer(remoteServer);
         exptUploader.setComments(comments);
         exptUploader.setInstrumentId(instrumentId);
-        exptUploader.setFilesToUpload(filesToUpload);
         
         // Get the spectrum data uploader
         log.info("Initializing SpectrumDataUploadService");

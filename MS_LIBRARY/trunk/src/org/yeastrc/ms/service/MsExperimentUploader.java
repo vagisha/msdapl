@@ -8,14 +8,12 @@ package org.yeastrc.ms.service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.domain.general.impl.ExperimentBean;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.service.ms2file.MS2DataUploadService;
 import org.yeastrc.ms.service.percolator.PercolatorXmlDataUploadService;
 import org.yeastrc.ms.service.sqtfile.AbstractSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
@@ -46,8 +44,6 @@ public class MsExperimentUploader {
     private StringBuilder preUploadCheckMsg;
     
     private int experimentId = 0; // uploaded experimentId
-    
-    private Set<String> filesToUpload;
     
     public MsExperimentUploader () {
         this.preUploadCheckMsg = new StringBuilder();
@@ -96,10 +92,6 @@ public class MsExperimentUploader {
         this.uploadDirectory = directory;
     }
     
-    public void setFilesToUpload(Set<String> filesToUpload) {
-		this.filesToUpload = filesToUpload;
-	}
-
 	public boolean preUploadCheckPassed() {
         boolean passed = true;
         

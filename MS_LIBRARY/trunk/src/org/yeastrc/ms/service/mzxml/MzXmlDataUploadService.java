@@ -391,6 +391,6 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
 
 	@Override
 	public void setUploadFileNames(Set<String> fileNames) {
-		throw new UnsupportedOperationException();
+		// Do nothing. Assume all mzXML files in the directory should be uploaded. 
 	}
 }
