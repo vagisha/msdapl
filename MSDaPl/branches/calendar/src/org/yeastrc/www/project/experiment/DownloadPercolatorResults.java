@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.yeastrc.www.project.experiment;
 
@@ -44,7 +44,7 @@ import org.yeastrc.www.util.RoundingUtils;
  * DownloadPercolatorResults.java
  * @author Vagisha Sharma
  * Jun 10, 2010
- * 
+ *
  */
 public class DownloadPercolatorResults extends Action {
 
@@ -61,7 +61,7 @@ public class DownloadPercolatorResults extends Action {
     	List<Integer> resultIds = (List<Integer>) request.getAttribute("analysisResultIds");
     	Program program = (Program) request.getAttribute("analysisProgram");
     	PercolatorFilterResultsForm myForm = (PercolatorFilterResultsForm) request.getAttribute("filterForm");
-    	
+
     	long s = System.currentTimeMillis();
         response.setContentType("text/plain");
         response.setHeader("Content-Disposition","attachment; filename=\"Analysis_"+analysisId+".txt\"");
@@ -77,9 +77,9 @@ public class DownloadPercolatorResults extends Action {
         log.info("DownloadAnalysisResults results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
         return null;
     }
-    	
-    private void writePsmResults(PrintWriter writer, int analysisId, List<Integer> resultIds, Program analysisProgram, AnalysisFilterResultsForm myForm) {	
-    	
+
+    private void writePsmResults(PrintWriter writer, int analysisId, List<Integer> resultIds, Program analysisProgram, AnalysisFilterResultsForm myForm) {
+
     	if(analysisProgram == Program.PERCOLATOR) {
             writePercolatorPsmResults(writer, analysisId, analysisProgram, resultIds, ((PercolatorFilterResultsForm)myForm));
         }
@@ -88,9 +88,9 @@ public class DownloadPercolatorResults extends Action {
     		writer.write("Unrecognized analysis program: "+analysisProgram);
     	}
     }
-    
-    private void writePeptideResults(PrintWriter writer, int analysisId, List<Integer> resultIds, Program analysisProgram, AnalysisFilterResultsForm myForm) {	
-    	
+
+    private void writePeptideResults(PrintWriter writer, int analysisId, List<Integer> resultIds, Program analysisProgram, AnalysisFilterResultsForm myForm) {
+
     	if(analysisProgram == Program.PERCOLATOR) {
             writePercolatorPeptideResults(writer, analysisId, analysisProgram, resultIds, ((PercolatorFilterResultsForm)myForm));
         }
@@ -100,16 +100,16 @@ public class DownloadPercolatorResults extends Action {
     	}
     }
 
-	private void writePercolatorPsmResults(PrintWriter writer,int analysisId, Program analysisProgram, List<Integer> resultIds, 
+	private void writePercolatorPsmResults(PrintWriter writer,int analysisId, Program analysisProgram, List<Integer> resultIds,
 			PercolatorFilterResultsForm myForm) {
-		
+
 		PercolatorResultFilterCriteria filterCriteria = myForm.getFilterCriteria();
 		writeFilters(writer, filterCriteria, myForm.isPeptideResults());
 		writer.write("\n\n");
-		
+
 		// Get the names of the files
 		Map<Integer, String> filenameMap = getFileNames(analysisId);
-		
+
 		// Do we have Bullseye results for the searched files
         boolean hasBullsEyeArea = false;
         List<Integer> searchIds = DAOFactory.instance().getMsSearchAnalysisDAO().getSearchIdsForAnalysis(analysisId);
@@ -123,7 +123,7 @@ public class DownloadPercolatorResults extends Action {
                 break;
             }
         }
-        
+
         MsSearchAnalysis analysis = DAOFactory.instance().getMsSearchAnalysisDAO().load(analysisId);
         // Which version of Percolator are we using
         String version = analysis.getAnalysisProgramVersion();
@@ -135,31 +135,31 @@ public class DownloadPercolatorResults extends Action {
         catch(NumberFormatException e){
             log.error("Cannot determine if this version of Percolator prints PEP. Version: "+version);
         }
-        
+
         // Summary
         writer.write("SUMMARY:  ");
         writer.write("# Unfiltered Results: "+getUnfilteredResultCount(analysisProgram, analysisId));
         writer.write("# Filtered Results: "+resultIds.size());
         writer.write("\n\n\n");
-        
+
         // Results
         PercolatorResultDAO presDao = DAOFactory.instance().getPercolatorResultDAO();
         SequestSearchResultDAO seqResDao = DAOFactory.instance().getSequestResultDAO();
         MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
         MS2ScanDAO ms2ScanDao = DAOFactory.instance().getMS2FileScanDAO();
-        
+
         PercolatorPeptideResultDAO peptResDao = DAOFactory.instance().getPercolatorPeptideResultDAO();
         boolean hasPeptideResults = false;
         if(peptResDao.peptideCountForAnalysis(analysisId) > 0) {
       	  hasPeptideResults = true;
         }
-        
+
         writePsmFileHeader(writer, hasBullsEyeArea, hasPEP, hasPeptideResults);
-        
+
 		for(int percResultId: resultIds) {
 			PercolatorResult result = presDao.loadForPercolatorResultId(percResultId);
             PercolatorResultPlus resPlus = null;
-            
+
             if(hasBullsEyeArea) {
                 MS2Scan scan = ms2ScanDao.loadScanLite(result.getScanId());
                 resPlus = new PercolatorResultPlus(result, scan);
@@ -168,38 +168,38 @@ public class DownloadPercolatorResults extends Action {
                 MsScan scan = scanDao.loadScanLite(result.getScanId());
                 resPlus = new PercolatorResultPlus(result, scan);
             }
-            
+
             if(hasPeptideResults) {
             	resPlus.setPeptideResult(peptResDao.load(result.getPeptideResultId()));
             }
-            
+
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
             resPlus.setSequestData(seqResDao.load(result.getId()).getSequestResultData());
-            
+
             writePsmResult(resPlus, hasPEP, hasBullsEyeArea, hasPeptideResults, writer);
 		}
-		
+
 	}
-	
-	private void writePercolatorPeptideResults(PrintWriter writer,int analysisId, Program analysisProgram, List<Integer> resultIds, 
+
+	private void writePercolatorPeptideResults(PrintWriter writer,int analysisId, Program analysisProgram, List<Integer> resultIds,
 			PercolatorFilterResultsForm myForm) {
-		
+
 		PercolatorResultFilterCriteria filterCriteria = myForm.getFilterCriteria();
 		writeFilters(writer, filterCriteria, myForm.isPeptideResults());
 		writer.write("\n\n");
-		
+
 		// Get the names of the files
 		Map<Integer, String> filenameMap = getFileNames(analysisId);
-		
+
         // Summary
         writer.write("SUMMARY:  ");
         writer.write("# Unfiltered Results: "+getUnfilteredResultCount(analysisProgram, analysisId));
         writer.write("# Filtered Results: "+resultIds.size());
         writer.write("\n\n\n");
-        
+
         // Results
         PercolatorPeptideResultDAO presDao = DAOFactory.instance().getPercolatorPeptideResultDAO();
-        
+
         writer.write("Petide\t");
 		writer.write("q-value\t");
     	writer.write("PEP\t");
@@ -207,30 +207,30 @@ public class DownloadPercolatorResults extends Action {
     	writer.write("pvalue\t");
     	writer.write("#PSMs\t");
     	writer.write("Protein(s)\n");
-    	
+
 		for(int percPeptideResultId: resultIds) {
 			PercolatorPeptideResult result = presDao.load(percPeptideResultId);
-            
+
 	        String modifiedSequence = null;
 	        try {
 	        	// get modified peptide of the form: K.PEP[+80]TIDE.L
-	        	modifiedSequence = result.getResultPeptide().getFullModifiedPeptide(true); 
+	        	modifiedSequence = result.getResultPeptide().getFullModifiedPeptide(true);
 	        }
 	        catch (ModifiedSequenceBuilderException e) {
 	            modifiedSequence = "Error building peptide sequence";
 	        }
-	        
+
             writer.write(modifiedSequence+"\t");
-            writer.write(result.getQvalueRounded()+"\t");
-            writer.write(result.getPosteriorErrorProbabilityRounded()+"\t");
-            writer.write(result.getDiscriminantScoreRounded()+"\t");
-            writer.write(result.getPvalueRounded()+"\t");
+            writer.write(result.getQvalueRounded3SignificantDigits() + "\t");
+            writer.write(result.getPosteriorErrorProbabilityRounded3SignificantDigits()+"\t");
+            writer.write(result.getDiscriminantScoreRounded3SignificantDigits()+"\t");
+            writer.write(result.getPvalueRounded3SignificantDigits()+"\t");
             writer.write(result.getPsmIdList().size()+"\t");
-            
+
             String proteins = "";
             for(MsSearchResultProtein protein: result.getProteinMatchList())
             	proteins += ","+protein.getAccession();
-            
+
             if(proteins.length() > 0)
             	proteins = proteins.substring(1); // remove first comma
             writer.write(proteins+"\n");
@@ -240,7 +240,7 @@ public class DownloadPercolatorResults extends Action {
 	private void writeFilters(PrintWriter writer,
 			PercolatorResultFilterCriteria filterCriteria, boolean peptideLevelFilter) {
 		writer.write("FILTERS:\n");
-		
+
 		if(!peptideLevelFilter) {
 			if(filterCriteria.getMinScan() != null)
 				writer.write("Min. Scan: "+filterCriteria.getMinScan()+"\n");
@@ -259,7 +259,7 @@ public class DownloadPercolatorResults extends Action {
 			if(filterCriteria.getMaxObservedMass() != null)
 				writer.write("Max. Obs. Mass: "+filterCriteria.getMaxObservedMass()+"\n");
 		}
-		
+
 		if(peptideLevelFilter) {
 			if (filterCriteria.getMinQValue() != null)
 				writer.write("Min. q-value (Peptide): "+filterCriteria.getMinQValue()+"\n");
@@ -280,8 +280,8 @@ public class DownloadPercolatorResults extends Action {
 			if (filterCriteria.getMaxPep() != null)
 				writer.write("Max. PEP (PSM): "+filterCriteria.getMaxPep()+"\n");
 		}
-		
-		
+
+
 		if (filterCriteria.getPeptide() != null) {
 			writer.write("Filter peptide: "+filterCriteria.getPeptide());
 			if(filterCriteria.getPeptide() != null && filterCriteria.getPeptide().trim().length() > 0) {
@@ -289,7 +289,7 @@ public class DownloadPercolatorResults extends Action {
 			}
 			writer.write("\n");
 		}
-		
+
 		writer.write("Modified peptides: "+(!filterCriteria.isShowOnlyUnmodified())+"\n");
 		writer.write("Un-modified peptides: "+(!filterCriteria.isShowOnlyModified())+"\n");
 	}
@@ -305,32 +305,32 @@ public class DownloadPercolatorResults extends Action {
         	writer.write("Area\t");
         // qvalue at the PSM level
         writer.write("q-value(PSM)\t");
-        	
+
         // PEP at the PSM level
-        if(hasPEP) 
+        if(hasPEP)
         	writer.write("PEP(PSM)\t");
         else
         	writer.write("DiscriminantScore\t");
-        
+
         if(hasPeptideLevelScore) {
         	writer.write("q-value(Peptide)\t");
         	writer.write("PEP(Peptide)\t");
         }
-        
+
         writer.write("XCorrRank\t");
         writer.write("XCorr\t");
         writer.write("Peptide\t");
         writer.write("Protein(s)\n");
 	}
-	
-	private void writePsmResult(PercolatorResultPlus result, boolean hasPEP, boolean hasBullseyeArea, boolean hasPeptideLevelScores, 
+
+	private void writePsmResult(PercolatorResultPlus result, boolean hasPEP, boolean hasBullseyeArea, boolean hasPeptideLevelScores,
 			PrintWriter writer) {
-		
+
 		writer.write(result.getFilename()+"\t");
 		writer.write(result.getScanNumber()+"\t");
         writer.write(result.getCharge()+"\t");
         writer.write(String.valueOf(RoundingUtils.getInstance().roundFour(result.getObservedMass()))+"\t");
-        
+
         // Retention time
         BigDecimal temp = result.getRetentionTime();
         if(temp == null) {
@@ -338,43 +338,43 @@ public class DownloadPercolatorResults extends Action {
         }
         else
             writer.write(RoundingUtils.getInstance().roundFour(temp)+"\t");
-        
+
         // Area of the precursor ion
         if(hasBullseyeArea) {
             writer.write(String.valueOf(RoundingUtils.getInstance().roundTwo(result.getArea()))+"\t");
         }
-        
-        writer.write(result.getQvalueRounded()+"\t");
+
+        writer.write(result.getQvalueRounded3SignificantDigits()+"\t");
         if(hasPEP)
-            writer.write(result.getPosteriorErrorProbabilityRounded()+"\t");
+            writer.write(result.getPosteriorErrorProbabilityRounded3SignificantDigits()+"\t");
         else
-            writer.write(result.getDiscriminantScoreRounded()+"\t");
-        
+            writer.write(result.getDiscriminantScoreRounded3SignificantDigits()+"\t");
+
         // Peptide-level scores
         if(hasPeptideLevelScores) {
         	writer.write(result.getPeptideQvalue()+"\t");
         	writer.write(result.getPeptidePosteriorErrorProbability()+"\t");
         }
-        
+
         // Sequest data
         writer.write(result.getSequestData().getxCorrRank()+"\t");
         writer.write(RoundingUtils.getInstance().roundTwo(result.getSequestData().getxCorr())+"\t");
-        
+
         try {
             writer.write(result.getResultPeptide().getFullModifiedPeptide()+"\t");
         }
         catch (ModifiedSequenceBuilderException e) {
         	writer.write("ERROR\t");
         }
-        
+
         String proteins = "";
         for(MsSearchResultProtein protein: result.getProteinMatchList())
         	proteins += ","+protein.getAccession();
-        
+
         if(proteins.length() > 0)
         	proteins = proteins.substring(1); // remove first comma
         writer.write(proteins+"\n");
-        
+
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -393,7 +393,7 @@ public class DownloadPercolatorResults extends Action {
         return filenameMap;
 
     }
-    
+
     // ----------------------------------------------------------------------------------------
     // UN-FILTERED RESULT COUNT
     // ----------------------------------------------------------------------------------------

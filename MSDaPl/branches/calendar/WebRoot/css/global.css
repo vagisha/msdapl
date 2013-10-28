@@ -139,7 +139,7 @@ border-style: outset none outset outset; border-width: 1px 0px 0px 1px; border-c
 	display:block;
 	height:20px;
 	font-size:11pt;
-	font-weight:bold;	
+	font-weight:bold;
 }
 #sub_menu ul{margin:0px;padding:0;list-style-type:none;width:auto;font-size:9pt;}
 #sub_menu ul li{display:block;float:left;margin:0 5px 0 0;}
@@ -150,7 +150,7 @@ background-color:#939cb0; border-color: #939cb0; border-width: 1px; border-style
 
 DIV #history {
 	border: 1px dashed #8CACBB;
-	background-color: white;	
+	background-color: white;
 	margin: 2 5 2 5;
 	padding: 3;
 }
@@ -219,7 +219,7 @@ DIV.pinfer_header_small {
 
 /* url(../images/sprite.png) repeat-x scroll 0 -100px; */
 .table_basic TH , .table_same_color_row TH, .table_compare_grp TH, TH.header {
-	background: #D8D8DA url(../images/sprite.png) repeat-x scroll 0 0; 
+	background: #D8D8DA url(../images/sprite.png) repeat-x scroll 0 0;
 	color: #3D4960;
 	padding: 3 5 3 5;
 	text-align: center;
@@ -268,6 +268,7 @@ DIV.pinfer_header_small {
 
 .table_basic td.right_align, .table_compare_grp td.right_align{
 	text-align: right;
+	white-space: nowrap;
 }
 
 .table_compare_grp td {
@@ -296,7 +297,7 @@ TABLE.table_basic_small {
 }
 
 .table_basic_small TH {
-	background: #F2F2F2; 
+	background: #F2F2F2;
 	color: #3D4960;
 	padding: 2 3 2 3;
 	text-align: center;
@@ -319,7 +320,7 @@ TABLE.table_basic_small {
 }
 
 TD.centered {
-	text-align: center;	
+	text-align: center;
 }
 
 .faded {
@@ -327,11 +328,11 @@ TD.centered {
 }
 
 .small_font {
-	font-size:8pt;	
+	font-size:8pt;
 }
 
 .font_9 {
-	font-size:9pt;	
+	font-size:9pt;
 }
 
 /****************************************************************************************************/*
@@ -340,8 +341,8 @@ TD.centered {
 INPUT.plain_button, .plain_button {
 	background: transparent url(../images/sprite.png) repeat-x scroll 0 -1502px;;
 	color:#ffffff;
-	border-color: #3d4960; 
-	border-width: 1px; 
+	border-color: #3d4960;
+	border-width: 1px;
 	font-size:9pt;
 	font-weight:bold;
 	margin-top:15px;
@@ -350,10 +351,10 @@ INPUT.plain_button, .plain_button {
 }
 
 INPUT.error_button, .error_button {
-	background-color:#D74D2D; 
+	background-color:#D74D2D;
 	color:#ffffff;
-	border-color: #D74D2D; 
-	border-width: 1px; 
+	border-color: #D74D2D;
+	border-width: 1px;
 	font-size:9pt;
 	font-weight:bold;
 	margin-top:15px;
@@ -362,7 +363,7 @@ INPUT.error_button, .error_button {
 }
 
 /****************************************************************************************************/*
-/* FOLDABLE 
+/* FOLDABLE
 /****************************************************************************************************/*
 
 .clickable {
@@ -411,7 +412,7 @@ span.tooltip {
 }
 span.tooltip:hover {
 	background-color:#FFE4C4;
-	font-weight:bold;	
+	font-weight:bold;
 }
 
 
@@ -468,7 +469,7 @@ DIV.search .button {
 	color:white;
 	font-size:10pt;
 	font-weight:bold;
-	margin-top:20px;	
+	margin-top:20px;
 }
 
 
@@ -490,7 +491,7 @@ DIV.project .button {
 	color:white;
 	font-size:10pt;
 	font-weight:bold;
-	margin-top:20px;	
+	margin-top:20px;
 }
 
 
@@ -570,7 +571,7 @@ DIV.ms .button {
 	color: #EBFFE6;
 	font-size:10pt;
 	font-weight:bold;
-	margin-top:20px;	
+	margin-top:20px;
 }
 
 
@@ -633,7 +634,7 @@ span.go_obsolete {
 	color:white;
 	font-size:8pt;
 	font-weight:bold;
-	padding:0 2 0 2;	
+	padding:0 2 0 2;
 }
 span.go_obsolete:hover {
 	cursor:help;
