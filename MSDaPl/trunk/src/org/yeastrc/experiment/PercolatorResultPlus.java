@@ -17,9 +17,10 @@ import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
+import org.yeastrc.utils.RoundingUtilsMSLIBRARY;
 
 /**
- * 
+ *
  */
 public class PercolatorResultPlus implements PercolatorResult {
 
@@ -30,8 +31,8 @@ public class PercolatorResultPlus implements PercolatorResult {
     private final BigDecimal retentionTime;
     private double area = -1.0;
     private String filename;
-    
-   
+
+
     public PercolatorResultPlus(PercolatorResult result, MsScan scan) {
         this.result = result;
         this.scanNumber = scan.getStartScanNum();
@@ -41,11 +42,25 @@ public class PercolatorResultPlus implements PercolatorResult {
             area = scan2.getBullsEyeArea();
         }
     }
-    
+
+
+
+    /**
+     * get qvalue rounded to 3 significant digits
+     * @return
+     */
+	@Override
+    public String getQvalueRounded3SignificantDigits() {
+
+    	String qValue3sigDigits = RoundingUtilsMSLIBRARY.getInstance().roundThreeSignificantDigits( result.getQvalue() );
+
+    	return qValue3sigDigits;
+    }
+
     public void setPeptideResult(PercolatorPeptideResult peptideResult) {
     	this.peptideResult = peptideResult;
     }
-    
+
     public String getFilename() {
         return filename;
     }
@@ -61,29 +76,29 @@ public class PercolatorResultPlus implements PercolatorResult {
     public int getScanNumber() {
         return scanNumber;
     }
-    
+
     public BigDecimal getRetentionTime() {
         return retentionTime;
     }
-    
+
     public double getArea() {
         return area;
     }
-    
+
     public double getPeptideQvalue() {
     	if(this.peptideResult != null)
     		return peptideResult.getQvalueRounded();
     	else
     		return -1.0;
     }
-    
+
     public double getPeptidePosteriorErrorProbability() {
     	if(this.peptideResult != null)
     		return peptideResult.getPosteriorErrorProbabilityRounded();
     	else
     		return -1.0;
     }
-    
+
     @Override
     public Double getDiscriminantScore() {
         return result.getDiscriminantScore();
@@ -94,6 +109,14 @@ public class PercolatorResultPlus implements PercolatorResult {
         return result.getDiscriminantScoreRounded();
     }
 
+
+	@Override
+	public String getDiscriminantScoreRounded3SignificantDigits() {
+
+		return result.getDiscriminantScoreRounded3SignificantDigits();
+	}
+
+
     @Override
     public double getPosteriorErrorProbability() {
         return result.getPosteriorErrorProbability();
@@ -103,6 +126,14 @@ public class PercolatorResultPlus implements PercolatorResult {
     public double getPosteriorErrorProbabilityRounded() {
         return result.getPosteriorErrorProbabilityRounded();
     }
+
+
+	@Override
+	public String getPosteriorErrorProbabilityRounded3SignificantDigits() {
+
+		return result.getPosteriorErrorProbabilityRounded3SignificantDigits();
+	}
+
 
     @Override
     public BigDecimal getPredictedRetentionTime() {
@@ -121,19 +152,27 @@ public class PercolatorResultPlus implements PercolatorResult {
 
     @Override
 	public Double getPvalue() {
-		return result.getQvalue();
+		return result.getPvalue();
 	}
 
 	@Override
 	public Double getPvalueRounded() {
-		return result.getQvalueRounded();
+		return result.getPvalueRounded();
 	}
-	
+
+
+	@Override
+	public String getPvalueRounded3SignificantDigits() {
+
+		return result.getPvalueRounded3SignificantDigits();
+	}
+
+
 	@Override
 	public int getPeptideResultId() {
 		return result.getPeptideResultId();
 	}
-	
+
     @Override
     public int getRunSearchAnalysisId() {
         return result.getRunSearchAnalysisId();
@@ -148,12 +187,12 @@ public class PercolatorResultPlus implements PercolatorResult {
     public int getPercolatorResultId() {
         return result.getPercolatorResultId();
     }
-    
+
     @Override
     public List<MsSearchResultProtein> getProteinMatchList() {
         return result.getProteinMatchList();
     }
-    
+
     public String getOtherProteinsShortHtml() {
         if(result.getProteinMatchList() == null)
             return null;
@@ -172,7 +211,7 @@ public class PercolatorResultPlus implements PercolatorResult {
             return buf.toString();
         }
     }
-    
+
     public String getOneProteinShort() {
         if(result.getProteinMatchList() == null)
             return null;
@@ -180,14 +219,14 @@ public class PercolatorResultPlus implements PercolatorResult {
         	return makeShort(result.getProteinMatchList().get(0).getAccession());
         }
     }
-    
+
     private String makeShort(String string) {
     	if(string.length() > 23)
     		return string.substring(0, 20)+"...";
     	else
     		return string;
     }
-    
+
     public int getProteinCount() {
         return result.getProteinMatchList().size();
     }
@@ -240,5 +279,11 @@ public class PercolatorResultPlus implements PercolatorResult {
     public void setResultPeptide(MsSearchResultPeptide resultPeptide) {
         throw new UnsupportedOperationException();
     }
-	
+
+
+
+
+
+
+
 }

@@ -13,6 +13,7 @@ import java.util.List;
 import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
+import org.yeastrc.utils.RoundingUtilsMSLIBRARY;
 import org.yeastrc.www.misc.HyperlinkedData;
 import org.yeastrc.www.misc.Pageable;
 import org.yeastrc.www.misc.TableCell;
@@ -24,47 +25,49 @@ import org.yeastrc.www.util.RoundingUtils;
 public class TabularPercolatorResults implements Tabular, Pageable {
 
 	private List<SORT_BY> columns = new ArrayList<SORT_BY>();
-    
+
     private SORT_BY sortColumn;
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
-    
+
     private boolean hasPEP = true;
-    
+
     private List<PercolatorResultPlus> results;
     private boolean hasBullsEyeArea = false;
     private boolean hasPeptideResults = false;
-    
+
     private int currentPage;
     private int numPerPage;
     private int lastPage = currentPage;
     private List<Integer> displayPageNumbers;
-    
+
     private RoundingUtils rounder;
-    
+
+    RoundingUtilsMSLIBRARY roundingUtilsMSLIBRARY;
+
     public TabularPercolatorResults(List<PercolatorResultPlus> results, boolean hasPEP, boolean hasBullsEyeArea,
     		boolean hasPeptideResults) {
         this.results = results;
         displayPageNumbers = new ArrayList<Integer>();
         displayPageNumbers.add(currentPage);
-        
+
         this.hasPEP = hasPEP;
         this.hasBullsEyeArea = hasBullsEyeArea;
         this.hasPeptideResults = hasPeptideResults;
-        
+
         columns.add(SORT_BY.FILE_ANALYSIS);
         columns.add(SORT_BY.SCAN);
-        columns.add(SORT_BY.CHARGE); 
-        columns.add(SORT_BY.MASS); 
-        columns.add(SORT_BY.RT); 
+        columns.add(SORT_BY.CHARGE);
+        columns.add(SORT_BY.MASS);
+        columns.add(SORT_BY.RT);
         if(this.hasBullsEyeArea) {
         	columns.add(SORT_BY.AREA);
         }
-        columns.add(SORT_BY.QVAL); 
+        columns.add(SORT_BY.QVAL);
         if(hasPEP)
         	columns.add(SORT_BY.PEP);
         else
         	columns.add(SORT_BY.DS); // Report Percolator Discriminant Score instead of PEP
-        
+
         if(this.hasPeptideResults) {
         	columns.add(SORT_BY.QVAL_PEPT);
         	columns.add(SORT_BY.PEP_PEPT);
@@ -73,10 +76,12 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         columns.add(SORT_BY.XCORR);
         columns.add(SORT_BY.PEPTIDE);
         columns.add(SORT_BY.PROTEIN);
-       
+
         this.rounder = RoundingUtils.getInstance();
+
+        roundingUtilsMSLIBRARY = RoundingUtilsMSLIBRARY.getInstance();
     }
-    
+
     @Override
     public int columnCount() {
         return columns.size();
@@ -85,11 +90,11 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     public SORT_BY getSortedColumn() {
         return sortColumn;
     }
-    
+
     public void setSortedColumn(SORT_BY column) {
         this.sortColumn = column;
     }
-    
+
     public SORT_ORDER getSortOrder() {
         return sortOrder;
     }
@@ -103,40 +108,40 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         List<TableHeader> headers = new ArrayList<TableHeader>(columnCount());
         for(SORT_BY col: columns) {
             TableHeader header = new TableHeader(col.getDisplayName(), col.name());
-            
+
             if(col == SORT_BY.XCORR_RANK || col == SORT_BY.XCORR || col == SORT_BY.DELTACN)
                 header.setSortable(false);
             if(col == SORT_BY.QVAL_PEPT || col == SORT_BY.PEP_PEPT)
             	header.setSortable(false);
             if(col == SORT_BY.PROTEIN || col == SORT_BY.AREA)
                 header.setSortable(false);
-            
+
             if(col == sortColumn) {
                 header.setSorted(true);
                 header.setSortOrder(sortOrder);
             }
-            
+
             if(col.getTooltip() != null)
             	header.setTitle(col.getTooltip());
-            
+
             headers.add(header);
         }
         return headers;
     }
-    
+
     @Override
     public TableRow getRow(int index) {
         if(index >= results.size())
             return null;
         PercolatorResultPlus result = results.get(index);
         TableRow row = new TableRow();
-        
+
         // row.addCell(new TableCell(String.valueOf(result.getPercolatorResultId())));
         row.addCell(new TableCell(result.getFilename()));
         row.addCell(makeRightAlignCell(String.valueOf(result.getScanNumber())));
         row.addCell(makeRightAlignCell(String.valueOf(result.getCharge())));
         row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getObservedMass())));
-        
+
         // Retention time
         BigDecimal temp = result.getRetentionTime();
         if(temp == null) {
@@ -144,32 +149,32 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         }
         else
             row.addCell(makeRightAlignCell(rounder.roundTwoFormat(temp)));
-        
+
         // Area of the precursor ion
         if(hasBullsEyeArea) {
             row.addCell(makeRightAlignCell(rounder.roundTwoFormat(result.getArea())));
         }
-        
-        row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getQvalueRounded())));
+
+        row.addCell(makeRightAlignCell( result.getQvalueRounded3SignificantDigits() ));
         if(this.hasPEP)
-            row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getPosteriorErrorProbabilityRounded())));
+            row.addCell(makeRightAlignCell( result.getPosteriorErrorProbabilityRounded3SignificantDigits() ));
         else
-            row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getDiscriminantScoreRounded())));
-        
+            row.addCell(makeRightAlignCell( result.getDiscriminantScoreRounded3SignificantDigits() ));
+
         if(hasPeptideResults) {
-        	row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getPeptideQvalue())));
-        	row.addCell(makeRightAlignCell(rounder.roundFourFormat(result.getPeptidePosteriorErrorProbability())));
+        	row.addCell(makeRightAlignCell( roundingUtilsMSLIBRARY.roundThreeSignificantDigits( result.getPeptideQvalue())));
+        	row.addCell(makeRightAlignCell(roundingUtilsMSLIBRARY.roundThreeSignificantDigits(result.getPeptidePosteriorErrorProbability())));
         }
         // Sequest data
         row.addCell(makeRightAlignCell(String.valueOf(result.getSequestData().getxCorrRank())));
         row.addCell(makeRightAlignCell((rounder.roundFourFormat(result.getSequestData().getxCorr()))));
 //        row.addCell(new TableCell(String.valueOf(round(result.getSequestData().getDeltaCN()))));
-        
+
         TableCell cell = null;
         String modifiedSequence = null;
         try {
         	// get modified peptide of the form: K.PEP[+80]TIDE.L
-        	modifiedSequence = result.getResultPeptide().getFullModifiedPeptide(true); 
+        	modifiedSequence = result.getResultPeptide().getFullModifiedPeptide(true);
         }
         catch (ModifiedSequenceBuilderException e) {
             cell = new TableCell("Error building peptide sequence");
@@ -185,21 +190,21 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         	javaLink.setHyperlink(url, true);
         	javaLink.setTargetName("spec_view_java");
         	cell.addData(javaLink);
-        	
+
         	HyperlinkedData jsLink = new HyperlinkedData("<span style='font-size:8pt;' title='JavaScript Spectrum Viewer'>(JS)</span>");
         	url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId()
         	+"&runSearchAnalysisID="+result.getRunSearchAnalysisId();
         	jsLink.setHyperlink(url, true);
         	jsLink.setTargetName("spec_view_js");
         	cell.addData(jsLink);
-        	
+
         	if(result.getResultPeptide().hasDynamicModification())
         		cell.addData("<span class=\"peptide\">"+modifiedSequence+"</span>");
         	else
         		cell.addData(modifiedSequence);
         }
         row.addCell(cell);
-        
+
         String cellContents = result.getOneProteinShort();
         if(result.getProteinCount() > 1) {
             cellContents += " <span class=\"underline clickable\" "+
@@ -210,16 +215,16 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         }
         cell = new TableCell(cellContents);
         row.addCell(cell);
-        
+
         return row;
     }
-    
+
     private TableCell makeRightAlignCell(String content) {
     	TableCell cell = new TableCell(content);
     	cell.setClassName("right_align");
     	return cell;
     }
-    
+
     @Override
     public int rowCount() {
         return results.size();
@@ -229,12 +234,12 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     public void tabulate() {
         // nothing to do here?
     }
-    
+
     @Override
     public int getCurrentPage() {
         return currentPage;
     }
-    
+
     public void setCurrentPage(int pageNum) {
         this.currentPage = pageNum;
     }
@@ -243,7 +248,7 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     public List<Integer> getDisplayPageNumbers() {
         return this.displayPageNumbers;
     }
-    
+
     public void setDisplayPageNumbers(List<Integer> pageNums) {
         this.displayPageNumbers = pageNums;
     }
@@ -252,7 +257,7 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     public int getLastPage() {
         return this.lastPage;
     }
-    
+
     public void setLastPage(int pageNum) {
         this.lastPage = pageNum;
     }
@@ -261,7 +266,7 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     public int getPageCount() {
         return lastPage;
     }
-    
+
     @Override
 	public int getNumPerPage() {
 		return numPerPage;
