@@ -186,6 +186,8 @@ public class SQTHeader implements SQTRunSearchIn {
             sqtType = SearchFileFormat.SQT_PPROBE;
         else if (sqtGenerator.equalsIgnoreCase(Program.TIDE.displayName()))
             sqtType = SearchFileFormat.SQT_TIDE;
+        else if (sqtGenerator.equalsIgnoreCase(Program.COMET.displayName()))
+            sqtType = SearchFileFormat.SQT_COMET;
         else {
             sqtType = SearchFileFormat.UNKNOWN;
         }

@@ -40,7 +40,7 @@ import org.yeastrc.ms.util.FileUtils;
 /**
  * 
  */
-public final class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
+public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
 
     
     private final SequestSearchResultDAO sqtResultDao;
@@ -92,7 +92,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
             String remoteServer, String remoteDirectory,
             Date searchDate) throws UploadException {
         
-        SequestParamsParser parser = parseSequestParams(paramFileDirectory, remoteServer);
+        SequestParamsParser parser = parseParamsFile(paramFileDirectory, remoteServer);
         
         usesEvalue = parser.reportEvalue();
         db = parser.getSearchDatabase();
@@ -122,7 +122,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         }
     }
     
-    private SequestParamsParser parseSequestParams(String fileDirectory, final String remoteServer) throws UploadException {
+    protected SequestParamsParser parseParamsFile(String fileDirectory, final String remoteServer) throws UploadException {
         
         // parse the parameters file
         final SequestParamsParser parser = new SequestParamsParser();

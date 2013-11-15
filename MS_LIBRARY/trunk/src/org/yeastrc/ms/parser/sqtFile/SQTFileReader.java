@@ -123,7 +123,7 @@ public abstract class SQTFileReader <T extends SQTSearchScanIn<?>> extends Abstr
     private void addHeaderItem(SQTHeader header, String[] nameAndVal) throws DataProviderException {
         
         if (nameAndVal.length == 0)
-            throw new DataProviderException(currentLineNum, "Invalid Header line.", currentLine);
+            return;
         
         String name = nameAndVal[0];
         String val = nameAndVal.length > 1 ? nameAndVal[1] : null;
