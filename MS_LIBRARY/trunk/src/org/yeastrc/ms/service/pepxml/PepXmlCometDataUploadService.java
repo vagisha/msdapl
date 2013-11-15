@@ -1,13 +1,14 @@
 /**
- * SQTDataUploadService.java
+ * PepXmlSequestDataUploadService.java
  * @author Vagisha Sharma
- * Jul 15, 2008
+ * Oct 6, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.service.sqtfile;
+package org.yeastrc.ms.service.pepxml;
 
 import java.io.File;
 
+import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.cometParams.CometParamsParser;
@@ -17,15 +18,24 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 /**
  * 
  */
-public final class CometSQTDataUploadService extends SequestSQTDataUploadService {
+public class PepXmlCometDataUploadService extends PepXmlSequestDataUploadService {
 
+    private static final Logger log = Logger.getLogger(PepXmlCometDataUploadService.class.getName());
     
-    public CometSQTDataUploadService() {
+    
+    public PepXmlCometDataUploadService() {
+        
         super();
     }
     
+    @Override
     public Program getSearchProgram() {
         return Program.COMET;
+    }
+    
+    protected String searchParamsFile() {
+        CometParamsParser parser = new CometParamsParser();
+        return parser.paramsFileName();
     }
     
     protected CometParamsParser parseParamsFile(String fileDirectory, final String remoteServer) throws UploadException {
@@ -47,11 +57,5 @@ public final class CometSQTDataUploadService extends SequestSQTDataUploadService
             ex.setErrorMessage(e.getMessage());
             throw ex;
         }
-    }
-    
-    @Override
-    String searchParamsFile() {
-        CometParamsParser parser = new CometParamsParser();
-        return parser.paramsFileName();
     }
 }

@@ -87,7 +87,7 @@ public class PepXmlSequestDataUploadService extends PepXmlDataUploadService<PepX
         return true;
     }
 
-    private String searchParamsFile() {
+    protected String searchParamsFile() {
         SequestParamsParser parser = new SequestParamsParser();
         return parser.paramsFileName();
     }
@@ -166,15 +166,15 @@ public class PepXmlSequestDataUploadService extends PepXmlDataUploadService<PepX
             String remoteServer, String remoteDirectory,
             Date searchDate) throws UploadException {
         
-        SequestParamsParser parser = parseSequestParams(paramFileDirectory, remoteServer);
+        SequestParamsParser parser = parseParamsFile(paramFileDirectory, remoteServer);
         
         usesEvalue = parser.reportEvalue();
         
-        SequestSearchIn search = makeSearchObject(parser, Program.SEQUEST, remoteDirectory, searchDate);
+        SequestSearchIn search = makeSearchObject(parser, getSearchProgram(), remoteDirectory, searchDate);
         return search;
     }
     
-    private SequestParamsParser parseSequestParams(String fileDirectory, final String remoteServer) throws UploadException {
+    protected SequestParamsParser parseParamsFile(String fileDirectory, final String remoteServer) throws UploadException {
         
         // parse the parameters file
         final SequestParamsParser parser = new SequestParamsParser();

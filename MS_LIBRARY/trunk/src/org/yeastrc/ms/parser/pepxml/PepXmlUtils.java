@@ -143,6 +143,8 @@ public class PepXmlUtils {
             return SearchFileFormat.PEPXML_MASCOT;
         else if(program == Program.XTANDEM)
             return SearchFileFormat.PEPXML_XTANDEM;
+        else if(program == Program.COMET)
+            return SearchFileFormat.PEPXML_COMET;
         else
             return SearchFileFormat.UNKNOWN;
     }
@@ -151,6 +153,7 @@ public class PepXmlUtils {
         if("SEQUEST".equalsIgnoreCase(value))           return Program.SEQUEST;
         else if("MASCOT".equalsIgnoreCase(value))       return Program.MASCOT;
         else if ("X! Tandem".equalsIgnoreCase(value))   return Program.XTANDEM;
+        else if("Comet".equalsIgnoreCase(value))		return Program.COMET;
         return null;
     }
 }

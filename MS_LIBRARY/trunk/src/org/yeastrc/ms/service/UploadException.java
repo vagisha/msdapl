@@ -59,6 +59,7 @@ public class UploadException extends Exception {
         MOD_LOOKUP_FAILED       ("Modification lookup failed", WARN),
         
         MISSING_SEQUEST_PARAMS  ("Missing sequest.params file.", ERROR),
+        MISSING_COMET_PARAMS    ("Missing comet.params file.", ERROR),
         MISSING_PROLUCID_PARAMS ("Missing search.xml files.", ERROR),
         UNKNOWN_PARAMS          ("Unknown parameters file for search.", ERROR),
         PARAM_PARSING_ERROR     ("Error parsing parameters file", ERROR),

@@ -512,6 +512,8 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
             runSearch.setSearchFileFormat(SearchFileFormat.PEPXML_MASCOT);
         else if(this.searchProgram == Program.XTANDEM)
             runSearch.setSearchFileFormat(SearchFileFormat.PEPXML_XTANDEM);
+        else if(this.searchProgram == Program.COMET)
+            runSearch.setSearchFileFormat(SearchFileFormat.PEPXML_COMET);
         else
             throw new DataProviderException("Unknown search program for pepxml file: "+this.pepXmlFilePath);
         return runSearch;
