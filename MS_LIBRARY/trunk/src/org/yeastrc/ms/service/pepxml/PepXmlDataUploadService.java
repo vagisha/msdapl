@@ -21,7 +21,6 @@ import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.domain.analysis.peptideProphet.GenericPeptideProphetResultIn;
-import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
@@ -29,14 +28,12 @@ import org.yeastrc.ms.domain.search.MsResultResidueModIds;
 import org.yeastrc.ms.domain.search.MsResultTerminalModIds;
 import org.yeastrc.ms.domain.search.MsRunSearchIn;
 import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchIn;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModIds;
 import org.yeastrc.ms.domain.search.impl.ResultTerminalModIds;
@@ -46,14 +43,10 @@ import org.yeastrc.ms.domain.search.pepxml.PepXmlSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.pepxml.PepXmlBaseFileReader;
 import org.yeastrc.ms.parser.pepxml.PepXmlGenericFileReader;
-import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.service.DynamicModLookupUtil;
 import org.yeastrc.ms.service.SearchDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.service.database.fasta.PeptideProteinMatch;
-import org.yeastrc.ms.service.database.fasta.PeptideProteinMatchingService;
-import org.yeastrc.ms.service.database.fasta.PeptideProteinMatchingServiceException;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.nrseq.dao.NrSeqLookupUtil;
 
@@ -101,9 +94,6 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
     private int sequenceDatabaseId;
     private DynamicModLookupUtil dynaModLookup;
     private int numSearchesUploaded = 0;
-
-    // private Map<String, List<PeptideProteinMatch>> proteinMatches;
-    private PeptideProteinMatchingService matchService;
 
     private static final Logger log = Logger.getLogger(PepXmlDataUploadService.class.getName());
 
@@ -470,13 +460,6 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         int runSearchId = uploadRunSearchHeader(searchId, runId, parser);
         log.info("Created entry in msRunSearch table: "+runSearchId);
         
-        Map<String, List<PeptideProteinMatch>> proteinMatches = new HashMap<String, List<PeptideProteinMatch>>();
-        
-        // If the refresh parser has not been run we will initialize the PeptideProteinMatchingService
-        if(!parser.isRefreshParserRun()) {
-            initializePeptideProteinMatchingService(searchId);
-        }
-
         // upload the search results for each scan + charge combination
         int numResults = 0;
         try {
@@ -486,114 +469,6 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                 int scanId = getScanId(runId, scan.getScanNumber());
 
                 for(G result: scan.getScanResults()) {
-                    // If the refresh parser has not been run, find alternative matches for the peptide
-                    if(!parser.isRefreshParserRun()) {
-
-                        R sres = result.getSearchResult();
-                        String peptideSeq = sres.getResultPeptide().getPeptideSequence();
-                        List<PeptideProteinMatch> matches = proteinMatches.get(peptideSeq);
-                        if(matches == null) {
-                            try {
-								matches = matchService.getMatchingProteins(peptideSeq);
-							} catch (PeptideProteinMatchingServiceException e) {
-								log.error("Error finding protein matches. ", e); // we are not propagating this up because the cause of the  
-																				 // exception may be that no matches were found. We will give it
-																				 // one more shot. 
-							}
-                            if(matches == null || matches.size() == 0) {
-
-                                // This can happen if no matching protein was found with the search 
-                                // constraints used. Mascot still reports the hit. 
-                                // So we relax the constraints and search again
-                                int oldNet = matchService.getNumEnzymaticTermini();
-                                if(oldNet > 0) {
-                                    log.info("No protein match found for peptide: "+peptideSeq+"; relaxing NET and searching again...");
-                                    matchService.setNumEnzymaticTermini(0);
-                                    
-                                    try {
-										matches = matchService.getMatchingProteins(peptideSeq);
-									} catch (PeptideProteinMatchingServiceException e) {
-										log.error("Error finding protein matches. ", e);
-										 UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
-										 ex.setErrorMessage("No protein matches found for peptide: "+peptideSeq);
-										 ex.appendErrorMessage(e.getMessage());
-										 throw ex;
-									}
-                                    
-                                    matchService.setNumEnzymaticTermini(oldNet); // set it back
-                                }
-
-                                // If we still did not find any matches
-                                if(matches == null || matches.size() == 0) {
-                                    UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-                                    ex.setErrorMessage("No protein matches found for peptide: "+peptideSeq);
-                                    throw ex;
-                                }
-                            }
-                            proteinMatches.put(peptideSeq, matches);
-                        }
-
-                        List<MsSearchResultProteinIn> protList = sres.getProteinMatchList();
-                        // truncate accessions if required
-                        // accessions in the pepXML files can be longer than the accessions in YRC_NRSEQ
-                        // Limit was 255 now increased to 500
-                        // If the fasta file has already been uploaded it means that 
-                        // 500 chars are enough to uniquely identify this accession in the fasta file.
-                        for(MsSearchResultProteinIn prot: protList) {
-                        	if(prot.getAccession().length() > 500) {
-                        		log.warn("Truncating LONG Protein name in pepXML; length: "+prot.getAccession().length()+"\n"+
-                        				prot.getAccession());
-                        		prot.setAccession(prot.getAccession().substring(0,500));
-                        	}
-                        }
-
-                        List<DbLocus> newLoci = new ArrayList<DbLocus>();
-                        
-                        for(PeptideProteinMatch match: matches) {
-                        	
-                            boolean haveAlready = false;
-                            for(MsSearchResultProteinIn prot: protList) {
-                                if(match.getProtein().getAccessionString().equals(prot.getAccession())) { // this one we have already
-                                    haveAlready = true;
-                                    break;
-                                }
-                                // It is possible that our protein was entered into the database BEFORE column definition
-                                // was changed to 500 chars
-                                // In this case we look for a matching prefix
-                                else if(match.getProtein().getAccessionString().length() == 255) {
-                                	
-                                	if(prot.getAccession().startsWith(match.getProtein().getAccessionString())) {
-                                		// update the accession so that we don't have trouble matching it with 
-                                		// entries in YRC_NRSEQ later
-                                		prot.setAccession(match.getProtein().getAccessionString());
-                                		haveAlready = true;
-                                		break;
-                                	}
-                                }
-                                // What if the protein names in pepXML are truncated.
-//                                else if(match.getProtein().getAccessionString().startsWith(prot.getAccession())) {
-//                                	// update the accession so that we don't have trouble matching it with 
-//                            		// entries in YRC_NRSEQ later
-//                            		prot.setAccession(match.getProtein().getAccessionString());
-//                            		haveAlready = true;
-//                            		break;
-//                                }
-                            }
-                            
-                            if(haveAlready)
-                                continue;
-                            DbLocus locus = new DbLocus(match.getProtein().getAccessionString(), match.getProtein().getDescription());
-                            locus.setNtermResidue(match.getPreResidue());
-                            locus.setCtermResidue(match.getPostResidue());
-                            locus.setNumEnzymaticTermini(match.getNumEnzymaticTermini());
-                            newLoci.add(locus);
-                        }
-                        
-                        for(DbLocus locus: newLoci) {
-                        	sres.addMatchingProteinMatch(locus);
-                        }
-                    }
-                    
                     int resultId = uploadBaseSearchResult(result.getSearchResult(), runSearchId, scanId);
                     uploadProgramSpecificResultData(result.getSearchResult(), resultId); // Program specific scores
                     numResults++;
@@ -609,54 +484,6 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         log.info("Uploaded search results for file: "+filename+", with "+numResults+
                 " results. (runSearchId: "+runSearchId+")");
 
-    }
-
-    private void initializePeptideProteinMatchingService(int searchId)
-    throws UploadException {
-
-        if(this.matchService != null)
-            return;
-
-        // get the search
-        MsSearch search = searchDao.loadSearch(searchId);
-        List<MsEnzyme> enzymes = search.getEnzymeList();
-        List<MsSearchDatabase> databases = search.getSearchDatabases();
-
-        
-        int numEnzymaticTermini = 0; 
-        
-        
-        // Sequest pepXML files have all protein matches regardless of NET
-        if(search.getSearchProgram() == Program.SEQUEST)
-        	numEnzymaticTermini = 0;
-        else if(search.getSearchProgram() == Program.MASCOT)
-        	numEnzymaticTermini = getNumEnzymaticTermini(searchId);
-
-        boolean clipNterMet = getClipNtermMethionine(searchId);
-        
-        if(databases.size() != 1) {
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-            ex.setErrorMessage("Multiple search databases found for search: "+
-                    searchId+
-            "; PeptideProteinMatchingService does not handle multiple databases");
-            throw ex; 
-        }
-        try {
-            this.matchService = new PeptideProteinMatchingService(databases.get(0).getSequenceDatabaseId());
-        }
-        catch (PeptideProteinMatchingServiceException e) {
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
-            ex.setErrorMessage("Error initializing PeptideProteinMatchingService for databaseID: "+
-                    databases.get(0).getSequenceDatabaseId());
-            ex.appendErrorMessage(e.getMessage());
-            throw ex; 
-        }
-
-        matchService.setNumEnzymaticTermini(numEnzymaticTermini);
-        matchService.setEnzymes(enzymes);
-        matchService.setDoItoLSubstitution(false);
-        matchService.setClipNtermMet(clipNterMet);
-        matchService.setRemoveAsterisks(false); // '*' in a protein sequence will be treated as protein ends.
     }
 
     protected void flush() {
@@ -727,23 +554,6 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         }
     }
 
-//    private final void uploadProteinMatches(MsSearchResult result, final int resultId)
-//    throws UploadException {
-//        // upload the protein matches if the cache has enough entries
-//        if (proteinMatchList.size() >= BUF_SIZE) {
-//            uploadProteinMatchBuffer();
-//        }
-//        // add the protein matches for this result to the cache
-//        Set<String> accSet = new HashSet<String>(result.getProteinMatchList().size());
-//        for (MsSearchResultProtein match: result.getProteinMatchList()) {
-//            // only UNIQUE accession strings for this result will be added.
-//            if (accSet.contains(match.getAccession()))
-//                continue;
-//            accSet.add(match.getAccession());
-//            proteinMatchList.add(new SearchResultProteinBean(result.getId(), match.getAccession()));
-//        }
-//    }
-
     private void uploadProteinMatchBuffer() {
 
         List<MsSearchResultProtein> list = new ArrayList<MsSearchResultProtein>(proteinMatchList.size());
@@ -780,31 +590,6 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         }
     }
 
-//    private void uploadResultResidueMods(MsSearchResult result, int resultId,
-//            int searchId) throws UploadException {
-//        // upload the result dynamic residue modifications if the cache has enough entries
-//        if (resultResidueModList.size() >= BUF_SIZE) {
-//            uploadResultResidueModBuffer();
-//        }
-//        // add the dynamic residue modifications for this result to the cache
-//        for (MsResultResidueMod mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
-//            if (mod == null)
-//                continue;
-//            int modId = dynaModLookup.getDynamicResidueModificationId( 
-//                    mod.getModifiedResidue(), mod.getModificationMass()); 
-//            if (modId == 0) {
-//                UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
-//                ex.setErrorMessage("No matching dynamic residue modification found for: searchId: "+
-//                        searchId+
-//                        "; modResidue: "+mod.getModifiedResidue()+
-//                        "; modMass: "+mod.getModificationMass().doubleValue());
-//                throw ex;
-//            }
-//            ResultResidueModIds resultMod = new ResultResidueModIds(resultId, modId, mod.getModifiedPosition());
-//            resultResidueModList.add(resultMod);
-//        }
-//    }
-
     private void uploadResultResidueModBuffer() {
         modDao.saveAllDynamicResidueModsForResult(resultResidueModList);
         resultResidueModList.clear();
@@ -834,31 +619,6 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
             resultTerminalModList.add(resultMod);
         }
     }
-
-//    private void uploadResultTerminalMods(MsSearchResult result, int resultId,
-//            int searchId) throws UploadException {
-//        // upload the result dynamic terminal modifications if the cache has enough entries
-//        if (resultTerminalModList.size() >= BUF_SIZE) {
-//            uploadResultTerminalModBuffer();
-//        }
-//        // add the dynamic terminal modifications for this result to the cache
-//        for (MsTerminalModificationIn mod: result.getResultPeptide().getResultDynamicTerminalModifications()) {
-//            if (mod == null)
-//                continue;
-//            int modId = dynaModLookup.getDynamicTerminalModificationId(
-//                    mod.getModifiedTerminal(), mod.getModificationMass()); 
-//            if (modId == 0) {
-//                UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
-//                ex.setErrorMessage("No matching dynamic terminal modification found for: searchId: "+
-//                        searchId+
-//                        "; modTerminal: "+mod.getModifiedTerminal()+
-//                        "; modMass: "+mod.getModificationMass().doubleValue());
-//                throw ex;
-//            }
-//            ResultTerminalModIds resultMod = new ResultTerminalModIds(resultId, modId);
-//            resultTerminalModList.add(resultMod);
-//        }
-//    }
 
     private void uploadResultTerminalModBuffer() {
         modDao.saveAllDynamicTerminalModsForResult(resultTerminalModList);

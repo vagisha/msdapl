@@ -19,6 +19,7 @@ import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.impl.RunSearchAnalysisBean;
 import org.yeastrc.ms.domain.analysis.impl.SearchAnalysisBean;
@@ -35,6 +36,7 @@ import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.impl.SearchResultProteinBean;
 import org.yeastrc.ms.domain.search.pepxml.PepXmlBaseSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.pepxml.PepXmlBaseFileReader;
@@ -73,10 +75,12 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
     private final MsRunSearchAnalysisDAO runSearchAnalysisDao;
     private final PeptideProphetRocDAO rocDao;
     private final PeptideProphetResultDAO ppResDao;
+    private final MsSearchResultProteinDAO proteinMatchDao;
     
     
     // these are the things we will cache and do bulk-inserts
     private List<PeptideProphetResultDataWId> prophetResultDataList; // PeptideProphet scores
+    private List<MsSearchResultProtein> proteinMatchList;
     
     private List<MsResidueModification> dynaResidueMods;
     private List<MsTerminalModification> dynaTermMods;
@@ -100,6 +104,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         this.interactPepxmlFiles = new ArrayList<String>();
         
         this.prophetResultDataList = new ArrayList<PeptideProphetResultDataWId>(BUF_SIZE);
+        this.proteinMatchList = new ArrayList<MsSearchResultProtein>(BUF_SIZE);
         
         this.dynaResidueMods = new ArrayList<MsResidueModification>();
         this.dynaTermMods = new ArrayList<MsTerminalModification>();
@@ -116,6 +121,8 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         
         this.rocDao = daoFactory.getPeptideProphetRocDAO();
         this.ppResDao = daoFactory.getPeptideProphetResultDAO();
+        
+        this.proteinMatchDao = daoFactory.getMsProteinMatchDAO();
         
         uploadMsg = new StringBuilder();
         this.analysisIds = new ArrayList<Integer>();
@@ -295,11 +302,6 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
                 throw ex;
             }
 
-            // TODO  this check should be removed once I am confident that the protein matches that
-            // I get from PeptideProteinMatchingService are the same as the ones the TPP's
-            // refresh parser generates.  Till then I will be matching the protein matches
-            // in the interact*.pep.xml files against those I store in the database in the 
-            // PepxmlSearchDataUploadService. 
             if(!parser.isRefreshParserRun()) {
                 UploadException ex = new UploadException(ERROR_CODE.PEPXML_ERROR);
                 ex.setErrorMessage("Refresh parser has not been run");
@@ -436,10 +438,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
                 
                 for(BasePeptideProphetResultIn result: scan.getScanResults()) {
                     int resultId = getUploadedResultId(result, runSearchId, scanId);
-                    // TODO this check should be removed soon.
-                    if(checkPeptideProteinMatches) {
-                        checkPeptideProteinMatches(resultId, result);
-                    }
+                    updatePeptideProteinMatches(resultId, result);
                     uploadAnalysisResult(result, resultId, runSearchAnalysisId);      // PeptideProphet scores
                     numResults++;
                 }
@@ -581,8 +580,60 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
             }
         }
     }
+    
+    private void updatePeptideProteinMatches(int matchingSearchResultId, BasePeptideProphetResultIn result) throws UploadException {
+        
+//        log.info("Updating matching proteins");
+        
+        // load the stored result
+        MsSearchResult storedResult = resDao.load(matchingSearchResultId);
+        List<MsSearchResultProtein> storedMatches = storedResult.getProteinMatchList();
+        Set<String> storedAccessions = new HashSet<String>(storedMatches.size()*2);
+        for(MsSearchResultProtein prot: storedMatches) {
+            storedAccessions.add(prot.getAccession());
+        }
+        
+        List<MsSearchResultProteinIn> pepXmlMatches = result.getSearchResult().getProteinMatchList();
+        // Get the unique accessions from the interact pepxml file
+        // If the accessions are longer than 500 chars truncate them. 
+        // YRC_NRSEQ supports only 500 length accessions
+        Set<String> newAccessions = new HashSet<String>();
+        for(MsSearchResultProteinIn match: pepXmlMatches) {
+        	String accession = match.getAccession();
+        	if(accession.length() > 500)
+        		accession = accession.substring(0, 500);
+        	
+        	if(!storedAccessions.contains(accession))
+        	{
+        		newAccessions.add(accession);
+        	}
+        }
+        
+        uploadProteinMatches(newAccessions, matchingSearchResultId);
+    }
 
 
+    private void uploadProteinMatches(Set<String>accessions, final int resultId)
+    throws UploadException {
+        // upload the protein matches if the cache has enough entries
+        if (proteinMatchList.size() >= BUF_SIZE) {
+            uploadProteinMatchBuffer();
+        }
+        // add the protein matches for this result to the cache
+        for (String accession: accessions) {
+            log.debug("Adding match: resultID: "+resultId+"; Accession : "+accession);
+            proteinMatchList.add(new SearchResultProteinBean(resultId, accession));
+        }
+    }
+    
+    private void uploadProteinMatchBuffer() {
+
+        List<MsSearchResultProtein> list = new ArrayList<MsSearchResultProtein>(proteinMatchList.size());
+        list.addAll(proteinMatchList);
+        proteinMatchDao.saveAll(list);
+        proteinMatchList.clear();
+    }
+    
     private int getRunIdForRunSearch(int runSearchId) {
         MsRunSearch rs = runSearchDao.loadRunSearch(runSearchId);
         if(rs != null)
@@ -646,6 +697,10 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         
         if(prophetResultDataList.size() > 0) {
             uploadPeptideProphetResultBuffer();
+        }
+        
+        if (proteinMatchList.size() > 0) {
+            uploadProteinMatchBuffer();
         }
     }
     // -------------------------------------------------------------------------------------------
@@ -735,6 +790,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
     private void resetCaches() {
         
         prophetResultDataList.clear();
+        proteinMatchList.clear();
     }
     
     @Override
