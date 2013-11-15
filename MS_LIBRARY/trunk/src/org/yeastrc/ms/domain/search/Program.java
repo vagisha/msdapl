@@ -5,6 +5,7 @@ public enum Program {
     SEQUEST("SEQUEST"),
     EE_NORM_SEQUEST("EE-normalized SEQUEST"),
     NORM_SEQUEST("SEQUEST-NORM"),
+    COMET("Comet"),
     MASCOT("MASCOT"),
     XTANDEM("XTANDEM"),
     TIDE("Tide"),

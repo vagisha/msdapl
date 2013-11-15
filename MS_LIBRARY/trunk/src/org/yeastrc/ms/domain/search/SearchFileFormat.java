@@ -12,6 +12,7 @@ public enum SearchFileFormat {
 
     SQT("SQT: GENERIC"),
     SQT_SEQ("SQT: "+Program.SEQUEST.displayName()), 
+    SQT_COMET("SQT: "+Program.COMET.displayName()), 
     SQT_EENSEQ("SQT: "+Program.EE_NORM_SEQUEST.displayName()), 
     SQT_NSEQ("SQT: "+Program.NORM_SEQUEST.displayName()), 
     SQT_PLUCID("SQT: "+Program.PROLUCID.displayName()), 
@@ -23,6 +24,7 @@ public enum SearchFileFormat {
     XML_PERC("XML: "+Program.PERCOLATOR.displayName()),
     PEPXML("pepxml: GENERIC"), 
     PEPXML_SEQ("pepxml: "+Program.SEQUEST.displayName()),
+    PEPXML_COMET("pepxml: "+Program.COMET.displayName()),
     PEPXML_MASCOT("pepxml: "+Program.MASCOT.displayName()),
     PEPXML_XTANDEM("pepxml: "+Program.XTANDEM.displayName()),
     PEPXML_PEPT_PROPHET("pepxml: "+Program.PEPTIDE_PROPHET.displayName()),

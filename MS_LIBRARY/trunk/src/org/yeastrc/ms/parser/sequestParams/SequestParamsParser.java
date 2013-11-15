@@ -62,10 +62,10 @@ public class SequestParamsParser implements SearchParamsDataProvider {
     static final Pattern dynamicTermModPattern = Pattern.compile("^variable\\_([N|C])\\_terminus");
     static final Pattern staticResidueModPattern = Pattern.compile("^add\\_([A-Z])\\_[\\w]+");
     static final Pattern enzymePattern = Pattern.compile("^(\\d+)\\.\\s+(\\S+)\\s+([0|1])\\s+([[\\-]|[A-Z]]+)\\s+([[\\-]|[A-Z]]+)$");
-    static final Pattern modCharsPattern = Pattern.compile("[A-Z]+");
+    protected static final Pattern modCharsPattern = Pattern.compile("[A-Z]+");
 
 
-    private static final char[] modSymbols = {'*', '#', '@', '^', '~', '$'};
+    protected static final char[] modSymbols = {'*', '#', '@', '^', '~', '$'};
 
     
     public MsSearchDatabaseIn getSearchDatabase() {
@@ -143,9 +143,11 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         
         init(remoteServer);
         
+        String paramsFile = paramsFileDir+File.separator+paramsFileName();
+        
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(paramsFileDir+File.separator+paramsFileName()));
+            reader = new BufferedReader(new FileReader(paramsFile));
             while ((currentLine = reader.readLine())!= null) {
                 currentLineNum++;
                 currentLine = currentLine.trim();
@@ -161,7 +163,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
                 }
                 // look for the sequest enzyme info section so that we can get the details for the enzyme
                 // used for the search.
-                else if (currentLine.startsWith("[SEQUEST_ENZYME_INFO]")){
+                else if (currentLine.startsWith(getEnzymeInfoHeader())){
                     parseEnzymes(reader);
                 }
             }
@@ -180,8 +182,16 @@ public class SequestParamsParser implements SearchParamsDataProvider {
                 e.printStackTrace();
             }
         }
-        if (database == null || enzyme == null)
-            throw new DataProviderException("No database and/or enzyme information found in file: "+paramsFileDir);
+        if (database == null)
+        	throw new DataProviderException("No database information found in file: "+paramsFile);
+        if (enzyme == null)
+        	throw new DataProviderException("No enzyme information found in file: "+paramsFile);
+            
+    }
+    
+    protected String getEnzymeInfoHeader()
+    {
+    	return "[SEQUEST_ENZYME_INFO]";
     }
 
     void parseEnzymes(BufferedReader reader) throws IOException {
@@ -191,12 +201,17 @@ public class SequestParamsParser implements SearchParamsDataProvider {
             // if we don't get a match it means we are no longer looking at enzymes. 
             if (!m.matches())
                 break;
-            MsEnzymeIn enz = matchEnzyme(m, this.enzymeCode);
+            MsEnzymeIn enz = matchEnzyme(m, getSearchEnzymeCode());
             if (enz != null) {
                 this.enzyme = enz;
                 break;
             }
         }
+    }
+    
+    protected String getSearchEnzymeCode()
+    {
+    	return this.enzymeCode;
     }
     
     MsEnzymeIn matchEnzyme(Matcher m, String enzymeCode) {
@@ -215,7 +230,8 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         return enz;
     }
 
-    private void addParam(Param param) throws DataProviderException {
+	private void addParam(Param param) throws DataProviderException {
+    	
         paramList.add(param);
         // e-value
         if (param.getParamName().equalsIgnoreCase("print_expect_score")) {
@@ -229,19 +245,26 @@ public class SequestParamsParser implements SearchParamsDataProvider {
             db.setServerPath(param.getParamValue());
             database = db;
         }
-        // enzyme number (actual enzyme information will be parsed later in the file
-        else if (param.getParamName().equalsIgnoreCase("enzyme_number")) {
+        
+        else if (parsedStaticTerminalModParam(param.getParamName(), param.getParamValue())) return;
+        else if (parsedStaticResidueModParam(param.getParamName(), param.getParamValue()))  return;
+        else if (parsedDynamicTerminalModParam(param.getParamName(), param.getParamValue()))  return;
+        
+        else
+        	addCustomParam(param);
+    }
+    
+    protected void addCustomParam(Param param) throws DataProviderException 
+    {
+    	// enzyme number (actual enzyme information will be parsed later in the file
+    	if (param.getParamName().equalsIgnoreCase("enzyme_number")) {
             enzymeCode = param.getParamValue();
         }
         else if (param.getParamName().equalsIgnoreCase("diff_search_options")) {
             parseDynamicResidueMods(param.getParamValue());
         }
-        else if (parsedStaticTerminalModParam(param.getParamName(), param.getParamValue())) return;
-        else if (parsedStaticResidueModParam(param.getParamName(), param.getParamValue()))  return;
-        else if (parsedDynamicTerminalModParam(param.getParamName(), param.getParamValue()))  return;
-        
-        // print_duplicate_references
-        if (param.getParamName().equalsIgnoreCase("print_duplicate_references")) {
+    	// print_duplicate_references
+        else if (param.getParamName().equalsIgnoreCase("print_duplicate_references")) {
             if (param.getParamValue().equals("1"))
                 printDuplicateReferences = true;
         }
@@ -358,17 +381,22 @@ public class SequestParamsParser implements SearchParamsDataProvider {
                 mod.setModificationMass(mass);
                 mod.setModifiedResidue(modChars.charAt(j));
                 mod.setModificationSymbol(modSymbols[modCharIdx]);
-                dynamicResidueModifications.add(mod);
+                addDynamicResidueModification(mod);
             }
 //            modCharIdx++;
         }
+    }
+    
+    protected void addDynamicResidueModification(ResidueModification mod)
+    {
+    	dynamicResidueModifications.add(mod);
     }
 
     // parameter_name = parameter_value ; parameter_description
     // e.g. create_output_files = 1                ; 0=no, 1=yes
     // e.g. database_name = /net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta
     Param matchParamValuePair(String line) {
-        Matcher m = paramLinePattern.matcher(line);
+        Matcher m = getParamLinePattern().matcher(line);
         if (m.matches()) {
             final String paramName = m.group(1).trim();
             final String paramVal = m.group(2).trim();
@@ -378,6 +406,21 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         else {
             return null;
         }
+    }
+    
+    protected Pattern getParamLinePattern()
+    {
+    	return paramLinePattern;
+    }
+    
+    protected String getCurrentLine()
+    {
+    	return this.currentLine;
+    }
+    
+    protected int getCurrentLineNumber()
+    {
+    	return this.currentLineNum;
     }
 
     /**
