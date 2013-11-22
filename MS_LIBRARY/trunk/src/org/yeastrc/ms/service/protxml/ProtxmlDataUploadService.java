@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +84,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
 
     private final DAOFactory daoFactory;
     private final MsSearchResultDAO resDao;
+    private final MsSearchDAO searchDao;
     private final PeptideProphetResultDAO ppResDao;
     
     
@@ -119,7 +121,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     
     //private static final Pattern fileNamePattern = Pattern.compile("interact\\S*.prot.xml");
     private List<String> protXmlFiles = new ArrayList<String>();
-    private List<Integer> runSearchAnalysisIds;  
+    private Set<Integer> runSearchAnalysisIds;  
     
     private InteractProtXmlParser parser = null;
     private Pattern equivalentAAPattern = null;
@@ -128,6 +130,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     
     private Map<String, Integer> proteinIdMap;
     private Map<Integer, Set<String>> subsumedMap;
+	
+	private Map<String, List<PeptideProphetResultForMap>> peptideionPeptideProphetResultMap;
     
     private static final Logger log = Logger.getLogger(ProtxmlDataUploadService.class.getName());
     
@@ -137,12 +141,14 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         ionMap = new HashMap<String, Integer>();
         modifiedStateMap = new HashMap<String, Integer>();
         peptModStateCountMap = new HashMap<Integer, Integer>();
-        runSearchAnalysisIds = new ArrayList<Integer>();
+        runSearchAnalysisIds = new HashSet<Integer>();
+        peptideionPeptideProphetResultMap = new HashMap<String, List<PeptideProphetResultForMap>>();
         
         
         piDaoFactory = ProteinferDAOFactory.instance();
         daoFactory = DAOFactory.instance();
         
+        searchDao = daoFactory.getMsSearchDAO();
         resDao = daoFactory.getMsSearchResultDAO();
         ppResDao = daoFactory.getPeptideProphetResultDAO();
         
@@ -167,6 +173,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         modifiedStateMap.clear();
         peptModStateCountMap.clear();
         runSearchAnalysisIds.clear();
+        peptideionPeptideProphetResultMap.clear();
         
         proteinIdMap = new HashMap<String, Integer>();
         subsumedMap = new HashMap<Integer, Set<String>>();
@@ -199,13 +206,36 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             this.nrseqDatabaseId = dbList.get(0).getSequenceDatabaseId();
         }
         
+        modLookup = new DynamicModLookupUtil(searchId);
+        
         for(String protxmlFile: this.protXmlFiles) {
+        	
+        	if(protXmlFileExists(protxmlFile))
+        	{
+        		continue;
+        	}
             uploadProtxmlFile(protxmlFile);
         }
     }
 
+    private boolean protXmlFileExists(String protxmlFile) {
+		
+    	int experimentId = this.searchDao.loadSearch(searchId).getExperimentId();
+        
+        List<Integer> pinferIds = ppRunDao.loadProteinferIdsForExperiment(experimentId);
+        for(Integer pinferId: pinferIds)
+        {
+        	ProteinProphetRun run = ppRunDao.loadProteinferRun(pinferId);
+        	if(run.getFilename().equals(protxmlFile))
+        	{
+        		log.info("ProtXml file " + protxmlFile + " has already been uploaded. Skipping...");
+        		return true;
+        	}
+        }
+        return false;
+	}
 
-    private void uploadProtxmlFile(String protxmlFile) throws UploadException {
+	private void uploadProtxmlFile(String protxmlFile) throws UploadException {
         
         log.info("Uploading protein inference results in file: "+protxmlFile);
         
@@ -218,47 +248,44 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         
         parser = new InteractProtXmlParser();
         try {
-            parser.open(this.protxmlDirectory+File.separator+protxmlFile);
-        }
+        	parser.open(this.protxmlDirectory+File.separator+protxmlFile);
+        	
+        	// create a new entry for this protein inference run
+        	uploadedPinferId = addProteinInferenceRun(parser);
+        	
+        	// Create a map of the PeptideProphet results
+        	makePeptideIonPeptideProphetResultMap();
+        	
+        	// save the protein and protein groups
+        	while(parser.hasNextProteinGroup()) {
+                saveProteinProphetGroup(parser.getNextGroup(), uploadedPinferId);
+                numProteinGroups++;
+                if(numProteinGroups % 100 == 0)
+                	log.info("Saved " + numProteinGroups + " ProteinProphet groups");
+            }
+    	}
         catch (DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.PROTXML_ERROR, e);
             ex.appendErrorMessage(e.getMessage());
-            throw ex;
-        }
-        
-        modLookup = new DynamicModLookupUtil(searchId);
-        
-        // create a new entry for this protein inference run
-        try {uploadedPinferId = addProteinInferenceRun(parser);}
-        catch(UploadException ex) {
-            parser.close();
-            ex.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
-            ppRunDao.delete(uploadedPinferId);
-            throw ex;
-        }
-        
-        // save the protein and protein groups
-        try {
-            while(parser.hasNextProteinGroup()) {
-                saveProteinProphetGroup(parser.getNextGroup(), uploadedPinferId);
-                numProteinGroups++;
+            if(uploadedPinferId != 0)
+            {
+            	ex.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
+                ppRunDao.delete(uploadedPinferId);
             }
+            throw ex;
         }
-        catch (DataProviderException e) {
-            UploadException ex = new UploadException(ERROR_CODE.PROTXML_ERROR, e);
-            ex.appendErrorMessage(e.getErrorMessage());
+        catch(UploadException ex) {
             ex.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
             ppRunDao.delete(uploadedPinferId);
             throw ex;
-        }
-        catch(UploadException e) {
-            e.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
-            ppRunDao.delete(uploadedPinferId);
-            throw e;
         }
         catch(RuntimeException e) {
             UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
-            ex.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
+            if(uploadedPinferId != 0)
+            {
+            	ex.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
+                ppRunDao.delete(uploadedPinferId);
+            }
             ppRunDao.delete(uploadedPinferId);
             throw ex;
         }
@@ -266,13 +293,14 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             parser.close();
         }
         
-        long e = System.currentTimeMillis();
         
         // save subsumed proteins
         // Subsumed proteins are not always in the same ProteinProphet group as the subsuming proteins
         // That is why we have to read through the entire file to have protein name to piProteinID mapping
         // for all subsuming proteins.
         saveSubsumedProteins(subsumedMap, proteinIdMap);
+        
+        long e = System.currentTimeMillis();
         
         log.info("Uploaded file: "+protxmlFile+"; ID: "+uploadedPinferId+"; #protein groups: "+numProteinGroups+
                 "; Time: "+TimeUtils.timeElapsedSeconds(s, e));
@@ -380,7 +408,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         
         if(nrseqId == 0) {
             UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND);
-            ex.appendErrorMessage("No NRSEQ id foud for protein: "+protein.getProteinName()+"; databaseId: "+nrseqDatabaseId);
+            ex.appendErrorMessage("No NRSEQ id found for protein: "+protein.getProteinName()+"; databaseId: "+nrseqDatabaseId);
             throw ex;
         }
         
@@ -575,11 +603,40 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         return modList;
     }
     
-    private void saveIonSpectra(ProteinProphetProteinPeptideIon ion, List<MsResultResidueMod> modList) 
-        throws UploadException {
-        
-        
-        // get all spectra for the given searchID that have the given unmodified sequence
+    private List<ProteinferSpectrumMatch> getSpectrumMatches(ProteinProphetProteinPeptideIon ion, 
+			List<MsResultResidueMod> modList) throws UploadException
+	{
+		// long s = System.currentTimeMillis();
+		// log.info("Getting spectrum matches for "+ion.getModifiedSequence());
+
+		List<PeptideProphetResultForMap> peptideProphetResults = peptideionPeptideProphetResultMap.get(ion.getUnmodifiedSequence());
+		List<ProteinferSpectrumMatch> matchList = new ArrayList<ProteinferSpectrumMatch>(peptideProphetResults.size());
+		int rank = 0;
+		
+		for(PeptideProphetResultForMap peptideProphetResult: peptideProphetResults)
+		{
+			rank++;
+			if(peptideProphetResult.charge != ion.getCharge())
+				continue;
+			if(!peptideProphetResult.modifiedSequence.equals(ion.getModifiedSequence()))
+				continue;
+			ProteinferSpectrumMatch psm = new ProteinferSpectrumMatch();
+			psm.setResultId(peptideProphetResult.peptideProphetResultId);
+			psm.setScanId(peptideProphetResult.scanId);
+			psm.setProteinferIonId(ion.getId());
+			psm.setRank(rank); 
+			matchList.add(psm);
+		}
+		// long e = System.currentTimeMillis();
+		return matchList;
+	}
+    
+    private List<ProteinferSpectrumMatch> getSpectrumMatchesForEquivalentSequences(ProteinProphetProteinPeptideIon ion, 
+    		                             List<MsResultResidueMod> modList) throws UploadException
+    {
+    	// log.info("Getting spectrum matches for "+ion.getModifiedSequence());
+    	
+    	// get all spectra for the given searchID that have the given unmodified sequence
         List<Integer> resultIds = getSearchResultIdsMatchingPeptide(ion);
         
         List<PeptideProphetResult> matchingResults = new ArrayList<PeptideProphetResult>();
@@ -607,7 +664,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         
         // store the ones that have the charge and modification state as this ion
         int rank = 0;
-        int numFound = 0;
+        List<ProteinferSpectrumMatch> matchList = new ArrayList<ProteinferSpectrumMatch>(matchingResults.size());
+        
         for(PeptideProphetResult result: matchingResults) {
         
             rank++;
@@ -631,41 +689,82 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
                 throw ex;
             }
             if(ion.getModifiedSequence().equals(modifiedSeq)) {
-                numFound++;
                 ProteinferSpectrumMatch psm = new ProteinferSpectrumMatch();
                 psm.setResultId(result.getPeptideProphetResultId());
                 psm.setScanId(result.getScanId());
                 psm.setProteinferIonId(ion.getId());
                 psm.setRank(rank); 
-                psmDao.saveSpectrumMatch(psm);
+                matchList.add(psm);
             }
         }
+        return matchList;
+    }
+    
+    private void saveIonSpectra(ProteinProphetProteinPeptideIon ion, List<MsResultResidueMod> modList) 
+        throws UploadException {
         
-        // make sure the number of results returned above match the spectrum count for this ion in the 
+//        _ionCount++;
+//        if(_ionCount % 100 == 0)
+//        	log.info("Saved spectra for "+_ionCount+" ions");
+        
+    	List<ProteinferSpectrumMatch> matchingSpectra = getSpectrumMatches(ion, modList);
+    	
+    	// make sure the number of results returned above match the spectrum count for this ion in the 
         // ProtXml file.
-        if(numFound != ion.getSpectrumCount()) {
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-            ex.appendErrorMessage("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
-                        ") in protXML does not match the number of results returned: "+numFound);
-            throw ex;
-//            log.error("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
-//            ") in protXML does not match the number of results returned: "+numFound);
+    	if(matchingSpectra.size() != ion.getSpectrumCount())
+    	{
+    		// If the count does not match, query for results with equivalent sequence (I -> L substitution)
+    		log.info("Spectrum count does not match for " + ion.getModifiedSequence() + " in protXML. "+
+    				" Looking for equivalent sequences.");
+    		matchingSpectra = getSpectrumMatchesForEquivalentSequences(ion, modList);
+    	}
+    	
+    	if(matchingSpectra.size() != ion.getSpectrumCount())
+    	{
+    		UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+    		ex.appendErrorMessage("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
+                      ") in protXML does not match the number of results returned: "+matchingSpectra.size());
+    		throw ex;
+//          log.error("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
+//          ") in protXML does not match the number of results returned: "+matchingSpectra.size());
+    	}
+    	
+        for(ProteinferSpectrumMatch psm: matchingSpectra)
+        {
+        	psmDao.saveSpectrumMatch(psm);
         }
     }
 
     private List<Integer> getSearchResultIdsMatchingPeptide(
             ProteinProphetProteinPeptideIon ion) {
         
+    	List<Integer> runSearchIds = daoFactory.getMsRunSearchDAO().loadRunSearchIdsForSearch(searchId);
+    	
         // first check if this peptide had any equivalent amino acids (e.g I, L)
         boolean equi = hasEquivalentAminoAcids(ion.getUnmodifiedSequence());
         if(!equi)
-            return resDao.loadResultIdsForSearchPeptide(searchId, ion.getUnmodifiedSequence());
+        {
+//        	List<Integer> resultIds = new ArrayList<Integer>();
+//        	for(int runSearchId: runSearchIds)
+//        	{
+//        		resultIds.addAll(resDao.loadResultIdsForRunSearchPeptide(runSearchId, ion.getUnmodifiedSequence()));
+//        	}
+//        	return resultIds;
+        	return resDao.loadResultIdsForSearchPeptide(searchId, ion.getUnmodifiedSequence());
+        }
         else {
             // MySQL regexps appear to be slow so switching to searching on all permutations
 //            String peptideRegex = makeRegex(ion.getUnmodifiedSequence());
 //            return resDao.loadResultIdsForSearchPeptideRegex(searchId, peptideRegex);
-            List<String> peptidePermutations = makePermutations(ion.getUnmodifiedSequence());
-            return resDao.loadResultIdsForSearchPeptides(searchId, peptidePermutations);
+        	List<Integer> resultIds = new ArrayList<Integer>();
+        	List<String> peptidePermutations = makePermutations(ion.getUnmodifiedSequence());
+    		Set<Integer> uniqResIds = new HashSet<Integer>();
+    		for(String pepPerm: peptidePermutations)
+    		{
+    			uniqResIds.addAll(resDao.loadResultIdsForSearchPeptide(searchId, pepPerm));
+    		}
+    		resultIds.addAll(uniqResIds);
+        	return resultIds;
         }
     }
 
@@ -860,7 +959,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             }
             
             MsRunSearchAnalysisDAO rsaDao = daoFactory.getMsRunSearchAnalysisDAO();
-            this.runSearchAnalysisIds = rsaDao.getRunSearchAnalysisIdsForAnalysis(analysis.getId());
+            this.runSearchAnalysisIds.addAll(rsaDao.getRunSearchAnalysisIdsForAnalysis(analysis.getId()));
             
             ProteinferInputDAO inputDao = ProteinferDAOFactory.instance().getProteinferInputDao();
             try {
@@ -910,7 +1009,75 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         return uploadedPinferId;
     }
 
+    private void makePeptideIonPeptideProphetResultMap() throws UploadException
+	{
+		List<Integer> peptideProphetResultIds = new ArrayList<Integer>();
+		
+		long s = System.currentTimeMillis();
+		for(int runSearchAnalysisId: this.runSearchAnalysisIds)
+		{
+			List<Integer> ids = ppResDao.loadIdsForRunSearchAnalysis(runSearchAnalysisId);
+			peptideProphetResultIds.addAll(ids);
+		}
+		long e = System.currentTimeMillis();
+		log.info("Returned all PeptideProphetResult Ids in " + TimeUtils.timeElapsedSeconds(s, e) + " seconds");
+		
+		s = System.currentTimeMillis();
+		for(int peptideProphetResultId: peptideProphetResultIds)
+		{
+			PeptideProphetResult result = ppResDao.loadForProphetResultId(peptideProphetResultId);
+			if(result.getProbability() < parser.getMinInitialProbability())
+				continue;
+			
+			PeptideProphetResultForMap resultForMap = new PeptideProphetResultForMap();
+			resultForMap.charge = result.getCharge();
+			try 
+			{
+				resultForMap.modifiedSequence = result.getResultPeptide().getModifiedPeptide();
+			} 
+			catch (ModifiedSequenceBuilderException x) {
+				UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
+				ex.appendErrorMessage("Error building modified sequence for result: "
+						+result.getId()+
+						"; sequence: "+result.getResultPeptide().getPeptideSequence());
+				ex.appendErrorMessage(x.getMessage());
+				throw ex;
+			}
+			resultForMap.peptideProphetResultId = peptideProphetResultId;
+			resultForMap.scanId = result.getScanId();
+			resultForMap.probability = result.getProbability();
+			
+			String sequence = result.getResultPeptide().getPeptideSequence();
+			List<PeptideProphetResultForMap> results = this.peptideionPeptideProphetResultMap.get(sequence);
+			if(results == null)
+			{
+				results = new ArrayList<PeptideProphetResultForMap>();
+				this.peptideionPeptideProphetResultMap.put(sequence, results);
+			}
+			results.add(resultForMap);
+		}
+		
+		e = System.currentTimeMillis();
+		log.info("Peptide sequence > PeptideProphetResult map made in " + TimeUtils.timeElapsedSeconds(s, e) + " seconds");
+		
+		s = System.currentTimeMillis();
+		for(String sequence: this.peptideionPeptideProphetResultMap.keySet())
+		{
+			List<PeptideProphetResultForMap> results = this.peptideionPeptideProphetResultMap.get(sequence);
+			Collections.sort(results, new Comparator<PeptideProphetResultForMap>() {
 
+				@Override
+				public int compare(PeptideProphetResultForMap arg0,
+						PeptideProphetResultForMap arg1) {
+					// Sort descending on probability
+					return Double.valueOf(arg1.probability).compareTo(arg0.probability);
+				}
+			});
+		}
+		e = System.currentTimeMillis();
+		log.info("PeptideProphet results sorted in " + TimeUtils.timeElapsedSeconds(s, e) + " seconds");
+	}
+    
     @Override
     public void setAnalysisId(int analysisId) {
     	log.warn("ProxmlDataUploadService determines the analysis ID based "+ 
@@ -1006,6 +1173,15 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     public void setRemoteServer(String remoteServer) {
         throw new UnsupportedOperationException();
     }
+    
+    private class PeptideProphetResultForMap
+	{
+		private int peptideProphetResultId;
+		private int scanId;
+		private int charge;
+		private String modifiedSequence;
+		private double probability;
+	}
     
     public static void main(String[] args) throws UploadException {
         ProtxmlDataUploadService p = new ProtxmlDataUploadService();

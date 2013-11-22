@@ -744,16 +744,43 @@ public class PercolatorXmlDataUploadService implements
         		else {
         		
         			String modifiedPeptideSeq = peptide.getModifiedPeptidePS(false);
-        			// check for exact modified sequence
-        			List<MsSearchResult> matchingResults3 = new ArrayList<MsSearchResult>();
-        			for(MsSearchResult res: matchingResults2) {
-        				if(res.getResultPeptide().getModifiedPeptidePS(false).equals(modifiedPeptideSeq)) {
-        					matchingResults3.add(res);
-        				}
+        			if(matchingResults2.size() > 0)
+        			{
+            			// check for exact modified sequence
+            			List<MsSearchResult> matchingResults3 = new ArrayList<MsSearchResult>();
+            			for(MsSearchResult res: matchingResults2) {
+            				if(res.getResultPeptide().getModifiedPeptidePS(false).equals(modifiedPeptideSeq)) {
+            					matchingResults3.add(res);
+            				}
+            			}
+            			
+            			if(matchingResults3.size() == 1)
+                			bestRes = matchingResults3.get(0);
         			}
-        			
-        			if(matchingResults3.size() == 1)
-            			bestRes = matchingResults3.get(0);
+        			else if(matchingResults2.size() == 0)
+        			{
+        				// Note: 11/06/13
+        				// Added for Alex Zelter's data, searched via Comet and manipulated to conform to 
+        				// MSDaPl's requirements.
+        				// <exp_mass> in his Percolator output has m/z values instead of M+H, so the 
+        				// check for matching <exp_mass> and observed mass in SQT fails. 
+        				// I could move the check for modified sequence before the check for mass, 
+        				// but that check takes longer since it involves querying the database for 
+        				// modifications. For most of the files from the MacCoss lab's pipelines (hermie and LabKey)
+        				// matching the mass is sufficient.
+        				
+        				// Check for exact modified sequence
+            			List<MsSearchResult> matchingResults4 = new ArrayList<MsSearchResult>();
+            			for(MsSearchResult res: matchingResults) {
+            				if(res.getResultPeptide().getModifiedPeptidePS(false).equals(modifiedPeptideSeq)) {
+            					matchingResults4.add(res);
+            				}
+            			}
+            			
+            			if(matchingResults4.size() == 1)
+                			bestRes = matchingResults4.get(0);
+        				
+        			}
         		}
         		
         		
