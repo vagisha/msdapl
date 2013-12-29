@@ -289,7 +289,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
     		
     		boolean clip;
     		
-    		if(msSearch.getSearchProgram() == Program.SEQUEST) {
+    		if(msSearch.getSearchProgram() == Program.SEQUEST || msSearch.getSearchProgram() == Program.COMET) {
     			clip = DAOFactory.instance().getSequestSearchDAO().getClipNterMethionine(searchId);
             }
     		else
@@ -321,7 +321,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
     		
     		int net = -1;
     		
-    		if(msSearch.getSearchProgram() == Program.SEQUEST) {
+    		if(msSearch.getSearchProgram() == Program.SEQUEST || msSearch.getSearchProgram() == Program.COMET) {
     			net = DAOFactory.instance().getSequestSearchDAO().getNumEnzymaticTermini(searchId);
             }
             else if(msSearch.getSearchProgram() == Program.MASCOT)

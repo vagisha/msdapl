@@ -75,7 +75,7 @@ public class IdPickerInputGetter {
         Program inputGenerator = run.getInputGenerator();
         log.info("Reading search/analysis results for Protein Inference run: "+run.getId()+"; Input Generator Program: "+inputGenerator.displayName());
         
-        if (inputGenerator == Program.SEQUEST ) { // || inputGenerator == Program.EE_NORM_SEQUEST) {
+        if (inputGenerator == Program.SEQUEST || inputGenerator == Program.COMET) { // || inputGenerator == Program.EE_NORM_SEQUEST) {
             SequestResultsGetter seqResGetter = SequestResultsGetter.instance();
             return seqResGetter.getResults(run, params);
         }
