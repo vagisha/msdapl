@@ -6,7 +6,9 @@
  */
 package org.yeastrc.ms.dao.protinfer.proteinProphet;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.protinfer.GenericProteinferPeptideDAO;
@@ -62,9 +64,25 @@ public class ProteinProphetPeptideDAO extends BaseSqlMapDAO  implements
         return peptDao.getUniquePeptideSequenceCountForRun(proteinferId);
     }
     
+    public int getUniquePeptideSequenceCountForProphetGroupProbability(int pinferId, double prophetGroupProbability) 
+    {
+    	Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put("pinferId", pinferId);
+        map.put("minProbability", prophetGroupProbability);
+        return (Integer)queryForObject(sqlMapNameSpace+".peptideSequenceCountForProphetGroupProbability", map);
+    }
+    
     @Override
     public int getUniqueIonCountForRun(int proteinferId) {
         return peptDao.getUniqueIonCountForRun(proteinferId);
+    }
+    
+    public int getIonCountForProphetGroupProbability(int pinferId, double prophetGroupProbability) 
+    {
+    	Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put("pinferId", pinferId);
+        map.put("minProbability", prophetGroupProbability);
+        return (Integer)queryForObject(sqlMapNameSpace+".ionCountForProphetGroupProbability", map);
     }
     
     @Override

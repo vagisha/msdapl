@@ -529,6 +529,32 @@
     	GROUP BY prot.id
     	HAVING cnt BETWEEN #minPeptides# AND #maxPeptides#
     </select>
+    
+    <select id="prophetGroupCountByGroupProbability" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT COUNT(*)
+    	FROM ProteinProphetProteinGroup AS ppProtGrp
+    	WHERE ppProtGrp.piRunID=#pinferId#
+    	AND ppProtGrp.probability >= #minProbability#
+    </select>
+    
+    <select id="indistinguishableGroupCountByGroupProbability" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT COUNT(DISTINCT ppProt.groupID)
+    	FROM ProteinProphetProteinGroup AS ppProtGrp, ProteinProphetProtein AS ppProt
+    	WHERE ppProtGrp.piRunID=#pinferId#
+    	AND ppProtGrp.id = ppProt.proteinProphetGroupID
+    	AND ppProtGrp.probability >= #minProbability#
+    	AND ppProt.subsumed = 0
+    </select>
+    
+    <select id="proteinCountCountByGroupProbability" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT COUNT(ppProt.piProteinID)
+    	FROM ProteinProphetProteinGroup AS ppProtGrp, ProteinProphetProtein AS ppProt
+    	WHERE ppProtGrp.piRunID=#pinferId#
+    	AND ppProtGrp.id = ppProt.proteinProphetGroupID
+    	AND ppProtGrp.probability >= #minProbability#
+    	AND ppProt.subsumed = 0
+    </select>
+    
    <!-- =========================================================================== -->
     
     

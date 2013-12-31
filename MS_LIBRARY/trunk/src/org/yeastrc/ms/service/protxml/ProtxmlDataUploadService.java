@@ -32,6 +32,7 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferPeptideDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferSpectrumMatchDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetParamDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetPeptideDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinGroupDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinIonDAO;
@@ -311,7 +312,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         	saveStats(uploadedPinferId);
         }
         catch(Exception ex) {
-        	log.warn("Error saving status for runID: "+uploadedPinferId,ex);
+        	log.warn("Error saving stats for runID: "+uploadedPinferId,ex);
         }
         
         uploadMsg.append("\n\tProtein inferenceID: "+uploadedPinferId);
@@ -322,14 +323,25 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     	
     	// Extract information from the protein inference tables
 		ProteinProphetProteinDAO prophetProtDao = ProteinferDAOFactory.instance().getProteinProphetProteinDao();
-        ProteinferPeptideDAO peptDao = ProteinferDAOFactory.instance().getProteinferPeptideDao();
+        // ProteinferPeptideDAO peptDao = ProteinferDAOFactory.instance().getProteinferPeptideDao();
         ProteinferSpectrumMatchDAO specDao = ProteinferDAOFactory.instance().getProteinferSpectrumMatchDao();
+        ProteinProphetRocDAO rocDao = ProteinferDAOFactory.instance().getProteinProphetRocDao();
+        ProteinProphetPeptideDAO ppPeptDao = ProteinferDAOFactory.instance().getProteinProphetPeptideDao();
         
-        int proteinCount = prophetProtDao.getProteinferProteinIds(piRunId, true).size();
-        int iGroupCount = prophetProtDao.getIndistinguishableGroupCount(piRunId, true);
-        int prophetGrpCount = prophetProtDao.getProteinProphetGroupCount(piRunId, true);
-        int peptSeqCount = peptDao.getUniquePeptideSequenceCountForRun(piRunId);
-        int ionCount = peptDao.getUniqueIonCountForRun(piRunId);
+        ProteinProphetROC roc = rocDao.loadRoc(piRunId);
+        double minProbability = roc.getMinProbabilityForError(roc.getClosestError(0.01)); // get the probability for a 1% error rate.
+        
+        int prophetGrpCount = prophetProtDao.getProphetGroupCountForProbability(piRunId, minProbability);
+        int iGroupCount = prophetProtDao.getIndistinguishableGroupCountForProbability(piRunId, minProbability);
+        int proteinCount = prophetProtDao.getProteinCountForProbability(piRunId, minProbability);
+        int peptSeqCount = ppPeptDao.getUniquePeptideSequenceCountForProphetGroupProbability(piRunId, minProbability);
+        int ionCount = ppPeptDao.getIonCountForProphetGroupProbability(piRunId, minProbability);
+        
+        // int proteinCount = prophetProtDao.getProteinferProteinIds(piRunId, true).size();
+        // int iGroupCount = prophetProtDao.getIndistinguishableGroupCount(piRunId, true);
+        // int prophetGrpCount = prophetProtDao.getProteinProphetGroupCount(piRunId, true);
+        // int peptSeqCount = peptDao.getUniquePeptideSequenceCountForRun(piRunId);
+        // int ionCount = peptDao.getUniqueIonCountForRun(piRunId);
         int spectrumCount = specDao.getSpectrumCountForPinferRun(piRunId);
         int minSpectrumCount = specDao.getMinSpectrumCountForPinferRunProtein(piRunId);
         int maxSpectrumCount = specDao.getMaxSpectrumCountForPinferRunProtein(piRunId);

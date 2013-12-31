@@ -30,4 +30,34 @@
     	AND protMatch.piProteinID = #id#
     </select>
     
+    <select id="peptideSequenceCountForProphetGroupProbability" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT COUNT(DISTINCT p.sequence)
+    	FROM  msProteinInferPeptide AS p, 
+    	      msProteinInferProteinPeptideMatch AS protMatch,
+    	      ProteinProphetProtein AS ppProt, 
+    	      ProteinProphetProteinGroup AS ppProtGrp 
+    	WHERE p.id = protMatch.piPeptideID
+    	AND protMatch.piProteinID = ppProt.piProteinID
+    	AND ppProt.proteinProphetGroupID = ppProtGrp.id
+    	AND ppProtGrp.piRunID = #pinferId#
+    	AND ppProtGrp.probability >= #minProbability#
+    	AND ppProt.subsumed = 0
+    </select>
+    
+    <select id="ionCountForProphetGroupProbability" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT COUNT(DISTINCT ion.id)
+    	FROM  msProteinInferIon AS ion,
+    		  msProteinInferPeptide AS p, 
+    	      msProteinInferProteinPeptideMatch AS protMatch, 
+    	      ProteinProphetProtein AS ppProt, 
+    	      ProteinProphetProteinGroup AS ppProtGrp 
+    	WHERE ion.piPeptideID = p.id 
+    	AND p.id = protMatch.piPeptideID
+    	AND protMatch.piProteinID = ppProt.piProteinID
+    	AND ppProt.proteinProphetGroupID = ppProtGrp.id
+    	AND ppProtGrp.piRunID = #pinferId#
+    	AND ppProtGrp.probability >= #minProbability#
+    	AND ppProt.subsumed = 0
+    </select>
+    
 </sqlMap>
