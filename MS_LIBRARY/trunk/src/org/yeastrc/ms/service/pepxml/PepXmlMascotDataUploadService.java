@@ -124,7 +124,7 @@ public class PepXmlMascotDataUploadService extends PepXmlDataUploadService<PepXm
             throws UploadException {
         
         // read parameters from one of the pep.xml files
-        String filePath = dataDirectory+File.separator+searchDataFileNames.get(0)+".pep.xml";
+        String filePath = dataDirectory+File.separator+inputXmlFileNames.get(0);
         PepXmlMascotFileReader parser = new PepXmlMascotFileReader();
         MascotSearchIn search = null;
         try {

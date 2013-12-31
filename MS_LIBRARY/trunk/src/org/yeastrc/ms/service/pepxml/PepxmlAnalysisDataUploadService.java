@@ -230,12 +230,12 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
             parser.close();
         
             if(searchDataFileNames != null) {
-                for(String input:inputFileNames) {
-                    if(!searchDataFileNames.contains(input)) {
-                        appendToMsg("No corresponding search data file found for: "+input);
-                        return false;
-                    }
-                }
+	            for(String input:inputFileNames) {
+	            	if(!searchDataFileNames.contains(input)) {
+	                    appendToMsg("No corresponding search data file found for: "+input);
+	                    return false;
+	                }
+	            }
             }
         }
         
@@ -262,16 +262,6 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
                 throw ex;
             }
         }
-        
-        Map<String,Integer> runSearchIdMap;
-        try {
-           runSearchIdMap = createRunSearchIdMap();
-        }
-        catch(UploadException e) {
-            e.appendErrorMessage("\n\t!!!PEPTIDE_PROPHET ANALYSIS WILL NOT BE UPLOADED\n");
-            throw e;
-        }
-        
         
         // get the modifications used for this search. Will be used for parsing the peptide sequence
         getSearchModifications(searchId);
@@ -322,7 +312,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
                 while(parser.hasNextRunSearch()) {
                     String filename = parser.getRunSearchName();
 
-                    Integer runSearchId = runSearchIdMap.get(filename);
+                    Integer runSearchId = getRunSearchIdForFile(filename);
                     try {
                         uploadRunSearchAnalysis(filename, searchId, analysisId, runSearchId, parser);
                     }
@@ -751,23 +741,18 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         rsa.setRunSearchId(runSearchId);
         return runSearchAnalysisDao.save(rsa);
     }
-
-    private Map<String, Integer> createRunSearchIdMap() throws UploadException {
-        
-        Map<String, Integer> runSearchIdMap = new HashMap<String, Integer>(searchDataFileNames.size()*2);
-        
-        for(String file: searchDataFileNames) {
-            int runSearchId = runSearchDao.loadIdForSearchAndFileName(searchId, file);
-            if(runSearchId == 0) {
-                UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_ANALYSIS_FILE);
-                ex.appendErrorMessage("File: "+file);
-                ex.appendErrorMessage("; SearchID: "+searchId);
-                throw ex;
-            }
-            runSearchIdMap.put(file, runSearchId);
-        }
-        return runSearchIdMap;
-    }
+    
+    private int getRunSearchIdForFile(String file) throws UploadException 
+    {
+		int runSearchId = runSearchDao.loadIdForSearchAndFileName(searchId, file);
+		if(runSearchId == 0) {
+			UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_ANALYSIS_FILE);
+			ex.appendErrorMessage("File: "+file);
+			ex.appendErrorMessage("; SearchID: "+searchId);
+			throw ex;
+		}
+		return runSearchId;
+	}
 
 
     void reset() {

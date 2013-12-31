@@ -30,6 +30,7 @@ import org.yeastrc.ms.domain.search.MsRunSearchIn;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchIn;
+import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
@@ -69,10 +70,9 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
     protected StringBuilder preUploadCheckMsg;
     protected boolean preUploadCheckDone;
 
-    protected List<String> searchDataFileNames; // names without extensions
-    private String fileExtension;
+    protected List<String> inputXmlFileNames; // names WITH extensions
+    private Set<String> runFileNames; // run names WITHOUT extension
     private List<String> spectrumFileNames;
-
     
 
     private final MsRunDAO runDao;
@@ -100,7 +100,8 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
     public PepXmlDataUploadService() {
 
         super();
-        this.searchDataFileNames = new ArrayList<String>();
+        this.inputXmlFileNames = new ArrayList<String>();
+        this.runFileNames = new HashSet<String>();
 
         this.proteinMatchList = new ArrayList<MsSearchResultProtein>(BUF_SIZE);
         this.resultResidueModList = new ArrayList<MsResultResidueModIds>(BUF_SIZE);
@@ -161,7 +162,8 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
     @Override
     public String getUploadSummary() {
         return "\tSearch file format: "+getSearchFileFormat()+
-        "\n\t#Search files in Directory: "+searchDataFileNames.size()+"; #Uploaded: "+numSearchesUploaded;
+        "\n\t#Input PepXml(interact) files in Directory: "+inputXmlFileNames.size()
+        + "; #Run searches " + runFileNames.size() + "; #Uploaded: "+numSearchesUploaded;
     }
 
     @Override
@@ -188,9 +190,7 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                 String name_uc = name.toLowerCase();
                 return (name_uc.endsWith(".pep.xml") || name_uc.endsWith(".xml"));
             }});
-        // Remove files where PeptideProphet has been run. We are interested in files
-        // that contain only search results.
-        List<File> searchResultFiles = new ArrayList<File>();
+        // Keep only files where PeptideProphet has been run.
         for (int i = 0; i < files.length; i++) {
         	String fileName = files[i].getName();
         	
@@ -207,69 +207,33 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
             	parser.close();
             	continue;
             }
-            else if (parser.isPeptideProphetRun()) {
+            else if (!parser.isPeptideProphetRun()) {
             	parser.close();
             	continue;
             }
-            // This is a TPP-generated file and does not contain PeptideProphet results
-            searchResultFiles.add(files[i]);
+            // This is a TPP-generated file and contains PeptideProphet results
+            inputXmlFileNames.add(files[i].getName());
+            
+            try {
+                while(parser.hasNextRunSearch()) {
+                	// Add all the run file names to our list. Each interact pepxml file may contain
+                	// results for more than one run.
+                    runFileNames.add(parser.getRunSearchName());
+                }
+            }
+            catch (DataProviderException e) {
+            	appendToMsg("Error opening file: "+fileName+"\n"+e.getMessage());
+                return false;
+            }
+            
             parser.close();
         }
-        // If we did not find any TPP generated files that also do not contain PeptideProphet results
-        // add files that contain PeptideProphet results.  In this case we will only upload
-        // search results that made it through the PeptideProphet analysis
-        if(searchResultFiles.size() == 0) {
-        	
-        	log.info("No files found containing only search results and not PeptideProphet results");
-        	for (int i = 0; i < files.length; i++) {
-            	String fileName = files[i].getName();
-            	
-            	PepXmlBaseFileReader parser = new PepXmlBaseFileReader();
-                try {
-                    parser.open(dataDirectory+File.separator+fileName);
-                }
-                catch (DataProviderException e) {
-                    appendToMsg("Error opening file: "+fileName+"\n"+e.getMessage());
-                    return false;
-                }
-                
-                if(parser.isTPPFile()) {
-                	searchResultFiles.add(files[i]);
-                }
-                parser.close();
-            }
-        }
         
-        for (File file: searchResultFiles) {
-            String name = file.getName();
-            
-            int idx = name.lastIndexOf(".pep.xml");
-            if(idx == -1)
-            	idx = name.lastIndexOf(".xml");
-            
-            String ext = name.substring(idx);
-            name = name.substring(0, idx);
-            searchDataFileNames.add(name);
-            
-            
-            if(this.fileExtension == null) {
-            	this.fileExtension = ext;
-            }
-            else {
-            	
-            	if(!this.fileExtension.equals(ext)) {
-            		appendToMsg("Multiple file extensions: "+this.fileExtension+", "+ext);
-            		return false;
-            	}
-            }
-        }
-        log.info("File extension is: "+this.fileExtension);
-
-
+        
         // 3. If we know the raw data file names that will be uploaded match them with up with the 
         //    *.pep.xml file and make sure there is a spectrum data file for each one.
         if(spectrumFileNames != null) {
-            for(String file:searchDataFileNames) {
+            for(String file:runFileNames) {
                 if(!spectrumFileNames.contains(file)) {
                     appendToMsg("No corresponding spectrum data file found for: "+file);
                     return false;
@@ -323,17 +287,6 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
             }
         }
 
-        // get the runIds corresponding to the files we will be uploading
-        Map<String, Integer> runIdMap;
-        try {
-            runIdMap = createRunIdMap();
-        }
-        catch(UploadException e) {
-            e.appendErrorMessage("\n\t!!!SEARCH WILL NOT BE UPLOADED\n");
-            throw e;
-        }
-
-
         searchId = 0;
         // parse and upload the search parameters
         try {
@@ -350,15 +303,12 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         dynaModLookup = new DynamicModLookupUtil(searchId);
         
         // now upload the search data in the *.pep.xml or *.xml files
-        for (String file: searchDataFileNames) {
+        for (String file: inputXmlFileNames) {
             
-            Integer runId = runIdMap.get(file); 
-
-            String filePath = dataDirectory+File.separator+file+fileExtension;
+            String filePath = dataDirectory+File.separator+file;
             log.info("Reading file: "+filePath);
             
             resetCaches();
-            // int runSearchId;
 
             long s = System.currentTimeMillis();
             log.info("Uploading search results in file: "+file);
@@ -374,10 +324,12 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                 throw ex;
             }
 
-            // there should only be one run_search in this file
             try {
                 while(parser.hasNextRunSearch()) {
 
+                	String runName = parser.getRunSearchName();
+                	int runId = getRunId(runName);
+                			
                     // match the search parameters found in the file against the ones we saved
                     // for this search
                     matchSearchParams(searchId, parser.getSearch(), parser.getRunSearchName());
@@ -457,8 +409,22 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
 
     	log.info("Loading search results for file: "+filename);
     	
-        int runSearchId = uploadRunSearchHeader(searchId, runId, parser);
-        log.info("Created entry in msRunSearch table: "+runSearchId);
+    	String runName = parser.getRunSearchName();
+    	
+    	int runSearchId = getRunSearchId(runId);
+    	if(runSearchId > 0)
+    	{
+    		// If we have already uploaded the search results for this run don't upload them again.
+    		// This could happen, for example, if there is one interact*.pep.xml file per run, and 
+    		// also a combined interact.pep.xml
+    		log.info("Search results for file " + parser.getRunSearchName() + " have been uploaded. Adding to existing results, if required...");
+    	}
+    	else
+    	{
+    		runSearchId = uploadRunSearchHeader(searchId, runId, parser);
+    		log.info("Created entry in msRunSearch table: "+runSearchId);
+    	}
+        
         
         // upload the search results for each scan + charge combination
         int numResults = 0;
@@ -469,9 +435,17 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                 int scanId = getScanId(runId, scan.getScanNumber());
 
                 for(G result: scan.getScanResults()) {
-                    int resultId = uploadBaseSearchResult(result.getSearchResult(), runSearchId, scanId);
-                    uploadProgramSpecificResultData(result.getSearchResult(), resultId); // Program specific scores
-                    numResults++;
+                	
+                	int charge = result.getSearchResult().getCharge();
+                	String sequence = result.getSearchResult().getResultPeptide().getPeptideSequence();
+                	
+                	List<MsSearchResult> results = resultDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, charge, sequence);
+                	if(results.size() == 0)
+                	{
+	                    int resultId = uploadBaseSearchResult(result.getSearchResult(), runSearchId, scanId);
+	                    uploadProgramSpecificResultData(result.getSearchResult(), resultId); // Program specific scores
+	                    numResults++;
+                	}
                 }
             }
         }
@@ -481,7 +455,7 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         }
 
         flush(); // save any cached data
-        log.info("Uploaded search results for file: "+filename+", with "+numResults+
+        log.info("Uploaded search results in file: "+filename+ " for run " + runName + ", with "+numResults+
                 " results. (runSearchId: "+runSearchId+")");
 
     }
@@ -651,25 +625,27 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
         }
     }
 
-    private Map<String, Integer> createRunIdMap() throws UploadException {
 
-        Map<String, Integer> runIdMap = new HashMap<String, Integer>(searchDataFileNames.size()*2);
-        for(String file: searchDataFileNames) {
-            int runId = 0;
-            try {runId = runDao.loadRunIdForExperimentAndFileName(experimentId, file);}
-            catch(Exception e) {
-                UploadException ex = new UploadException(ERROR_CODE.RUNTIME_ERROR);
-                throw ex;
-            }
-            if(runId == 0) {
-                UploadException ex = new UploadException(ERROR_CODE.NO_RUNID_FOR_SEARCH_FILE);
-                ex.appendErrorMessage("File: "+file);
-                throw ex;
-            }
-            runIdMap.put(file, runId);
-        }
-        return runIdMap;
+    private int getRunId(String filename) throws UploadException
+    {
+    	int runId = 0;
+		try {runId = runDao.loadRunIdForExperimentAndFileName(experimentId, filename);}
+		catch(Exception e) {
+		    UploadException ex = new UploadException(ERROR_CODE.RUNTIME_ERROR);
+		    throw ex;
+		}
+		if(runId == 0) {
+		    UploadException ex = new UploadException(ERROR_CODE.NO_RUNID_FOR_SEARCH_FILE);
+		    ex.appendErrorMessage("File: "+filename);
+		    throw ex;
+		}
+		return runId;
     }
+    
+	private int getRunSearchId(int runId) throws UploadException {
+		
+		return runSearchDao.loadIdForRunAndSearch(runId, searchId);
+	}
 
     private int uploadSearch(int experimentId, S search) throws UploadException {
 
@@ -768,7 +744,7 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
 
     @Override
     public List<String> getFileNames() {
-        return this.searchDataFileNames;
+        return new ArrayList<String>(runFileNames);
     }
 
 }

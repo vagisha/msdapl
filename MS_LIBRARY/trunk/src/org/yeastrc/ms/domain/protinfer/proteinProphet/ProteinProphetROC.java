@@ -66,11 +66,20 @@ public class ProteinProphetROC implements Serializable {
                 probability = point.getMinProbability();
             }
         }
+        
+        if(probability == -1.0)
+        	return 0.0;
+        
         return probability;
     }
     
     public double getClosestError(double error) {
         
+    	if(rocPoints == null || rocPoints.size() == 0)
+    	{
+    		return 1.0;
+    	}
+    	
         double closestError = rocPoints.get(0).getFalsePositiveErrorRate();
         
         for(ProteinProphetROCPoint point: rocPoints) {
