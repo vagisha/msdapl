@@ -140,26 +140,32 @@ public class QCStatsGetter {
         if(spectraDistrUrl == null) {
         	SpectraRetTimeDistributionGetter distrGetter = new SpectraRetTimeDistributionGetter(analysisId, scoreCutoff);
         	SpectraRetTimeDistribution result = distrGetter.getDistribution();
-            spectraFileStats = result.getFileStatsList();
-            spectraDistrUrl = result.getGoogleChartUrl();
-            PlotUrlCache.getInstance().addSpectraRtPlotUrl(analysisId, scoreCutoff, spectraDistrUrl, spectraFileStats);
+        	if(result != null)
+        	{
+	            spectraFileStats = result.getFileStatsList();
+	            spectraDistrUrl = result.getGoogleChartUrl();
+	            PlotUrlCache.getInstance().addSpectraRtPlotUrl(analysisId, scoreCutoff, spectraDistrUrl, spectraFileStats);
+        	}
         }
         
         log.info("#Spectra-RT Plot URL: "+spectraDistrUrl);
         
-        // stats at the experiment (analysis) level
-        spectraAnalysisStats = new FileStats(analysisId, "none");
-        int totalSpectraCount = 0; int goodSpectraCount = 0;
-        for(FileStats stat: spectraFileStats) { totalSpectraCount += stat.getTotalCount(); goodSpectraCount += stat.getGoodCount();}
-        spectraAnalysisStats.setTotalCount(totalSpectraCount);
-        spectraAnalysisStats.setGoodCount(goodSpectraCount);
-    	
-        if(spectraFileStats.get(0).getHasPopulationStats()) {
-        	FileStats st = spectraFileStats.get(0);
-        	spectraAnalysisStats.setPopulationMin(st.getPopulationMin());
-        	spectraAnalysisStats.setPopulationMax(st.getPopulationMax());
-        	spectraAnalysisStats.setPopulationMean(st.getPopulationMean());
-        	spectraAnalysisStats.setPopulationStandardDeviation(st.getPopulationStandardDeviation());
+        if(spectraFileStats != null)
+        {
+	        // stats at the experiment (analysis) level
+	        spectraAnalysisStats = new FileStats(analysisId, "none");
+	        int totalSpectraCount = 0; int goodSpectraCount = 0;
+	        for(FileStats stat: spectraFileStats) { totalSpectraCount += stat.getTotalCount(); goodSpectraCount += stat.getGoodCount();}
+	        spectraAnalysisStats.setTotalCount(totalSpectraCount);
+	        spectraAnalysisStats.setGoodCount(goodSpectraCount);
+	    	
+	        if(spectraFileStats.get(0).getHasPopulationStats()) {
+	        	FileStats st = spectraFileStats.get(0);
+	        	spectraAnalysisStats.setPopulationMin(st.getPopulationMin());
+	        	spectraAnalysisStats.setPopulationMax(st.getPopulationMax());
+	        	spectraAnalysisStats.setPopulationMean(st.getPopulationMean());
+	        	spectraAnalysisStats.setPopulationStandardDeviation(st.getPopulationStandardDeviation());
+	        }
         }
 	}
 	

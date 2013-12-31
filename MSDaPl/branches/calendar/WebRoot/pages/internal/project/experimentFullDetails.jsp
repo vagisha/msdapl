@@ -32,6 +32,20 @@
 				</td>
 				</logic:equal>
 				
+				<!-- !!!!!! COMET !!!!!! -->
+				<logic:equal name="search" property="searchProgram" value="<%=Program.COMET.toString() %>">
+				<td width="33%">
+					<b>
+					<html:link action="viewSequestResults.do" 
+								paramId="ID" 
+								paramName="search" paramProperty="id">[View Results]</html:link>
+					<!-- <html:link action="percolatorPepXmlDownloadForm.do" 
+								paramId="ID" 
+								paramName="search" paramProperty="id">[PepXML]</html:link> -->
+					</b>
+				</td>
+				</logic:equal>
+				
 				<!-- !!!!!! TIDE !!!!!! -->
 				<logic:equal name="search" property="searchProgram" value="<%=Program.TIDE.toString() %>">
 				<td width="33%">

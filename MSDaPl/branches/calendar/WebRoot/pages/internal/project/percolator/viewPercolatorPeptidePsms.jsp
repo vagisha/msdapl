@@ -30,7 +30,7 @@
 				<td><bean:write name="psm" property="scanNumber"/></td>
 				<td><bean:write name="psm" property="charge"/></td>
 				<td><bean:write name="psm" property="retentionTime"/></td>
-				<td><bean:write name="psm" property="getQvalueRounded3SignificantDigits"/></td>
+				<td><bean:write name="psm" property="qvalueRounded3SignificantDigits"/></td>
 				<!--
 				<td><bean:write name="psm" property="qvalueRounded"/></td>
 				-->

@@ -492,17 +492,24 @@ public class ViewProjectAction extends Action {
         	
         	PeptideProphetRocDAO rocDao = DAOFactory.instance().getPeptideProphetRocDAO();
     		PeptideProphetROC roc = rocDao.loadRoc(analysis.getId());
-    		double errRate = roc.getClosestError(QCStatsGetter.PEPPROPHET_ERR_RATE_DEFAULT);
-    		double probability = roc.getMinProbabilityForError(errRate);
-    		
-    		FileStats analysisSpectraRtStat = qcStatsGetter.getSpectraAnalysisStats();
-        	String qcSummaryString = analysisSpectraRtStat.getPercentGoodCount()+"% spectra with results at error rate "+errRate+" (prob. "+probability+")";
-        	sAnalysis.addQcSummaryString(qcSummaryString);
-        	
-        	List<QCPlot> qcPlots = new ArrayList<QCPlot>(2);
-        	// qcPlots.add(new QCPlot(qcStatsGetter.getPsmDistrUrl(), "Retention Time vs # PSM"));
-        	qcPlots.add(new QCPlot(qcStatsGetter.getSpectraDistrUrl(), "Retention Time vs # Spectra"));
-        	sAnalysis.setQcPlots(qcPlots);
+    		if(roc.getRocPoints().size() > 0)
+    		{
+	    		double errRate = roc.getClosestError(QCStatsGetter.PEPPROPHET_ERR_RATE_DEFAULT);
+	    		double probability = roc.getMinProbabilityForError(errRate);
+	    		
+	    		FileStats analysisSpectraRtStat = qcStatsGetter.getSpectraAnalysisStats();
+	    		String qcSummaryString = "";
+	    		if(analysisSpectraRtStat != null)
+	    		{
+	    			qcSummaryString = analysisSpectraRtStat.getPercentGoodCount()+"% spectra with results at error rate "+errRate+" (prob. "+probability+")";
+	    		}
+	        	sAnalysis.addQcSummaryString(qcSummaryString);
+	        	
+	        	List<QCPlot> qcPlots = new ArrayList<QCPlot>(2);
+	        	// qcPlots.add(new QCPlot(qcStatsGetter.getPsmDistrUrl(), "Retention Time vs # PSM"));
+	        	qcPlots.add(new QCPlot(qcStatsGetter.getSpectraDistrUrl(), "Retention Time vs # Spectra"));
+	        	sAnalysis.setQcPlots(qcPlots);
+    		}
         }
         
         return sAnalysis;

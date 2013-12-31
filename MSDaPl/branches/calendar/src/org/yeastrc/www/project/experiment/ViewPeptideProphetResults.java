@@ -252,7 +252,7 @@ public class ViewPeptideProphetResults extends Action {
             List<Integer> forPage, int numResultsPerPage, PeptideProphetFilterResultsForm myForm) {
         
         if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET &&
-                searchProgram == Program.SEQUEST) {
+                (searchProgram == Program.SEQUEST || searchProgram == Program.COMET)) {
             return getPeptideProphetSequestResults(analysis, forPage, numResultsPerPage, myForm);
         }
         else if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET &&

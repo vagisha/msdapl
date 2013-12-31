@@ -66,15 +66,15 @@ public class SpectraRetTimeDistributionGetter {
 		
 		if(filteredResults == null || filteredResults.size() == 0) {
 			
-			// Results were not found in the database; calculate now
-			PeptideProphetRocDAO rocDao = DAOFactory.instance().getPeptideProphetRocDAO();
-			PeptideProphetROC roc = rocDao.loadRoc(analysisId);
-			double probability = roc.getMinProbabilityForError(0.01);
-			log.info("Probability for error rate of "+scoreCutoff+" is: "+probability);
-			
-			ProphetFilteredSpectraDistributionCalculator calc = new ProphetFilteredSpectraDistributionCalculator(analysisId, probability);
-			calc.calculate();
-			filteredResults = calc.getFilteredResults();
+//			// Results were not found in the database; calculate now
+//			PeptideProphetRocDAO rocDao = DAOFactory.instance().getPeptideProphetRocDAO();
+//			PeptideProphetROC roc = rocDao.loadRoc(analysisId);
+//			double probability = roc.getMinProbabilityForError(0.01);
+//			log.info("Probability for error rate of "+scoreCutoff+" is: "+probability);
+//			
+//			ProphetFilteredSpectraDistributionCalculator calc = new ProphetFilteredSpectraDistributionCalculator(analysisId, probability);
+//			calc.calculate();
+//			filteredResults = calc.getFilteredResults();
 		}
 		
 		if(filteredResults == null || filteredResults.size() == 0) {
