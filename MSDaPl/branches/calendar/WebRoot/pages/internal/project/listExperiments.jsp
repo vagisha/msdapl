@@ -244,7 +244,6 @@ function setupEditableInstrument(editable) {
 
 	$(editable).click(function() {
 		var id = $(this).attr('id');
-		
 		var instrumentId = $(this).attr('title').split("_")[0];
 		var experimentId = $(this).attr('title').split("_")[1];
 
@@ -273,13 +272,16 @@ function setupEditableInstrument(editable) {
 }
 
 function saveSelectedInstrument(elementId, experimentId, editInstrumentElementId) {
-	var selectedInstrumentId = $("#instrumentSelect option[selected]").val();
+	
+	var selectedInstrumentId = $("#instrumentSelect").find(":selected").val();
+	// alert("Selected instrument Id " + selectedInstrumentId);
 	
 	if(selectedInstrumentId == 0) {
 		alert("Please select a instrument"); return;
 	}
 	
-	var selectedInstrumentName = $("#instrumentSelect option[selected]").text();
+	var selectedInstrumentName = $("#instrumentSelect").find(":selected").text();
+	// alert(selectedInstrumentName);
 	
 	var oldInstrumentName = $("#"+elementId).text();
 	
@@ -298,14 +300,14 @@ function saveSelectedInstrument(elementId, experimentId, editInstrumentElementId
 			        	$("#"+elementId).text(selectedInstrumentName);
 			        }
 			        else {
-			        	$(textFieldId).text(oldInstrumentName);
+			        	$("#"+elementId).text(oldInstrumentName);
 			        	alert("Error saving instrument: "+data);
 			        }
 			        success = true;
 		          },
 		complete:  function(xhr, textStatus) {
 			if(!success) {
-				$(textFieldId).text(oldInstrumentName);
+				$("#"+elementId).text(oldInstrumentName);
 			    alert("Error saving instrument: "+data);
 			}
 		}
