@@ -239,7 +239,7 @@ function removeFromGoTermFilters(goTerm, warn) {
   	<td valign="top">Peptide: </td>
 	<td valign="top">
 		<html:text name="proteinProphetFilterForm" property="peptide" size="40"></html:text>
-		<nobr><span style="font-size:8pt;">Exact Match:<html:checkbox property="proteinProphetFilterForm" property="exactPeptideMatch"></html:checkbox></span></nobr>
+		<nobr><span style="font-size:8pt;">Exact Match:<html:checkbox name="proteinProphetFilterForm" property="exactPeptideMatch"></html:checkbox></span></nobr>
 	</td>
   	
   	<td> Charge:</td>		
@@ -299,7 +299,7 @@ function removeFromGoTermFilters(goTerm, warn) {
   			<td valign="top">Exclude: </td>
   			<td valign="bottom">
   				<html:text name="proteinProphetFilterForm" property="descriptionNotLike" size="40"></html:text>
-  				<nobr><span style="font-size:8pt;">Search All:<html:checkbox property="proteinProphetFilterForm" property="searchAllDescriptions"></html:checkbox></span></nobr>
+  				<nobr><span style="font-size:8pt;">Search All:<html:checkbox name="proteinProphetFilterForm" property="searchAllDescriptions"></html:checkbox></span></nobr>
   			</td>
   		</tr>
   		

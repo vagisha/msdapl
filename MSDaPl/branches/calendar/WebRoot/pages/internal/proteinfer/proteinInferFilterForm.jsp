@@ -264,7 +264,7 @@ function saveDisplayColumnsCookie() {
   	<tr>
   	<td>Peptide:</td>
   	<td><html:text name="proteinInferFilterForm" property="peptide" size="40"></html:text>
-  		<nobr><span style="font-size:8pt;">Exact Match:<html:checkbox property="proteinInferFilterForm" property="exactPeptideMatch"></html:checkbox></span></nobr>
+  		<nobr><span style="font-size:8pt;">Exact Match:<html:checkbox name="proteinInferFilterForm" property="exactPeptideMatch"></html:checkbox></span></nobr>
   	</td>
   	<td> Charge:</td>
   	<td>
@@ -329,7 +329,7 @@ function saveDisplayColumnsCookie() {
   			<td valign="top">Exclude: </td>
   			<td valign="top">
   				<html:text name="proteinInferFilterForm" property="descriptionNotLike" size="40"></html:text>
-  				<nobr><span style="font-size:8pt;">Search All:<html:checkbox property="proteinInferFilterForm" property="searchAllDescriptions"></html:checkbox></span></nobr>
+  				<nobr><span style="font-size:8pt;">Search All:<html:checkbox name="proteinInferFilterForm" property="searchAllDescriptions"></html:checkbox></span></nobr>
   			</td>
   		</tr>
   		<tr>
@@ -397,10 +397,10 @@ function saveDisplayColumnsCookie() {
  <!-- Download Options -->
  <div align="center" style="margin:10 0 5 0;">
   	<a href="" onclick="javascript:downloadResults();return false;" ><b>Download Results</b></a> &nbsp; 
-  	<html:checkbox name="proteinInferFilterForm"property="printPeptides" >Include Peptides</html:checkbox>
-  	<html:checkbox name="proteinInferFilterForm"property="printDescriptions" >Include Descriptions</html:checkbox>
-  	<html:checkbox name="proteinInferFilterForm"property="collapseGroups" >Collapse Protein Groups</html:checkbox>
-  	<html:checkbox name="proteinInferFilterForm"property="downloadGOAnnotations" >GO Annotations</html:checkbox>
+  	<html:checkbox name="proteinInferFilterForm" property="printPeptides" >Include Peptides</html:checkbox>
+  	<html:checkbox name="proteinInferFilterForm" property="printDescriptions" >Include Descriptions</html:checkbox>
+  	<html:checkbox name="proteinInferFilterForm" property="collapseGroups" >Collapse Protein Groups</html:checkbox>
+  	<html:checkbox name="proteinInferFilterForm" property="downloadGOAnnotations" >GO Annotations</html:checkbox>
  </div>
  
  

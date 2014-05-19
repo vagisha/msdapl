@@ -43,7 +43,7 @@
   <logic:notEmpty name="run" property="baitDesc">
   <yrcwww:colorrow scheme="ms">
    <TD valign="top" width="25%">Bait Desc.:</TD>
-   <TD valign="top" width="75%"><bean:write name="run" property="baitDesc"/></logic:notEmpty></TD>
+   <TD valign="top" width="75%"><bean:write name="run" property="baitDesc"/></TD>
   </yrcwww:colorrow>
   </logic:notEmpty>
 

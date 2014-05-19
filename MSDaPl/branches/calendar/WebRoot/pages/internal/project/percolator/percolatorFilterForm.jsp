@@ -111,8 +111,8 @@ $(document).ready(function() {
 					<td colspan="2">
 						<!-- "value" is the value that is submitted if checked -->
 						<span class="tooltip"
-						title="Select 'Peptides' to view peptide-level Percolator results, if available">Peptides</span><html:radio property="filterForm" property="peptideResults" value="true" />
-						PSMs<html:radio property="filterForm" property="peptideResults" value="false" />
+						title="Select 'Peptides' to view peptide-level Percolator results, if available">Peptides</span><html:radio name="filterForm" property="peptideResults" value="true" />
+						PSMs<html:radio name="filterForm" property="peptideResults" value="false" />
 					</td>
 				</tr>
 				
