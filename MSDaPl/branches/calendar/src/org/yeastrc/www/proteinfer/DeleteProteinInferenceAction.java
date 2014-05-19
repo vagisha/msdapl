@@ -115,6 +115,9 @@ public class DeleteProteinInferenceAction extends Action {
             fact.getProteinferRunDao().delete(pinferId);
         }
         catch(Exception e) {
+        	
+        	log.error( "Error deleting protein inference ID: " + pinferId, e ); 
+        	
             ActionErrors errors = new ActionErrors();
             errors.add("proteinfer", new ActionMessage("error.proteinfer.deletejob", "Error deleting protein inference ID: "+pinferId));
             saveErrors(request, errors);
@@ -127,6 +130,10 @@ public class DeleteProteinInferenceAction extends Action {
             dao.deleteBookmark(pinferId);
         }
         catch(Exception e) {
+        	
+        	log.error( "Protein inference ID: "+pinferId+" was deleted"+
+            		" but there was an error deleting the bookmark entry.", e ); 
+
         	ActionErrors errors = new ActionErrors();
             errors.add("proteinfer", new ActionMessage("error.proteinfer.deletejob", "Protein inference ID: "+pinferId+" was deleted"+
             		" but there was an error deleting the bookmark entry."));
