@@ -335,7 +335,7 @@ public class ViewSpectrumAction extends Action {
         MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
         
         // load the results for the appropriate program
-        if(search.getSearchProgram() == Program.SEQUEST) {
+        if(search.getSearchProgram() == Program.SEQUEST || search.getSearchProgram() == Program.COMET) {
             
             TabularSequestResults tabRes = new TabularSequestResults();
             SequestSearchDAO seqSearchDao = DAOFactory.instance().getSequestSearchDAO();
