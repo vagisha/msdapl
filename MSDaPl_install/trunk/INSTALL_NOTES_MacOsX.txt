@@ -46,6 +46,14 @@ Tomcat 6.0.x
    grant all privileges on SangerPombe.* to 'msdapl_root'@'localhost';
    grant all privileges on go_human.* to 'msdapl_root'@'localhost';
    grant all privileges on mygo.* to 'msdapl_root'@'localhost';
+
+     These databases may/will have a date as part of them
+
+   grant all privileges on sgd_static_YYYYMM.* to 'msdapl_root'@'localhost';
+   grant all privileges on hgnc_static_YYYYMM.* to 'msdapl_root'@'localhost';
+   grant all privileges on cgd_static_YYYYMM.* to 'msdapl_root'@'localhost';
+   grant all privileges on mygo_YYYYMM.* to 'msdapl_root'@'localhost';
+
    
 4. Create user with all privileges to 'msData', 'mainDb' and 'jobQueue'; 
    SELECT privileges for all other databases.  This user information will
