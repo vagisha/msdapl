@@ -13,6 +13,7 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
@@ -22,8 +23,16 @@ import org.yeastrc.bio.taxonomy.TaxonomySearcher;
 
 public class UploadMSDataForm extends ActionForm {
 
+	private static final Logger log = Logger.getLogger(UploadMSDataForm.class);
     
-    private Date experimentDate;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	
+	private Date experimentDate;
     private String month;
     private String day;
     private String year;
@@ -88,6 +97,8 @@ public class UploadMSDataForm extends ActionForm {
                 if (ts.getName(speciesID) == null)
                     errors.add("upload", new ActionMessage("error.upload.invalidspecies"));
             } catch (Exception e) {
+            	log.error("Exception getting species name for id: " + speciesID, e );
+            	
                 errors.add("upload", new ActionMessage("error.upload.invalidspecies"));
             }
         }
