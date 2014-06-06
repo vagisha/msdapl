@@ -18,6 +18,33 @@
 	<property name="web_xml" value="${webinf_dir}${file.separator}web.xml" />
 
 	<!-- ================================================================================== -->
+	<!-- SVN repository wide overall SVN properties in svn_resources.properties -->
+	<!-- ================================================================================== -->
+	<property file="${basedir}${file.separator}..${file.separator}..${file.separator}..${file.separator}aa_SVN_Info_Resources${file.separator}svn_resources.properties" />
+
+	<!-- ================================================================================== -->
+	<!--  SVN repository wide overall Ant properties in overall_build_config.properties -->
+	<!-- ================================================================================== -->
+	<property file="${basedir}${file.separator}..${file.separator}..${file.separator}..${file.separator}aa_Ant_Config${file.separator}overall_build_config.properties" />
+		
+	<!-- ================================================================================== -->
+	<!-- Setup classpath for svnant -->
+	<!-- ================================================================================== -->
+	<path id= "svnant.classpath" >
+		
+		<fileset dir= "${basedir}${file.separator}..${file.separator}..${file.separator}..${file.separator}aa_SVN_Info_Resources/${svn.jars.dir}" >
+			<include name= "*.jar" />
+		</fileset>
+	</path>
+	
+	<!-- ================================================================================== -->
+	<!-- Test for svnant -->
+	<!-- ================================================================================== -->
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
+		
+	
+	
+	<!-- ================================================================================== -->
 	<!-- jars required only for compiling. Should not be packaged with the .war -->
 	<!-- ================================================================================== -->
 	<property name="libs_for_compile" value="${basedir}${file.separator}lib" />
@@ -30,7 +57,35 @@
 	<target name="package_war" depends="compile"
 		description="Packages the project as a deployable war file">
 
+		<svn username="${svn.username}" password="${svn.password}">
+			
+			<wcVersion path="${basedir}" prefix="msdapl_war."/>
+
+<!--			
+			<wcVersion path="${project.yrc_utils}" prefix="yrc_utils."/>
+-->			
+		</svn>
+		
+		<condition property="wc_modified" else="NO" value="YES">
+  			<isset property="msdapl_war.modified"/>
+  		</condition>
+		<condition property="wc_mixed" else="NO" value="YES">
+  			<isset property="msdapl_war.mixed"/>
+  		</condition>
+  		<echo message="${basedir} is at revision ${msdapl_war.revision.max-with-flags}" />
+  		<echo message="Working copy is modifed ${wc_modified}" />
+  		<echo message="Working copy is mixed ${wc_mixed}" />
+		
 		<war destfile="${war_file}" webxml="${web_xml}">
+  			<manifest>
+  				<attribute name="Built-By" value="${user.name}"/>
+  				<attribute name="Svn-Repository-URL" value="${msdapl_war.repository.url}"/>
+  				<attribute name="Svn-Revision" value="${msdapl_war.revision.max-with-flags}"/>
+  				<attribute name="Svn-Revision-Range" value="${msdapl_war.revision.range}"/>
+  				<attribute name="Svn-WorkingCopy-Modified" value="${wc_modified}"/>
+  				<attribute name="Svn-WorkingCopy-Mixed" value="${wc_mixed}"/>
+  			</manifest>
+
 <!--
 			<lib dir="${lib_dir}"></lib>
 			<classes dir="${classes_dir}" />
@@ -57,7 +112,7 @@
 	<!-- ================================================================================== -->
     <target name="compile" depends="clean,prepare,resources">
     	<echo message="${toString:compile.classpath}"/>
-        <javac debug="on" srcdir="${src_dir}" destdir="${classes_dir}" source="${source}" target="${target}">
+        <javac debug="on" srcdir="${src_dir}" destdir="${classes_dir}" source="${source}" target="${target}" encoding="${msdapl.java.source.character.set}" >
             <classpath refid="compile.classpath"/>
         </javac>
     </target>
