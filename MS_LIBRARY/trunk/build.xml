@@ -4,10 +4,22 @@
 	<property name="target" value="1.6"/>
 	<property name="source" value="1.6"/>
 		
+	
+	<!-- ================================================================================== -->
+	<!-- SVN repository wide overall SVN properties in svn_resources.properties -->
+	<!-- ================================================================================== -->
+	<property file="${basedir}${file.separator}..${file.separator}..${file.separator}aa_SVN_Info_Resources${file.separator}svn_resources.properties" />
+
+	<!-- ================================================================================== -->
+	<!--  SVN repository wide overall Ant properties in overall_build_config.properties -->
+	<!-- ================================================================================== -->
+	<property file="${basedir}${file.separator}..${file.separator}..${file.separator}aa_Ant_Config${file.separator}overall_build_config.properties" />
+		
+	
 	<!-- ================================================================================== -->
 	<!-- user defined values can be defined in build.properties -->
 	<!-- ================================================================================== -->
-	<property file="${basedir}/build.properties" />
+	<property file="${basedir}${file.separator}build.properties" />
 	
 	<!-- ================================================================================== -->
   	<!-- PRINT HELP -->
@@ -22,7 +34,8 @@
 	<!-- Setup classpath for svnant -->
 	<!-- ================================================================================== -->
 	<path id= "svnant.classpath" >
-		<fileset dir= "${basedir}/lib" >
+		
+		<fileset dir= "${basedir}${file.separator}..${file.separator}..${file.separator}aa_SVN_Info_Resources/${svn.jars.dir}" >
 			<include name= "*.jar" />
 		</fileset>
 	</path>
@@ -89,11 +102,11 @@
 	<target name="build_jar" depends="compile,svn_info,manifest"
 			description="Packages the project as a jar file">
 		
-		<delete file="${basedir}/mslib.jar" />
+		<delete file="${basedir}${file.separator}mslib.jar" />
 		
 		<!-- exclude everything in the default packaage-->
-		<jar destfile="${basedir}/mslib.jar" 
-			basedir="${basedir}/bin"
+		<jar destfile="${basedir}${file.separator}mslib.jar" 
+			basedir="${basedir}${file.separator}bin"
 			excludes="*.*" 
 			manifest="${basedir}/MANIFEST.MF">
 			
@@ -122,7 +135,7 @@
 	<target name="build_fatjar" depends="compile,svn_info,manifest"
 			description="Packages the project as a fatjar file">
 		
-		<delete file="${basedir}/mslib_fat.jar" />
+		<delete file="${basedir}${file.separator}mslib_fat.jar" />
 		
 		<fatjar.build output="mslib_fat.jar">
             <fatjar.manifest mergemanifests="true" manifestfile="${basedir}/MANIFEST.MF">
@@ -160,7 +173,7 @@
 	<!-- ================================================================================== -->
     <target name="compile" depends="clean">
     	<!-- <echo message="${toString:compile.classpath}"/> -->
-        <javac debug="on" srcdir="src" destdir="bin" source="${source}" target="${target}">
+        <javac debug="on" srcdir="src" destdir="bin" source="${source}" target="${target}" encoding="${msdapl.java.source.character.set}" >
             <classpath refid="compile.classpath"/>
         </javac>
     	<!-- copy the sqlmap xml files -->
