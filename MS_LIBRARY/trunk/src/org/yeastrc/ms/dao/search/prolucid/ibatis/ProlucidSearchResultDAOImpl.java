@@ -404,11 +404,27 @@ ProlucidSearchResultDAO {
             values.append(data.getMatchingIons() == -1 ? "NULL" : data.getMatchingIons());
             values.append(",");
             values.append(data.getPredictedIons() == -1 ? "NULL" : data.getPredictedIons()  );
-            values.append(")");
+            values.append(")\n");
         }
         values.deleteCharAt(0);
+        
+        String insertSQL = values.toString();
+        
+        String statementName = "ProlucidResult.insertAll";
 
-        save("ProlucidResult.insertAll", values.toString());
+        try {
+            save(statementName, insertSQL);
+        }
+        catch (RuntimeException e) {
+            log.error("Failed to execute save statement: " + statementName + " , insert SQL: \n" + insertSQL, e);
+            throw e;
+            
+        } 
+//        catch (Exception e) { 
+//            log.error("Failed to execute save statement: " + statementName + " , insert SQL: \n" + insertSQL, e);
+//            throw new RuntimeException("Failed to execute save statement: " + statementName, e);
+//        }
+
     }
 
     @Override
