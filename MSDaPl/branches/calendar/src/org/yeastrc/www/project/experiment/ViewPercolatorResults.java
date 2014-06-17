@@ -176,6 +176,8 @@ public class ViewPercolatorResults extends Action {
     				}
     			} catch (Exception e) {
 
+    	    		log.error( "Error loading project, projectId: " + projectId + ", searchAnalysisId: " + searchAnalysisId, e);
+
     				// Couldn't load the project.
     				ActionErrors errors = new ActionErrors();
     				errors.add("username", new ActionMessage("error.project.projectnotfound"));
