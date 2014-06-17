@@ -65,177 +65,188 @@ public class ViewPercolatorResults extends Action {
     throws Exception {
 
 
-
-        // User making this request
-        User user = UserUtils.getUser(request);
-        if (user == null) {
-            ActionErrors errors = new ActionErrors();
-            errors.add("username", new ActionMessage("error.login.notloggedin"));
-            saveErrors( request, errors );
-            return mapping.findForward("authenticate");
-        }
-
-        // Get the form
-        PercolatorFilterResultsForm myForm = (PercolatorFilterResultsForm)form;
-
-        int searchAnalysisId = myForm.getSearchAnalysisId();
-        if(searchAnalysisId == 0) {
-            try {
-                String strID = request.getParameter("ID");
-                if(strID != null)
-                    searchAnalysisId = Integer.parseInt(strID);
+		int searchAnalysisId = 0;
+    	
+    	try {
 
 
-            } catch (NumberFormatException nfe) {
-                ActionErrors errors = new ActionErrors();
-                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.invalid.id", "Percolator analysis"));
-                saveErrors( request, errors );
-                return mapping.findForward("Failure");
-            }
-        }
-        // If we still don't have a valid id, return an error
-        if(searchAnalysisId == 0) {
-            ActionErrors errors = new ActionErrors();
-            errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.invalid.id", "Percolator analysis"));
-            saveErrors( request, errors );
-            return mapping.findForward("Failure");
-        }
+    		// User making this request
+    		User user = UserUtils.getUser(request);
+    		if (user == null) {
+    			ActionErrors errors = new ActionErrors();
+    			errors.add("username", new ActionMessage("error.login.notloggedin"));
+    			saveErrors( request, errors );
+    			return mapping.findForward("authenticate");
+    		}
 
-        // If this is a brand new form
-        if(myForm.getSearchAnalysisId() == 0) {
-            myForm.setSearchAnalysisId(searchAnalysisId);
-            myForm.setShowModified(true);
-            myForm.setShowUnmodified(true);
-            myForm.setExactPeptideMatch(true);
-            myForm.setMaxQValue("0.01");
-            myForm.setSortBy(SORT_BY.QVAL);
-            myForm.setSortOrder(SORT_ORDER.ASC);
-            
-            List<Integer> searchIds = DAOFactory.instance().getMsSearchAnalysisDAO().getSearchIdsForAnalysis(searchAnalysisId);
-            // We should only have one searchID
-            if(searchIds.size() == 1) {
-            	List<MsResidueModification> mods = DAOFactory.instance().getMsSearchModDAO().loadDynamicResidueModsForSearch(searchIds.get(0));
-            	List<SelectableModificationBean> modBeans = new ArrayList<SelectableModificationBean>(mods.size());
-            	for(MsResidueModification mod: mods) {
-            		SelectableModificationBean modBean = new SelectableModificationBean();
-            		modBean.setId(mod.getId());
-            		modBean.setModificationMass(mod.getModificationMass());
-            		modBean.setModificationSymbol(mod.getModificationSymbol());
-            		modBean.setModifiedResidue(mod.getModifiedResidue());
-            		modBean.setSelected(true);
-            		modBeans.add(modBean);
-            	}
-            	myForm.setModificationList(modBeans);
-            }
-        }
+    		// Get the form
+    		PercolatorFilterResultsForm myForm = (PercolatorFilterResultsForm)form;
 
-        boolean usePeptideResults = myForm.isPeptideResults();
-        
-        // GET THE SUMMARY 
-        List<Integer> projectIds = new ArrayList<Integer>();
-        List<Integer> experimentIds = new ArrayList<Integer>();
-        String programString = "";
-        int numResults = 0;
-        int numResultsFiltered = 0;
+    		searchAnalysisId = myForm.getSearchAnalysisId();
+    		if(searchAnalysisId == 0) {
+    			try {
+    				String strID = request.getParameter("ID");
+    				if(strID != null)
+    					searchAnalysisId = Integer.parseInt(strID);
 
 
-        MsSearchAnalysis analysis = DAOFactory.instance().getMsSearchAnalysisDAO().load(searchAnalysisId);
-        programString = analysis.getAnalysisProgram()+" "+analysis.getAnalysisProgramVersion();
-        
+    			} catch (NumberFormatException nfe) {
+    				ActionErrors errors = new ActionErrors();
+    				errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.invalid.id", "Percolator analysis"));
+    				saveErrors( request, errors );
+    				return mapping.findForward("Failure");
+    			}
+    		}
+    		// If we still don't have a valid id, return an error
+    		if(searchAnalysisId == 0) {
+    			ActionErrors errors = new ActionErrors();
+    			errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.invalid.id", "Percolator analysis"));
+    			saveErrors( request, errors );
+    			return mapping.findForward("Failure");
+    		}
 
-        List<Integer> searchIds = DAOFactory.instance().getMsSearchAnalysisDAO().getSearchIdsForAnalysis(searchAnalysisId);
-        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+    		// If this is a brand new form
+    		if(myForm.getSearchAnalysisId() == 0) {
+    			myForm.setSearchAnalysisId(searchAnalysisId);
+    			myForm.setShowModified(true);
+    			myForm.setShowUnmodified(true);
+    			myForm.setExactPeptideMatch(true);
+    			myForm.setMaxQValue("0.01");
+    			myForm.setSortBy(SORT_BY.QVAL);
+    			myForm.setSortOrder(SORT_ORDER.ASC);
 
+    			List<Integer> searchIds = DAOFactory.instance().getMsSearchAnalysisDAO().getSearchIdsForAnalysis(searchAnalysisId);
+    			// We should only have one searchID
+    			if(searchIds.size() == 1) {
+    				List<MsResidueModification> mods = DAOFactory.instance().getMsSearchModDAO().loadDynamicResidueModsForSearch(searchIds.get(0));
+    				List<SelectableModificationBean> modBeans = new ArrayList<SelectableModificationBean>(mods.size());
+    				for(MsResidueModification mod: mods) {
+    					SelectableModificationBean modBean = new SelectableModificationBean();
+    					modBean.setId(mod.getId());
+    					modBean.setModificationMass(mod.getModificationMass());
+    					modBean.setModificationSymbol(mod.getModificationSymbol());
+    					modBean.setModifiedResidue(mod.getModifiedResidue());
+    					modBean.setSelected(true);
+    					modBeans.add(modBean);
+    				}
+    				myForm.setModificationList(modBeans);
+    			}
+    		}
 
-        for(int searchId: searchIds) {
-            MsSearch search = searchDao.loadSearch(searchId);
-            experimentIds.add(search.getExperimentId());
-        }
-        if(experimentIds.size() > 0) {
-            // Get the projects for these experiments
-            ProjectExperimentDAO projExpDao = ProjectExperimentDAO.instance();
-            projectIds = projExpDao.getProjectIdsForExperiments(experimentIds);
-        }
+    		boolean usePeptideResults = myForm.isPeptideResults();
 
-        // Does the user have access to look at these results? 
-        for(int projectId: projectIds) {
-            Project project;
-            try {
-                project = ProjectFactory.getProject(projectId);
-                if (!project.checkReadAccess(user.getResearcher())) {
-                    
-                    // This user doesn't have access to this project.
-                    ActionErrors errors = new ActionErrors();
-                    errors.add("username", new ActionMessage("error.project.noaccess"));
-                    saveErrors( request, errors );
-                    return mapping.findForward("Failure");
-                }
-            } catch (Exception e) {
-                
-                // Couldn't load the project.
-                ActionErrors errors = new ActionErrors();
-                errors.add("username", new ActionMessage("error.project.projectnotfound"));
-                saveErrors( request, errors );
-                return mapping.findForward("Failure");  
-            }
-        }
-
-        // Get ALL the filtered and sorted resultIds
-        numResults = getUnfilteredResultCount(searchAnalysisId, usePeptideResults);
-        // peptide IDs if we are getting peptide-level results. Otherwise, psm IDs
-        List<Integer> resultIds = getFilteredResultIds(searchAnalysisId, myForm);
-        
-        if(myForm.isDoDownload()) {
-        	// Forward to the Download action
-        	request.setAttribute("analysisId", analysis.getId());
-        	request.setAttribute("analysisResultIds", resultIds);
-        	request.setAttribute("analysisProgram", analysis.getAnalysisProgram());
-        	request.setAttribute("filterForm", myForm);
-        	return mapping.findForward("Download");
-        }
-        numResultsFiltered = resultIds.size();
+    		// GET THE SUMMARY 
+    		List<Integer> projectIds = new ArrayList<Integer>();
+    		List<Integer> experimentIds = new ArrayList<Integer>();
+    		String programString = "";
+    		int numResults = 0;
+    		int numResultsFiltered = 0;
 
 
-        // Extract the ones we will display
-        int numResultsPerPage = myForm.getNumPerPage();
-        int pageNum = myForm.getPageNum();
-        if(pageNum <= 0) {
-            pageNum = 1;
-            myForm.setPageNum(pageNum);
-        }
-        ResultsPager pager = ResultsPager.instance();
-        boolean desc = false;
-        if(myForm.getSortOrder() != null)
-            desc = myForm.getSortOrder() == SORT_ORDER.DESC ? true : false;
-        // TODO if the pageNum is out of range .....
-        List<Integer> forPage = pager.page(resultIds, pageNum, numResultsPerPage, desc);
+    		MsSearchAnalysis analysis = DAOFactory.instance().getMsSearchAnalysisDAO().load(searchAnalysisId);
+    		programString = analysis.getAnalysisProgram()+" "+analysis.getAnalysisProgramVersion();
+
+
+    		List<Integer> searchIds = DAOFactory.instance().getMsSearchAnalysisDAO().getSearchIdsForAnalysis(searchAnalysisId);
+    		MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+
+
+    		for(int searchId: searchIds) {
+    			MsSearch search = searchDao.loadSearch(searchId);
+    			experimentIds.add(search.getExperimentId());
+    		}
+    		if(experimentIds.size() > 0) {
+    			// Get the projects for these experiments
+    			ProjectExperimentDAO projExpDao = ProjectExperimentDAO.instance();
+    			projectIds = projExpDao.getProjectIdsForExperiments(experimentIds);
+    		}
+
+    		// Does the user have access to look at these results? 
+    		for(int projectId: projectIds) {
+    			Project project;
+    			try {
+    				project = ProjectFactory.getProject(projectId);
+    				if (!project.checkReadAccess(user.getResearcher())) {
+
+    					// This user doesn't have access to this project.
+    					ActionErrors errors = new ActionErrors();
+    					errors.add("username", new ActionMessage("error.project.noaccess"));
+    					saveErrors( request, errors );
+    					return mapping.findForward("Failure");
+    				}
+    			} catch (Exception e) {
+
+    				// Couldn't load the project.
+    				ActionErrors errors = new ActionErrors();
+    				errors.add("username", new ActionMessage("error.project.projectnotfound"));
+    				saveErrors( request, errors );
+    				return mapping.findForward("Failure");  
+    			}
+    		}
+
+    		// Get ALL the filtered and sorted resultIds
+    		numResults = getUnfilteredResultCount(searchAnalysisId, usePeptideResults);
+    		// peptide IDs if we are getting peptide-level results. Otherwise, psm IDs
+    		List<Integer> resultIds = getFilteredResultIds(searchAnalysisId, myForm);
+
+    		if(myForm.isDoDownload()) {
+    			// Forward to the Download action
+    			request.setAttribute("analysisId", analysis.getId());
+    			request.setAttribute("analysisResultIds", resultIds);
+    			request.setAttribute("analysisProgram", analysis.getAnalysisProgram());
+    			request.setAttribute("filterForm", myForm);
+    			return mapping.findForward("Download");
+    		}
+    		numResultsFiltered = resultIds.size();
+
+
+    		// Extract the ones we will display
+    		int numResultsPerPage = myForm.getNumPerPage();
+    		int pageNum = myForm.getPageNum();
+    		if(pageNum <= 0) {
+    			pageNum = 1;
+    			myForm.setPageNum(pageNum);
+    		}
+    		ResultsPager pager = ResultsPager.instance();
+    		boolean desc = false;
+    		if(myForm.getSortOrder() != null)
+    			desc = myForm.getSortOrder() == SORT_ORDER.DESC ? true : false;
+    		// TODO if the pageNum is out of range .....
+    		List<Integer> forPage = pager.page(resultIds, pageNum, numResultsPerPage, desc);
 
 
 
-        // Get details for the result we will display
-        // Set up for tabular display
-        Tabular tabResults = getTabularPercolatorResults(analysis, forPage, numResultsPerPage, 
-        		myForm, usePeptideResults);
-        
-        ((Pageable)tabResults).setCurrentPage(pageNum);
-        ((Pageable)tabResults).setNumPerPage(numResultsPerPage);
-        int pageCount = pager.getPageCount(resultIds.size(), numResultsPerPage);
-        ((Pageable)tabResults).setLastPage(pageCount);
-        List<Integer> pageList = pager.getPageList(resultIds.size(), pageNum, numResultsPerPage);
-        ((Pageable)tabResults).setDisplayPageNumbers(pageList);
+    		// Get details for the result we will display
+    		// Set up for tabular display
+    		Tabular tabResults = getTabularPercolatorResults(analysis, forPage, numResultsPerPage, 
+    				myForm, usePeptideResults);
 
-        
+    		((Pageable)tabResults).setCurrentPage(pageNum);
+    		((Pageable)tabResults).setNumPerPage(numResultsPerPage);
+    		int pageCount = pager.getPageCount(resultIds.size(), numResultsPerPage);
+    		((Pageable)tabResults).setLastPage(pageCount);
+    		List<Integer> pageList = pager.getPageList(resultIds.size(), pageNum, numResultsPerPage);
+    		((Pageable)tabResults).setDisplayPageNumbers(pageList);
 
-        // required attributes in the request
-        request.setAttribute("projectIds", projectIds);
-        request.setAttribute("experimentIds", experimentIds);
-        request.setAttribute("program", programString);
-        request.setAttribute("numResults", numResults);
-        request.setAttribute("numResultsFiltered", numResultsFiltered);
 
-        request.setAttribute("filterForm", myForm);
-        request.setAttribute("results", tabResults);
-        request.setAttribute("searchAnalysisId", searchAnalysisId);
+
+    		// required attributes in the request
+    		request.setAttribute("projectIds", projectIds);
+    		request.setAttribute("experimentIds", experimentIds);
+    		request.setAttribute("program", programString);
+    		request.setAttribute("numResults", numResults);
+    		request.setAttribute("numResultsFiltered", numResultsFiltered);
+
+    		request.setAttribute("filterForm", myForm);
+    		request.setAttribute("results", tabResults);
+    		request.setAttribute("searchAnalysisId", searchAnalysisId);
+
+    	} catch (Exception e) {
+
+    		log.error( "Error processing request, searchAnalysisId: " + searchAnalysisId, e);
+    		
+    		throw e;
+    	}
 
 
         // Forward them on to the happy success view page!
