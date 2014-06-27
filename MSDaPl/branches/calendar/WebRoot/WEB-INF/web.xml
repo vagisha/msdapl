@@ -1,10 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Switch to servlet 2.5 spec -->
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee   http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+ 
+<!--  
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!DOCTYPE web-app
   PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN"
   "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
-
 <web-app>
+-->
+
+
   <display-name>YRC Informatics Platform</display-name>
   
   <!-- Standard Action Servlet Configuration (with debugging) -->
@@ -51,7 +60,12 @@
   </session-config>
 
 
+  <!-- taglib not allowed in Servlet 2.5
+       WEB-INF and it's subdirectories will be searched for *.tld files
+   -->
+
   <!-- Struts Tag Library Descriptors -->
+  <!--  
   <taglib>
     <taglib-uri>/WEB-INF/struts-bean.tld</taglib-uri>
     <taglib-location>/WEB-INF/struts-bean.tld</taglib-location>
@@ -81,5 +95,6 @@
     <taglib-uri>/WEB-INF/yrc-www.tld</taglib-uri>
     <taglib-location>/WEB-INF/yrc-www.tld</taglib-location>
   </taglib>
+  -->
 
 </web-app>
