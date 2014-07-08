@@ -383,7 +383,7 @@ CREATE TABLE ProLuCIDSearchResult (
    primaryScoreRank INT UNSIGNED NOT NULL,
    secondaryScoreRank INT UNSIGNED NOT NULL,
    deltaCN DECIMAL(10,5)  NOT NULL,
-   primaryScore DOUBLE UNSIGNED NOT NULL,
+   primaryScore DOUBLE NOT NULL,
    secondaryScore DOUBLE NOT NULL,
    calculatedMass DECIMAL(18,9),
    matchingIons INT UNSIGNED,
