@@ -524,6 +524,8 @@ function confirmDeleteExperiment(experimentId) {
 								  						$("#expt_fold_"+exptId+"_target a.thumb").each(function() {
 															makeZoomableThumbnail(this);
 														});
+								  						
+								  						CreatePrecursorScanCountCharts.createDisplayPrecursorScanCountChartForExperimentId( exptId );
 														
 								  					});
  		

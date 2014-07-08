@@ -20,6 +20,10 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 
 <body>
 
+<input type="hidden" id="webAppContextPath_WebApp_Wide" value="${ webAppContextPath }" />
+
+
+
 <script src="<yrcwww:link path='js/jquery-1.4.2.js'/>"></script>
 <script src="<yrcwww:link path='js/msdapl.js'/>"></script>
 <script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>

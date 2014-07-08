@@ -48,7 +48,18 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     private boolean uploadSuccess = true;
     private int uploadJobId;
     
-    public void setHasFullInformation(boolean full) {
+    
+    private String precursorMassChartData;
+    
+    public String getPrecursorMassChartData() {
+		return precursorMassChartData;
+	}
+
+	public void setPrecursorMassChartData(String precursorMassChartData) {
+		this.precursorMassChartData = precursorMassChartData;
+	}
+
+	public void setHasFullInformation(boolean full) {
     	this.hasFullInformation = full;
     }
     

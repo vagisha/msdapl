@@ -59,9 +59,17 @@
     <session-timeout>120</session-timeout>
   </session-config>
 
-
-  <!-- taglib not allowed in Servlet 2.5
-       WEB-INF and it's subdirectories will be searched for *.tld files
+  
+	<!-- Servlet Context Listeners.  Called on Web app startup and shutdown -->
+	<listener>
+		<listener-class>
+		org.yeastrc.web_general.ServletContextAppListener
+		</listener-class>
+	</listener>
+	
+	
+  <!-- taglib not needed or allowed in Servlet 2.5.
+       The WEB-INF directory and it's subdirectories will be searched for *.tld files
    -->
 
   <!-- Struts Tag Library Descriptors -->

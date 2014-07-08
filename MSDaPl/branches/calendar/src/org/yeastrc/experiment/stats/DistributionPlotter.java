@@ -41,7 +41,8 @@ public class DistributionPlotter {
         String url = "http://chart.apis.google.com/chart?";
         url += "cht=bvs";                        // vertical stacked bar chart
         url += "&chbh=a";                        // adjust bar widths to fit in chart
-        url += "&chs=500x325";                  // chart size
+        url += "&chs=750x400";                  // chart size
+        //   url += "&chs=500x325";                  // chart size
         // url += "&chdl="+"PSMs with qvalue<="+result.getScoreCutoff()+"|All Percolator PSMs"; // legend
         url += "&chdl="+result.getChartLegend();
         url += "&chdlp=t";  // place the legend at the top
@@ -99,7 +100,8 @@ public class DistributionPlotter {
         String url = "http://chart.apis.google.com/chart?";
         url += "cht=bvs";                        // vertical stacked bar chart
         url += "&chbh=a";                        // adjust bar widths to fit in chart
-        url += "&chs=500x325";                  // chart size
+        url += "&chs=750x400";                  // chart size
+        //      url += "&chs=500x325";                  // chart size
         // url += "&chdl="+"MS/MS scans with good results (qvalue<="+result.getScoreCutoff()+")|All MS/MS Scans"; // legend
         url += "&chdl="+result.getChartLegend(); // legend
         url += "&chdlp=t";  // place the legent at the top

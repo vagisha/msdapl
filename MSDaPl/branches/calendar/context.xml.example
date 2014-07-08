@@ -1,6 +1,6 @@
 <!-- The contents of this file will be loaded for each web application -->
 <Context>
-    	<Resource     	name="jdbc/yrc"
+    	<Resource     	name="jdbc/msdapl_main"
                         auth="Container"
                         type="javax.sql.DataSource"
 						factory="org.apache.commons.dbcp.BasicDataSourceFactory"

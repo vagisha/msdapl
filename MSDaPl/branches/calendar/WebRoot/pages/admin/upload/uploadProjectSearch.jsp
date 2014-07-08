@@ -18,6 +18,8 @@
 
 <body>
 
+<input type="hidden" id="webAppContextPath_WebApp_Wide" value="${ webAppContextPath }" />
+
 <yrcwww:contentbox title="Mini Project Searcher" centered="true" width="550" scheme="upload">
 <center>
 

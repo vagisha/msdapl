@@ -5,6 +5,7 @@ package org.yeastrc.www.project.experiment;
 
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,8 @@ import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorPeptideResult;
@@ -36,6 +39,8 @@ import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.util.RoundingUtils;
@@ -145,6 +150,7 @@ public class DownloadPercolatorResults extends Action {
         // Results
         PercolatorResultDAO presDao = DAOFactory.instance().getPercolatorResultDAO();
         SequestSearchResultDAO seqResDao = DAOFactory.instance().getSequestResultDAO();
+        ProlucidSearchResultDAO prolucidResDao = DAOFactory.instance().getProlucidResultDAO();
         MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
         MS2ScanDAO ms2ScanDao = DAOFactory.instance().getMS2FileScanDAO();
 
@@ -154,7 +160,39 @@ public class DownloadPercolatorResults extends Action {
       	  hasPeptideResults = true;
         }
 
-        writePsmFileHeader(writer, hasBullsEyeArea, hasPEP, hasPeptideResults);
+        
+        
+        
+		boolean hasSequestData = false;
+		boolean hasProlucidData = false;
+
+        MsSearchDAO msSearchDAO = DAOFactory.instance().getMsSearchDAO();
+        List<String> msSearchAnalysisProgramNamesForSearchAnalysisID =  msSearchDAO.getAnalysisProgramNamesForSearchAnalysisID( analysisId );
+        
+        for ( String msSearchAnalysisProgramName : msSearchAnalysisProgramNamesForSearchAnalysisID ) {
+        	
+        	Program msSearchAnalysisProgram = Program.instance( msSearchAnalysisProgramName );
+        	
+        	if ( Program.isSequest( msSearchAnalysisProgram ) ) {
+        		
+        		hasSequestData = true;
+        	}
+        	
+        	if ( msSearchAnalysisProgram.equals( Program.PROLUCID ) ) {
+        		
+        		 hasProlucidData = true;
+        	}
+        }
+        
+        if ( ! hasProlucidData ) {
+        	
+        	hasSequestData = true; // Default to Sequest if not Prolucid.  Handles COMET and others
+        }
+        
+
+
+        writePsmFileHeader(writer, hasBullsEyeArea, hasPEP, hasPeptideResults, hasSequestData, hasProlucidData);
+
 
 		for(int percResultId: resultIds) {
 			PercolatorResult result = presDao.loadForPercolatorResultId(percResultId);
@@ -174,10 +212,106 @@ public class DownloadPercolatorResults extends Action {
             }
 
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
-            resPlus.setSequestData(seqResDao.load(result.getId()).getSequestResultData());
+            
+            
+            SequestSearchResult sequestSearchResult = seqResDao.load(result.getId());
+            
+            if ( sequestSearchResult != null ) {
+            	
+           		resPlus.setSequestData(sequestSearchResult.getSequestResultData());
+           		
+            } else {
+           		
+            	ProlucidSearchResult prolucidSearchResult = prolucidResDao.load(result.getId());
+            	
+            	if ( prolucidSearchResult != null ) {
+            	
+            		resPlus.setProlucidData(prolucidSearchResult.getProlucidResultData());
+            	}
+            }
 
-            writePsmResult(resPlus, hasPEP, hasBullsEyeArea, hasPeptideResults, writer);
+            writePsmResult(resPlus, hasPEP, hasBullsEyeArea, hasPeptideResults, hasSequestData, hasProlucidData,writer);
 		}
+
+        
+        
+//        List<PercolatorResultPlus> percResultPlusList = new ArrayList<PercolatorResultPlus>( resultIds.size() );
+//
+//		for(int percResultId: resultIds) {
+//			PercolatorResult result = presDao.loadForPercolatorResultId(percResultId);
+//            PercolatorResultPlus resPlus = null;
+//
+//            if(hasBullsEyeArea) {
+//                MS2Scan scan = ms2ScanDao.loadScanLite(result.getScanId());
+//                resPlus = new PercolatorResultPlus(result, scan);
+//            }
+//            else {
+//                MsScan scan = scanDao.loadScanLite(result.getScanId());
+//                resPlus = new PercolatorResultPlus(result, scan);
+//            }
+//
+//            if(hasPeptideResults) {
+//            	resPlus.setPeptideResult(peptResDao.load(result.getPeptideResultId()));
+//            }
+//
+//            resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
+//            
+//            
+//            SequestSearchResult sequestSearchResult = seqResDao.load(result.getId());
+//            
+//            if ( sequestSearchResult != null ) {
+//            	
+//           		resPlus.setSequestData(sequestSearchResult.getSequestResultData());
+//           		
+//            } else {
+//           		
+//            	ProlucidSearchResult prolucidSearchResult = prolucidResDao.load(result.getId());
+//            	
+//            	if ( prolucidSearchResult != null ) {
+//            	
+//            		resPlus.setProlucidData(prolucidSearchResult.getProlucidResultData());
+//            	}
+//            }
+//            
+//            percResultPlusList.add( resPlus );
+//		}
+//		
+//		boolean hasSequestData = true;
+//		boolean hasProlucidData = false;
+//    	
+//    	boolean foundSequestData = false;
+//    	boolean foundProlucidData = false;
+//
+//    	if ( ! percResultPlusList.isEmpty() ) {
+//    		
+//    		for ( PercolatorResultPlus result : percResultPlusList ) {
+//
+//    			if ( result.getSequestData() != null ) {
+//    				foundSequestData = true;
+//    			}
+//    			if ( result.getProlucidData() != null ) {
+//    				foundProlucidData = true;
+//    			}
+//    		}
+//        	
+//        	if ( foundSequestData ) {
+//        		hasSequestData = true;
+//        	} else {
+//        		hasSequestData = false;
+//        	}
+//        	if ( foundProlucidData ) {
+//        		hasProlucidData = true;
+//        	} else {
+//        		hasProlucidData = false;
+//        	}
+//    	}
+//
+//        writePsmFileHeader(writer, hasBullsEyeArea, hasPEP, hasPeptideResults, hasSequestData, hasProlucidData);
+//
+//		for( PercolatorResultPlus resPlus : percResultPlusList ) {
+//
+//            writePsmResult(resPlus, hasPEP, hasBullsEyeArea, hasPeptideResults, hasSequestData, hasProlucidData,writer);
+//		}
 
 	}
 
@@ -295,7 +429,10 @@ public class DownloadPercolatorResults extends Action {
 	}
 
 	private void writePsmFileHeader(PrintWriter writer, boolean hasBullsEyeArea,
-			boolean hasPEP, boolean hasPeptideLevelScore) {
+			boolean hasPEP, boolean hasPeptideLevelScore,
+			boolean hasSequestData,
+			boolean hasProlucidData) {
+		
 		writer.write("File\t");
         writer.write("Scan#\t");
         writer.write("Charge\t");
@@ -317,13 +454,22 @@ public class DownloadPercolatorResults extends Action {
         	writer.write("PEP(Peptide)\t");
         }
 
-        writer.write("XCorrRank\t");
-        writer.write("XCorr\t");
+        if ( hasSequestData ) {
+        	writer.write("XCorrRank\t");
+        	writer.write("XCorr\t");
+        }
+        if ( hasProlucidData ) {
+        	writer.write("PrimaryScoreRank\t");
+        	writer.write("PrimaryScore\t");
+        }
+        
         writer.write("Peptide\t");
         writer.write("Protein(s)\n");
 	}
 
 	private void writePsmResult(PercolatorResultPlus result, boolean hasPEP, boolean hasBullseyeArea, boolean hasPeptideLevelScores,
+			boolean hasSequestData,
+			boolean hasProlucidData,
 			PrintWriter writer) {
 
 		writer.write(result.getFilename()+"\t");
@@ -356,9 +502,34 @@ public class DownloadPercolatorResults extends Action {
         	writer.write(result.getPeptidePosteriorErrorProbability()+"\t");
         }
 
-        // Sequest data
-        writer.write(result.getSequestData().getxCorrRank()+"\t");
-        writer.write(RoundingUtils.getInstance().roundTwo(result.getSequestData().getxCorr())+"\t");
+        if ( hasSequestData ) {
+    		if ( result.getSequestData() != null ) {
+
+				// Sequest data
+    			writer.write(result.getSequestData().getxCorrRank()+"\t");
+    	        writer.write(RoundingUtils.getInstance().roundTwo(result.getSequestData().getxCorr())+"\t");
+				
+    		} else {
+				// No Sequest data this row
+    	        writer.write("" + "\t");
+    	        writer.write("" + "\t");
+    		}
+        }        
+        if ( hasProlucidData ) {
+
+        	if ( result.getProlucidData() != null ) {
+
+        		// Prolucid data
+    			writer.write(result.getProlucidData().getPrimaryScoreRank()+"\t");
+    	        writer.write(RoundingUtils.getInstance().roundTwo(result.getProlucidData().getPrimaryScore())+"\t");
+    		} else {
+				// No Prolucid data this row
+    	        writer.write("" + "\t");
+    	        writer.write("" + "\t");
+        	}
+        }
+        
+        
 
         try {
             writer.write(result.getResultPeptide().getFullModifiedPeptide()+"\t");

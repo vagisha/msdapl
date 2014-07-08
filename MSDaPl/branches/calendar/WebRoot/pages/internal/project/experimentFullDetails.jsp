@@ -9,7 +9,8 @@
 <!-- SEARCHES FOR THE EXPERIMENT -->
 <logic:notEmpty name="experiment" property="searches">
 	<logic:iterate name="experiment" property="searches" id="search">
-		<div style="background-color: #FFFFE0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
+		<div style="background-color: #FFFFE0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" 
+				search_id="${ search.id }">
 		<table width="100%">
 			<tr>
 				<td width="33%"><b>Program: </b>&nbsp;
@@ -25,9 +26,9 @@
 					<html:link action="viewSequestResults.do" 
 								paramId="ID" 
 								paramName="search" paramProperty="id">[View Results]</html:link>
-					<!-- <html:link action="percolatorPepXmlDownloadForm.do" 
+					<%-- <html:link action="percolatorPepXmlDownloadForm.do" 
 								paramId="ID" 
-								paramName="search" paramProperty="id">[PepXML]</html:link> -->
+								paramName="search" paramProperty="id">[PepXML]</html:link> --%>
 					</b>
 				</td>
 				</logic:equal>
@@ -39,9 +40,9 @@
 					<html:link action="viewSequestResults.do" 
 								paramId="ID" 
 								paramName="search" paramProperty="id">[View Results]</html:link>
-					<!-- <html:link action="percolatorPepXmlDownloadForm.do" 
+					<%-- <html:link action="percolatorPepXmlDownloadForm.do" 
 								paramId="ID" 
-								paramName="search" paramProperty="id">[PepXML]</html:link> -->
+								paramName="search" paramProperty="id">[PepXML]</html:link> --%>
 					</b>
 				</td>
 				</logic:equal>
@@ -53,9 +54,9 @@
 					<html:link action="viewTideResults.do" 
 								paramId="ID" 
 								paramName="search" paramProperty="id">[View Results]</html:link>
-					<!-- <html:link action="percolatorPepXmlDownloadForm.do" 
+					<%-- <html:link action="percolatorPepXmlDownloadForm.do" 
 								paramId="ID" 
-								paramName="search" paramProperty="id">[PepXML]</html:link> -->
+								paramName="search" paramProperty="id">[PepXML]</html:link> --%>
 					</b>
 				</td>
 				</logic:equal>
@@ -141,7 +142,8 @@
 	<logic:equal name="experiment" property="analysisProgramName" value="<%=Program.PERCOLATOR.displayName() %>">
 		
 			<logic:iterate name="experiment" property="analyses" id="analysis" indexId="analysis_idx">
-			<div style="background-color: #F0FFF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
+			<div style="background-color: #F0FFF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" 
+					analysis_id="${ analysis.id }">
 			<table width="100%">
 			<tbody>
 			<tr>
@@ -194,7 +196,7 @@
 					<td>
 						<b><a href="<yrcwww:link path='newPercolatorProteinInference.do?'/>searchAnalysisId=<bean:write name='analysis' property='id' />&projectId=<bean:write name='experiment' property='projectId'/>"> 
 						[Infer Proteins]</a></b>
-						<a href="" onclick="openInformationPopup('<yrcwww:link path='pages/internal/docs/proteinInference.jsp'/>'); return false;">
+						<a href="" onclick="openInformationPopup('<yrcwww:link path="pages/internal/docs/proteinInference.jsp"/>'); return false;">
 	   					<img src="<yrcwww:link path='images/info_16.png'/>" align="bottom" border="0"/></a>
 					</td>
 				</logic:equal>

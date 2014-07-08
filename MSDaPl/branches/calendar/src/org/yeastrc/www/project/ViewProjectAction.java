@@ -59,6 +59,7 @@ import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRunSummary;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.mz_scan_count_plot.service.MZScanCountPlotter;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.properties.ApplicationProperties;
@@ -72,10 +73,11 @@ import org.yeastrc.yates.YatesRunMsSearchLinker;
 import org.yeastrc.yates.YatesRunSearcher;
 
 /**
- * Implements the logic to register a user
+ * 
  */
 public class ViewProjectAction extends Action {
 
+	private static final int EXPERIMENT_DETAILS_INITIAL_LOAD_LIMIT = 5;
     
     private static DAOFactory daoFactory = DAOFactory.instance();
     private static final Logger log = Logger.getLogger(ViewProjectAction.class.getName());
@@ -151,8 +153,8 @@ public class ViewProjectAction extends Action {
 		    writeAccess = true;
 		request.setAttribute("writeAccess", writeAccess);
 		
-		// Check for experiment data for this project
-		List<ProjectExperiment> experiments = getProjectExperiments(projectID, 5); // get the last 5 uploaded
+		// Check for experiment data for this project  (  get details for the last EXPERIMENT_DETAILS_INITIAL_LOAD_LIMIT experiments uploaded  )
+		List<ProjectExperiment> experiments = getProjectExperiments(projectID, EXPERIMENT_DETAILS_INITIAL_LOAD_LIMIT); 
 		
 		
 		// get any bookmarked protein inferences
@@ -265,6 +267,14 @@ public class ViewProjectAction extends Action {
                 pExpt.setUploadSuccess(false);
             
             experiments.add(pExpt);
+            
+            //  Load Precursor Mass Chart Data
+            String precursorMassChartData = MZScanCountPlotter.getStoredMZScanCountPlotFromDB(experimentId);
+            if ( precursorMassChartData == null ) {
+            	precursorMassChartData = "";
+            }
+            pExpt.setPrecursorMassChartData(precursorMassChartData);
+            
             
             count++;
             if(count > limitCount) {

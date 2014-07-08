@@ -1828,6 +1828,16 @@
       <forward name="Failure" path="/viewProject.do" redirect="false"/>
     </action>
    
+   
+   <!-- JSON services -->
+       
+    <action
+      path="/getPrecursorScanCountChartDataService"
+      type="org.yeastrc.www_services.GetPrecursorScanCountChartDataServiceAction"
+      >
+    </action>
+    
+   
 	
 	<!-- ================================================================================== -->
 	<!-- ================================================================================== -->

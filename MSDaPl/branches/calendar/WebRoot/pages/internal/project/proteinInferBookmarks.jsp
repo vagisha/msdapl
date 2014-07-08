@@ -19,16 +19,16 @@
 		<thead>
 		<tr align="left">
 			<th></th>
-			<th class="sort-int sortable" style="color:black; background:url('')" valign="top">ID</th>
-			<th class="sort-alpha sortable" style="color:black; background:url('')" valign="top">User</th>
+			<th class="sort-int sortable" style="color:black; " valign="top">ID</th>
+			<th class="sort-alpha sortable" style="color:black; " valign="top">User</th>
 			<th valign="top">Version</th>
 			<th valign="top">Date</th>
-			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Indist.<br>Groups</th>
-			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Proteins</th>
-			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Pept.<br/>Seq.</th>
-			<th class="sort-int sortable" style="color:black; background:url('')" valign="top" align="center">#Ions</th>
-			<th class="sort-alpha sortable" style="color:black; background:url('')" valign="top">Name</th>
-			<th class="sort-alpha sortable" style="color:black; background:url('')" valign="top">Comments</th>
+			<th class="sort-int sortable" style="color:black; " valign="top" align="center">#Indist.<br>Groups</th>
+			<th class="sort-int sortable" style="color:black; " valign="top" align="center">#Proteins</th>
+			<th class="sort-int sortable" style="color:black; " valign="top" align="center">#Pept.<br/>Seq.</th>
+			<th class="sort-int sortable" style="color:black; " valign="top" align="center">#Ions</th>
+			<th class="sort-alpha sortable" style="color:black; " valign="top">Name</th>
+			<th class="sort-alpha sortable" style="color:black; " valign="top">Comments</th>
 			<th valign="top">&nbsp;</th>
 			<th valign="top">Compare</th></tr>
 		</thead>
@@ -137,15 +137,15 @@
 	<thead>
 	<tr align="left">
 		<th></th>
-		<th class="sort-int sortable" style="color:black; background:url('')"  valign="top">ID</th>
+		<th class="sort-int sortable" style="color:black; "  valign="top">ID</th>
 		<th valign="top">Version</th>
-		<th class="sort-alpha sortable" style="color:black; background:url('')" valign="top">File</th>
-		<th class="sort-int sortable" style="color:black; background:url('')"  valign="top" align="center">#Prophet<br>Groups</th>
-		<th class="sort-int sortable" style="color:black; background:url('')"  valign="top" align="center">#Indist.<br>Groups</th>
-		<th class="sort-int sortable" style="color:black; background:url('')"  valign="top" align="center">#Proteins</th>
-		<th class="sort-int sortable" style="color:black; background:url('')"  valign="top" align="center">#Pept.<br/>Seq.</th>
-		<th class="sort-int sortable" style="color:black; background:url('')"  valign="top" align="center">#Ions</th>
-		<th class="sort-alpha sortable" style="color:black; background:url('')" valign="top">Comments</th>
+		<th class="sort-alpha sortable" style="color:black; " valign="top">File</th>
+		<th class="sort-int sortable" style="color:black; "  valign="top" align="center">#Prophet<br>Groups</th>
+		<th class="sort-int sortable" style="color:black; "  valign="top" align="center">#Indist.<br>Groups</th>
+		<th class="sort-int sortable" style="color:black; "  valign="top" align="center">#Proteins</th>
+		<th class="sort-int sortable" style="color:black; "  valign="top" align="center">#Pept.<br/>Seq.</th>
+		<th class="sort-int sortable" style="color:black; "  valign="top" align="center">#Ions</th>
+		<th class="sort-alpha sortable" style="color:black; " valign="top">Comments</th>
 		<th valign="top"></th>
 		<th valign="top">Compare</th></tr>
 	</thead>

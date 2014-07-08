@@ -10,6 +10,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
@@ -34,6 +37,9 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     private List<PercolatorResultPlus> results;
     private boolean hasBullsEyeArea = false;
     private boolean hasPeptideResults = false;
+    
+    private boolean hasSequestData = false;
+    private boolean hasProlucidData = false;
 
     private int currentPage;
     private int numPerPage;
@@ -44,8 +50,72 @@ public class TabularPercolatorResults implements Tabular, Pageable {
 
     RoundingUtilsMSLIBRARY roundingUtilsMSLIBRARY;
 
-    public TabularPercolatorResults(List<PercolatorResultPlus> results, boolean hasPEP, boolean hasBullsEyeArea,
+    public TabularPercolatorResults(List<PercolatorResultPlus> results, int searchAnalysisId,
+    		boolean hasPEP, boolean hasBullsEyeArea,
     		boolean hasPeptideResults) {
+    	
+    	hasSequestData = true;
+    	hasProlucidData = false;
+    	
+    	
+    	boolean foundSequestData = false;
+    	boolean foundProlucidData = false;
+
+    	if ( ! results.isEmpty() ) {
+    		
+    		for ( PercolatorResultPlus result : results ) {
+
+    			if ( result.getSequestData() != null ) {
+    				foundSequestData = true;
+    			}
+    			if ( result.getProlucidData() != null ) {
+    				foundProlucidData = true;
+    			}
+    		}
+        	
+        	if ( foundSequestData ) {
+        		hasSequestData = true;
+        	} else {
+        		hasSequestData = false;
+        	}
+        	if ( foundProlucidData ) {
+        		hasProlucidData = true;
+        	} else {
+        		hasProlucidData = false;
+        	}
+    	
+    	} else {
+
+    		//  No results to go by so query to get the search program used
+
+            MsSearchDAO msSearchDAO = DAOFactory.instance().getMsSearchDAO();
+            List<String> msSearchAnalysisProgramNamesForSearchAnalysisID =  msSearchDAO.getAnalysisProgramNamesForSearchAnalysisID( searchAnalysisId );
+            
+            for ( String msSearchAnalysisProgramName : msSearchAnalysisProgramNamesForSearchAnalysisID ) {
+            	
+            	Program msSearchAnalysisProgram = Program.instance( msSearchAnalysisProgramName );
+            	
+            	if ( Program.isSequest( msSearchAnalysisProgram ) ) {
+            		
+            		hasSequestData = true;
+            	}
+            	
+            	if ( msSearchAnalysisProgram.equals( Program.PROLUCID ) ) {
+            		
+            		 hasProlucidData = true;
+            	}
+            }
+            
+            if ( ! hasProlucidData ) {
+            	
+            	hasSequestData = true; // Default to Sequest if not Prolucid.  Handles COMET and others
+            }
+            
+    	}
+
+    	
+    	
+    	
         this.results = results;
         displayPageNumbers = new ArrayList<Integer>();
         displayPageNumbers.add(currentPage);
@@ -72,8 +142,16 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         	columns.add(SORT_BY.QVAL_PEPT);
         	columns.add(SORT_BY.PEP_PEPT);
         }
-        columns.add(SORT_BY.XCORR_RANK);
-        columns.add(SORT_BY.XCORR);
+        
+        if ( hasSequestData ) {
+        	columns.add(SORT_BY.XCORR_RANK);
+        	columns.add(SORT_BY.XCORR);
+        }        
+        if ( hasProlucidData ) {
+        	columns.add(SORT_BY.PRIMARY_SCORE_RANK);
+        	columns.add(SORT_BY.PRIMARY_SCORE);
+        }
+        
         columns.add(SORT_BY.PEPTIDE);
         columns.add(SORT_BY.PROTEIN);
 
@@ -165,10 +243,36 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         	row.addCell(makeRightAlignCell( roundingUtilsMSLIBRARY.roundThreeSignificantDigits( result.getPeptideQvalue())));
         	row.addCell(makeRightAlignCell(roundingUtilsMSLIBRARY.roundThreeSignificantDigits(result.getPeptidePosteriorErrorProbability())));
         }
-        // Sequest data
-        row.addCell(makeRightAlignCell(String.valueOf(result.getSequestData().getxCorrRank())));
-        row.addCell(makeRightAlignCell((rounder.roundFourFormat(result.getSequestData().getxCorr()))));
-//        row.addCell(new TableCell(String.valueOf(round(result.getSequestData().getDeltaCN()))));
+        
+        
+        
+        if ( hasSequestData ) {
+    		if ( result.getSequestData() != null ) {
+
+				// Sequest data
+				row.addCell(makeRightAlignCell(String.valueOf(result.getSequestData().getxCorrRank())));
+				row.addCell(makeRightAlignCell((rounder.roundFourFormat(result.getSequestData().getxCorr()))));
+//    	        row.addCell(new TableCell(String.valueOf(round(result.getSequestData().getDeltaCN()))));
+				
+    		} else {
+				// No Sequest data this row
+				row.addCell(makeRightAlignCell(""));
+				row.addCell(makeRightAlignCell(""));
+    		}
+        }        
+        if ( hasProlucidData ) {
+
+        	if ( result.getProlucidData() != null ) {
+
+        		// Prolucid data
+        		row.addCell(makeRightAlignCell(String.valueOf(result.getProlucidData().getPrimaryScoreRank())));
+        		row.addCell(makeRightAlignCell((rounder.roundFourFormat(result.getProlucidData().getPrimaryScore()))));
+    		} else {
+				// No Prolucid data this row
+				row.addCell(makeRightAlignCell(""));
+				row.addCell(makeRightAlignCell(""));
+        	}
+        }
 
         TableCell cell = null;
         String modifiedSequence = null;

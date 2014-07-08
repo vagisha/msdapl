@@ -162,4 +162,17 @@
 <%@ include file="listExperiments.jsp" %>
 <br>
 
+<script src="<yrcwww:link path='js/experimentDetailsPrecursorScanCountChart.js'/>"></script>
+
+<%-- Google Chart API import, for use on experimentDetails.jsp  --%>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+  google.load("visualization", "1", {packages:["corechart"]});
+  
+  //  Do NOT call a method on an object here.  The "this" gets set to the window.
+  google.setOnLoadCallback(createAllInitialDisplayPrecursorScanCountCharts);
+</script>
+
+
 <%@ include file="/includes/footer.jsp" %>
+

@@ -33,6 +33,7 @@ import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorPeptideResult;
@@ -43,6 +44,8 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.www.misc.Pageable;
@@ -344,6 +347,8 @@ public class ViewPercolatorResults extends Action {
         MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
         SequestSearchResultDAO seqResDao = DAOFactory.instance().getSequestResultDAO();
         
+        ProlucidSearchResultDAO prolucidResDao = DAOFactory.instance().getProlucidResultDAO();
+        
         // Do we have Bullseye results for the searched files
         boolean hasBullsEyeArea = false;
         List<Integer> searchIds = DAOFactory.instance().getMsSearchAnalysisDAO().getSearchIdsForAnalysis(analysis.getId());
@@ -385,7 +390,33 @@ public class ViewPercolatorResults extends Action {
             }
             
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
-            resPlus.setSequestData(seqResDao.load(result.getId()).getSequestResultData());
+            
+//            Program analysisProgram = analysis.getAnalysisProgram();
+//            
+//            String analysisProgramDisplayName = analysisProgram.toString();
+            
+            
+            //   Does not work since Program.PERCOLATOR == analysisProgram
+            
+//            if ( Program.PROLUCID == analysisProgram ) {
+
+            
+            SequestSearchResult sequestSearchResult = seqResDao.load(result.getId());
+            
+            if ( sequestSearchResult != null ) {
+            	
+           		resPlus.setSequestData(sequestSearchResult.getSequestResultData());
+           		
+            } else {
+           		
+            	ProlucidSearchResult prolucidSearchResult = prolucidResDao.load(result.getId());
+            	
+            	if ( prolucidSearchResult != null ) {
+            	
+            		resPlus.setProlucidData(prolucidSearchResult.getProlucidResultData());
+            	}
+            }
+            
             results.add(resPlus);
         }
         
@@ -402,7 +433,7 @@ public class ViewPercolatorResults extends Action {
 
         
         
-        TabularPercolatorResults tabResults = new TabularPercolatorResults(results, hasPEP, hasBullsEyeArea, hasPeptideResults);
+        TabularPercolatorResults tabResults = new TabularPercolatorResults(results, myForm.getSearchAnalysisId(), hasPEP, hasBullsEyeArea, hasPeptideResults);
         tabResults.setSortedColumn(myForm.getSortBy());
         tabResults.setSortOrder(myForm.getSortOrder());
         
