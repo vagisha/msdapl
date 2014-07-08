@@ -297,14 +297,14 @@ CreatePrecursorScanCountChartsClass.prototype.createPrecursorScanCountChartActua
 
 			//  X axis label below chart
 			hAxis: { baselineColor: 'transparent'   // remove line on left side of chart area bounding the chart lines
-				,textPosition: 'none'		  // remove the text labels for values on X axis
+					,textPosition: 'none'		  // remove the text labels for values on X axis
 					, gridlines: { color: 'transparent' }  // remove horizontal grid lines 
 			},  
 			//  Y axis label left of chart data
-			vAxis: { 
-				baselineColor: 'transparent'  // remove line on bottom side of chart area bounding the chart lines
-					,textPosition: 'none'		  // remove the text labels for values on Y axis
-						,gridlines: { color: 'transparent' }  // remove vertical grid lines  
+			vAxis: { baseline: 0                    // always start at zero
+					, baselineColor: 'transparent'  // remove line on bottom side of chart area bounding the chart lines
+					, textPosition: 'none'		    // remove the text labels for values on Y axis
+					, gridlines: { color: 'transparent' }  // remove vertical grid lines  
 			},
 
 			enableInteractivity: false, //  false for turn off tool tips and other interactive features 
@@ -395,6 +395,7 @@ CreatePrecursorScanCountChartsClass.prototype.createPrecursorScanCountChartActua
 					},  
 					//  Y axis label left of chart
 					vAxis: { title: 'Scan Count', titleTextStyle: {color: 'black'}
+								,baseline: 0                    // always start at zero
 					},
 					legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
 					width:800, height:400,   // width and height of chart, otherwise controlled by enclosing div
