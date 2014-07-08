@@ -223,6 +223,89 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         catch(SQTParseException e) {assertEquals("No matching modification found: M@; sequence: "+seq, e.getMessage());}
     }
     
+    public void testGetResultModsValidEmbeddedMass() {
+    	
+        List<ResidueModification> dynaMods = new ArrayList<ResidueModification>(4);
+        dynaMods.add(new ResidueModification('S', '*', "80.0"));
+        dynaMods.add(new ResidueModification('T', '*', "80.0"));
+        dynaMods.add(new ResidueModification('Y', '*', "80.0"));
+        dynaMods.add(new ResidueModification('M', '#', "16.0"));
+  
+        String seq = "S(80)ABM(16.0)A";
+        try{
+        	builder.getResultMods(seq, dynaMods); 
+        }catch(SQTParseException e) {
+        	fail("Valid sequence. Exception message: " + e.getMessage());
+        }
+        
+        
+        seq = "S(80)ABM(16.0)A";
+        try{
+        	builder.getResultMods(seq, dynaMods); 
+        }catch(SQTParseException e) {
+        	fail("Valid sequence. Exception message: " + e.getMessage());
+        }
+        
+        seq = "S(80)ABM(16.0)";
+        try{
+        	builder.getResultMods(seq, dynaMods); 
+        }catch(SQTParseException e) {
+        	fail("Valid sequence. Exception message: " + e.getMessage());
+        }
+
+    }
+    
+    
+    public void testGetResultModsInvalidEmbeddedMass() {
+    	
+        List<ResidueModification> dynaMods = new ArrayList<ResidueModification>(4);
+        dynaMods.add(new ResidueModification('A', '*', "80.0E-2"));
+        dynaMods.add(new ResidueModification('S', '*', "80.0"));
+        dynaMods.add(new ResidueModification('T', '*', "80.0"));
+        dynaMods.add(new ResidueModification('Y', '*', "80.0"));
+        dynaMods.add(new ResidueModification('M', '#', "16.0"));
+  
+        String seq = "S(80.5)ABM(16.0)A";
+        try{
+        	builder.getResultMods(seq, dynaMods); 
+        	fail("Invalid sequence. seq: " + seq);
+        }catch(SQTParseException e) {
+        	assertEquals("No matching modification found: S(80.5); sequence: " + seq, e.getMessage());
+        }
+        
+        seq = "A(80.0)ABM(16.0)A";
+        try{
+        	builder.getResultMods(seq, dynaMods); 
+        	fail("Invalid sequence. seq: " + seq);
+        }catch(SQTParseException e) {
+        	String message = e.getMessage();
+//        	System.out.println(message);
+        	assertEquals("No matching modification found: A(80.0); sequence: " + seq, e.getMessage());
+        }
+        
+        
+        seq = "S(80.5";
+        try{
+        	builder.getResultMods(seq, dynaMods); 
+        	fail("Invalid sequence. seq: " + seq);
+        }catch(SQTParseException e) {
+        	String message = e.getMessage();
+        	assertEquals("Failed to find closing dynamic modification character ')' before end of sequence.  Processing modified residue 'S' at position 0; sequence: " + seq, e.getMessage());
+        }
+ 
+        
+        seq = "S)";
+        try{
+        	builder.getResultMods(seq, dynaMods); 
+        	fail("Invalid sequence. seq: " + seq);
+        }catch(SQTParseException e) {
+        	String message = e.getMessage();
+//        	System.out.println(message);
+        	assertEquals("Found closing dynamic modification character ')' without preceding matching start dynamic modification character.  Processing modified residue 'S' at position 0; sequence: " + seq, e.getMessage());
+        }
+        
+    }
+    
     public void testGetResultTerminalMods() {
         List<ResidueModification> dynaMods = new ArrayList<ResidueModification>(4);
         dynaMods.add(new ResidueModification('S', '*', "80.0"));

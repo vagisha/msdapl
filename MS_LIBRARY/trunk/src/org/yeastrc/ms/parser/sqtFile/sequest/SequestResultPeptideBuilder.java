@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.parser.sqtFile.sequest;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -137,39 +138,236 @@ public final class SequestResultPeptideBuilder implements PeptideResultBuilder {
     	return resultTermMods;
 	}
     
+    
+    
     List<MsResultResidueMod> getResultMods(String peptide, List<? extends MsResidueModificationIn> dynaMods) throws SQTParseException {
         
-        // create a map of the dynamic modifications for the search for easy access.
-        Map<String, MsResidueModificationIn> modMap = new HashMap<String, MsResidueModificationIn>(dynaMods.size());
-        for (MsResidueModificationIn mod: dynaMods)
-            modMap.put(mod.getModifiedResidue()+""+mod.getModificationSymbol(), mod);
+    	// Total rewrite of this method to add support for embedded dynamic mod mass with mass value surrounded 
+    	// by "()" or "[]", ie "(123)" or "[123]"
+    	
+    	
+        // create a map of the dynamic modifications keyed on symbol for the search for easy access.
+        Map<String, MsResidueModificationIn> modMapKeyedOnSymbol = new HashMap<String, MsResidueModificationIn>(dynaMods.size());
+        for (MsResidueModificationIn mod: dynaMods) {
+            modMapKeyedOnSymbol.put(mod.getModifiedResidue() + "" + mod.getModificationSymbol(), mod);
+        }
+        
+        // create a map of the dynamic modifications keyed on mass for the search for easy access.
+        Map<String, MsResidueModificationIn> modMapKeyedOnMassTrailingZerosRemoved = new HashMap<String, MsResidueModificationIn>(dynaMods.size());
+        for (MsResidueModificationIn mod: dynaMods) {
+        	
+//        	char modResidue = mod.getModifiedResidue();
+        	
+        	BigDecimal massBD = mod.getModificationMass();
+        	
+//        	String massStr = massBD.toString();
+        	String massPlainStr = massBD.toPlainString();
+        	
+        	String massForMap = massPlainStr;
+        	
+        	if ( massPlainStr.contains( "." ) ) {
+        		
+        		//  remove trailing zeros to right of "." since they are not passed by Prolucid
+        	
+        		int lastNonZeroCharIndex = massPlainStr.length() - 1;
+
+        		while ( lastNonZeroCharIndex > 0 && massPlainStr.charAt( lastNonZeroCharIndex ) == '0' ) {
+
+        			lastNonZeroCharIndex--;
+        		}
+        		
+        		if ( lastNonZeroCharIndex > 0 && massPlainStr.charAt( lastNonZeroCharIndex ) == '.' ) {
+
+        			lastNonZeroCharIndex--;
+        		}
+
+        		massForMap = massPlainStr.substring(0, lastNonZeroCharIndex + 1 );
+        	}        	
+        	
+        	StringBuilder mapKeySB = new StringBuilder();
+        	mapKeySB.append( mod.getModifiedResidue() );
+        	mapKeySB.append( massForMap );
+        	String mapKey = mapKeySB.toString();
+        	
+        	modMapKeyedOnMassTrailingZerosRemoved.put( mapKey, mod);
+        }
+        
+
         
         List<MsResultResidueMod> resultMods = new ArrayList<MsResultResidueMod>();
         char modifiedChar = 0;
         int modCharIndex = -1;
-        for (int i = 0; i < peptide.length(); i++) {
-            char x = peptide.charAt(i);
+        
+        char modificationSymbol = ' ';
+        
+        for (int peptideIndex = 0; peptideIndex < peptide.length(); peptideIndex++) {
+        	
+            char peptideCharAtIndex = peptide.charAt(peptideIndex);
+            
             // if this is a valid residue skip over it
-            if (isResidue(x))   {
-                modifiedChar = x;
+            if (isResidue(peptideCharAtIndex))   {
+                modifiedChar = peptideCharAtIndex;
                 modCharIndex++;
                 continue;
             }
-            MsResidueModificationIn matchingMod = modMap.get(modifiedChar+""+x);
-            if (matchingMod == null)
-                throw new SQTParseException("No matching modification found: "+modifiedChar+x+"; sequence: "+peptide);
+            
+            MsResidueModificationIn matchingMod = null;
+            
+            //  wanted to support "[]" for dynamic mod mass delimiter but "[]" appears to be already used
+            
+            if ( peptideCharAtIndex == ')' ) { //  || peptideCharAtIndex == ']'
+            	
+        		throw new SQTParseException("Found closing dynamic modification character '" 
+        				+ peptideCharAtIndex + "' without preceding matching start dynamic modification character.  "
+        				+ "Processing modified residue '" + modifiedChar
+        				+ "' at position " + modCharIndex
+        				+ "; sequence: " + peptide);
+            }
+            
+            if ( peptideCharAtIndex == '(' ) { //  || peptideCharAtIndex == '[' 
+            	
+            	
+            	//  dynamic mod with embedded mass
+            	
+            	char openingModChar = peptideCharAtIndex;
+            	
+//            	char closingModChar = ']';
+//            	
+//                if ( openingModChar == '(' ) {
+//                	
+//                	closingModChar = ')';
+//                }
+                
+                char closingModChar = ')';
+                
+                
+                
+        		StringBuilder massSB = new StringBuilder(20);					// the string we're building that contains a mass (e.g. 24.12)
+
+                peptideIndex++;  // advance to first character of mass
+                
+                while ( ( peptideCharAtIndex = peptide.charAt(peptideIndex) ) != closingModChar ) {
+                	
+                	massSB.append( peptideCharAtIndex );
+                	
+                    peptideIndex++;  // advance to next character
+                    
+                    if ( peptideIndex >=  peptide.length() ) {
+                    	
+                		throw new SQTParseException("Failed to find closing dynamic modification character '" 
+                				+ closingModChar + "' before end of sequence.  "
+                				+ "Processing modified residue '" + modifiedChar
+                				+ "' at position " + modCharIndex
+                				+ "; sequence: " + peptide);
+                    }
+                }
+                
+                String massStr = massSB.toString();
+                
+                BigDecimal massBD = null;
+                
+                try {
+                	
+                    massBD = new BigDecimal( massStr );
+                	
+                } catch ( Exception e) {
+                	
+            		throw new SQTParseException("Failed to parse dynamic modification mass '" 
+            				+ massStr + "'.  "
+            				+ "Processing modified residue '" + modifiedChar
+            				+ "' at position " + modCharIndex
+            				+ "; sequence: " + peptide);
+                }
+                
+                //  Look up mass
+                for (MsResidueModificationIn mod: dynaMods) {
+                    
+                	if ( mod.getModificationMass().equals( massBD ) && mod.getModifiedResidue() == modifiedChar ) {
+                		
+                		matchingMod = mod;
+                		
+                		break;
+                	}
+                }
+                
+                if ( matchingMod == null ) {
+                	
+                	String searchMapKey = modifiedChar + massBD.toPlainString();
+
+                	matchingMod = modMapKeyedOnMassTrailingZerosRemoved.get( searchMapKey );
+                }
+                
+                if ( matchingMod == null ) {
+                	
+            		throw new SQTParseException("No matching modification found: " 
+            				+ modifiedChar + openingModChar + massStr + closingModChar + "; sequence: " + peptide);
+                }
+                
+            	
+            	modificationSymbol = matchingMod.getModificationSymbol();
+
+            	
+            } else {
+            	
+            	modificationSymbol = peptideCharAtIndex;
+            	matchingMod = modMapKeyedOnSymbol.get(modifiedChar + "" + peptideCharAtIndex);
+            	if (matchingMod == null)
+            		throw new SQTParseException("No matching modification found: " + modifiedChar + peptideCharAtIndex + "; sequence: " + peptide);
+            }
             
             // found a match!!
             ResultResidueModBean resultMod = new ResultResidueModBean();
             resultMod.setModificationMass(matchingMod.getModificationMass());
             resultMod.setModifiedResidue(modifiedChar);
-            resultMod.setModificationSymbol(x);
+            resultMod.setModificationSymbol(modificationSymbol);
             resultMod.setModifiedPosition(modCharIndex);
             resultMods.add(resultMod);
         }
         
         return resultMods;
     }
+    
+    
+    //   WAS 
+//    List<MsResultResidueMod> getResultMods(String peptide, List<? extends MsResidueModificationIn> dynaMods) throws SQTParseException {
+//        
+//        // create a map of the dynamic modifications for the search for easy access.
+//        Map<String, MsResidueModificationIn> modMap = new HashMap<String, MsResidueModificationIn>(dynaMods.size());
+//        for (MsResidueModificationIn mod: dynaMods)
+//            modMap.put(mod.getModifiedResidue()+""+mod.getModificationSymbol(), mod);
+//        
+//        List<MsResultResidueMod> resultMods = new ArrayList<MsResultResidueMod>();
+//        char modifiedChar = 0;
+//        int modCharIndex = -1;
+//        for (int i = 0; i < peptide.length(); i++) {
+//            char x = peptide.charAt(i);
+//            // if this is a valid residue skip over it
+//            if (isResidue(x))   {
+//                modifiedChar = x;
+//                modCharIndex++;
+//                continue;
+//            }
+//            MsResidueModificationIn matchingMod = modMap.get(modifiedChar+""+x);
+//            if (matchingMod == null)
+//                throw new SQTParseException("No matching modification found: "+modifiedChar+x+"; sequence: "+peptide);
+//            
+//            // found a match!!
+//            ResultResidueModBean resultMod = new ResultResidueModBean();
+//            resultMod.setModificationMass(matchingMod.getModificationMass());
+//            resultMod.setModifiedResidue(modifiedChar);
+//            resultMod.setModificationSymbol(x);
+//            resultMod.setModifiedPosition(modCharIndex);
+//            resultMods.add(resultMod);
+//        }
+//        
+//        return resultMods;
+//    }
+    
+    
+    
+    
+    
+    
 
     static String removeDots(String sequence) throws SQTParseException {
         if (!hasNtermSeparator(sequence) || !hasCtermSeparater(sequence))
