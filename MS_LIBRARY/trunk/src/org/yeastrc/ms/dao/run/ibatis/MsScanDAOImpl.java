@@ -21,7 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.db.DBConnectionManager;
 import org.yeastrc.ms.ConnectionFactory;
+import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.domain.run.DataConversionType;
@@ -30,6 +32,7 @@ import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.Peak;
 import org.yeastrc.ms.domain.run.PeakStorageType;
 import org.yeastrc.ms.util.PeakStringBuilder;
+import org.yeastrc.ms.util.StringUtils;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -109,6 +112,178 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
         map.put("level", level);
         return (Integer)queryForObject("MsScan.selectScanCountForRunLevel", map);
     }
+    
+    
+    @Override
+    public int numScansForExperimentId(int experimentId) {
+        return (Integer)queryForObject("MsScan.selectScanCountForExperimentId", experimentId);
+    }
+    
+    @Override
+    public BigDecimal getMaxPreMZForExperimentId(int experimentId) {
+    	BigDecimal maxPreMZ = (BigDecimal) queryForObject("MsScan.getMaxPreMZForExperimentId", experimentId);
+        return maxPreMZ;
+    }
+    
+    @Override
+    public BigDecimal getMinPreMZForExperimentId(int experimentId) {
+    	BigDecimal minPreMZ = (BigDecimal) queryForObject("MsScan.getMinPreMZForExperimentId", experimentId);
+        return minPreMZ;
+    }
+    
+    
+    // Not used, iBatis returned exception: Error: executeQueryForObject returned too many results.
+//    @Override
+//    public List<BigDecimal> getPreMZForExperimentId(int experimentId) {
+//    	List<BigDecimal> preMZList = (List<BigDecimal>) queryForObject("MsScan.getPreMZListForExperimentId", experimentId);
+//        return preMZList;
+//    }
+    
+    
+
+    // query string
+    private static final String getPreMZForExperimentIdSqlStr = "SELECT msScan.preMZ FROM msScan "
+    		+ " INNER JOIN msRun ON msScan.runID = msRun.id INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID  "
+    		+ " WHERE msExperimentRun.experimentID = ?";
+    
+    @Override
+    public List<BigDecimal> getPreMZForExperimentId(int experimentId) {
+        // Get our connection to the database.
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;    
+        
+        List<BigDecimal> outputList = new ArrayList<BigDecimal>();
+
+
+        try {
+            conn = DAOFactory.instance().getConnection();
+
+            stmt = conn.prepareStatement(getPreMZForExperimentIdSqlStr);
+
+            stmt.setInt( 1, experimentId );
+            
+            rs = stmt.executeQuery();
+
+            while(rs.next()) {
+            	
+            	BigDecimal preMZ = rs.getBigDecimal("preMZ");
+
+            	outputList.add(preMZ);
+            }
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute sql: " + getPreMZForExperimentIdSqlStr, e);
+            throw new RuntimeException("Failed to execute sql: " + getPreMZForExperimentIdSqlStr, e);
+        }
+        finally {
+
+            // Always make sure result sets and statements are closed,
+            // and the connection is returned to the pool
+            if (rs != null) {
+                try { rs.close(); } catch (SQLException e) { ; }
+                rs = null;
+            }
+            if (stmt != null) {
+                try { stmt.close(); } catch (SQLException e) { ; }
+                stmt = null;
+            }
+            if (conn != null) {
+                try { conn.close(); } catch (SQLException e) { ; }
+                conn = null;
+            }
+        }
+        
+        return outputList;
+    }
+    
+    
+    
+
+
+    // query string
+    private static final String getPreMZArrayForExperimentIdSqlStr = "SELECT msScan.preMZ FROM msScan "
+    		+ " INNER JOIN msRun ON msScan.runID = msRun.id INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID  "
+    		+ " WHERE msExperimentRun.experimentID = ?";
+    
+    @Override
+    public double[] getPreMZArrayForExperimentId(int experimentId) {
+        // Get our connection to the database.
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;    
+        
+        int numScans = numScansForExperimentId( experimentId );
+        
+        double[] preMZArray  = new double[ numScans ];
+
+
+        try {
+            conn = DAOFactory.instance().getConnection();
+
+            stmt = conn.prepareStatement(getPreMZArrayForExperimentIdSqlStr);
+
+            stmt.setInt( 1, experimentId );
+            
+            rs = stmt.executeQuery();
+            
+            int rowIndex = 0;
+
+            while(rs.next()) {
+            	
+            	if ( rowIndex >= preMZArray.length ) {
+            		
+            		String msg = "getPreMZArrayForExperimentId: Unexpected error: rowIndex >= preMZArray.length:"
+            				+ "experimentId: " + experimentId + ", sql: " + getPreMZArrayForExperimentIdSqlStr;
+            		log.error( msg );
+            		throw new RuntimeException(msg);
+            	}
+            	
+            	double preMZ = rs.getDouble("preMZ");
+
+            	preMZArray[ rowIndex ] = preMZ;
+            	
+            	rowIndex++;
+            }
+            
+        	if ( rowIndex != preMZArray.length ) {
+        		
+        		String msg = "getPreMZArrayForExperimentId: Unexpected error: after loading all rows, rowIndex != preMZArray.length:"
+        				+ "experimentId: " + experimentId + ", sql: " + getPreMZArrayForExperimentIdSqlStr;
+        		log.error( msg );
+        		throw new RuntimeException(msg);
+        	}
+        }
+        catch (SQLException e) {
+            log.error("getPreMZArrayForExperimentId: Failed to execute sql: " + getPreMZArrayForExperimentIdSqlStr, e);
+            throw new RuntimeException("Failed to execute sql: " + getPreMZArrayForExperimentIdSqlStr, e);
+        }
+        finally {
+
+            // Always make sure result sets and statements are closed,
+            // and the connection is returned to the pool
+            if (rs != null) {
+                try { rs.close(); } catch (SQLException e) { ; }
+                rs = null;
+            }
+            if (stmt != null) {
+                try { stmt.close(); } catch (SQLException e) { ; }
+                stmt = null;
+            }
+            if (conn != null) {
+                try { conn.close(); } catch (SQLException e) { ; }
+                conn = null;
+            }
+        }
+        
+        return preMZArray;
+    }
+    
+
+
+
+
+    
     
     public int loadScanIdForScanNumRun(int scanNum, int runId) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);

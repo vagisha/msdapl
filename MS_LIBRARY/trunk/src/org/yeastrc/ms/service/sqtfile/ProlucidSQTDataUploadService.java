@@ -205,12 +205,24 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
             int scanId = getScanId(runId, scan.getScanNumber());
             // save spectrum data
             if(uploadSearchScan(scan, runSearchId, scanId)) {
-                // save all the search results for this scan
-                for (ProlucidSearchResultIn result: scan.getScanResults()) {
-                    uploadSearchResult(result, runSearchId, scanId);
-                    numResults++;
-                    numProteins += result.getProteinMatchList().size();
-                }
+            	
+                // save ONLY the FIRST search result for this scan
+            	
+            	if ( ! scan.getScanResults().isEmpty() ) {
+            		ProlucidSearchResultIn result = scan.getScanResults().get(0);
+            		uploadSearchResult(result, runSearchId, scanId);
+            		numResults++;
+            		numProteins += result.getProteinMatchList().size();
+            	}
+            	
+            	//  WAS
+            	
+//                // save all the search results for this scan
+//                for (ProlucidSearchResultIn result: scan.getScanResults()) {
+//                    uploadSearchResult(result, runSearchId, scanId);
+//                    numResults++;
+//                    numProteins += result.getProteinMatchList().size();
+//                }
             }
             else {
                 log.info("Ignoring search scan: "+scan.getScanNumber()+"; scanId: "+scanId+"; charge: "+scan.getCharge()+"; mass: "+scan.getObservedMass());

@@ -58,6 +58,12 @@ public class MascotSearchDAOImpl extends BaseSqlMapDAO implements MascotSearchDA
         return searchDao.getSearchIdsForExperiment(experimentId);
     }
     
+
+	@Override
+	public List<String> getAnalysisProgramNamesForSearchAnalysisID(int searchAnalysisID) {
+		return searchDao.getAnalysisProgramNamesForSearchAnalysisID( searchAnalysisID );
+	}
+    
     @Override
     public MassType getFragmentMassType(int searchId) {
         String val = getSearchParamValue(searchId, "precursor_mass_type");
@@ -132,4 +138,5 @@ public class MascotSearchDAOImpl extends BaseSqlMapDAO implements MascotSearchDA
             return param.getParamValue();
         }
     }
+
 }

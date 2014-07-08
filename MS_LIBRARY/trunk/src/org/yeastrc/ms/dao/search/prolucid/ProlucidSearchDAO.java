@@ -28,4 +28,12 @@ public interface ProlucidSearchDAO extends GenericSearchDAO<ProlucidSearchIn, Pr
      * @return
      */
     public abstract MassType getFragmentMassType(int searchId);
+    
+    /**
+     * Returns the specificity contraint used for this search
+     * @param searchId
+     * @return
+     */
+    public abstract int getSpecificity(int searchId);
+
 }

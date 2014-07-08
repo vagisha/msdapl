@@ -42,6 +42,14 @@ public interface GenericSearchDAO <I extends MsSearchIn, O extends MsSearch> {
      */
     public abstract List<Integer> getSearchIdsForExperiment(int experimentId);
     
+
+    /**
+     * Return a list of AnalysisProgramNames from the msSearch table for the provided searchAnalysisID
+     * @param searchAnalysisID
+     * @return
+     */
+    public abstract List<String> getAnalysisProgramNamesForSearchAnalysisID(int searchAnalysisID);
+    
     /**
      * Updates the value of the analysisProgramVersion in msSearch table
      * @param searchId

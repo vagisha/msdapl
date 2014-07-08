@@ -120,6 +120,20 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO {
         return queryForList("MsSearch.selectSearchIdsForExperiment", experimentId);
     }
     
+    
+    @Override
+    public List<String> getAnalysisProgramNamesForSearchAnalysisID(int searchAnalysisID) {
+        return queryForList("MsSearch.selectAnalysisProgramNamesForSearchAnalysisID", searchAnalysisID);
+    }
+    
+//    SELECT msSearch.*
+//    FROM msSearch WHERE id IN (
+//
+//       SELECT DISTINCT( msRunSearch.searchID ) FROM msRunSearchAnalysis 
+//            INNER JOIN msRunSearch ON msRunSearchAnalysis.runSearchID = msRunSearch.id
+//            WHERE msRunSearchAnalysis.searchAnalysisID = 1
+//    )
+    
     public void deleteSearch(int searchId) {
         delete("MsSearch.delete", searchId);
     }

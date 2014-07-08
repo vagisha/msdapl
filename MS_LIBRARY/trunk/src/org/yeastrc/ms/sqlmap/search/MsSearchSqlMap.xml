@@ -54,6 +54,17 @@
     <select id="selectSearchIdsForExperiment" resultClass="Integer" parameterClass="Integer">
     	SELECT id FROM msSearch WHERE experimentID = #experimentId#
     </select>
+
+    <select id="selectAnalysisProgramNamesForSearchAnalysisID" resultClass="String" parameterClass="Integer">
+    	    SELECT msSearch.analysisProgramName
+		    FROM msSearch WHERE id IN (
+
+		       SELECT DISTINCT( msRunSearch.searchID ) FROM msRunSearchAnalysis 
+		            INNER JOIN msRunSearch ON msRunSearchAnalysis.runSearchID = msRunSearch.id
+		            WHERE msRunSearchAnalysis.searchAnalysisID = #searchAnalysisID#
+		    )
+    </select>
+    
     
     <insert id="insert" parameterMap="msSearchParam">
     	INSERT INTO msSearch (

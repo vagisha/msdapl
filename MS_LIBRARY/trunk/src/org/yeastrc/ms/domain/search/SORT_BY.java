@@ -19,7 +19,11 @@ public enum SORT_BY {
     PROTEIN("Protein", "accession"),
     FILE_SEARCH("File", "runSearchID"),
     FILE_ANALYSIS("File", "runSearchAnalysisID"),
-    
+
+    // Prolucid specific
+    PRIMARY_SCORE_RANK("PrimaryScoreRank", "PrimaryScoreRank"),
+    PRIMARY_SCORE("PrimaryScore", "PrimaryScore"),
+
     // Sequest specific
     XCORR("XCorr", "XCorr"),
     XCORR_RANK("XCr", "XCorrRank", "XCorr Rank"),

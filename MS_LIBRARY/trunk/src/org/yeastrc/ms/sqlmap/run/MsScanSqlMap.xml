@@ -145,6 +145,43 @@
     	SELECT min(retentionTime) from msScan where runID IN ($runList$)
     </select>
     
+    
+    
+    <select id="selectScanCountForExperimentId" resultClass="Integer" parameterClass="Integer"> 
+        SELECT COUNT(*) AS count FROM msScan
+           INNER JOIN msRun ON msScan.runID = msRun.id 
+           INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID 
+           WHERE msExperimentRun.experimentID = #experimentId#
+    </select> 
+    
+    <select id="getMaxPreMZForExperimentId" resultClass="java.math.BigDecimal" parameterClass="Integer">
+        SELECT MAX(msScan.preMZ) AS maxpreMZ FROM msScan 
+           INNER JOIN msRun ON msScan.runID = msRun.id 
+           INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID 
+           WHERE msExperimentRun.experimentID = #experimentId#
+    </select>
+    
+    <select id="getMinPreMZForExperimentId" resultClass="java.math.BigDecimal" parameterClass="Integer">
+        SELECT MIN(msScan.preMZ) AS minPreMZ FROM msScan 
+           INNER JOIN msRun ON msScan.runID = msRun.id 
+           INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID 
+           WHERE msExperimentRun.experimentID = #experimentId#
+    </select>    
+    
+    
+    <!-- Not used, iBatis returned exception: Error: executeQueryForObject returned too many results. -->
+    <!--  
+    <select id="getPreMZListForExperimentId" resultClass="java.math.BigDecimal" parameterClass="Integer">
+        SELECT msScan.preMZ FROM msScan 
+           INNER JOIN msRun ON msScan.runID = msRun.id 
+           INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID 
+           WHERE msExperimentRun.experimentID = #experimentId#
+    </select>           
+    -->
+    
+    
+           
+    
     <insert id="insert" parameterMap="msScanParam">
     	INSERT INTO msScan (runID, 
     						startScanNumber, 

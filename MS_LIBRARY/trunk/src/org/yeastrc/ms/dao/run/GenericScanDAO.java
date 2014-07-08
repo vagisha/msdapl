@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.dao.run;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.yeastrc.ms.domain.run.MsScanIn;
@@ -76,6 +77,43 @@ public interface GenericScanDAO <I extends MsScanIn, O extends MsScan> {
      * @return
      */
     public abstract int numScans(int runId, int level);
+    
+    /**
+     * Returns the number of scans of the given experimentId;
+     * @param experimentId
+     * @return
+     */
+    public abstract int numScansForExperimentId(int experimentId);
+
+    
+    /**
+     * Returns the max value of preMZ in msScans for the given experimentId;
+     * @param experimentId
+     * @return
+     */
+    public abstract BigDecimal getMaxPreMZForExperimentId(int experimentId);
+    
+    /**
+     * Returns the min value of preMZ in msScans for the given experimentId;
+     * @param experimentId
+     * @return
+     */
+    public abstract BigDecimal getMinPreMZForExperimentId(int experimentId);
+    
+    /**
+     * Returns the list of values of preMZ in msScans for the given experimentId;
+     * @param experimentId
+     * @return
+     */
+    public abstract List<BigDecimal> getPreMZForExperimentId(int experimentId);
+
+    
+    /**
+     * Returns the array of values of preMZ in msScans for the given experimentId;
+     * @param experimentId
+     * @return
+     */    
+    public double[] getPreMZArrayForExperimentId(int experimentId);
     
     
     public abstract void delete(int scanId);

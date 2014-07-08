@@ -67,6 +67,12 @@ public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements ProlucidSear
     public List<Integer> getSearchIdsForExperiment(int experimentId) {
         return searchDao.getSearchIdsForExperiment(experimentId);
     }
+
+	@Override
+	public List<String> getAnalysisProgramNamesForSearchAnalysisID(int searchAnalysisID) {
+		return searchDao.getAnalysisProgramNamesForSearchAnalysisID( searchAnalysisID );
+	}
+
     
     @Override
     public MassType getFragmentMassType(int searchId) {
@@ -85,6 +91,17 @@ public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements ProlucidSear
         else if (val.equals("mono"))   return MassType.MONO;
         return null; // we don't recognize this value
     }
+    
+    
+    @Override
+    public int getSpecificity(int searchId) {
+        String val = getSearchParamValue(searchId, "specificity", "enzyme_info");
+        if(val == null)
+            return 2;  // default to 2 if not found
+        
+        return Integer.valueOf(val);
+    }
+
     
     private String getSearchParamValue(int searchId, String paramName, String parentParamName) {
         Map<String, Object> map = new HashMap<String, Object>();

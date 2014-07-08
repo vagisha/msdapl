@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.dao.run.ms2file.ibatis;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
@@ -89,9 +90,39 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MS2ScanDAO {
         return msScanDao.numScans(runId, level);
     }
     
+
+	@Override
+	public int numScansForExperimentId(int experimentId) {
+		return msScanDao.numScansForExperimentId(experimentId);
+	}
+
+    
     public int loadScanIdForScanNumRun(int scanNum, int runId) {
         return msScanDao.loadScanIdForScanNumRun(scanNum, runId);
     }
+    
+
+	@Override
+	public BigDecimal getMaxPreMZForExperimentId(int experimentId) {
+		return msScanDao.getMaxPreMZForExperimentId(experimentId);
+	}
+
+	@Override
+	public BigDecimal getMinPreMZForExperimentId(int experimentId) {
+		return msScanDao.getMinPreMZForExperimentId(experimentId);
+	}
+
+	@Override
+	public List<BigDecimal> getPreMZForExperimentId(int experimentId) {
+		return msScanDao.getPreMZForExperimentId(experimentId);
+	}
+
+
+	@Override
+	public double[] getPreMZArrayForExperimentId(int experimentId) {
+		return msScanDao.getPreMZArrayForExperimentId(experimentId);
+	}
+
     
     /**
      * Saves the scan along with any MS2 file format specific data.

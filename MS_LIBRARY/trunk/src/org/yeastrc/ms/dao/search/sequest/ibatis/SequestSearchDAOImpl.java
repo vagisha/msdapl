@@ -57,6 +57,12 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements SequestSearch
     public List<Integer> getSearchIdsForExperiment(int experimentId) {
         return searchDao.getSearchIdsForExperiment(experimentId);
     }
+
+	@Override
+	public List<String> getAnalysisProgramNamesForSearchAnalysisID(int searchAnalysisID) {
+		return searchDao.getAnalysisProgramNamesForSearchAnalysisID( searchAnalysisID );
+	}
+
     
     @Override
     public MassType getFragmentMassType(int searchId) {
