@@ -37,6 +37,11 @@ public class FastaInMemorySuffixCreator {
         List<Integer> dbProteinIds = NrSeqLookupUtil.getDbProteinIdsForDatabase(databaseId);
         log.info("# proteins: "+dbProteinIds.size()+" in databaseID: "+databaseId);
         
+        if ( dbProteinIds.isEmpty() ) {
+        	
+        	log.error( "ERROR:  No proteins loaded from tblProteinDatabase for databaseID: " + databaseId );
+        }
+        
         // some proteins in a fasta file have the same sequence.  We will not create suffixes twice
         Set<Integer> seenSequenceIds = new HashSet<Integer>(dbProteinIds.size());
         
