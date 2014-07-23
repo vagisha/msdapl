@@ -44,6 +44,9 @@ import javax.xml.stream.XMLStreamReader;
  * name of the name-value pair containing the scan number is "scan", so I'm knocking off everything but that pair.
  * Also changing to cobble together Scan.massIntensityList from its components, which was missed earlier.
  * Also calling tmpScanHeader.setRetentionTime(), which was previously not set.
+ * 
+ * djaschob  2014/07/23, incorporating latest Sourceforge code for Retention Time processing setting of rt 
+ * for units of "minute".
 
  */
 public class MLScanAndHeaderParser
