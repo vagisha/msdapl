@@ -206,10 +206,12 @@ public class MLScanAndHeaderParser
                         {
                             String timeType = xmlSR.getAttributeValue(null,"unitName");
                             double rt = Double.parseDouble(xmlSR.getAttributeValue(null, "value"));
+                            
+                            //  djaschob changes to match latest code
                             if(timeType.equals("minute"))
-                                tmpScanHeader.setRT(rt*60);
-                            else
-                                tmpScanHeader.setRT(rt);
+                                rt = rt * 60;
+                            
+                            tmpScanHeader.setRT(rt);
 
                             //dhmay adding for backward compatibility.  Probably this should be rewired so that
                             //getDoubleRetentionTime just accesses the rt variable, but I don't want to sort out
