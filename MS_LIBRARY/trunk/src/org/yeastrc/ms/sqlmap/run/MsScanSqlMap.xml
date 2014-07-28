@@ -147,25 +147,25 @@
     
     
     
-    <select id="selectScanCountForExperimentId" resultClass="Integer" parameterClass="Integer"> 
+    <select id="selectScanCountForExperimentIdScanLevelNotOnePreMZNotNULL" resultClass="Integer" parameterClass="Integer"> 
         SELECT COUNT(*) AS count FROM msScan
            INNER JOIN msRun ON msScan.runID = msRun.id 
            INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID 
-           WHERE msExperimentRun.experimentID = #experimentId#
+           WHERE msExperimentRun.experimentID = #experimentId# AND msScan.level != 1 AND msScan.preMZ IS NOT NULL
     </select> 
     
-    <select id="getMaxPreMZForExperimentId" resultClass="java.math.BigDecimal" parameterClass="Integer">
+    <select id="getMaxPreMZForExperimentIdScanLevelNotOnePreMZNotNULL" resultClass="java.math.BigDecimal" parameterClass="Integer">
         SELECT MAX(msScan.preMZ) AS maxpreMZ FROM msScan 
            INNER JOIN msRun ON msScan.runID = msRun.id 
            INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID 
-           WHERE msExperimentRun.experimentID = #experimentId#
+           WHERE msExperimentRun.experimentID = #experimentId# AND msScan.level != 1 AND msScan.preMZ IS NOT NULL
     </select>
     
-    <select id="getMinPreMZForExperimentId" resultClass="java.math.BigDecimal" parameterClass="Integer">
+    <select id="getMinPreMZForExperimentIdScanLevelNotOnePreMZNotNULL" resultClass="java.math.BigDecimal" parameterClass="Integer">
         SELECT MIN(msScan.preMZ) AS minPreMZ FROM msScan 
            INNER JOIN msRun ON msScan.runID = msRun.id 
            INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID 
-           WHERE msExperimentRun.experimentID = #experimentId#
+           WHERE msExperimentRun.experimentID = #experimentId# AND msScan.level != 1 AND msScan.preMZ IS NOT NULL
     </select>    
     
     

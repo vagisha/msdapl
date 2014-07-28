@@ -92,8 +92,8 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MS2ScanDAO {
     
 
 	@Override
-	public int numScansForExperimentId(int experimentId) {
-		return msScanDao.numScansForExperimentId(experimentId);
+	public int numScansForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId) {
+		return msScanDao.numScansForExperimentIdScanLevelNotOnePreMZNotNULL(experimentId);
 	}
 
     
@@ -103,24 +103,24 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MS2ScanDAO {
     
 
 	@Override
-	public BigDecimal getMaxPreMZForExperimentId(int experimentId) {
-		return msScanDao.getMaxPreMZForExperimentId(experimentId);
+	public BigDecimal getMaxPreMZForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId) {
+		return msScanDao.getMaxPreMZForExperimentIdScanLevelNotOnePreMZNotNULL(experimentId);
 	}
 
 	@Override
-	public BigDecimal getMinPreMZForExperimentId(int experimentId) {
-		return msScanDao.getMinPreMZForExperimentId(experimentId);
+	public BigDecimal getMinPreMZForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId) {
+		return msScanDao.getMinPreMZForExperimentIdScanLevelNotOnePreMZNotNULL(experimentId);
 	}
 
 	@Override
-	public List<BigDecimal> getPreMZForExperimentId(int experimentId) {
-		return msScanDao.getPreMZForExperimentId(experimentId);
+	public List<BigDecimal> getPreMZForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId) {
+		return msScanDao.getPreMZForExperimentIdScanLevelNotOnePreMZNotNULL(experimentId);
 	}
 
 
 	@Override
-	public double[] getPreMZArrayForExperimentId(int experimentId) {
-		return msScanDao.getPreMZArrayForExperimentId(experimentId);
+	public double[] getPreMZArrayForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId) {
+		return msScanDao.getPreMZArrayForExperimentIdScanLevelNotOnePreMZNotNULL(experimentId);
 	}
 
     

@@ -83,7 +83,7 @@ public interface GenericScanDAO <I extends MsScanIn, O extends MsScan> {
      * @param experimentId
      * @return
      */
-    public abstract int numScansForExperimentId(int experimentId);
+    public abstract int numScansForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId);
 
     
     /**
@@ -91,21 +91,21 @@ public interface GenericScanDAO <I extends MsScanIn, O extends MsScan> {
      * @param experimentId
      * @return
      */
-    public abstract BigDecimal getMaxPreMZForExperimentId(int experimentId);
+    public abstract BigDecimal getMaxPreMZForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId);
     
     /**
      * Returns the min value of preMZ in msScans for the given experimentId;
      * @param experimentId
      * @return
      */
-    public abstract BigDecimal getMinPreMZForExperimentId(int experimentId);
+    public abstract BigDecimal getMinPreMZForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId);
     
     /**
      * Returns the list of values of preMZ in msScans for the given experimentId;
      * @param experimentId
      * @return
      */
-    public abstract List<BigDecimal> getPreMZForExperimentId(int experimentId);
+    public abstract List<BigDecimal> getPreMZForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId);
 
     
     /**
@@ -113,7 +113,7 @@ public interface GenericScanDAO <I extends MsScanIn, O extends MsScan> {
      * @param experimentId
      * @return
      */    
-    public double[] getPreMZArrayForExperimentId(int experimentId);
+    public double[] getPreMZArrayForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId);
     
     
     public abstract void delete(int scanId);

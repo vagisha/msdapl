@@ -102,7 +102,7 @@ public class MZScanCountPlotter {
 		
 		long startTime = System.currentTimeMillis();
 		
-		double[] preMZArray  = daoFactory.getMsScanDAO().getPreMZArrayForExperimentId(experimentId);
+		double[] preMZArray  = daoFactory.getMsScanDAO().getPreMZArrayForExperimentIdScanLevelNotOnePreMZNotNULL(experimentId);
 		
 		int numScans = preMZArray.length;
 
