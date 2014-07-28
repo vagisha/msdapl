@@ -199,12 +199,12 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
     
     
     
-
+    //  Add msScan.level != 1  to only retrieve MS2 records
 
     // query string
     private static final String getPreMZArrayForExperimentIdSqlStr = "SELECT msScan.preMZ FROM msScan "
     		+ " INNER JOIN msRun ON msScan.runID = msRun.id INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID  "
-    		+ " WHERE msExperimentRun.experimentID = ?";
+    		+ " WHERE msExperimentRun.experimentID = ? AND msScan.level != 1 AND msScan.preMZ IS NOT NULL";
     
     @Override
     public double[] getPreMZArrayForExperimentId(int experimentId) {
