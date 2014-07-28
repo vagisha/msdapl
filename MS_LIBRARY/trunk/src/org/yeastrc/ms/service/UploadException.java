@@ -45,6 +45,10 @@ public class UploadException extends Exception {
         INVALID_MZXML_SCAN        ("Invalid mzXML scan", ERROR),
         RUNTIME_MZXML_ERROR       ("", ERROR),
         
+        READ_ERROR_MZML          ("Error reading mzML file", ERROR),
+        INVALID_MZML_SCAN        ("Invalid mzML scan", ERROR),
+        RUNTIME_MZML_ERROR       ("", ERROR),
+        
         NO_SQT_TYPE             ("No sqt type found", ERROR),
         UNSUPPORTED_SQT         ("Unsupported sqt file found", ERROR),
         MULTIPLE_SQT_TYPES      ("More than one sqt file types found", ERROR),

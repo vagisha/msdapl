@@ -194,8 +194,10 @@ public class MzXmlFileReader implements MzXmlDataProvider {
             return DataConversionType.NON_CENTROID;
         else if (centroided == DataProcessingInfo.YES)
             return DataConversionType.CENTROID;
-        else
-            return DataConversionType.UNKNOWN;
+        else {
+        	return DataConversionType.NON_CENTROID;  // Hard code to Non_Centroid per Mike Riffle since for mzML files only centroid Yes is indicated. 
+//            return DataConversionType.UNKNOWN;
+        }
         
     }
 }

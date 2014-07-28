@@ -9,6 +9,7 @@ package org.yeastrc.ms.service.mzxml;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -176,6 +177,10 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
                 throw ex;
             }
         }
+        
+        //  process the files in the sorted order
+        Collections.sort(filenames);
+        
         for (String filename: filenames) {
             try {
                 String filepath = dataDirectory+File.separator+filename;

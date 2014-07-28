@@ -32,14 +32,21 @@ public class MzXmlHeader implements MsRunIn {
     private String acquisionMethod;
     private String comment;
     private DataConversionType dataConversionType = DataConversionType.UNKNOWN;
-    
+    private RunFileFormat runFileFormat = RunFileFormat.MZXML;
     
     public void setFileName(String fileName) {
         int idx = fileName.toLowerCase().lastIndexOf("."+RunFileFormat.MZXML.name().toLowerCase());
-        if(idx == -1)
-            this.fileName = fileName;
-        else
+        if(idx == -1) {
+            idx = fileName.toLowerCase().lastIndexOf("."+RunFileFormat.MZML.name().toLowerCase());
+            if(idx == -1) {
+                this.fileName = fileName;
+            } else {
+                this.fileName = fileName.substring(0, idx);
+                runFileFormat = RunFileFormat.MZML;
+            }
+        } else {
             this.fileName = fileName.substring(0, idx);
+        }
     }
     
     public String getFileName() {
@@ -141,7 +148,7 @@ public class MzXmlHeader implements MsRunIn {
     }
     
     public RunFileFormat getRunFileFormat() {
-        return RunFileFormat.MZXML;
+        return runFileFormat;
     }
 
 }

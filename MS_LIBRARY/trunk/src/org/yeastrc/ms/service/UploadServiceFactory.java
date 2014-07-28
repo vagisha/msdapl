@@ -18,6 +18,7 @@ import org.yeastrc.ms.parser.pepxml.PepXmlUtils;
 import org.yeastrc.ms.parser.percolator.PercolatorXmlFileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadService;
+import org.yeastrc.ms.service.mzml.MzMlDataUploadService;
 import org.yeastrc.ms.service.mzxml.MzXmlDataUploadService;
 import org.yeastrc.ms.service.pepxml.PepXmlCometDataUploadService;
 import org.yeastrc.ms.service.pepxml.PepXmlMascotDataUploadService;
@@ -124,6 +125,12 @@ public class UploadServiceFactory {
             SpectrumDataUploadService service = new MzXmlDataUploadService();
             service.setDirectory(dataDirectory);
             return service;
+        }
+        else if(format == RunFileFormat.MZML) {
+            SpectrumDataUploadService service = new MzMlDataUploadService();
+            service.setDirectory(dataDirectory);
+            return service;
+        
         }
         else {
             throw new UploadServiceFactoryException("We do not currently have support for the spectrum file format: "+format.toString());

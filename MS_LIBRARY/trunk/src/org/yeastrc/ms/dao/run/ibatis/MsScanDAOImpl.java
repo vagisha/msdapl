@@ -142,7 +142,7 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
     
 
     // query string
-    private static final String getPreMZForExperimentIdSqlStr = "SELECT msScan.preMZ FROM msScan "
+    private static final String getPreMZForExperimentIdScanLevelNotOnePreMZNotNULLSqlStr = "SELECT msScan.preMZ FROM msScan "
     		+ " INNER JOIN msRun ON msScan.runID = msRun.id INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID  "
     		+ " WHERE msExperimentRun.experimentID = ? AND msScan.level != 1 AND msScan.preMZ IS NOT NULL";
     
@@ -150,7 +150,7 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
     public List<BigDecimal> getPreMZForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId) {
     	
     	
-    	final String sql = getPreMZForExperimentIdSqlStr;
+    	final String sql = getPreMZForExperimentIdScanLevelNotOnePreMZNotNULLSqlStr;
     	
     	
 
@@ -179,8 +179,8 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
             }
         }
         catch (SQLException e) {
-            log.error("Failed to execute sql: " + sql, e);
-            throw new RuntimeException("Failed to execute sql: " + sql, e);
+            log.error("getPreMZForExperimentIdScanLevelNotOnePreMZNotNULL: Failed to execute sql: " + sql, e);
+            throw new RuntimeException("getPreMZForExperimentIdScanLevelNotOnePreMZNotNULL: Failed to execute sql: " + sql, e);
         }
         finally {
 
@@ -208,7 +208,7 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
     //  Add msScan.level != 1  to only retrieve MS2 records
 
     // query string
-    private static final String getPreMZArrayForExperimentIdSqlStr = "SELECT msScan.preMZ FROM msScan "
+    private static final String getPreMZArrayForExperimentIdScanLevelNotOnePreMZNotNULLSqlStr = "SELECT msScan.preMZ FROM msScan "
     		+ " INNER JOIN msRun ON msScan.runID = msRun.id INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID  "
     		+ " WHERE msExperimentRun.experimentID = ? AND msScan.level != 1 AND msScan.preMZ IS NOT NULL";
     
@@ -216,7 +216,7 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
     public double[] getPreMZArrayForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId) {
     	
     	
-    	final String sql = getPreMZArrayForExperimentIdSqlStr;
+    	final String sql = getPreMZArrayForExperimentIdScanLevelNotOnePreMZNotNULLSqlStr;
     	
     	
         // Get our connection to the database.
@@ -266,8 +266,8 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
         	}
         }
         catch (SQLException e) {
-            log.error("getPreMZArrayForExperimentId: Failed to execute sql: " + getPreMZArrayForExperimentIdSqlStr, e);
-            throw new RuntimeException("Failed to execute sql: " + getPreMZArrayForExperimentIdSqlStr, e);
+            log.error("getPreMZArrayForExperimentIdScanLevelNotOnePreMZNotNULL: Failed to execute sql: " + sql, e);
+            throw new RuntimeException("Failed to execute sql: " + sql, e);
         }
         finally {
 
