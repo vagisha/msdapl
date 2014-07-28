@@ -44,10 +44,8 @@ import javax.xml.stream.XMLStreamReader;
  * name of the name-value pair containing the scan number is "scan", so I'm knocking off everything but that pair.
  * Also changing to cobble together Scan.massIntensityList from its components, which was missed earlier.
  * Also calling tmpScanHeader.setRetentionTime(), which was previously not set.
- * 
- * djaschob  2014/07/23, incorporating latest Sourceforge code for Retention Time processing setting of rt 
- * for units of "minute".
-
+ *
+ * F Levander changing 2010-02-11. Changed parsing of CVparams from names to accession numbers since those are stable.
  */
 public class MLScanAndHeaderParser
 {
@@ -65,8 +63,6 @@ public class MLScanAndHeaderParser
     {
         this.isScan = isScan;
     }
-
-
 
     public void setFileInputStream(FileInputStream in)
     {
@@ -95,15 +91,26 @@ public class MLScanAndHeaderParser
      * the "id" attribute of "spectrum", which is being used to contain multiple name-value pairs; the
      * name of the name-value pair containing the scan number is "scan", so I'm knocking off everything but that pair.
      * @param idString
-     * @return
+     * @return The scan number or if a numeric value couldn't be parsed.
      */
      protected int parseScanNumberFromSpectrumIdField(String idString)
      {
+    	 int retval=-1;
          if (idString.contains("scan="))
              idString = idString.substring(idString.indexOf("scan=") + "scan=".length());
+         if (idString.contains("scanId="))
+             idString = idString.substring(idString.indexOf("scanId=") + "scanId=".length());
          if (idString.contains(" "))
              idString = idString.substring(0, idString.indexOf(" "));
-         return Integer.parseInt(idString);
+         try
+         {
+        	 retval=Integer.parseInt(idString);
+         }
+         catch(Exception e)
+         {
+             e.printStackTrace();
+         }
+         return retval;
      }
 
 
@@ -170,50 +177,52 @@ public class MLScanAndHeaderParser
                     tmpScanHeader = new ScanHeader();
                     //dhmay changing 2009/03/09.  mzML 1.1 changes the way scan IDs are stored
                     tmpScanHeader.setNum(parseScanNumberFromSpectrumIdField(getStringValue(xmlSR, "id")));
+                    // If scan number couldn't be parsed, fall back to index+1.
+                    if (tmpScanHeader.getNum()==-1) 
+                    	tmpScanHeader.setNum(getIntValue(xmlSR, "index")+1);
                     tmpScanHeader.setPeaksCount(getIntValue(xmlSR, "defaultArrayLength"));
 
                 }
                 if(elementName.equals("cvParam"))
                 {
                     attriName = xmlSR.getAttributeValue(null,"name");
+                    String attriAccession = xmlSR.getAttributeValue(null,"accession");
                     if(inSpectrum)
                     {
 
-                        if(attriName.equals("ms level"))
+                        if(attriAccession.equals("MS:1000511"))
                             tmpScanHeader.setMsLevel(getIntValue(xmlSR, "value"));
-                        if(attriName.equals("centroid mass spectrum"))
+                        if(attriAccession.equals("MS:1000127"))
                             tmpScanHeader.setCentroided(1);
-                        if(attriName.equals("base peak m/z"))
+                        if(attriAccession.equals("MS:1000504"))
                             tmpScanHeader.setBasePeakMz(getFloatValue(xmlSR, "value"));
-                        if(attriName.equals("base peak intensity"))
+                        if(attriAccession.equals("MS:1000505"))
                             tmpScanHeader.setBasePeakIntensity(getFloatValue(xmlSR, "value"));
-                        if(attriName.equals("total ion current"))
+                        if(attriAccession.equals("MS:1000285"))
                             tmpScanHeader.setTotIonCurrent(getFloatValue(xmlSR, "value"));
-                        if(attriName.equals("lowest m/z value"))
+                        if(attriAccession.equals("MS:1000528"))
                             tmpScanHeader.setStartMz(getFloatValue(xmlSR, "value"));
-                        if(attriName.equals("highest m/z value"))
+                        if(attriAccession.equals("MS:1000527"))
                             tmpScanHeader.setEndMz(getFloatValue(xmlSR, "value"));
-                        if(attriName.equals("scan m/z lower limit"))
+                        if(attriAccession.equals("MS:1000501"))
                             tmpScanHeader.setLowMz(getFloatValue(xmlSR, "value"));
-                        if(attriName.equals("scan m/z upper limit"))
+                        if(attriAccession.equals("MS:1000500" ))
                             tmpScanHeader.setHighMz(getFloatValue(xmlSR, "value"));
-                        if(attriName.equals("filter string"))
+                        if(attriAccession.equals("MS:1000512"))
                             tmpScanHeader.setFilterLine(getStringValue(xmlSR,"value"));
-                        if(attriName.equals("full scan"))
+                        if(attriAccession.equals("MS:1000498"))
                             tmpScanHeader.setScanType("full scan");
-                        if(attriName.equals("positive scan"))
+                        if(attriAccession.equals("MS:1000130"))
                             tmpScanHeader.setPolarity("+");
                         //dhmay changed this for mzML 1.1.0RC5,a nd then again for RC6.
                         //Hopefully the name of this attribute will settle down.
-                        if(attriName.equals("scan start time"))
+                        if(attriAccession.equals("MS:1000016"))
                         {
                             String timeType = xmlSR.getAttributeValue(null,"unitName");
                             double rt = Double.parseDouble(xmlSR.getAttributeValue(null, "value"));
-                            
-                            //  djaschob changes to match latest code
+                            // flevander changed 
                             if(timeType.equals("minute"))
                                 rt = rt * 60;
-                            
                             tmpScanHeader.setRT(rt);
 
                             //dhmay adding for backward compatibility.  Probably this should be rewired so that
@@ -221,33 +230,34 @@ public class MLScanAndHeaderParser
                             //that tangle
                             tmpScanHeader.setRetentionTime("PT" + rt + "S");                            
                         }
-                        //precursor
-                        if(attriName.equals("m/z"))
+                        // Precursor m/z from isolation window target m/z or selected ion m/z
+                        // Selected m7z comes afterwards and will have precedence
+                        if(attriAccession.equals("MS:1000827") || attriAccession.equals("MS:1000744"))
                             tmpScanHeader.setPrecursorMz(getFloatValue(xmlSR,"value"));
-                        if(attriName.equals("intensity"))
+                        if(attriAccession.equals("MS:1000042"))
                             tmpScanHeader.setPrecursorIntensity(getFloatValue(xmlSR,"value"));
-                        if(attriName.equals("charge"))
+                        if(attriAccession.equals("MS:1000041"))
                             tmpScanHeader.setPrecursorCharge(getIntValue(xmlSR,"value"));
-                        if(attriName.equals("collision energy"))
+                        if(attriAccession.equals("MS:1000045"))
                             tmpScanHeader.setCollisionEnergy(getFloatValue(xmlSR,"value"));
                     }
                     if(inPeaks)
                     {
-                        if(attriName.equals("64-bit float"))
+                        if(attriAccession.equals("MS:1000523"))
                         {
                             if(count == 1)
                                 tmpScanHeader.setMassPrecision(64);
                             if(count == 2)
                                 tmpScanHeader.setIntenPrecision(64);
                         }
-                        if(attriName.equals("32-bit float"))
+                        if(attriAccession.equals("MS:1000521"))
                         {
                             if(count == 1)
                                 tmpScanHeader.setMassPrecision(32);
                             if(count == 2)
                                 tmpScanHeader.setIntenPrecision(32);
                         }
-                        if(attriName.equals("no compression"))
+                        if(attriAccession.equals("MS:1000576"))
                         {
                             if(count == 1)
                             {
@@ -258,7 +268,7 @@ public class MLScanAndHeaderParser
                                 tmpScanHeader.setIntenCompressionType("None");
                             }
                         }
-                        if(attriName.indexOf("zlib") != -1)
+                        if(attriAccession.equals("MS:1000574"))
                         {
                             if(count == 1)
                             {

@@ -72,6 +72,12 @@ public class MSXMLSequentialParser {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         xmlSR = inputFactory.createXMLStreamReader(inputStr);
 
+        //  djaschob  7-25-2014   
+        //
+        //     Replaced code with previous version of that code found in MSDAPL Google Code SVN
+        //     so that any XMLStreamException with message "HeaderEndFoundException" will be ignored and swallowed
+        
+
         // read the file header 
         readFileHeader(xmlSR);
     }
@@ -87,6 +93,22 @@ public class MSXMLSequentialParser {
         }
     }
 
+    //  djaschob  7-25-2014   
+    //
+    //     Replaced code in readFileHeader with previous version of that code found in MSDAPL Google Code SVN 
+    //     so that any XMLStreamException with message "HeaderEndFoundException" will be ignored and swallowed
+    
+//    /**this gives back the file header (info before scan)
+//     *@return the file header info (MZXMLFileInfo)
+//     * @throws XMLStreamException 
+//     */
+//    private void readFileHeader(XMLStreamReader reader) throws XMLStreamException {
+//        FileHeaderParser fileHeaderParser = new FileHeaderParser(fileName);
+//       	fileHeaderParser.parseFileHeader(reader);
+//       	this.fileHeader = fileHeaderParser.getInfo();
+//    }
+    
+    
     /**this gives back the file header (info before scan)
      *@return the file header info (MZXMLFileInfo)
      * @throws XMLStreamException 

@@ -26,6 +26,7 @@ import java.util.*;
  * dhmay 20091021:
  * -Incorporating Vagisha's changes to close files, merging in my changes for mzML 1.1 support
  * -adding a debug flag for messages that probably don't need to be displayed every time
+ 
  */
 public class IndexParser
 {
@@ -150,7 +151,7 @@ public class IndexParser
         XMLStreamReader xmlSR = null;
         try{
             long indexPos = getIndexPosition();
-            //System.out.println("indexPos "+indexPos);
+//            System.out.println("indexPos "+indexPos);
 
 
             fileIN = new FileInputStream(inputMZXMLfilename);
@@ -175,7 +176,7 @@ public class IndexParser
                 if(event == xmlSR.START_ELEMENT)
                 {
                     elementName = xmlSR.getLocalName();
-                    //System.out.println("elementName "+elementName);
+//                    System.out.println("elementName "+elementName);
 
                     if(elementName.equals("index"))
                     {
@@ -238,9 +239,6 @@ public class IndexParser
                             throw new XMLStreamException("IndexEndFoundException");
                         else if(inChrogram)
                             throw new XMLStreamException("IndexEndFoundException");
-
-
-
                     }
                 }
             }

@@ -95,7 +95,6 @@ public class ScanAndHeaderParser{
     }
 
 
-
     public void parseScanAndHeader(XMLStreamReader xmlSR)
             throws XMLStreamException {
         boolean inPrecursorMZ = false;
@@ -194,11 +193,14 @@ public class ScanAndHeaderParser{
 				    peaksBuffer = null;
 				    throw new XMLStreamException("ScanEndFoundException");
 				    
+				    //   djaschob:   replace exception thrown with simply breaking out of the while loop
+//				    
+//				    break;
+				    
+				    
 				    
 				}
 			}
-
-		    
 		}
     }
 
