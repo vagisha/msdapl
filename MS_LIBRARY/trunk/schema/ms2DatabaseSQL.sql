@@ -1,3 +1,19 @@
+
+#  ######################################################
+
+#   !!!!!!!!!!!!!!!!!   WARNING   !!!!!!!!!!!!!!!!!!!!!!!!!
+
+#    The contents of this file reside in TWO files
+
+# 		MS_LIBRARY/trunk/schema/ms2DatabaseSQL.sql
+
+#	   AND
+
+#               MSDaPl_install/trunk/schema/msData.sql
+
+#   If you update the file in one place, update the other to keep them in sync
+
+
 DROP DATABASE IF EXISTS msData;
 CREATE DATABASE msData;
 USE msData;

@@ -1,3 +1,20 @@
+
+#  ######################################################
+
+#   !!!!!!!!!!!!!!!!!   WARNING   !!!!!!!!!!!!!!!!!!!!!!!!!
+
+#    The contents of this file reside in TWO files
+
+# 		MS_LIBRARY/trunk/schema/ms2DatabaseSummaryTablesSQL.sql
+
+#	   AND
+
+#               MSDaPl_install/trunk/schema/msData_summary_tables.sql
+
+#   If you update the file in one place, update the other to keep them in sync
+
+
+
 # ##############################################################################################
 # Percolator result stats
 # ##############################################################################################
@@ -57,6 +74,49 @@ CREATE TABLE PercolatorFilteredBinnedSpectraResult (
 ALTER TABLE PercolatorFilteredBinnedSpectraResult ADD INDEX (percScanResultID);
 
 # ##############################################################################################
+# ProteinProphet result stats
+# ##############################################################################################
+
+CREATE TABLE ProphetFilteredBinnedPsmResult (
+	prophetPsmResultID INT UNSIGNED NOT NULL,
+	binStart INT UNSIGNED NOT NULL,
+	binEnd INT UNSIGNED NOT NULL,
+	total INT UNSIGNED NOT NULL,
+	filtered INT UNSIGNED NOT NULL
+);
+ALTER TABLE ProphetFilteredBinnedPsmResult ADD INDEX (prophetPsmResultID);
+
+
+CREATE TABLE ProphetFilteredPsmResult (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	runSearchAnalysisID INT UNSIGNED NOT NULL,
+	probability DOUBLE UNSIGNED NOT NULL,
+	total INT UNSIGNED NOT NULL,
+	filtered INT UNSIGNED NOT NULL
+);
+ALTER TABLE ProphetFilteredPsmResult ADD INDEX (runSearchAnalysisID);
+ALTER TABLE ProphetFilteredPsmResult ADD UNIQUE INDEX (runSearchAnalysisID, probability);
+
+CREATE TABLE ProphetFilteredSpectraResult (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	runSearchAnalysisID INT UNSIGNED NOT NULL,
+	probability DOUBLE UNSIGNED NOT NULL,
+	total INT UNSIGNED NOT NULL,
+	filtered INT UNSIGNED NOT NULL
+);
+ALTER TABLE ProphetFilteredSpectraResult ADD INDEX (runSearchAnalysisID);
+ALTER TABLE ProphetFilteredSpectraResult ADD UNIQUE INDEX (runSearchAnalysisID, probability);
+
+CREATE TABLE ProphetFilteredBinnedSpectraResult (
+	prophetScanResultID INT UNSIGNED NOT NULL,
+	binStart INT UNSIGNED NOT NULL,
+	binEnd INT UNSIGNED NOT NULL,
+	total INT UNSIGNED NOT NULL,
+	filtered INT UNSIGNED NOT NULL
+);
+ALTER TABLE ProphetFilteredBinnedSpectraResult ADD INDEX (prophetScanResultID);
+
+# ##############################################################################################
 # Protein Inference results stats
 # ##############################################################################################
 CREATE TABLE proteinInferRunSummary (
@@ -81,6 +141,22 @@ CREATE TABLE proteinProphetRunSummary (
   minSpectrumCount INT unsigned NOT NULL,
   maxSpectrumCount INT unsigned NOT NULL
 ); 
+
+ CREATE TABLE proteinInferProteinSummary (
+  piRunID INT unsigned NOT NULL,
+  piProteinID INT UNSIGNED NOT NULL PRIMARY KEY,
+  nrseqProteinID INT UNSIGNED NOT NULL PRIMARY KEY,
+  peptideCount INT UNSIGNED NOT NULL,
+  uniqPeptideCount INT UNSIGNED NOT NULL,
+  ionCount INT UNSIGNED NOT NULL,
+  uniqueIonCount INT UNSIGNED NOT NULL,
+  psmCount INT UNSIGNED NOT NULL,
+  spectrumCount INT UNSIGNED NOT NULL,
+  peptDef_peptideCount INT UNSIGNED NOT NULL,
+  peptDef_uniqPeptideCount INT UNSIGNED NOT NULL
+ );
+ ALTER TABLE proteinInferProteinSummary ADD INDEX (piRunID);
+ ALTER TABLE proteinInferProteinSummary ADD INDEX (nrseqProteinID, piRunID);
  
 # --------------------------------------------------------------------------------------------
 # ADD TRIGGERS

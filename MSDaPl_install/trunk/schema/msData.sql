@@ -1,3 +1,19 @@
+
+#  ######################################################
+
+#   !!!!!!!!!!!!!!!!!   WARNING   !!!!!!!!!!!!!!!!!!!!!!!!!
+
+#    The contents of this file reside in TWO files
+
+# 		MS_LIBRARY/trunk/schema/ms2DatabaseSQL.sql
+
+#	   AND
+
+#               MSDaPl_install/trunk/schema/msData.sql
+
+#   If you update the file in one place, update the other to keep them in sync
+
+
 DROP DATABASE IF EXISTS msData;
 CREATE DATABASE msData;
 USE msData;
@@ -242,13 +258,12 @@ CREATE TABLE SQTSpectrumData (
    observedMass DECIMAL(18,9) NOT NULL,
    processTime INT UNSIGNED,
    serverName VARCHAR(50),
-   totalIntensity DECIMAL(18,9),
+   totalIntensity DOUBLE,
    lowestSp DECIMAL(10,5),
    sequenceMatches INT UNSIGNED
 );
-ALTER TABLE SQTSpectrumData ADD INDEX(scanID, runSearchID, charge, observedMass);
+ALTER TABLE SQTSpectrumData ADD INDEX(scanID, runSearchID);
 ALTER TABLE SQTSpectrumData ADD INDEX (runSearchID);
-
 
 CREATE TABLE SQTFileHeader (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -739,6 +754,19 @@ CREATE TABLE BaristaProtein (
 );
 ALTER TABLE BaristaProtein ADD INDEX(proteinGroupID);
 
+
+#####################################################################
+# Plot Tables
+#####################################################################
+
+CREATE TABLE mz_scan_count_plot_data (
+  experiment_id int(10) unsigned NOT NULL,
+  plot_data varchar(4000) NOT NULL,
+  scan_count int(10) unsigned NOT NULL,
+  create_time_in_seconds int(10) unsigned NOT NULL,
+  data_version int(10) unsigned NOT NULL,
+  PRIMARY KEY (experiment_id)
+);
 
 #######################################################################################
 # TRIGGERS TO ENSURE CASCADING DELETES

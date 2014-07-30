@@ -1,3 +1,20 @@
+
+#  ######################################################
+
+#   !!!!!!!!!!!!!!!!!   WARNING   !!!!!!!!!!!!!!!!!!!!!!!!!
+
+#    The contents of this file reside in TWO files
+
+# 		MS_LIBRARY/trunk/schema/ms2DatabaseSummaryTablesSQL.sql
+
+#	   AND
+
+#               MSDaPl_install/trunk/schema/msData_summary_tables.sql
+
+#   If you update the file in one place, update the other to keep them in sync
+
+
+
 # ##############################################################################################
 # Percolator result stats
 # ##############################################################################################
