@@ -38,8 +38,8 @@ public class ProteinAbundanceDao {
 		
 		try {
 			
-			String sql = "SELECT orfName, abundance from yeastProteinAbundance WHERE proteinID = "+nrseqProteinId;
-			conn = DBConnectionManager.getConnection(DBConnectionManager.NRSEQ);
+			String sql = "SELECT orfName, abundance from yeastProteinAbundance.yeastProteinAbundance WHERE proteinID = "+nrseqProteinId;
+			conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sql);
 			
