@@ -123,6 +123,13 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MS2ScanDAO {
 		return msScanDao.getPreMZArrayForExperimentIdScanLevelNotOnePreMZNotNULL(experimentId);
 	}
 
+	
+
+	@Override
+	public int[] getPeakCountArrayForExperimentIdScanLevelNotOne(int experimentId) {
+		return msScanDao.getPeakCountArrayForExperimentIdScanLevelNotOne(experimentId);
+	}
+
     
     /**
      * Saves the scan along with any MS2 file format specific data.
@@ -160,4 +167,10 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MS2ScanDAO {
     public void delete(int scanId) {
         msScanDao.delete(scanId);
     }
+
+	@Override
+	public int numScansForExperimentIdScanLevelNotOne(int experimentId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

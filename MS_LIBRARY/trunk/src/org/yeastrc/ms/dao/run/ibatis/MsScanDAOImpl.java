@@ -119,6 +119,13 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
         return (Integer)queryForObject("MsScan.selectScanCountForExperimentIdScanLevelNotOnePreMZNotNULL", experimentId);
     }
     
+    
+    @Override
+    public int numScansForExperimentIdScanLevelNotOne(int experimentId) {
+        return (Integer)queryForObject("MsScan.selectScanCountForExperimentIdScanLevelNotOne", experimentId);
+    }
+    
+    
     @Override
     public BigDecimal getMaxPreMZForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId) {
     	BigDecimal maxPreMZ = (BigDecimal) queryForObject("MsScan.getMaxPreMZForExperimentIdScanLevelNotOnePreMZNotNULL", experimentId);
@@ -290,6 +297,92 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
         return preMZArray;
     }
     
+    
+
+    // query string
+    private static final String getPeakCountArrayForExperimentIdScanLevelNotOneSqlStr = "SELECT msScan.peakCount FROM msScan "
+    		+ " INNER JOIN msRun ON msScan.runID = msRun.id INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID  "
+    		+ " WHERE msExperimentRun.experimentID = ? AND msScan.level != 1 ";
+    
+
+	@Override
+	public int[] getPeakCountArrayForExperimentIdScanLevelNotOne( int experimentId ) {
+
+    	
+    	final String sql = getPeakCountArrayForExperimentIdScanLevelNotOneSqlStr;
+    	
+    	
+        // Get our connection to the database.
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;    
+        
+        int numScans = numScansForExperimentIdScanLevelNotOne( experimentId );
+        
+        int[] peakCountArray  = new int[ numScans ];
+
+
+        try {
+            conn = DAOFactory.instance().getConnection();
+
+            stmt = conn.prepareStatement(sql);
+
+            stmt.setInt( 1, experimentId );
+            
+            rs = stmt.executeQuery();
+            
+            int rowIndex = 0;
+
+            while(rs.next()) {
+            	
+            	if ( rowIndex >= peakCountArray.length ) {
+            		
+            		String msg = "getPeakCountArrayForExperimentIdScanLevelNotOne: Unexpected error: rowIndex >= peakCountArray.length:"
+            				+ "experimentId: " + experimentId + ", sql: " + sql;
+            		log.error( msg );
+            		throw new RuntimeException(msg);
+            	}
+            	
+            	int peakCount = rs.getInt("peakCount");
+
+            	peakCountArray[ rowIndex ] = peakCount;
+            	
+            	rowIndex++;
+            }
+            
+        	if ( rowIndex != peakCountArray.length ) {
+        		
+        		String msg = "getPeakCountArrayForExperimentIdScanLevelNotOne: Unexpected error: after loading all rows, rowIndex != peakCountArray.length:"
+        				+ "experimentId: " + experimentId + ", sql: " + sql;
+        		log.error( msg );
+        		throw new RuntimeException(msg);
+        	}
+        }
+        catch (SQLException e) {
+            log.error("getPeakCountArrayForExperimentIdScanLevelNotOne: Failed to execute sql: " + sql, e);
+            throw new RuntimeException("Failed to execute sql: " + sql, e);
+        }
+        finally {
+
+            // Always make sure result sets and statements are closed,
+            // and the connection is returned to the pool
+            if (rs != null) {
+                try { rs.close(); } catch (SQLException e) { ; }
+                rs = null;
+            }
+            if (stmt != null) {
+                try { stmt.close(); } catch (SQLException e) { ; }
+                stmt = null;
+            }
+            if (conn != null) {
+                try { conn.close(); } catch (SQLException e) { ; }
+                conn = null;
+            }
+        }
+        
+        return peakCountArray;
+	}
+
 
 
 

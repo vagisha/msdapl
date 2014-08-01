@@ -80,28 +80,41 @@ public interface GenericScanDAO <I extends MsScanIn, O extends MsScan> {
     
     /**
      * Returns the number of scans of the given experimentId;
+     * searching msScan records where the level is not one and the preMZ is not NULL
      * @param experimentId
      * @return
      */
     public abstract int numScansForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId);
 
+    /**
+     * Returns the number of scans of the given experimentId;
+     * searching msScan records where the level is not one
+     * @param experimentId
+     * @return
+     */
+    public abstract int numScansForExperimentIdScanLevelNotOne(int experimentId);
+
+    
     
     /**
-     * Returns the max value of preMZ in msScans for the given experimentId;
+     * Returns the max value of preMZ in msScans for the given experimentId
+     * searching msScan records where the level is not one and the preMZ is not NULL
      * @param experimentId
      * @return
      */
     public abstract BigDecimal getMaxPreMZForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId);
     
     /**
-     * Returns the min value of preMZ in msScans for the given experimentId;
+     * Returns the min value of preMZ in msScans for the given experimentId
+     * searching msScan records where the level is not one and the preMZ is not NULL
      * @param experimentId
      * @return
      */
     public abstract BigDecimal getMinPreMZForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId);
     
     /**
-     * Returns the list of values of preMZ in msScans for the given experimentId;
+     * Returns the list of values of preMZ in msScans for the given experimentId
+     * searching msScan records where the level is not one and the preMZ is not NULL
      * @param experimentId
      * @return
      */
@@ -109,11 +122,23 @@ public interface GenericScanDAO <I extends MsScanIn, O extends MsScan> {
 
     
     /**
-     * Returns the array of values of preMZ in msScans for the given experimentId;
+     * Returns the array of values of preMZ in msScans for the given experimentId
+     * searching msScan records where the level is not one and the preMZ is not NULL
      * @param experimentId
      * @return
      */    
     public double[] getPreMZArrayForExperimentIdScanLevelNotOnePreMZNotNULL(int experimentId);
+    
+    
+    
+    /**
+     * Returns the array of values of peakCount in msScans for the given experimentId
+     * searching msScan records where the level is not one and the preMZ is not NULL
+     * @param experimentId
+     * @return
+     */    
+    public int[] getPeakCountArrayForExperimentIdScanLevelNotOne(int experimentId);
+    
     
     
     public abstract void delete(int scanId);

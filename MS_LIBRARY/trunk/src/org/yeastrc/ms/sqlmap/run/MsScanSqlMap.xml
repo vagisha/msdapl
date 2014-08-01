@@ -153,6 +153,16 @@
            INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID 
            WHERE msExperimentRun.experimentID = #experimentId# AND msScan.level != 1 AND msScan.preMZ IS NOT NULL
     </select> 
+
+    
+    <select id="selectScanCountForExperimentIdScanLevelNotOne" resultClass="Integer" parameterClass="Integer"> 
+        SELECT COUNT(*) AS count FROM msScan
+           INNER JOIN msRun ON msScan.runID = msRun.id 
+           INNER JOIN msExperimentRun ON msRun.id = msExperimentRun.runID 
+           WHERE msExperimentRun.experimentID = #experimentId# AND msScan.level != 1
+    </select> 
+    
+    
     
     <select id="getMaxPreMZForExperimentIdScanLevelNotOnePreMZNotNULL" resultClass="java.math.BigDecimal" parameterClass="Integer">
         SELECT MAX(msScan.preMZ) AS maxpreMZ FROM msScan 

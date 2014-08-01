@@ -104,23 +104,37 @@ public class MZScanCountPlotter {
 		
 		double[] preMZArray  = daoFactory.getMsScanDAO().getPreMZArrayForExperimentIdScanLevelNotOnePreMZNotNULL(experimentId);
 		
-		int numScans = preMZArray.length;
-
-		double precursorMZMinDouble = Double.MAX_VALUE;
-		double precursorMZMaxDouble =  -Double.MAX_VALUE;
 		
+//		Arrays.sort( preMZArray );  //  only use for debugging
+
+		
+		int numScans = preMZArray.length;
+		
+		double precursorMZMinDouble = 0;
+		double precursorMZMaxDouble =  0;
+		
+		boolean firstEntry = true;
+
 		//  Find max and min values
 		
 		for ( double preMZ : preMZArray ) {
 			
-			if ( preMZ < precursorMZMinDouble ) {
+			if ( firstEntry ) {
+				
+				firstEntry = false;
+				
 				precursorMZMinDouble = preMZ;
-			}
-			
-			if ( preMZ > precursorMZMaxDouble ) {
 				precursorMZMaxDouble = preMZ;
-			}
+				
+			} else {
+				if ( preMZ < precursorMZMinDouble ) {
+					precursorMZMinDouble = preMZ;
+				}
 
+				if ( preMZ > precursorMZMaxDouble ) {
+					precursorMZMaxDouble = preMZ;
+				}
+			}
 		}
 		
 		double precursorMZMaxMinusMin = precursorMZMaxDouble - precursorMZMinDouble;
