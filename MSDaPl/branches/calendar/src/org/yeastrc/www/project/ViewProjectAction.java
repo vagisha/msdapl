@@ -63,6 +63,7 @@ import org.yeastrc.mz_scan_count_plot.service.MZScanCountPlotter;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.properties.ApplicationProperties;
+import org.yeastrc.qc_plots.plot_peaks_per_scan_per_experiment.service.QC_Plot_PeaksPerScanPerExperiment_Plotter;
 import org.yeastrc.www.project.experiment.QCPlot;
 import org.yeastrc.www.proteinfer.job.ProteinInferJobSearcher;
 import org.yeastrc.www.proteinfer.job.ProteinferJob;
@@ -274,6 +275,23 @@ public class ViewProjectAction extends Action {
             	precursorMassChartData = "";
             }
             pExpt.setPrecursorMassChartData(precursorMassChartData);
+            
+            
+            
+            //  Load Peak Count Chart Data
+            String peakCountChartData = QC_Plot_PeaksPerScanPerExperiment_Plotter.getStoredPeaksPerScanPerExperimentPlotFromDB(experimentId);
+            if ( peakCountChartData == null ) {
+            	peakCountChartData = "";
+            }
+            pExpt.setPeakCountChartData( peakCountChartData );
+            
+            
+//            //  Load Peak Count Chart Data
+//            String peakCountChartData = QC_Plot_PeaksPerScanPerExperiment_Plotter.getPeaksPerScanPerExperimentPlot(experimentId);
+//            if ( peakCountChartData == null ) {
+//            	peakCountChartData = "";
+//            }
+//            pExpt.setPeakCountChartData( peakCountChartData );
             
             
             count++;

@@ -164,13 +164,21 @@
 
 <script src="<yrcwww:link path='js/experimentDetailsPrecursorScanCountChart.js'/>"></script>
 
+<script src="<yrcwww:link path='js/experimentDetailsPeakCountChart.js'/>"></script>
+
 <%-- Google Chart API import, for use on experimentDetails.jsp  --%>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
   google.load("visualization", "1", {packages:["corechart"]});
   
+  var googleOnLoadCallbackFunction = function() {
+	  
+	  createAllInitialDisplayPrecursorScanCountCharts();
+	  createAllInitialDisplayPeakCountCharts();
+  }
+  
   //  Do NOT call a method on an object here.  The "this" gets set to the window.
-  google.setOnLoadCallback(createAllInitialDisplayPrecursorScanCountCharts);
+  google.setOnLoadCallback(googleOnLoadCallbackFunction);
 </script>
 
 

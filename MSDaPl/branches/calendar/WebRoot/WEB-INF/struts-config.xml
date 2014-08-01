@@ -1836,7 +1836,12 @@
       type="org.yeastrc.www_services.GetPrecursorScanCountChartDataServiceAction"
       >
     </action>
-    
+         
+    <action
+      path="/getPeaksPerScanCountChartDataService"
+      type="org.yeastrc.www_services.GetPeaksPerScanCountChartDataServiceAction"
+      >
+    </action>  
    
 	
 	<!-- ================================================================================== -->

@@ -51,7 +51,17 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     
     private String precursorMassChartData;
     
-    public String getPrecursorMassChartData() {
+    private String peakCountChartData;
+    
+    public String getPeakCountChartData() {
+		return peakCountChartData;
+	}
+
+	public void setPeakCountChartData(String peakCountChartData) {
+		this.peakCountChartData = peakCountChartData;
+	}
+
+	public String getPrecursorMassChartData() {
 		return precursorMassChartData;
 	}
 
