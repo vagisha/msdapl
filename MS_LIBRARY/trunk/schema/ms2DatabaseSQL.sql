@@ -756,20 +756,8 @@ ALTER TABLE BaristaProtein ADD INDEX(proteinGroupID);
 
 
 #####################################################################
-# Plot Tables
+# Plot Table
 #####################################################################
-
-CREATE TABLE mz_scan_count_plot_data (
-  experiment_id int(10) unsigned NOT NULL,
-  plot_data varchar(16000) NOT NULL,
-  scan_count int(10) unsigned NOT NULL,
-  create_time_in_seconds int(10) unsigned NOT NULL,
-  data_version int(10) unsigned NOT NULL,
-  PRIMARY KEY (experiment_id)
-);
-
-
-
 
 CREATE TABLE qc_plot_data (
   experiment_id int(10) unsigned NOT NULL,
