@@ -1,6 +1,6 @@
 
 
-//   experimentDetailsPrecursorScanCountChart.js
+//   experimentDetailsIntensityCountChart.js
 
 
 //   Set up parts of experimentDetails.jsp
@@ -25,13 +25,13 @@
 
 
 //Called from the Google Chart load callback
-function createAllInitialDisplayPrecursorScanCountCharts() {
+function createAllInitialDisplayIntensityCountCharts() {
 
 
 	//	delay to disconnect from page loading Javascript execution
 	setTimeout(function(){
 
-		CreatePrecursorScanCountCharts.createAllInitialDisplayPrecursorScanCountCharts();
+		CreateIntensityCountCharts.createAllInitialDisplayIntensityCountCharts();
 
 	}, 50); // delay in milliseconds
 
@@ -45,14 +45,14 @@ function createAllInitialDisplayPrecursorScanCountCharts() {
 
 //Constructor
 
-var CreatePrecursorScanCountChartsClass = function () {
+var CreateIntensityCountChartsClass = function () {
 
 
 	this.webAppContextPath_WebApp_Wide_Val = $("#webAppContextPath_WebApp_Wide").val();
 
 	this.SERVICE_URLS = {
 			
-			GET_CHART_DATA_FOR_EXPERIMENT_IDS: this.webAppContextPath_WebApp_Wide_Val + "/getPrecursorScanCountChartDataService.do"
+			GET_CHART_DATA_FOR_EXPERIMENT_IDS: this.webAppContextPath_WebApp_Wide_Val + "/getIntensitysPerScanCountChartDataService.do"
 	};
 	
 };
@@ -60,9 +60,9 @@ var CreatePrecursorScanCountChartsClass = function () {
 
 /////////////////////////////////////
 
-//Create the PrecursorScanCount Chart for the passed in experiment id
+//Create the IntensityCount Chart for the passed in experiment id
 
-CreatePrecursorScanCountChartsClass.prototype.createDisplayPrecursorScanCountChartForExperimentId = function( experimentId ) {
+CreateIntensityCountChartsClass.prototype.createDisplayIntensityCountChartForExperimentId = function( experimentId ) {
 	
 	var objectThis = this;
 	
@@ -91,9 +91,9 @@ CreatePrecursorScanCountChartsClass.prototype.createDisplayPrecursorScanCountCha
 
 /////////////////////////////////////
 
-//  Create the PrecursorScanCount Chart for all the experiments on the page that loaded successfully
+//  Create the IntensityCount Chart for all the experiments on the page that loaded successfully
 
-CreatePrecursorScanCountChartsClass.prototype.createAllInitialDisplayPrecursorScanCountCharts = function(  ) {
+CreateIntensityCountChartsClass.prototype.createAllInitialDisplayIntensityCountCharts = function(  ) {
 	
 	var objectThis = this;
 	
@@ -122,7 +122,7 @@ CreatePrecursorScanCountChartsClass.prototype.createAllInitialDisplayPrecursorSc
 			
 			//  get chart data from hidden input field
 
-			var $chartData = $experimentDetailsDiv.find(".experiment_precursor_scan_count_chart_data_jq");
+			var $chartData = $experimentDetailsDiv.find(".experiment_intensity_count_chart_data_jq");
 
 			var chartDataString = $chartData.val();
 
@@ -143,7 +143,7 @@ CreatePrecursorScanCountChartsClass.prototype.createAllInitialDisplayPrecursorSc
 					throw "Error parsing JSON on page.  experiment_id: " + experimentIdString + ", Error: " + e.message; 
 				}				
 
-				objectThis.createPrecursorScanCountChartActual( $experimentDetailsDiv, chartDataFromServer, experimentIdString );
+				objectThis.createIntensityCountChartActual( $experimentDetailsDiv, chartDataFromServer, experimentIdString );
 			}
 		}
 	});
@@ -161,7 +161,7 @@ CreatePrecursorScanCountChartsClass.prototype.createAllInitialDisplayPrecursorSc
 
 //  Load the charts that need computing via ajax
 
-CreatePrecursorScanCountChartsClass.prototype.getChartDataViaAjax = function ( experimentIdsForGetViaAjax, $experiment_details_outer_div_list, experimentIdIndex ) {
+CreateIntensityCountChartsClass.prototype.getChartDataViaAjax = function ( experimentIdsForGetViaAjax, $experiment_details_outer_div_list, experimentIdIndex ) {
 	
 	//  This function will get the chart data via AJAX for the experiment ids in experimentIdsForGetViaAjax.
 	
@@ -244,7 +244,7 @@ CreatePrecursorScanCountChartsClass.prototype.getChartDataViaAjax = function ( e
 
 /////////////////////////////////////
 
-CreatePrecursorScanCountChartsClass.prototype.processChartDataFromAjax = function ( param ) {
+CreateIntensityCountChartsClass.prototype.processChartDataFromAjax = function ( param ) {
 	
 	var objectThis = this;
 
@@ -258,15 +258,15 @@ CreatePrecursorScanCountChartsClass.prototype.processChartDataFromAjax = functio
 
 		var $experimentDetailsDiv = this.get$experimentDetailsDivFromExperimentId( chartDataFromServer.experimentId );
 
-		objectThis.createPrecursorScanCountChartActual( $experimentDetailsDiv, chartDataFromServer, chartDataFromServer.experimentId );
+		objectThis.createIntensityCountChartActual( $experimentDetailsDiv, chartDataFromServer, chartDataFromServer.experimentId );
 	}
 };
 
 /////////////////////////////////////
 
-//  Create the PrecursorScanCount Chart for one experiment on the page
+//  Create the IntensityCount Chart for one experiment on the page
 
-CreatePrecursorScanCountChartsClass.prototype.createPrecursorScanCountChartActual = function ( $experimentDetailsDiv, chartDataFromServer, experimentIdString ) {
+CreateIntensityCountChartsClass.prototype.createIntensityCountChartActual = function ( $experimentDetailsDiv, chartDataFromServer, experimentIdString ) {
 	
 	var chartBuckets = chartDataFromServer.chartBuckets;
 
@@ -274,15 +274,15 @@ CreatePrecursorScanCountChartsClass.prototype.createPrecursorScanCountChartActua
 	var chartData = [];
 
 	//  output columns specification
-	chartData.push( ["preMZ","count",{role: "tooltip",  'p': {'html': true} } ] );
+	chartData.push( ["intensityPercent","count",{role: "tooltip",  'p': {'html': true}}] );
 
 
 	for ( var index = 0; index < chartBuckets.length; index++ ) {
 
 		var bucket = chartBuckets[ index ];
 		
-		var tooltip = "<div style='margin: 10px;'>scan count: " + bucket.count + 
-		"<br>preMZ approximately " + bucket.binStart + " to " + bucket.binEnd + "</div>";
+		var tooltip = "<div style='margin: 10px;'>peak count: " + bucket.count + 
+		"<br>intensity percentage approximately " + bucket.binStart + "% to " + bucket.binEnd + "%</div>";
 
 		chartData.push( [bucket.binMiddle, bucket.count, tooltip  ] );
 	}
@@ -334,16 +334,14 @@ CreatePrecursorScanCountChartsClass.prototype.createPrecursorScanCountChartActua
 	
 	//  get div to put the chart in, and create sub div
 
-	var $chartThumbnailDiv = $experimentDetailsDiv.find(".experiment_precursor_scan_count_chart_div_jq");
-	
-	
-	if ( $chartThumbnailDiv.length < 1 ) {
-		
-		throw "unable to find div with class = " + "experiment_precursor_scan_count_chart_div_jq";
-	}
+	var $chartThumbnailDiv = $experimentDetailsDiv.find(".experiment_intensity_count_chart_div_jq");
 	
 	var $divInsideThumbnailChartDiv = $("<div actual_thumbnail_chart_holder='true'></div>").appendTo( $chartThumbnailDiv );
 
+	if ( $chartThumbnailDiv.length < 1 ) {
+		
+		throw "unable to find div with class = " + "experiment_intensity_count_chart_div_jq";
+	}
 
 	var divInsideThumbnailChartDivHTML = $divInsideThumbnailChartDiv[0];
 
@@ -353,10 +351,10 @@ CreatePrecursorScanCountChartsClass.prototype.createPrecursorScanCountChartActua
 	var chartThumbnailReadyHandler = function( paramNotProvided) {
 
 		//  Show the created chart
-		var $experiment_precursor_scan_count_chart_outer_div_jq = 
-			$experimentDetailsDiv.find(".experiment_precursor_scan_count_chart_outer_div_jq");
+		var $experiment_intensity_count_chart_outer_div_jq = 
+			$experimentDetailsDiv.find(".experiment_intensity_count_chart_outer_div_jq");
 
-		$experiment_precursor_scan_count_chart_outer_div_jq.show();
+		$experiment_intensity_count_chart_outer_div_jq.show();
 		
 		//  Show the enclosing "QC Plots" div
 		var $enclosing_qc_plots_div_jq = 
@@ -373,29 +371,30 @@ CreatePrecursorScanCountChartsClass.prototype.createPrecursorScanCountChartActua
 
 	//   Set up the creating of the full size chart when the thumbnail chart is clicked 
 
-	var $experiment_precursor_scan_count_chart_click_for_full_size_jq = 
-		$experimentDetailsDiv.find(".experiment_precursor_scan_count_chart_click_for_full_size_jq");
+	var $experiment_intensity_count_chart_click_for_full_size_jq = 
+		$experimentDetailsDiv.find(".experiment_intensity_count_chart_click_for_full_size_jq");
 
-	$experiment_precursor_scan_count_chart_click_for_full_size_jq.click( function() {
+	$experiment_intensity_count_chart_click_for_full_size_jq.click( function() {
 
-		var $experiment_precursor_scan_count_chart_full_size_jq = 
-			$experimentDetailsDiv.find(".experiment_precursor_scan_count_chart_full_size_jq");
+		var $experiment_intensity_count_chart_full_size_jq = 
+			$experimentDetailsDiv.find(".experiment_intensity_count_full_size_jq");
 		
-		if ( $experiment_precursor_scan_count_chart_full_size_jq.length < 1 ) {
+
+		if ( $experiment_intensity_count_chart_full_size_jq.length < 1 ) {
 			
-			throw "unable to find div with class = " + "experiment_precursor_scan_count_chart_full_size_jq";
+			throw "unable to find div with class = " + "experiment_intensity_count_full_size_jq";
 		}
-		
 
 
-		var title = $experiment_precursor_scan_count_chart_full_size_jq.attr('title');
 
-		var $divInsideFullSizeChartDiv = $experiment_precursor_scan_count_chart_full_size_jq.find("div");
+		var title = $experiment_intensity_count_chart_full_size_jq.attr('title');
+
+		var $divInsideFullSizeChartDiv = $experiment_intensity_count_chart_full_size_jq.find("div");
 		
 		//  Detect if full size chart already created
 		if ( $divInsideFullSizeChartDiv.length === 0 ) {
 		
-			$divInsideFullSizeChartDiv = $("<div actual_full_size_chart_holder='true'></div>").appendTo( $experiment_precursor_scan_count_chart_full_size_jq );
+			$divInsideFullSizeChartDiv = $("<div actual_full_size_chart_holder='true'></div>").appendTo( $experiment_intensity_count_chart_full_size_jq );
 			
 			//////////////////////////////////
 
@@ -404,13 +403,13 @@ CreatePrecursorScanCountChartsClass.prototype.createPrecursorScanCountChartActua
 			var optionsFullsize = {
 					tooltip: {isHtml: true},
 
-					title: 'Precursor M/Z distribution', // Title above chart
+					title: 'Intensity distribution', // Title above chart
 
 					//  X axis label below chart
-					hAxis: { title: 'Precursor M/Z', titleTextStyle: {color: 'black'}
+					hAxis: { title: 'Intensity Percent of Max', titleTextStyle: {color: 'black'}
 					},  
 					//  Y axis label left of chart
-					vAxis: { title: 'Scan Count', titleTextStyle: {color: 'black'}
+					vAxis: { title: 'Peak Count', titleTextStyle: {color: 'black'}
 								,baseline: 0                    // always start at zero
 					},
 					legend: { position: 'none' }, //  position: 'none':  Don't show legend of bar colors in upper right corner
@@ -418,9 +417,10 @@ CreatePrecursorScanCountChartsClass.prototype.createPrecursorScanCountChartActua
 					bar: { groupWidth: '100%' },  // set bar width large to eliminate space between bars
 					colors: ['green']  //  Color of bars
 			};        
+
+			var divInsideFullSizeChartDivHTML = $divInsideFullSizeChartDiv[0];
 			
-			
-			var chartFullsize = new google.visualization.ColumnChart( $divInsideFullSizeChartDiv[0] );
+			var chartFullsize = new google.visualization.ColumnChart( divInsideFullSizeChartDivHTML );
 			chartFullsize.draw(data, optionsFullsize);
 		}
 
@@ -430,7 +430,7 @@ CreatePrecursorScanCountChartsClass.prototype.createPrecursorScanCountChartActua
 					returnFocus: false,  // If true, focus will be returned when Colorbox exits to the element it was launched from.
 					open:	true, 		 // If true, Colorbox will immediately open.
 					inline:true,         //  Use HTML element specified in href to display in colorbox
-					href:$experiment_precursor_scan_count_chart_full_size_jq  //  Use HTML element specified in href to display in colorbox
+					href:$experiment_intensity_count_chart_full_size_jq  //  Use HTML element specified in href to display in colorbox
 				});
 	});
 };
@@ -439,7 +439,7 @@ CreatePrecursorScanCountChartsClass.prototype.createPrecursorScanCountChartActua
 
 /////////////////////////////////////
 
-CreatePrecursorScanCountChartsClass.prototype.get$experimentDetailsDivFromExperimentId = function( experimentId ) {
+CreateIntensityCountChartsClass.prototype.get$experimentDetailsDivFromExperimentId = function( experimentId ) {
 	
 	var html_id = "exp_root_target_" + experimentId;
 	
@@ -454,9 +454,9 @@ CreatePrecursorScanCountChartsClass.prototype.get$experimentDetailsDivFromExperi
 
 /////////////////////////////////////
 
-CreatePrecursorScanCountChartsClass.prototype.isThumbnailAlreadyCreated = function( $experimentDetailsDiv ) {
+CreateIntensityCountChartsClass.prototype.isThumbnailAlreadyCreated = function( $experimentDetailsDiv ) {
 	
-	var $chartThumbnailDiv = $experimentDetailsDiv.find(".experiment_precursor_scan_count_chart_div_jq");
+	var $chartThumbnailDiv = $experimentDetailsDiv.find(".experiment_intensity_count_chart_div_jq");
 
 	var $divInsideThumbnailChartDiv = $chartThumbnailDiv.find("div");
 	
@@ -472,11 +472,11 @@ CreatePrecursorScanCountChartsClass.prototype.isThumbnailAlreadyCreated = functi
 
 
 
-//  Declare CreatePrecursorScanCountCharts namespace by creating a variable 
+//  Declare CreateIntensityCountCharts namespace by creating a variable 
 
-var CreatePrecursorScanCountCharts = new CreatePrecursorScanCountChartsClass(); 
+var CreateIntensityCountCharts = new CreateIntensityCountChartsClass(); 
 
 
 //assign to window
-window.CreatePrecursorScanCountCharts = CreatePrecursorScanCountCharts;
+window.CreateIntensityCountCharts = CreateIntensityCountCharts;
 

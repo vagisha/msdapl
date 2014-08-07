@@ -274,15 +274,34 @@ CreatePeakCountChartsClass.prototype.createPeakCountChartActual = function ( $ex
 	var chartData = [];
 
 	//  output columns specification
-	chartData.push( ["numPeaks","count",{role: "tooltip"}] );
+	chartData.push( ["numPeaks","count",{role: "tooltip",  'p': {'html': true}}] );
 
 
 	for ( var index = 0; index < chartBuckets.length; index++ ) {
 
 		var bucket = chartBuckets[ index ];
 		
-		var tooltip = "scan count: " + bucket.scanCount;
-		chartData.push( [bucket.numPeaks, bucket.scanCount, tooltip  ] );
+		var nextNumberOfPeaksStart = 0;
+		
+		if ( index < ( chartBuckets.length - 1 ) ) {
+			
+			nextNumberOfPeaksStart = chartBuckets[ index + 1 ].numPeaks - 1;
+		} else  {
+			
+			nextNumberOfPeaksStart = chartDataFromServer.numPeaksMax;
+		}
+		
+//		var numberOfPeaksStart = 
+		
+		var tooltip = "<div style='margin: 10px;'>scan count: " + bucket.scanCount + 
+		"<br>number of peaks: " + bucket.numPeaks + " - " + nextNumberOfPeaksStart + "</div>";
+		
+		var peaksMiddle = ( ( nextNumberOfPeaksStart - bucket.numPeaks ) / 2 ) + bucket.numPeaks;
+		
+		chartData.push( [ peaksMiddle, bucket.scanCount, tooltip  ] );
+		
+//		chartData.push( [bucket.numPeaks, bucket.scanCount, tooltip  ] );
+
 	}
 
 	// create the chart
@@ -292,6 +311,8 @@ CreatePeakCountChartsClass.prototype.createPeakCountChartActual = function ( $ex
 	// https://developers.google.com/chart/interactive/docs/gallery/columnchart#Configuration_Options
 
 	var optionsThumbnail = {
+			
+			focusTarget: 'category',
 
 			axisTitlesPosition: 'none',  //  'in', out or none
 
@@ -334,12 +355,19 @@ CreatePeakCountChartsClass.prototype.createPeakCountChartActual = function ( $ex
 
 	var $chartThumbnailDiv = $experimentDetailsDiv.find(".experiment_peak_count_chart_div_jq");
 	
+	if ( $chartThumbnailDiv.length < 1 ) {
+		
+		throw "unable to find div with class = " + "experiment_peak_count_chart_div_jq";
+	}
+	
 	var $divInsideThumbnailChartDiv = $("<div actual_thumbnail_chart_holder='true'></div>").appendTo( $chartThumbnailDiv );
 
 
 	var divInsideThumbnailChartDivHTML = $divInsideThumbnailChartDiv[0];
 
 
+
+	
 	var chartThumbnail = new google.visualization.ColumnChart( divInsideThumbnailChartDivHTML );
 
 	var chartThumbnailReadyHandler = function( paramNotProvided) {
@@ -373,6 +401,11 @@ CreatePeakCountChartsClass.prototype.createPeakCountChartActual = function ( $ex
 		var $experiment_peak_count_chart_full_size_jq = 
 			$experimentDetailsDiv.find(".experiment_peak_count_full_size_jq");
 
+		
+		if ( $experiment_peak_count_chart_full_size_jq.length < 1 ) {
+			
+			throw "unable to find div with class = " + "experiment_peak_count_full_size_jq";
+		}
 
 		var title = $experiment_peak_count_chart_full_size_jq.attr('title');
 
@@ -388,6 +421,8 @@ CreatePeakCountChartsClass.prototype.createPeakCountChartActual = function ( $ex
 			// Full size chart created when the thumbnail is clicked the first time
 			
 			var optionsFullsize = {
+					tooltip: {isHtml: true},
+					
 					title: 'Peak Count distribution', // Title above chart
 
 					//  X axis label below chart

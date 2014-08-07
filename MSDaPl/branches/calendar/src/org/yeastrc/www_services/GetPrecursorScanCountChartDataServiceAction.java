@@ -16,9 +16,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.ProjectExperimentDAO;
-import org.yeastrc.mz_scan_count_plot.service.MZScanCountPlotter;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
+import org.yeastrc.qc_plots.premz_scan_count_plot.service.PreMZScanCountPlotter;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -115,7 +115,7 @@ public class GetPrecursorScanCountChartDataServiceAction  extends Action {
 				
 				try {
 				
-					precursorMassChartData = MZScanCountPlotter.getMZScanCountPlot( experimentId );
+					precursorMassChartData = PreMZScanCountPlotter.getMZScanCountPlot( experimentId );
 				
 				} catch ( Exception ex ) {
 					

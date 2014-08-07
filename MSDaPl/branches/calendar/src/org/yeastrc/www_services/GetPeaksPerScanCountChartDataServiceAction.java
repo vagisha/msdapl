@@ -16,7 +16,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.ProjectExperimentDAO;
-import org.yeastrc.mz_scan_count_plot.service.MZScanCountPlotter;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.qc_plots.plot_peaks_per_scan_per_experiment.service.QC_Plot_PeaksPerScanPerExperiment_Plotter;

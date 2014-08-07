@@ -59,11 +59,12 @@ import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRunSummary;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
-import org.yeastrc.mz_scan_count_plot.service.MZScanCountPlotter;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.properties.ApplicationProperties;
+import org.yeastrc.qc_plots.plot_intensity_per_experiment.service.QC_Plot_IntensityPerExperiment_Plotter;
 import org.yeastrc.qc_plots.plot_peaks_per_scan_per_experiment.service.QC_Plot_PeaksPerScanPerExperiment_Plotter;
+import org.yeastrc.qc_plots.premz_scan_count_plot.service.PreMZScanCountPlotter;
 import org.yeastrc.www.project.experiment.QCPlot;
 import org.yeastrc.www.proteinfer.job.ProteinInferJobSearcher;
 import org.yeastrc.www.proteinfer.job.ProteinferJob;
@@ -270,7 +271,7 @@ public class ViewProjectAction extends Action {
             experiments.add(pExpt);
             
             //  Load Precursor Mass Chart Data
-            String precursorMassChartData = MZScanCountPlotter.getStoredMZScanCountPlotFromDB(experimentId);
+            String precursorMassChartData = PreMZScanCountPlotter.getStoredMZScanCountPlotFromDB(experimentId);
             if ( precursorMassChartData == null ) {
             	precursorMassChartData = "";
             }
@@ -286,12 +287,12 @@ public class ViewProjectAction extends Action {
             pExpt.setPeakCountChartData( peakCountChartData );
             
             
-//            //  Load Peak Count Chart Data
-//            String peakCountChartData = QC_Plot_PeaksPerScanPerExperiment_Plotter.getPeaksPerScanPerExperimentPlot(experimentId);
-//            if ( peakCountChartData == null ) {
-//            	peakCountChartData = "";
-//            }
-//            pExpt.setPeakCountChartData( peakCountChartData );
+            //  Load Intensity Count Chart Data
+            String intensityCountChartData = QC_Plot_IntensityPerExperiment_Plotter.getIntensityPerExperimentPlot(experimentId);
+            if ( intensityCountChartData == null ) {
+            	intensityCountChartData = "";
+            }
+            pExpt.setIntensityCountChartData( intensityCountChartData );
             
             
             count++;

@@ -109,7 +109,7 @@
 			  </td>
 			  
 			  <%--  td and divs for showing preMZ chart thumbnail --%>
-			  <td  style="width: 100px;">  <%-- Set td width as needed for image --%>
+			  <td  style="width: 150px;">  <%-- Set td width as needed for image --%>
 			  
 			   <div class="experiment_details_qc_plots_div_jq" style="display: none;" >
 			   
@@ -142,7 +142,7 @@
 				    </div>
 				   </div>
 				   
-				   <div class="experiment_peak_count_chart_outer_div_jq" style="display: none;">
+				   <div class="experiment_peak_count_chart_outer_div_jq" style="display: none; float: left; padding-right: 5px;">
 				    <%--  Outer div used to crop thumbnail image --%>
 				  	<div style="width: 40px; height: 40px; position: relative; overflow: hidden; border-color: grey; border-style: solid; border-width: 2px; background-color: transparent;"
 				  		>
@@ -161,6 +161,24 @@
 				    </div>
 				   </div>
 				   
+				   <div class="experiment_intensity_count_chart_outer_div_jq" style="display: none;">
+				    <%--  Outer div used to crop thumbnail image --%>
+				  	<div style="width: 40px; height: 40px; position: relative; overflow: hidden; border-color: grey; border-style: solid; border-width: 2px; background-color: transparent;"
+				  		>
+				  		<%-- Div that Google chart will put the thumbnail image in.  Positioned to show just the chart through the clipping of the parent div --%>
+				  		<div style="position: absolute; left: -10px; top: -12px;"
+				  					 class="experiment_intensity_count_chart_div_jq"  
+				  					 id="experiment_<bean:write name='experiment' property='id'/>_intensity_count_Chart">
+				  	    </div>
+				  	    <%-- overlay div on top of chart for click handling and tool tip --%>
+				  		<div style="position: absolute; left: 0px; top: 0px; width: 40px; height: 40px; cursor: pointer;"
+				  			class="experiment_intensity_count_chart_click_for_full_size_jq "
+				  			title="View Intensity distribution">
+				  		
+				  			&nbsp;
+				  	    </div>
+				    </div>
+				   </div>
 				   
 				  </logic:equal>
 
@@ -183,6 +201,12 @@
 				experiment_id="<bean:write name='experiment' property='id'/>"
 				value='<bean:write name="experiment" property="peakCountChartData" filter="false"/>' />
 			
+			<input type="hidden" class="experiment_intensity_count_chart_data_jq" 
+				experiment_id="<bean:write name='experiment' property='id'/>"
+				value='<bean:write name="experiment" property="intensityCountChartData" filter="false"/>' />
+			
+			
+			
 			
 			<%--  Divs for showing preMZ chart full size in overlay using "colorbox" jQuery plugin --%>
 			<div style="display: none;" >
@@ -195,7 +219,13 @@
 				<div class="experiment_peak_count_full_size_jq" style="width: 850px; height: 450px; " 
 					title="   " ></div>
 			</div>
-					
+			
+			<%--  Divs for showing Intensity Count chart full size in overlay using "colorbox" jQuery plugin --%>
+			<div style="display: none;" >
+				<div class="experiment_intensity_count_full_size_jq" style="width: 850px; height: 450px; " 
+					title="   " ></div>
+			</div>
+										
 			
 			<logic:equal name="experiment" property="hasFullInformation" value="false">
 				<div id="expt_fold_<bean:write name="experiment" property="id"/>_target"></div>

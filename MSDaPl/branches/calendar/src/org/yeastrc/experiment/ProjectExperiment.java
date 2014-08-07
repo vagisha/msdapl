@@ -53,7 +53,17 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     
     private String peakCountChartData;
     
-    public String getPeakCountChartData() {
+    private String intensityCountChartData;
+    
+    public String getIntensityCountChartData() {
+		return intensityCountChartData;
+	}
+
+	public void setIntensityCountChartData(String intensityCountChartData) {
+		this.intensityCountChartData = intensityCountChartData;
+	}
+
+	public String getPeakCountChartData() {
 		return peakCountChartData;
 	}
 

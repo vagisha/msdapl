@@ -166,6 +166,8 @@
 
 <script src="<yrcwww:link path='js/experimentDetailsPeakCountChart.js'/>"></script>
 
+<script src="<yrcwww:link path='js/experimentDetailsIntensityCountChart.js'/>"></script>
+
 <%-- Google Chart API import, for use on experimentDetails.jsp  --%>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
@@ -175,6 +177,7 @@
 	  
 	  createAllInitialDisplayPrecursorScanCountCharts();
 	  createAllInitialDisplayPeakCountCharts();
+	  createAllInitialDisplayIntensityCountCharts();
   }
   
   //  Do NOT call a method on an object here.  The "this" gets set to the window.
