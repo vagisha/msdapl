@@ -27,7 +27,7 @@ public class QCPlotDataDAOImpl implements QCPlotDataDAO {
 
 	
     @Override
-    public int save(QCPlotDataDTO qcPlotDataDTO) {
+    public int saveOrUpdate(QCPlotDataDTO qcPlotDataDTO) {
     	
 
 //    	CREATE TABLE mz_scan_count_plot_data (
@@ -113,76 +113,76 @@ public class QCPlotDataDAOImpl implements QCPlotDataDAO {
     
     @Override
     public QCPlotDataDTO load( int experimentId, String plotType ) {
-    	{
-    		final String querySqlStringComplete = loadFromExperimentIdPlotType;
-    	    		
-    		QCPlotDataDTO qcPlotDataDTO = null;
 
-    		Connection connection = null;
+    	final String querySqlStringComplete = loadFromExperimentIdPlotType;
 
-    		PreparedStatement pstmt = null;
+    	QCPlotDataDTO qcPlotDataDTO = null;
 
-    		ResultSet rs = null;
+    	Connection connection = null;
 
-    		try {
+    	PreparedStatement pstmt = null;
 
-    			connection = DAOFactory.instance().getConnection();
+    	ResultSet rs = null;
 
-    			pstmt = connection.prepareStatement( querySqlStringComplete );
+    	try {
 
-    			pstmt.setInt( 1, experimentId );
+    		connection = DAOFactory.instance().getConnection();
 
-    			rs = pstmt.executeQuery();
+    		pstmt = connection.prepareStatement( querySqlStringComplete );
 
-    			if ( rs.next() ) {
+    		pstmt.setInt( 1, experimentId );
 
-    				qcPlotDataDTO = new QCPlotDataDTO();
-    				
-    				qcPlotDataDTO.setExperimentId( experimentId );
-    				qcPlotDataDTO.setPlotType( plotType );
-    				
-    				qcPlotDataDTO.setPlotData( rs.getString( "plot_data" ) );
-    				qcPlotDataDTO.setDataVersion( rs.getInt( "data_version" ) );
-    			}
+    		rs = pstmt.executeQuery();
+
+    		if ( rs.next() ) {
+
+    			qcPlotDataDTO = new QCPlotDataDTO();
+
+    			qcPlotDataDTO.setExperimentId( experimentId );
+    			qcPlotDataDTO.setPlotType( plotType );
+
+    			qcPlotDataDTO.setPlotData( rs.getString( "plot_data" ) );
+    			qcPlotDataDTO.setDataVersion( rs.getInt( "data_version" ) );
+    		}
 
 
-    		} catch (Exception sqlEx) {
+    	} catch (Exception sqlEx) {
 
-    			String msg = "load :Exception '" + sqlEx.toString() + '.';
-    			log.error( msg, sqlEx);
-    			throw new RuntimeException( msg, sqlEx );
+    		String msg = "load :Exception '" + sqlEx.toString() + '.';
+    		log.error( msg, sqlEx);
+    		throw new RuntimeException( msg, sqlEx );
 
-    		} finally {
+    	} finally {
 
-    			if (rs != null) {
-    				try {
-    					rs.close();
-    				} catch (SQLException ex) {
-    					// ignore
-    				}
-    			}
-
-    			if (pstmt != null) {
-    				try {
-    					pstmt.close();
-    				} catch (SQLException ex) {
-    					// ignore
-    				}
-    			}
-
-    			if (connection != null) {
-    				try {
-    					connection.close();
-    				} catch (SQLException ex) {
-    					// ignore
-    				}
+    		if (rs != null) {
+    			try {
+    				rs.close();
+    			} catch (SQLException ex) {
+    				// ignore
     			}
     		}
 
-    		return qcPlotDataDTO;
+    		if (pstmt != null) {
+    			try {
+    				pstmt.close();
+    			} catch (SQLException ex) {
+    				// ignore
+    			}
+    		}
+
+    		if (connection != null) {
+    			try {
+    				connection.close();
+    			} catch (SQLException ex) {
+    				// ignore
+    			}
+    		}
     	}
+
+    	return qcPlotDataDTO;
+
     }
-    
+
     
     
 	private String loadFromExperimentIdPlotTypeAndDataVersionSqlString 
@@ -190,76 +190,134 @@ public class QCPlotDataDAOImpl implements QCPlotDataDAO {
     
     @Override
     public QCPlotDataDTO loadFromExperimentIdPlotTypeAndDataVersion(int experimentId, String plotType, int dataVersion) {
-    	{
-    		final String querySqlStringComplete = loadFromExperimentIdPlotTypeAndDataVersionSqlString;
-    		
-    		QCPlotDataDTO qcPlotDataDTO = null;
 
-    		Connection connection = null;
+    	final String querySqlStringComplete = loadFromExperimentIdPlotTypeAndDataVersionSqlString;
 
-    		PreparedStatement pstmt = null;
+    	QCPlotDataDTO qcPlotDataDTO = null;
 
-    		ResultSet rs = null;
+    	Connection connection = null;
 
-    		try {
+    	PreparedStatement pstmt = null;
 
-    			connection = DAOFactory.instance().getConnection();
+    	ResultSet rs = null;
 
-    			pstmt = connection.prepareStatement( querySqlStringComplete );
+    	try {
 
-    			pstmt.setInt( 1, experimentId );
-    			pstmt.setString( 2, plotType );
-    			pstmt.setInt( 3, dataVersion );
+    		connection = DAOFactory.instance().getConnection();
 
-    			rs = pstmt.executeQuery();
+    		pstmt = connection.prepareStatement( querySqlStringComplete );
 
-    			if ( rs.next() ) {
+    		pstmt.setInt( 1, experimentId );
+    		pstmt.setString( 2, plotType );
+    		pstmt.setInt( 3, dataVersion );
 
-    				qcPlotDataDTO = new QCPlotDataDTO();
-    				
-    				qcPlotDataDTO.setExperimentId( experimentId );
-    				
-    				qcPlotDataDTO.setPlotData( rs.getString( "plot_data" ) );
-    				qcPlotDataDTO.setDataVersion( dataVersion );
-    			}
+    		rs = pstmt.executeQuery();
+
+    		if ( rs.next() ) {
+
+    			qcPlotDataDTO = new QCPlotDataDTO();
+
+    			qcPlotDataDTO.setExperimentId( experimentId );
+
+    			qcPlotDataDTO.setPlotData( rs.getString( "plot_data" ) );
+    			qcPlotDataDTO.setDataVersion( dataVersion );
+    		}
 
 
-    		} catch (Exception sqlEx) {
+    	} catch (Exception sqlEx) {
 
-    			String msg = "loadFromExperimentIdPlotTypeAndDataVersion :Exception '" + sqlEx.toString() + '.';
-    			log.error( msg, sqlEx);
-    			throw new RuntimeException( msg, sqlEx );
+    		String msg = "loadFromExperimentIdPlotTypeAndDataVersion :Exception '" + sqlEx.toString() + '.';
+    		log.error( msg, sqlEx);
+    		throw new RuntimeException( msg, sqlEx );
 
-    		} finally {
+    	} finally {
 
-    			if (rs != null) {
-    				try {
-    					rs.close();
-    				} catch (SQLException ex) {
-    					// ignore
-    				}
-    			}
-
-    			if (pstmt != null) {
-    				try {
-    					pstmt.close();
-    				} catch (SQLException ex) {
-    					// ignore
-    				}
-    			}
-
-    			if (connection != null) {
-    				try {
-    					connection.close();
-    				} catch (SQLException ex) {
-    					// ignore
-    				}
+    		if (rs != null) {
+    			try {
+    				rs.close();
+    			} catch (SQLException ex) {
+    				// ignore
     			}
     		}
 
-    		return qcPlotDataDTO;
+    		if (pstmt != null) {
+    			try {
+    				pstmt.close();
+    			} catch (SQLException ex) {
+    				// ignore
+    			}
+    		}
+
+    		if (connection != null) {
+    			try {
+    				connection.close();
+    			} catch (SQLException ex) {
+    				// ignore
+    			}
+    		}
     	}
+
+    	return qcPlotDataDTO;
     }
+
+    
+    
+	private String deleteFromExperimentIdPlotTypeSqlString 
+	= "DELETE FROM qc_plot_data WHERE experiment_id = ? AND plot_type = ?";
+    
+
+
+	@Override
+	public void deleteForExperimentIdPlotType(	int experimentId, String plotType ) {
+
+
+    	final String querySqlStringComplete = deleteFromExperimentIdPlotTypeSqlString;
+
+    	Connection connection = null;
+
+    	PreparedStatement pstmt = null;
+
+
+    	try {
+
+    		connection = DAOFactory.instance().getConnection();
+
+    		pstmt = connection.prepareStatement( querySqlStringComplete );
+
+    		pstmt.setInt( 1, experimentId );
+    		pstmt.setString( 2, plotType );
+
+    		pstmt.executeUpdate();
+
+
+
+    	} catch (Exception sqlEx) {
+
+    		String msg = "deleteForExperimentIdPlotType :Exception '" + sqlEx.toString() + '.';
+    		log.error( msg, sqlEx);
+    		throw new RuntimeException( msg, sqlEx );
+
+    	} finally {
+
+    		if (pstmt != null) {
+    			try {
+    				pstmt.close();
+    			} catch (SQLException ex) {
+    				// ignore
+    			}
+    		}
+
+    		if (connection != null) {
+    			try {
+    				connection.close();
+    			} catch (SQLException ex) {
+    				// ignore
+    			}
+    		}
+    	}
+
+		
+	}
 
 
 }

@@ -54,7 +54,7 @@ public class QC_Plot_PeaksPerScanPerExperiment_Plotter {
 
 		try {
 			
-			qcPlotDataDAO.save( qcPlotDataDTO );
+			qcPlotDataDAO.saveOrUpdate( qcPlotDataDTO );
 		
 		} catch (Exception ex ) {
 			

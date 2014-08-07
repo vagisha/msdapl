@@ -91,10 +91,20 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
             return 0;
     }
     
+    @Override
     public List<Integer> loadScanIdsForRun(int runId) {
         return queryForList("MsScan.selectScanIdsForRun", runId);
     }
     
+    @Override
+    public List<Integer> loadScanIdsForRunAndLevel(int runId, int level) {
+        Map<String, Integer> map = new HashMap<String, Integer>(4);
+        map.put("runId", runId);
+        map.put("level", level);
+        return queryForList("MsScan.selectScanIdsForRunAndLevel", map);
+    }
+    
+    @Override
     public List<Integer> loadMS2ScanIdsForMS1Scan(int ms1ScanId) {
         return queryForList("MsScan.selectMs2ScansForMs1Scan", ms1ScanId);
     }

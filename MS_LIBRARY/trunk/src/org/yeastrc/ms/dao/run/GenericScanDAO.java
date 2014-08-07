@@ -65,6 +65,15 @@ public interface GenericScanDAO <I extends MsScanIn, O extends MsScan> {
     public abstract List<Integer> loadScanIdsForRun(int runId);
     
     /**
+     * Returns a list of scan ID's for the given run and level (MS level of 1,2,...)
+     * @param runId
+     * @return
+     */
+    public List<Integer> loadScanIdsForRunAndLevel(int runId, int level);
+
+    
+    
+    /**
      * Returns the number of scans for the given runId;
      * @param runId
      * @return

@@ -67,6 +67,16 @@
         SELECT id FROM msScan WHERE runID = #id#
     </select> 
     
+    <select id="selectScanIdsWithLevelOf2ForRun" resultClass="Integer" parameterClass="Integer"> 
+        SELECT id FROM msScan WHERE runID = #id# AND level = 2
+    </select>     
+	
+    <select id="selectScanIdsForRunAndLevel" resultClass="Integer" parameterClass="java.util.Map"> 
+        SELECT id FROM msScan 
+        WHERE runID = #runId#
+        AND level = #level#
+    </select> 
+    
     <select id="selectScanCountForRun" resultClass="Integer" parameterClass="Integer"> 
         SELECT count(*) FROM msScan WHERE runID = #id#
     </select> 
