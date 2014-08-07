@@ -288,7 +288,7 @@ public class ViewProjectAction extends Action {
             
             
             //  Load Intensity Count Chart Data
-            String intensityCountChartData = QC_Plot_IntensityPerExperiment_Plotter.getIntensityPerExperimentPlot(experimentId);
+            String intensityCountChartData = QC_Plot_IntensityPerExperiment_Plotter.getStoredIntensityPerExperimentPlotFromDB( experimentId );
             if ( intensityCountChartData == null ) {
             	intensityCountChartData = "";
             }
