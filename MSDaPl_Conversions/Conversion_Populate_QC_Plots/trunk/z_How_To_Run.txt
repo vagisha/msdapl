@@ -1,0 +1,25 @@
+
+
+Create a directory somewhere.
+
+Copy the following files and directories to it:
+
+lib
+lib_from_MS_LIBRARY
+log4j.properties
+msDataDB.properties
+NrSeqSqlMapConfig.xml
+run_Conversion_Populate_QC_Plots.sh
+SqlMapConfig.xml
+
+
+
+build a jar for this project using the ant script in build.xml
+
+copy that jar to the lib directory in the directory you created.
+
+configure msDataDB.properties
+
+
+run the bash script run_Conversion_Populate_QC_Plots.sh
+

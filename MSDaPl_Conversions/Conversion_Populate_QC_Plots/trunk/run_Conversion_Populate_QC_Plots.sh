@@ -1,0 +1,1 @@
+java  -Xmx512m  -Dbase_dir=`pwd`   -cp ".:lib/*:lib_from_MS_LIBRARY/*" org.yeastrc.conversion.populate_qc_plots.main.Main > z_sysout.txt 2> z_syserr.txt
