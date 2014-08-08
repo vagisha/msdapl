@@ -16,6 +16,10 @@
 
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 
+//   Changed to NOT load the chart via AJAX since the creation time is too long and would place too high a load on the database
+//   This chart takes minutes to create the data.
+
+
 "use strict";
 
 
@@ -48,12 +52,12 @@ function createAllInitialDisplayIntensityCountCharts() {
 var CreateIntensityCountChartsClass = function () {
 
 
-	this.webAppContextPath_WebApp_Wide_Val = $("#webAppContextPath_WebApp_Wide").val();
-
-	this.SERVICE_URLS = {
-			
-			GET_CHART_DATA_FOR_EXPERIMENT_IDS: this.webAppContextPath_WebApp_Wide_Val + "/getIntensitysPerScanCountChartDataService.do"
-	};
+//	this.webAppContextPath_WebApp_Wide_Val = $("#webAppContextPath_WebApp_Wide").val();
+//
+//	this.SERVICE_URLS = {
+//			
+//			GET_CHART_DATA_FOR_EXPERIMENT_IDS: this.webAppContextPath_WebApp_Wide_Val + "/getIntensitysPerScanCountChartDataService.do"
+//	};
 	
 };
 
@@ -62,31 +66,31 @@ var CreateIntensityCountChartsClass = function () {
 
 //Create the IntensityCount Chart for the passed in experiment id
 
-CreateIntensityCountChartsClass.prototype.createDisplayIntensityCountChartForExperimentId = function( experimentId ) {
-	
-	var objectThis = this;
-	
-	var experiment_details_outer_div_id = "exp_root_target_" + experimentId;
-	
-	var $experimentDetailsDiv = $("#" + experiment_details_outer_div_id);
-	
-	var uploadSuccess = $experimentDetailsDiv.attr("experiment_upload_success");
-	
-	if ( uploadSuccess === "true" ) {
-		
-		//  Only get chart data for uploadSuccess === "true"
-			
-		var experimentIdString = $experimentDetailsDiv.attr("experiment_id");
-		
-		var experimentIdsForGetViaAjax = [ experimentIdString ];
-
-
-	//  Load the chart that need computing via ajax
-
-		this.getChartDataViaAjax( experimentIdsForGetViaAjax, $experimentDetailsDiv );
-				
-	}
-};
+//CreateIntensityCountChartsClass.prototype.createDisplayIntensityCountChartForExperimentId = function( experimentId ) {
+//	
+//	var objectThis = this;
+//	
+//	var experiment_details_outer_div_id = "exp_root_target_" + experimentId;
+//	
+//	var $experimentDetailsDiv = $("#" + experiment_details_outer_div_id);
+//	
+//	var uploadSuccess = $experimentDetailsDiv.attr("experiment_upload_success");
+//	
+//	if ( uploadSuccess === "true" ) {
+//		
+//		//  Only get chart data for uploadSuccess === "true"
+//			
+//		var experimentIdString = $experimentDetailsDiv.attr("experiment_id");
+//		
+//		var experimentIdsForGetViaAjax = [ experimentIdString ];
+//
+//
+//	//  Load the chart that need computing via ajax
+//
+//		this.getChartDataViaAjax( experimentIdsForGetViaAjax, $experimentDetailsDiv );
+//				
+//	}
+//};
 
 
 /////////////////////////////////////
@@ -130,7 +134,7 @@ CreateIntensityCountChartsClass.prototype.createAllInitialDisplayIntensityCountC
 
 				//  the chart data was not pre-computed so must request it via ajax
 
-				experimentIdsForGetViaAjax.push( experimentIdString );
+//				experimentIdsForGetViaAjax.push( experimentIdString );
 
 			} else {
 
@@ -148,12 +152,12 @@ CreateIntensityCountChartsClass.prototype.createAllInitialDisplayIntensityCountC
 		}
 	});
 	
-	if ( experimentIdsForGetViaAjax.length > 0 ) {  
-		
-		//  Load the charts that need computing via ajax
-	
-		objectThis.getChartDataViaAjax( experimentIdsForGetViaAjax, $experiment_details_outer_div_list );
-	}
+//	if ( experimentIdsForGetViaAjax.length > 0 ) {  
+//		
+//		//  Load the charts that need computing via ajax
+//	
+//		objectThis.getChartDataViaAjax( experimentIdsForGetViaAjax, $experiment_details_outer_div_list );
+//	}
 };	
 
 
@@ -161,106 +165,106 @@ CreateIntensityCountChartsClass.prototype.createAllInitialDisplayIntensityCountC
 
 //  Load the charts that need computing via ajax
 
-CreateIntensityCountChartsClass.prototype.getChartDataViaAjax = function ( experimentIdsForGetViaAjax, $experiment_details_outer_div_list, experimentIdIndex ) {
-	
-	//  This function will get the chart data via AJAX for the experiment ids in experimentIdsForGetViaAjax.
-	
-	//   It will do the AJAX call for the experiment id specified by experimentIdIndex.
-	//       After the AJAX callback, it will call itself after incrementing experimentIdIndex to process the next experiment id
-	
-	var objectThis = this;
-	
-	if ( experimentIdIndex === undefined ) {
-		experimentIdIndex = 0;
-	}
-	
-	var experimentId = experimentIdsForGetViaAjax[ experimentIdIndex ];
-	
-	var context = { $experiment_details_outer_div_list : $experiment_details_outer_div_list };
-	
-	
-	//  Optional way to combine the ids into comma delim list to get all at once (then need to remove code in callback that calls this function again) 
-//	var experimentIdsCommaDelim = experimentIdsForGetViaAjax.join(",");
-
-	
-	//  Actually sending the experiment ids one at a time but could send a comma delimited list of experiment ids
-	var ajaxData = { "experimentIds" : experimentId };
-
-	$.ajax(
-		{ url : this.SERVICE_URLS.GET_CHART_DATA_FOR_EXPERIMENT_IDS,
-			cache: false, //  always need to send this request to the server
-
-			success :  function( data ) {
-
-				objectThis.processChartDataFromAjax( { chartDataArrayFromServer: data, context: context } );
-
-				experimentIdIndex++;  // advance to next experiment id
-				
-				//  Continue if there are any more to load
-				while ( experimentIdIndex < experimentIdsForGetViaAjax.length) {
-					
-					//  get next experiment id
-					var nextExperimentIdForGetViaAjax = experimentIdsForGetViaAjax[ experimentIdIndex ];
-					
-					var $experimentDetailsDiv = objectThis.get$experimentDetailsDivFromExperimentId( nextExperimentIdForGetViaAjax );
-
-					if ( ! objectThis.isThumbnailAlreadyCreated( $experimentDetailsDiv ) ) {
-
-						//  If not already loaded, break this loop and it will be loaded in the code next
-						break;
-					}
-					
-					experimentIdIndex++;  //  advance to skip over experiment id where thumbnail chart already created
-				}
-					
-				//  Load the data for the next chart if there are any more charts to load data for
-				if ( experimentIdIndex < experimentIdsForGetViaAjax.length) {
-						
-					var getNextChartDataDelay = 200; // delay in milliseconds
-					
-					if ( experimentIdIndex > 3 ) {
-						getNextChartDataDelay = 4000; // after the 4th chart loaded via AJAX, increase the delay to 4 seconds 
-					}
-
-					//  delay to load each experiment chart data after a delay to space out the load on the server
-					setTimeout(function(){
-
-						objectThis.getChartDataViaAjax( experimentIdsForGetViaAjax, $experiment_details_outer_div_list, experimentIdIndex );
-
-					}, getNextChartDataDelay ); // delay in milliseconds
-				}
-			},
-
-			error: function(jqXHR, textStatus, errorThrown) {
-
-				throw "AJAX error:  textStatus: " + textStatus + ", errorThrown: " + errorThrown;
-			},
-			data: ajaxData,  //  The data sent as params on the URL
-			dataType : "json"
-		});
-};
+//CreateIntensityCountChartsClass.prototype.getChartDataViaAjax = function ( experimentIdsForGetViaAjax, $experiment_details_outer_div_list, experimentIdIndex ) {
+//	
+//	//  This function will get the chart data via AJAX for the experiment ids in experimentIdsForGetViaAjax.
+//	
+//	//   It will do the AJAX call for the experiment id specified by experimentIdIndex.
+//	//       After the AJAX callback, it will call itself after incrementing experimentIdIndex to process the next experiment id
+//	
+//	var objectThis = this;
+//	
+//	if ( experimentIdIndex === undefined ) {
+//		experimentIdIndex = 0;
+//	}
+//	
+//	var experimentId = experimentIdsForGetViaAjax[ experimentIdIndex ];
+//	
+//	var context = { $experiment_details_outer_div_list : $experiment_details_outer_div_list };
+//	
+//	
+//	//  Optional way to combine the ids into comma delim list to get all at once (then need to remove code in callback that calls this function again) 
+////	var experimentIdsCommaDelim = experimentIdsForGetViaAjax.join(",");
+//
+//	
+//	//  Actually sending the experiment ids one at a time but could send a comma delimited list of experiment ids
+//	var ajaxData = { "experimentIds" : experimentId };
+//
+//	$.ajax(
+//		{ url : this.SERVICE_URLS.GET_CHART_DATA_FOR_EXPERIMENT_IDS,
+//			cache: false, //  always need to send this request to the server
+//
+//			success :  function( data ) {
+//
+//				objectThis.processChartDataFromAjax( { chartDataArrayFromServer: data, context: context } );
+//
+//				experimentIdIndex++;  // advance to next experiment id
+//				
+//				//  Continue if there are any more to load
+//				while ( experimentIdIndex < experimentIdsForGetViaAjax.length) {
+//					
+//					//  get next experiment id
+//					var nextExperimentIdForGetViaAjax = experimentIdsForGetViaAjax[ experimentIdIndex ];
+//					
+//					var $experimentDetailsDiv = objectThis.get$experimentDetailsDivFromExperimentId( nextExperimentIdForGetViaAjax );
+//
+//					if ( ! objectThis.isThumbnailAlreadyCreated( $experimentDetailsDiv ) ) {
+//
+//						//  If not already loaded, break this loop and it will be loaded in the code next
+//						break;
+//					}
+//					
+//					experimentIdIndex++;  //  advance to skip over experiment id where thumbnail chart already created
+//				}
+//					
+//				//  Load the data for the next chart if there are any more charts to load data for
+//				if ( experimentIdIndex < experimentIdsForGetViaAjax.length) {
+//						
+//					var getNextChartDataDelay = 200; // delay in milliseconds
+//					
+//					if ( experimentIdIndex > 3 ) {
+//						getNextChartDataDelay = 4000; // after the 4th chart loaded via AJAX, increase the delay to 4 seconds 
+//					}
+//
+//					//  delay to load each experiment chart data after a delay to space out the load on the server
+//					setTimeout(function(){
+//
+//						objectThis.getChartDataViaAjax( experimentIdsForGetViaAjax, $experiment_details_outer_div_list, experimentIdIndex );
+//
+//					}, getNextChartDataDelay ); // delay in milliseconds
+//				}
+//			},
+//
+//			error: function(jqXHR, textStatus, errorThrown) {
+//
+//				throw "AJAX error:  textStatus: " + textStatus + ", errorThrown: " + errorThrown;
+//			},
+//			data: ajaxData,  //  The data sent as params on the URL
+//			dataType : "json"
+//		});
+//};
 
 
 
 /////////////////////////////////////
 
-CreateIntensityCountChartsClass.prototype.processChartDataFromAjax = function ( param ) {
-	
-	var objectThis = this;
-
-	var chartDataArrayFromServer = param.chartDataArrayFromServer.data;
-
-//	var context = param.context;
-
-	for ( var index = 0; index < chartDataArrayFromServer.length; index++ ) {
-
-		var chartDataFromServer = chartDataArrayFromServer[ index ];
-
-		var $experimentDetailsDiv = this.get$experimentDetailsDivFromExperimentId( chartDataFromServer.experimentId );
-
-		objectThis.createIntensityCountChartActual( $experimentDetailsDiv, chartDataFromServer, chartDataFromServer.experimentId );
-	}
-};
+//CreateIntensityCountChartsClass.prototype.processChartDataFromAjax = function ( param ) {
+//	
+//	var objectThis = this;
+//
+//	var chartDataArrayFromServer = param.chartDataArrayFromServer.data;
+//
+////	var context = param.context;
+//
+//	for ( var index = 0; index < chartDataArrayFromServer.length; index++ ) {
+//
+//		var chartDataFromServer = chartDataArrayFromServer[ index ];
+//
+//		var $experimentDetailsDiv = this.get$experimentDetailsDivFromExperimentId( chartDataFromServer.experimentId );
+//
+//		objectThis.createIntensityCountChartActual( $experimentDetailsDiv, chartDataFromServer, chartDataFromServer.experimentId );
+//	}
+//};
 
 /////////////////////////////////////
 
