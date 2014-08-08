@@ -270,29 +270,32 @@ public class ViewProjectAction extends Action {
             
             experiments.add(pExpt);
             
-            //  Load Precursor Mass Chart Data
-            String precursorMassChartData = PreMZScanCountPlotter.getStoredMZScanCountPlotFromDB(experimentId);
-            if ( precursorMassChartData == null ) {
-            	precursorMassChartData = "";
+            if ( pExpt.isUploadSuccess() ) {
+            	
+            	//  Load Precursor Mass Chart Data
+            	String precursorMassChartData = PreMZScanCountPlotter.getStoredMZScanCountPlotFromDB(experimentId);
+            	if ( precursorMassChartData == null ) {
+            		precursorMassChartData = "";
+            	}
+            	pExpt.setPrecursorMassChartData(precursorMassChartData);
+
+
+
+            	//  Load Peak Count Chart Data
+            	String peakCountChartData = QC_Plot_PeaksPerScanPerExperiment_Plotter.getStoredPeaksPerScanPerExperimentPlotFromDB(experimentId);
+            	if ( peakCountChartData == null ) {
+            		peakCountChartData = "";
+            	}
+            	pExpt.setPeakCountChartData( peakCountChartData );
+
+
+            	//  Load Intensity Count Chart Data
+            	String intensityCountChartData = QC_Plot_IntensityPerExperiment_Plotter.getStoredIntensityPerExperimentPlotFromDB( experimentId );
+            	if ( intensityCountChartData == null ) {
+            		intensityCountChartData = "";
+            	}
+            	pExpt.setIntensityCountChartData( intensityCountChartData );
             }
-            pExpt.setPrecursorMassChartData(precursorMassChartData);
-            
-            
-            
-            //  Load Peak Count Chart Data
-            String peakCountChartData = QC_Plot_PeaksPerScanPerExperiment_Plotter.getStoredPeaksPerScanPerExperimentPlotFromDB(experimentId);
-            if ( peakCountChartData == null ) {
-            	peakCountChartData = "";
-            }
-            pExpt.setPeakCountChartData( peakCountChartData );
-            
-            
-            //  Load Intensity Count Chart Data
-            String intensityCountChartData = QC_Plot_IntensityPerExperiment_Plotter.getStoredIntensityPerExperimentPlotFromDB( experimentId );
-            if ( intensityCountChartData == null ) {
-            	intensityCountChartData = "";
-            }
-            pExpt.setIntensityCountChartData( intensityCountChartData );
             
             
             count++;
