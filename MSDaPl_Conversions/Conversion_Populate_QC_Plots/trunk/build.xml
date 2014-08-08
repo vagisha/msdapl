@@ -5,6 +5,82 @@
 	<property name="source" value="1.6"/>
 		
 	<property name="output_jar" value="Conversion_Populate_QC_Plots.jar"/>
+
+
+	
+	<property name="aa_SVN_Info_Resources__dir_name" value="aa_SVN_Info_Resources" />
+	
+	<property name="aa_Ant_Config__dir_name" value="aa_Ant_Config" />
+
+	
+	<!--  list the two paths to the SVN checkout root that will be tested. 
+			The one that is found to hold  'aa_SVN_Info_Resources' will be used\
+	-->
+	
+	<property name="path_to_SVN_checkout_root_1" 
+		value="${basedir}${file.separator}..${file.separator}..${file.separator}" />
+
+	<property name="path_to_SVN_checkout_root_2" 
+		value="${basedir}${file.separator}..${file.separator}..${file.separator}..${file.separator}" />
+
+	
+	<!--  if root SVN found, use this -->
+	<condition property="path_to_SVN_checkout_root" value="${path_to_SVN_checkout_root_1}">
+       	<available file="${path_to_SVN_checkout_root_1}${file.separator}${aa_SVN_Info_Resources__dir_name}" />
+	</condition>
+	
+	<!--  if root SVN found, use this -->
+	<condition property="path_to_SVN_checkout_root" value="${path_to_SVN_checkout_root_2}">
+       	<available file="${path_to_SVN_checkout_root_2}${file.separator}${aa_SVN_Info_Resources__dir_name}" />
+	</condition>
+	
+	
+	<fail message="ERROR: Test failed for checking path to SVN checkout Root: 'aa_SVN_Info_Resources' directory not found at SVN checkout root, check the path. paths attempted are: ${path_to_SVN_checkout_root_1} and ${path_to_SVN_checkout_root_2}">
+	    <condition>
+	        <not>
+	        	<isset property="path_to_SVN_checkout_root"/>
+	        </not>
+	    </condition>
+	</fail>
+	
+	
+	
+	
+	
+
+	<property name="path_to__aa_SVN_Info_Resources" value="${path_to_SVN_checkout_root}${file.separator}${aa_SVN_Info_Resources__dir_name}" />
+	
+	<property name="path_to__aa_Ant_Config" value="${path_to_SVN_checkout_root}${file.separator}${aa_Ant_Config__dir_name}" />
+
+	
+	<fail message="ERROR: 'aa_Ant_Config' directory not found at SVN checkout root, check the path. path: ${path_to__aa_Ant_Config}">
+	    <condition>
+	        <not>
+	        	<available file="${path_to__aa_Ant_Config}" />
+	        </not>
+	    </condition>
+	</fail>
+	
+		
+	<!-- ================================================================================== -->
+	<!--  SVN repository wide overall Ant properties in overall_build_config.properties -->
+	<!-- ================================================================================== -->
+	
+	
+	<property name="overall_build_config.properties__file_with_path" 
+		value="${path_to__aa_Ant_Config}${file.separator}overall_build_config.properties"/>
+	
+	<fail message="ERROR: 'overall_build_config.properties' file not found, check the path. filename with path: ${overall_build_config.properties__file_with_path}">
+	<condition>
+	    <not>
+	    	<available file="${overall_build_config.properties__file_with_path}" />
+	    </not>
+	</condition>
+	</fail>
+	
+	<!-- This does not fail if the file is not found -->
+	<property file="${overall_build_config.properties__file_with_path}" />
+	
 	
 	
 	<!-- ================================================================================== -->
@@ -12,7 +88,7 @@
 	<!-- ================================================================================== -->
 	
 	<property name="svn_resources.properties__file_with_path" 
-		value="${basedir}${file.separator}..${file.separator}..${file.separator}..${file.separator}aa_SVN_Info_Resources${file.separator}svn_resources.properties"/>
+		value="${path_to__aa_SVN_Info_Resources}${file.separator}svn_resources.properties"/>
 	
 	<fail message="ERROR: 'svn_resources.properties' file not found, check the path. filename with path: ${svn_resources.properties__file_with_path}">
 	    <condition>
@@ -22,29 +98,22 @@
 	    </condition>
 	</fail>
 	
+	<!-- This does not fail if the file is not found -->
 	<property file="${svn_resources.properties__file_with_path}" />
 
+	
 	<!-- ================================================================================== -->
-	<!--  SVN repository wide overall Ant properties in overall_build_config.properties -->
+	<!-- Setup classpath for svnant -->
 	<!-- ================================================================================== -->
+	<path id= "svnant.classpath" >
+		
+		<fileset dir= "${path_to__aa_SVN_Info_Resources}${file.separator}${svn.jars.dir}" >
+			<include name= "*.jar" />
+		</fileset>
+	</path>
 	
-	<!--
-	<property file="${basedir}${file.separator}..${file.separator}..${file.separator}..${file.separator}aa_Ant_Config${file.separator}overall_build_config.properties" />
-		-->
-	
-	<property name="overall_build_config.properties__file_with_path" 
-		value="${basedir}${file.separator}..${file.separator}..${file.separator}..${file.separator}aa_Ant_Config${file.separator}overall_build_config.properties"/>
-	
-	<fail message="ERROR: 'overall_build_config.properties' file not found, check the path. filename with path: ${overall_build_config.properties__file_with_path}">
-	    <condition>
-	        <not>
-	        	<available file="${overall_build_config.properties__file_with_path}" />
-	        </not>
-	    </condition>
-	</fail>
-	
-	<property file="${overall_build_config.properties__file_with_path}" />
-
+			
+				
 	
 	<!-- ================================================================================== -->
 	<!-- user defined values can be defined in build.properties -->
@@ -59,16 +128,7 @@
 	   		<arg value="-p"/>
 	  	</exec>
 	</target>
-	
-	<!-- ================================================================================== -->
-	<!-- Setup classpath for svnant -->
-	<!-- ================================================================================== -->
-	<path id= "svnant.classpath" >
-		
-		<fileset dir= "${basedir}${file.separator}..${file.separator}..${file.separator}..${file.separator}aa_SVN_Info_Resources/${svn.jars.dir}" >
-			<include name= "*.jar" />
-		</fileset>
-	</path>
+
 	
 	<!-- ================================================================================== -->
 	<!-- Test for svnant -->
