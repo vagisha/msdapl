@@ -327,6 +327,9 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
             else if(msSearch.getSearchProgram() == Program.MASCOT)
             	net = DAOFactory.instance().getMascotSearchDAO().getNumEnzymaticTermini(searchId);
     		
+            else if(msSearch.getSearchProgram() == Program.PROLUCID)
+            	net = DAOFactory.instance().getProlucidSearchDAO().getSpecificity(searchId);
+    		
             else {
             	throw new ResultGetterException("Unknown search program: "+msSearch.getSearchProgram()+". Protein inference ID: "+pinferId);
             }
