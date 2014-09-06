@@ -11,7 +11,7 @@
 <P>You've attempted to directly access a JSP page that isn't meant to be directly accessed.
 
 <P>If you feel you're getting this message in error, please
-<A HREF="mailto:<bean:message key="global.admin.email"/>">email</A> us.
+<A HREF="mailto:<bean:write name="globalAdminEmailConfigCache" property="globalAdminEmail" />">email</A> us.
 
 <P align="center"><A HREF="javascript:history.back()">Go Back</A>.
 

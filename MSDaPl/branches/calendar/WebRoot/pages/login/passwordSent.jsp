@@ -13,7 +13,7 @@
   <P>Your username and newly generated password have been successfully sent to the email address we have on file for
   that account.
   
-  <P>If you do not receive your email, or have any other problems, please <A HREF="mailto:<bean:message key="global.admin.email"/>">email</A> us.
+  <P>If you do not receive your email, or have any other problems, please <A HREF="mailto:<bean:write name="globalAdminEmailConfigCache" property="globalAdminEmail" />">email</A> us.
 
 </html:form>
 

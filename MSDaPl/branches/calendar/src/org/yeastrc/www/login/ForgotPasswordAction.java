@@ -10,13 +10,20 @@
 package org.yeastrc.www.login;
 
 import javax.servlet.http.*;
+
+import org.apache.log4j.Logger;
 import org.apache.struts.action.*;
+
+import java.sql.SQLException;
 import java.util.*;
 
 import javax.mail.*;
 import javax.mail.internet.*;
 
 import org.yeastrc.www.user.*;
+import org.yeastrc.config_web.ConfigWebDAO;
+import org.yeastrc.config_web.ConfigWebKeyConstants;
+import org.yeastrc.config_web.ForgotPasswordConfigCache;
 import org.yeastrc.project.Researcher;
 
 
@@ -25,6 +32,8 @@ import org.yeastrc.project.Researcher;
  */
 public class ForgotPasswordAction extends Action {
 
+	private static final Logger log = Logger.getLogger(ForgotPasswordAction.class);
+	
 	public ActionForward execute( ActionMapping mapping,
 								  ActionForm form,
 								  HttpServletRequest request,
@@ -92,34 +101,8 @@ public class ForgotPasswordAction extends Action {
 		
 		// Generate and send the email to the user.
         try {
-           // set the SMTP host property value
-           Properties properties = System.getProperties();
-           properties.put("mail.smtp.host", "localhost");
-
-           // create a JavaMail session
-           javax.mail.Session mSession = javax.mail.Session.getInstance(properties, null);
-
-           // create a new MIME message
-           MimeMessage message = new MimeMessage(mSession);
-
-           // set the from address
-           Address fromAddress = new InternetAddress("do_not_reply@yeastrc.org");
-           message.setFrom(fromAddress);
-
-           // set the to address
-			Address[] toAddress = InternetAddress.parse(user.getResearcher().getEmail());
-			message.setRecipients(Message.RecipientType.TO, toAddress);
-
-           // set the subject
-           message.setSubject("YRC Registration Info");
-
-           // set the message body
-			String text = "Here is your login information for http://www.yeastrc.org/ :\n\n";
-			text += "Username: " + user.getUsername() + "\n";
-			text += "Password: " + password + "\n\n";
-			text += "Thank you,\nThe Yeast Resource Center\n";
-			
-           message.setText(text);
+            		
+           MimeMessage message = createMailMessageToSend( user, password );
 
            // send the message
            Transport.send(message);
@@ -130,6 +113,7 @@ public class ForgotPasswordAction extends Action {
 			ActionErrors errors = new ActionErrors();
 			errors.add("email", new ActionMessage("error.forgotpassword.sendmailerror"));
 			saveErrors( request, errors );
+			log.warn( "ForgotPasswordAction: AddressException: user email: " + user.getResearcher().getEmail(), e );
 			return mapping.findForward("Failure");
 		}
 		catch (SendFailedException e) {
@@ -137,6 +121,7 @@ public class ForgotPasswordAction extends Action {
 			ActionErrors errors = new ActionErrors();
 			errors.add("email", new ActionMessage("error.forgotpassword.sendmailerror"));
 			saveErrors( request, errors );
+			log.error( "ForgotPasswordAction: SendFailedException: user email: " + user.getResearcher().getEmail(), e );
 			return mapping.findForward("Failure");
 		}
 		catch (MessagingException e) {
@@ -144,12 +129,71 @@ public class ForgotPasswordAction extends Action {
 			ActionErrors errors = new ActionErrors();
 			errors.add("email", new ActionMessage("error.forgotpassword.sendmailerror"));
 			saveErrors( request, errors );
+			log.error( "ForgotPasswordAction: MessagingException: user email: " + user.getResearcher().getEmail(), e );
+			return mapping.findForward("Failure");
+		}
+		catch (Exception e) {
+			// Invalid email address format
+			ActionErrors errors = new ActionErrors();
+			errors.add("email", new ActionMessage("error.forgotpassword.sendmailerror"));
+			saveErrors( request, errors );
+			log.error( "ForgotPasswordAction: Exception: user email: " + user.getResearcher().getEmail(), e );
 			return mapping.findForward("Failure");
 		}
 
 
 		// Forward them on to the happy success page!
 		return mapping.findForward("Success");
+	}
+
+	
+	
+	/**
+	 * @param user
+	 * @param password
+	 * @return
+	 * @throws AddressException
+	 * @throws MessagingException
+	 * @throws SQLException 
+	 */
+	private MimeMessage createMailMessageToSend( User user, String password )
+	throws AddressException, MessagingException, SQLException {
+		
+		ForgotPasswordConfigCache forgotPasswordConfigCache = ForgotPasswordConfigCache.getInstance();
+		
+		
+		// set the SMTP host property value
+		Properties properties = System.getProperties();
+		properties.put("mail.smtp.host", forgotPasswordConfigCache.getMailSmtpHost());
+
+		// create a JavaMail session
+		javax.mail.Session mSession = javax.mail.Session.getInstance(properties, null);
+
+		// create a new MIME message
+		MimeMessage message = new MimeMessage(mSession);
+
+		// set the from address
+		Address fromAddress = new InternetAddress( forgotPasswordConfigCache.getForgotPasswordFromEmailAddress() );
+		message.setFrom(fromAddress);
+
+		// set the to address
+		Address[] toAddress = InternetAddress.parse(user.getResearcher().getEmail());
+		message.setRecipients(Message.RecipientType.TO, toAddress);
+
+		// set the subject
+		message.setSubject( forgotPasswordConfigCache.getForgotPasswordSubject() );
+
+		// set the message body
+		String text = forgotPasswordConfigCache.getForgotPasswordMessageBodyPrefix()
+			+ "\n\n"
+		 	+ "Username: " + user.getUsername() + "\n"
+		 	+ "Password: " + password + "\n\n"
+		 	+ forgotPasswordConfigCache.getForgotPasswordMessageBodyPostfix();
+
+		message.setText(text);
+		
+		
+		return message;
 	}
 	
 }

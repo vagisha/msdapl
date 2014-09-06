@@ -12,13 +12,12 @@
 
 <html:form action="sendPassword" method="POST">
   
-  <P>To retrieve your password, simply supply your username or email address below.  If either is found
+  <P>To have a <I>newly generated password</I> emailed to you, simply supply your username or email address below.  If either is found
   in the database, your username and <I>newly generated password</I> will be sent to the email address we have on file for
   that user.
   
   <P>If you can not remember your username or email address with which you registered, please
-   <A HREF="mailto:<bean:message key="global.admin.email"/>">email</A> us.
-
+   <A HREF="mailto:<bean:write name="globalAdminEmailConfigCache" property="globalAdminEmail" />">email</A> us.
     <CENTER>
 	 <TABLE BORDER="0">
 	  <TR>

@@ -31,7 +31,15 @@
 
 </html:form>
 
-<P align="center">Forgot your password? <a href="<yrcwww:link path='pages/login/forgotPassword.jsp'/>">Click here.</a>
+
+<logic:equal name="forgotPasswordConfigCache" property="forgotPasswordConfigInitialized" value="true">
+
+  <logic:equal name="forgotPasswordConfigCache" property="forgotPasswordConfigured" value="true">
+
+	<P align="center">Forgot your password? <a href="<yrcwww:link path='pages/login/forgotPassword.jsp'/>">Click here.</a>
+
+  </logic:equal>
+</logic:equal>
 
 <P align="center">Not registered? <html:link action="viewRegister.do">Click here.</html:link>
 

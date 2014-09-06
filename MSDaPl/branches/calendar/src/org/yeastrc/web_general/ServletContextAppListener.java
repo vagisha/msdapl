@@ -4,6 +4,8 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.config_web.ForgotPasswordConfigCache;
+import org.yeastrc.config_web.GlobalAdminEmailConfigCache;
 import org.yeastrc.constants_web.MainWebConstants;
 
 
@@ -32,10 +34,36 @@ public class ServletContextAppListener  extends HttpServlet implements ServletCo
 		CurrentContext.setCurrentWebAppContext( contextPath );
 
 
-		log.warn( "INFO:  !!!!!!!!!!!!!!!   Start up of web app  'MSDaPl'  !!!!!!!!!!!!!!!!!!!! " );
+		log.warn( "INFO:  !!!!!!!!!!!!!!!   web app  'MSDaPl'  Starting Up  !!!!!!!!!!!!!!!!!!!! " );
 
 		log.warn( "INFO: Application context values set.  Key = " + MainWebConstants.APP_CONTEXT_CONTEXT_PATH + ": value = " + contextPath
 				+ "" );
+
+		
+		try {
+
+			ForgotPasswordConfigCache.getInstance().initIfNotInitialized();
+
+			ForgotPasswordConfigCache forgotPasswordConfigCache = ForgotPasswordConfigCache.getInstance();
+
+			forgotPasswordConfigCache.initIfNotInitialized();
+
+			context.setAttribute( MainWebConstants.FORGOT_PASSWORD_CONFIG_CACHE_OBJECT , forgotPasswordConfigCache );
+
+			GlobalAdminEmailConfigCache globalAdminEmailConfigCache = GlobalAdminEmailConfigCache.getInstance();
+
+			globalAdminEmailConfigCache.initIfNotInitialized();
+
+			context.setAttribute( MainWebConstants.GLOBAL_ADMIN_EMAIL_CONFIG_CACHE_OBJECT, globalAdminEmailConfigCache );
+			
+		} catch ( RuntimeException ex ) {
+			
+			log.error("Error in initializing MSDaPl Web App: Exception: " + ex.toString(), ex );
+			
+			throw ex;
+		}
+
+		log.warn( "INFO:  !!!!!!!!!!!!!!!   web app  'MSDaPl' Finished Starting Up  !!!!!!!!!!!!!!!!!!!! " );
 
 
 	}
