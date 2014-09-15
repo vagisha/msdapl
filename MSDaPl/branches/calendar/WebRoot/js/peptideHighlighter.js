@@ -30,7 +30,10 @@
 	         
 	        	  var o = options;  
                   //Assign current element to variable; should be a <span>  
-                  var obj = $(this);  
+                  var obj = $(this);
+                  
+                  //console.log( obj.html() );
+                  
 	           	  var text = obj.text();
 	           	  
 	           	  //console.log(text);
@@ -52,7 +55,7 @@
 	           	  	      var tooltip = label; // text within the square brackets will be used as the tooltip
 	           	  	      
 	           	  	      // remove a leading '+' or a '-' from the label
-	           	  	      if(label.match("^\\+") || label.match("^\\-"))
+	           	  	      while(label.match("^\\+") || label.match("^\\-"))
 	           	  	    	  label = label.substring(1,label.length);
 	           	  	      
 	           	  	      
@@ -70,8 +73,11 @@
 	           	  	      // If we still don't have the color use a default color
 	           	  	      if(!h_color) {
 	           	  	    	  //console.log("getting colors");
-	           	  	    	  h_color = defaultColors[label % defaultColors.length].highlightColor;
-	           	  	    	  t_color = defaultColors[label % defaultColors.length].textColor;
+	           	  	    	  if( defaultColors[( label * label.length ) % defaultColors.length] === undefined ) {
+	           	  	    		  var foo = 'bar';
+	           	  	    	  }
+	           	  	    	  h_color = defaultColors[( label * label.length ) % defaultColors.length].highlightColor;
+	           	  	    	  t_color = defaultColors[( label * label.length ) % defaultColors.length].textColor;
 	           	  	      }
 	           	  	      
 	           	  	      

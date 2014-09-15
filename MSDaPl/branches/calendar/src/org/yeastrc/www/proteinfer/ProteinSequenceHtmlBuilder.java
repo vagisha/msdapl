@@ -96,7 +96,7 @@ public class ProteinSequenceHtmlBuilder {
         		if(modificationMass[i] > 0)
         			retStr+= "[+"+modificationMass[i]+"]";
         		else
-        			retStr+= "[-"+modificationMass[i]+"]";
+        			retStr+= "["+modificationMass[i]+"]";
         		retStr += "</span>";
         	}
         	
