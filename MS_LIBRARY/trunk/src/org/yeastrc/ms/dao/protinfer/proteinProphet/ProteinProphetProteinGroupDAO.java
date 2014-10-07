@@ -6,7 +6,9 @@
  */
 package org.yeastrc.ms.dao.protinfer.proteinProphet;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetGroup;
@@ -34,5 +36,13 @@ public class ProteinProphetProteinGroupDAO extends BaseSqlMapDAO {
     
     public List<Integer> loadProphetGroupIds(int pinferId) {
     	return queryForList(sqlMapNameSpace+".selectGroupIds", pinferId);
+    }
+    
+    public int getProphetGroupCountForProbability(int pinferId, double prophetGroupProbability)
+    {
+    	Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put("pinferId", pinferId);
+        map.put("minProbability", prophetGroupProbability);
+        return (Integer)queryForObject(sqlMapNameSpace+".prophetGroupCountByGroupProbability", map);
     }
 }

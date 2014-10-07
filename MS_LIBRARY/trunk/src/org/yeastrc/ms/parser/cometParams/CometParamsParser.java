@@ -26,7 +26,7 @@ public class CometParamsParser extends SequestParamsParser {
     private String sampleEnzymeCode;
 
     static final Pattern paramLinePattern = Pattern.compile("^([\\S&&[^=]]+)\\s*=\\s*([^#]*)\\s*#?(.*)");
-    static final Pattern variableModParamPattern = Pattern.compile("^variable_mod(\\d)$");
+    static final Pattern variableModParamPattern = Pattern.compile("^variable_mod(\\d+)$");
     
     public Program getSearchProgram() {
         return Program.COMET;
@@ -73,7 +73,7 @@ public class CometParamsParser extends SequestParamsParser {
     	 * 		e.g. 79.966331 STY 0 3
     	 */
     	final String[] tokens = modString.split("\\s+");
-    	if(tokens.length != 4)
+    	if(tokens.length < 4)
     	{
     		throw new DataProviderException(getCurrentLineNumber(), "Error parsing dynamic residue modification string", getCurrentLine());
     	}

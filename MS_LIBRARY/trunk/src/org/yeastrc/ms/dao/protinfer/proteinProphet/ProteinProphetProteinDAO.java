@@ -1003,14 +1003,6 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         }
         return protGrpmap;
     }
-
-    public int getProphetGroupCountForProbability(int pinferId, double prophetGroupProbability)
-    {
-    	Map<String, Object> map = new HashMap<String, Object>(2);
-        map.put("pinferId", pinferId);
-        map.put("minProbability", prophetGroupProbability);
-        return (Integer)queryForObject(sqlMapNameSpace+".prophetGroupCountByGroupProbability", map);
-    }
     
     public int getIndistinguishableGroupCountForProbability(int pinferId, double prophetGroupProbability)
     {

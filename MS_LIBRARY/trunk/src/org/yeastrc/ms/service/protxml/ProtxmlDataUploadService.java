@@ -322,6 +322,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     private void saveStats(int piRunId) {
     	
     	// Extract information from the protein inference tables
+    	ProteinProphetProteinGroupDAO prophetGroupDao = ProteinferDAOFactory.instance().getProteinProphetProteinGroupDao();
 		ProteinProphetProteinDAO prophetProtDao = ProteinferDAOFactory.instance().getProteinProphetProteinDao();
         // ProteinferPeptideDAO peptDao = ProteinferDAOFactory.instance().getProteinferPeptideDao();
         ProteinferSpectrumMatchDAO specDao = ProteinferDAOFactory.instance().getProteinferSpectrumMatchDao();
@@ -331,7 +332,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         ProteinProphetROC roc = rocDao.loadRoc(piRunId);
         double minProbability = roc.getMinProbabilityForError(roc.getClosestError(0.01)); // get the probability for a 1% error rate.
         
-        int prophetGrpCount = prophetProtDao.getProphetGroupCountForProbability(piRunId, minProbability);
+        int prophetGrpCount = prophetGroupDao.getProphetGroupCountForProbability(piRunId, minProbability);
         int iGroupCount = prophetProtDao.getIndistinguishableGroupCountForProbability(piRunId, minProbability);
         int proteinCount = prophetProtDao.getProteinCountForProbability(piRunId, minProbability);
         int peptSeqCount = ppPeptDao.getUniquePeptideSequenceCountForProphetGroupProbability(piRunId, minProbability);

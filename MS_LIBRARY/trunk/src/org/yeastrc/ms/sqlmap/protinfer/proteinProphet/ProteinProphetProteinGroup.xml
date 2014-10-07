@@ -26,6 +26,13 @@
     	SELECT id FROM ProteinProphetProteinGroup WHERE piRunID = #id#
     </select>
     
+    <select id="prophetGroupCountByGroupProbability" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT COUNT(*)
+    	FROM ProteinProphetProteinGroup
+    	WHERE piRunID=#pinferId#
+    	AND probability >= #minProbability#
+    </select>
+    
     <insert id="insert" parameterMap="groupParam">
     	INSERT INTO ProteinProphetProteinGroup (
     	piRunID,
