@@ -64,6 +64,7 @@
     	SELECT DISTINCT(nrseqProteinID) FROM msProteinInferProtein WHERE piRunID = #id#
     </select>
     
+    <!-- 
     <select id="peptidesForProteinInRuns" resultClass="String" parameterClass="java.util.Map">
     	SELECT DISTINCT(sequence)
     	FROM msProteinInferPeptide AS pept, 
@@ -74,6 +75,15 @@
     	AND pept.piRunID = prot.piRunID
     	AND prot.id = m.piProteinID 
     	AND m.piPeptideID = pept.id
+    </select>
+    -->
+    
+    <select id="peptidesForProteinInRuns" resultClass="String" parameterClass="java.util.Map">
+		SELECT DISTINCT (sequence) FROM
+		msProteinInferPeptide AS pept INNER JOIN
+		msProteinInferProteinPeptideMatch AS m ON pept.id = m.piPeptideID INNER JOIN
+		msProteinInferProtein AS prot ON m.piProteinID = prot.id
+		WHERE prot.nrseqProteinID = #nrseqId# AND prot.piRunID IN $pinferIds$
     </select>
     
     <select id="proteinsForPeptideInRun" resultClass="Integer" parameterClass="java.util.Map">
