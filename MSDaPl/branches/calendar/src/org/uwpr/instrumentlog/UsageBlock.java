@@ -137,12 +137,4 @@ public class UsageBlock extends UsageBlockBase {
 	public UsageBlock newBlock() {
         return new UsageBlock();
     }
-	
-	public BigDecimal getFee()
-	{
-		BigDecimal fee = rate.multiply(new BigDecimal(getNumHours()));
-		if(CostCenterConstants.ADD_SETUP_COST)
-			fee = fee.add(CostCenterConstants.SETUP_COST);
-		return fee;
-	}
 }

@@ -111,7 +111,7 @@ public class InstrumentUsageDAO {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
-        StringBuilder sql = new StringBuilder("Update InstrumentUsage SET");
+        StringBuilder sql = new StringBuilder("Update instrumentUsage SET");
         sql.append(" startDate = ?");
         sql.append(", endDate = ?");
         sql.append(", updatedBy = ?");

@@ -28,6 +28,7 @@ import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.ProjectsSearcher;
 import org.yeastrc.project.Researcher;
 import org.yeastrc.project.payment.PaymentMethod;
+import org.yeastrc.project.Affiliation;
 
 /**
  * 
@@ -394,7 +395,7 @@ public class BillingInformationExporter {
 		InstrumentRate rate = InstrumentRateDAO.getInstance().getInstrumentRate(block.getInstrumentRateID());
 		BigDecimal fee = rate.getRate().multiply(new BigDecimal(block.getNumHours()));
 		if(CostCenterConstants.ADD_SETUP_COST)
-			fee = fee.add(CostCenterConstants.SETUP_COST);
+			fee = fee.add(getSetupCost(block));
 
 		// get the name of the time block
 		TimeBlock timeBlock = rate.getTimeBlock();
@@ -417,6 +418,20 @@ public class BillingInformationExporter {
 			return null;
 		else
 			return buffer;
+	}
+
+	private BigDecimal getSetupCost(UsageBlockBase block) throws SQLException {
+		if(block == null){
+			return BigDecimal.ZERO;
+		}
+		MsInstrument instrument = MsInstrumentUtils.instance().getMsInstrument(block.getInstrumentID());
+		if(instrument != null && instrument.getName().equals("Bravo"))
+		{
+			return BigDecimal.ZERO;
+		}
+		InstrumentRate rate = InstrumentRateDAO.getInstance().getInstrumentRate(block.getInstrumentRateID());
+		boolean internal = rate.getRateType().getName().equals(Affiliation.internal.getName());
+		return internal ? CostCenterConstants.SETUP_COST_INTERNAL : CostCenterConstants.SETUP_COST_EXTERNAL;
 	}
 	
 	// Get the details for a block and payment method combination

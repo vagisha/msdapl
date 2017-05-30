@@ -281,7 +281,6 @@ public class JSONInstrumentUsageGetter {
 		event.put("title", String.valueOf(blocks.get(0).getProjectID())
 				   + " " + getResearcherName(blocks.get(0).getResearcherID()));
 		event.put("instrumentId", Integer.valueOf(blocks.get(0).getInstrumentID()));
-		event.put("title", String.valueOf(blocks.get(0).getProjectID()));
 		event.put("start", sd.toString());
 		event.put("end", ed.toString());
 		event.put("allDay", Boolean.FALSE);

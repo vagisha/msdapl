@@ -7,7 +7,10 @@ import java.math.BigDecimal;
 
 import org.uwpr.costcenter.CostCenterConstants;
 import org.uwpr.costcenter.InstrumentRate;
+import org.uwpr.instrumentlog.MsInstrument;
+import org.uwpr.instrumentlog.MsInstrumentUtils;
 import org.uwpr.instrumentlog.UsageBlockBase;
+import org.yeastrc.project.Affiliation;
 
 /**
  * UsageBlockBaseWithRate.java
@@ -38,8 +41,19 @@ public class UsageBlockBaseWithRate extends UsageBlockBase {
 	public BigDecimal getFee()
 	{
 		BigDecimal fee = getRate().getRate().multiply(new BigDecimal(getNumHours()));
+
+		MsInstrument instrument = MsInstrumentUtils.instance().getMsInstrument(getInstrumentID());
+		if(instrument != null && instrument.getName().equals("Bravo"))
+		{
+			// No setup cost for the bravo
+			return fee;
+		}
 		if(CostCenterConstants.ADD_SETUP_COST)
-			fee = fee.add(CostCenterConstants.SETUP_COST);
+		{
+			boolean external = rate.getRateType().getName().equals(Affiliation.external.getName());
+			fee = external? fee.add(CostCenterConstants.SETUP_COST_EXTERNAL) :
+			                fee.add(CostCenterConstants.SETUP_COST_INTERNAL);
+		}
 		return fee;
 	}
 }

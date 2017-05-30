@@ -232,7 +232,7 @@ function getTotalCost() {
 				</td>
 				<td><bean:write name="usageBlock" property="startDateFormated"/></td>
 				<td><bean:write name="usageBlock" property="endDateFormated"/></td>
-				<td align="right"><span class="costColumn"><bean:write name="usageBlock" property="fee"/></span></td>
+				<td align="right"><span class="costColumn"><bean:write name="usageBlock" property="rate"/></span></td>
 				<td>
 					<logic:empty name="usageBlock" property="invoiceDate">
 					-

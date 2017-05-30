@@ -22,6 +22,7 @@ import org.uwpr.instrumentlog.InstrumentUsagePayment;
 import org.uwpr.instrumentlog.MsInstrument;
 import org.uwpr.instrumentlog.MsInstrumentUtils;
 import org.uwpr.instrumentlog.UsageBlockBase;
+import org.yeastrc.project.Affiliation;
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.Researcher;
@@ -318,9 +319,10 @@ public class BillingInformationExcelExporter extends BillingInformationExporter 
 		BigDecimal percent = block.getBillingPercent();
 		
 		BigDecimal finalCost = block.getCost();
+		BigDecimal setupCost = getSetupCost(block);
 		if(CostCenterConstants.ADD_SETUP_COST)
 		{
-			finalCost = finalCost.add(CostCenterConstants.SETUP_COST);
+			finalCost = finalCost.add(setupCost);
 		}
 		
 		BigDecimal billedCost = getBilledCost(finalCost, percent, block.getStartDate(), block.getEndDate());
@@ -359,7 +361,7 @@ public class BillingInformationExcelExporter extends BillingInformationExporter 
 		
 		if(CostCenterConstants.ADD_SETUP_COST)
 		{
-			row.createCell(cellnum++).setCellValue(CostCenterConstants.SETUP_COST.toString());
+			row.createCell(cellnum++).setCellValue(setupCost.toString());
 		}
 		
 		row.createCell(cellnum++).setCellValue(finalCost.toString());
@@ -403,6 +405,20 @@ public class BillingInformationExcelExporter extends BillingInformationExporter 
 		row.createCell(cellnum++).setCellValue(paymentMethod.getContactPhone());
 		
 		return true;
+	}
+
+	private BigDecimal getSetupCost(UsageBlockForBilling block)
+	{
+		if(block == null){
+			return BigDecimal.ZERO;
+		}
+		MsInstrument instrument = block.getInstrument();
+		if(instrument != null && instrument.getName().equals("Bravo"))
+		{
+			return BigDecimal.ZERO;
+		}
+		Affiliation affiliation = block.getProject().getAffiliation();
+		return affiliation.equals(Affiliation.internal) ? CostCenterConstants.SETUP_COST_INTERNAL : CostCenterConstants.SETUP_COST_EXTERNAL;
 	}
 	
 }
