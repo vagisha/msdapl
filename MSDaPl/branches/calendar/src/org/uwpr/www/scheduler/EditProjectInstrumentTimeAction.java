@@ -219,6 +219,7 @@ public class EditProjectInstrumentTimeAction extends Action {
         usageBlock.setStartDate(rangeStartDate);
         usageBlock.setEndDate(rangeEndDate);
         usageBlock.setRate(rate);
+        usageBlock.setNotes(((EditProjectInstrumentTimeForm) form).getNotes());
             
             
         allBlocks.add(usageBlock);

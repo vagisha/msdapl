@@ -9,6 +9,7 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
@@ -35,6 +36,7 @@ public class EditProjectInstrumentTimeForm extends ActionForm{
 	private String endTime;
 	private Date startDateDate;
 	private Date endDateDate;
+	private String notes;
 	
 	/** 
 	 * Method validate
@@ -65,6 +67,11 @@ public class EditProjectInstrumentTimeForm extends ActionForm{
 			if(!endDateDate.after(startDateDate)) {
 				errors.add("costcenter", new ActionMessage("error.costcenter.invaliddata", "End date has to be after start date."));
 			}
+		}
+
+		if(StringUtils.isBlank(notes))
+		{
+			errors.add("costcenter", new ActionMessage("error.costcenter.invaliddata", "Please enter a value in the 'Data requested by' field."));
 		}
 		
 		return errors;
@@ -172,5 +179,13 @@ public class EditProjectInstrumentTimeForm extends ActionForm{
 
 	public void setUpdateDate(String updateDate) {
 		this.updateDate = updateDate;
+	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
 }

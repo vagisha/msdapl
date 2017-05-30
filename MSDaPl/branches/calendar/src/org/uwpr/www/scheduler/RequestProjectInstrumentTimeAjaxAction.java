@@ -193,6 +193,8 @@ public class RequestProjectInstrumentTimeAjaxAction extends Action{
     				" and timeBlockId: "+timeBlock.getId()+" and rateTypeId: "+rateType.getId()+" in request");
     	}
 
+    	String requestedBy = request.getParameter("requestedBy");
+
     	List<UsageBlockBaseWithRate> allBlocks = new ArrayList<UsageBlockBaseWithRate>();
     	
     	UsageBlockBaseWithRate usageBlock = new UsageBlockBaseWithRate();
@@ -203,6 +205,7 @@ public class RequestProjectInstrumentTimeAjaxAction extends Action{
     	usageBlock.setStartDate(rangeStartDate);
     	usageBlock.setEndDate(rangeEndDate);
     	usageBlock.setRate(rate);
+    	usageBlock.setNotes(requestedBy);
 
     	allBlocks.add(usageBlock);
             	

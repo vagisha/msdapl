@@ -412,7 +412,12 @@
 	   			div += '&nbsp; &nbsp; &nbsp; End Date: ';
 	   			div += '<input type="text" class="uwpr_datepicker" id="uwpr_datepicker_repeat"></input>'
 	   			div += '</div>';
-	   			
+
+	   			// 'Data requested by' field
+                div += '<div style="margin: 10px;">';
+                div += 'Data requested by: <input type="text" id="data_requested_by_text"></input>'
+                div += '</div>';
+
 	   			// Add and Cancel buttons
 	   			div += '<div style="text-align: center; font-size:12px; margin-top:20px;">';
 	   			// Add button
@@ -461,7 +466,15 @@
 	       				return;
 	       			}
 	       			
-	       			
+	       			var requestedBy = $("#data_requested_by_text").val();
+	       			requestedBy = requestedBy ? requestedBy.trim() : "";
+					if(requestedBy.length === 0)
+					{
+                        $('#eventBubble').remove();
+                        showErrorDialog("Please enter a value in the 'Data requested by' field.");
+                        return;
+					}
+
 	       			// get the selected start date and time
 	       			var selectedStartDate = $("#uwpr_datepicker_start").val();
 	       			var selectedStartTime = $("#startTimeSelectorList option:selected").val();
@@ -489,7 +502,8 @@
 	       				       "endDate": selectedEndDate,
 	       				       "endTime": selectedEndTime,
 	       				       "repeatdaily": repeat,
-	       				       "repeatenddate":$("#uwpr_datepicker_repeat").val()
+	       				       "repeatenddate":$("#uwpr_datepicker_repeat").val(),
+							   "requestedBy": requestedBy
 	       				       },
 	       				       
 	       				beforeSend: function(jqXHR, settings) {

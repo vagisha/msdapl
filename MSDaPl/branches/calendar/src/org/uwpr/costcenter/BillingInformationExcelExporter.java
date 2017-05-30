@@ -213,6 +213,7 @@ public class BillingInformationExcelExporter extends BillingInformationExporter 
 		row.createCell(cellnum++).setCellValue("Lab_Director");
 		row.createCell(cellnum++).setCellValue("Researcher");
 		row.createCell(cellnum++).setCellValue("Instrument");
+		row.createCell(cellnum++).setCellValue("RequestedBy");
 		row.createCell(cellnum++).setCellValue("UsageBlockID");
 		row.createCell(cellnum++).setCellValue("Start");
 		row.createCell(cellnum++).setCellValue("End");
@@ -342,6 +343,10 @@ public class BillingInformationExcelExporter extends BillingInformationExporter 
 		row.createCell(cellnum++).setCellValue(block.getUser().getLastName());
 
 		row.createCell(cellnum++).setCellValue(block.getInstrument().getName());
+
+		// NOTE: Since we are not exporting summarized results for MacCoss MSDaPl, UsageBlockForBilling only has one UsageBlockBase.
+		//       This code will have to be updated if we ever have to export summarized results.
+		row.createCell(cellnum++).setCellValue(block.getBlocks().get(0).getNotes());
 		
 //		if(!summarize)
 		row.createCell(cellnum++).setCellValue(block.getFirstUsageBlockId());

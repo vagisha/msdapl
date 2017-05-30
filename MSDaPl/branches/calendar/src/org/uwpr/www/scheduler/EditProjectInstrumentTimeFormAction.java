@@ -249,6 +249,7 @@ public class EditProjectInstrumentTimeFormAction extends Action {
         editForm.setInstrumentId(instrumentId);
         editForm.setInstrumentName(instrument.getName());
         editForm.setUsageBlockIdsToEdit(usageBlockIdString);
+        editForm.setNotes(blocksToDelete.get(0).getNotes()); // WARN: Notes field from other blocks, if any, will be overwritten.
         
         // TODO Multiple creators??
         editForm.setCreatorId(creator.getID());

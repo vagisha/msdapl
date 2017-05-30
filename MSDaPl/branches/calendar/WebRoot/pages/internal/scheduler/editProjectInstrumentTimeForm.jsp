@@ -49,7 +49,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td><b>Created By: </b></td>
+	<td><b>Created by: </b></td>
 	<td>
 		<yrcwww:researcherLink researcherId="<%=editForm.getCreatorId()%>"/>
 		<html:hidden name="editInstrumentTimeForm" property="creatorId" />
@@ -57,7 +57,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td><b>Created On: </b></td>
+	<td><b>Created on: </b></td>
 	<td>
 		<bean:write name="editInstrumentTimeForm" property="createDate" />
 		<html:hidden name="editInstrumentTimeForm" property="createDate" />
@@ -65,10 +65,18 @@
 	<td></td>
 </tr>
 
+<tr>
+	<td><b>Data requested by: </b></td>
+	<td>
+		<html:text name="editInstrumentTimeForm" property="notes" />
+	</td>
+	<td></td>
+</tr>
+
 
 <logic:notEqual name="editInstrumentTimeForm" property="updaterId" value="0">
 <tr>
-	<td><b>Updated By: </b></td>
+	<td><b>Updated by: </b></td>
 	<td>
 		<yrcwww:researcherLink researcherId="<%=editForm.getUpdaterId()%>"/>
 		<html:hidden name="editInstrumentTimeForm" property="updaterId" />
@@ -76,7 +84,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td><b>Updated On: </b></td>
+	<td><b>Updated on: </b></td>
 	<td>
 		<bean:write name="editInstrumentTimeForm" property="updateDate" />
 		<html:hidden name="editInstrumentTimeForm" property="updateDate" />
