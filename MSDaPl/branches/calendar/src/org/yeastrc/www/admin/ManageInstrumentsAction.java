@@ -17,8 +17,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.domain.general.MsInstrument;
+import org.uwpr.instrumentlog.MsInstrument;
+import org.uwpr.instrumentlog.MsInstrumentUtils;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -53,7 +53,7 @@ public class ManageInstrumentsAction extends Action {
         }
 
         // Set up the list of instruments in the request
-        List<MsInstrument> instruments = DAOFactory.instance().getInstrumentDAO().loadAllInstruments();
+        List<MsInstrument> instruments = MsInstrumentUtils.instance().getMsInstruments();
         request.setAttribute("instrumentList", instruments);
         
 

@@ -15,9 +15,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.general.MsInstrumentDAO;
-import org.yeastrc.ms.domain.general.MsInstrument;
+import org.uwpr.instrumentlog.MsInstrument;
+import org.uwpr.instrumentlog.MsInstrumentUtils;
 import org.yeastrc.ms.domain.general.impl.InstrumentBean;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
@@ -53,11 +52,18 @@ public class SaveInstrumentAction extends Action {
         }
 
         AddInstrumentForm myForm = (AddInstrumentForm) form;
-        MsInstrumentDAO instrDao = DAOFactory.instance().getInstrumentDAO();
-        
+
+        MsInstrumentUtils instrUtils = MsInstrumentUtils.instance();
+        String color = myForm.getColor();
+        if(color != null && color.startsWith("#"))
+        {
+            color = color.substring(1); // Remove # from
+        }
+
+        MsInstrument instrument;
         // updating an existing instrument
         if(myForm.getId() > 0) {
-            MsInstrument instrument = instrDao.load(myForm.getId());
+            instrument = MsInstrumentUtils.instance().getMsInstrument(myForm.getId());
             if(instrument == null) {
                 ActionErrors errors = new ActionErrors();
                 errors.add(ActionErrors.GLOBAL_ERROR, 
@@ -66,21 +72,18 @@ public class SaveInstrumentAction extends Action {
                 saveErrors( request, errors );
                 return mapping.findForward("Failure");
             }
-            else {
-                instrument.setName(myForm.getName());
-                instrument.setDescription(myForm.getDescription());
-                instrDao.updateInstrument(instrument);
-            }
         }
-        
         // adding a new instrument
         else {
-            InstrumentBean instrument = new InstrumentBean();
-            instrument.setName(myForm.getName());
-            instrument.setDescription(myForm.getDescription());
-            instrDao.saveInstrument(instrument);
+            instrument = new MsInstrument();
         }
-        
+
+        instrument.setName(myForm.getName());
+        instrument.setDescription(myForm.getDescription());
+        instrument.setColor(color);
+        instrument.setActive(myForm.isActive());
+        instrUtils.saveInstrument(instrument);
+
         // Kick it to the view page
         return mapping.findForward("Success");
     }

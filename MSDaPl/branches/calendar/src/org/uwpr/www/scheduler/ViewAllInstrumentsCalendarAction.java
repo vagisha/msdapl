@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.comparators.ReverseComparator;
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
@@ -73,7 +74,8 @@ public class ViewAllInstrumentsCalendarAction extends Action {
         	item.setName(instrument.getName());
         	
         	item.setActive(instrument.isActive());
-        	item.setColor(InstrumentColors.getColor(instrument.getID()));
+			String color = instrument.getColor();
+			item.setColor(StringUtils.isBlank(color) ? InstrumentColors.getColor(instrument.getID()) : color);
         	instrumentNameColors.add(item);
         }
         request.setAttribute("instruments", instrumentNameColors);

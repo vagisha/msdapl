@@ -618,13 +618,16 @@
 	  <forward name="Success" path="/pages/admin/addInstrument.jsp" redirect="false"/>
 	  <forward name="Failure" path="/manageInstruments.do" redirect="false"/>
 	</action>
-	
+
 	<action
-	  path="/editInstrument"
-	  type="org.yeastrc.www.admin.EditInstrumentAction"
-	 >
-	  <forward name="Success" path="/pages/admin/addInstrument.jsp" redirect="false"/>
-	  <forward name="Failure" path="/manageInstruments.do" redirect="false"/>
+		path="/editInstrument"
+		name="addInstrumentForm"
+		input="/pages/admin/addInstrument.jsp"
+		type="org.yeastrc.www.admin.EditInstrumentAction"
+		validate="false"
+	>
+			<forward name="Success" path="/pages/admin/addInstrument.jsp" redirect="false"/>
+			<forward name="Failure" path="/manageInstruments.do" redirect="false"/>
 	</action>
 	
 	<action

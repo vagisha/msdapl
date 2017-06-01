@@ -15,9 +15,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.general.MsInstrumentDAO;
-import org.yeastrc.ms.domain.general.MsInstrument;
+import org.uwpr.instrumentlog.InstrumentColors;
+import org.uwpr.instrumentlog.MsInstrument;
+import org.uwpr.instrumentlog.MsInstrumentUtils;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -64,8 +64,7 @@ public class EditInstrumentAction extends Action {
             return mapping.findForward("Failure");
         }
         
-        MsInstrumentDAO instrDao = DAOFactory.instance().getInstrumentDAO();
-        MsInstrument instrument = instrDao.load(instrumentId);
+        MsInstrument instrument = MsInstrumentUtils.instance().getMsInstrument(instrumentId);
         if(instrument == null) {
             ActionErrors errors = new ActionErrors();
             errors.add(ActionErrors.GLOBAL_ERROR, 
@@ -74,11 +73,14 @@ public class EditInstrumentAction extends Action {
             saveErrors( request, errors );
             return mapping.findForward("Failure");
         }
-        
+
         AddInstrumentForm myForm = new AddInstrumentForm();
-        myForm.setId(instrument.getId());
-        myForm.setName(instrument.getName());
+        myForm.setId(instrument.getID());
+        myForm.setName(instrument.getNameOnly());
         myForm.setDescription(instrument.getDescription());
+        myForm.setActive(instrument.isActive());
+        String color = instrument.getHexColor(); // Colors stored in the database do not start with #.
+        myForm.setColor(color == null ? InstrumentColors.getColor(instrument.getID()) : color);
         request.setAttribute("addInstrumentForm", myForm);
         // Kick it to the view page
         return mapping.findForward("Success");

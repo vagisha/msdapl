@@ -74,7 +74,8 @@ public class MsInstrumentUtils {
 				String name = rs.getString("name");
 				String desc = rs.getString("description");
 				boolean active = rs.getBoolean("active");
-				list.add(new MsInstrument(id, name, desc, active));
+				String color = rs.getString("color");
+				list.add(new MsInstrument(id, name, desc, active, color));
 			}
 
 		} catch (SQLException e) {
@@ -138,7 +139,8 @@ public class MsInstrumentUtils {
 				String name = rs.getString("name");
 				String desc = rs.getString("description");
 				boolean active = rs.getBoolean("active");
-				return new MsInstrument(id, name, desc, active);
+				String color = rs.getString("color");
+				return new MsInstrument(id, name, desc, active, color);
 			}
 
 		} catch (SQLException e) {
@@ -412,5 +414,78 @@ public class MsInstrumentUtils {
 		return buf.toString();
 	}
 
+	public void saveInstrument(MsInstrument instrument)
+	{
+		if(instrument.getID() != 0)
+		{
+			updateInstrument(instrument);
+			return;
+		}
+
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+
+		String sql = "INSERT INTO " + getInstrumentsTableSQL() + " (name, description, active, color) VALUES(?,?,?,?)";
+		try
+		{
+			conn = getConnection();
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, instrument.getNameOnly());
+			stmt.setString(2, instrument.getDescription());
+			stmt.setInt(3, instrument.isActive() ? 1 : 0);
+			stmt.setString(4, instrument.getColor());
+			stmt.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		finally
+		{
+			if (rs != null) {try { rs.close(); } catch (SQLException ignored) {}}
+			if (stmt != null) {try { stmt.close(); } catch (SQLException ignored) {}}
+			if (conn != null) {try { conn.close(); } catch (SQLException ignored) {}}
+
+		}
+	}
+
+	private void updateInstrument(MsInstrument instrument)
+	{
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+
+		String sql = "UPDATE " + getInstrumentsTableSQL() + " SET name=?, description=?, active=?, color=? WHERE id=?";
+		try
+		{
+			conn = getConnection();
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, instrument.getNameOnly());
+			stmt.setString(2, instrument.getDescription());
+			stmt.setInt(3, instrument.isActive() ? 1 : 0);
+			stmt.setString(4, instrument.getColor());
+			stmt.setInt(5, instrument.getID());
+			stmt.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		finally
+		{
+			if (rs != null) {try { rs.close(); } catch (SQLException ignored) {}}
+			if (stmt != null) {try { stmt.close(); } catch (SQLException ignored) {}}
+			if (conn != null) {try { conn.close(); } catch (SQLException ignored) {}}
+
+		}
+	}
+
+	private static String getInstrumentsTableSQL()
+	{
+		return DBConnectionManager.MS_DATA + ".msInstrument";
+	}
 }
 

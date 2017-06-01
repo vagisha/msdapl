@@ -130,6 +130,11 @@ public class JSONInstrumentUsageGetter {
 		//Date endDate = DateUtils.getDate(DateUtils.getDaysInMonth(month, year), month, year);
 		
 		String instrumentColor = InstrumentColors.getColor(instrumentId);
+		MsInstrument instrument = MsInstrumentUtils.instance().getMsInstrument(instrumentId);
+		if(instrument != null && !StringUtils.isBlank(instrument.getColor()))
+		{
+			instrumentColor = instrument.getColor();
+		}
 		instrumentColor = "#"+instrumentColor;
 		
 		List<UsageBlock> usageBlocks = MsInstrumentUtils.instance().getUsageBlocksForInstrument(instrumentId, startDate, endDate,
